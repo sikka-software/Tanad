@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { products as productsTable } from "@/db/schema";
+import { GetServerSideProps } from "next";
+import { db } from "@/db/drizzle";
 
 interface Product {
   id: string;
@@ -16,34 +18,56 @@ interface Product {
   updated_at: string;
 }
 
-export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Get products on the server side
+export const getServerSideProps: GetServerSideProps = async () => {
+  try {
+    const products = await db.select().from(productsTable);
+    console.log("products", products);
+    return {
+      props: {
+        initialProducts: products,
+        error: null,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+    return {
+      props: {
+        initialProducts: [],
+        error: "Failed to load products",
+      },
+    };
+  }
+};
 
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .order("created_at", { ascending: false });
+interface ProductsPageProps {
+  initialProducts: Product[];
+  error: string | null;
+}
 
-        if (error) throw error;
-        setProducts(data || []);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "An error occurred while fetching products"
-        );
-      } finally {
-        setLoading(false);
-      }
+export default function ProductsPage({
+  initialProducts,
+  error: initialError,
+}: ProductsPageProps) {
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(initialError);
+
+  // Optional: Refresh products client-side
+  const refreshProducts = async () => {
+    setLoading(true);
+    try {
+      const data = await fetch("/api/products").then((res) => res.json());
+      setProducts(data.products);
+      setError(null);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to refresh products"
+      );
+    } finally {
+      setLoading(false);
     }
-
-    fetchProducts();
-  }, []);
+  };
 
   if (loading) {
     return (
@@ -80,7 +104,7 @@ export default function ProductsPage() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Products</h1>
-        <Link 
+        <Link
           href="/products/add"
           className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md inline-flex items-center gap-2"
         >
@@ -88,11 +112,11 @@ export default function ProductsPage() {
           Add Product
         </Link>
       </div>
-      
+
       {products.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500">No products found</p>
-          <Link 
+          <Link
             href="/products/add"
             className="text-primary hover:text-primary/90 mt-2 inline-flex items-center gap-2"
           >
@@ -103,7 +127,10 @@ export default function ProductsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {products.map((product) => (
-            <Card key={product.id} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={product.id}
+              className="hover:shadow-lg transition-shadow"
+            >
               <CardHeader>
                 <h3 className="text-lg font-semibold">{product.name}</h3>
               </CardHeader>
@@ -111,7 +138,9 @@ export default function ProductsPage() {
                 <p className="text-gray-600 mb-2">
                   {product.description || "No description"}
                 </p>
-                <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
+                <p className="text-lg font-bold">
+                  ${Number(product.price).toFixed(2)}
+                </p>
                 <p className="text-sm text-gray-500">
                   SKU: {product.sku || "N/A"}
                 </p>

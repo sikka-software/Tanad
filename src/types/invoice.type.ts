@@ -24,10 +24,8 @@ export type ProductForInvoiceProps = {
 };
 
 export type InvoiceProps = {
-  _id: string;
   title: string;
   description: string;
-
   amount: number;
   date: string;
   expiry_date: string;
