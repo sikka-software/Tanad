@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { products as productsTable } from "@/db/schema";
-import { GetServerSideProps } from "next";
-import { db } from "@/db/drizzle";
 
 interface Product {
   id: string;
@@ -18,56 +16,34 @@ interface Product {
   updated_at: string;
 }
 
-// Get products on the server side
-export const getServerSideProps: GetServerSideProps = async () => {
-  try {
-    const products = await db.select().from(productsTable);
-    console.log("products", products);
-    return {
-      props: {
-        initialProducts: products,
-        error: null,
-      },
-    };
-  } catch (error) {
-    console.error("Failed to fetch products:", error);
-    return {
-      props: {
-        initialProducts: [],
-        error: "Failed to load products",
-      },
-    };
-  }
-};
+export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-interface ProductsPageProps {
-  initialProducts: Product[];
-  error: string | null;
-}
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-export default function ProductsPage({
-  initialProducts,
-  error: initialError,
-}: ProductsPageProps) {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(initialError);
-
-  // Optional: Refresh products client-side
-  const refreshProducts = async () => {
-    setLoading(true);
-    try {
-      const data = await fetch("/api/products").then((res) => res.json());
-      setProducts(data.products);
-      setError(null);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to refresh products"
-      );
-    } finally {
-      setLoading(false);
+        if (error) throw error;
+        setProducts(data || []);
+      } catch (err) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "An error occurred while fetching products"
+        );
+      } finally {
+        setLoading(false);
+      }
     }
-  };
+
+    fetchProducts();
+  }, []);
 
   if (loading) {
     return (
@@ -138,9 +114,7 @@ export default function ProductsPage({
                 <p className="text-gray-600 mb-2">
                   {product.description || "No description"}
                 </p>
-                <p className="text-lg font-bold">
-                  ${Number(product.price).toFixed(2)}
-                </p>
+                <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
                 <p className="text-sm text-gray-500">
                   SKU: {product.sku || "N/A"}
                 </p>

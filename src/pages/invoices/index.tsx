@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface Client {
   id: string;
@@ -117,8 +118,10 @@ export default function InvoicesPage() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Invoices</h1>
+
         <Link href="/invoices/add">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md">
+          <Button>
+            <Plus className="h-4 w-4" />
             Create Invoice
           </Button>
         </Link>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Building2, Mail, Phone, MapPin } from "lucide-react";
+import { Building2, Mail, Phone, MapPin, Plus } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -85,9 +85,11 @@ export default function ClientsPage() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Clients</h1>
+
         <Link href="/clients/add">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md">
-            Add Client
+          <Button>
+            <Plus className="h-4 w-4" />
+            Create Client
           </Button>
         </Link>
       </div>

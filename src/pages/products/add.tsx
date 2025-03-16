@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -60,17 +59,24 @@ export default function AddProductPage() {
   const onSubmit = async (data: ProductFormValues) => {
     setLoading(true);
     try {
-      const { error } = await supabase.from("products").insert([
-        {
+      const response = await fetch("/api/add-product", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           name: data.name.trim(),
           description: data.description?.trim() || null,
-          price: parseFloat(data.price),
+          price: data.price,
           sku: data.sku?.trim() || null,
-          stock_quantity: parseInt(data.stock_quantity),
-        },
-      ]);
+          stock_quantity: data.stock_quantity,
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create product");
+      }
 
       toast.success("Success", {
         description: "Product created successfully",
