@@ -9,75 +9,65 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
-interface ProductFormData {
-  name: string;
-  description: string;
-  price: string;
-  sku: string;
-  stock_quantity: string;
-}
+const productSchema = z.object({
+  name: z.string().min(1, "Product name is required"),
+  description: z.string().optional(),
+  price: z
+    .string()
+    .min(1, "Price is required")
+    .refine(
+      (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
+      "Price must be a positive number"
+    ),
+  sku: z.string().optional(),
+  stock_quantity: z
+    .string()
+    .min(1, "Stock quantity is required")
+    .refine(
+      (val) => !isNaN(parseInt(val)) && parseInt(val) >= 0,
+      "Stock quantity must be a positive number"
+    ),
+});
+
+type ProductFormValues = z.infer<typeof productSchema>;
 
 export default function AddProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<ProductFormData>({
-    name: "",
-    description: "",
-    price: "",
-    sku: "",
-    stock_quantity: "",
+
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      price: "",
+      sku: "",
+      stock_quantity: "",
+    },
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validateForm = (): boolean => {
-    if (!formData.name.trim()) {
-      toast.error("Validation Error", {
-        description: "Product name is required",
-      });
-      return false;
-    }
-
-    if (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) < 0) {
-      toast.error("Validation Error", {
-        description: "Please enter a valid price",
-      });
-      return false;
-    }
-
-    if (
-      isNaN(parseInt(formData.stock_quantity)) ||
-      parseInt(formData.stock_quantity) < 0
-    ) {
-      toast.error("Validation Error", {
-        description: "Please enter a valid stock quantity",
-      });
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) return;
-
+  const onSubmit = async (data: ProductFormValues) => {
     setLoading(true);
     try {
       const { error } = await supabase.from("products").insert([
         {
-          name: formData.name.trim(),
-          description: formData.description.trim() || null,
-          price: parseFloat(formData.price),
-          sku: formData.sku.trim() || null,
-          stock_quantity: parseInt(formData.stock_quantity) || 0,
+          name: data.name.trim(),
+          description: data.description?.trim() || null,
+          price: parseFloat(data.price),
+          sku: data.sku?.trim() || null,
+          stock_quantity: parseInt(data.stock_quantity),
         },
       ]);
 
@@ -113,86 +103,112 @@ export default function AddProductPage() {
             <CardTitle>Product Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Product Name *</Label>
-                <Input
-                  id="name"
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
                   name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter product name"
-                  required
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product Name *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter product name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
+                <FormField
+                  control={form.control}
                   name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Enter product description"
-                  rows={4}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Enter product description"
+                          rows={4}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="price">Price *</Label>
-                  <Input
-                    id="price"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
                     name="price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="0.00"
-                    required
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="0.00"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="stock_quantity">Stock Quantity *</Label>
-                  <Input
-                    id="stock_quantity"
+                  <FormField
+                    control={form.control}
                     name="stock_quantity"
-                    type="number"
-                    min="0"
-                    value={formData.stock_quantity}
-                    onChange={handleChange}
-                    placeholder="0"
-                    required
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Stock Quantity *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            placeholder="0"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="sku">SKU</Label>
-                <Input
-                  id="sku"
+                <FormField
+                  control={form.control}
                   name="sku"
-                  value={formData.sku}
-                  onChange={handleChange}
-                  placeholder="Enter SKU (optional)"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>SKU</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter SKU (optional)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="flex justify-end gap-4 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.push("/products")}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Creating..." : "Create Product"}
-                </Button>
-              </div>
-            </form>
+                <div className="flex justify-end gap-4 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => router.push("/products")}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={loading}>
+                    {loading ? "Creating..." : "Create Product"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </CardContent>
         </Card>
       </div>
