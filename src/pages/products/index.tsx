@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 interface Product {
   id: string;
@@ -76,15 +78,32 @@ export default function ProductsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Products</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Products</h1>
+        <Link 
+          href="/products/add"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md inline-flex items-center gap-2"
+        >
+          <Plus className="h-4 w-4" />
+          Add Product
+        </Link>
+      </div>
+      
       {products.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500">No products found</p>
+          <Link 
+            href="/products/add"
+            className="text-primary hover:text-primary/90 mt-2 inline-flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add your first product
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {products.map((product) => (
-            <Card key={product.id}>
+            <Card key={product.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <h3 className="text-lg font-semibold">{product.name}</h3>
               </CardHeader>
