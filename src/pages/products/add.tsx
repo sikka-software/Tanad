@@ -59,7 +59,7 @@ export default function AddProductPage() {
   const onSubmit = async (data: ProductFormValues) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/add-product", {
+      const response = await fetch("/api/products/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

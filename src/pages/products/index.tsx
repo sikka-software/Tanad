@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Product {
   id: string;
@@ -80,12 +81,11 @@ export default function ProductsPage() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Products</h1>
-        <Link
-          href="/products/add"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md inline-flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Add Product
+        <Link href="/products/add">
+          <Button>
+            <Plus className="h-4 w-4" />
+            Create Product
+          </Button>
         </Link>
       </div>
 
