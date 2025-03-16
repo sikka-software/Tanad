@@ -1,0 +1,15 @@
+services:
+  pukla:
+    image: ghcr.io/zaaakher/pukla:latest
+    container_name: pukla-app
+    restart: always
+    ports:
+      - "3036:3036"
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_APP_URL}/api
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - HOST=0.0.0.0  # Add this to ensure Next.js binds to all interfaces
+      - PORT=3036  # Explicitly set the port to 3036
+    platform: linux/amd64

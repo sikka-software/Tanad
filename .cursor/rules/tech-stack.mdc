@@ -1,0 +1,23 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+# Technology Stack
+
+- NextJS (Pages router)
+- TailwindCSS (for styling)
+- Shadcn (for UI components)
+- Supabase (for database, auth, and storage)
+- React Hook Form (for form handling)
+- Zod (for form validation)
+- next-themes (for appearance settings)
+- sonner (for toasts)
+- next-intl (for internationalization)
+- hookform/resolvers
+- lucide-react (for icons)
+- motion (for animations)
+- qrcode.react (for qr codes)
+- zod (for validations)
+- zustand (for state management)
