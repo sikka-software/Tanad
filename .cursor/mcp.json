@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "Supabase Sanad Project": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:Ux1maCYOQf8TTYM4@db.jbyougyxkvhffbnqstiq.supabase.co:5432/postgres"
+      ]
+    }
+  }
+}

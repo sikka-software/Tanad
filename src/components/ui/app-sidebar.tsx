@@ -10,6 +10,10 @@ import {
   MessageSquareWarning,
   Brush,
   Paperclip,
+  LayoutDashboard,
+  Package,
+  File,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -55,9 +59,10 @@ export function AppSidebar() {
   const router = useRouter();
 
   const items = [
-    { title: t("MyPuklas.title"), url: "/dashboard", icon: Paperclip },
-    { title: t("Editor.title"), url: "/editor", icon: Link2 },
-    { title: t("Theme.title"), url: "/theme", icon: Brush },
+    { title: t("Dashboard.title"), url: "/dashboard", icon: LayoutDashboard },
+    { title: t("Products.title"), url: "/products", icon: Package },
+    { title: t("Invoices.title"), url: "/invoices", icon: File },
+    { title: t("Clients.title"), url: "/clients", icon: Users },
     { title: t("Analytics.title"), url: "/analytics", icon: BarChart },
     { title: t("Billing.title"), url: "/billing", icon: CreditCard },
   ];
@@ -111,10 +116,12 @@ export function AppSidebar() {
                       tooltip={item.title}
                       className={cn(
                         router.pathname === item.url &&
-                          "bg-primary text-background hover:bg-primary hover:text-background",
+                          "bg-primary text-background hover:bg-primary hover:text-background"
                       )}
                     >
-                      {item.icon && <item.icon className="!size-6 md:!size-4" />}
+                      {item.icon && (
+                        <item.icon className="!size-6 md:!size-4" />
+                      )}
                       <span>{item.title}</span>
                     </SidebarMenuButton>
                   </Link>
