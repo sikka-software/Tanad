@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface Client {
   id: string;
@@ -115,9 +117,11 @@ export default function InvoicesPage() {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Invoices</h1>
-        <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md">
-          Create Invoice
-        </button>
+        <Link href="/invoices/add">
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md">
+            Create Invoice
+          </Button>
+        </Link>
       </div>
 
       {invoices.length === 0 ? (
