@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
@@ -25,13 +24,13 @@ export default function ProductsPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .order("created_at", { ascending: false });
+        const response = await fetch("/api/products/all");
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const data = await response.json();
 
-        if (error) throw error;
-        setProducts(data || []);
+        setProducts(data.products || []);
       } catch (err) {
         setError(
           err instanceof Error
@@ -49,7 +48,15 @@ export default function ProductsPage() {
   if (loading) {
     return (
       <div className="container mx-auto p-6 space-y-4">
-        <h1 className="text-2xl font-bold mb-6">Products</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Products</h1>
+          <Link href="/products/add">
+            <Button disabled>
+              <Plus className="h-4 w-4" />
+              Create Product
+            </Button>
+          </Link>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <Card key={i}>
@@ -114,7 +121,9 @@ export default function ProductsPage() {
                 <p className="text-gray-600 mb-2">
                   {product.description || "No description"}
                 </p>
-                <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
+                <p className="text-lg font-bold">
+                  ${Number(product.price).toFixed(2)}
+                </p>
                 <p className="text-sm text-gray-500">
                   SKU: {product.sku || "N/A"}
                 </p>
