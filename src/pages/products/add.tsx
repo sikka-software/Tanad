@@ -19,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { GetStaticProps } from "next";
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -45,7 +46,7 @@ type ProductFormValues = z.infer<typeof productSchema>;
 export default function AddProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const t = useTranslations('Products');
+  const t = useTranslations("Products");
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -77,14 +78,14 @@ export default function AddProductPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || t('error.create'));
+        throw new Error(errorData.error || t("error.create"));
       }
 
-      toast.success(t('success.created'));
+      toast.success(t("success.created"));
       router.push("/products");
     } catch (error) {
-      toast.error(t('error.create'), {
-        description: error instanceof Error ? error.message : t('error.create'),
+      toast.error(t("error.create"), {
+        description: error instanceof Error ? error.message : t("error.create"),
       });
     } finally {
       setLoading(false);
@@ -98,12 +99,12 @@ export default function AddProductPage() {
           <Link href="/products" className="text-gray-500 hover:text-gray-700">
             <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
           </Link>
-          <h1 className="text-2xl font-bold">{t('add_new')}</h1>
+          <h1 className="text-2xl font-bold">{t("add_new")}</h1>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>{t('product_details')}</CardTitle>
+            <CardTitle>{t("product_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -116,9 +117,12 @@ export default function AddProductPage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('product_name')} *</FormLabel>
+                      <FormLabel>{t("product_name")} *</FormLabel>
                       <FormControl>
-                        <Input placeholder={t('enter_product_name')} {...field} />
+                        <Input
+                          placeholder={t("enter_product_name")}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -130,10 +134,10 @@ export default function AddProductPage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('description')}</FormLabel>
+                      <FormLabel>{t("description")}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder={t('enter_description')}
+                          placeholder={t("enter_description")}
                           rows={4}
                           {...field}
                         />
@@ -149,7 +153,7 @@ export default function AddProductPage() {
                     name="price"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('price')} *</FormLabel>
+                        <FormLabel>{t("price")} *</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -169,7 +173,7 @@ export default function AddProductPage() {
                     name="stock_quantity"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('stock_quantity')} *</FormLabel>
+                        <FormLabel>{t("stock_quantity")} *</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -189,9 +193,9 @@ export default function AddProductPage() {
                   name="sku"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('sku')}</FormLabel>
+                      <FormLabel>{t("sku")}</FormLabel>
                       <FormControl>
-                        <Input placeholder={t('enter_sku')} {...field} />
+                        <Input placeholder={t("enter_sku")} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -204,10 +208,10 @@ export default function AddProductPage() {
                     variant="outline"
                     onClick={() => router.push("/products")}
                   >
-                    {t('cancel')}
+                    {t("cancel")}
                   </Button>
                   <Button type="submit" disabled={loading}>
-                    {loading ? t('creating_product') : t('create_product')}
+                    {loading ? t("creating_product") : t("create_product")}
                   </Button>
                 </div>
               </form>
@@ -218,3 +222,11 @@ export default function AddProductPage() {
     </div>
   );
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`../../../locales/${locale}.json`)).default,
+    },
+  };
+};

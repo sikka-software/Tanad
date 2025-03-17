@@ -1224,5 +1224,34 @@
       "create": "Failed to create product",
       "fetch": "Failed to fetch products"
     }
+  },
+  "Invoices": {
+    "title": "Invoices",
+    "add_new": "Add New Invoice",
+    "invoice_details": "Invoice Details",
+    "invoice_number": "Invoice Number",
+    "enter_invoice_number": "Enter invoice number",
+    "description": "Description",
+    "enter_description": "Enter invoice description",
+    "price": "Price",
+    "price_required": "Price is required",
+    "stock_quantity": "Stock Quantity",
+    "stock_quantity_required": "Stock quantity is required",
+    "sku": "SKU",
+    "enter_sku": "Enter SKU (optional)",
+    "no_description": "No description",
+    "sku_label": "SKU: {value}",
+    "stock_label": "In Stock: {value}",
+    "create_invoice": "Create Invoice",
+    "creating_invoice": "Creating...",
+    "no_invoices": "No invoices found",
+    "add_first_invoice": "Add your first invoice",
+    "success": {
+      "created": "Invoice created successfully"
+    },
+    "error": {
+      "create": "Failed to create invoice",
+      "fetch": "Failed to fetch invoices"
+    }
   }
 }

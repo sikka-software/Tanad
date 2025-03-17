@@ -5,6 +5,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Building2, Mail, Phone, MapPin, Plus } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
+import PageTitle from "@/components/ui/page-title";
+import { GetStaticProps } from "next";
 
 interface Client {
   id: string;
@@ -21,6 +24,7 @@ interface Client {
 }
 
 export default function ClientsPage() {
+  const t = useTranslations("Clients");
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,8 +55,14 @@ export default function ClientsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6 space-y-4">
-        <h1 className="text-2xl font-bold mb-6">Clients</h1>
+      <div className="container mx-auto space-y-4">
+        <PageTitle
+          title={t("title")}
+          createButtonLink="/clients/add"
+          createButtonText={t("create_client")}
+          createButtonDisabled
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <Card key={i}>
@@ -73,7 +83,7 @@ export default function ClientsPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
@@ -82,17 +92,12 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Clients</h1>
-
-        <Link href="/clients/add">
-          <Button>
-            <Plus className="h-4 w-4" />
-            Create Client
-          </Button>
-        </Link>
-      </div>
+    <div className="container mx-auto">
+      <PageTitle
+        title={t("title")}
+        createButtonLink="/clients/add"
+        createButtonText={t("create_client")}
+      />
 
       {clients.length === 0 ? (
         <div className="text-center py-12">
@@ -151,3 +156,11 @@ export default function ClientsPage() {
     </div>
   );
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`../../../locales/${locale}.json`)).default,
+    },
+  };
+};

@@ -162,9 +162,7 @@ const AppPages = ({ children }: { children: React.ReactNode }) => {
               </div>
               {urlTooLong && <LazimAd />}
               {/* {process.env.NODE_ENV === "development" && <DebugPukla />} */}
-              <div className=" relative p-4 max-w-screen-lg mx-auto">
-                {children}
-              </div>
+              <div className=" relative mx-auto">{children}</div>
             </div>
           </SidebarProvider>
         </ThemeProvider>

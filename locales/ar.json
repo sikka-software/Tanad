@@ -1254,5 +1254,36 @@
       "create": "فشل في إنشاء المنتج",
       "fetch": "فشل في جلب المنتجات"
     }
+  },
+  
+  "Invoices": {
+    "title": "الفواتير",
+    "add_new": "إضافة فاتورة جديدة",
+    "invoice_details": "تفاصيل الفاتورة",
+    "invoice_number": "رقم الفاتورة",
+    "enter_invoice_number": "أدخل رقم الفاتورة",
+    "description": "الوصف",
+    "enter_description": "أدخل وصف الفاتورة",
+    "price": "السعر",
+        "price_required": "السعر مطلوب",
+    "stock_quantity": "الكمية المتوفرة",
+    "stock_quantity_required": "الكمية المتوفرة مطلوبة",
+    "sku": "رمز المنتج",
+    "enter_sku": "أدخل رمز المنتج (اختياري)",
+    "no_description": "لا يوجد وصف",
+    "sku_label": "رمز المنتج: {value}",
+    "stock_label": "المتوفر: {value}",
+    "create_invoice": "إنشاء فاتورة",
+    "creating_invoice": "جاري الإنشاء...",
+    "no_invoices": "لا توجد فواتير",
+    "add_first_invoice": "أضف أول فاتورة",
+    "success": {
+      "created": "تم إنشاء الفاتورة بنجاح"
+    },
+    "error": {
+      "create":  "فشل في إنشاء الفاتورة",
+      "fetch": "فشل في جلب الفواتير"
+    }
   }
+
 }

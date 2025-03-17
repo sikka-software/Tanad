@@ -7,6 +7,9 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import PageTitle from "@/components/ui/page-title";
+import { useTranslations } from "next-intl";
+import { GetStaticProps } from "next";
 
 interface Client {
   id: string;
@@ -44,6 +47,7 @@ function getStatusColor(status: string): string {
 }
 
 export default function InvoicesPage() {
+  const t = useTranslations("Invoices");
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,8 +89,14 @@ export default function InvoicesPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6 space-y-4">
-        <h1 className="text-2xl font-bold mb-6">Invoices</h1>
+      <div className="container mx-auto space-y-4">
+        <PageTitle
+          title={t("title")}
+          createButtonLink="/invoices/add"
+          createButtonText={t("create_invoice")}
+          createButtonDisabled
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2, 3].map((i) => (
             <Card key={i}>
@@ -106,7 +116,7 @@ export default function InvoicesPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
@@ -115,73 +125,78 @@ export default function InvoicesPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Invoices</h1>
+    <div className="container mx-auto">
+      <PageTitle
+        title={t("title")}
+        createButtonLink="/invoices/add"
+        createButtonText={t("create_invoice")}
+      />
 
-        <Link href="/invoices/add">
-          <Button>
-            <Plus className="h-4 w-4" />
-            Create Invoice
-          </Button>
-        </Link>
-      </div>
-
-      {invoices.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">No invoices found</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {invoices.map((invoice) => (
-            <Card
-              key={invoice.id}
-              className="hover:shadow-lg transition-shadow"
-            >
-              <CardHeader className="flex flex-row justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-semibold">
-                    Invoice #{invoice.invoice_number}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {invoice.client.company}
-                  </p>
-                </div>
-                <Badge className={getStatusColor(invoice.status)}>
-                  {invoice.status}
-                </Badge>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Issue Date</span>
-                    <span className="text-sm">
-                      {format(new Date(invoice.issue_date), "MMM dd, yyyy")}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Due Date</span>
-                    <span className="text-sm">
-                      {format(new Date(invoice.due_date), "MMM dd, yyyy")}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-500">Amount</span>
-                    <span className="text-lg font-bold">
-                      ${invoice.total.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="pt-2 border-t">
+      <div className="p-4">
+        {invoices.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No invoices found</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {invoices.map((invoice) => (
+              <Card
+                key={invoice.id}
+                className="hover:shadow-lg transition-shadow"
+              >
+                <CardHeader className="flex flex-row justify-between items-start">
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      Invoice #{invoice.invoice_number}
+                    </h3>
                     <p className="text-sm text-gray-500">
-                      {invoice.client.name} • {invoice.client.email}
+                      {invoice.client.company}
                     </p>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                  <Badge className={getStatusColor(invoice.status)}>
+                    {invoice.status}
+                  </Badge>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Issue Date</span>
+                      <span className="text-sm">
+                        {format(new Date(invoice.issue_date), "MMM dd, yyyy")}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Due Date</span>
+                      <span className="text-sm">
+                        {format(new Date(invoice.due_date), "MMM dd, yyyy")}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-500">Amount</span>
+                      <span className="text-lg font-bold">
+                        ${invoice.total.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <p className="text-sm text-gray-500">
+                        {invoice.client.name} • {invoice.client.email}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`../../../locales/${locale}.json`)).default,
+    },
+  };
+};
