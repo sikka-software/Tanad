@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useTranslations } from "next-intl";
 import {
   Form,
   FormControl,
@@ -44,6 +45,7 @@ type ProductFormValues = z.infer<typeof productSchema>;
 export default function AddProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const t = useTranslations('Products');
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -75,18 +77,14 @@ export default function AddProductPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create product");
+        throw new Error(errorData.error || t('error.create'));
       }
 
-      toast.success("Success", {
-        description: "Product created successfully",
-      });
-
+      toast.success(t('success.created'));
       router.push("/products");
     } catch (error) {
-      toast.error("Error", {
-        description:
-          error instanceof Error ? error.message : "An error occurred",
+      toast.error(t('error.create'), {
+        description: error instanceof Error ? error.message : t('error.create'),
       });
     } finally {
       setLoading(false);
@@ -100,12 +98,12 @@ export default function AddProductPage() {
           <Link href="/products" className="text-gray-500 hover:text-gray-700">
             <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
           </Link>
-          <h1 className="text-2xl font-bold">Add New Product</h1>
+          <h1 className="text-2xl font-bold">{t('add_new')}</h1>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Product Details</CardTitle>
+            <CardTitle>{t('product_details')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -118,9 +116,9 @@ export default function AddProductPage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Product Name *</FormLabel>
+                      <FormLabel>{t('product_name')} *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter product name" {...field} />
+                        <Input placeholder={t('enter_product_name')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -132,10 +130,10 @@ export default function AddProductPage() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>{t('description')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Enter product description"
+                          placeholder={t('enter_description')}
                           rows={4}
                           {...field}
                         />
@@ -151,7 +149,7 @@ export default function AddProductPage() {
                     name="price"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Price *</FormLabel>
+                        <FormLabel>{t('price')} *</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -171,7 +169,7 @@ export default function AddProductPage() {
                     name="stock_quantity"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Stock Quantity *</FormLabel>
+                        <FormLabel>{t('stock_quantity')} *</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -191,9 +189,9 @@ export default function AddProductPage() {
                   name="sku"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>SKU</FormLabel>
+                      <FormLabel>{t('sku')}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter SKU (optional)" {...field} />
+                        <Input placeholder={t('enter_sku')} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -206,10 +204,10 @@ export default function AddProductPage() {
                     variant="outline"
                     onClick={() => router.push("/products")}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                   <Button type="submit" disabled={loading}>
-                    {loading ? "Creating..." : "Create Product"}
+                    {loading ? t('creating_product') : t('create_product')}
                   </Button>
                 </div>
               </form>

@@ -1224,5 +1224,35 @@
     "no_puklas_found_description": "حاول تعديل البحث أو تحقق لاحقاً من البكلات الجديدة",
     "total_puklas": "تم العثور على {count} بكلة",
     "loading": "جاري تحميل البكلات..."
+  },
+  "Products": {
+    "title": "المنتجات",
+    "add_new": "إضافة منتج جديد",
+    "product_details": "تفاصيل المنتج",
+    "product_name": "اسم المنتج",
+    "product_name_required": "اسم المنتج مطلوب",
+    "enter_product_name": "أدخل اسم المنتج",
+    "description": "الوصف",
+    "enter_description": "أدخل وصف المنتج",
+    "price": "السعر",
+    "price_required": "السعر مطلوب",
+    "stock_quantity": "الكمية المتوفرة",
+    "stock_quantity_required": "الكمية المتوفرة مطلوبة",
+    "sku": "رمز المنتج",
+    "enter_sku": "أدخل رمز المنتج (اختياري)",
+    "no_description": "لا يوجد وصف",
+    "sku_label": "رمز المنتج: {value}",
+    "stock_label": "المتوفر: {value}",
+    "create_product": "إنشاء منتج",
+    "creating_product": "جاري الإنشاء...",
+    "no_products": "لا توجد منتجات",
+    "add_first_product": "أضف أول منتج",
+    "success": {
+      "created": "تم إنشاء المنتج بنجاح"
+    },
+    "error": {
+      "create": "فشل في إنشاء المنتج",
+      "fetch": "فشل في جلب المنتجات"
+    }
   }
 }

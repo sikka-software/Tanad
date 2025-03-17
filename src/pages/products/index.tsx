@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 interface Product {
   id: string;
@@ -20,13 +21,14 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations('Products');
 
   useEffect(() => {
     async function fetchProducts() {
       try {
         const response = await fetch("/api/products/all");
         if (!response.ok) {
-          throw new Error("Failed to fetch products");
+          throw new Error(t('error.fetch'));
         }
         const data = await response.json();
 
@@ -35,7 +37,7 @@ export default function ProductsPage() {
         setError(
           err instanceof Error
             ? err.message
-            : "An error occurred while fetching products"
+            : t('error.fetch')
         );
       } finally {
         setLoading(false);
@@ -43,17 +45,17 @@ export default function ProductsPage() {
     }
 
     fetchProducts();
-  }, []);
+  }, [t]);
 
   if (loading) {
     return (
       <div className="container mx-auto p-6 space-y-4">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Products</h1>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
           <Link href="/products/add">
             <Button disabled>
               <Plus className="h-4 w-4" />
-              Create Product
+              {t('create_product')}
             </Button>
           </Link>
         </div>
@@ -87,24 +89,24 @@ export default function ProductsPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Products</h1>
+        <h1 className="text-2xl font-bold">{t('title')}</h1>
         <Link href="/products/add">
           <Button>
             <Plus className="h-4 w-4" />
-            Create Product
+            {t('create_product')}
           </Button>
         </Link>
       </div>
 
       {products.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">No products found</p>
+          <p className="text-gray-500">{t('no_products')}</p>
           <Link
             href="/products/add"
             className="text-primary hover:text-primary/90 mt-2 inline-flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
-            Add your first product
+            {t('add_first_product')}
           </Link>
         </div>
       ) : (
@@ -119,16 +121,16 @@ export default function ProductsPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-2">
-                  {product.description || "No description"}
+                  {product.description || t('no_description')}
                 </p>
                 <p className="text-lg font-bold">
                   ${Number(product.price).toFixed(2)}
                 </p>
                 <p className="text-sm text-gray-500">
-                  SKU: {product.sku || "N/A"}
+                  {t('sku_label', { value: product.sku || 'N/A' })}
                 </p>
                 <p className="text-sm text-gray-500">
-                  In Stock: {product.stock_quantity}
+                  {t('stock_label', { value: product.stock_quantity })}
                 </p>
               </CardContent>
             </Card>

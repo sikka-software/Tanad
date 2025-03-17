@@ -1194,5 +1194,35 @@
     "no_puklas_found_description": "Try adjusting your search or check back later for new Puklas",
     "total_puklas": "{count} Puklas found",
     "loading": "Loading Puklas..."
+  },
+  "Products": {
+    "title": "Products",
+    "add_new": "Add New Product",
+    "product_details": "Product Details",
+    "product_name": "Product Name",
+    "product_name_required": "Product name is required",
+    "enter_product_name": "Enter product name",
+    "description": "Description",
+    "enter_description": "Enter product description",
+    "price": "Price",
+    "price_required": "Price is required",
+    "stock_quantity": "Stock Quantity",
+    "stock_quantity_required": "Stock quantity is required",
+    "sku": "SKU",
+    "enter_sku": "Enter SKU (optional)",
+    "no_description": "No description",
+    "sku_label": "SKU: {value}",
+    "stock_label": "In Stock: {value}",
+    "create_product": "Create Product",
+    "creating_product": "Creating...",
+    "no_products": "No products found",
+    "add_first_product": "Add your first product",
+    "success": {
+      "created": "Product created successfully"
+    },
+    "error": {
+      "create": "Failed to create product",
+      "fetch": "Failed to fetch products"
+    }
   }
 }
