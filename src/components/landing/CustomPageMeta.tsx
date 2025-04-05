@@ -20,7 +20,7 @@ const CustomPageMeta: React.FC<MetaProps> = ({ title, description, keywords, aut
 
   return (
     <Head>
-      <title>{`${t("General.sanad")} | ${title || defaultTitle}`}</title>
+      <title>{`${t("General.tanad")} | ${title || defaultTitle}`}</title>
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       <meta charSet="utf-8" />
       <meta name="description" content={description || defaultDescription} />

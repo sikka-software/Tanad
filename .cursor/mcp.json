@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "Supabase Sanad Project": {
+    "Supabase Tanad Project": {
       "command": "npx",
       "args": [
         "-y",

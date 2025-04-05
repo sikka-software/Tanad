@@ -12,7 +12,7 @@ import LandingLayout from "@/components/layouts/landing-layout";
 import { LoadingBar } from "@/components/ui/loading-bar";
 import "@/styles/globals.css";
 
-export default function Sanad({ Component, pageProps, router }: AppProps) {
+export default function Tanad({ Component, pageProps, router }: AppProps) {
   useEffect(() => {
     router.events.emit("routeChangeComplete", router.asPath);
   }, []);

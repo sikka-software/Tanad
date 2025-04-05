@@ -184,7 +184,7 @@ export default function Auth() {
       />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          Sanad
+          Tanad
           {/* <Image
             src={`/assets/pukla-logo-full-${resolvedTheme === "dark" ? "green" : "purple"}.png`}
             alt="Pukla"

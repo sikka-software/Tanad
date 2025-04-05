@@ -116,7 +116,7 @@ export default function Navigation(props: any) {
       >
         <div className="flex flex-row items-center justify-center gap-10">
           <Link href={"/"}>
-          Sanad
+          Tanad
             {/* <Image
               loading="lazy"
               width={512}

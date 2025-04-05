@@ -1,7 +1,7 @@
 services:
-  sanad:
-    image: ghcr.io/zaaakher/sanad:latest
-    container_name: sanad-app
+  tanad:
+    image: ghcr.io/zaaakher/tanad:latest
+    container_name: tanad-app
     restart: always
     ports:
       - "3036:3036"
