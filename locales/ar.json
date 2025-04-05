@@ -1304,6 +1304,13 @@
     "recent_invoices": "الفواتير الأخيرة",
     "recent_invoices_list": "قريباً: قائمة الفواتير الأخيرة",
     "popular_products": "المنتجات الرائجة",
-    "popular_products_list": "قريباً: قائمة المنتجات الرائجة"
+    "popular_products_list": "قريباً: قائمة المنتجات الرائجة",
+    "create": "إنشاء",
+    "select_create_option": "حدد خيارًا",
+    "add_product": "إضافة منتج",
+    "add_invoice": "إضافة فاتورة",
+    "add_client": "إضافة عميل",
+    "add_employee": "إضافة موظف",
+    "add_warehouse": "إضافة مستودع"
   }
 }

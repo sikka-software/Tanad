@@ -1,3 +1,7 @@
+import { useId, useState } from "react";
+
+import { useTranslations } from "next-intl";
+
 import {
   ColumnDef,
   PaginationState,
@@ -16,18 +20,10 @@ import {
   ChevronRight,
   ChevronUp,
 } from "lucide-react";
-import { useId, useState } from "react";
-import { useTranslations } from "next-intl";
-
-import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@/components/ui/pagination";
+import { Pagination, PaginationContent, PaginationItem } from "@/components/ui/pagination";
 import {
   Select,
   SelectContent,
@@ -43,6 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 interface AnalyticsData {
   country: string;
@@ -68,9 +65,7 @@ export default function AnalyticsTable({
     {
       header: t("General.country"),
       accessorKey: "country",
-      cell: ({ row }) => (
-        <div className="font-medium">{row.getValue("country")}</div>
-      ),
+      cell: ({ row }) => <div className="font-medium">{row.getValue("country")}</div>,
       size: 180,
     },
     {
@@ -81,25 +76,19 @@ export default function AnalyticsTable({
     {
       header: t("General.mobile"),
       accessorKey: "mobile",
-      cell: ({ row }) => (
-        <div className="text-right">{row.getValue("mobile")}</div>
-      ),
+      cell: ({ row }) => <div className="text-right">{row.getValue("mobile")}</div>,
       size: 120,
     },
     {
       header: t("General.desktop"),
       accessorKey: "desktop",
-      cell: ({ row }) => (
-        <div className="text-right">{row.getValue("desktop")}</div>
-      ),
+      cell: ({ row }) => <div className="text-right">{row.getValue("desktop")}</div>,
       size: 120,
     },
     {
       header: t("General.total"),
       accessorKey: "total",
-      cell: ({ row }) => (
-        <div className="text-right">{row.getValue("total")}</div>
-      ),
+      cell: ({ row }) => <div className="text-right">{row.getValue("total")}</div>,
       size: 120,
     },
   ];
@@ -135,8 +124,8 @@ export default function AnalyticsTable({
     <div className={cn("space-y-4", className)}>
       <div
         className={cn(
-          "overflow-hidden rounded-lg border border-border bg-background",
-          fake ? "h-full" : ""
+          "border-border bg-background overflow-hidden rounded-lg border",
+          fake ? "h-full" : "",
         )}
       >
         <Table className="table-auto">
@@ -144,7 +133,7 @@ export default function AnalyticsTable({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
-                className="hover:bg-transparent *:border-border [&>:not(:last-child)]:border-e"
+                className="*:border-border hover:bg-transparent [&>:not(:last-child)]:border-e"
               >
                 {headerGroup.headers.map((header) => {
                   return (
@@ -157,7 +146,7 @@ export default function AnalyticsTable({
                         <div
                           className={cn(
                             header.column.getCanSort() &&
-                              "flex h-full cursor-pointer select-none items-center justify-between gap-2"
+                              "flex h-full cursor-pointer items-center justify-between gap-2 select-none",
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                           onKeyDown={(e) => {
@@ -172,10 +161,7 @@ export default function AnalyticsTable({
                           }}
                           tabIndex={header.column.getCanSort() ? 0 : undefined}
                         >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          {flexRender(header.column.columnDef.header, header.getContext())}
                           {{
                             asc: (
                               <ChevronUp
@@ -196,10 +182,7 @@ export default function AnalyticsTable({
                           }[header.column.getIsSorted() as string] ?? null}
                         </div>
                       ) : (
-                        flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )
+                        flexRender(header.column.columnDef.header, header.getContext())
                       )}
                     </TableHead>
                   );
@@ -217,20 +200,14 @@ export default function AnalyticsTable({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   {t("General.no_results")}
                 </TableCell>
               </TableRow>
@@ -252,11 +229,9 @@ export default function AnalyticsTable({
               }}
             >
               <SelectTrigger id={id} className="w-fit whitespace-nowrap">
-                <SelectValue
-                  placeholder={t("General.select_number_of_results")}
-                />
+                <SelectValue placeholder={t("General.select_number_of_results")} />
               </SelectTrigger>
-              <SelectContent className="[&_*[role=option]>span]:end-2 [&_*[role=option]>span]:start-auto [&_*[role=option]]:pe-8 [&_*[role=option]]:ps-2">
+              <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
                 {[5, 10, 25, 50].map((pageSize) => (
                   <SelectItem key={pageSize} value={pageSize.toString()}>
                     {pageSize}
@@ -266,30 +241,21 @@ export default function AnalyticsTable({
             </Select>
           </div>
           {/* Page number information */}
-          <div className="flex grow justify-end whitespace-nowrap text-sm text-muted-foreground">
-            <p
-              className="whitespace-nowrap text-sm text-muted-foreground"
-              aria-live="polite"
-            >
+          <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap">
+            <p className="text-muted-foreground text-sm whitespace-nowrap" aria-live="polite">
               <span className="text-foreground">
-                {table.getState().pagination.pageIndex *
-                  table.getState().pagination.pageSize +
-                  1}
-                -
+                {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}-
                 {Math.min(
                   Math.max(
-                    table.getState().pagination.pageIndex *
-                      table.getState().pagination.pageSize +
+                    table.getState().pagination.pageIndex * table.getState().pagination.pageSize +
                       table.getState().pagination.pageSize,
-                    0
+                    0,
                   ),
-                  table.getRowCount()
+                  table.getRowCount(),
                 )}
               </span>{" "}
               {t("General.of")}{" "}
-              <span className="text-foreground">
-                {table.getRowCount().toString()}
-              </span>
+              <span className="text-foreground">{table.getRowCount().toString()}</span>
             </p>
           </div>
           {/* Pagination buttons */}

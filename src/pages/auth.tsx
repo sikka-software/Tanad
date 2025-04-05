@@ -8,8 +8,8 @@ import { toast } from "sonner";
 import { GetStaticProps } from "next";
 // UI
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
+import LanguageSwitcher from "@/components/ui/language-switcher";
+import ThemeSwitcher from "@/components/ui/theme-switcher";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";

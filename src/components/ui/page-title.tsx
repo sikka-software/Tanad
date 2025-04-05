@@ -16,7 +16,7 @@ const PageTitle = ({
   customButton?: React.ReactNode;
 }) => {
   return (
-    <div className=" p-4  border-b flex justify-between items-center">
+    <div className=" p-4  border-b flex justify-between items-center !min-h-20">
       <h1 className="text-2xl font-bold">{title}</h1>
       {customButton
         ? customButton

@@ -8,8 +8,8 @@ import { useTranslations, useLocale } from "next-intl";
 // UI
 import { Button } from "@/components/ui/button";
 // Components
-import ThemeSwitcher from "@/components/ThemeSwitcher";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ThemeSwitcher from "@/components/ui/theme-switcher";
+import LanguageSwitcher from "@/components/ui/language-switcher";
 
 export default function NoPuklaFound() {
   const t = useTranslations("PuklaNotFound");

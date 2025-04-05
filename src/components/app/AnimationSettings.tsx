@@ -1,9 +1,11 @@
-import { useTranslations } from "next-intl";
-import { UseFormReturn } from "react-hook-form";
-import { Check, Minus } from "lucide-react";
 import { useId } from "react";
-import { motion } from "motion/react";
 import { useState } from "react";
+import { UseFormReturn } from "react-hook-form";
+
+import { useTranslations } from "next-intl";
+
+import { Check, Minus } from "lucide-react";
+import { motion } from "motion/react";
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
@@ -26,9 +28,7 @@ const AnimationSettings = ({
 }: AnimationSettingsProps) => {
   const t = useTranslations();
   const id = useId();
-  const [selectedAnimation, setSelectedAnimation] = useState(
-    initialValues.animation || "fade"
-  );
+  const [selectedAnimation, setSelectedAnimation] = useState(initialValues.animation || "fade");
 
   const handleAnimationChange = (value: string) => {
     console.log("Animation changed to:", value);
@@ -78,7 +78,7 @@ const AnimationSettings = ({
     <div className="space-y-4 select-none">
       <fieldset className="space-y-4">
         <RadioGroup
-          className="flex gap-3 flex-wrap"
+          className="flex flex-wrap gap-3"
           value={selectedAnimation}
           onValueChange={handleAnimationChange}
         >
@@ -91,7 +91,7 @@ const AnimationSettings = ({
                 disabled={isPending}
               />
               {item.preview}
-              <span className="group mt-2 flex items-center gap-1 peer-data-[state=unchecked]:text-muted-foreground/70">
+              <span className="group peer-data-[state=unchecked]:text-muted-foreground/70 mt-2 flex items-center gap-1">
                 <Check
                   size={16}
                   strokeWidth={2}
@@ -142,13 +142,13 @@ const SlideUpPreview = () => {
       whileTap="hover"
       exit="exit"
       animate="initial"
-      className="w-full p-2 bg-card min-w-[88px] rounded-lg gap-2 flex flex-col cursor-pointer"
+      className="bg-card flex w-full min-w-[88px] cursor-pointer flex-col gap-2 rounded-lg p-2"
     >
       {[1, 2, 3].map((num) => (
         <motion.div
           key={num}
           variants={itemVariants}
-          className="w-full p-1 bg-primary text-primary-foreground rounded-lg text-xs text-center"
+          className="bg-primary text-primary-foreground w-full rounded-lg p-1 text-center text-xs"
         >
           Button {num}
         </motion.div>
@@ -181,13 +181,13 @@ const SlideDownPreview = () => {
       whileTap="hover"
       exit="exit"
       animate="initial"
-      className="w-full p-2 bg-card min-w-[88px] rounded-lg gap-2 flex flex-col cursor-pointer"
+      className="bg-card flex w-full min-w-[88px] cursor-pointer flex-col gap-2 rounded-lg p-2"
     >
       {[1, 2, 3].map((num) => (
         <motion.div
           key={num}
           variants={itemVariants}
-          className="w-full p-1 bg-primary text-primary-foreground rounded-lg text-xs text-center"
+          className="bg-primary text-primary-foreground w-full rounded-lg p-1 text-center text-xs"
         >
           Button {num}
         </motion.div>
@@ -220,13 +220,13 @@ const SlideLeftPreview = () => {
       whileTap="hover"
       exit="exit"
       animate="initial"
-      className="w-full p-2 bg-card min-w-[88px] rounded-lg gap-2 flex flex-col cursor-pointer"
+      className="bg-card flex w-full min-w-[88px] cursor-pointer flex-col gap-2 rounded-lg p-2"
     >
       {[1, 2, 3].map((num) => (
         <motion.div
           key={num}
           variants={itemVariants}
-          className="w-full p-1 bg-primary text-primary-foreground rounded-lg text-xs text-center"
+          className="bg-primary text-primary-foreground w-full rounded-lg p-1 text-center text-xs"
         >
           Button {num}
         </motion.div>
@@ -259,13 +259,13 @@ const SlideRightPreview = () => {
       whileTap="hover"
       exit="exit"
       animate="initial"
-      className="w-full p-2 bg-card min-w-[88px] rounded-lg gap-2 flex flex-col cursor-pointer"
+      className="bg-card flex w-full min-w-[88px] cursor-pointer flex-col gap-2 rounded-lg p-2"
     >
       {[1, 2, 3].map((num) => (
         <motion.div
           key={num}
           variants={itemVariants}
-          className="w-full p-1 bg-primary text-primary-foreground rounded-lg text-xs text-center"
+          className="bg-primary text-primary-foreground w-full rounded-lg p-1 text-center text-xs"
         >
           Button {num}
         </motion.div>
@@ -300,13 +300,13 @@ const FadePreview = () => {
       whileTap="hover"
       exit="exit"
       animate="initial"
-      className="w-full p-2 bg-card min-w-[88px] rounded-lg gap-2 flex flex-col cursor-pointer"
+      className="bg-card flex w-full min-w-[88px] cursor-pointer flex-col gap-2 rounded-lg p-2"
     >
       {[1, 2, 3].map((num) => (
         <motion.div
           key={num}
           variants={itemVariants}
-          className="w-full p-1 bg-primary text-primary-foreground rounded-lg text-xs text-center"
+          className="bg-primary text-primary-foreground w-full rounded-lg p-1 text-center text-xs"
         >
           Button {num}
         </motion.div>
@@ -343,13 +343,13 @@ const ScalePreview = () => {
       whileTap="hover"
       exit="exit"
       animate="initial"
-      className="w-full p-2 bg-card min-w-[88px] rounded-lg gap-2 flex flex-col cursor-pointer"
+      className="bg-card flex w-full min-w-[88px] cursor-pointer flex-col gap-2 rounded-lg p-2"
     >
       {[1, 2, 3].map((num) => (
         <motion.div
           key={num}
           variants={itemVariants}
-          className="w-full p-1 bg-primary text-primary-foreground rounded-lg text-xs text-center"
+          className="bg-primary text-primary-foreground w-full rounded-lg p-1 text-center text-xs"
         >
           Button {num}
         </motion.div>
@@ -359,11 +359,11 @@ const ScalePreview = () => {
 };
 const NoAnimationPreview = () => {
   return (
-    <div className="w-full p-2 bg-card min-w-[88px] rounded-lg gap-2 flex flex-col cursor-pointer">
+    <div className="bg-card flex w-full min-w-[88px] cursor-pointer flex-col gap-2 rounded-lg p-2">
       {[1, 2, 3].map((num) => (
         <div
           key={num}
-          className="w-full p-1 bg-primary text-primary-foreground rounded-lg text-xs text-center"
+          className="bg-primary text-primary-foreground w-full rounded-lg p-1 text-center text-xs"
         >
           Button {num}
         </div>

@@ -1,24 +1,15 @@
-import { useTranslations } from "next-intl";
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
-import { Loader2, Search } from "lucide-react";
-import * as LucideIcons from "lucide-react";
+
+import { useTranslations } from "next-intl";
 import Image from "next/image";
+
 import { useVirtualizer } from "@tanstack/react-virtual";
 import debounce from "lodash/debounce";
+import { Loader2, Search } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { toast } from "sonner";
 
-import { usePuklaStore } from "@/hooks/use-pukla-store";
-import useMainStore from "@/hooks/main.store";
-import useUserStore from "@/hooks/use-user-store";
-
-import { cn } from "@/lib/utils";
-import { updateLink } from "@/lib/operations";
-import { iconNames } from "@/lib/constants/icons-names";
-import { IconPosition, ThumbnailIcon } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
-
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -27,6 +18,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useMainStore from "@/hooks/main.store";
+import { usePuklaStore } from "@/hooks/use-pukla-store";
+import useUserStore from "@/hooks/use-user-store";
+import { iconNames } from "@/lib/constants/icons-names";
+import { updateLink } from "@/lib/operations";
+import { supabase } from "@/lib/supabase";
+import { IconPosition, ThumbnailIcon } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 type ActionThumbnailProps = {
   linkId: string;
@@ -53,18 +53,12 @@ const ActionThumbnail = ({
 }: ActionThumbnailProps) => {
   const t = useTranslations();
   const { user } = useUserStore();
-  const [selectedTab, setSelectedTab] = useState<"icon" | "image">(
-    currentThumbnailType || "icon"
-  );
-  const [selectedIcon, setSelectedIcon] = useState<string | undefined>(
-    currentThumbnailIcon?.name
-  );
+  const [selectedTab, setSelectedTab] = useState<"icon" | "image">(currentThumbnailType || "icon");
+  const [selectedIcon, setSelectedIcon] = useState<string | undefined>(currentThumbnailIcon?.name);
   const [iconPosition, setIconPosition] = useState<IconPosition>(
-    currentThumbnailIcon?.position || "start"
+    currentThumbnailIcon?.position || "start",
   );
-  const [selectedImage, setSelectedImage] = useState<string | undefined>(
-    currentThumbnailImage
-  );
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(currentThumbnailImage);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loadedIconCount, setLoadedIconCount] = useState(ICONS_PER_PAGE);
@@ -118,9 +112,7 @@ const ActionThumbnail = ({
 
     // If we're near the bottom and not searching, load more icons
     if (scrollHeight - scrollPosition < 100) {
-      setLoadedIconCount((prev) =>
-        Math.min(prev + ICONS_PER_PAGE, Object.keys(iconNames).length)
-      );
+      setLoadedIconCount((prev) => Math.min(prev + ICONS_PER_PAGE, Object.keys(iconNames).length));
     }
   }, [searchQuery]);
 
@@ -153,7 +145,7 @@ const ActionThumbnail = ({
       debounce((value: string) => {
         setSearchQuery(value);
       }, 300),
-    []
+    [],
   );
 
   // Cleanup debounce on unmount
@@ -193,7 +185,7 @@ const ActionThumbnail = ({
       // Cleanup function to revoke the URL when component unmounts
       return () => URL.revokeObjectURL(previewUrl);
     },
-    [t, user?.subscribed_to, onUpgradeNeeded]
+    [t, user?.subscribed_to, onUpgradeNeeded],
   );
 
   const handleSave = useCallback(async () => {
@@ -231,9 +223,7 @@ const ActionThumbnail = ({
 
         setPuklaItems((items) => {
           return items.map((item) =>
-            item.id === linkId
-              ? { ...item, item_thumbnail: updateData.item_thumbnail }
-              : item
+            item.id === linkId ? { ...item, item_thumbnail: updateData.item_thumbnail } : item,
           );
         });
       }
@@ -245,19 +235,16 @@ const ActionThumbnail = ({
           const fileName = `${linkId}-${Date.now()}.${fileExt}`;
 
           // Upload to Supabase Storage
-          const { data: uploadData, error: uploadError } =
-            await supabase.storage
-              .from("pukla_item_thumbnails")
-              .upload(fileName, selectedFile);
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from("pukla_item_thumbnails")
+            .upload(fileName, selectedFile);
 
           if (uploadError) throw uploadError;
 
           // Get the public URL
           const {
             data: { publicUrl },
-          } = supabase.storage
-            .from("pukla_item_thumbnails")
-            .getPublicUrl(fileName);
+          } = supabase.storage.from("pukla_item_thumbnails").getPublicUrl(fileName);
 
           const updateData = {
             item_thumbnail: {
@@ -276,9 +263,7 @@ const ActionThumbnail = ({
 
           setPuklaItems((items) => {
             return items.map((item) =>
-              item.id === linkId
-                ? { ...item, item_thumbnail: updateData.item_thumbnail }
-                : item
+              item.id === linkId ? { ...item, item_thumbnail: updateData.item_thumbnail } : item,
             );
           });
         }
@@ -319,9 +304,7 @@ const ActionThumbnail = ({
 
       setPuklaItems((items) => {
         return items.map((item) =>
-          item.id === linkId
-            ? { ...item, item_thumbnail: updateData.item_thumbnail }
-            : item
+          item.id === linkId ? { ...item, item_thumbnail: updateData.item_thumbnail } : item,
         );
       });
 
@@ -359,18 +342,14 @@ const ActionThumbnail = ({
         }}
       >
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="icon">
-            {t("Editor.thumbnail.choose_icon")}
-          </TabsTrigger>
-          <TabsTrigger value="image">
-            {t("Editor.thumbnail.choose_image")}
-          </TabsTrigger>
+          <TabsTrigger value="icon">{t("Editor.thumbnail.choose_icon")}</TabsTrigger>
+          <TabsTrigger value="image">{t("Editor.thumbnail.choose_image")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="icon" className="mt-4">
           <div className="flex flex-col gap-4">
             <div className="relative">
-              <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="text-muted-foreground absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2" />
               <Input
                 placeholder={t("Editor.search_icons")}
                 onChange={(e) => debouncedSearch(e.target.value)}
@@ -380,29 +359,18 @@ const ActionThumbnail = ({
             {selectedIcon && (
               <Select
                 value={iconPosition}
-                onValueChange={(value) =>
-                  setIconPosition(value as IconPosition)
-                }
+                onValueChange={(value) => setIconPosition(value as IconPosition)}
               >
                 <SelectTrigger>
-                  <SelectValue
-                    placeholder={t("Editor.thumbnail.icon_position")}
-                  />
+                  <SelectValue placeholder={t("Editor.thumbnail.icon_position")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="start">
-                    {t("Editor.thumbnail.position_start")}
-                  </SelectItem>
-                  <SelectItem value="end">
-                    {t("Editor.thumbnail.position_end")}
-                  </SelectItem>
+                  <SelectItem value="start">{t("Editor.thumbnail.position_start")}</SelectItem>
+                  <SelectItem value="end">{t("Editor.thumbnail.position_end")}</SelectItem>
                 </SelectContent>
               </Select>
             )}
-            <div
-              ref={scrollRef}
-              className="h-[200px] overflow-auto rounded-md border p-4"
-            >
+            <div ref={scrollRef} className="h-[200px] overflow-auto rounded-md border p-4">
               <div
                 style={{
                   height: `${rowVirtualizer.getTotalSize()}px`,
@@ -412,10 +380,7 @@ const ActionThumbnail = ({
               >
                 {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                   const rowStart = virtualRow.index * GRID_COLUMNS;
-                  const rowIcons = filteredIcons.slice(
-                    rowStart,
-                    rowStart + GRID_COLUMNS
-                  );
+                  const rowIcons = filteredIcons.slice(rowStart, rowStart + GRID_COLUMNS);
 
                   return (
                     <div
@@ -428,17 +393,14 @@ const ActionThumbnail = ({
                         height: `${ICON_SIZE}px`,
                         transform: `translateY(${virtualRow.start}px)`,
                       }}
-                      className="flex gap-2 justify-center"
+                      className="flex justify-center gap-2"
                     >
                       {rowIcons.map(([iconName]) => {
                         // Convert kebab-case to PascalCase for Lucide icons
                         const formattedIconName =
                           iconName
                             .split("-")
-                            .map(
-                              (part) =>
-                                part.charAt(0).toUpperCase() + part.slice(1)
-                            )
+                            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
                             .join("") + "Icon";
 
                         const Icon = (LucideIcons as any)[formattedIconName];
@@ -449,15 +411,15 @@ const ActionThumbnail = ({
                             variant="outline"
                             size="icon"
                             className={cn(
-                              "h-10 w-10 relative group",
-                              selectedIcon === iconName && "border-primary"
+                              "group relative h-10 w-10",
+                              selectedIcon === iconName && "border-primary",
                             )}
                             onClick={() => setSelectedIcon(iconName)}
                           >
                             {Icon ? (
                               <Icon className="h-4 w-4" />
                             ) : (
-                              <div className="h-4 w-4 flex items-center justify-center text-xs">
+                              <div className="flex h-4 w-4 items-center justify-center text-xs">
                                 ?
                               </div>
                             )}
@@ -484,22 +446,14 @@ const ActionThumbnail = ({
               <>
                 <Select
                   value={iconPosition}
-                  onValueChange={(value) =>
-                    setIconPosition(value as IconPosition)
-                  }
+                  onValueChange={(value) => setIconPosition(value as IconPosition)}
                 >
                   <SelectTrigger>
-                    <SelectValue
-                      placeholder={t("Editor.thumbnail.icon_position")}
-                    />
+                    <SelectValue placeholder={t("Editor.thumbnail.icon_position")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="start">
-                      {t("Editor.thumbnail.position_start")}
-                    </SelectItem>
-                    <SelectItem value="end">
-                      {t("Editor.thumbnail.position_end")}
-                    </SelectItem>
+                    <SelectItem value="start">{t("Editor.thumbnail.position_start")}</SelectItem>
+                    <SelectItem value="end">{t("Editor.thumbnail.position_end")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="relative h-32 w-32 rounded-md border">
@@ -516,17 +470,8 @@ const ActionThumbnail = ({
         </TabsContent>
       </Tabs>
 
-      <Button
-        variant="default"
-        className="w-full"
-        onClick={handleSave}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          t("Editor.save")
-        )}
+      <Button variant="default" className="w-full" onClick={handleSave} disabled={isLoading}>
+        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Editor.save")}
       </Button>
     </div>
   );

@@ -1,23 +1,12 @@
 import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormField, FormItem, FormControl } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
-const AgeVerificationDialog = ({
-  open,
-  form,
-  onSubmit,
-  error,
-  onOpenChange,
-}: any) => {
+const AgeVerificationDialog = ({ open, form, onSubmit, error, onOpenChange }: any) => {
   const t = useTranslations();
   const lang = useLocale();
 
@@ -25,9 +14,7 @@ const AgeVerificationDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
         <DialogHeader>
-          <DialogTitle>
-            {t("Editor.lock_link.requires_date_of_birth.title")}
-          </DialogTitle>
+          <DialogTitle>{t("Editor.lock_link.requires_date_of_birth.title")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -38,13 +25,7 @@ const AgeVerificationDialog = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="DD"
-                        min="1"
-                        max="31"
-                        {...field}
-                      />
+                      <Input type="number" placeholder="DD" min="1" max="31" {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -55,13 +36,7 @@ const AgeVerificationDialog = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="MM"
-                        min="1"
-                        max="12"
-                        {...field}
-                      />
+                      <Input type="number" placeholder="MM" min="1" max="12" {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -84,7 +59,7 @@ const AgeVerificationDialog = ({
                 )}
               />
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && <p className="text-destructive text-sm">{error}</p>}
             <Button type="submit" className="w-full">
               {t("General.submit")}
             </Button>

@@ -1272,6 +1272,13 @@
     "recent_invoices": "Recent Invoices",
     "recent_invoices_list": "Coming soon: Recent invoices list",
     "popular_products": "Popular Products",
-    "popular_products_list": "Coming soon: Popular products list"
+    "popular_products_list": "Coming soon: Popular products list",
+    "create": "Create",
+    "select_create_option": "Select an option",
+    "add_product": "Add Product",
+    "add_invoice": "Add Invoice",
+    "add_client": "Add Client",
+    "add_employee": "Add Employee",
+    "add_warehouse": "Add Warehouse"
   }
 }

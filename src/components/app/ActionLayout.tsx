@@ -1,16 +1,17 @@
-import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { toast } from "sonner";
+
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
-import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
-import { LinkLayoutType } from "@/lib/types";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
 import { useMainStore } from "@/hooks/main.store";
 import { usePuklaStore } from "@/hooks/use-pukla-store";
 import useUserStore from "@/hooks/use-user-store";
-
-import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabase";
+import { LinkLayoutType } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 interface ActionLayoutProps {
   linkId: string;
@@ -18,11 +19,7 @@ interface ActionLayoutProps {
   onUpgradeNeeded?: () => void;
 }
 
-const ActionLayout = ({
-  linkId,
-  puklaId,
-  onUpgradeNeeded,
-}: ActionLayoutProps) => {
+const ActionLayout = ({ linkId, puklaId, onUpgradeNeeded }: ActionLayoutProps) => {
   const t = useTranslations();
   const router = useRouter();
   const { setItemAction } = useMainStore();
@@ -33,7 +30,7 @@ const ActionLayout = ({
   // Find the current item's layout from puklaItems
   const currentItem = puklaItems.find((item) => item.id === linkId);
   const [selectedLayout, setSelectedLayout] = useState<LinkLayoutType>(
-    currentItem?.item_layout || "default"
+    currentItem?.item_layout || "default",
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -56,7 +53,7 @@ const ActionLayout = ({
       // Update the item in the store
       usePuklaStore.setState((state) => ({
         puklaItems: state.puklaItems.map((item) =>
-          item.id === linkId ? { ...item, item_layout: selectedLayout } : item
+          item.id === linkId ? { ...item, item_layout: selectedLayout } : item,
         ),
       }));
 
@@ -83,9 +80,9 @@ const ActionLayout = ({
   }) => (
     <div
       className={cn(
-        "w-full rounded-md transition-all pointer-events-none",
+        "pointer-events-none w-full rounded-md transition-all",
         className,
-        isHighlighted ? "bg-primary/20" : "bg-primary/5"
+        isHighlighted ? "bg-primary/20" : "bg-primary/5",
       )}
     />
   );
@@ -99,7 +96,7 @@ const ActionLayout = ({
       id: "default",
       name: t("Editor.default_layout"),
       preview: (
-        <div className="w-full h-24 flex flex-col gap-2">
+        <div className="flex h-24 w-full flex-col gap-2">
           <PreviewButton isHighlighted={false} className="h-6" />
           <PreviewButton isHighlighted={true} className="h-6" />
           <PreviewButton isHighlighted={false} className="h-6" />
@@ -110,7 +107,7 @@ const ActionLayout = ({
       id: "double-height",
       name: t("Editor.double_height_layout"),
       preview: (
-        <div className="w-full h-24 flex flex-col gap-2">
+        <div className="flex h-24 w-full flex-col gap-2">
           <PreviewButton isHighlighted={false} className="h-5" />
           <PreviewButton isHighlighted={true} className="h-14" />
           <PreviewButton isHighlighted={false} className="h-5" />
@@ -121,11 +118,11 @@ const ActionLayout = ({
       id: "half-width",
       name: t("Editor.half_width_layout"),
       preview: (
-        <div className="w-full h-24 flex flex-col gap-2">
+        <div className="flex h-24 w-full flex-col gap-2">
           <PreviewButton isHighlighted={false} className="h-6" />
           <div className="flex gap-2">
             <PreviewButton isHighlighted={true} className="h-6 w-1/2" />
-            <div className="w-1/2 h-6 border border-dashed border-primary/20 rounded-md" />
+            <div className="border-primary/20 h-6 w-1/2 rounded-md border border-dashed" />
           </div>
           <PreviewButton isHighlighted={false} className="h-6" />
         </div>
@@ -135,11 +132,11 @@ const ActionLayout = ({
       id: "square",
       name: t("Editor.square_layout"),
       preview: (
-        <div className="w-full h-24 flex flex-col gap-2">
+        <div className="flex h-24 w-full flex-col gap-2">
           <PreviewButton isHighlighted={false} className="h-5" />
           <div className="flex gap-2">
             <PreviewButton isHighlighted={true} className="h-14 w-1/2" />
-            <div className="w-1/2 h-14 border border-dashed border-primary/20 rounded-md" />
+            <div className="border-primary/20 h-14 w-1/2 rounded-md border border-dashed" />
           </div>
           <PreviewButton isHighlighted={false} className="h-5" />
         </div>
@@ -153,7 +150,7 @@ const ActionLayout = ({
         <div className="flex items-center justify-between">
           <span>{t("Editor.change_layout")}</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {layoutOptions.map((layout) => (
             <button
               key={layout.id}
@@ -163,27 +160,20 @@ const ActionLayout = ({
               aria-label={layout.name}
               tabIndex={0}
               className={cn(
-                "w-full p-3 rounded-lg border-2 transition-all cursor-pointer",
+                "w-full cursor-pointer rounded-lg border-2 p-3 transition-all",
                 "hover:border-primary/50 hover:bg-primary/5",
-                "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                selectedLayout === layout.id
-                  ? "border-primary bg-primary/5"
-                  : "border-border"
+                "focus-visible:ring-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+                selectedLayout === layout.id ? "border-primary bg-primary/5" : "border-border",
               )}
             >
               {layout.preview}
-              <span className="text-xs mt-2 block font-medium pointer-events-none">
+              <span className="pointer-events-none mt-2 block text-xs font-medium">
                 {layout.name}
               </span>
             </button>
           ))}
         </div>
-        <Button
-          variant="default"
-          className="w-full"
-          onClick={handleSave}
-          disabled={isSaving}
-        >
+        <Button variant="default" className="w-full" onClick={handleSave} disabled={isSaving}>
           {isSaving ? t("General.saving") : t("Editor.save")}
         </Button>
       </div>

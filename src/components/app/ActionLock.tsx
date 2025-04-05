@@ -1,21 +1,18 @@
-import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
+
+import { useTranslations } from "next-intl";
+
 import { AccordionTrigger } from "@radix-ui/react-accordion";
 import { ChevronDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { supabase } from "@/lib/supabase";
-import useUserStore from "@/hooks/use-user-store";
-
+import { Accordion, AccordionContent, AccordionItem } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-} from "@/components/ui/accordion";
+import { Label } from "@/components/ui/label";
+import useUserStore from "@/hooks/use-user-store";
+import { supabase } from "@/lib/supabase";
 
 const ActionLock = ({
   linkId,
@@ -34,9 +31,7 @@ const ActionLock = ({
   const [minAge, setMinAge] = useState(18);
   const [passwordProtected, setPasswordProtected] = useState(false);
   const [ageRestricted, setAgeRestricted] = useState(false);
-  const [passwordAccordion, setPasswordAccordion] = useState<
-    string | undefined
-  >();
+  const [passwordAccordion, setPasswordAccordion] = useState<string | undefined>();
   const [ageAccordion, setAgeAccordion] = useState<string | undefined>();
 
   // Fetch initial settings
@@ -163,12 +158,9 @@ const ActionLock = ({
     setIsLoadingPasswordSave(true);
     try {
       // First hash the password
-      const { data: hashedPassword, error: hashError } = await supabase.rpc(
-        "hash_password",
-        {
-          password: password,
-        }
-      );
+      const { data: hashedPassword, error: hashError } = await supabase.rpc("hash_password", {
+        password: password,
+      });
 
       if (hashError) throw hashError;
 
@@ -229,7 +221,7 @@ const ActionLock = ({
         disabled={!passwordProtected}
       >
         <AccordionItem value="item-1" className="border-none">
-          <div className="relative flex w-full justify-between items-start gap-2 rounded border border-input p-4 shadow-sm shadow-black/5">
+          <div className="border-input relative flex w-full items-start justify-between gap-2 rounded border p-4 shadow-sm shadow-black/5">
             <div className="flex flex-row gap-2">
               <Checkbox
                 id="password-check"
@@ -242,25 +234,20 @@ const ActionLock = ({
                 <Label className="text-start">
                   <div className="flex items-center gap-2">
                     <p>{t("Editor.lock_link.password_protected.title")}</p>
-                    {isLoadingPasswordToggle && (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    )}
+                    {isLoadingPasswordToggle && <Loader2 className="h-4 w-4 animate-spin" />}
                   </div>
                 </Label>
-                <p
-                  id="password-description"
-                  className="text-xs text-muted-foreground"
-                >
+                <p id="password-description" className="text-muted-foreground text-xs">
                   {t("Editor.lock_link.password_protected.description")}
                 </p>
               </div>
             </div>
-            <AccordionTrigger className="hover:no-underline p-2">
+            <AccordionTrigger className="p-2 hover:no-underline">
               <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
             </AccordionTrigger>
           </div>
           <AccordionContent className="p-0">
-            <div className="p-4 border-x border-b rounded-b">
+            <div className="rounded-b border-x border-b p-4">
               <div className="flex flex-col gap-4">
                 <div className="grid w-full items-center gap-1.5">
                   <Label htmlFor="password">{t("Auth.password")}</Label>
@@ -307,7 +294,7 @@ const ActionLock = ({
         disabled={!ageRestricted}
       >
         <AccordionItem value="item-2" className="border-none">
-          <div className="relative flex w-full justify-between items-start gap-2 rounded border border-input p-4 shadow-sm shadow-black/5">
+          <div className="border-input relative flex w-full items-start justify-between gap-2 rounded border p-4 shadow-sm shadow-black/5">
             <div className="flex flex-row gap-2">
               <Checkbox
                 id="age-check"
@@ -320,30 +307,23 @@ const ActionLock = ({
                 <Label className="text-start">
                   <div className="flex items-center gap-2">
                     <p>{t("Editor.lock_link.requires_date_of_birth.title")}</p>
-                    {isLoadingAgeToggle && (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    )}
+                    {isLoadingAgeToggle && <Loader2 className="h-4 w-4 animate-spin" />}
                   </div>
                 </Label>
-                <p
-                  id="age-description"
-                  className="text-xs text-muted-foreground"
-                >
+                <p id="age-description" className="text-muted-foreground text-xs">
                   {t("Editor.lock_link.requires_date_of_birth.description")}
                 </p>
               </div>
             </div>
-            <AccordionTrigger className="hover:no-underline p-2">
+            <AccordionTrigger className="p-2 hover:no-underline">
               <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
             </AccordionTrigger>
           </div>
           <AccordionContent className="p-0">
-            <div className="p-4 border-x border-b rounded-b">
+            <div className="rounded-b border-x border-b p-4">
               <div className="flex flex-col gap-4">
                 <div className="grid w-full items-center gap-1.5">
-                  <Label htmlFor="min_age">
-                    {t("Editor.lock_link.min_age.label")}
-                  </Label>
+                  <Label htmlFor="min_age">{t("Editor.lock_link.min_age.label")}</Label>
                   <form
                     className="flex flex-row gap-2"
                     onSubmit={(e) => {

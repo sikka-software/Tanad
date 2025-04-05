@@ -1,7 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
+
 import { User as SupabaseUser } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase";
+
 import useUserStore from "@/hooks/use-user-store";
+import { supabase } from "@/lib/supabase";
 
 type UserType = SupabaseUser & {
   stripe_customer_id: string | null;

@@ -29,8 +29,8 @@ import { useWindowSize } from "@/hooks/use-window-size";
 // Utils
 import { navigationMenuTriggerStyle, cn } from "@/lib/utils";
 import settings from "../../../landing.config";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
+import LanguageSwitcher from "@/components/ui/language-switcher";
+import ThemeSwitcher from "@/components/ui/theme-switcher";
 
 export const contactIcons: IconComponents = {
   whatsapp: <Logos.whatsapp className="h-4 w-4" />,

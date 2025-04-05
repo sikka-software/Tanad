@@ -8,6 +8,8 @@ import PageTitle from "@/components/ui/page-title";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { Combobox } from "@/components/ui/combobox";
+import { useRouter } from "next/router";
 
 interface DashboardStats {
   totalInvoices: number;
@@ -26,6 +28,38 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
+  const router = useRouter();
+
+  const createOptions = [
+    {
+      label: t("Dashboard.add_product"),
+      value: "product",
+      path: "/products/add",
+    },
+    {
+      label: t("Dashboard.add_invoice"),
+      value: "invoice",
+      path: "/invoices/add",
+    },
+    { label: t("Dashboard.add_client"), value: "client", path: "/clients/add" },
+    {
+      label: t("Dashboard.add_employee"),
+      value: "employee",
+      path: "/employees/add",
+    },
+    {
+      label: t("Dashboard.add_warehouse"),
+      value: "warehouse",
+      path: "/warehouses/add",
+    },
+  ];
+
+  const handleCreateOption = (value: string) => {
+    const option = createOptions.find((opt) => opt.value === value);
+    if (option) {
+      router.push(option.path);
+    }
+  };
 
   useEffect(() => {
     async function fetchDashboardStats() {
@@ -76,19 +110,21 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto space-y-6">
-        <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-4 w-3/4" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-1/2" />
-              </CardContent>
-            </Card>
-          ))}
+      <div className="">
+        <PageTitle title={t("Dashboard.title")} />{" "}
+        <div className="p-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-4 w-3/4" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-1/2" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -96,7 +132,7 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="container mx-auto">
+      <div className="mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
@@ -109,10 +145,27 @@ export default function Dashboard() {
       <PageTitle
         title={t("Dashboard.title")}
         customButton={
-          <Button>
-            <Plus className="h-4 w-4" />
-            {t("Dashboard.create")}
-          </Button>
+          <div className="flex items-center">
+            <Combobox
+              data={createOptions}
+              onChange={handleCreateOption}
+              texts={{
+                placeholder: t("Dashboard.select_create_option"),
+                noItems: t("General.no_results"),
+                searchPlaceholder: t("General.search"),
+              }}
+              width="fit"
+              inputProps={{
+                className: "focus:ring-0",
+              }}
+              renderSelected={(item) => (
+                <div className="flex items-center">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {item.label}
+                </div>
+              )}
+            />
+          </div>
         }
       />
       <div className="p-4">

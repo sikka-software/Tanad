@@ -1,5 +1,7 @@
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+
+import { useRouter } from "next/router";
+
 // Hooks
 import useUserStore from "@/hooks/use-user-store";
 
@@ -23,11 +25,11 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       setIsRedirecting(true);
       // Store the intended URL to redirect back after auth
       const currentPath = router.asPath;
-      if (currentPath !== '/auth') {
-        sessionStorage.setItem('redirectAfterAuth', currentPath);
+      if (currentPath !== "/auth") {
+        sessionStorage.setItem("redirectAfterAuth", currentPath);
       }
-      
-      router.replace('/auth').then(() => {
+
+      router.replace("/auth").then(() => {
         setIsRedirecting(false);
       });
     }
