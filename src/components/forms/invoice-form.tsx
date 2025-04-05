@@ -5,9 +5,9 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import * as z from "zod";
 
 import { ClientForm } from "@/components/forms/client-form";
@@ -31,13 +31,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
@@ -394,7 +394,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => remove(index)}
-                className="p-0 h-8 w-8"
+                className="h-8 w-8 p-0"
               >
                 <Trash2 className="h-4 w-4 text-red-500" />
               </Button>
@@ -403,7 +403,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
         },
       },
     ],
-    [form, fields, productOptions, productsLoading, handleProductSelection, remove]
+    [form, fields, productOptions, productsLoading, handleProductSelection, remove],
   );
 
   // Set up the table

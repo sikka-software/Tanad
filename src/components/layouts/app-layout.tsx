@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { AppSidebar } from "@/components/ui/app-sidebar";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import { LoadingBar } from "@/components/ui/loading-bar";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -33,12 +34,16 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
             />
             <div className="w-full">
               <div className="flex w-full flex-row justify-between border-b p-2">
-                <SidebarTrigger />
+                <div className="flex flex-row items-center gap-0">
+                  <SidebarTrigger />
+                  <Breadcrumb />
+                </div>
                 <div className="flex flex-row gap-2">
                   <ThemeSwitcher />
                   <LanguageSwitcher />
                 </div>
               </div>
+              {/* Breadcrumb navigation */}
               {/* {process.env.NODE_ENV === "development" && <DebugPukla />} */}
               <div className="relative mx-auto">{children}</div>
             </div>
