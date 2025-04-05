@@ -1,37 +1,13 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import PageTitle from "@/components/ui/page-title";
-import { useTranslations } from "next-intl";
 import { GetStaticProps } from "next";
-
-interface Client {
-  id: string;
-  name: string;
-  company: string;
-  email: string;
-  phone: string;
-}
-
-interface Invoice {
-  id: string;
-  invoice_number: string;
-  issue_date: string;
-  due_date: string;
-  subtotal: number;
-  tax_rate: number | null;
-  tax_amount: number | null;
-  total: number;
-  status: string;
-  notes: string | null;
-  client: Client;
-}
+import { useInvoices } from "@/hooks/useInvoices";
+import { Invoice } from "@/api/invoices";
 
 function getStatusColor(status: string): string {
   switch (status.toLowerCase()) {
@@ -48,46 +24,9 @@ function getStatusColor(status: string): string {
 
 export default function InvoicesPage() {
   const t = useTranslations("Invoices");
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: invoices = [], isLoading, error } = useInvoices();
 
-  useEffect(() => {
-    async function fetchInvoices() {
-      try {
-        const { data, error } = await supabase
-          .from("invoices")
-          .select(
-            `
-            *,
-            client:client_id (
-              id,
-              name,
-              company,
-              email,
-              phone
-            )
-          `
-          )
-          .order("created_at", { ascending: false });
-
-        if (error) throw error;
-        setInvoices(data || []);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "An error occurred while fetching invoices"
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchInvoices();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="mx-auto space-y-4">
         <PageTitle
@@ -118,7 +57,7 @@ export default function InvoicesPage() {
     return (
       <div className="mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
+          {error instanceof Error ? error.message : "An error occurred while fetching invoices"}
         </div>
       </div>
     );
@@ -139,7 +78,7 @@ export default function InvoicesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {invoices.map((invoice) => (
+            {invoices.map((invoice: Invoice) => (
               <Card
                 key={invoice.id}
                 className="hover:shadow-lg transition-shadow"

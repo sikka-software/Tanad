@@ -1,59 +1,18 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Building2, Mail, Phone, MapPin, Plus } from "lucide-react";
+import { Building2, Mail, Phone, MapPin } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
 import PageTitle from "@/components/ui/page-title";
 import { GetStaticProps } from "next";
-
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  company: string;
-  address: string;
-  city: string;
-  state: string;
-  zip_code: string;
-  notes: string | null;
-  created_at: string;
-}
+import { useClients } from "@/hooks/useClients";
+import { Client } from "@/api/clients";
 
 export default function ClientsPage() {
   const t = useTranslations("Clients");
-  const [clients, setClients] = useState<Client[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: clients = [], isLoading, error } = useClients();
 
-  useEffect(() => {
-    async function fetchClients() {
-      try {
-        const { data, error } = await supabase
-          .from("clients")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        if (error) throw error;
-        setClients(data || []);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "An error occurred while fetching clients"
-        );
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchClients();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="mx-auto space-y-4">
         <PageTitle
@@ -85,7 +44,7 @@ export default function ClientsPage() {
     return (
       <div className="mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
+          {error instanceof Error ? error.message : "An error occurred while fetching clients"}
         </div>
       </div>
     );
@@ -105,7 +64,7 @@ export default function ClientsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {clients.map((client) => (
+          {clients.map((client: Client) => (
             <Card key={client.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <h3 className="text-lg font-semibold">{client.name}</h3>
