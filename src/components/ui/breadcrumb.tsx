@@ -87,11 +87,9 @@ export function Breadcrumb() {
       if (pattern.test(pathname)) {
         return breadcrumbs.map((crumb) => ({
           ...crumb,
-          label:
-            crumb.label ||
-            (crumb.labelKey
-              ? getT(crumb.labelKey.split(".")[0])(crumb.labelKey.split(".")[1])
-              : ""),
+          label: crumb.labelKey
+            ? getT(crumb.labelKey.split(".")[0])(crumb.labelKey.split(".")[1])
+            : "",
         }));
       }
     }

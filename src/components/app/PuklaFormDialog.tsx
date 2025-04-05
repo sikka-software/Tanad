@@ -1,24 +1,18 @@
 import React from "react";
-import { useTranslations, useLocale } from "next-intl";
-import { zodResolver } from "@hookform/resolvers/zod";
-import useUserStore from "@/hooks/use-user-store";
-import { Sparkles, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+
+import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Sparkles, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import * as z from "zod";
 
-import { supabase } from "@/lib/supabase";
-import { blacklist } from "@/lib/constants";
-import { checkExistingSlug } from "@/lib/operations";
-
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 // UI
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -29,8 +23,10 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import useUserStore from "@/hooks/use-user-store";
+import { blacklist } from "@/lib/constants";
+import { checkExistingSlug } from "@/lib/operations";
+import { supabase } from "@/lib/supabase";
 
 type PuklaFormDialogProps = {
   openDialog: boolean;
@@ -77,12 +73,12 @@ export const PuklaFormDialog: React.FC<PuklaFormDialogProps> = ({
           }
           return true;
         },
-        { message: t("MyPuklas.short_slug_pro_feature") }
+        { message: t("MyPuklas.short_slug_pro_feature") },
       ),
     is_public: z.boolean().default(false),
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<z.input<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { title: "", bio: "", slug: "", is_public: false },
   });
@@ -129,7 +125,7 @@ export const PuklaFormDialog: React.FC<PuklaFormDialogProps> = ({
     }
   };
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.input<typeof formSchema>) => {
     try {
       setIsLoading(true);
 
@@ -212,9 +208,7 @@ export const PuklaFormDialog: React.FC<PuklaFormDialogProps> = ({
     } catch (error) {
       console.error("Error handling pukla:", error);
       toast.error(
-        mode === "create"
-          ? t("MyPuklas.error_creating_pukla")
-          : t("General.something_went_wrong")
+        mode === "create" ? t("MyPuklas.error_creating_pukla") : t("General.something_went_wrong"),
       );
     } finally {
       setIsLoading(false);
@@ -226,9 +220,7 @@ export const PuklaFormDialog: React.FC<PuklaFormDialogProps> = ({
       <DialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
         <DialogHeader>
           <DialogTitle>
-            {mode === "create"
-              ? t("MyPuklas.create_pukla")
-              : t("Editor.edit_pukla")}
+            {mode === "create" ? t("MyPuklas.create_pukla") : t("Editor.edit_pukla")}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -240,10 +232,7 @@ export const PuklaFormDialog: React.FC<PuklaFormDialogProps> = ({
                 <FormItem>
                   <FormLabel>{t("MyPuklas.pukla_title")}</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("MyPuklas.pukla_title_placeholder")}
-                      {...field}
-                    />
+                    <Input placeholder={t("MyPuklas.pukla_title_placeholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -257,10 +246,7 @@ export const PuklaFormDialog: React.FC<PuklaFormDialogProps> = ({
                 <FormItem>
                   <FormLabel>{t("MyPuklas.pukla_bio")}</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("MyPuklas.pukla_bio_placeholder")}
-                      {...field}
-                    />
+                    <Input placeholder={t("MyPuklas.pukla_bio_placeholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -275,7 +261,7 @@ export const PuklaFormDialog: React.FC<PuklaFormDialogProps> = ({
                   <FormLabel>{t("MyPuklas.custom_slug_optional")}</FormLabel>
                   <FormControl>
                     <div className="relative" dir="ltr">
-                      <span className="absolute inline-flex items-center h-full rounded-s-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+                      <span className="border-input bg-background text-muted-foreground absolute inline-flex h-full items-center rounded-s-lg border px-3 text-sm">
                         https://puk.la/
                       </span>
                       <Input
@@ -291,17 +277,16 @@ export const PuklaFormDialog: React.FC<PuklaFormDialogProps> = ({
                         {isGeneratingSlug ? (
                           <Loader2 className="size-4 animate-spin" />
                         ) : (
-                          <Sparkles className="size-4 text-muted-foreground" />
+                          <Sparkles className="text-muted-foreground size-4" />
                         )}
                       </button>
                     </div>
                   </FormControl>
-                  {mode === "create" &&
-                    user?.subscribed_to === "pukla_free" && (
-                      <p className="text-xs text-muted-foreground">
-                        {t("MyPuklas.short_slug_pro_feature_description")}
-                      </p>
-                    )}
+                  {mode === "create" && user?.subscribed_to === "pukla_free" && (
+                    <p className="text-muted-foreground text-xs">
+                      {t("MyPuklas.short_slug_pro_feature_description")}
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -313,10 +298,7 @@ export const PuklaFormDialog: React.FC<PuklaFormDialogProps> = ({
               render={({ field }) => (
                 <FormItem className="flex flex-row items-start gap-3 space-y-0 rounded-md border p-4">
                   <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel>{t("MyPuklas.is_discoverable")}</FormLabel>

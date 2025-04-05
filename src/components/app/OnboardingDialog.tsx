@@ -1,25 +1,19 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { toast } from "sonner";
-import { QRCodeSVG } from "qrcode.react";
-import { useForm } from "react-hook-form";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Sparkles, Loader2, Trash, ArrowDown } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { toast } from "sonner";
+import * as z from "zod";
 
-import { supabase } from "@/lib/supabase";
-import { checkExistingSlug } from "@/lib/operations";
-import useUserStore from "@/hooks/use-user-store";
-import { useMainStore } from "@/hooks/main.store";
-import { Pukla } from "@/lib/types";
-
-// UI
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import AdjustableDialog from "@/components/ui/adjustable-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// UI
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -28,6 +22,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useMainStore } from "@/hooks/main.store";
+import useUserStore from "@/hooks/use-user-store";
+import { checkExistingSlug } from "@/lib/operations";
+import { supabase } from "@/lib/supabase";
+import { Pukla } from "@/lib/types";
 
 interface OnboardingDialogProps {
   onClose?: () => void;
@@ -52,7 +53,7 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
       .min(1, t("MyPuklas.pukla_slug_required"))
       .regex(
         /^[a-zA-Z0-9-]+$/,
-        t("MyPuklas.custom_slug_can_only_contain_letters_numbers_and_hyphens")
+        t("MyPuklas.custom_slug_can_only_contain_letters_numbers_and_hyphens"),
       ),
     title: z
       .string()
@@ -84,12 +85,12 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
               return false;
             }
           }, t("Editor.link_url_invalid")),
-      })
+      }),
     ),
   });
 
-  type FormValues = z.infer<typeof formSchema>;
-  type LinksFormValues = z.infer<typeof linksSchema>;
+  type FormValues = z.input<typeof formSchema>;
+  type LinksFormValues = z.input<typeof linksSchema>;
 
   const form = useForm<FormValues>({
     mode: "onChange",
@@ -173,17 +174,14 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
         let avatarPath = "";
         if (avatarFile) {
           let fileName = `${user?.id}-${Date.now()}.${avatarFile.name.split(".").pop()}`;
-          const { data: uploadData, error: uploadError } =
-            await supabase.storage
-              .from("pukla_avatars")
-              .upload(fileName, avatarFile);
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from("pukla_avatars")
+            .upload(fileName, avatarFile);
 
           if (uploadError) throw uploadError;
           const {
             data: { publicUrl },
-          } = await supabase.storage
-            .from("pukla_avatars")
-            .getPublicUrl(fileName);
+          } = await supabase.storage.from("pukla_avatars").getPublicUrl(fileName);
           avatarPath = publicUrl;
         }
 
@@ -240,16 +238,13 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
             is_favorite: false,
             is_expanded: false,
             item_type: "link",
-          }))
+          })),
         );
 
         if (linksError) throw linksError;
 
         const puklaWithType = newPukla as Pukla;
-        const updatedPuklas = [
-          ...useMainStore.getState().puklas,
-          puklaWithType,
-        ];
+        const updatedPuklas = [...useMainStore.getState().puklas, puklaWithType];
         setPuklas(updatedPuklas);
         setSelectedPukla(puklaWithType);
         setCreatedPukla(puklaWithType);
@@ -283,8 +278,7 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
     const target = e.currentTarget;
     const isScrollable = target.scrollHeight > target.clientHeight;
     const isScrolledToBottom =
-      Math.abs(target.scrollHeight - target.clientHeight - target.scrollTop) <
-      1;
+      Math.abs(target.scrollHeight - target.clientHeight - target.scrollTop) < 1;
     setShowScrollIndicator(isScrollable && !isScrolledToBottom);
   };
 
@@ -301,7 +295,7 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
                 <FormItem>
                   <FormLabel>{t("MyPuklas.custom_slug_optional")}</FormLabel>
                   <div className="relative" dir="ltr">
-                    <span className="absolute inline-flex items-center h-full rounded-s-lg border border-input bg-background px-3 text-sm text-muted-foreground">
+                    <span className="border-input bg-background text-muted-foreground absolute inline-flex h-full items-center rounded-s-lg border px-3 text-sm">
                       https://puk.la/
                     </span>
                     <FormControl>
@@ -324,9 +318,9 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
                       }}
                     >
                       {isGeneratingSlug ? (
-                        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                        <Loader2 className="text-muted-foreground size-4 animate-spin" />
                       ) : (
-                        <Sparkles className="size-4 text-muted-foreground" />
+                        <Sparkles className="text-muted-foreground size-4" />
                       )}
                     </button>
                   </div>
@@ -401,11 +395,7 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() =>
-                          document
-                            .getElementById("avatar-image-upload")
-                            ?.click()
-                        }
+                        onClick={() => document.getElementById("avatar-image-upload")?.click()}
                       >
                         {t("OnBoardingForm.upload_image")}
                       </Button>
@@ -431,24 +421,20 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
         <Form {...linksForm}>
           <div className="relative">
             <div
-              className="space-y-4 max-h-[60vh] overflow-y-auto p-2 border rounded-lg mb-2 scroll-smooth"
+              className="mb-2 max-h-[60vh] space-y-4 overflow-y-auto scroll-smooth rounded-lg border p-2"
               onScroll={checkScroll}
               ref={(el) => {
                 // Check initial scroll state
                 if (el) {
                   const isScrollable = el.scrollHeight > el.clientHeight;
                   const isScrolledToBottom =
-                    Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) <
-                    1;
+                    Math.abs(el.scrollHeight - el.clientHeight - el.scrollTop) < 1;
                   setShowScrollIndicator(isScrollable && !isScrolledToBottom);
                 }
               }}
             >
               {linksForm.watch("links").map((_, index) => (
-                <div
-                  key={index}
-                  className="space-y-2 relative border p-4 rounded-lg"
-                >
+                <div key={index} className="relative space-y-2 rounded-lg border p-4">
                   <FormField
                     control={linksForm.control}
                     name={`links.${index}.title`}
@@ -474,15 +460,12 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
                               https://
                             </span>
                             <Input
-                              className="ps-1 rounded-s-none shadow-none"
+                              className="rounded-s-none ps-1 shadow-none"
                               type="text"
                               {...field}
                               onChange={(e) => {
                                 // Remove https:// if user pastes full URL
-                                const value = e.target.value.replace(
-                                  /^https?:\/\//,
-                                  ""
-                                );
+                                const value = e.target.value.replace(/^https?:\/\//, "");
                                 field.onChange(value);
                                 linksForm.trigger(`links.${index}.url`);
                               }}
@@ -504,7 +487,7 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
                           const currentLinks = linksForm.watch("links");
                           linksForm.setValue(
                             "links",
-                            currentLinks.filter((_, i) => i !== index)
+                            currentLinks.filter((_, i) => i !== index),
                           );
                         }}
                       >
@@ -552,7 +535,7 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
               ))}
             </div>
             {showScrollIndicator && (
-              <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none rounded-b-lg" />
+              <div className="from-background pointer-events-none absolute right-0 bottom-0 left-0 h-8 rounded-b-lg bg-gradient-to-t to-transparent" />
             )}
           </div>
           <Button
@@ -560,10 +543,7 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
             variant="outline"
             className="w-full"
             onClick={() =>
-              linksForm.setValue("links", [
-                ...linksForm.watch("links"),
-                { title: "", url: "" },
-              ])
+              linksForm.setValue("links", [...linksForm.watch("links"), { title: "", url: "" }])
             }
           >
             {t("OnBoardingForm.add_more_links")}
@@ -575,9 +555,7 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
       id: "step3",
       content: (
         <div className="space-y-4 text-center">
-          <h2 className="text-2xl font-bold">
-            {t("OnBoarding.congratulations")}
-          </h2>
+          <h2 className="text-2xl font-bold">{t("OnBoarding.congratulations")}</h2>
           <p>{t("OnBoarding.pukla_created")}</p>
           <div className="flex justify-center">
             {createdPukla && (
@@ -585,7 +563,7 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
                 value={`${process.env.NEXT_PUBLIC_APP_URL}/${createdPukla.slug}`}
                 size={200}
                 level="L"
-                className="dark:bg-white p-2 rounded-lg"
+                className="rounded-lg p-2 dark:bg-white"
               />
             )}
           </div>
@@ -596,15 +574,11 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
       id: "step4",
       content: (
         <div className="space-y-4 text-center">
-          <h2 className="text-xl font-semibold">
-            {t("OnBoarding.next_steps")}
-          </h2>
+          <h2 className="text-xl font-semibold">{t("OnBoarding.next_steps")}</h2>
           <p>{t("OnBoarding.editor_info")}</p>
           <p>{t("OnBoarding.theme_info")}</p>
-          <div className="flex gap-2 justify-center">
-            <Button onClick={() => router.push("/editor")}>
-              {t("OnBoarding.go_to_editor")}
-            </Button>
+          <div className="flex justify-center gap-2">
+            <Button onClick={() => router.push("/editor")}>{t("OnBoarding.go_to_editor")}</Button>
             <Button variant="outline" onClick={() => router.push("/theme")}>
               {t("OnBoarding.go_to_theme")}
             </Button>
