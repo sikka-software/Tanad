@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { useRouter } from "next/router";
@@ -7,7 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { ClientForm } from "@/components/forms/client-form";
 import { Button } from "@/components/ui/button";
+import { ComboboxAdd } from "@/components/ui/combobox-add";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -17,11 +20,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
 
 const invoiceSchema = z.object({
-  client_name: z.string().min(1, "Client name is required"),
+  client_id: z.string().min(1, "Client is required"),
   invoice_number: z.string().min(1, "Invoice number is required"),
   amount: z
     .string()
@@ -44,11 +54,47 @@ interface InvoiceFormProps {
 export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [clients, setClients] = useState<any[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [clientsLoading, setClientsLoading] = useState(true);
+
+  useEffect(() => {
+    // Get the current user ID and fetch clients
+    const getUserIdAndClients = async () => {
+      setClientsLoading(true);
+
+      // Get user ID
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        setUserId(userData.user.id);
+      }
+
+      // Fetch clients
+      try {
+        const { data, error } = await supabase
+          .from("clients")
+          .select("id, name, company")
+          .order("name");
+
+        if (error) throw error;
+
+        setClients(data || []);
+      } catch (error) {
+        console.error("Error fetching clients:", error);
+        toast.error("Failed to load clients");
+      } finally {
+        setClientsLoading(false);
+      }
+    };
+
+    getUserIdAndClients();
+  }, []);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
-      client_name: "",
+      client_id: "",
       invoice_number: "",
       amount: "",
       due_date: "",
@@ -62,7 +108,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
     try {
       const { error } = await supabase.from("invoices").insert([
         {
-          client_name: data.client_name.trim(),
+          client_id: data.client_id,
           invoice_number: data.invoice_number.trim(),
           amount: parseFloat(data.amount),
           due_date: data.due_date,
@@ -91,19 +137,129 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
     }
   };
 
+  const handleClientAdded = async () => {
+    // Close the dialog
+    setIsDialogOpen(false);
+
+    // Refresh the clients list
+    try {
+      const { data, error } = await supabase
+        .from("clients")
+        .select("id, name, company")
+        .order("name");
+
+      if (error) throw error;
+
+      setClients(data || []);
+
+      // Show success message
+      toast.success("Client added successfully");
+    } catch (error) {
+      console.error("Error refreshing clients:", error);
+    }
+  };
+
+  // Format clients for ComboboxAdd
+  const clientOptions = clients.map((client) => ({
+    label: client.company ? `${client.name} (${client.company})` : client.name,
+    value: client.id,
+  }));
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="client_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Client *</FormLabel>
+                  <FormControl>
+                    <ComboboxAdd
+                      data={clientOptions}
+                      isLoading={clientsLoading}
+                      defaultValue={field.value}
+                      onChange={field.onChange}
+                      texts={{
+                        placeholder: "Select a client",
+                        searchPlaceholder: "Search clients...",
+                        noItems: "No clients found",
+                      }}
+                      addText="Add New Client"
+                      onAddClick={() => setIsDialogOpen(true)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="invoice_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Invoice Number *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter invoice number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount *</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="due_date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Due Date *</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
-            name="client_name"
+            name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Client Name *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter client name" {...field} />
-                </FormControl>
+                <FormLabel>Status *</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="overdue">Overdue</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -111,94 +267,37 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
 
           <FormField
             control={form.control}
-            name="invoice_number"
+            name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Invoice Number *</FormLabel>
+                <FormLabel>Notes</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter invoice number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Amount *</FormLabel>
-                <FormControl>
-                  <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                  <Textarea placeholder="Enter any additional notes" rows={4} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="due_date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Due Date *</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+          <div className="flex justify-end gap-4 pt-4">
+            <Button type="button" variant="outline" onClick={() => router.push("/invoices")}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Creating..." : "Create Invoice"}
+            </Button>
+          </div>
+        </form>
+      </Form>
 
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Status *</FormLabel>
-              <FormControl>
-                <select
-                  className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                  {...field}
-                >
-                  <option value="draft">Draft</option>
-                  <option value="pending">Pending</option>
-                  <option value="paid">Paid</option>
-                  <option value="overdue">Overdue</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notes</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Enter any additional notes" rows={4} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end gap-4 pt-4">
-          <Button type="button" variant="outline" onClick={() => router.push("/invoices")}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? "Creating..." : "Create Invoice"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Add New Client</DialogTitle>
+          </DialogHeader>
+          <ClientForm userId={userId} onSuccess={handleClientAdded} />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

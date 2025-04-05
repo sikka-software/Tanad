@@ -1,3 +1,4 @@
+import { GetStaticProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -31,3 +32,11 @@ export default function AddInvoicePage() {
     </div>
   );
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`../../../locales/${locale}.json`)).default,
+    },
+  };
+};

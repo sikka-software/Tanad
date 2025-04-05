@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
 
+import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -31,20 +31,20 @@ interface Product {
 export default function ProductsPage() {
   const t = useTranslations("Products");
   const [dataSource, setDataSource] = useState("");
-  
+
   const fetchProducts = async (): Promise<Product[]> => {
     // List of endpoints to try, in order of preference
     const endpoints = [
-      "/api/get-products",             // Direct Postgres query
-      "/api/products/all",             // Drizzle ORM query
-      "/api/products/fallback",        // Hardcoded fallback
+      "/api/get-products", // Direct Postgres query
+      "/api/products/all", // Drizzle ORM query
+      "/api/products/fallback", // Hardcoded fallback
     ];
-    
+
     // Helper to fetch with timeout
     const fetchWithTimeout = async (url: string, timeout = 8000) => {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
-      
+
       try {
         const response = await fetch(url, { signal: controller.signal });
         clearTimeout(id);
@@ -54,19 +54,19 @@ export default function ProductsPage() {
         throw error;
       }
     };
-    
+
     let lastError = null;
-    
+
     // Try each endpoint one by one
     for (const endpoint of endpoints) {
       try {
         console.log(`Trying to fetch from ${endpoint}...`);
         const response = await fetchWithTimeout(endpoint);
-        
+
         if (response.ok) {
           const data = await response.json();
           console.log(`Successfully fetched from ${endpoint}:`, data);
-          
+
           if (data.products && Array.isArray(data.products)) {
             // Save the source info for display
             if (data.source) {
@@ -76,7 +76,7 @@ export default function ProductsPage() {
             } else {
               setDataSource("database");
             }
-            
+
             return data.products;
           }
         }
@@ -85,7 +85,7 @@ export default function ProductsPage() {
         lastError = error;
       }
     }
-    
+
     // If we got here, all endpoints failed
     throw lastError || new Error("All endpoints failed");
   };
@@ -106,7 +106,7 @@ export default function ProductsPage() {
 
   // Debug output
   console.log("Query state:", { loading, error, productsLength: products.length, dataSource });
-  
+
   const errorMessage = error instanceof Error ? error.message : t("error.fetch");
 
   if (loading) {
@@ -142,7 +142,10 @@ export default function ProductsPage() {
       <div className="container mx-auto">
         <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
           <p className="font-medium">{errorMessage}</p>
-          <p className="mt-1 text-sm">Database connection issues detected. Check your database connection and ensure it's running properly.</p>
+          <p className="mt-1 text-sm">
+            Database connection issues detected. Check your database connection and ensure it's
+            running properly.
+          </p>
           <div className="mt-2">
             <Button variant="outline" size="sm" onClick={() => refetch()}>
               Try Again
@@ -160,16 +163,16 @@ export default function ProductsPage() {
         createButtonLink="/products/add"
         createButtonText={t("create_product")}
       />
-      
+
       {dataSource === "fallback" && (
         <div className="mx-4 mb-4 rounded border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm text-yellow-700">
-          Using fallback data due to database connection issues. 
+          Using fallback data due to database connection issues.
           <Button variant="link" size="sm" className="px-1 py-0" onClick={() => refetch()}>
             Try again with real database
           </Button>
         </div>
       )}
-      
+
       <div className="p-4">
         {products.length === 0 ? (
           <div className="py-12 text-center">

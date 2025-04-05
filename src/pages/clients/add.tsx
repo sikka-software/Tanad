@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+import { GetStaticProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -50,3 +51,11 @@ export default function AddClientPage() {
     </div>
   );
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`../../../locales/${locale}.json`)).default,
+    },
+  };
+};

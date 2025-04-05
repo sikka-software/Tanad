@@ -1,10 +1,12 @@
-import { useTranslations } from "next-intl";
 import { GetStaticProps } from "next";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import { useTranslations } from "next-intl";
+
 import BottomCTA from "@/components/landing/BottomCTA";
-import HeroSection from "@/components/landing/HeroSection";
-import FloatingPuklas from "@/components/landing/FloatingPuklas";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import Features from "@/components/landing/Features";
+import FloatingPuklas from "@/components/landing/FloatingPuklas";
+import HeroSection from "@/components/landing/HeroSection";
+
 // import Link from "next/link";
 
 export default function LandingPage() {
@@ -12,10 +14,7 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-col">
-      <CustomPageMeta
-        title={t("SEO.landing.title")}
-        description={t("SEO.landing.description")}
-      />
+      <CustomPageMeta title={t("SEO.landing.title")} description={t("SEO.landing.description")} />
 
       <div className="flex flex-col gap-[150px]">
         <div className="flex flex-col gap-[150px] px-10 py-24 pt-32 md:pt-44">
