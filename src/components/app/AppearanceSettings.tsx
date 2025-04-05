@@ -49,14 +49,14 @@ const AppearanceSettings = ({
     hideWatermark: boolean;
     hideTitle: boolean;
     hideBio: boolean;
-    avatarShape?: "circle" | "square" | "horizontal_rectangle" | "vertical_rectangle";
+    avatarShape: "circle" | "square" | "horizontal_rectangle" | "vertical_rectangle";
   }) => Promise<void>;
   initialValues?: {
     hideAvatar: boolean;
     hideWatermark: boolean;
     hideTitle: boolean;
     hideBio: boolean;
-    avatarShape?: "circle" | "square" | "horizontal_rectangle" | "vertical_rectangle";
+    avatarShape: "circle" | "square" | "horizontal_rectangle" | "vertical_rectangle";
   };
   isPending?: boolean;
   form?: UseFormReturn<AppearanceFormValues>;
@@ -93,7 +93,7 @@ const AppearanceSettings = ({
         hideWatermark: data.hideWatermark,
         hideTitle: data.hideTitle,
         hideBio: data.hideBio,
-        avatarShape: data.avatarShape,
+        avatarShape: data.avatarShape || "circle",
       });
       toast.success(t("Settings.appearanceUpdated"));
     } catch (error) {
