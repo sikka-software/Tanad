@@ -7,21 +7,27 @@ const PageTitle = ({
   createButtonLink,
   createButtonText,
   createButtonDisabled,
+  customButton,
 }: {
   title: string;
-  createButtonLink: string;
-  createButtonText: string;
+  createButtonLink?: string;
+  createButtonText?: string;
   createButtonDisabled?: boolean;
+  customButton?: React.ReactNode;
 }) => {
   return (
     <div className=" p-4  border-b flex justify-between items-center">
       <h1 className="text-2xl font-bold">{title}</h1>
-      <Link href={createButtonLink}>
-        <Button disabled={createButtonDisabled}>
-          <Plus className="h-4 w-4" />
-          {createButtonText}
-        </Button>
-      </Link>
+      {customButton
+        ? customButton
+        : createButtonLink && (
+            <Link href={createButtonLink}>
+              <Button disabled={createButtonDisabled}>
+                <Plus className="h-4 w-4" />
+                {createButtonText}
+              </Button>
+            </Link>
+          )}
     </div>
   );
 };

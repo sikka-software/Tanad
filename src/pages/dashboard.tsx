@@ -6,6 +6,8 @@ import Link from "next/link";
 import { GetStaticProps } from "next";
 import PageTitle from "@/components/ui/page-title";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface DashboardStats {
   totalInvoices: number;
@@ -106,8 +108,12 @@ export default function Dashboard() {
     <div className="">
       <PageTitle
         title={t("Dashboard.title")}
-        createButtonLink="/products/add"
-        createButtonText={t("Dashboard.create_product")}
+        customButton={
+          <Button>
+            <Plus className="h-4 w-4" />
+            {t("Dashboard.create")}
+          </Button>
+        }
       />
       <div className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
