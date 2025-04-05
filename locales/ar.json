@@ -1245,12 +1245,15 @@
     "stock_label": "المتوفر: {value}",
     "create_product": "إنشاء منتج",
     "creating_product": "جاري الإنشاء...",
+    "cancel": "إلغاء",
     "no_products": "لا توجد منتجات",
     "add_first_product": "أضف أول منتج",
     "success": {
+      "title": "تم بنجاح",
       "created": "تم إنشاء المنتج بنجاح"
     },
     "error": {
+      "title": "خطأ",
       "create": "فشل في إنشاء المنتج",
       "fetch": "فشل في جلب المنتجات"
     }
@@ -1274,15 +1277,37 @@
     "sku_label": "رمز المنتج: {value}",
     "stock_label": "المتوفر: {value}",
     "create_invoice": "إنشاء فاتورة",
-    "creating_invoice": "جاري الإنشاء...",
+    "creating": "جاري الإنشاء...",
     "no_invoices_found": "لا توجد فواتير",
     "add_first_invoice": "أضف أول فاتورة",
-    "success": {
-      "created": "تم إنشاء الفاتورة بنجاح"
+    "client": "العميل",
+    "select_client": "اختر عميل",
+    "search_clients": "بحث عن العملاء...",
+    "no_clients": "لم يتم العثور على عملاء",
+    "add_new_client": "إضافة عميل جديد",
+    "amount": "المبلغ",
+    "due_date": "تاريخ الاستحقاق",
+    "select_status": "اختر الحالة",
+    "status": {
+      "title": "الحالة",
+      "draft": "مسودة",
+      "pending": "معلقة",
+      "paid": "مدفوعة",
+      "overdue": "متأخرة"
     },
+    "notes": "ملاحظات",
+    "enter_notes": "أدخل أي ملاحظات إضافية",
+    "cancel": "إلغاء",
+    "client_added": "تمت إضافة العميل بنجاح",
     "error": {
+      "load_clients": "فشل في تحميل العملاء",
       "create": "فشل في إنشاء الفاتورة",
-      "fetch": "فشل في جلب الفواتير"
+      "fetch": "فشل في جلب الفواتير",
+      "title": "خطأ"
+    },
+    "success": {
+      "title": "تم بنجاح",
+      "created": "تم إنشاء الفاتورة بنجاح"
     }
   },
 
@@ -1290,7 +1315,36 @@
     "title": "العملاء",
     "create_client": "إضافة عميل",
     "no_clients_found": "لم يتم العثور على عملاء",
-    "error_fetching_clients": "حدث خطأ أثناء جلب العملاء"
+    "error_fetching_clients": "حدث خطأ أثناء جلب العملاء",
+    "full_name": "الاسم الكامل",
+    "enter_full_name": "أدخل الاسم الكامل",
+    "company": "الشركة",
+    "enter_company_name": "أدخل اسم الشركة",
+    "email": "البريد الإلكتروني",
+    "enter_email": "أدخل البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "enter_phone": "أدخل رقم الهاتف",
+    "address": "العنوان",
+    "enter_address": "أدخل العنوان",
+    "city": "المدينة",
+    "enter_city": "أدخل المدينة",
+    "state": "المنطقة",
+    "enter_state": "أدخل المنطقة",
+    "zip_code": "الرمز البريدي",
+    "enter_zip_code": "أدخل الرمز البريدي",
+    "notes": "ملاحظات",
+    "enter_notes": "أدخل أي ملاحظات إضافية",
+    "cancel": "إلغاء",
+    "creating": "جاري الإنشاء...",
+    "error": {
+      "not_authenticated": "المستخدم غير مصرح له",
+      "title": "خطأ",
+      "create": "فشل في إنشاء العميل"
+    },
+    "success": {
+      "title": "تم بنجاح",
+      "created": "تم إنشاء العميل بنجاح"
+    }
   },
   "Dashboard": {
     "title": "لوحة التحكم",

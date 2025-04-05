@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,6 +59,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [clientsLoading, setClientsLoading] = useState(true);
+  const t = useTranslations("Invoices");
 
   useEffect(() => {
     // Get the current user ID and fetch clients
@@ -82,14 +84,14 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
         setClients(data || []);
       } catch (error) {
         console.error("Error fetching clients:", error);
-        toast.error("Failed to load clients");
+        toast.error(t("error.load_clients"));
       } finally {
         setClientsLoading(false);
       }
     };
 
     getUserIdAndClients();
-  }, []);
+  }, [t]);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
@@ -119,8 +121,8 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
 
       if (error) throw error;
 
-      toast.success("Success", {
-        description: "Invoice created successfully",
+      toast.success(t("success.title"), {
+        description: t("success.created"),
       });
 
       if (onSuccess) {
@@ -129,8 +131,8 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
         router.push("/invoices");
       }
     } catch (error) {
-      toast.error("Error", {
-        description: error instanceof Error ? error.message : "An error occurred",
+      toast.error(t("error.title"), {
+        description: error instanceof Error ? error.message : t("error.create"),
       });
     } finally {
       setLoading(false);
@@ -153,7 +155,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
       setClients(data || []);
 
       // Show success message
-      toast.success("Client added successfully");
+      toast.success(t("client_added"));
     } catch (error) {
       console.error("Error refreshing clients:", error);
     }
@@ -175,7 +177,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
               name="client_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Client *</FormLabel>
+                  <FormLabel>{t("client")} *</FormLabel>
                   <FormControl>
                     <ComboboxAdd
                       data={clientOptions}
@@ -183,11 +185,11 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
                       defaultValue={field.value}
                       onChange={field.onChange}
                       texts={{
-                        placeholder: "Select a client",
-                        searchPlaceholder: "Search clients...",
-                        noItems: "No clients found",
+                        placeholder: t("select_client"),
+                        searchPlaceholder: t("search_clients"),
+                        noItems: t("no_clients"),
                       }}
-                      addText="Add New Client"
+                      addText={t("add_new_client")}
                       onAddClick={() => setIsDialogOpen(true)}
                     />
                   </FormControl>
@@ -201,9 +203,9 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
               name="invoice_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Invoice Number *</FormLabel>
+                  <FormLabel>{t("invoice_number")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter invoice number" {...field} />
+                    <Input placeholder={t("enter_invoice_number")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -217,7 +219,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
               name="amount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Amount *</FormLabel>
+                  <FormLabel>{t("amount")} *</FormLabel>
                   <FormControl>
                     <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
                   </FormControl>
@@ -231,7 +233,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
               name="due_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Due Date *</FormLabel>
+                  <FormLabel>{t("due_date")} *</FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
@@ -246,18 +248,18 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Status *</FormLabel>
+                <FormLabel>{t("status.title")} *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a status" />
+                      <SelectValue placeholder={t("select_status")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="overdue">Overdue</SelectItem>
+                    <SelectItem value="draft">{t("status.draft")}</SelectItem>
+                    <SelectItem value="pending">{t("status.pending")}</SelectItem>
+                    <SelectItem value="paid">{t("status.paid")}</SelectItem>
+                    <SelectItem value="overdue">{t("status.overdue")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -270,9 +272,9 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Notes</FormLabel>
+                <FormLabel>{t("notes")}</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Enter any additional notes" rows={4} {...field} />
+                  <Textarea placeholder={t("enter_notes")} rows={4} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -281,10 +283,10 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
 
           <div className="flex justify-end gap-4 pt-4">
             <Button type="button" variant="outline" onClick={() => router.push("/invoices")}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Invoice"}
+              {loading ? t("creating") : t("create_invoice")}
             </Button>
           </div>
         </form>
@@ -293,7 +295,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Add New Client</DialogTitle>
+            <DialogTitle>{t("add_new_client")}</DialogTitle>
           </DialogHeader>
           <ClientForm userId={userId} onSuccess={handleClientAdded} />
         </DialogContent>

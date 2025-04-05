@@ -1215,12 +1215,15 @@
     "stock_label": "In Stock: {value}",
     "create_product": "Create Product",
     "creating_product": "Creating...",
+    "cancel": "Cancel",
     "no_products": "No products found",
     "add_first_product": "Add your first product",
     "success": {
+      "title": "Success",
       "created": "Product created successfully"
     },
     "error": {
+      "title": "Error",
       "create": "Failed to create product",
       "fetch": "Failed to fetch products"
     }
@@ -1243,22 +1246,74 @@
     "sku_label": "SKU: {value}",
     "stock_label": "In Stock: {value}",
     "create_invoice": "Create Invoice",
-    "creating_invoice": "Creating...",
+    "creating": "Creating...",
     "no_invoices_found": "No invoices found",
     "add_first_invoice": "Add your first invoice",
-    "success": {
-      "created": "Invoice created successfully"
+    "client": "Client",
+    "select_client": "Select a client",
+    "search_clients": "Search clients...",
+    "no_clients": "No clients found",
+    "add_new_client": "Add New Client",
+    "amount": "Amount",
+    "due_date": "Due Date",
+
+    "select_status": "Select a status",
+    "status": {
+      "title": "Status",
+      "draft": "Draft",
+      "pending": "Pending",
+      "paid": "Paid",
+      "overdue": "Overdue"
     },
+    "notes": "Notes",
+    "enter_notes": "Enter any additional notes",
+    "cancel": "Cancel",
+    "client_added": "Client added successfully",
     "error": {
+      "load_clients": "Failed to load clients",
       "create": "Failed to create invoice",
-      "fetch": "Failed to fetch invoices"
+      "fetch": "Failed to fetch invoices",
+      "title": "Error"
+    },
+    "success": {
+      "title": "Success",
+      "created": "Invoice created successfully"
     }
   },
   "Clients": {
     "title": "Clients",
     "create_client": "Create Client",
     "no_clients_found": "No clients found",
-    "error_fetching_clients": "An error occurred while fetching clients"
+    "error_fetching_clients": "An error occurred while fetching clients",
+    "full_name": "Full Name",
+    "enter_full_name": "Enter full name",
+    "company": "Company",
+    "enter_company_name": "Enter company name",
+    "email": "Email",
+    "enter_email": "Enter email address",
+    "phone": "Phone",
+    "enter_phone": "Enter phone number",
+    "address": "Address",
+    "enter_address": "Enter street address",
+    "city": "City",
+    "enter_city": "Enter city",
+    "state": "State",
+    "enter_state": "Enter state",
+    "zip_code": "ZIP Code",
+    "enter_zip_code": "Enter ZIP code",
+    "notes": "Notes",
+    "enter_notes": "Enter any additional notes",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "error": {
+      "not_authenticated": "User not authenticated",
+      "title": "Error",
+      "create": "Failed to create client"
+    },
+    "success": {
+      "title": "Success",
+      "created": "Client created successfully"
+    }
   },
   "Dashboard": {
     "title": "Dashboard",

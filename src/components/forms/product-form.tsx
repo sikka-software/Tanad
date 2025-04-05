@@ -84,7 +84,9 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
         throw new Error(errorData.error || t("error.create"));
       }
 
-      toast.success(t("success.created"));
+      toast.success(t("success.title"), {
+        description: t("success.created")
+      });
 
       if (onSuccess) {
         onSuccess();
@@ -92,7 +94,7 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
         router.push("/products");
       }
     } catch (error) {
-      toast.error(t("error.create"), {
+      toast.error(t("error.title"), {
         description: error instanceof Error ? error.message : t("error.create"),
       });
     } finally {
