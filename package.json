@@ -12,9 +12,9 @@
     "dev": "next dev -p 3036",
     "build": "next build",
     "start": "next start -p 3036",
-    "admin:dev": "infisical run --env=dev next dev",
-    "admin:build": "infisical run --env=dev next build",
-    "admin:start": "infisical run --env=dev next start",
+    "admin:build": "npx infisical run --env=dev next build",
+    "admin:dev": "npx infisical run --env=dev next dev",
+    "admin:start": "npx infisical run --env=dev next start",
     "lint": "next lint"
   },
   "dependencies": {
