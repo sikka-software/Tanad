@@ -6,9 +6,9 @@ alwaysApply: false
 
 # Project Overview
 
-- Project Name (en): Pukla
-- Project Name (ar): بكلة
+- Project Name (en): Sanad
+- Project Name (ar): سند
 - Default Language: Arabic
 - Available Languages: Arabic, English
-- Pukla is a platform that allows users to create link-in-bio pages for all their links.
-- URL: https://puk.la
+- Sanad is an invoicing system and CRM and ERP
+- URL: https://sanad.app

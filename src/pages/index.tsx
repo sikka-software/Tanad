@@ -5,7 +5,7 @@ import BottomCTA from "@/components/landing/BottomCTA";
 import HeroSection from "@/components/landing/HeroSection";
 import FloatingPuklas from "@/components/landing/FloatingPuklas";
 import Features from "@/components/landing/Features";
-import Link from "next/link";
+// import Link from "next/link";
 
 export default function LandingPage() {
   const t = useTranslations();
