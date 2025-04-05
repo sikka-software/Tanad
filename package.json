@@ -1,6 +1,6 @@
 {
   "name": "tanad",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "Proprietary",
   "author": {
     "name": "Sikka Software",
@@ -9,9 +9,12 @@
   },
   "private": true,
   "scripts": {
-    "dev": "infisical run --env=dev next dev",
+    "dev": "next dev -p 3036",
     "build": "next build",
     "start": "next start -p 3036",
+    "admin:dev": "infisical run --env=dev next dev",
+    "admin:build": "infisical run --env=dev next build",
+    "admin:start": "infisical run --env=dev next start",
     "lint": "next lint"
   },
   "dependencies": {

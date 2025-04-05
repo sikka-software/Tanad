@@ -1,44 +1,53 @@
-import { useTranslations, useLocale } from "next-intl";
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/router";
-import { Loader2 } from "lucide-react";
-import { GetStaticProps } from "next";
-import { toast } from "sonner";
 import { useForm } from "react-hook-form";
-// Hooks
-import { usePuklaStore } from "@/hooks/use-pukla-store";
-import useUserStore from "@/hooks/use-user-store";
-import useMainStore from "@/hooks/main.store";
-// Lib
-import {
-  Pukla,
-  PuklaThemeProps,
-  PuklaSettings,
-  AnimationType,
-} from "@/lib/types";
-import { predefinedThemes } from "@/lib/constants";
-import { fetchPuklas } from "@/lib/operations";
-import { supabase } from "@/lib/supabase";
-// UI
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
+import { GetStaticProps } from "next";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/router";
+
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { z } from "zod";
+
+import AnimationSettings from "@/components/app/AnimationSettings";
+import AppearanceSettings from "@/components/app/AppearanceSettings";
+import { CurrentPuklaInfo } from "@/components/app/CurrentPuklaInfo";
+import { CustomizePuklaTheme } from "@/components/app/CustomizePuklaTheme";
+// Components
+import { PredefinedThemesSection } from "@/components/app/PredefinedThemes";
+import SocialPlatformsSection from "@/components/app/SocialPlatformsSection";
+import type { SocialPlatformsSectionRef } from "@/components/app/SocialPlatformsSection";
+import UpgradeDialog from "@/components/app/UpgradeDialog";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import {
   Accordion,
   AccordionTrigger,
   AccordionContent,
   AccordionItem,
 } from "@/components/ui/accordion";
-// Components
-import { PredefinedThemesSection } from "@/components/app/PredefinedThemes";
-import { CustomizePuklaTheme } from "@/components/app/CustomizePuklaTheme";
-import { CurrentPuklaInfo } from "@/components/app/CurrentPuklaInfo";
-import AppearanceSettings from "@/components/app/AppearanceSettings";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import UpgradeDialog from "@/components/app/UpgradeDialog";
-import AnimationSettings from "@/components/app/AnimationSettings";
-import SocialPlatformsSection from "@/components/app/SocialPlatformsSection";
-import type { SocialPlatformsSectionRef } from "@/components/app/SocialPlatformsSection";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+// UI
+import { Separator } from "@/components/ui/separator";
+import useMainStore from "@/hooks/main.store";
+// Hooks
+import { usePuklaStore } from "@/hooks/use-pukla-store";
+import useUserStore from "@/hooks/use-user-store";
+import { predefinedThemes } from "@/lib/constants";
+import { fetchPuklas } from "@/lib/operations";
+import { supabase } from "@/lib/supabase";
+// Lib
+import { Pukla, PuklaThemeProps, PuklaSettings, AnimationType } from "@/lib/types";
+
+const appearanceSchema = z.object({
+  hideAvatar: z.boolean(),
+  hideWatermark: z.boolean(),
+  hideTitle: z.boolean(),
+  hideBio: z.boolean(),
+  avatarShape: z
+    .enum(["circle", "square", "horizontal_rectangle", "vertical_rectangle"])
+    .default("circle"),
+});
 
 export default function Theme() {
   const t = useTranslations();
@@ -50,23 +59,11 @@ export default function Theme() {
   const [puklas, setPuklas] = useState<Pukla[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { selectedPukla, setSelectedPukla } = useMainStore();
-  const [selectedTheme, setSelectedTheme] = useState<PuklaThemeProps | null>(
-    null
-  );
+  const [selectedTheme, setSelectedTheme] = useState<PuklaThemeProps | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [openUpgradeDialog, setOpenUpgradeDialog] = useState(false);
 
-  const appearanceForm = useForm<{
-    hideAvatar: boolean;
-    hideWatermark: boolean;
-    hideTitle: boolean;
-    hideBio: boolean;
-    avatarShape:
-      | "circle"
-      | "square"
-      | "horizontal_rectangle"
-      | "vertical_rectangle";
-  }>({
+  const appearanceForm = useForm<z.input<typeof appearanceSchema>>({
     defaultValues: {
       hideAvatar: selectedPukla?.settings?.hide_avatar || false,
       hideWatermark: selectedPukla?.settings?.hide_watermark || false,
@@ -156,9 +153,7 @@ export default function Theme() {
       if (error) throw error;
 
       // Update both local states
-      setPuklas(
-        puklas.map((p) => (p.id === selectedPukla.id ? { ...p, theme } : p))
-      );
+      setPuklas(puklas.map((p) => (p.id === selectedPukla.id ? { ...p, theme } : p)));
       setSelectedPukla({
         ...selectedPukla!,
         theme,
@@ -179,11 +174,7 @@ export default function Theme() {
     hideWatermark: boolean;
     hideTitle: boolean;
     hideBio: boolean;
-    avatarShape:
-      | "circle"
-      | "square"
-      | "horizontal_rectangle"
-      | "vertical_rectangle";
+    avatarShape: "circle" | "square" | "horizontal_rectangle" | "vertical_rectangle";
   }) => {
     if (!selectedPukla) {
       toast.error(t("Theme.no_pukla_selected"));
@@ -214,10 +205,8 @@ export default function Theme() {
       // Update local state
       setPuklas(
         puklas.map((p) =>
-          p.id === selectedPukla.id
-            ? { ...p, settings: updatedSettings as PuklaSettings }
-            : p
-        )
+          p.id === selectedPukla.id ? { ...p, settings: updatedSettings as PuklaSettings } : p,
+        ),
       );
       setSelectedPukla({
         ...selectedPukla,
@@ -233,9 +222,7 @@ export default function Theme() {
     }
   };
 
-  const handleUpdateAnimationSettings = async (animationSettings: {
-    animation: string;
-  }) => {
+  const handleUpdateAnimationSettings = async (animationSettings: { animation: string }) => {
     if (!selectedPukla) {
       toast.error(t("Theme.no_pukla_selected"));
       return;
@@ -264,9 +251,7 @@ export default function Theme() {
 
       // Update local state
       setPuklas(
-        puklas.map((p) =>
-          p.id === selectedPukla.id ? { ...p, settings: updatedSettings } : p
-        )
+        puklas.map((p) => (p.id === selectedPukla.id ? { ...p, settings: updatedSettings } : p)),
       );
       setSelectedPukla({
         ...selectedPukla,
@@ -311,9 +296,7 @@ export default function Theme() {
 
       // Update local state
       setPuklas(
-        puklas.map((p) =>
-          p.id === selectedPukla.id ? { ...p, settings: updatedSettings } : p
-        )
+        puklas.map((p) => (p.id === selectedPukla.id ? { ...p, settings: updatedSettings } : p)),
       );
       setSelectedPukla({
         ...selectedPukla,
@@ -331,39 +314,30 @@ export default function Theme() {
 
   return (
     <main
-      className="flex flex-col w-full max-w-[100vw] overflow-hidden justify-between gap-4"
+      className="flex w-full max-w-[100vw] flex-col justify-between gap-4 overflow-hidden"
       dir={lang === "ar" ? "rtl" : "ltr"}
     >
-      <CustomPageMeta
-        title={t("SEO.theme.title")}
-        description={t("SEO.theme.description")}
-      />
+      <CustomPageMeta title={t("SEO.theme.title")} description={t("SEO.theme.description")} />
 
-      <CurrentPuklaInfo
-        pukla={selectedPukla}
-        allPuklas={puklas}
-        loading={isLoading}
-      />
-      <div className="flex flex-col w-full overflow-hidden">
+      <CurrentPuklaInfo pukla={selectedPukla} allPuklas={puklas} loading={isLoading} />
+      <div className="flex w-full flex-col overflow-hidden">
         <Accordion type="single" collapsible className="w-full space-y-2">
           {/* Social Media Settings */}
           <AccordionItem
             value="social_media_settings"
-            className="rounded-lg border bg-background px-4 py-1 data-[state=open]:border-primary transition-all"
+            className="bg-background data-[state=open]:border-primary rounded-lg border px-4 py-1 transition-all"
           >
             <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline">
-              <span className="flex  text-start flex-col space-y-1">
-                <span className="text-lg font-bold">
-                  {t("Theme.social_media_settings")}
-                </span>
+              <span className="flex flex-col space-y-1 text-start">
+                <span className="text-lg font-bold">{t("Theme.social_media_settings")}</span>
                 <span className="text-sm font-normal">
                   {t("Theme.choose_social_media_settings")}
                 </span>
               </span>
             </AccordionTrigger>
-            <AccordionContent className="pb-2 text-muted-foreground">
+            <AccordionContent className="text-muted-foreground pb-2">
               <Separator className="my-2" />
-              <div className="flex flex-row justify-between items-start p-0 mb-4">
+              <div className="mb-4 flex flex-row items-start justify-between p-0">
                 <Button
                   onClick={async () => {
                     try {
@@ -387,9 +361,7 @@ export default function Theme() {
                 <SocialPlatformsSection
                   ref={socialFormRef}
                   initialLinks={selectedPukla?.settings?.social_links || []}
-                  initialPosition={
-                    selectedPukla?.settings?.socials_position || "top"
-                  }
+                  initialPosition={selectedPukla?.settings?.socials_position || "top"}
                   onUpdate={(data) => {
                     handleUpdateSocialLinks(data);
                   }}
@@ -402,21 +374,17 @@ export default function Theme() {
           {/* Appearance Settings */}
           <AccordionItem
             value="appearance_settings"
-            className="rounded-lg border bg-background px-4 py-1 data-[state=open]:border-primary transition-all"
+            className="bg-background data-[state=open]:border-primary rounded-lg border px-4 py-1 transition-all"
           >
             <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline">
-              <span className="flex  text-start flex-col space-y-1">
-                <span className="text-lg font-bold">
-                  {t("Theme.appearance_settings")}
-                </span>
-                <span className="text-sm font-normal">
-                  {t("Theme.choose_appearance_settings")}
-                </span>
+              <span className="flex flex-col space-y-1 text-start">
+                <span className="text-lg font-bold">{t("Theme.appearance_settings")}</span>
+                <span className="text-sm font-normal">{t("Theme.choose_appearance_settings")}</span>
               </span>
             </AccordionTrigger>
-            <AccordionContent className="pb-2 text-muted-foreground">
+            <AccordionContent className="text-muted-foreground pb-2">
               <Separator className="my-2" />
-              <div className="flex flex-row justify-between items-start p-0 mb-4">
+              <div className="mb-4 flex flex-row items-start justify-between p-0">
                 <Button
                   onClick={() =>
                     appearanceForm.handleSubmit((data) =>
@@ -425,8 +393,8 @@ export default function Theme() {
                         hideWatermark: data.hideWatermark,
                         hideTitle: data.hideTitle,
                         hideBio: data.hideBio,
-                        avatarShape: data.avatarShape,
-                      })
+                        avatarShape: data.avatarShape || "circle",
+                      }),
                     )()
                   }
                   disabled={isUpdating || !selectedTheme}
@@ -445,12 +413,10 @@ export default function Theme() {
                   onUpdate={handleUpdateAppearanceSettings}
                   initialValues={{
                     hideAvatar: selectedPukla?.settings?.hide_avatar || false,
-                    hideWatermark:
-                      selectedPukla?.settings?.hide_watermark || false,
+                    hideWatermark: selectedPukla?.settings?.hide_watermark || false,
                     hideTitle: selectedPukla?.settings?.hide_title || false,
                     hideBio: selectedPukla?.settings?.hide_bio || false,
-                    avatarShape:
-                      selectedPukla?.settings?.avatar_shape || "circle",
+                    avatarShape: selectedPukla?.settings?.avatar_shape || "circle",
                   }}
                   isPending={isUpdating}
                 />
@@ -461,27 +427,23 @@ export default function Theme() {
           {/* Animation Settings */}
           <AccordionItem
             value="animation_settings"
-            className="rounded-lg border bg-background px-4 py-1 data-[state=open]:border-primary transition-all"
+            className="bg-background data-[state=open]:border-primary rounded-lg border px-4 py-1 transition-all"
           >
             <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline">
-              <span className="flex  text-start flex-col space-y-1">
-                <span className="text-lg font-bold">
-                  {t("Theme.animation_settings")}
-                </span>
-                <span className="text-sm font-normal">
-                  {t("Theme.choose_animation_settings")}
-                </span>
+              <span className="flex flex-col space-y-1 text-start">
+                <span className="text-lg font-bold">{t("Theme.animation_settings")}</span>
+                <span className="text-sm font-normal">{t("Theme.choose_animation_settings")}</span>
               </span>
             </AccordionTrigger>
-            <AccordionContent className="pb-2 text-muted-foreground">
+            <AccordionContent className="text-muted-foreground pb-2">
               <Separator className="my-2" />
-              <div className="flex flex-row justify-between items-start p-0 mb-4">
+              <div className="mb-4 flex flex-row items-start justify-between p-0">
                 <Button
                   onClick={() =>
                     animationForm.handleSubmit((data) =>
                       handleUpdateAnimationSettings({
                         animation: data.animation,
-                      })
+                      }),
                     )()
                   }
                   disabled={isUpdating}
@@ -510,21 +472,17 @@ export default function Theme() {
           {/* Predefined Themes */}
           <AccordionItem
             value="predefined_themes"
-            className="rounded-lg border bg-background px-4 py-1 data-[state=open]:border-primary transition-all"
+            className="bg-background data-[state=open]:border-primary rounded-lg border px-4 py-1 transition-all"
           >
             <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline">
-              <span className="flex  text-start flex-col space-y-1">
-                <span className="text-lg font-bold">
-                  {t("Theme.predefined_themes")}
-                </span>
-                <span className="text-sm font-normal">
-                  {t("Theme.choose_theme")}
-                </span>
+              <span className="flex flex-col space-y-1 text-start">
+                <span className="text-lg font-bold">{t("Theme.predefined_themes")}</span>
+                <span className="text-sm font-normal">{t("Theme.choose_theme")}</span>
               </span>
             </AccordionTrigger>
-            <AccordionContent className="pb-2 text-muted-foreground">
+            <AccordionContent className="text-muted-foreground pb-2">
               <Separator className="my-2" />
-              <div className="flex flex-row justify-between items-start p-0 mb-4">
+              <div className="mb-4 flex flex-row items-start justify-between p-0">
                 <Button
                   onClick={() => handleUpdateTheme(selectedTheme!)}
                   disabled={isUpdating || !selectedTheme}
@@ -537,7 +495,7 @@ export default function Theme() {
                   )}
                 </Button>
               </div>
-              <div className="min-w-0 max-h-[300px] overflow-y-auto">
+              <div className="max-h-[300px] min-w-0 overflow-y-auto">
                 <PredefinedThemesSection
                   allThemes={predefinedThemes}
                   selectedTheme={selectedTheme}
@@ -552,26 +510,22 @@ export default function Theme() {
           <AccordionItem
             // disabled={user?.subscribed_to === "pukla_free"}
             value="custom_theme"
-            className="rounded-lg border bg-background px-4 py-1 data-[state=open]:border-primary transition-all"
+            className="bg-background data-[state=open]:border-primary rounded-lg border px-4 py-1 transition-all"
           >
             <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline">
-              <span className="flex text-start flex-col space-y-1">
+              <span className="flex flex-col space-y-1 text-start">
                 <div className="flex flex-row items-center gap-2">
-                  <span className="text-lg font-bold">
-                    {t("Theme.custom_theme")}
-                  </span>
+                  <span className="text-lg font-bold">{t("Theme.custom_theme")}</span>
                   {user?.subscribed_to === "pukla_free" && (
                     <Badge variant="default">{t("Billing.pro_plan")}</Badge>
                   )}
                 </div>
-                <span className="text-sm font-normal">
-                  {t("Theme.customize_colors")}
-                </span>
+                <span className="text-sm font-normal">{t("Theme.customize_colors")}</span>
               </span>
             </AccordionTrigger>
-            <AccordionContent className="pb-2 text-muted-foreground">
+            <AccordionContent className="text-muted-foreground pb-2">
               <Separator className="my-2" />
-              <div className="flex flex-row justify-between items-start p-0 mb-4">
+              <div className="mb-4 flex flex-row items-start justify-between p-0">
                 <Button
                   onClick={() => {
                     if (user?.subscribed_to === "pukla_free") {
@@ -581,7 +535,7 @@ export default function Theme() {
                     handleUpdateTheme(customTheme);
                   }}
                   // disabled={isUpdating || user?.subscribed_to === "pukla_free"}
-                  className="w-full mt-4"
+                  className="mt-4 w-full"
                 >
                   {isUpdating ? (
                     <Loader2 className="me-2 h-4 w-4 animate-spin" />
@@ -590,10 +544,7 @@ export default function Theme() {
                   )}
                 </Button>
               </div>
-              <CustomizePuklaTheme
-                handleUpdateTheme={handleUpdateTheme}
-                isUpdating={isUpdating}
-              />
+              <CustomizePuklaTheme handleUpdateTheme={handleUpdateTheme} isUpdating={isUpdating} />
             </AccordionContent>
           </AccordionItem>
 
