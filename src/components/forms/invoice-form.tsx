@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import * as z from "zod";
 
 import { ClientForm } from "@/components/forms/client-form";
@@ -30,6 +31,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
 
@@ -246,6 +255,165 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
     value: product.id,
   }));
 
+  // Define table columns for the products
+  const columns = useMemo(
+    () => [
+      {
+        id: "product",
+        header: "Product",
+        cell: ({ row }: any) => {
+          const index = row.index;
+          return (
+            <FormField
+              control={form.control}
+              name={`items.${index}.product_id`}
+              render={({ field }) => (
+                <FormItem className="space-y-0">
+                  <FormControl>
+                    <ComboboxAdd
+                      data={productOptions}
+                      isLoading={productsLoading}
+                      defaultValue={field.value}
+                      onChange={(value) => {
+                        field.onChange(value);
+                        handleProductSelection(index, value);
+                      }}
+                      texts={{
+                        placeholder: "Select product",
+                        searchPlaceholder: "Search products",
+                        noItems: "No products found",
+                      }}
+                      addText="Add new product"
+                      onAddClick={() => setIsNewProductDialogOpen(true)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          );
+        },
+      },
+      {
+        id: "quantity",
+        header: "Quantity",
+        cell: ({ row }: any) => {
+          const index = row.index;
+          return (
+            <FormField
+              control={form.control}
+              name={`items.${index}.quantity`}
+              render={({ field }) => (
+                <FormItem className="space-y-0">
+                  <FormControl>
+                    <Input type="number" min="1" step="1" {...field} className="w-24" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          );
+        },
+      },
+      {
+        id: "unitPrice",
+        header: "Unit Price",
+        cell: ({ row }: any) => {
+          const index = row.index;
+          return (
+            <FormField
+              control={form.control}
+              name={`items.${index}.unit_price`}
+              render={({ field }) => (
+                <FormItem className="space-y-0">
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      {...field}
+                      className="w-32"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          );
+        },
+      },
+      {
+        id: "description",
+        header: "Description",
+        cell: ({ row }: any) => {
+          const index = row.index;
+          return (
+            <FormField
+              control={form.control}
+              name={`items.${index}.description`}
+              render={({ field }) => (
+                <FormItem className="space-y-0">
+                  <FormControl>
+                    <Input placeholder="Product description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          );
+        },
+      },
+      {
+        id: "subtotal",
+        header: "Subtotal",
+        cell: ({ row }: any) => {
+          const index = row.index;
+          return (
+            <div className="text-right">
+              $
+              {form.watch(`items.${index}.quantity`) && form.watch(`items.${index}.unit_price`)
+                ? (
+                    parseFloat(form.watch(`items.${index}.quantity`) || "0") *
+                    parseFloat(form.watch(`items.${index}.unit_price`) || "0")
+                  ).toFixed(2)
+                : "0.00"}
+            </div>
+          );
+        },
+      },
+      {
+        id: "actions",
+        header: "",
+        cell: ({ row }: any) => {
+          const index = row.index;
+          return (
+            fields.length > 1 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => remove(index)}
+                className="p-0 h-8 w-8"
+              >
+                <Trash2 className="h-4 w-4 text-red-500" />
+              </Button>
+            )
+          );
+        },
+      },
+    ],
+    [form, fields, productOptions, productsLoading, handleProductSelection, remove]
+  );
+
+  // Set up the table
+  const data = useMemo(() => fields.map((_, i) => ({ index: i })), [fields]);
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <>
       <Form {...form}>
@@ -347,7 +515,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
             )}
           />
 
-          {/* Products Section */}
+          {/* Products Section with Table */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium">Products</h3>
@@ -364,116 +532,40 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
               </Button>
             </div>
 
-            {fields.map((field, index) => (
-              <Card key={field.id} className="overflow-hidden">
-                <CardContent className="p-4">
-                  <div className="mb-2 flex items-start justify-between">
-                    <h4 className="font-medium">Product #{index + 1}</h4>
-                    {fields.length > 1 && (
-                      <Button type="button" variant="ghost" size="sm" onClick={() => remove(index)}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.product_id`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Product</FormLabel>
-                          <FormControl>
-                            <ComboboxAdd
-                              data={productOptions}
-                              isLoading={productsLoading}
-                              defaultValue={field.value}
-                              onChange={(value) => {
-                                field.onChange(value);
-                                handleProductSelection(index, value);
-                              }}
-                              texts={{
-                                placeholder: "Select product",
-                                searchPlaceholder: "Search products",
-                                noItems: "No products found",
-                              }}
-                              addText="Add new product"
-                              onAddClick={() => setIsNewProductDialogOpen(true)}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.quantity`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Quantity *</FormLabel>
-                          <FormControl>
-                            <Input type="number" min="1" step="1" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.unit_price`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Unit Price *</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              placeholder="0.00"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="flex items-end">
-                      <p className="text-muted-foreground">
-                        Subtotal: $
-                        {form.watch(`items.${index}.quantity`) &&
-                        form.watch(`items.${index}.unit_price`)
-                          ? (
-                              parseFloat(form.watch(`items.${index}.quantity`) || "0") *
-                              parseFloat(form.watch(`items.${index}.unit_price`) || "0")
-                            ).toFixed(2)
-                          : "0.00"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <FormField
-                      control={form.control}
-                      name={`items.${index}.description`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Description</FormLabel>
-                          <FormControl>
-                            <Textarea placeholder="Product description" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id}>
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} className="h-24 text-center">
+                        No products added
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </div>
 
           <FormField
