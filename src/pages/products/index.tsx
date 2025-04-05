@@ -82,7 +82,7 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="contaner x-auto">
+    <div className="">
       <PageTitle
         title={t("title")}
         createButtonLink="/products/add"

@@ -79,6 +79,8 @@ export default function PuklaLanding({
     );
   }
 
+  // This will change to invoice pages
+  // to be viewed in example.com/invoices/[id]
   if (puklaPages) {
     return (
       <NextIntlClientProvider

@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { GetStaticProps } from "next";
+import PageTitle from "@/components/ui/page-title";
+import { useTranslations } from "next-intl";
 
 interface DashboardStats {
   totalInvoices: number;
@@ -21,6 +23,7 @@ export default function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslations();
 
   useEffect(() => {
     async function fetchDashboardStats() {
@@ -100,90 +103,97 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+    <div className="">
+      <PageTitle
+        title={t("Dashboard.title")}
+        createButtonLink="/products/add"
+        createButtonText={t("Dashboard.create_product")}
+      />
+      <div className="p-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Link href="/invoices">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  {t("Dashboard.total_invoices")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalInvoices}</div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {stats.pendingInvoices} {t("Dashboard.pending")}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Link href="/invoices">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+          <Link href="/products">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  {t("Dashboard.total_products")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.totalProducts}</div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Card>
             <CardHeader>
               <CardTitle className="text-sm font-medium text-gray-500">
-                Total Invoices
+                {t("Dashboard.total_revenue")}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalInvoices}</div>
+              <div className="text-2xl font-bold">
+                ${stats.totalRevenue.toFixed(2)}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium text-gray-500">
+                {t("Dashboard.pending_invoices")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.pendingInvoices}</div>
               <p className="text-xs text-gray-500 mt-1">
-                {stats.pendingInvoices} pending
+                {((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(
+                  1
+                )}
+                {t("Dashboard.of_total")}
               </p>
             </CardContent>
           </Card>
-        </Link>
+        </div>
 
-        <Link href="/products">
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-medium text-gray-500">
-                Total Products
-              </CardTitle>
+              <CardTitle>{t("Dashboard.recent_invoices")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalProducts}</div>
+              <p className="text-sm text-gray-500">
+                {t("Dashboard.recent_invoices_list")}
+              </p>
             </CardContent>
           </Card>
-        </Link>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Total Revenue
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${stats.totalRevenue.toFixed(2)}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-500">
-              Pending Invoices
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.pendingInvoices}</div>
-            <p className="text-xs text-gray-500 mt-1">
-              {((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}
-              % of total
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Invoices</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-500">
-              Coming soon: Recent invoices list
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Popular Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-500">
-              Coming soon: Popular products list
-            </p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("Dashboard.popular_products")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500">
+                {t("Dashboard.popular_products_list")}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

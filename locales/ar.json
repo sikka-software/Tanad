@@ -1291,5 +1291,19 @@
     "create_client": "إضافة عميل",
     "no_clients_found": "لم يتم العثور على عملاء",
     "error_fetching_clients": "حدث خطأ أثناء جلب العملاء"
+  },
+  "Dashboard": {
+    "title": "لوحة التحكم",
+    "create_product": "إضافة منتج",
+    "total_invoices": "إجمالي الفواتير",
+    "pending": "معلقة",
+    "total_products": "إجمالي المنتجات",
+    "total_revenue": "إجمالي الإيرادات",
+    "pending_invoices": "الفواتير المعلقة",
+    "of_total": "% من الإجمالي",
+    "recent_invoices": "الفواتير الأخيرة",
+    "recent_invoices_list": "قريباً: قائمة الفواتير الأخيرة",
+    "popular_products": "المنتجات الرائجة",
+    "popular_products_list": "قريباً: قائمة المنتجات الرائجة"
   }
 }

@@ -1259,5 +1259,19 @@
     "create_client": "Create Client",
     "no_clients_found": "No clients found",
     "error_fetching_clients": "An error occurred while fetching clients"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "create_product": "Add Product",
+    "total_invoices": "Total Invoices",
+    "pending": "pending",
+    "total_products": "Total Products",
+    "total_revenue": "Total Revenue",
+    "pending_invoices": "Pending Invoices",
+    "of_total": "% of total",
+    "recent_invoices": "Recent Invoices",
+    "recent_invoices_list": "Coming soon: Recent invoices list",
+    "popular_products": "Popular Products",
+    "popular_products_list": "Coming soon: Popular products list"
   }
 }

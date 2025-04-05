@@ -14,6 +14,7 @@ import {
   Package,
   File,
   Users,
+  ChevronDown,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -78,9 +79,31 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton>
+                  Select Workspace
+                  <ChevronDown className="ms-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[var(--radix-popper-anchor-width)]">
+                <DropdownMenuItem>
+                  <span>Acme Inc</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <span>Acme Corp.</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarHeader className="p-0">
+          {/* <SidebarHeader className="p-0">
             <Link
               href={user ? "/dashboard" : "/"}
               className="flex items-center"
@@ -105,7 +128,7 @@ export function AppSidebar() {
                 )}
               </span>
             </Link>
-          </SidebarHeader>
+          </SidebarHeader> */}
           <SidebarGroupContent>
             <SidebarMenu className="mt-4 gap-2">
               {items.map((item, i) => (
