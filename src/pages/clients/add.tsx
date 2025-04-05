@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +37,22 @@ type ClientFormValues = z.infer<typeof clientSchema>;
 export default function AddClientPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get the current user ID when component mounts
+    const getUserId = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        setUserId(data.user.id);
+      } else {
+        // Redirect to login if no user is found
+        router.push('/auth/login');
+      }
+    };
+    
+    getUserId();
+  }, [router]);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
@@ -56,17 +72,23 @@ export default function AddClientPage() {
   const onSubmit = async (data: ClientFormValues) => {
     setLoading(true);
     try {
+      // Check if user ID is available
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
       const { error } = await supabase.from("clients").insert([
         {
           name: data.name.trim(),
           email: data.email.trim(),
           phone: data.phone.trim(),
-          company: data.company?.trim() || null,
+          company: data.company?.trim() || '',
           address: data.address.trim(),
           city: data.city.trim(),
           state: data.state.trim(),
           zip_code: data.zip_code.trim(),
           notes: data.notes?.trim() || null,
+          user_id: userId, // Add the user_id field
         },
       ]);
 
