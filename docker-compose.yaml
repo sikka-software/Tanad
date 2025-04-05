@@ -1,7 +1,7 @@
 services:
-  pukla:
-    image: ghcr.io/zaaakher/pukla:latest
-    container_name: pukla-app
+  sanad:
+    image: ghcr.io/zaaakher/sanad:latest
+    container_name: sanad-app
     restart: always
     ports:
       - "3036:3036"

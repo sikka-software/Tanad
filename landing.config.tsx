@@ -14,7 +14,7 @@ import { ContactSettings } from "@/lib/types";
 
 const settings: settingsProps = {
   navigation: { withRegister: true, withLogin: true, fullWidth: true },
-  projectName: { ar: "بكلة", en: "Pukla" },
+  projectName: { ar: "سند", en: "Sanad" },
   languages: ["ar", "en"],
   billingCycles: ["monthly", "annually"],
   billingCurrencies: ["sar", "usd"],
