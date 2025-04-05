@@ -1,49 +1,113 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useTranslations } from "next-intl";
-import PageTitle from "@/components/ui/page-title";
-import { GetStaticProps } from "next";
 
+import { GetStaticProps } from "next";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+
+import { Plus } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import PageTitle from "@/components/ui/page-title";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Match the Drizzle schema and potential API response format
 interface Product {
   id: string;
   name: string;
   description: string | null;
-  price: number;
+  price: string; // numeric in DB comes as string
   sku: string | null;
-  stock_quantity: number;
-  created_at: string;
-  updated_at: string;
+  // Handle both snake_case (from API) and camelCase (from Drizzle)
+  stockQuantity?: number;
+  stock_quantity?: number;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
 }
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const t = useTranslations("Products");
-
-  useEffect(() => {
-    async function fetchProducts() {
+  const [dataSource, setDataSource] = useState("");
+  
+  const fetchProducts = async (): Promise<Product[]> => {
+    // List of endpoints to try, in order of preference
+    const endpoints = [
+      "/api/get-products",             // Direct Postgres query
+      "/api/products/all",             // Drizzle ORM query
+      "/api/products/fallback",        // Hardcoded fallback
+    ];
+    
+    // Helper to fetch with timeout
+    const fetchWithTimeout = async (url: string, timeout = 8000) => {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+      
       try {
-        const response = await fetch("/api/products/all");
-        if (!response.ok) {
-          throw new Error(t("error.fetch"));
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(id);
+        return response;
+      } catch (error) {
+        clearTimeout(id);
+        throw error;
+      }
+    };
+    
+    let lastError = null;
+    
+    // Try each endpoint one by one
+    for (const endpoint of endpoints) {
+      try {
+        console.log(`Trying to fetch from ${endpoint}...`);
+        const response = await fetchWithTimeout(endpoint);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log(`Successfully fetched from ${endpoint}:`, data);
+          
+          if (data.products && Array.isArray(data.products)) {
+            // Save the source info for display
+            if (data.source) {
+              setDataSource(data.source);
+            } else if (endpoint.includes("fallback")) {
+              setDataSource("fallback");
+            } else {
+              setDataSource("database");
+            }
+            
+            return data.products;
+          }
         }
-        const data = await response.json();
-
-        setProducts(data.products || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : t("error.fetch"));
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.error(`Error fetching from ${endpoint}:`, error);
+        lastError = error;
       }
     }
+    
+    // If we got here, all endpoints failed
+    throw lastError || new Error("All endpoints failed");
+  };
 
-    fetchProducts();
-  }, [t]);
+  const {
+    data: products = [],
+    isLoading: loading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+    retry: 2,
+    retryDelay: 1000,
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
+  });
+
+  // Debug output
+  console.log("Query state:", { loading, error, productsLength: products.length, dataSource });
+  
+  const errorMessage = error instanceof Error ? error.message : t("error.fetch");
 
   if (loading) {
     return (
@@ -54,18 +118,20 @@ export default function ProductsPage() {
           createButtonText={t("create_product")}
           createButtonDisabled
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-4 w-3/4" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 w-1/2 mb-2" />
-                <Skeleton className="h-4 w-1/4" />
-              </CardContent>
-            </Card>
-          ))}
+        <div className="p-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-4 w-3/4" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="mb-2 h-4 w-1/2" />
+                  <Skeleton className="h-4 w-1/4" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -74,8 +140,14 @@ export default function ProductsPage() {
   if (error) {
     return (
       <div className="container mx-auto">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
+        <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+          <p className="font-medium">{errorMessage}</p>
+          <p className="mt-1 text-sm">Database connection issues detected. Check your database connection and ensure it's running properly.</p>
+          <div className="mt-2">
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
+              Try Again
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -88,9 +160,19 @@ export default function ProductsPage() {
         createButtonLink="/products/add"
         createButtonText={t("create_product")}
       />
+      
+      {dataSource === "fallback" && (
+        <div className="mx-4 mb-4 rounded border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm text-yellow-700">
+          Using fallback data due to database connection issues. 
+          <Button variant="link" size="sm" className="px-1 py-0" onClick={() => refetch()}>
+            Try again with real database
+          </Button>
+        </div>
+      )}
+      
       <div className="p-4">
         {products.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="py-12 text-center">
             <p className="text-gray-500">{t("no_products")}</p>
             <Link
               href="/products/add"
@@ -101,27 +183,22 @@ export default function ProductsPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map((product) => (
-              <Card
-                key={product.id}
-                className="hover:shadow-lg transition-shadow"
-              >
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {products.map((product: Product) => (
+              <Card key={product.id} className="transition-shadow hover:shadow-lg">
                 <CardHeader>
                   <h3 className="text-lg font-semibold">{product.name}</h3>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 mb-2">
-                    {product.description || t("no_description")}
-                  </p>
-                  <p className="text-lg font-bold">
-                    ${Number(product.price).toFixed(2)}
-                  </p>
+                  <p className="mb-2 text-gray-600">{product.description || t("no_description")}</p>
+                  <p className="text-lg font-bold">${Number(product.price).toFixed(2)}</p>
                   <p className="text-sm text-gray-500">
                     {t("sku_label", { value: product.sku || "N/A" })}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {t("stock_label", { value: product.stock_quantity })}
+                    {t("stock_label", {
+                      value: product.stockQuantity || product.stock_quantity || 0,
+                    })}
                   </p>
                 </CardContent>
               </Card>

@@ -7,6 +7,11 @@
         "@modelcontextprotocol/server-postgres",
         "postgresql://postgres:Ux1maCYOQf8TTYM4@db.jbyougyxkvhffbnqstiq.supabase.co:5432/postgres"
       ]
+    },
+    "tanad-write-access-db": {
+        "command": "uv",
+        "args": ["run", "/Users/zakhermasri/.local/bin/supabase-mcp-server"]
+      
     }
   }
 }
