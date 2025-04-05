@@ -1244,7 +1244,7 @@
     "stock_label": "In Stock: {value}",
     "create_invoice": "Create Invoice",
     "creating_invoice": "Creating...",
-    "no_invoices": "No invoices found",
+    "no_invoices_found": "No invoices found",
     "add_first_invoice": "Add your first invoice",
     "success": {
       "created": "Invoice created successfully"
@@ -1253,5 +1253,11 @@
       "create": "Failed to create invoice",
       "fetch": "Failed to fetch invoices"
     }
+  },
+  "Clients": {
+    "title": "Clients",
+    "create_client": "Create Client",
+    "no_clients_found": "No clients found",
+    "error_fetching_clients": "An error occurred while fetching clients"
   }
 }

@@ -47,7 +47,7 @@ export default function ProductsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto space-y-4">
+      <div className="mx-auto space-y-4">
         <PageTitle
           title={t("title")}
           createButtonLink="/products/add"

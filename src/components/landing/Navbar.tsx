@@ -85,11 +85,11 @@ export default function Navigation(props: any) {
       action: () => router.push(`/${router.locale}/pricing`),
       trigger: t("Landing.pricing"),
     },
-    {
-      path: `/${router.locale}/directory`,
-      action: () => router.push(`/${router.locale}/directory`),
-      trigger: t("Landing.directory"),
-    },
+    // {
+    //   path: `/${router.locale}/directory`,
+    //   action: () => router.push(`/${router.locale}/directory`),
+    //   trigger: t("Landing.directory"),
+    // },
   ];
 
   const logoSrc = `/assets/pukla-logo-full-${
@@ -116,14 +116,15 @@ export default function Navigation(props: any) {
       >
         <div className="flex flex-row items-center justify-center gap-10">
           <Link href={"/"}>
-            <Image
+          Sanad
+            {/* <Image
               loading="lazy"
               width={512}
               height={512}
               src={logoSrc}
               className="w-[150px] aspect-auto"
               alt="Pukla Logo"
-            />
+            /> */}
           </Link>
           {(size?.width ?? 0) > 800 && (
             <div className="flex w-full flex-row gap-4 ">

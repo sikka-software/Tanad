@@ -184,13 +184,14 @@ export default function Auth() {
       />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <Image
+          Sanad
+          {/* <Image
             src={`/assets/pukla-logo-full-${resolvedTheme === "dark" ? "green" : "purple"}.png`}
             alt="Pukla"
             className="h-12 w-auto"
             width={512}
             height={512}
-          />
+          /> */}
         </div>
       </div>
       {isForgotPassword ? (

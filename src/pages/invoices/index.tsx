@@ -89,7 +89,7 @@ export default function InvoicesPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto space-y-4">
+      <div className="mx-auto space-y-4">
         <PageTitle
           title={t("title")}
           createButtonLink="/invoices/add"
@@ -116,7 +116,7 @@ export default function InvoicesPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto">
+      <div className="mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
@@ -125,7 +125,7 @@ export default function InvoicesPage() {
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="mx-auto">
       <PageTitle
         title={t("title")}
         createButtonLink="/invoices/add"
@@ -135,7 +135,7 @@ export default function InvoicesPage() {
       <div className="p-4">
         {invoices.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">No invoices found</p>
+            <p className="text-gray-500">{t("no_invoices_found")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

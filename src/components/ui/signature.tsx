@@ -115,8 +115,8 @@ export const Signature: FC<SignatureCanvasProps> = ({
         ref={canvasRef}
         {...canvasProps}
         className={cn(
-          "rounded border bg-[hsl(var(--constant-background))]",
-          canvasProps?.className,
+          "rounded border bg-[var(--constant-background)]",
+          canvasProps?.className
         )}
       />
 
@@ -126,9 +126,7 @@ export const Signature: FC<SignatureCanvasProps> = ({
         <p
           className={cn(
             "my-0 text-start text-xs text-helper-color transition-all",
-            helperText
-              ? "h-4 opacity-100"
-              : "h-0 opacity-0",
+            helperText ? "h-4 opacity-100" : "h-0 opacity-0"
           )}
         >
           {helperText}

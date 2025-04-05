@@ -55,7 +55,7 @@ export default function ClientsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto space-y-4">
+      <div className="mx-auto space-y-4">
         <PageTitle
           title={t("title")}
           createButtonLink="/clients/add"
@@ -83,7 +83,7 @@ export default function ClientsPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto">
+      <div className="mx-auto">
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
@@ -92,7 +92,7 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="container mx-auto">
+    <div className="mx-auto">
       <PageTitle
         title={t("title")}
         createButtonLink="/clients/add"
@@ -101,7 +101,7 @@ export default function ClientsPage() {
 
       {clients.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">No clients found</p>
+          <p className="text-gray-500">{t("no_clients_found")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

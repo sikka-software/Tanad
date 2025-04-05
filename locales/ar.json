@@ -1255,7 +1255,7 @@
       "fetch": "فشل في جلب المنتجات"
     }
   },
-  
+
   "Invoices": {
     "title": "الفواتير",
     "add_new": "إضافة فاتورة جديدة",
@@ -1265,7 +1265,7 @@
     "description": "الوصف",
     "enter_description": "أدخل وصف الفاتورة",
     "price": "السعر",
-        "price_required": "السعر مطلوب",
+    "price_required": "السعر مطلوب",
     "stock_quantity": "الكمية المتوفرة",
     "stock_quantity_required": "الكمية المتوفرة مطلوبة",
     "sku": "رمز المنتج",
@@ -1275,15 +1275,21 @@
     "stock_label": "المتوفر: {value}",
     "create_invoice": "إنشاء فاتورة",
     "creating_invoice": "جاري الإنشاء...",
-    "no_invoices": "لا توجد فواتير",
+    "no_invoices_found": "لا توجد فواتير",
     "add_first_invoice": "أضف أول فاتورة",
     "success": {
       "created": "تم إنشاء الفاتورة بنجاح"
     },
     "error": {
-      "create":  "فشل في إنشاء الفاتورة",
+      "create": "فشل في إنشاء الفاتورة",
       "fetch": "فشل في جلب الفواتير"
     }
-  }
+  },
 
+  "Clients": {
+    "title": "العملاء",
+    "create_client": "إضافة عميل",
+    "no_clients_found": "لم يتم العثور على عملاء",
+    "error_fetching_clients": "حدث خطأ أثناء جلب العملاء"
+  }
 }

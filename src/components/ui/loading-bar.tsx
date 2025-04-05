@@ -16,7 +16,7 @@ export const LoadingBar: React.FC<LoadingBarProps> = ({
   startPosition = 0.3,
   stopDelayMs = 0,
   height = 5,
-  options
+  options,
 }) => {
   let timer: NodeJS.Timeout | null = null;
 
@@ -53,7 +53,7 @@ export const LoadingBar: React.FC<LoadingBarProps> = ({
         pointer-events: none;
       }
       #nprogress .bar {
-        background: ${color || "hsl(var(--primary))"};
+        background: ${color || "var(--primary)"};
         position: fixed;
         z-index: 1031;
         top: 0;
