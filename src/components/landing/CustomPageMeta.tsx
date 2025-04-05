@@ -1,4 +1,5 @@
 import React from "react";
+
 import { useTranslations } from "next-intl";
 import Head from "next/head";
 
@@ -9,12 +10,7 @@ interface MetaProps {
   author?: string;
 }
 
-const CustomPageMeta: React.FC<MetaProps> = ({
-  title,
-  description,
-  keywords,
-  author,
-}) => {
+const CustomPageMeta: React.FC<MetaProps> = ({ title, description, keywords, author }) => {
   const t = useTranslations();
 
   const defaultTitle = t("SEO.landing.title");
@@ -24,13 +20,11 @@ const CustomPageMeta: React.FC<MetaProps> = ({
 
   return (
     <Head>
-      <title>{`${t("General.pukla")} | ${title || defaultTitle}`}</title>
+      <title>{`${t("General.sanad")} | ${title || defaultTitle}`}</title>
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       <meta charSet="utf-8" />
       <meta name="description" content={description || defaultDescription} />
-      {keywords && (
-        <meta name="keywords" content={keywords || defaultKeywords} />
-      )}
+      {keywords && <meta name="keywords" content={keywords || defaultKeywords} />}
       {author && <meta name="author" content={author || defaultAuthor} />}
     </Head>
   );

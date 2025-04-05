@@ -1,12 +1,13 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, UseFormReturn } from "react-hook-form";
-import { toast } from "sonner";
 import { useState, useRef } from "react";
-import * as z from "zod";
+import { useForm, UseFormReturn } from "react-hook-form";
+
 import { useTranslations } from "next-intl";
 
-import useUserStore from "@/hooks/use-user-store";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import * as z from "zod";
 
+import { Badge } from "@/components/ui/badge";
 import {
   Form,
   FormControl,
@@ -15,8 +16,6 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -24,6 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import useUserStore from "@/hooks/use-user-store";
 
 const formSchema = z.object({
   hideAvatar: z.boolean(),
@@ -35,7 +36,7 @@ const formSchema = z.object({
     .default("circle"),
 });
 
-type AppearanceFormValues = z.infer<typeof formSchema>;
+type AppearanceFormValues = z.input<typeof formSchema>;
 
 const AppearanceSettings = ({
   onUpdate,
@@ -48,22 +49,14 @@ const AppearanceSettings = ({
     hideWatermark: boolean;
     hideTitle: boolean;
     hideBio: boolean;
-    avatarShape:
-      | "circle"
-      | "square"
-      | "horizontal_rectangle"
-      | "vertical_rectangle";
+    avatarShape?: "circle" | "square" | "horizontal_rectangle" | "vertical_rectangle";
   }) => Promise<void>;
   initialValues?: {
     hideAvatar: boolean;
     hideWatermark: boolean;
     hideTitle: boolean;
     hideBio: boolean;
-    avatarShape?:
-      | "circle"
-      | "square"
-      | "horizontal_rectangle"
-      | "vertical_rectangle";
+    avatarShape?: "circle" | "square" | "horizontal_rectangle" | "vertical_rectangle";
   };
   isPending?: boolean;
   form?: UseFormReturn<AppearanceFormValues>;
@@ -113,11 +106,7 @@ const AppearanceSettings = ({
   return (
     <div className="space-y-6">
       <Form {...form}>
-        <form
-          ref={formRef}
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-4"
-        >
+        <form ref={formRef} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           {/* Avatar Shape */}
           <FormField
             control={form.control}
@@ -125,31 +114,19 @@ const AppearanceSettings = ({
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-base text-primary">
+                  <FormLabel className="text-primary text-base">
                     {t("Settings.avatarShape")}
                   </FormLabel>
-                  <FormDescription>
-                    {t("Settings.avatarShapeDescription")}
-                  </FormDescription>
+                  <FormDescription>{t("Settings.avatarShapeDescription")}</FormDescription>
                 </div>
                 <FormControl>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isPending}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange} disabled={isPending}>
                     <SelectTrigger className="w-[180px]">
-                      <SelectValue
-                        placeholder={t("Settings.selectAvatarShape")}
-                      />
+                      <SelectValue placeholder={t("Settings.selectAvatarShape")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="circle">
-                        {t("Settings.avatarShapes.circle")}
-                      </SelectItem>
-                      <SelectItem value="square">
-                        {t("Settings.avatarShapes.square")}
-                      </SelectItem>
+                      <SelectItem value="circle">{t("Settings.avatarShapes.circle")}</SelectItem>
+                      <SelectItem value="square">{t("Settings.avatarShapes.square")}</SelectItem>
                       <SelectItem value="horizontal_rectangle">
                         {t("Settings.avatarShapes.horizontal_rectangle")}
                       </SelectItem>
@@ -169,12 +146,10 @@ const AppearanceSettings = ({
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-base text-primary">
+                  <FormLabel className="text-primary text-base">
                     {t("Settings.hideAvatar")}
                   </FormLabel>
-                  <FormDescription>
-                    {t("Settings.hideAvatarDescription")}
-                  </FormDescription>
+                  <FormDescription>{t("Settings.hideAvatarDescription")}</FormDescription>
                 </div>
                 <FormControl>
                   <Switch
@@ -194,12 +169,10 @@ const AppearanceSettings = ({
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-base text-primary">
+                  <FormLabel className="text-primary text-base">
                     {t("Settings.hideTitle")}
                   </FormLabel>
-                  <FormDescription>
-                    {t("Settings.hideTitleDescription")}
-                  </FormDescription>
+                  <FormDescription>{t("Settings.hideTitleDescription")}</FormDescription>
                 </div>
                 <FormControl>
                   <Switch
@@ -219,12 +192,8 @@ const AppearanceSettings = ({
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-base text-primary">
-                    {t("Settings.hideBio")}
-                  </FormLabel>
-                  <FormDescription>
-                    {t("Settings.hideBioDescription")}
-                  </FormDescription>
+                  <FormLabel className="text-primary text-base">{t("Settings.hideBio")}</FormLabel>
+                  <FormDescription>{t("Settings.hideBioDescription")}</FormDescription>
                 </div>
                 <FormControl>
                   <Switch
@@ -243,8 +212,8 @@ const AppearanceSettings = ({
             name="hideWatermark"
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5 ">
-                  <FormLabel className="text-base items-center flex flex-row text-primary">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-primary flex flex-row items-center text-base">
                     <span>{t("Settings.hideWatermark")}</span>
                     {user?.subscribed_to === "pukla_free" && (
                       <Badge variant="outline" className="ms-2">
@@ -252,9 +221,7 @@ const AppearanceSettings = ({
                       </Badge>
                     )}
                   </FormLabel>
-                  <FormDescription>
-                    {t("Settings.hideWatermarkDescription")}
-                  </FormDescription>
+                  <FormDescription>{t("Settings.hideWatermarkDescription")}</FormDescription>
                 </div>
                 <div>
                   <FormControl>

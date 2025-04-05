@@ -14,7 +14,7 @@ import ThemeSwitcher from "@/components/ui/theme-switcher";
 
 import { UserProvider } from "../UserContext";
 
-export const AppLayout = ({ children }: { children: React.ReactNode }) => {
+const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const lang = useLocale();
   const defaultOpen = Cookies.get("sidebar_state") === "true";
   return (
@@ -48,3 +48,5 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
     </UserProvider>
   );
 };
+
+export default AppLayout;

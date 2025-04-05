@@ -1,22 +1,18 @@
 "use client";
 
-import "@/styles/globals.css";
+import { useEffect } from "react";
+
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import type { AppProps } from "next/app";
-import { useLocale } from "next-intl";
-import { useEffect } from "react";
-import LandingLayout from "@/components/landing/LandingLayout";
+
+import AppLayout from "@/components/layouts/app-layout";
+import AuthLayout from "@/components/layouts/auth-layout";
+import LandingLayout from "@/components/layouts/landing-layout";
 import { LoadingBar } from "@/components/ui/loading-bar";
-import { Toaster } from "@/components/ui/sonner";
+import "@/styles/globals.css";
 
-import { AppLayout } from "@/components/layouts/app-layout";
-
-export default function PuklaLanding({
-  Component,
-  pageProps,
-  router,
-}: AppProps) {
+export default function Sanad({ Component, pageProps, router }: AppProps) {
   useEffect(() => {
     router.events.emit("routeChangeComplete", router.asPath);
   }, []);
@@ -49,7 +45,7 @@ export default function PuklaLanding({
         timeZone="Asia/Riyadh"
         now={new Date()}
       >
-        <AuthPages>{<Component {...pageProps} />}</AuthPages>
+        <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
       </NextIntlClientProvider>
     );
   }
@@ -63,7 +59,7 @@ export default function PuklaLanding({
         timeZone="Asia/Riyadh"
         now={new Date()}
       >
-        <LandingPages>{<Component {...pageProps} />}</LandingPages>
+        <LandingLayout>{<Component {...pageProps} />}</LandingLayout>
       </NextIntlClientProvider>
     );
   }
@@ -96,51 +92,9 @@ export default function PuklaLanding({
   );
 }
 
-const AuthPages = ({ children }: { children: React.ReactNode }) => {
-  const lang = useLocale();
-  return (
-    <ThemeProvider
-      attribute="class"
-      disableTransitionOnChange
-      enableSystem
-      defaultTheme="dark"
-    >
-      <LoadingBar />
-      <Toaster
-        richColors
-        position={lang === "ar" ? "bottom-left" : "bottom-right"}
-        dir={lang === "ar" ? "rtl" : "ltr"}
-        style={{ fontFamily: "var(--font-family)" }}
-      />
-      {children}
-    </ThemeProvider>
-  );
-};
-
-const LandingPages = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <ThemeProvider
-      attribute="class"
-      disableTransitionOnChange
-      enableSystem
-      defaultTheme="dark"
-    >
-      <LandingLayout>
-        <LoadingBar />
-        {children}
-      </LandingLayout>
-    </ThemeProvider>
-  );
-};
-
 const PuklaPages = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ThemeProvider
-      attribute="class"
-      disableTransitionOnChange
-      enableSystem
-      defaultTheme="dark"
-    >
+    <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
       <LoadingBar />
       {children}
     </ThemeProvider>
