@@ -189,6 +189,13 @@ export function AppSidebar() {
                                             variant="ghost"
                                             size="icon"
                                             className="ms-auto !size-5 cursor-pointer !p-2"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              if (submenu.plusAction) {
+                                                router.push(submenu.plusAction);
+                                              }
+                                            }}
                                           >
                                             <Plus className="!size-3" />
                                           </Button>
