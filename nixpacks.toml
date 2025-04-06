@@ -1,0 +1,21 @@
+# nixpacks.toml
+
+# Phase 1: Setup - Install necessary system packages/tools
+[phases.setup]
+# Add the 'infisical' Nix package.
+# Note: Check the Nixpkgs search (search.nixos.org) if 'infisical' isn't the exact name; sometimes it might be 'infisical-cli'. 'infisical' is the common name currently.
+pkgs = ["infisical"]
+
+# Phase 2: Install - Install language-specific dependencies
+[phases.install]
+# Override the default install command (which would just be 'bun install')
+# This command first exports secrets from Infisical to a .env file,
+# and only if that succeeds (due to &&), it runs 'bun install'.
+cmds = ["infisical export --format=dotenv-export > .env", "bun install"]
+
+# You might also have build and start phases defined here
+[phases.build]
+cmds = ["bun run build"]
+
+[start]
+cmd = "bun run start"
