@@ -1256,14 +1256,14 @@
     "add_new_client": "Add New Client",
     "amount": "Amount",
     "due_date": "Due Date",
-
     "select_status": "Select a status",
     "status": {
       "title": "Status",
       "draft": "Draft",
       "pending": "Pending",
       "paid": "Paid",
-      "overdue": "Overdue"
+      "overdue": "Overdue",
+      "cancelled": "Cancelled"
     },
     "notes": "Notes",
     "enter_notes": "Enter any additional notes",
@@ -1278,6 +1278,21 @@
     "success": {
       "title": "Success",
       "created": "Invoice created successfully"
+    },
+    "submitting": "Submitting...",
+    "products": {
+      "title": "Products",
+      "add_product": "Add Product",
+      "no_products": "No products added",
+      "product": "Product",
+      "quantity": "Quantity",
+      "unit_price": "Unit Price",
+      "subtotal": "Subtotal",
+      "select_product": "Select product",
+      "search_products": "Search products",
+      "no_products_found": "No products found",
+      "add_new_product": "Add new product",
+      "product_description": "Product description"
     }
   },
   "Clients": {
@@ -1314,6 +1329,40 @@
       "title": "Success",
       "created": "Client created successfully"
     }
+  },
+  "Sales": {
+    "title": "Sales"
+  },
+  "Quotes": {
+    "title": "Quotes"
+  },
+  "Employees": {
+    "title": "Employees",
+    "allEmployees": "All Employees"
+  },
+  "Salaries": {
+    "title": "Salaries"
+  },
+  "Leave": {
+    "title": "Leave"
+  },
+  "Holidays": {
+    "title": "Holidays"
+  },
+  "Reports": {
+    "title": "Reports"
+  },
+  "Requests": {
+    "title": "Requests"
+  },
+  "Applicants": {
+    "title": "Applicants"
+  },
+  "Attendance": {
+    "title": "Attendance"
+  },
+  "Users": {
+    "title": "Users"
   },
   "Dashboard": {
     "title": "Dashboard",

@@ -1,4 +1,5 @@
 import { GetStaticProps } from "next";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -9,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function AddInvoicePage() {
   const router = useRouter();
+  const t = useTranslations("Invoices");
 
   return (
     <div className="container mx-auto p-6">
@@ -17,12 +19,12 @@ export default function AddInvoicePage() {
           <Link href="/invoices" className="text-gray-500 hover:text-gray-700">
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <h1 className="text-2xl font-bold">Add New Invoice</h1>
+          <h1 className="text-2xl font-bold">{t("add_new")}</h1>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Invoice Details</CardTitle>
+            <CardTitle>{t("invoice_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <InvoiceForm />

@@ -76,17 +76,17 @@ const dynamicRoutePatterns = [
 export function Breadcrumb() {
   const router = useRouter();
   const t = useTranslations();
-  
+
   // Rather than creating a new translation context, handle namespace translation differently
   const getTranslatedKey = (key: string) => {
     if (!key) return "";
-    
+
     const [namespace, translationKey] = key.split(".");
     // Use the default t function if no namespace is provided
     if (!translationKey) {
       return t(key);
     }
-    
+
     try {
       // Try to use the namespace and key directly from the base t function
       return t(`${namespace}.${translationKey}`);

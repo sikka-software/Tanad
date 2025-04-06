@@ -334,17 +334,6 @@
       "answer": "تستطيع التواصل معنا عن طريق <email>البريد الإلكتروني</email> او عن طريق <twitter>تويتر</twitter> او عن طريق <whatsapp>واتساب</whatsapp> أو عن طريق <phone>الهاتف</phone>"
     }
   },
-  "Help": {
-    "hero": {
-      "title": "صفحة المساعدة",
-      "subtitle": "سنقوم بإضافة محتوى تعليمي قريبا إن شاء الله",
-      "in-the-meantime": "في الوقت حالي, تفضل بالتواصل معنا إذا تحتاج مساعدة"
-    },
-    "contact": {
-      "title": "تواصل معنا",
-      "subtitle": "في خاطرك شي؟ حياك أرسل لنا رسالة "
-    }
-  },
   "ReportPage": {
     "page-title": "التبليغ عن مخالفة",
     "page-subtitle": "هل اكتشفت مشكلة غير قانونية أو غير أخلاقية في إحدى البكلات؟ الرجاء ملء النموذج التالي للتبليغ عنها.",
@@ -1259,6 +1248,38 @@
     }
   },
 
+  "Dashboard": {
+    "title": "لوحة التحكم",
+    "create_product": "إضافة منتج",
+    "total_invoices": "إجمالي الفواتير",
+    "pending": "معلقة",
+    "total_products": "إجمالي المنتجات",
+    "total_revenue": "إجمالي الإيرادات",
+    "pending_invoices": "الفواتير المعلقة",
+    "of_total": "% من الإجمالي",
+    "recent_invoices": "الفواتير الأخيرة",
+    "recent_invoices_list": "قريباً: قائمة الفواتير الأخيرة",
+    "popular_products": "المنتجات الرائجة",
+    "popular_products_list": "قريباً: قائمة المنتجات الرائجة",
+    "create": "إنشاء",
+    "select_create_option": "حدد خيارًا",
+    "add_product": "إضافة منتج",
+    "add_invoice": "إضافة فاتورة",
+    "add_client": "إضافة عميل",
+    "add_employee": "إضافة موظف",
+    "add_warehouse": "إضافة مستودع"
+  },
+  "Help": {
+    "hero": {
+      "title": "صفحة المساعدة",
+      "subtitle": "سنقوم بإضافة محتوى تعليمي قريبا إن شاء الله",
+      "in-the-meantime": "في الوقت حالي, تفضل بالتواصل معنا إذا تحتاج مساعدة"
+    },
+    "contact": {
+      "title": "تواصل معنا",
+      "subtitle": "في خاطرك شي؟ حياك أرسل لنا رسالة "
+    }
+  },
   "Invoices": {
     "title": "الفواتير",
     "add_new": "إضافة فاتورة جديدة",
@@ -1293,7 +1314,8 @@
       "draft": "مسودة",
       "pending": "معلقة",
       "paid": "مدفوعة",
-      "overdue": "متأخرة"
+      "overdue": "متأخرة",
+      "cancelled": "ملغية"
     },
     "notes": "ملاحظات",
     "enter_notes": "أدخل أي ملاحظات إضافية",
@@ -1308,63 +1330,55 @@
     "success": {
       "title": "تم بنجاح",
       "created": "تم إنشاء الفاتورة بنجاح"
-    }
-  },
-
-  "Clients": {
-    "title": "العملاء",
-    "create_client": "إضافة عميل",
-    "no_clients_found": "لم يتم العثور على عملاء",
-    "error_fetching_clients": "حدث خطأ أثناء جلب العملاء",
-    "full_name": "الاسم الكامل",
-    "enter_full_name": "أدخل الاسم الكامل",
-    "company": "الشركة",
-    "enter_company_name": "أدخل اسم الشركة",
-    "email": "البريد الإلكتروني",
-    "enter_email": "أدخل البريد الإلكتروني",
-    "phone": "رقم الهاتف",
-    "enter_phone": "أدخل رقم الهاتف",
-    "address": "العنوان",
-    "enter_address": "أدخل العنوان",
-    "city": "المدينة",
-    "enter_city": "أدخل المدينة",
-    "state": "المنطقة",
-    "enter_state": "أدخل المنطقة",
-    "zip_code": "الرمز البريدي",
-    "enter_zip_code": "أدخل الرمز البريدي",
-    "notes": "ملاحظات",
-    "enter_notes": "أدخل أي ملاحظات إضافية",
-    "cancel": "إلغاء",
-    "creating": "جاري الإنشاء...",
-    "error": {
-      "not_authenticated": "المستخدم غير مصرح له",
-      "title": "خطأ",
-      "create": "فشل في إنشاء العميل"
     },
-    "success": {
-      "title": "تم بنجاح",
-      "created": "تم إنشاء العميل بنجاح"
+    "submitting": "جاري الإرسال...",
+    "products": {
+      "title": "المنتجات",
+      "add_product": "إضافة منتج",
+      "no_products": "لا توجد منتجات",
+      "product": "المنتج",
+      "quantity": "الكمية",
+      "unit_price": "سعر الوحدة",
+      "subtotal": "المجموع الفرعي",
+      "select_product": "اختر منتج",
+      "search_products": "بحث عن المنتجات",
+      "no_products_found": "لم يتم العثور على منتجات",
+      "add_new_product": "إضافة منتج جديد",
+      "product_description": "وصف المنتج"
     }
   },
-  "Dashboard": {
-    "title": "لوحة التحكم",
-    "create_product": "إضافة منتج",
-    "total_invoices": "إجمالي الفواتير",
-    "pending": "معلقة",
-    "total_products": "إجمالي المنتجات",
-    "total_revenue": "إجمالي الإيرادات",
-    "pending_invoices": "الفواتير المعلقة",
-    "of_total": "% من الإجمالي",
-    "recent_invoices": "الفواتير الأخيرة",
-    "recent_invoices_list": "قريباً: قائمة الفواتير الأخيرة",
-    "popular_products": "المنتجات الرائجة",
-    "popular_products_list": "قريباً: قائمة المنتجات الرائجة",
-    "create": "إنشاء",
-    "select_create_option": "حدد خيارًا",
-    "add_product": "إضافة منتج",
-    "add_invoice": "إضافة فاتورة",
-    "add_client": "إضافة عميل",
-    "add_employee": "إضافة موظف",
-    "add_warehouse": "إضافة مستودع"
+  "Sales": {
+    "title": "المبيعات"
+  },
+  "Quotes": {
+    "title": "عروض الأسعار"
+  },
+  "Employees": {
+    "title": "الموظفون",
+    "allEmployees": "جميع الموظفين"
+  },
+  "Salaries": {
+    "title": "الرواتب"
+  },
+  "Leave": {
+    "title": "الإجازات"
+  },
+  "Holidays": {
+    "title": "العطلات الرسمية"
+  },
+  "Reports": {
+    "title": "التقارير"
+  },
+  "Requests": {
+    "title": "الطلبات"
+  },
+  "Applicants": {
+    "title": "المتقدمون"
+  },
+  "Attendance": {
+    "title": "الحضور"
+  },
+  "Users": {
+    "title": "المستخدمون"
   }
 }

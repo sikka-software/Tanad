@@ -518,7 +518,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
           {/* Products Section with Table */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">Products</h3>
+              <h3 className="text-lg font-medium">{t("products.title")}</h3>
               <Button
                 type="button"
                 variant="outline"
@@ -528,7 +528,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
                 }
               >
                 <PlusCircle className="mr-2 h-4 w-4" />
-                Add Product
+                {t("products.add_product")}
               </Button>
             </div>
 
@@ -559,7 +559,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
                   ) : (
                     <TableRow>
                       <TableCell colSpan={columns.length} className="h-24 text-center">
-                        No products added
+                        {t("products.no_products")}
                       </TableCell>
                     </TableRow>
                   )}
