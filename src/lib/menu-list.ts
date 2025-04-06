@@ -45,15 +45,27 @@ export function getMenuList(pathname: string): Group[] {
         },
         {
           href: "/products",
-          label: "Products",
+          label: "Sales",
           icon: Package,
           active: pathname === "/products",
-        },
-        {
-          href: "/invoices",
-          label: "Invoices",
-          icon: File,
-          active: pathname === "/invoices",
+          submenus: [
+            {
+              href: "/products",
+              label: "Products",
+              active: pathname === "/products",
+            },
+            {
+              href: "/invoices",
+              label: "Invoices",
+              // icon: File,
+              active: pathname === "/invoices",
+            },
+            {
+              href: "/quotes",
+              label: "Quotes",
+              active: pathname === "/quotes",
+            },
+          ],
         },
         {
           href: "/clients",

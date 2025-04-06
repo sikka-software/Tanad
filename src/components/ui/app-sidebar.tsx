@@ -47,6 +47,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
+  SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
@@ -77,6 +78,8 @@ export function AppSidebar() {
   const logoSrc = `/assets/pukla-logo-full-${
     !isMounted || resolvedTheme === "dark" ? "green" : "purple"
   }${lang === "en" ? "-en" : ""}.png`;
+
+  const sidebarIsOpen = state !== "collapsed" && !isMobile;
 
   return (
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"}>
@@ -135,47 +138,51 @@ export function AppSidebar() {
               {menuGroups.map((group, groupIndex) => (
                 <div key={groupIndex}>
                   {group.groupLabel && (
-                    <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
+                    <div className="text-muted-foreground px-3 py-2 text-xs font-medium">
                       {t(group.groupLabel)}
                     </div>
                   )}
                   {group.menus.map((menu, menuIndex) => (
-                    menu.submenus && menu.submenus.length > 0 ? (
-                      <Collapsible key={menuIndex} defaultOpen className="group/collapsible">
-                        <SidebarMenuItem>
-                          <CollapsibleTrigger asChild>
-                            <SidebarMenuButton>
-                              {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                              <span>{t(menu.label)}</span>
-                            </SidebarMenuButton>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent>
-                            <SidebarMenuSub>
-                              {menu.submenus.map((submenu, submenuIndex) => (
-                                <SidebarMenuSubItem key={submenuIndex}>
-                                  <Link href={submenu.href}>{t(submenu.label)}</Link>
-                                </SidebarMenuSubItem>
-                              ))}
-                            </SidebarMenuSub>
-                          </CollapsibleContent>
-                        </SidebarMenuItem>
-                      </Collapsible>
-                    ) : (
-                      <SidebarMenuItem key={menuIndex}>
+                    <SidebarMenuItem key={menuIndex}>
+                      {menu.submenus && menu.submenus.length > 0 ? (
+                        <Collapsible defaultOpen className="group/collapsible">
+                          <SidebarMenuItem>
+                            <CollapsibleTrigger asChild>
+                              <SidebarMenuButton className="justify-between">
+                                {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
+                                <span>{t(menu.label)}</span>
+                                <ChevronDown className="ms-auto" />
+                              </SidebarMenuButton>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="">
+                              <SidebarMenuSub className="!ms-2 w-full">
+                                {menu.submenus.map((submenu, submenuIndex) => (
+                                  <Link href={submenu.href}>
+                                    <SidebarMenuSubButton key={submenuIndex} className="w-ful">
+                                      <span>{t(submenu.label)}</span>
+                                    </SidebarMenuSubButton>
+                                  </Link>
+                                ))}
+                              </SidebarMenuSub>
+                            </CollapsibleContent>
+                          </SidebarMenuItem>
+                        </Collapsible>
+                      ) : (
                         <Link href={menu.href}>
                           <SidebarMenuButton
                             dir={lang === "ar" ? "rtl" : "ltr"}
                             tooltip={t(menu.label)}
                             className={cn(
-                              menu.active && "bg-primary text-background hover:bg-primary hover:text-background",
+                              menu.active &&
+                                "bg-primary text-background hover:bg-primary hover:text-background",
                             )}
                           >
                             {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
                             <span>{t(menu.label)}</span>
                           </SidebarMenuButton>
                         </Link>
-                      </SidebarMenuItem>
-                    )
+                      )}
+                    </SidebarMenuItem>
                   ))}
                 </div>
               ))}
