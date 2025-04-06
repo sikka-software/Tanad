@@ -11,7 +11,7 @@ pkgs = ["infisical"]
 # Override the default install command (which would just be 'bun install')
 # This command first exports secrets from Infisical to a .env file,
 # and only if that succeeds (due to &&), it runs 'bun install'.
-cmds = ["npx @infisical/cli export --format=dotenv-export > .env", "bun install"]
+cmds = ["npx @infisical/cli login --method=universal-auth --client-id=540329b9-c746-49d0-929f-1b854143d3d2 --client-secret=7e47941f02ee1fb1220c8c6906103be7db2c3d25fb27642d8247d14e46e1cb54", "bun install"]
 
 # You might also have build and start phases defined here
 [phases.build]
