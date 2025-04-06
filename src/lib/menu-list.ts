@@ -31,14 +31,14 @@ type Menu = {
 };
 
 type Group = {
-  groupLabel: string;
+  groupLabel?: string;
   menus: Menu[];
 };
 
 export function getMenuList(pathname: string): Group[] {
   return [
     {
-      groupLabel: "Main",
+      // groupLabel: "Main",
       menus: [
         {
           href: "/dashboard",
@@ -46,6 +46,13 @@ export function getMenuList(pathname: string): Group[] {
           translationKey: "Dashboard.title",
           icon: LayoutDashboard,
           active: pathname === "/dashboard",
+        },
+        {
+          href: "/analytics",
+          label: "Analytics",
+          translationKey: "Analytics.title",
+          icon: BarChart,
+          active: pathname === "/analytics",
         },
         {
           href: "/products",
@@ -84,59 +91,74 @@ export function getMenuList(pathname: string): Group[] {
           icon: Users,
           active: pathname === "/clients",
         },
-        {
-          href: "/analytics",
-          label: "Analytics",
-          translationKey: "Analytics.title",
-          icon: BarChart,
-          active: pathname === "/analytics",
-        },
-        {
-          href: "/billing",
-          label: "Billing",
-          translationKey: "Billing.title",
-          icon: CreditCard,
-          active: pathname === "/billing",
-        },
       ],
     },
     {
-      groupLabel: "Contents",
+      groupLabel: "Human Resources",
       menus: [
         {
           href: "",
-          label: "Posts",
-          translationKey: "Posts.title",
-          icon: SquarePen,
-          active: pathname.startsWith("/posts"),
+          label: "Employees",
+          translationKey: "Employees.title",
+          icon: Users,
+          active: pathname.startsWith("/employees"),
           submenus: [
             {
-              href: "/posts",
-              label: "All Posts",
-              translationKey: "Posts.allPosts",
-              active: pathname === "/posts",
+              href: "/employees",
+              label: "All Employees",
+              translationKey: "Employees.allEmployees",
+              plusAction: "/employees/add",
+              active: pathname === "/employees",
             },
             {
-              href: "/posts/new",
-              label: "New Post",
-              translationKey: "Posts.newPost",
-              active: pathname === "/posts/new",
+              href: "/salaries",
+              label: "Salaries",
+              translationKey: "Salaries.title",
+              active: pathname === "/salaries",
             },
+
+            {
+              href: "/leave",
+              label: "Leave",
+              translationKey: "Leave.title",
+              active: pathname === "/leave",
+            },
+            {
+              href: "/holidays",
+              label: "Holidays",
+              translationKey: "Holidays.title",
+              active: pathname === "/holidays",
+            },
+            {
+              href: "/reports",
+              label: "Reports",
+              translationKey: "Reports.title",
+              active: pathname === "/reports",
+            },
+
+            // requests
+            {
+              href: "/requests",
+              label: "Requests",
+              translationKey: "Requests.title",
+              active: pathname === "/requests",
+            },
+            // applications
           ],
         },
         {
-          href: "/categories",
-          label: "Categories",
-          translationKey: "Categories.title",
-          icon: Bookmark,
-          active: pathname === "/categories",
+          href: "/applicants",
+          label: "Applicants",
+          translationKey: "Applicants.title",
+          icon: Users,
+          active: pathname === "/applicants",
         },
         {
-          href: "/tags",
-          label: "Tags",
-          translationKey: "Tags.title",
+          href: "/attendance",
+          label: "Attendance",
+          translationKey: "Attendance.title",
           icon: Tag,
-          active: pathname === "/tags",
+          active: pathname === "/attendance",
         },
       ],
     },
@@ -149,6 +171,13 @@ export function getMenuList(pathname: string): Group[] {
           translationKey: "Users.title",
           icon: Users,
           active: pathname === "/users",
+        },
+        {
+          href: "/billing",
+          label: "Billing",
+          translationKey: "Billing.title",
+          icon: CreditCard,
+          active: pathname === "/billing",
         },
         {
           href: "/account",

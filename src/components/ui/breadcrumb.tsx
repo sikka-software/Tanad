@@ -76,7 +76,25 @@ const dynamicRoutePatterns = [
 export function Breadcrumb() {
   const router = useRouter();
   const t = useTranslations();
-  const getT = (ns: string) => useTranslations(ns);
+  
+  // Rather than creating a new translation context, handle namespace translation differently
+  const getTranslatedKey = (key: string) => {
+    if (!key) return "";
+    
+    const [namespace, translationKey] = key.split(".");
+    // Use the default t function if no namespace is provided
+    if (!translationKey) {
+      return t(key);
+    }
+    
+    try {
+      // Try to use the namespace and key directly from the base t function
+      return t(`${namespace}.${translationKey}`);
+    } catch (error) {
+      // Fallback to just the key if namespace doesn't exist
+      return translationKey;
+    }
+  };
 
   // Generate breadcrumbs based on the current path
   const getBreadcrumbs = () => {
@@ -87,9 +105,7 @@ export function Breadcrumb() {
       if (pattern.test(pathname)) {
         return breadcrumbs.map((crumb) => ({
           ...crumb,
-          label: crumb.labelKey
-            ? getT(crumb.labelKey.split(".")[0])(crumb.labelKey.split(".")[1])
-            : "",
+          label: crumb.labelKey ? getTranslatedKey(crumb.labelKey) : "",
         }));
       }
     }
@@ -111,9 +127,7 @@ export function Breadcrumb() {
       breadcrumbs.push({
         path: pathname,
         label: routeMap[pathname].translationKey
-          ? getT(routeMap[pathname].translationKey!.split(".")[0])(
-              routeMap[pathname].translationKey!.split(".")[1],
-            )
+          ? getTranslatedKey(routeMap[pathname].translationKey!)
           : routeMap[pathname].label,
         isActive: true,
       });

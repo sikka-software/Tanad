@@ -55,6 +55,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
 import useUserStore from "@/hooks/use-user-store";
@@ -163,6 +164,7 @@ export function AppSidebar() {
                         {t(group.groupLabel)}
                       </div>
                     )}
+                    <SidebarSeparator className="mb-2" />
                     {group.menus.map((menu, menuIndex) => (
                       <SidebarMenuItem key={menuIndex}>
                         {menu.submenus && menu.submenus.length > 0 ? (
@@ -211,14 +213,14 @@ export function AppSidebar() {
                           <Link href={menu.href}>
                             <SidebarMenuButton
                               dir={lang === "ar" ? "rtl" : "ltr"}
-                              tooltip={t(menu.label)}
+                              tooltip={t(menu.translationKey)}
                               className={cn(
                                 menu.active &&
                                   "bg-primary text-background hover:bg-primary hover:text-background",
                               )}
                             >
                               {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                              <span>{t(menu.label)}</span>
+                              <span>{t(menu.translationKey)}</span>
                             </SidebarMenuButton>
                           </Link>
                         )}
