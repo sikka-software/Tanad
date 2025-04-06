@@ -23,6 +23,7 @@ import {
   File,
   Users,
   ChevronDown,
+  Plus,
 } from "lucide-react";
 
 import {
@@ -183,6 +184,15 @@ export function AppSidebar() {
                                     <Link href={submenu.href} key={submenuIndex}>
                                       <SidebarMenuSubButton className="w-full">
                                         <span>{t(submenu.translationKey)}</span>
+                                        {submenu.plusAction && (
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="ms-auto !size-5 cursor-pointer !p-2"
+                                          >
+                                            <Plus className="!size-3" />
+                                          </Button>
+                                        )}
                                       </SidebarMenuSubButton>
                                     </Link>
                                   ))}

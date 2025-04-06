@@ -18,6 +18,7 @@ type Submenu = {
   label: string;
   translationKey: string;
   active?: boolean;
+  plusAction?: string;
 };
 
 type Menu = {
@@ -58,18 +59,21 @@ export function getMenuList(pathname: string): Group[] {
               label: "Products",
               translationKey: "Products.title",
               active: pathname === "/products",
+              plusAction: "/products/add",
             },
             {
               href: "/invoices",
               label: "Invoices",
               translationKey: "Invoices.title",
               active: pathname === "/invoices",
+              plusAction: "/invoices/add",
             },
             {
               href: "/quotes",
               label: "Quotes",
               translationKey: "Quotes.title",
               active: pathname === "/quotes",
+              plusAction: "/quotes/add",
             },
           ],
         },
