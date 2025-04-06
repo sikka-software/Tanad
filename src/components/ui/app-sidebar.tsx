@@ -52,6 +52,7 @@ import {
 } from "@/components/ui/sidebar";
 import useUserStore from "@/hooks/use-user-store";
 import { CACHE_KEY } from "@/lib/constants";
+import { getMenuList } from "@/lib/menu-list";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
@@ -66,14 +67,7 @@ export function AppSidebar() {
   const { user } = useUserStore();
   const router = useRouter();
 
-  const items = [
-    { title: t("Dashboard.title"), url: "/dashboard", icon: LayoutDashboard },
-    { title: t("Products.title"), url: "/products", icon: Package },
-    { title: t("Invoices.title"), url: "/invoices", icon: File },
-    { title: t("Clients.title"), url: "/clients", icon: Users },
-    { title: t("Analytics.title"), url: "/analytics", icon: BarChart },
-    { title: t("Billing.title"), url: "/billing", icon: CreditCard },
-  ];
+  const menuGroups = getMenuList(router.pathname);
 
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
@@ -138,39 +132,52 @@ export function AppSidebar() {
           </SidebarHeader> */}
           <SidebarGroupContent>
             <SidebarMenu className="mt-4 gap-2">
-              <Collapsible defaultOpen className="group/collapsible">
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton>
-                      <Link2 />
-                      <span>Dashboard</span>
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <Link href="/dashboard">Dashboard</Link>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
-              {items.map((item, i) => (
-                <SidebarMenuItem key={i}>
-                  <Link href={item.url}>
-                    <SidebarMenuButton
-                      dir={lang === "ar" ? "rtl" : "ltr"}
-                      tooltip={item.title}
-                      className={cn(
-                        router.pathname === item.url &&
-                          "bg-primary text-background hover:bg-primary hover:text-background",
-                      )}
-                    >
-                      {item.icon && <item.icon className="!size-6 md:!size-4" />}
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </Link>
-                </SidebarMenuItem>
+              {menuGroups.map((group, groupIndex) => (
+                <div key={groupIndex}>
+                  {group.groupLabel && (
+                    <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
+                      {t(group.groupLabel)}
+                    </div>
+                  )}
+                  {group.menus.map((menu, menuIndex) => (
+                    menu.submenus && menu.submenus.length > 0 ? (
+                      <Collapsible key={menuIndex} defaultOpen className="group/collapsible">
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton>
+                              {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
+                              <span>{t(menu.label)}</span>
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <SidebarMenuSub>
+                              {menu.submenus.map((submenu, submenuIndex) => (
+                                <SidebarMenuSubItem key={submenuIndex}>
+                                  <Link href={submenu.href}>{t(submenu.label)}</Link>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        </SidebarMenuItem>
+                      </Collapsible>
+                    ) : (
+                      <SidebarMenuItem key={menuIndex}>
+                        <Link href={menu.href}>
+                          <SidebarMenuButton
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            tooltip={t(menu.label)}
+                            className={cn(
+                              menu.active && "bg-primary text-background hover:bg-primary hover:text-background",
+                            )}
+                          >
+                            {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
+                            <span>{t(menu.label)}</span>
+                          </SidebarMenuButton>
+                        </Link>
+                      </SidebarMenuItem>
+                    )
+                  ))}
+                </div>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
