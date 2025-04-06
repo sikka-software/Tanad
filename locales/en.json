@@ -1226,6 +1226,22 @@
       "title": "Error",
       "create": "Failed to create product",
       "fetch": "Failed to fetch products"
+    },
+    "products": {
+      "title": "Products",
+      "add_product": "Add Product",
+      "no_products": "No products added",
+      "product": "Product",
+      "quantity": "Quantity",
+      "unit_price": "Unit Price",
+      "subtotal": "Subtotal",
+      "select_product": "Select product",
+      "search_products": "Search products",
+      "no_products_found": "No products found",
+      "add_new_product": "Add new product",
+      "product_description": "Product description",
+      "name": "Name",
+      "save_product": "Save Product"
     }
   },
   "Invoices": {
@@ -1280,6 +1296,8 @@
       "created": "Invoice created successfully"
     },
     "submitting": "Submitting...",
+    "invoice_hash": "Invoice #{number}",
+    "issue_date": "Issue Date",
     "products": {
       "title": "Products",
       "add_product": "Add Product",

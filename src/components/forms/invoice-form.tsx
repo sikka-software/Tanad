@@ -260,7 +260,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
     () => [
       {
         id: "product",
-        header: "Product",
+        header: t("products.product"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -279,11 +279,11 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
                         handleProductSelection(index, value);
                       }}
                       texts={{
-                        placeholder: "Select product",
-                        searchPlaceholder: "Search products",
-                        noItems: "No products found",
+                        placeholder: t("products.select_product"),
+                        searchPlaceholder: t("products.search_products"),
+                        noItems: t("products.no_products_found"),
                       }}
-                      addText="Add new product"
+                      addText={t("products.add_new_product")}
                       onAddClick={() => setIsNewProductDialogOpen(true)}
                     />
                   </FormControl>
@@ -296,7 +296,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
       },
       {
         id: "quantity",
-        header: "Quantity",
+        header: t("products.quantity"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -317,7 +317,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
       },
       {
         id: "unitPrice",
-        header: "Unit Price",
+        header: t("products.unit_price"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -345,7 +345,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
       },
       {
         id: "description",
-        header: "Description",
+        header: t("description"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -355,7 +355,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
               render={({ field }) => (
                 <FormItem className="space-y-0">
                   <FormControl>
-                    <Input placeholder="Product description" {...field} />
+                    <Input placeholder={t("products.product_description")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -366,7 +366,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
       },
       {
         id: "subtotal",
-        header: "Subtotal",
+        header: t("products.subtotal"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -602,25 +602,25 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
       <Dialog open={isNewProductDialogOpen} onOpenChange={setIsNewProductDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Add New Product</DialogTitle>
+            <DialogTitle>{t("products.add_new_product")}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <FormLabel>Name *</FormLabel>
-                <Input id="name" placeholder="Product name" />
+                <FormLabel>{t("products.name")} *</FormLabel>
+                <Input id="name" placeholder={`${t("products.name")}...`} />
               </div>
               <div>
-                <FormLabel>Price *</FormLabel>
+                <FormLabel>{t("price")} *</FormLabel>
                 <Input id="price" type="number" min="0" step="0.01" placeholder="0.00" />
               </div>
               <div>
-                <FormLabel>Stock Quantity</FormLabel>
+                <FormLabel>{t("stock_quantity")}</FormLabel>
                 <Input id="stock_quantity" type="number" min="0" step="1" placeholder="0" />
               </div>
               <div className="col-span-2">
-                <FormLabel>Description</FormLabel>
-                <Textarea id="description" placeholder="Product description" />
+                <FormLabel>{t("description")}</FormLabel>
+                <Textarea id="description" placeholder={t("products.product_description")} />
               </div>
             </div>
             <div className="mt-4 flex justify-end">
@@ -630,7 +630,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
                 variant="outline"
                 className="mr-2"
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button
                 type="button"
@@ -640,7 +640,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
                   setIsNewProductDialogOpen(false);
                 }}
               >
-                Save Product
+                {t("products.save_product")}
               </Button>
             </div>
           </div>

@@ -1332,6 +1332,8 @@
       "created": "تم إنشاء الفاتورة بنجاح"
     },
     "submitting": "جاري الإرسال...",
+    "invoice_hash": "فاتورة #{number}",
+    "issue_date": "تاريخ الإصدار",
     "products": {
       "title": "المنتجات",
       "add_product": "إضافة منتج",
@@ -1344,7 +1346,9 @@
       "search_products": "بحث عن المنتجات",
       "no_products_found": "لم يتم العثور على منتجات",
       "add_new_product": "إضافة منتج جديد",
-      "product_description": "وصف المنتج"
+      "product_description": "وصف المنتج",
+      "name": "الاسم",
+      "save_product": "حفظ المنتج"
     }
   },
   "Sales": {
