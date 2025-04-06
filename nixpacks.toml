@@ -11,7 +11,7 @@ pkgs = ["infisical"]
 # Override the default install command (which would just be 'bun install')
 # This command first exports secrets from Infisical to a .env file,
 # and only if that succeeds (due to &&), it runs 'bun install'.
-cmds = ["npx @infisical/cli login --method=universal-auth --domain=https://secrets.sikka.io --client-id=$INFISICAL_CLIENT_ID --client-secret=INFISICAL_CLIENT_SECRET", "bun install"]
+cmds = ["npx @infisical/cli login --method=universal-auth --domain=https://secrets.sikka.io --client-id=$INFISICAL_CLIENT_ID --client-secret=$INFISICAL_CLIENT_SECRET", "bun install"]
 
 # You might also have build and start phases defined here
 [phases.build]
