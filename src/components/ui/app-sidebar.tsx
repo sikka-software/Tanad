@@ -1,5 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
+import { useTranslations, useLocale } from "next-intl";
+import { useTheme } from "next-themes";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
+
 import {
   Link2,
   BarChart,
@@ -16,8 +24,18 @@ import {
   Users,
   ChevronDown,
 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/router";
+
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -28,26 +46,15 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { supabase } from "@/lib/supabase";
-import { useTheme } from "next-themes";
-import { CACHE_KEY } from "@/lib/constants";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
 import useUserStore from "@/hooks/use-user-store";
-import Image from "next/image";
-import { useTranslations, useLocale } from "next-intl";
+import { CACHE_KEY } from "@/lib/constants";
+import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
+
 import { FeedbackDialog } from "../app/FeedbackDialog";
 
 export function AppSidebar() {
@@ -131,6 +138,23 @@ export function AppSidebar() {
           </SidebarHeader> */}
           <SidebarGroupContent>
             <SidebarMenu className="mt-4 gap-2">
+              <Collapsible defaultOpen className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <Link2 />
+                      <span>Dashboard</span>
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <Link href="/dashboard">Dashboard</Link>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
               {items.map((item, i) => (
                 <SidebarMenuItem key={i}>
                   <Link href={item.url}>
@@ -139,12 +163,10 @@ export function AppSidebar() {
                       tooltip={item.title}
                       className={cn(
                         router.pathname === item.url &&
-                          "bg-primary text-background hover:bg-primary hover:text-background"
+                          "bg-primary text-background hover:bg-primary hover:text-background",
                       )}
                     >
-                      {item.icon && (
-                        <item.icon className="!size-6 md:!size-4" />
-                      )}
+                      {item.icon && <item.icon className="!size-6 md:!size-4" />}
                       <span>{item.title}</span>
                     </SidebarMenuButton>
                   </Link>
@@ -154,13 +176,13 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className=" px-0">
-        <div className="p-2 flex flex-col gap-2">
+      <SidebarFooter className="px-0">
+        <div className="flex flex-col gap-2 p-2">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button
                 variant="outline"
-                className="text-xs  flex items-center  gap-2 text-muted-foreground  !p-1.5 !h-[34px] rounded-md border"
+                className="text-muted-foreground flex !h-[34px] items-center gap-2 rounded-md border !p-1.5 text-xs"
               >
                 <MessageSquareWarning className="!size-4" />
                 {!isMobile && state === "collapsed" ? null : (
@@ -177,12 +199,12 @@ export function AppSidebar() {
                   {!isMobile && state === "collapsed" ? (
                     <Button
                       variant="outline"
-                      className="text-xs flex items-center  gap-2 text-muted-foreground  !p-1.5 !h-[34px] rounded-md border"
+                      className="text-muted-foreground flex !h-[34px] items-center gap-2 rounded-md border !p-1.5 text-xs"
                     >
                       <User2 className="!size-4" />
                     </Button>
                   ) : (
-                    <Button variant={"outline"} className=" w-full">
+                    <Button variant={"outline"} className="w-full">
                       {user?.user_metadata.email}
                     </Button>
                   )}
@@ -198,9 +220,7 @@ export function AppSidebar() {
                 >
                   {!isMobile && state === "collapsed" && (
                     <>
-                      <DropdownMenuLabel>
-                        {user?.user_metadata.email}
-                      </DropdownMenuLabel>
+                      <DropdownMenuLabel>{user?.user_metadata.email}</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                     </>
                   )}
@@ -226,8 +246,7 @@ export function AppSidebar() {
                       });
                     }}
                   >
-                    <LogOut className="!size-4" />{" "}
-                    <span>{t("Auth.sign_out")}</span>
+                    <LogOut className="!size-4" /> <span>{t("Auth.sign_out")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
