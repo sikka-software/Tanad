@@ -25,8 +25,13 @@ import {
   ChevronDown,
 } from "lucide-react";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -145,28 +150,28 @@ export function AppSidebar() {
                   {group.menus.map((menu, menuIndex) => (
                     <SidebarMenuItem key={menuIndex}>
                       {menu.submenus && menu.submenus.length > 0 ? (
-                        <Collapsible defaultOpen className="group/collapsible">
-                          <SidebarMenuItem>
-                            <CollapsibleTrigger asChild>
-                              <SidebarMenuButton className="justify-between">
+                        <Accordion type="single" collapsible className="w-full">
+                          <AccordionItem value={`item-${menuIndex}`} className="border-none">
+                            <AccordionTrigger className="w-full p-0 hover:no-underline" hideChevron>
+                              <SidebarMenuButton className="w-full">
                                 {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
                                 <span>{t(menu.translationKey)}</span>
                                 <ChevronDown className="ms-auto" />
                               </SidebarMenuButton>
-                            </CollapsibleTrigger>
-                            <CollapsibleContent className="">
+                            </AccordionTrigger>
+                            <AccordionContent className="m-0 p-0">
                               <SidebarMenuSub className="!ms-2 w-full">
                                 {menu.submenus.map((submenu, submenuIndex) => (
-                                  <Link href={submenu.href}>
-                                    <SidebarMenuSubButton key={submenuIndex} className="w-ful">
+                                  <Link href={submenu.href} key={submenuIndex}>
+                                    <SidebarMenuSubButton className="w-full">
                                       <span>{t(submenu.translationKey)}</span>
                                     </SidebarMenuSubButton>
                                   </Link>
                                 ))}
                               </SidebarMenuSub>
-                            </CollapsibleContent>
-                          </SidebarMenuItem>
-                        </Collapsible>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
                       ) : (
                         <Link href={menu.href}>
                           <SidebarMenuButton
