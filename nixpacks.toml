@@ -15,7 +15,7 @@ cmds = ["npx @infisical/cli login --method=universal-auth --domain=https://secre
 
 # You might also have build and start phases defined here
 [phases.build]
-cmds = ["bun run build"]
+cmds = ["npx @infisical/cli run --env=dev bun run build"]
 
 [start]
-cmd = "bun run start"
+cmd = "npx @infisical/cli run --env=dev bun run start"
