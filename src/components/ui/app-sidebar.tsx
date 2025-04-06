@@ -150,7 +150,7 @@ export function AppSidebar() {
                             <CollapsibleTrigger asChild>
                               <SidebarMenuButton className="justify-between">
                                 {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                                <span>{t(menu.label)}</span>
+                                <span>{t(menu.translationKey)}</span>
                                 <ChevronDown className="ms-auto" />
                               </SidebarMenuButton>
                             </CollapsibleTrigger>
@@ -159,7 +159,7 @@ export function AppSidebar() {
                                 {menu.submenus.map((submenu, submenuIndex) => (
                                   <Link href={submenu.href}>
                                     <SidebarMenuSubButton key={submenuIndex} className="w-ful">
-                                      <span>{t(submenu.label)}</span>
+                                      <span>{t(submenu.translationKey)}</span>
                                     </SidebarMenuSubButton>
                                   </Link>
                                 ))}

@@ -1,27 +1,29 @@
-import { 
-  Tag, 
-  Users, 
-  Settings, 
-  Bookmark, 
-  SquarePen, 
-  LayoutGrid, 
+import {
+  Tag,
+  Users,
+  Settings,
+  Bookmark,
+  SquarePen,
+  LayoutGrid,
   LucideIcon,
   LayoutDashboard,
   Package,
   File,
   BarChart,
-  CreditCard
+  CreditCard,
 } from "lucide-react";
 
 type Submenu = {
   href: string;
   label: string;
+  translationKey: string;
   active?: boolean;
 };
 
 type Menu = {
   href: string;
   label: string;
+  translationKey: string;
   active?: boolean;
   icon: LucideIcon;
   submenus?: Submenu[];
@@ -40,29 +42,33 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/dashboard",
           label: "Dashboard",
+          translationKey: "Dashboard.title",
           icon: LayoutDashboard,
           active: pathname === "/dashboard",
         },
         {
           href: "/products",
           label: "Sales",
+          translationKey: "Sales.title",
           icon: Package,
           active: pathname === "/products",
           submenus: [
             {
               href: "/products",
               label: "Products",
+              translationKey: "Products.title",
               active: pathname === "/products",
             },
             {
               href: "/invoices",
               label: "Invoices",
-              // icon: File,
+              translationKey: "Invoices.title",
               active: pathname === "/invoices",
             },
             {
               href: "/quotes",
               label: "Quotes",
+              translationKey: "Quotes.title",
               active: pathname === "/quotes",
             },
           ],
@@ -70,18 +76,21 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/clients",
           label: "Clients",
+          translationKey: "Clients.title",
           icon: Users,
           active: pathname === "/clients",
         },
         {
           href: "/analytics",
           label: "Analytics",
+          translationKey: "Analytics.title",
           icon: BarChart,
           active: pathname === "/analytics",
         },
         {
           href: "/billing",
           label: "Billing",
+          translationKey: "Billing.title",
           icon: CreditCard,
           active: pathname === "/billing",
         },
@@ -93,17 +102,20 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "",
           label: "Posts",
+          translationKey: "Posts.title",
           icon: SquarePen,
           active: pathname.startsWith("/posts"),
           submenus: [
             {
               href: "/posts",
               label: "All Posts",
+              translationKey: "Posts.allPosts",
               active: pathname === "/posts",
             },
             {
               href: "/posts/new",
               label: "New Post",
+              translationKey: "Posts.newPost",
               active: pathname === "/posts/new",
             },
           ],
@@ -111,12 +123,14 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/categories",
           label: "Categories",
+          translationKey: "Categories.title",
           icon: Bookmark,
           active: pathname === "/categories",
         },
         {
           href: "/tags",
           label: "Tags",
+          translationKey: "Tags.title",
           icon: Tag,
           active: pathname === "/tags",
         },
@@ -128,12 +142,14 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "/users",
           label: "Users",
+          translationKey: "Users.title",
           icon: Users,
           active: pathname === "/users",
         },
         {
           href: "/account",
           label: "Account",
+          translationKey: "Account.title",
           icon: Settings,
           active: pathname === "/account",
         },
