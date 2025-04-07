@@ -908,3 +908,132 @@ export const employees = pgTable("employees", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const quotes = pgTable(
+  "quotes",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    quoteNumber: text("quote_number").notNull(),
+    issueDate: date("issue_date").notNull(),
+    expiryDate: date("expiry_date").notNull(),
+    status: text().default("draft").notNull(),
+    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
+    taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
+    taxAmount: numeric("tax_amount", {
+      precision: 10,
+      scale: 2,
+    }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
+    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(
+      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`
+    ),
+    notes: text(),
+    clientId: uuid("client_id").notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("quotes_client_id_idx").using(
+      "btree",
+      table.clientId.asc().nullsLast().op("uuid_ops")
+    ),
+    index("quotes_status_idx").using(
+      "btree",
+      table.status.asc().nullsLast().op("text_ops")
+    ),
+    index("quotes_user_id_idx").using(
+      "btree",
+      table.userId.asc().nullsLast().op("uuid_ops")
+    ),
+    foreignKey({
+      columns: [table.clientId],
+      foreignColumns: [clients.id],
+      name: "quotes_client_id_fkey",
+    }).onDelete("cascade"),
+    pgPolicy("Users can update their own quotes", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can read their own quotes", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+    }),
+    pgPolicy("Users can insert their own quotes", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+    }),
+    pgPolicy("Users can delete their own quotes", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+    }),
+    check(
+      "quotes_status_check",
+      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`
+    ),
+  ]
+);
+
+export const quoteItems = pgTable(
+  "quote_items",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    description: text().notNull(),
+    quantity: numeric({ precision: 10, scale: 2 }).default("1").notNull(),
+    unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
+    amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(
+      sql`(quantity * unit_price)`
+    ),
+    quoteId: uuid("quote_id").notNull(),
+  },
+  (table) => [
+    index("quote_items_quote_id_idx").using(
+      "btree",
+      table.quoteId.asc().nullsLast().op("uuid_ops")
+    ),
+    foreignKey({
+      columns: [table.quoteId],
+      foreignColumns: [quotes.id],
+      name: "quote_items_quote_id_fkey",
+    }).onDelete("cascade"),
+    pgPolicy("Users can update quote items through quotes", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+      using: sql`(EXISTS ( SELECT 1
+     FROM quotes
+    WHERE ((quotes.id = quote_items.quote_id) AND (quotes.user_id = auth.uid()))))`,
+    }),
+    pgPolicy("Users can read quote items through quotes", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+    }),
+    pgPolicy("Users can insert quote items through quotes", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+    }),
+    pgPolicy("Users can delete quote items through quotes", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+    }),
+  ]
+);

@@ -40,7 +40,7 @@ export type ClientFormValues = z.infer<ReturnType<typeof createClientSchema>>;
 
 interface ClientFormProps {
   id?: string;
-  onSuccess?: () => void;
+  onSuccess?: (client: any) => void;
   onSubmit?: (data: ClientFormValues) => Promise<void>;
   loading?: boolean;
   userId: string | null;
@@ -98,7 +98,7 @@ export function ClientForm({
           notes: data.notes?.trim() || null,
           user_id: userId,
         },
-      ]);
+      ]).select().single();
 
       if (error) throw error;
 
@@ -107,7 +107,7 @@ export function ClientForm({
       });
 
       if (onSuccess) {
-        onSuccess();
+        onSuccess(data);
       } else {
         router.push("/clients");
       }

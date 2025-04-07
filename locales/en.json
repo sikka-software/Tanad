@@ -1383,7 +1383,56 @@
     "title": "Sales"
   },
   "Quotes": {
-    "title": "Quotes"
+    "title": "Quotes",
+    "add_new": "Add New Quote",
+    "quote_details": "Quote Details",
+    "back_to_list": "Back to Quotes",
+    "create_quote": "Create Quote",
+    "no_quotes_found": "No quotes found",
+    "quote_number": "Quote Number",
+    "enter_quote_number": "Enter quote number",
+    "issue_date": "Issue Date",
+    "expiry_date": "Expiry Date",
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "client": "Client",
+    "select_client": "Select a client",
+    "search_clients": "Search clients",
+    "no_clients": "No clients found",
+    "add_new_client": "Add New Client",
+    "subtotal": "Subtotal",
+    "tax_rate": "Tax Rate",
+    "notes": "Notes",
+    "enter_notes": "Enter notes",
+    "products": {
+      "title": "Products",
+      "product": "Product",
+      "select_product": "Select a product",
+      "search_products": "Search products",
+      "no_products_found": "No products found",
+      "add_new_product": "Add New Product",
+      "add_product": "Add Product",
+      "no_products": "No products added yet",
+      "quantity": "Quantity",
+      "unit_price": "Unit Price",
+      "subtotal": "Subtotal",
+      "product_description": "Product description"
+    },
+    "submitting": "Submitting...",
+    "success": {
+      "title": "Success",
+      "created": "Quote created successfully"
+    },
+    "error": {
+      "title": "Error",
+      "create": "Failed to create quote",
+      "load_clients": "Failed to load clients"
+    }
   },
   "Salaries": {
     "title": "Salaries"
