@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 
+import DataModelList from "@/components/ui/data-model-list";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
@@ -91,8 +92,8 @@ export default function ProductsPage() {
   };
 
   const {
-    data: products = [],
-    isLoading: loading,
+    data: products,
+    isLoading,
     error,
     refetch,
   } = useQuery({
@@ -105,11 +106,29 @@ export default function ProductsPage() {
   });
 
   // Debug output
-  console.log("Query state:", { loading, error, productsLength: products.length, dataSource });
+  console.log("Query state:", { isLoading, error, productsLength: products?.length, dataSource });
 
   const errorMessage = error instanceof Error ? error.message : t("error.fetch");
 
-  if (loading) {
+  const renderProduct = (product: Product) => (
+    <Card key={product.id} className="transition-shadow hover:shadow-lg">
+      <CardHeader>
+        <h3 className="text-lg font-semibold">{product.name}</h3>
+      </CardHeader>
+      <CardContent>
+        <p className="mb-2 text-gray-600">{product.description || t("no_description")}</p>
+        <p className="text-lg font-bold">${Number(product.price).toFixed(2)}</p>
+        <p className="text-sm text-gray-500">{t("sku_label", { value: product.sku || "N/A" })}</p>
+        <p className="text-sm text-gray-500">
+          {t("stock_label", {
+            value: product.stockQuantity || product.stock_quantity || 0,
+          })}
+        </p>
+      </CardContent>
+    </Card>
+  );
+
+  if (isLoading) {
     return (
       <div className="mx-auto space-y-4">
         <PageTitle
@@ -157,15 +176,16 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="">
+    <div className="mx-auto space-y-4">
       <PageTitle
         title={t("title")}
         createButtonLink="/products/add"
         createButtonText={t("create_product")}
+        createButtonDisabled={isLoading}
       />
 
       {dataSource === "fallback" && (
-        <div className="mx-4 mb-4 rounded border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm text-yellow-700">
+        <div className="mx-4 rounded border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm text-yellow-700">
           Using fallback data due to database connection issues.
           <Button variant="link" size="sm" className="px-1 py-0" onClick={() => refetch()}>
             Try again with real database
@@ -174,40 +194,15 @@ export default function ProductsPage() {
       )}
 
       <div className="p-4">
-        {products.length === 0 ? (
-          <div className="py-12 text-center">
-            <p className="text-gray-500">{t("no_products")}</p>
-            <Link
-              href="/products/add"
-              className="text-primary hover:text-primary/90 mt-2 inline-flex items-center gap-2"
-            >
-              <Plus className="h-4 w-4" />
-              {t("add_first_product")}
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {products.map((product: Product) => (
-              <Card key={product.id} className="transition-shadow hover:shadow-lg">
-                <CardHeader>
-                  <h3 className="text-lg font-semibold">{product.name}</h3>
-                </CardHeader>
-                <CardContent>
-                  <p className="mb-2 text-gray-600">{product.description || t("no_description")}</p>
-                  <p className="text-lg font-bold">${Number(product.price).toFixed(2)}</p>
-                  <p className="text-sm text-gray-500">
-                    {t("sku_label", { value: product.sku || "N/A" })}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {t("stock_label", {
-                      value: product.stockQuantity || product.stock_quantity || 0,
-                    })}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+        <DataModelList
+          data={products}
+          isLoading={isLoading}
+          error={error as Error | null}
+          emptyMessage={t("no_products")}
+          addFirstItemMessage={t("add_first_product")}
+          renderItem={renderProduct}
+          gridCols="3"
+        />
       </div>
     </div>
   );
