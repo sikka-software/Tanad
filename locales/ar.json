@@ -1284,7 +1284,7 @@
     "title": "الفواتير",
     "add_new": "إضافة فاتورة جديدة",
     "invoice_details": "تفاصيل الفاتورة",
-    "invoice_number": "رقم الفاتورة",
+    "invoice_number": "فاتورة #{number}",
     "enter_invoice_number": "أدخل رقم الفاتورة",
     "description": "الوصف",
     "enter_description": "أدخل وصف الفاتورة",
@@ -1355,9 +1355,58 @@
     "title": "المبيعات"
   },
   "Quotes": {
-    "title": "عروض الأسعار"
+    "title": "عروض الأسعار",
+    "add_new": "إضافة عرض جديد",
+    "quote_details": "تفاصيل العرض",
+    "back_to_list": "العودة إلى العروض",
+    "create_quote": "إنشاء عرض",
+    "no_quotes_found": "لا توجد عروض أسعار",
+    "quote_number": "عرض أسعار #{number}",
+    "enter_quote_number": "أدخل رقم العرض",
+    "issue_date": "تاريخ الإصدار",
+    "expiry_date": "تاريخ الانتهاء",
+    "amount": "المبلغ",
+    "status": {
+      "draft": "مسودة",
+      "sent": "مرسل",
+      "accepted": "مقبول",
+      "rejected": "مرفوض",
+      "expired": "منتهي"
+    },
+    "client": "العميل",
+    "select_client": "اختر عميل",
+    "search_clients": "بحث عن العملاء",
+    "no_clients": "لم يتم العثور على عملاء",
+    "add_new_client": "إضافة عميل جديد",
+    "subtotal": "المجموع الفرعي",
+    "tax_rate": "نسبة الضريبة",
+    "notes": "ملاحظات",
+    "enter_notes": "أدخل ملاحظات",
+    "products": {
+      "title": "المنتجات",
+      "product": "المنتج",
+      "select_product": "اختر منتج",
+      "search_products": "بحث عن المنتجات",
+      "no_products_found": "لم يتم العثور على منتجات",
+      "add_new_product": "إضافة منتج جديد",
+      "add_product": "إضافة منتج",
+      "no_products": "لا توجد منتجات مضافة",
+      "quantity": "الكمية",
+      "unit_price": "سعر الوحدة",
+      "subtotal": "المجموع الفرعي",
+      "product_description": "وصف المنتج"
+    },
+    "submitting": "جاري الإرسال...",
+    "success": {
+      "title": "تم بنجاح",
+      "created": "تم إنشاء العرض بنجاح"
+    },
+    "error": {
+      "title": "خطأ",
+      "create": "فشل في إنشاء العرض",
+      "load_clients": "فشل في تحميل العملاء"
+    }
   },
-
   "Salaries": {
     "title": "الرواتب"
   },

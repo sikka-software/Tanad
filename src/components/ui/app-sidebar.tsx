@@ -165,10 +165,10 @@ export function AppSidebar() {
                       </div>
                     )}
                     <SidebarSeparator className="mb-2" />
-                    {group.menus.map((menu, menuIndex) => (
-                      <SidebarMenuItem key={menuIndex}>
-                        {menu.submenus && menu.submenus.length > 0 ? (
-                          <Accordion type="single" collapsible className="w-full">
+                    <Accordion type="single" collapsible className="w-full">
+                      {group.menus.map((menu, menuIndex) => (
+                        <SidebarMenuItem key={menuIndex}>
+                          {menu.submenus && menu.submenus.length > 0 ? (
                             <AccordionItem value={`item-${menuIndex}`} className="border-none">
                               <AccordionTrigger
                                 className="w-full p-0 hover:no-underline"
@@ -208,24 +208,24 @@ export function AppSidebar() {
                                 </SidebarMenuSub>
                               </AccordionContent>
                             </AccordionItem>
-                          </Accordion>
-                        ) : (
-                          <Link href={menu.href}>
-                            <SidebarMenuButton
-                              dir={lang === "ar" ? "rtl" : "ltr"}
-                              tooltip={t(menu.translationKey)}
-                              className={cn(
-                                menu.active &&
-                                  "bg-primary text-background hover:bg-primary hover:text-background",
-                              )}
-                            >
-                              {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                              <span>{t(menu.translationKey)}</span>
-                            </SidebarMenuButton>
-                          </Link>
-                        )}
-                      </SidebarMenuItem>
-                    ))}
+                          ) : (
+                            <Link href={menu.href}>
+                              <SidebarMenuButton
+                                dir={lang === "ar" ? "rtl" : "ltr"}
+                                tooltip={t(menu.translationKey)}
+                                className={cn(
+                                  menu.active &&
+                                    "bg-primary text-background hover:bg-primary hover:text-background",
+                                )}
+                              >
+                                {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
+                                <span>{t(menu.translationKey)}</span>
+                              </SidebarMenuButton>
+                            </Link>
+                          )}
+                        </SidebarMenuItem>
+                      ))}
+                    </Accordion>
                   </div>
                 ))}
               </SidebarMenu>

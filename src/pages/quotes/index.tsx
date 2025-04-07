@@ -34,7 +34,7 @@ export default function QuotesPage() {
     <Card key={quote.id} className="transition-shadow hover:shadow-lg">
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Quote #{quote.quote_number}</h3>
+          <h3 className="text-lg font-semibold">{t("quote_number", { number: quote.quote_number })}</h3>
           <p className="text-sm text-gray-500">{quote.clients.company}</p>
         </div>
         <Badge className={getStatusColor(quote.status)}>
