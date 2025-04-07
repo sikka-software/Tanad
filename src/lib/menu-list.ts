@@ -96,7 +96,6 @@ export function getMenuList(pathname: string): Group[] {
               label: "All Contacts",
               translationKey: "Contacts.allContacts",
               active: pathname === "/contacts",
-              plusAction: "/contacts/add",
             },
             {
               href: "/clients",
