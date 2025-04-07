@@ -11,7 +11,7 @@ export default function AddInvoicePage() {
   const t = useTranslations("Invoices");
 
   return (
-    <div className="">
+    <div>
       <PageTitle
         title={t("add_new")}
         createButtonLink="/invoices"

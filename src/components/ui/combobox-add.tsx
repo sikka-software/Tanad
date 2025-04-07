@@ -104,9 +104,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
         <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
           <PopoverTrigger asChild>
             {props.isLoading ? (
-              <div className="pb-2">
-                <Skeleton className="h-[40px] w-full" />
-              </div>
+              <Skeleton className="h-[40px] w-full" />
             ) : (
               <div className="flex flex-col items-start gap-2">
                 <div
@@ -161,7 +159,10 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
           </PopoverTrigger>
           <PopoverContent
             sideOffset={0}
-            className={cn("w-[var(--radix-popover-trigger-width)] p-0", props.helperText && "-mt-4")}
+            className={cn(
+              "w-[var(--radix-popover-trigger-width)] p-0",
+              props.helperText && "-mt-4",
+            )}
             dir={direction}
             // container={containerRef.current}
           >
@@ -218,7 +219,11 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                 </CommandGroup>
               </CommandList>
               <div className="flex flex-row items-center gap-2">
-                <Button variant="outline" className="w-full rounded-t-none" onClick={props.onAddClick}>
+                <Button
+                  variant="outline"
+                  className="w-full rounded-t-none"
+                  onClick={props.onAddClick}
+                >
                   {addText}
                   <Plus className="size-4" />
                 </Button>

@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
 
 import { ClientForm } from "@/components/forms/client-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,13 +15,11 @@ export default function AddClientPage() {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get the current user ID when component mounts
     const getUserId = async () => {
       const { data } = await supabase.auth.getUser();
       if (data.user) {
         setUserId(data.user.id);
       } else {
-        // Redirect to login if no user is found
         router.push("/auth/login");
       }
     };
@@ -29,7 +28,7 @@ export default function AddClientPage() {
   }, [router]);
 
   return (
-    <div className="">
+    <div>
       <PageTitle
         title={t("add_client")}
         createButtonLink="/clients"
