@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+
 import { Employee } from "@/api/employees";
 
 async function fetchEmployees(): Promise<Employee[]> {
@@ -15,4 +16,4 @@ export function useEmployees() {
     queryKey: ["employees"],
     queryFn: fetchEmployees,
   });
-} 
+}

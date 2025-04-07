@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable,
   pgSchema,
@@ -21,23 +22,12 @@ import {
   json,
   integer,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 
 export const auth = pgSchema("auth");
 export const aalLevelInAuth = auth.enum("aal_level", ["aal1", "aal2", "aal3"]);
-export const codeChallengeMethodInAuth = auth.enum("code_challenge_method", [
-  "s256",
-  "plain",
-]);
-export const factorStatusInAuth = auth.enum("factor_status", [
-  "unverified",
-  "verified",
-]);
-export const factorTypeInAuth = auth.enum("factor_type", [
-  "totp",
-  "webauthn",
-  "phone",
-]);
+export const codeChallengeMethodInAuth = auth.enum("code_challenge_method", ["s256", "plain"]);
+export const factorStatusInAuth = auth.enum("factor_status", ["unverified", "verified"]);
+export const factorTypeInAuth = auth.enum("factor_type", ["totp", "webauthn", "phone"]);
 export const oneTimeTokenTypeInAuth = auth.enum("one_time_token_type", [
   "confirmation_token",
   "reauthentication_token",
@@ -63,7 +53,7 @@ export const samlProvidersInAuth = auth.table(
   (table) => [
     index("saml_providers_sso_provider_id_idx").using(
       "btree",
-      table.ssoProviderId.asc().nullsLast().op("uuid_ops")
+      table.ssoProviderId.asc().nullsLast().op("uuid_ops"),
     ),
     foreignKey({
       columns: [table.ssoProviderId],
@@ -74,10 +64,10 @@ export const samlProvidersInAuth = auth.table(
     check("entity_id not empty", sql`char_length(entity_id) > 0`),
     check(
       "metadata_url not empty",
-      sql`(metadata_url = NULL::text) OR (char_length(metadata_url) > 0)`
+      sql`(metadata_url = NULL::text) OR (char_length(metadata_url) > 0)`,
     ),
     check("metadata_xml not empty", sql`char_length(metadata_xml) > 0`),
-  ]
+  ],
 );
 
 export const samlRelayStatesInAuth = auth.table(
@@ -95,15 +85,15 @@ export const samlRelayStatesInAuth = auth.table(
   (table) => [
     index("saml_relay_states_created_at_idx").using(
       "btree",
-      table.createdAt.desc().nullsFirst().op("timestamptz_ops")
+      table.createdAt.desc().nullsFirst().op("timestamptz_ops"),
     ),
     index("saml_relay_states_for_email_idx").using(
       "btree",
-      table.forEmail.asc().nullsLast().op("text_ops")
+      table.forEmail.asc().nullsLast().op("text_ops"),
     ),
     index("saml_relay_states_sso_provider_id_idx").using(
       "btree",
-      table.ssoProviderId.asc().nullsLast().op("uuid_ops")
+      table.ssoProviderId.asc().nullsLast().op("uuid_ops"),
     ),
     foreignKey({
       columns: [table.flowStateId],
@@ -116,7 +106,7 @@ export const samlRelayStatesInAuth = auth.table(
       name: "saml_relay_states_sso_provider_id_fkey",
     }).onDelete("cascade"),
     check("request_id not empty", sql`char_length(request_id) > 0`),
-  ]
+  ],
 );
 
 export const ssoProvidersInAuth = auth.table(
@@ -128,15 +118,12 @@ export const ssoProvidersInAuth = auth.table(
     updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }),
   },
   (table) => [
-    uniqueIndex("sso_providers_resource_id_idx").using(
-      "btree",
-      sql`lower(resource_id)`
-    ),
+    uniqueIndex("sso_providers_resource_id_idx").using("btree", sql`lower(resource_id)`),
     check(
       "resource_id not empty",
-      sql`(resource_id = NULL::text) OR (char_length(resource_id) > 0)`
+      sql`(resource_id = NULL::text) OR (char_length(resource_id) > 0)`,
     ),
-  ]
+  ],
 );
 
 export const usersInAuth = auth.table(
@@ -184,9 +171,7 @@ export const usersInAuth = auth.table(
       mode: "string",
     }),
     phoneChange: text("phone_change").default(""),
-    phoneChangeToken: varchar("phone_change_token", { length: 255 }).default(
-      ""
-    ),
+    phoneChangeToken: varchar("phone_change_token", { length: 255 }).default(""),
     phoneChangeSentAt: timestamp("phone_change_sent_at", {
       withTimezone: true,
       mode: "string",
@@ -198,9 +183,7 @@ export const usersInAuth = auth.table(
     emailChangeTokenCurrent: varchar("email_change_token_current", {
       length: 255,
     }).default(""),
-    emailChangeConfirmStatus: smallint("email_change_confirm_status").default(
-      0
-    ),
+    emailChangeConfirmStatus: smallint("email_change_confirm_status").default(0),
     bannedUntil: timestamp("banned_until", {
       withTimezone: true,
       mode: "string",
@@ -221,22 +204,13 @@ export const usersInAuth = auth.table(
       .using("btree", table.confirmationToken.asc().nullsLast().op("text_ops"))
       .where(sql`((confirmation_token)::text !~ '^[0-9 ]*$'::text)`),
     uniqueIndex("email_change_token_current_idx")
-      .using(
-        "btree",
-        table.emailChangeTokenCurrent.asc().nullsLast().op("text_ops")
-      )
+      .using("btree", table.emailChangeTokenCurrent.asc().nullsLast().op("text_ops"))
       .where(sql`((email_change_token_current)::text !~ '^[0-9 ]*$'::text)`),
     uniqueIndex("email_change_token_new_idx")
-      .using(
-        "btree",
-        table.emailChangeTokenNew.asc().nullsLast().op("text_ops")
-      )
+      .using("btree", table.emailChangeTokenNew.asc().nullsLast().op("text_ops"))
       .where(sql`((email_change_token_new)::text !~ '^[0-9 ]*$'::text)`),
     uniqueIndex("reauthentication_token_idx")
-      .using(
-        "btree",
-        table.reauthenticationToken.asc().nullsLast().op("text_ops")
-      )
+      .using("btree", table.reauthenticationToken.asc().nullsLast().op("text_ops"))
       .where(sql`((reauthentication_token)::text !~ '^[0-9 ]*$'::text)`),
     uniqueIndex("recovery_token_idx")
       .using("btree", table.recoveryToken.asc().nullsLast().op("text_ops"))
@@ -244,25 +218,21 @@ export const usersInAuth = auth.table(
     uniqueIndex("users_email_partial_key")
       .using("btree", table.email.asc().nullsLast().op("text_ops"))
       .where(sql`(is_sso_user = false)`),
-    index("users_instance_id_email_idx").using(
-      "btree",
-      sql`instance_id`,
-      sql`null`
-    ),
+    index("users_instance_id_email_idx").using("btree", sql`instance_id`, sql`null`),
     index("users_instance_id_idx").using(
       "btree",
-      table.instanceId.asc().nullsLast().op("uuid_ops")
+      table.instanceId.asc().nullsLast().op("uuid_ops"),
     ),
     index("users_is_anonymous_idx").using(
       "btree",
-      table.isAnonymous.asc().nullsLast().op("bool_ops")
+      table.isAnonymous.asc().nullsLast().op("bool_ops"),
     ),
     unique("users_phone_key").on(table.phone),
     check(
       "users_email_change_confirm_status_check",
-      sql`(email_change_confirm_status >= 0) AND (email_change_confirm_status <= 2)`
+      sql`(email_change_confirm_status >= 0) AND (email_change_confirm_status <= 2)`,
     ),
-  ]
+  ],
 );
 
 export const invoiceItems = pgTable(
@@ -279,15 +249,13 @@ export const invoiceItems = pgTable(
     description: text().notNull(),
     quantity: numeric({ precision: 10, scale: 2 }).default("1").notNull(),
     unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
-    amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(
-      sql`(quantity * unit_price)`
-    ),
+    amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
     invoiceId: uuid("invoice_id").notNull(),
   },
   (table) => [
     index("invoice_items_invoice_id_idx").using(
       "btree",
-      table.invoiceId.asc().nullsLast().op("uuid_ops")
+      table.invoiceId.asc().nullsLast().op("uuid_ops"),
     ),
     foreignKey({
       columns: [table.invoiceId],
@@ -317,7 +285,7 @@ export const invoiceItems = pgTable(
       for: "delete",
       to: ["public"],
     }),
-  ]
+  ],
 );
 
 export const invoices = pgTable(
@@ -342,25 +310,16 @@ export const invoices = pgTable(
       scale: 2,
     }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
     total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(
-      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`
+      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`,
     ),
     notes: text(),
     clientId: uuid("client_id").notNull(),
     userId: uuid("user_id").notNull(),
   },
   (table) => [
-    index("invoices_client_id_idx").using(
-      "btree",
-      table.clientId.asc().nullsLast().op("uuid_ops")
-    ),
-    index("invoices_status_idx").using(
-      "btree",
-      table.status.asc().nullsLast().op("text_ops")
-    ),
-    index("invoices_user_id_idx").using(
-      "btree",
-      table.userId.asc().nullsLast().op("uuid_ops")
-    ),
+    index("invoices_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+    index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+    index("invoices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
     foreignKey({
       columns: [table.clientId],
       foreignColumns: [clients.id],
@@ -389,9 +348,9 @@ export const invoices = pgTable(
     }),
     check(
       "invoices_status_check",
-      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`
+      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`,
     ),
-  ]
+  ],
 );
 
 export const clients = pgTable(
@@ -417,18 +376,9 @@ export const clients = pgTable(
     userId: uuid("user_id").notNull(),
   },
   (table) => [
-    index("clients_email_idx").using(
-      "btree",
-      table.email.asc().nullsLast().op("text_ops")
-    ),
-    index("clients_name_idx").using(
-      "btree",
-      table.name.asc().nullsLast().op("text_ops")
-    ),
-    index("clients_user_id_idx").using(
-      "btree",
-      table.userId.asc().nullsLast().op("uuid_ops")
-    ),
+    index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("clients_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
     pgPolicy("Users can update their own clients", {
       as: "permissive",
       for: "update",
@@ -450,7 +400,7 @@ export const clients = pgTable(
       for: "delete",
       to: ["public"],
     }),
-  ]
+  ],
 );
 
 export const sessionsInAuth = auth.table(
@@ -471,23 +421,20 @@ export const sessionsInAuth = auth.table(
   (table) => [
     index("sessions_not_after_idx").using(
       "btree",
-      table.notAfter.desc().nullsFirst().op("timestamptz_ops")
+      table.notAfter.desc().nullsFirst().op("timestamptz_ops"),
     ),
-    index("sessions_user_id_idx").using(
-      "btree",
-      table.userId.asc().nullsLast().op("uuid_ops")
-    ),
+    index("sessions_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
     index("user_id_created_at_idx").using(
       "btree",
       table.userId.asc().nullsLast().op("timestamptz_ops"),
-      table.createdAt.asc().nullsLast().op("timestamptz_ops")
+      table.createdAt.asc().nullsLast().op("timestamptz_ops"),
     ),
     foreignKey({
       columns: [table.userId],
       foreignColumns: [usersInAuth.id],
       name: "sessions_user_id_fkey",
     }).onDelete("cascade"),
-  ]
+  ],
 );
 
 export const refreshTokensInAuth = auth.table(
@@ -506,25 +453,25 @@ export const refreshTokensInAuth = auth.table(
   (table) => [
     index("refresh_tokens_instance_id_idx").using(
       "btree",
-      table.instanceId.asc().nullsLast().op("uuid_ops")
+      table.instanceId.asc().nullsLast().op("uuid_ops"),
     ),
     index("refresh_tokens_instance_id_user_id_idx").using(
       "btree",
       table.instanceId.asc().nullsLast().op("text_ops"),
-      table.userId.asc().nullsLast().op("uuid_ops")
+      table.userId.asc().nullsLast().op("uuid_ops"),
     ),
     index("refresh_tokens_parent_idx").using(
       "btree",
-      table.parent.asc().nullsLast().op("text_ops")
+      table.parent.asc().nullsLast().op("text_ops"),
     ),
     index("refresh_tokens_session_id_revoked_idx").using(
       "btree",
       table.sessionId.asc().nullsLast().op("bool_ops"),
-      table.revoked.asc().nullsLast().op("bool_ops")
+      table.revoked.asc().nullsLast().op("bool_ops"),
     ),
     index("refresh_tokens_updated_at_idx").using(
       "btree",
-      table.updatedAt.desc().nullsFirst().op("timestamptz_ops")
+      table.updatedAt.desc().nullsFirst().op("timestamptz_ops"),
     ),
     foreignKey({
       columns: [table.sessionId],
@@ -532,7 +479,7 @@ export const refreshTokensInAuth = auth.table(
       name: "refresh_tokens_session_id_fkey",
     }).onDelete("cascade"),
     unique("refresh_tokens_token_unique").on(table.token),
-  ]
+  ],
 );
 
 export const mfaChallengesInAuth = auth.table(
@@ -555,14 +502,14 @@ export const mfaChallengesInAuth = auth.table(
   (table) => [
     index("mfa_challenge_created_at_idx").using(
       "btree",
-      table.createdAt.desc().nullsFirst().op("timestamptz_ops")
+      table.createdAt.desc().nullsFirst().op("timestamptz_ops"),
     ),
     foreignKey({
       columns: [table.factorId],
       foreignColumns: [mfaFactorsInAuth.id],
       name: "mfa_challenges_auth_factor_id_fkey",
     }).onDelete("cascade"),
-  ]
+  ],
 );
 
 export const ssoDomainsInAuth = auth.table(
@@ -578,7 +525,7 @@ export const ssoDomainsInAuth = auth.table(
     uniqueIndex("sso_domains_domain_idx").using("btree", sql`lower(domain)`),
     index("sso_domains_sso_provider_id_idx").using(
       "btree",
-      table.ssoProviderId.asc().nullsLast().op("uuid_ops")
+      table.ssoProviderId.asc().nullsLast().op("uuid_ops"),
     ),
     foreignKey({
       columns: [table.ssoProviderId],
@@ -586,7 +533,7 @@ export const ssoDomainsInAuth = auth.table(
       name: "sso_domains_sso_provider_id_fkey",
     }).onDelete("cascade"),
     check("domain not empty", sql`char_length(domain) > 0`),
-  ]
+  ],
 );
 
 export const schemaMigrationsInAuth = auth.table("schema_migrations", {
@@ -599,9 +546,7 @@ export const flowStateInAuth = auth.table(
     id: uuid().primaryKey().notNull(),
     userId: uuid("user_id"),
     authCode: text("auth_code").notNull(),
-    codeChallengeMethod: codeChallengeMethodInAuth(
-      "code_challenge_method"
-    ).notNull(),
+    codeChallengeMethod: codeChallengeMethodInAuth("code_challenge_method").notNull(),
     codeChallenge: text("code_challenge").notNull(),
     providerType: text("provider_type").notNull(),
     providerAccessToken: text("provider_access_token"),
@@ -617,18 +562,15 @@ export const flowStateInAuth = auth.table(
   (table) => [
     index("flow_state_created_at_idx").using(
       "btree",
-      table.createdAt.desc().nullsFirst().op("timestamptz_ops")
+      table.createdAt.desc().nullsFirst().op("timestamptz_ops"),
     ),
-    index("idx_auth_code").using(
-      "btree",
-      table.authCode.asc().nullsLast().op("text_ops")
-    ),
+    index("idx_auth_code").using("btree", table.authCode.asc().nullsLast().op("text_ops")),
     index("idx_user_id_auth_method").using(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
-      table.authenticationMethod.asc().nullsLast().op("text_ops")
+      table.authenticationMethod.asc().nullsLast().op("text_ops"),
     ),
-  ]
+  ],
 );
 
 export const profiles = pgTable(
@@ -683,7 +625,7 @@ export const profiles = pgTable(
       for: "select",
       to: ["public"],
     }),
-  ]
+  ],
 );
 
 export const mfaFactorsInAuth = auth.table(
@@ -715,23 +657,20 @@ export const mfaFactorsInAuth = auth.table(
     index("factor_id_created_at_idx").using(
       "btree",
       table.userId.asc().nullsLast().op("timestamptz_ops"),
-      table.createdAt.asc().nullsLast().op("timestamptz_ops")
+      table.createdAt.asc().nullsLast().op("timestamptz_ops"),
     ),
     uniqueIndex("mfa_factors_user_friendly_name_unique")
       .using(
         "btree",
         table.friendlyName.asc().nullsLast().op("uuid_ops"),
-        table.userId.asc().nullsLast().op("text_ops")
+        table.userId.asc().nullsLast().op("text_ops"),
       )
       .where(sql`(TRIM(BOTH FROM friendly_name) <> ''::text)`),
-    index("mfa_factors_user_id_idx").using(
-      "btree",
-      table.userId.asc().nullsLast().op("uuid_ops")
-    ),
+    index("mfa_factors_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
     uniqueIndex("unique_phone_factor_per_user").using(
       "btree",
       table.userId.asc().nullsLast().op("text_ops"),
-      table.phone.asc().nullsLast().op("text_ops")
+      table.phone.asc().nullsLast().op("text_ops"),
     ),
     foreignKey({
       columns: [table.userId],
@@ -739,7 +678,7 @@ export const mfaFactorsInAuth = auth.table(
       name: "mfa_factors_user_id_fkey",
     }).onDelete("cascade"),
     unique("mfa_factors_last_challenged_at_key").on(table.lastChallengedAt),
-  ]
+  ],
 );
 
 export const oneTimeTokensInAuth = auth.table(
@@ -750,26 +689,22 @@ export const oneTimeTokensInAuth = auth.table(
     tokenType: oneTimeTokenTypeInAuth("token_type").notNull(),
     tokenHash: text("token_hash").notNull(),
     relatesTo: text("relates_to").notNull(),
-    createdAt: timestamp("created_at", { mode: "string" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
   },
   (table) => [
     index("one_time_tokens_relates_to_hash_idx").using(
       "hash",
-      table.relatesTo.asc().nullsLast().op("text_ops")
+      table.relatesTo.asc().nullsLast().op("text_ops"),
     ),
     index("one_time_tokens_token_hash_hash_idx").using(
       "hash",
-      table.tokenHash.asc().nullsLast().op("text_ops")
+      table.tokenHash.asc().nullsLast().op("text_ops"),
     ),
     uniqueIndex("one_time_tokens_user_id_token_type_key").using(
       "btree",
       table.userId.asc().nullsLast().op("uuid_ops"),
-      table.tokenType.asc().nullsLast().op("uuid_ops")
+      table.tokenType.asc().nullsLast().op("uuid_ops"),
     ),
     foreignKey({
       columns: [table.userId],
@@ -777,7 +712,7 @@ export const oneTimeTokensInAuth = auth.table(
       name: "one_time_tokens_user_id_fkey",
     }).onDelete("cascade"),
     check("one_time_tokens_token_hash_check", sql`char_length(token_hash) > 0`),
-  ]
+  ],
 );
 
 export const mfaAmrClaimsInAuth = auth.table(
@@ -803,9 +738,9 @@ export const mfaAmrClaimsInAuth = auth.table(
     }).onDelete("cascade"),
     unique("mfa_amr_claims_session_id_authentication_method_pkey").on(
       table.sessionId,
-      table.authenticationMethod
+      table.authenticationMethod,
     ),
-  ]
+  ],
 );
 
 export const auditLogEntriesInAuth = auth.table(
@@ -820,9 +755,9 @@ export const auditLogEntriesInAuth = auth.table(
   (table) => [
     index("audit_logs_instance_id_idx").using(
       "btree",
-      table.instanceId.asc().nullsLast().op("uuid_ops")
+      table.instanceId.asc().nullsLast().op("uuid_ops"),
     ),
-  ]
+  ],
 );
 
 export const identitiesInAuth = auth.table(
@@ -838,30 +773,22 @@ export const identitiesInAuth = auth.table(
     }),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }),
     updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }),
-    email: text().generatedAlwaysAs(
-      sql`lower((identity_data ->> 'email'::text))`
-    ),
+    email: text().generatedAlwaysAs(sql`lower((identity_data ->> 'email'::text))`),
     id: uuid().defaultRandom().primaryKey().notNull(),
   },
   (table) => [
     index("identities_email_idx").using(
       "btree",
-      table.email.asc().nullsLast().op("text_pattern_ops")
+      table.email.asc().nullsLast().op("text_pattern_ops"),
     ),
-    index("identities_user_id_idx").using(
-      "btree",
-      table.userId.asc().nullsLast().op("uuid_ops")
-    ),
+    index("identities_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
     foreignKey({
       columns: [table.userId],
       foreignColumns: [usersInAuth.id],
       name: "identities_user_id_fkey",
     }).onDelete("cascade"),
-    unique("identities_provider_id_provider_unique").on(
-      table.providerId,
-      table.provider
-    ),
-  ]
+    unique("identities_provider_id_provider_unique").on(table.providerId, table.provider),
+  ],
 );
 
 export const instancesInAuth = auth.table("instances", {
@@ -890,7 +817,7 @@ export const products = pgTable(
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
   },
-  (table) => [unique("products_sku_key").on(table.sku)]
+  (table) => [unique("products_sku_key").on(table.sku)],
 );
 
 export const employees = pgTable("employees", {

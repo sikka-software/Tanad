@@ -1,14 +1,15 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+
 import { format } from "date-fns";
 import { Building2, Mail, Phone, Calendar } from "lucide-react";
 
 import { Employee } from "@/api/employees";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useEmployees } from "@/hooks/useEmployees";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
+import { useEmployees } from "@/hooks/useEmployees";
 
 export default function EmployeesPage() {
   const t = useTranslations("Employees");
@@ -56,9 +57,7 @@ export default function EmployeesPage() {
             <span>Hired {format(new Date(employee.hireDate), "MMM dd, yyyy")}</span>
           </div>
           {employee.salary && (
-            <p className="text-sm text-gray-600">
-              Salary: ${employee.salary.toLocaleString()}
-            </p>
+            <p className="text-sm text-gray-600">Salary: ${employee.salary.toLocaleString()}</p>
           )}
           {employee.notes && (
             <p className="mt-2 border-t pt-2 text-sm text-gray-500">{employee.notes}</p>

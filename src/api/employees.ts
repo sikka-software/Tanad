@@ -12,4 +12,4 @@ export interface Employee {
   notes?: string;
   createdAt: string;
   updatedAt: string;
-} 
+}

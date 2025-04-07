@@ -1,12 +1,13 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+
 import { Building2, Mail, Phone, MapPin } from "lucide-react";
 
 import { Client } from "@/api/clients";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useClients } from "@/hooks/useClients";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
+import { useClients } from "@/hooks/useClients";
 
 export default function ClientsPage() {
   const t = useTranslations("Clients");
