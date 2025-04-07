@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
-
 import { GetStaticProps } from "next";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { ArrowLeft } from "lucide-react";
+import { useState, useEffect } from "react";
 
 import { ClientForm } from "@/components/forms/client-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PageTitle from "@/components/ui/page-title";
 import { supabase } from "@/lib/supabase";
 
 export default function AddClientPage() {
   const router = useRouter();
+  const t = useTranslations("Clients");
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,18 +29,16 @@ export default function AddClientPage() {
   }, [router]);
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mx-auto max-w-2xl">
-        <div className="mb-6 flex items-center gap-4">
-          <Link href="/clients" className="text-gray-500 hover:text-gray-700">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <h1 className="text-2xl font-bold">Add New Client</h1>
-        </div>
-
+    <div className="">
+      <PageTitle
+        title={t("add_client")}
+        createButtonLink="/clients"
+        createButtonText={t("back_to_list")}
+      />
+      <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>Client Details</CardTitle>
+            <CardTitle>{t("client_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ClientForm userId={userId} />
