@@ -388,4 +388,167 @@ export const employees = pgTable("employees", {
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}); 
+});
+
+export const expenses = pgTable(
+  "expenses",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    expenseNumber: text("expense_number").notNull(),
+    issueDate: date("issue_date").notNull(),
+    dueDate: date("due_date").notNull(),
+    status: text().default("pending").notNull(),
+    amount: numeric({ precision: 10, scale: 2 }).notNull(),
+    category: text("category").notNull(),
+    notes: text(),
+    clientId: uuid("client_id").notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("expenses_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+    index("expenses_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+    index("expenses_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.clientId],
+      foreignColumns: [clients.id],
+      name: "expenses_client_id_fkey",
+    }).onDelete("cascade"),
+    pgPolicy("Users can update their own expenses", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can read their own expenses", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+    }),
+    pgPolicy("Users can insert their own expenses", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+    }),
+    pgPolicy("Users can delete their own expenses", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+    }),
+    check(
+      "expenses_status_check",
+      sql`status = ANY (ARRAY[\'pending\'::text, \'paid\'::text, \'overdue\'::text])`,
+    ),
+  ],
+);
+
+export const vendors = pgTable(
+  "vendors",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone(\'utc\'::text, now())`),
+    name: text().notNull(),
+    email: text().notNull(),
+    phone: text().notNull(),
+    company: text().notNull(),
+    address: text().notNull(),
+    city: text().notNull(),
+    state: text().notNull(),
+    zipCode: text("zip_code").notNull(),
+    notes: text(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("vendors_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("vendors_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("vendors_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+    pgPolicy("Users can update their own vendors", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can read their own vendors", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can insert their own vendors", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+      withCheck: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can delete their own vendors", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+  ],
+);
+
+export const salaries = pgTable(
+  "salaries",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone(\'utc\'::text, now())`),
+    payPeriodStart: date("pay_period_start").notNull(),
+    payPeriodEnd: date("pay_period_end").notNull(),
+    paymentDate: date("payment_date").notNull(),
+    grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
+    netAmount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
+    deductions: jsonb("deductions"),
+    notes: text(),
+    employeeName: text("employee_name").notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("salaries_payment_date_idx").using("btree", table.paymentDate.asc().nullsLast()),
+    index("salaries_employee_name_idx").using("btree", table.employeeName.asc().nullsLast().op("text_ops")),
+    index("salaries_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+    pgPolicy("Users can update their own salary records", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can read their own salary records", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can insert their own salary records", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+      withCheck: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can delete their own salary records", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+  ],
+); 
