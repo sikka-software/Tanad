@@ -1315,39 +1315,60 @@
   },
   "Clients": {
     "title": "Clients",
-    "create_client": "Create Client",
-    "no_clients_found": "No clients found",
-    "add_client": "Add Client",
+    "add_new": "Add New Client",
     "back_to_list": "Back to List",
     "client_details": "Client Details",
-    "full_name": "Full Name",
-    "enter_full_name": "Enter full name",
-    "company": "Company",
-    "enter_company_name": "Enter company name",
-    "email": "Email",
-    "enter_email": "Enter email address",
-    "phone": "Phone",
-    "enter_phone": "Enter phone number",
-    "address": "Address",
-    "enter_address": "Enter address",
-    "city": "City",
-    "enter_city": "Enter city",
-    "state": "State",
-    "enter_state": "Enter state",
-    "zip_code": "ZIP Code",
-    "enter_zip_code": "Enter ZIP code",
-    "notes": "Notes",
-    "enter_notes": "Enter any additional notes",
-    "cancel": "Cancel",
-    "creating": "Creating...",
-    "error": {
-      "title": "Error",
-      "create": "An error occurred while creating the client",
-      "not_authenticated": "You must be logged in to create a client"
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter name"
+      },
+      "company": {
+        "label": "Company",
+        "placeholder": "Enter company name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter email address"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Enter phone number"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Enter address"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city"
+      },
+      "state": {
+        "label": "State",
+        "placeholder": "Enter state"
+      },
+      "zip_code": {
+        "label": "ZIP Code",
+        "placeholder": "Enter ZIP code"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      },
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "creating": "Creating client...",
+      "create": "Create Client"
     },
     "success": {
       "title": "Success",
       "created": "Client created successfully"
+    },
+    "error": {
+      "title": "Error",
+      "create": "An error occurred while creating the client",
+      "not_authenticated": "You must be logged in to create a client"
     }
   },
   "Sales": {

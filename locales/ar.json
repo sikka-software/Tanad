@@ -1485,39 +1485,60 @@
   },
   "Clients": {
     "title": "العملاء",
-    "create_client": "إضافة عميل",
-    "no_clients_found": "لا يوجد عملاء",
-    "add_client": "إضافة عميل",
+    "add_new": "إضافة عميل جديد",
     "back_to_list": "العودة للقائمة",
     "client_details": "تفاصيل العميل",
-    "full_name": "الاسم الكامل",
-    "enter_full_name": "أدخل الاسم الكامل",
-    "company": "الشركة",
-    "enter_company_name": "أدخل اسم الشركة",
-    "email": "البريد الإلكتروني",
-    "enter_email": "أدخل البريد الإلكتروني",
-    "phone": "رقم الهاتف",
-    "enter_phone": "أدخل رقم الهاتف",
-    "address": "العنوان",
-    "enter_address": "أدخل العنوان",
-    "city": "المدينة",
-    "enter_city": "أدخل المدينة",
-    "state": "المنطقة",
-    "enter_state": "أدخل المنطقة",
-    "zip_code": "الرمز البريدي",
-    "enter_zip_code": "أدخل الرمز البريدي",
-    "notes": "ملاحظات",
-    "enter_notes": "أدخل أي ملاحظات إضافية",
-    "cancel": "إلغاء",
-    "creating": "جاري الإنشاء...",
-    "error": {
-      "title": "خطأ",
-      "create": "حدث خطأ أثناء إنشاء العميل",
-      "not_authenticated": "يجب تسجيل الدخول لإضافة عميل"
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل الاسم"
+      },
+      "company": {
+        "label": "الشركة",
+        "placeholder": "أدخل اسم الشركة"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني"
+      },
+      "phone": {
+        "label": "رقم الهاتف",
+        "placeholder": "أدخل رقم الهاتف"
+      },
+      "address": {
+        "label": "العنوان",
+        "placeholder": "أدخل العنوان"
+      },
+      "city": {
+        "label": "المدينة",
+        "placeholder": "أدخل المدينة"
+      },
+      "state": {
+        "label": "المنطقة",
+        "placeholder": "أدخل المنطقة"
+      },
+      "zip_code": {
+        "label": "الرمز البريدي",
+        "placeholder": "أدخل الرمز البريدي"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل الملاحظات"
+      },
+      "cancel": "إلغاء"
+    },
+    "messages": {
+      "creating": "جاري إنشاء العميل...",
+      "create": "إنشاء عميل"
     },
     "success": {
       "title": "تم بنجاح",
-      "created": "تم إضافة العميل بنجاح"
+      "created": "تم إنشاء العميل بنجاح"
+    },
+    "error": {
+      "title": "خطأ",
+      "create": "حدث خطأ أثناء إنشاء العميل",
+      "not_authenticated": "يجب تسجيل الدخول لإنشاء عميل"
     }
   }
 }

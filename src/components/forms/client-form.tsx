@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import type { SubmitHandler } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -21,29 +22,35 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
 
-const clientSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(1, "Phone number is required"),
-  company: z.string().optional(),
-  address: z.string().min(1, "Address is required"),
-  city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State is required"),
-  zip_code: z.string().min(1, "ZIP code is required"),
-  notes: z.string().optional(),
-});
+// We'll create a schema factory to handle translations
+const createClientSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address"),
+    phone: z.string().min(1, "Phone number is required"),
+    company: z.string().optional(),
+    address: z.string().min(1, "Address is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    zip_code: z.string().min(1, "ZIP code is required"),
+    notes: z.string().optional(),
+  });
 
-export type ClientFormValues = z.infer<typeof clientSchema>;
+export type ClientFormValues = z.infer<ReturnType<typeof createClientSchema>>;
 
 interface ClientFormProps {
+  id?: string;
   onSuccess?: () => void;
+  onSubmit?: (data: ClientFormValues) => Promise<void>;
+  loading?: boolean;
   userId: string | null;
 }
 
-export function ClientForm({ onSuccess, userId }: ClientFormProps) {
+export function ClientForm({ id, onSuccess, onSubmit: externalSubmit, loading = false, userId }: ClientFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const t = useTranslations("Clients");
+  const t = useTranslations();
+
+  const clientSchema = createClientSchema(t);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
@@ -60,8 +67,12 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
     },
   });
 
-  const onSubmit = async (data: ClientFormValues) => {
-    setLoading(true);
+  const onSubmit: SubmitHandler<ClientFormValues> = async (data) => {
+    if (externalSubmit) {
+      await externalSubmit(data);
+      return;
+    }
+
     try {
       // Check if user ID is available
       if (!userId) {
@@ -79,7 +90,7 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
           state: data.state.trim(),
           zip_code: data.zip_code.trim(),
           notes: data.notes?.trim() || null,
-          user_id: userId, // Add the user_id field
+          user_id: userId,
         },
       ]);
 
@@ -98,23 +109,21 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
       toast.error(t("error.title"), {
         description: error instanceof Error ? error.message : t("error.create"),
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("full_name")} *</FormLabel>
+                <FormLabel>{t("Clients.form.name.label")} *</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter_full_name")} {...field} />
+                  <Input placeholder={t("Clients.form.name.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,9 +135,9 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
             name="company"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("company")}</FormLabel>
+                <FormLabel>{t("Clients.form.company.label")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter_company_name")} {...field} />
+                  <Input placeholder={t("Clients.form.company.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -142,9 +151,9 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("email")} *</FormLabel>
+                <FormLabel>{t("Clients.form.email.label")} *</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder={t("enter_email")} {...field} />
+                  <Input type="email" placeholder={t("Clients.form.email.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -156,9 +165,9 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("phone")} *</FormLabel>
+                <FormLabel>{t("Clients.form.phone.label")} *</FormLabel>
                 <FormControl>
-                  <Input type="tel" placeholder={t("enter_phone")} {...field} />
+                  <Input type="tel" placeholder={t("Clients.form.phone.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -171,9 +180,9 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("address")} *</FormLabel>
+              <FormLabel>{t("Clients.form.address.label")} *</FormLabel>
               <FormControl>
-                <Input placeholder={t("enter_address")} {...field} />
+                <Input placeholder={t("Clients.form.address.placeholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -186,9 +195,9 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
             name="city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("city")} *</FormLabel>
+                <FormLabel>{t("Clients.form.city.label")} *</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter_city")} {...field} />
+                  <Input placeholder={t("Clients.form.city.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -200,9 +209,9 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("state")} *</FormLabel>
+                <FormLabel>{t("Clients.form.state.label")} *</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter_state")} {...field} />
+                  <Input placeholder={t("Clients.form.state.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -214,9 +223,9 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
             name="zip_code"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("zip_code")} *</FormLabel>
+                <FormLabel>{t("Clients.form.zip_code.label")} *</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter_zip_code")} {...field} />
+                  <Input placeholder={t("Clients.form.zip_code.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -229,9 +238,9 @@ export function ClientForm({ onSuccess, userId }: ClientFormProps) {
           name="notes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("notes")}</FormLabel>
+              <FormLabel>{t("Clients.form.notes.label")}</FormLabel>
               <FormControl>
-                <Textarea placeholder={t("enter_notes")} rows={4} {...field} />
+                <Textarea placeholder={t("Clients.form.notes.placeholder")} rows={4} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
