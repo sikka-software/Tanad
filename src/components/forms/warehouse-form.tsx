@@ -9,8 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import type { Warehouse } from "@/api/warehouses"; // Import Warehouse type
-import { createWarehouse, fetchWarehouseById, updateWarehouse } from "@/api/warehouses"; // Import API functions
+import type { Warehouse } from "@/api/warehouses";
+// Import Warehouse type
+import { createWarehouse, fetchWarehouseById, updateWarehouse } from "@/api/warehouses";
+// Import API functions
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,8 +23,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
 // Schema factory for warehouse form validation with translations
 const createWarehouseSchema = (t: (key: string) => string) =>
@@ -38,7 +40,7 @@ const createWarehouseSchema = (t: (key: string) => string) =>
     notes: z.string().optional(),
   });
 
-export type WarehouseFormValues = z.infer<ReturnType<typeof createWarehouseSchema>>;
+export type WarehouseFormValues = z.input<ReturnType<typeof createWarehouseSchema>>;
 
 interface WarehouseFormProps {
   formId?: string;
@@ -153,8 +155,7 @@ export function WarehouseForm({
     } catch (error) {
       console.error("Failed to save warehouse:", error);
       toast.error(t("error.title"), {
-        description:
-          error instanceof Error ? error.message : t("Warehouses.messages.error_save"),
+        description: error instanceof Error ? error.message : t("Warehouses.messages.error_save"),
       });
     } finally {
       setInternalLoading(false);
@@ -163,11 +164,7 @@ export function WarehouseForm({
 
   return (
     <Form {...form}>
-      <form
-        id={formId}
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
-      >
+      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -342,11 +339,9 @@ export function WarehouseForm({
         />
 
         <Button type="submit" disabled={loading} className="w-full">
-          {warehouseId
-            ? t("Warehouses.form.update_button")
-            : t("Warehouses.form.create_button")}
+          {warehouseId ? t("Warehouses.form.update_button") : t("Warehouses.form.create_button")}
         </Button>
       </form>
     </Form>
   );
-} 
+}

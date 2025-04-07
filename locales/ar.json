@@ -1422,6 +1422,72 @@
   "Requests": {
     "title": "الطلبات"
   },
+  "Clients": {
+    "title": "العملاء",
+    "add_new": "إضافة عميل جديد",
+    "back_to_list": "الرجوع للقائمة",
+    "client_details": "تفاصيل العميل",
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل الاسم",
+        "required": "الاسم مطلوب"
+      },
+      "company": {
+        "label": "الشركة",
+        "placeholder": "أدخل اسم الشركة"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "phone": {
+        "label": "الهاتف",
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "رقم الهاتف مطلوب"
+      },
+      "address": {
+        "label": "العنوان",
+        "placeholder": "أدخل العنوان",
+        "required": "العنوان مطلوب"
+      },
+      "city": {
+        "label": "المدينة",
+        "placeholder": "أدخل المدينة",
+        "required": "المدينة مطلوبة"
+      },
+      "state": {
+        "label": "المنطقة",
+        "placeholder": "أدخل المنطقة",
+        "required": "المنطقة مطلوبة"
+      },
+      "zip_code": {
+        "label": "الرمز البريدي",
+        "placeholder": "أدخل الرمز البريدي",
+        "required": "الرمز البريدي مطلوب"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظات"
+      },
+      "cancel": "إلغاء"
+    },
+    "messages": {
+      "creating": "جاري إنشاء العميل...",
+      "create": "إنشاء عميل"
+    },
+    "success": {
+      "title": "تم بنجاح",
+      "created": "تم إنشاء العميل بنجاح"
+    },
+    "error": {
+      "title": "خطأ",
+      "create": "حدث خطأ أثناء إنشاء العميل",
+      "not_authenticated": "يجب تسجيل الدخول لإنشاء عميل"
+    }
+  },
   "Warehouses": {
     "title": "المستودعات",
     "add_new": "إضافة مستودع جديد",

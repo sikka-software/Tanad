@@ -9,8 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import type { Branch } from "@/api/branches"; // Import Branch type
-import { createBranch, fetchBranchById, updateBranch } from "@/api/branches"; // Import API functions
+import type { Branch } from "@/api/branches";
+// Import Branch type
+import { createBranch, fetchBranchById, updateBranch } from "@/api/branches";
+// Import API functions
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,8 +23,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
 // Schema factory for branch form validation with translations
 const createBranchSchema = (t: (key: string) => string) =>
@@ -161,8 +163,7 @@ export function BranchForm({
     } catch (error) {
       console.error("Failed to save branch:", error);
       toast.error(t("error.title"), {
-        description:
-          error instanceof Error ? error.message : t("Branches.messages.error_save"),
+        description: error instanceof Error ? error.message : t("Branches.messages.error_save"),
       });
     } finally {
       setInternalLoading(false);
@@ -171,11 +172,7 @@ export function BranchForm({
 
   return (
     <Form {...form}>
-      <form
-        id={formId}
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
-      >
+      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -352,16 +349,10 @@ export function BranchForm({
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">
-                  {t("Branches.form.is_active.label")}
-                </FormLabel>
+                <FormLabel className="text-base">{t("Branches.form.is_active.label")}</FormLabel>
               </div>
               <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={loading}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} disabled={loading} />
               </FormControl>
             </FormItem>
           )}
@@ -387,11 +378,9 @@ export function BranchForm({
         />
 
         <Button type="submit" disabled={loading} className="w-full">
-          {branchId
-            ? t("Branches.form.update_button")
-            : t("Branches.form.create_button")}
+          {branchId ? t("Branches.form.update_button") : t("Branches.form.create_button")}
         </Button>
       </form>
     </Form>
   );
-} 
+}

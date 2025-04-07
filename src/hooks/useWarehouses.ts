@@ -1,19 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Warehouse } from '@/api/warehouses';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import type { Warehouse } from "@/api/warehouses";
 import {
   createWarehouse,
   deleteWarehouse,
   fetchWarehouseById,
   fetchWarehouses,
   updateWarehouse,
-} from '@/api/warehouses';
+} from "@/api/warehouses";
 
 // Query keys for warehouses
 export const warehouseKeys = {
-  all: ['warehouses'] as const,
-  lists: () => [...warehouseKeys.all, 'list'] as const,
+  all: ["warehouses"] as const,
+  lists: () => [...warehouseKeys.all, "list"] as const,
   list: (filters: any) => [...warehouseKeys.lists(), { filters }] as const,
-  details: () => [...warehouseKeys.all, 'detail'] as const,
+  details: () => [...warehouseKeys.all, "detail"] as const,
   detail: (id: string) => [...warehouseKeys.details(), id] as const,
 };
 
@@ -39,7 +40,7 @@ export function useCreateWarehouse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newWarehouse: Omit<Warehouse, 'id' | 'created_at'> & { user_id: string }) =>
+    mutationFn: (newWarehouse: Omit<Warehouse, "id" | "created_at"> & { user_id: string }) =>
       createWarehouse(newWarehouse),
     onSuccess: () => {
       // Invalidate the list query to refetch
@@ -53,8 +54,13 @@ export function useUpdateWarehouse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, warehouse }: { id: string; warehouse: Partial<Omit<Warehouse, 'id' | 'created_at'>> }) =>
-      updateWarehouse(id, warehouse),
+    mutationFn: ({
+      id,
+      warehouse,
+    }: {
+      id: string;
+      warehouse: Partial<Omit<Warehouse, "id" | "created_at">>;
+    }) => updateWarehouse(id, warehouse),
     onSuccess: (data) => {
       // Invalidate both the specific detail and the list queries
       queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(data.id) });
@@ -75,4 +81,4 @@ export function useDeleteWarehouse() {
       queryClient.removeQueries({ queryKey: warehouseKeys.detail(variables) });
     },
   });
-} 
+}
