@@ -1491,7 +1491,8 @@
     "form": {
       "name": {
         "label": "الاسم",
-        "placeholder": "أدخل الاسم"
+        "placeholder": "أدخل الاسم",
+        "required": "الاسم مطلوب"
       },
       "company": {
         "label": "الشركة",
@@ -1499,27 +1500,34 @@
       },
       "email": {
         "label": "البريد الإلكتروني",
-        "placeholder": "أدخل البريد الإلكتروني"
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
       },
       "phone": {
         "label": "رقم الهاتف",
-        "placeholder": "أدخل رقم الهاتف"
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "رقم الهاتف مطلوب"
       },
       "address": {
         "label": "العنوان",
-        "placeholder": "أدخل العنوان"
+        "placeholder": "أدخل العنوان",
+        "required": "العنوان مطلوب"
       },
       "city": {
         "label": "المدينة",
-        "placeholder": "أدخل المدينة"
+        "placeholder": "أدخل المدينة",
+        "required": "المدينة مطلوبة"
       },
       "state": {
         "label": "المنطقة",
-        "placeholder": "أدخل المنطقة"
+        "placeholder": "أدخل المنطقة",
+        "required": "المنطقة مطلوبة"
       },
       "zip_code": {
         "label": "الرمز البريدي",
-        "placeholder": "أدخل الرمز البريدي"
+        "placeholder": "أدخل الرمز البريدي",
+        "required": "الرمز البريدي مطلوب"
       },
       "notes": {
         "label": "ملاحظات",

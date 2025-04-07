@@ -25,14 +25,14 @@ import { supabase } from "@/lib/supabase";
 // We'll create a schema factory to handle translations
 const createClientSchema = (t: (key: string) => string) =>
   z.object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Invalid email address"),
-    phone: z.string().min(1, "Phone number is required"),
+    name: z.string().min(1, t("Clients.form.name.required")),
+    email: z.string().email(t("Clients.form.email.invalid")),
+    phone: z.string().min(1, t("Clients.form.phone.required")),
     company: z.string().optional(),
-    address: z.string().min(1, "Address is required"),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    zip_code: z.string().min(1, "ZIP code is required"),
+    address: z.string().min(1, t("Clients.form.address.required")),
+    city: z.string().min(1, t("Clients.form.city.required")),
+    state: z.string().min(1, t("Clients.form.state.required")),
+    zip_code: z.string().min(1, t("Clients.form.zip_code.required")),
     notes: z.string().optional(),
   });
 
@@ -46,7 +46,13 @@ interface ClientFormProps {
   userId: string | null;
 }
 
-export function ClientForm({ id, onSuccess, onSubmit: externalSubmit, loading = false, userId }: ClientFormProps) {
+export function ClientForm({
+  id,
+  onSuccess,
+  onSubmit: externalSubmit,
+  loading = false,
+  userId,
+}: ClientFormProps) {
   const router = useRouter();
   const t = useTranslations();
 
@@ -153,7 +159,11 @@ export function ClientForm({ id, onSuccess, onSubmit: externalSubmit, loading = 
               <FormItem>
                 <FormLabel>{t("Clients.form.email.label")} *</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder={t("Clients.form.email.placeholder")} {...field} />
+                  <Input
+                    type="email"
+                    placeholder={t("Clients.form.email.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -246,15 +256,6 @@ export function ClientForm({ id, onSuccess, onSubmit: externalSubmit, loading = 
             </FormItem>
           )}
         />
-
-        <div className="flex justify-end gap-4 pt-4">
-          <Button type="button" variant="outline" onClick={() => router.push("/clients")}>
-            {t("cancel")}
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? t("creating") : t("create_client")}
-          </Button>
-        </div>
       </form>
     </Form>
   );

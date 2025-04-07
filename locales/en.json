@@ -1321,7 +1321,8 @@
     "form": {
       "name": {
         "label": "Name",
-        "placeholder": "Enter name"
+        "placeholder": "Enter name",
+        "required": "Name is required"
       },
       "company": {
         "label": "Company",
@@ -1329,27 +1330,34 @@
       },
       "email": {
         "label": "Email",
-        "placeholder": "Enter email address"
+        "placeholder": "Enter email address",
+        "required": "Email is required",
+        "invalid": "Invalid email address"
       },
       "phone": {
         "label": "Phone",
-        "placeholder": "Enter phone number"
+        "placeholder": "Enter phone number",
+        "required": "Phone number is required"
       },
       "address": {
         "label": "Address",
-        "placeholder": "Enter address"
+        "placeholder": "Enter address",
+        "required": "Address is required"
       },
       "city": {
         "label": "City",
-        "placeholder": "Enter city"
+        "placeholder": "Enter city",
+        "required": "City is required"
       },
       "state": {
         "label": "State",
-        "placeholder": "Enter state"
+        "placeholder": "Enter state",
+        "required": "State is required"
       },
       "zip_code": {
         "label": "ZIP Code",
-        "placeholder": "Enter ZIP code"
+        "placeholder": "Enter ZIP code",
+        "required": "ZIP code is required"
       },
       "notes": {
         "label": "Notes",
