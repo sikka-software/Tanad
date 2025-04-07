@@ -1,12 +1,23 @@
-import "dotenv/config";
-import { defineConfig } from "drizzle-kit";
+import * as dotenv from "dotenv";
+import type { Config } from "drizzle-kit";
 
-export default defineConfig({
+dotenv.config();
+
+const connectionString = process.env.DATABASE_URL!;
+const url = new URL(connectionString);
+
+export default {
+  schema: "./src/db/schema-public.ts",
   out: "./drizzle",
-  schema: "./src/db/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    host: url.hostname,
+    port: parseInt(url.port),
+    user: url.username,
+    password: url.password,
+    database: url.pathname.slice(1),
+    ssl: url.searchParams.get("sslmode") === "require",
   },
-  schemaFilter: ["public", "auth"],
-});
+  verbose: true,
+  strict: true,
+} satisfies Config;

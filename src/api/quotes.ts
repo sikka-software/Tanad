@@ -13,7 +13,7 @@ export interface Quote {
   status: string;
   notes: string | null;
   client_id: string;
-  client: Client;
+  clients: Client;
   created_at: string;
 }
 
@@ -32,7 +32,7 @@ export async function fetchQuotes(): Promise<Quote[]> {
     .from('quotes')
     .select(`
       *,
-      client:client_id (
+      clients!quotes_client_id_fkey (
         id,
         name,
         company,
@@ -54,7 +54,7 @@ export async function fetchQuoteById(id: string): Promise<Quote> {
     .from('quotes')
     .select(`
       *,
-      client:client_id (
+      clients!quotes_client_id_fkey (
         id,
         name,
         company,
@@ -72,7 +72,7 @@ export async function fetchQuoteById(id: string): Promise<Quote> {
   return data;
 }
 
-export async function createQuote(quote: Omit<Quote, 'id' | 'created_at' | 'client'>) {
+export async function createQuote(quote: Omit<Quote, 'id' | 'created_at' | 'clients'>) {
   const { data, error } = await supabase
     .from('quotes')
     .insert([quote])

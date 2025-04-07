@@ -35,7 +35,7 @@ export default function QuotesPage() {
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
           <h3 className="text-lg font-semibold">Quote #{quote.quote_number}</h3>
-          <p className="text-sm text-gray-500">{quote.client.company}</p>
+          <p className="text-sm text-gray-500">{quote.clients.company}</p>
         </div>
         <Badge className={getStatusColor(quote.status)}>
           {t(`status.${quote.status.toLowerCase()}`)}
@@ -63,7 +63,7 @@ export default function QuotesPage() {
           </div>
           <div className="border-t pt-2">
             <p className="text-sm text-gray-500">
-              {quote.client.name} • {quote.client.email}
+              {quote.clients.name} • {quote.clients.email}
             </p>
           </div>
         </div>
