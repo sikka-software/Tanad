@@ -1354,7 +1354,6 @@
   "Quotes": {
     "title": "Quotes"
   },
-
   "Salaries": {
     "title": "Salaries"
   },
@@ -1403,6 +1402,11 @@
   "Employees": {
     "title": "Employees",
     "allEmployees": "All Employees",
+    "add_employee": "Add Employee",
+    "back_to_list": "Back to List",
+    "employee_details": "Employee Details",
+    "no_employees_found": "No employees found",
+    "create_employee": "Create Employee",
     "add": "Add Employee",
     "edit": "Edit Employee",
     "list": "Employee List",
