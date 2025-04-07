@@ -1,28 +1,38 @@
 {
   "General": {
-    "sikka": "Sikka Software",
+    "sikka": "Sikka",
+    "language": "Language",
+    "error": "Error",
+    "delete": "Delete",
+    "edit": "Edit",
+    "share": "Share",
+    "save": "Save",
+    "add": "Add",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "update": "Update",
+    "updating": "Updating...",
+    "updated": "Updated",
+    "select": "Select",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "reload": "Reload",
+    "more": "More",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
     "tanad": "Tanad",
     "dark": "Dark",
     "light": "Light",
-    "language": "Language",
-    "theme": "Theme",
     "soon": "Coming Soon",
     "languages": {
       "label": "Change Language",
       "ar": "العربية",
       "en": "English"
     },
-    "error": "Error",
-    "cancel": "Cancel",
-    "save": "Save",
-    "preview": "Preview",
-    "share": "Share",
     "copy": "Copy",
     "copied": "Copied",
-    "edit": "Edit",
-    "delete": "Delete",
     "send": "Send",
-    "search": "Search",
     "enable": "Enable",
     "disable": "Disable",
     "enabled": "Enabled",
@@ -1215,8 +1225,7 @@
     "stock_label": "In Stock: {value}",
     "create_product": "Create Product",
     "creating_product": "Creating...",
-    "cancel": "Cancel",
-    "no_products": "No products found",
+    "no_products": "No products",
     "add_first_product": "Add your first product",
     "success": {
       "title": "Success",
@@ -1283,7 +1292,6 @@
     },
     "notes": "Notes",
     "enter_notes": "Enter any additional notes",
-    "cancel": "Cancel",
     "client_added": "Client added successfully",
     "error": {
       "load_clients": "Failed to load clients",
@@ -1362,8 +1370,7 @@
       "notes": {
         "label": "Notes",
         "placeholder": "Enter notes"
-      },
-      "cancel": "Cancel"
+      }
     },
     "messages": {
       "creating": "Creating client...",
@@ -1432,8 +1439,7 @@
       "notes": {
         "label": "Notes",
         "placeholder": "Enter notes"
-      },
-      "cancel": "Cancel"
+      }
     },
     "messages": {
       "creating": "Creating vendor...",
@@ -1861,5 +1867,89 @@
   },
   "Locations": {
     "title": "Locations"
+  },
+  "Employees": {
+    "title": "Employees",
+    "add_new": "Add New Employee",
+    "add_employee": "Add Employee",
+    "cancel": "Cancel",
+    "employee_details": "Employee Details",
+    "edit": "Edit Employee",
+    "back_to_list": "Back to List",
+    "allEmployees": "All Employees",
+    "form": {
+      "first_name": {
+        "label": "First Name",
+        "placeholder": "Enter first name",
+        "required": "First name is required"
+      },
+      "last_name": {
+        "label": "Last Name",
+        "placeholder": "Enter last name",
+        "required": "Last name is required"
+      },
+      "name": {
+        "label": "Full Name",
+        "placeholder": "Enter full name",
+        "required": "Full name is required"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter email address",
+        "required": "Email is required",
+        "invalid": "Invalid email address"
+      },
+      "phone": {
+        "label": "Phone Number",
+        "placeholder": "Enter phone number",
+        "required": "Phone number is required"
+      },
+      "position": {
+        "label": "Position",
+        "placeholder": "Enter position",
+        "required": "Position is required"
+      },
+      "department": {
+        "label": "Department",
+        "placeholder": "Enter department",
+        "required": "Department is required"
+      },
+      "hire_date": {
+        "label": "Hire Date",
+        "placeholder": "Enter hire date",
+        "required": "Hire date is required"
+      },
+      "salary": {
+        "label": "Salary",
+        "placeholder": "Enter salary",
+        "required": "Salary is required"
+      },
+      "is_active": {
+        "label": "Active Status"
+      },
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "on_leave": "On Leave"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Enter address"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      }
+    },
+    "messages": {
+      "creating": "Creating employee...",
+      "create": "Create Employee",
+      "create_employee": "Create Employee",
+      "created": "Employee created successfully",
+      "updated": "Employee updated successfully",
+      "deleted": "Employee deleted successfully",
+      "error": "An error occurred while processing your request"
+    }
   }
 }

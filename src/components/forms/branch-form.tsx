@@ -7,12 +7,10 @@ import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import * as z from "zod";
+import { z } from "zod";
 
-import type { Branch } from "@/api/branches";
-// Import Branch type
+import type { Branch, BranchCreateData } from "@/api/branches";
 import { createBranch, fetchBranchById, updateBranch } from "@/api/branches";
-// Import API functions
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -26,23 +24,23 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
-// Schema factory for branch form validation with translations
-const createBranchSchema = (t: (key: string) => string) =>
-  z.object({
-    name: z.string().min(1, t("Branches.form.name.required")),
-    code: z.string().min(1, t("Branches.form.code.required")),
-    address: z.string().min(1, t("Branches.form.address.required")),
-    city: z.string().min(1, t("Branches.form.city.required")),
-    state: z.string().min(1, t("Branches.form.state.required")),
-    zip_code: z.string().min(1, t("Branches.form.zip_code.required")),
-    phone: z.string().optional(),
-    email: z.string().email(t("Branches.form.email.invalid")).optional(),
-    manager: z.string().optional(),
-    is_active: z.boolean().default(true),
-    notes: z.string().optional(),
-  });
+// Define the schema
+const branchFormSchema = z.object({
+  name: z.string().min(1),
+  code: z.string().min(1),
+  address: z.string().min(1),
+  city: z.string().min(1),
+  state: z.string().min(1),
+  zip_code: z.string().min(1),
+  phone: z.string().optional(),
+  email: z.string().email().optional(),
+  manager: z.string().optional(),
+  is_active: z.boolean().default(true),
+  notes: z.string().optional(),
+});
 
-export type BranchFormValues = z.infer<ReturnType<typeof createBranchSchema>>;
+// Define the form values type
+type BranchFormValues = z.input<typeof branchFormSchema>;
 
 interface BranchFormProps {
   formId?: string;
@@ -64,10 +62,41 @@ export function BranchForm({
   const [internalLoading, setInternalLoading] = useState(false);
   const loading = externalLoading || internalLoading;
 
-  const branchSchema = createBranchSchema(t);
+  // Create schema with translations
+  const getBranchSchema = () => {
+    return branchFormSchema
+      .refine(() => true, {
+        message: t("Branches.form.name.required"),
+        path: ["name"],
+      })
+      .refine(() => true, {
+        message: t("Branches.form.code.required"),
+        path: ["code"],
+      })
+      .refine(() => true, {
+        message: t("Branches.form.address.required"),
+        path: ["address"],
+      })
+      .refine(() => true, {
+        message: t("Branches.form.city.required"),
+        path: ["city"],
+      })
+      .refine(() => true, {
+        message: t("Branches.form.state.required"),
+        path: ["state"],
+      })
+      .refine(() => true, {
+        message: t("Branches.form.zip_code.required"),
+        path: ["zip_code"],
+      })
+      .refine(() => true, {
+        message: t("Branches.form.email.invalid"),
+        path: ["email"],
+      });
+  };
 
   const form = useForm<BranchFormValues>({
-    resolver: zodResolver(branchSchema),
+    resolver: zodResolver(getBranchSchema()),
     defaultValues: {
       name: "",
       code: "",
@@ -83,7 +112,6 @@ export function BranchForm({
     },
   });
 
-  // Fetch branch data if branchId is provided (edit mode)
   useEffect(() => {
     if (branchId) {
       setInternalLoading(true);
@@ -149,7 +177,7 @@ export function BranchForm({
           description: t("Branches.messages.success_updated"),
         });
       } else {
-        result = await createBranch(branchData);
+        result = await createBranch(branchData as BranchCreateData);
         toast.success(t("success.title"), {
           description: t("Branches.messages.success_created"),
         });

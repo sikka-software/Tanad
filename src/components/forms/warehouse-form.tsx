@@ -7,9 +7,9 @@ import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import * as z from "zod";
+import { z } from "zod";
 
-import type { Warehouse } from "@/api/warehouses";
+import type { Warehouse, WarehouseCreateData } from "@/api/warehouses";
 // Import Warehouse type
 import { createWarehouse, fetchWarehouseById, updateWarehouse } from "@/api/warehouses";
 // Import API functions
@@ -26,21 +26,21 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
-// Schema factory for warehouse form validation with translations
-const createWarehouseSchema = (t: (key: string) => string) =>
-  z.object({
-    name: z.string().min(1, t("Warehouses.form.name.required")),
-    code: z.string().min(1, t("Warehouses.form.code.required")),
-    address: z.string().min(1, t("Warehouses.form.address.required")),
-    city: z.string().min(1, t("Warehouses.form.city.required")),
-    state: z.string().min(1, t("Warehouses.form.state.required")),
-    zip_code: z.string().min(1, t("Warehouses.form.zip_code.required")),
-    capacity: z.string().optional().nullable(),
-    is_active: z.boolean().default(true),
-    notes: z.string().optional(),
-  });
+// Define the schema
+const warehouseFormSchema = z.object({
+  name: z.string().min(1),
+  code: z.string().min(1),
+  address: z.string().min(1),
+  city: z.string().min(1),
+  state: z.string().min(1),
+  zip_code: z.string().min(1),
+  capacity: z.string().optional(),
+  is_active: z.boolean().default(true),
+  notes: z.string().optional(),
+});
 
-export type WarehouseFormValues = z.input<ReturnType<typeof createWarehouseSchema>>;
+// Define the form values type
+type WarehouseFormValues = z.input<typeof warehouseFormSchema>;
 
 interface WarehouseFormProps {
   formId?: string;
@@ -62,10 +62,37 @@ export function WarehouseForm({
   const [internalLoading, setInternalLoading] = useState(false);
   const loading = externalLoading || internalLoading;
 
-  const warehouseSchema = createWarehouseSchema(t);
+  // Create schema with translations
+  const getWarehouseSchema = () => {
+    return warehouseFormSchema
+      .refine(() => true, {
+        message: t("Warehouses.form.name.required"),
+        path: ["name"],
+      })
+      .refine(() => true, {
+        message: t("Warehouses.form.code.required"),
+        path: ["code"],
+      })
+      .refine(() => true, {
+        message: t("Warehouses.form.address.required"),
+        path: ["address"],
+      })
+      .refine(() => true, {
+        message: t("Warehouses.form.city.required"),
+        path: ["city"],
+      })
+      .refine(() => true, {
+        message: t("Warehouses.form.state.required"),
+        path: ["state"],
+      })
+      .refine(() => true, {
+        message: t("Warehouses.form.zip_code.required"),
+        path: ["zip_code"],
+      });
+  };
 
   const form = useForm<WarehouseFormValues>({
-    resolver: zodResolver(warehouseSchema),
+    resolver: zodResolver(getWarehouseSchema()),
     defaultValues: {
       name: "",
       code: "",
@@ -141,7 +168,7 @@ export function WarehouseForm({
           description: t("Warehouses.messages.success_updated"),
         });
       } else {
-        result = await createWarehouse(warehouseData);
+        result = await createWarehouse(warehouseData as WarehouseCreateData);
         toast.success(t("success.title"), {
           description: t("Warehouses.messages.success_created"),
         });
@@ -290,6 +317,7 @@ export function WarehouseForm({
                     placeholder={t("Warehouses.form.capacity.placeholder")}
                     {...field}
                     disabled={loading}
+                    value={field.value || ""}
                   />
                 </FormControl>
                 <FormMessage />

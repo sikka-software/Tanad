@@ -1,6 +1,6 @@
 {
   "General": {
-    "sikka": "سكة لتقنية المعلومات",
+    "sikka": "سِكَّة",
     "tanad": "تند",
     "dark": "داكن",
     "light": "فاتح",
@@ -13,7 +13,7 @@
       "en": "English"
     },
     "saving": "جاري الحفظ...",
-    "error": "حصل خطأ",
+    "error": "خطأ",
     "cancel": "إلغاء",
     "save": "حفظ",
     "preview": "معاينة",
@@ -76,7 +76,18 @@
     "error_updating_avatar": "حصل خطأ اثناء تحديث الصورة الرمزية",
     "next": "التالي",
     "previous": "السابق",
-    "done": "تم"
+    "done": "تم",
+    "saved": "تم الحفظ",
+    "update": "تحديث",
+    "updating": "جاري التحديث...",
+    "updated": "تم التحديث",
+    "select": "اختر",
+    "search": "بحث",
+    "filter": "تصفية",
+    "reset": "إعادة تعيين",
+    "reload": "إعادة تحميل",
+    "more": "المزيد",
+    "add": "إضافة"
   },
   "SEO": {
     "landing": {
@@ -1231,10 +1242,9 @@
     "enter_sku": "أدخل رمز المنتج (اختياري)",
     "no_description": "لا يوجد وصف",
     "sku_label": "رمز المنتج: {value}",
-    "stock_label": "المتوفر: {value}",
+    "stock_label": "متوفر: {value}",
     "create_product": "إنشاء منتج",
     "creating_product": "جاري الإنشاء...",
-    "cancel": "إلغاء",
     "no_products": "لا توجد منتجات",
     "add_first_product": "أضف أول منتج",
     "success": {
@@ -1245,6 +1255,22 @@
       "title": "خطأ",
       "create": "فشل في إنشاء المنتج",
       "fetch": "فشل في جلب المنتجات"
+    },
+    "products": {
+      "title": "المنتجات",
+      "add_product": "إضافة منتج",
+      "no_products": "لا توجد منتجات",
+      "product": "المنتج",
+      "quantity": "الكمية",
+      "unit_price": "سعر الوحدة",
+      "subtotal": "المجموع الفرعي",
+      "select_product": "اختر منتج",
+      "search_products": "بحث عن منتجات",
+      "no_products_found": "لا توجد منتجات",
+      "add_new_product": "إضافة منتج جديد",
+      "product_description": "وصف المنتج",
+      "name": "الاسم",
+      "save_product": "حفظ المنتج"
     }
   },
 
@@ -1296,30 +1322,29 @@
     "enter_sku": "أدخل رمز المنتج (اختياري)",
     "no_description": "لا يوجد وصف",
     "sku_label": "رمز المنتج: {value}",
-    "stock_label": "المتوفر: {value}",
+    "stock_label": "متوفر: {value}",
     "create_invoice": "إنشاء فاتورة",
     "creating": "جاري الإنشاء...",
     "no_invoices_found": "لا توجد فواتير",
     "add_first_invoice": "أضف أول فاتورة",
     "client": "العميل",
     "select_client": "اختر عميل",
-    "search_clients": "بحث عن العملاء...",
-    "no_clients": "لم يتم العثور على عملاء",
+    "search_clients": "بحث عن عملاء...",
+    "no_clients": "لا يوجد عملاء",
     "add_new_client": "إضافة عميل جديد",
     "amount": "المبلغ",
     "due_date": "تاريخ الاستحقاق",
-    "select_status": "اختر الحالة",
+    "select_status": "اختر حالة",
     "status": {
       "title": "الحالة",
       "draft": "مسودة",
-      "pending": "معلقة",
+      "pending": "قيد الانتظار",
       "paid": "مدفوعة",
       "overdue": "متأخرة",
-      "cancelled": "ملغية"
+      "cancelled": "ملغاة"
     },
     "notes": "ملاحظات",
     "enter_notes": "أدخل أي ملاحظات إضافية",
-    "cancel": "إلغاء",
     "client_added": "تمت إضافة العميل بنجاح",
     "error": {
       "load_clients": "فشل في تحميل العملاء",
@@ -1337,81 +1362,117 @@
     "products": {
       "title": "المنتجات",
       "add_product": "إضافة منتج",
-      "no_products": "لا توجد منتجات",
+      "no_products": "لا توجد منتجات مضافة",
       "product": "المنتج",
       "quantity": "الكمية",
       "unit_price": "سعر الوحدة",
       "subtotal": "المجموع الفرعي",
       "select_product": "اختر منتج",
-      "search_products": "بحث عن المنتجات",
-      "no_products_found": "لم يتم العثور على منتجات",
+      "search_products": "بحث عن منتجات",
+      "no_products_found": "لا توجد منتجات",
       "add_new_product": "إضافة منتج جديد",
-      "product_description": "وصف المنتج",
-      "name": "الاسم",
-      "save_product": "حفظ المنتج"
+      "product_description": "وصف المنتج"
     }
   },
   "Sales": {
-    "title": "المبيعات"
-  },
-  "Quotes": {
-    "title": "عروض الأسعار",
-    "add_new": "إضافة عرض جديد",
-    "quote_details": "تفاصيل العرض",
-    "back_to_list": "العودة إلى العروض",
-    "create_quote": "إنشاء عرض",
-    "no_quotes_found": "لا توجد عروض أسعار",
-    "quote_number": "عرض أسعار #{number}",
-    "enter_quote_number": "أدخل رقم العرض",
-    "issue_date": "تاريخ الإصدار",
-    "expiry_date": "تاريخ الانتهاء",
+    "title": "المبيعات",
+    "add_new": "إضافة مبيعات جديدة",
+    "sale_details": "تفاصيل البيع",
+    "description": "الوصف",
+    "description_required": "الوصف مطلوب",
+    "enter_description": "أدخل وصف البيع",
     "amount": "المبلغ",
+    "amount_required": "المبلغ مطلوب",
+    "date": "التاريخ",
+    "date_required": "التاريخ مطلوب",
     "status": {
-      "draft": "مسودة",
-      "sent": "مرسل",
-      "accepted": "مقبول",
-      "rejected": "مرفوض",
-      "expired": "منتهي"
+      "title": "الحالة",
+      "pending": "قيد الانتظار",
+      "completed": "مكتمل",
+      "cancelled": "ملغاة"
     },
+    "select_status": "اختر حالة",
+    "status_required": "الحالة مطلوبة",
+    "notes": "ملاحظات",
+    "enter_notes": "أدخل أي ملاحظات إضافية",
+    "create_sale": "إنشاء مبيعات",
+    "creating": "جاري الإنشاء...",
+    "no_sales": "لا توجد مبيعات",
+    "add_first_sale": "أضف أول بيع",
     "client": "العميل",
     "select_client": "اختر عميل",
-    "search_clients": "بحث عن العملاء",
-    "no_clients": "لم يتم العثور على عملاء",
+    "search_clients": "بحث عن عملاء...",
+    "no_clients": "لا يوجد عملاء",
     "add_new_client": "إضافة عميل جديد",
-    "subtotal": "المجموع الفرعي",
-    "tax_rate": "نسبة الضريبة",
-    "notes": "ملاحظات",
-    "enter_notes": "أدخل ملاحظات",
+    "client_added": "تمت إضافة العميل بنجاح",
     "products": {
       "title": "المنتجات",
-      "product": "المنتج",
-      "select_product": "اختر منتج",
-      "search_products": "بحث عن المنتجات",
-      "no_products_found": "لم يتم العثور على منتجات",
-      "add_new_product": "إضافة منتج جديد",
       "add_product": "إضافة منتج",
       "no_products": "لا توجد منتجات مضافة",
+      "product": "المنتج",
       "quantity": "الكمية",
       "unit_price": "سعر الوحدة",
       "subtotal": "المجموع الفرعي",
+      "select_product": "اختر منتج",
+      "search_products": "بحث عن منتجات",
+      "no_products_found": "لا توجد منتجات",
+      "add_new_product": "إضافة منتج جديد",
       "product_description": "وصف المنتج"
     },
-    "submitting": "جاري الإرسال...",
+    "error": {
+      "load_clients": "فشل في تحميل العملاء",
+      "create": "فشل في إنشاء البيع",
+      "fetch": "فشل في جلب المبيعات",
+      "title": "خطأ"
+    },
     "success": {
       "title": "تم بنجاح",
-      "created": "تم إنشاء العرض بنجاح"
+      "created": "تم إنشاء البيع بنجاح"
     },
+    "submitting": "جاري الإرسال..."
+  },
+  "Quotes": {
+    "title": "عروض الأسعار",
+    "add_new": "إضافة عرض سعر جديد",
+    "quote_details": "تفاصيل عرض السعر",
+    "quote_number": "عرض سعر #{number}",
+    "enter_quote_number": "أدخل رقم عرض السعر",
+    "description": "الوصف",
+    "enter_description": "أدخل وصف عرض السعر",
+    "create_quote": "إنشاء عرض سعر",
+    "creating": "جاري الإنشاء...",
+    "no_quotes": "لا توجد عروض أسعار",
+    "add_first_quote": "أضف أول عرض سعر",
+    "client": "العميل",
+    "select_client": "اختر عميل",
+    "search_clients": "بحث عن عملاء...",
+    "no_clients": "لا يوجد عملاء",
+    "add_new_client": "إضافة عميل جديد",
+    "amount": "المبلغ",
+    "expiry_date": "تاريخ انتهاء الصلاحية",
+    "select_status": "اختر حالة",
+    "status": {
+      "title": "الحالة",
+      "draft": "مسودة",
+      "sent": "مرسل",
+      "accepted": "مقبول",
+      "declined": "مرفوض",
+      "expired": "منتهي الصلاحية"
+    },
+    "notes": "ملاحظات",
+    "enter_notes": "أدخل أي ملاحظات إضافية",
+    "client_added": "تمت إضافة العميل بنجاح",
     "error": {
-      "title": "خطأ",
-      "create": "فشل في إنشاء العرض",
-      "load_clients": "فشل في تحميل العملاء"
-    }
-  },
-  "Salaries": {
-    "title": "الرواتب"
-  },
-  "Leave": {
-    "title": "الإجازات"
+      "load_clients": "فشل في تحميل العملاء",
+      "create": "فشل في إنشاء عرض السعر",
+      "fetch": "فشل في جلب عروض الأسعار",
+      "title": "خطأ"
+    },
+    "success": {
+      "title": "تم بنجاح",
+      "created": "تم إنشاء الإجازة بنجاح"
+    },
+    "submitting": "جاري الإرسال..."
   },
   "Holidays": {
     "title": "العطلات الرسمية"
@@ -1471,8 +1532,7 @@
       "notes": {
         "label": "ملاحظات",
         "placeholder": "أدخل ملاحظات"
-      },
-      "cancel": "إلغاء"
+      }
     },
     "messages": {
       "creating": "جاري إنشاء العميل...",
@@ -1488,70 +1548,131 @@
       "not_authenticated": "يجب تسجيل الدخول لإنشاء عميل"
     }
   },
-  "Warehouses": {
-    "title": "المستودعات",
-    "add_new": "إضافة مستودع جديد",
-    "warehouse_details": "تفاصيل المستودع",
-    "create_warehouse": "إنشاء مستودع",
-    "no_warehouses_found": "لا توجد مستودعات",
-    "capacity": "السعة",
-    "manager": "المدير",
-    "edit": "تعديل المستودع",
-    "status": {
-      "active": "نشط",
-      "inactive": "غير نشط"
-    },
+  "Employees": {
+    "title": "الموظفين",
+    "add_new": "إضافة موظف جديد",
+    "add_employee": "إضافة موظف",
+    "cancel": "إلغاء",
+    "employee_details": "تفاصيل الموظف",
+    "edit": "تعديل الموظف",
+    "back_to_list": "الرجوع للقائمة",
+    "allEmployees": "جميع الموظفين",
     "form": {
+      "first_name": {
+        "label": "الاسم الأول",
+        "placeholder": "أدخل الاسم الأول",
+        "required": "الاسم الأول مطلوب"
+      },
+      "last_name": {
+        "label": "اسم العائلة",
+        "placeholder": "أدخل اسم العائلة",
+        "required": "اسم العائلة مطلوب"
+      },
       "name": {
         "label": "الاسم",
         "placeholder": "أدخل الاسم",
         "required": "الاسم مطلوب"
       },
-      "code": {
-        "label": "الرمز",
-        "placeholder": "أدخل رمز المستودع",
-        "required": "الرمز مطلوب"
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
       },
-      "address": {
-        "label": "العنوان",
-        "placeholder": "أدخل العنوان",
-        "required": "العنوان مطلوب"
+      "phone": {
+        "label": "رقم الهاتف",
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "رقم الهاتف مطلوب"
       },
-      "city": {
-        "label": "المدينة",
-        "placeholder": "أدخل المدينة",
-        "required": "المدينة مطلوبة"
+      "position": {
+        "label": "المنصب",
+        "placeholder": "أدخل المنصب",
+        "required": "المنصب مطلوب"
       },
-      "state": {
-        "label": "المنطقة",
-        "placeholder": "أدخل المنطقة",
-        "required": "المنطقة مطلوبة"
+      "department": {
+        "label": "القسم",
+        "placeholder": "أدخل القسم",
+        "required": "القسم مطلوب"
       },
-      "zip_code": {
-        "label": "الرمز البريدي",
-        "placeholder": "أدخل الرمز البريدي",
-        "required": "الرمز البريدي مطلوب"
+      "hire_date": {
+        "label": "تاريخ التعيين",
+        "placeholder": "أدخل تاريخ التعيين",
+        "required": "تاريخ التعيين مطلوب"
       },
-      "capacity": {
-        "label": "السعة",
-        "placeholder": "أدخل سعة المستودع"
+      "salary": {
+        "label": "الراتب",
+        "placeholder": "أدخل الراتب",
+        "required": "الراتب مطلوب"
       },
       "is_active": {
         "label": "الحالة النشطة"
       },
+      "status": {
+        "label": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "on_leave": "في إجازة"
+      },
+      "address": {
+        "label": "العنوان",
+        "placeholder": "أدخل العنوان"
+      },
       "notes": {
         "label": "ملاحظات",
         "placeholder": "أدخل ملاحظات"
-      },
-      "update_button": "تحديث المستودع",
-      "create_button": "إنشاء مستودع"
+      }
     },
     "messages": {
-      "error_fetch": "فشل في جلب المستودع",
-      "error_save": "فشل في حفظ المستودع",
-      "success_updated": "تم تحديث المستودع بنجاح",
-      "success_created": "تم إنشاء المستودع بنجاح"
+      "creating": "جاري إنشاء الموظف...",
+      "create": "إنشاء موظف",
+      "create_employee": "إنشاء موظف",
+      "created": "تم إنشاء الموظف بنجاح",
+      "updated": "تم تحديث بيانات الموظف بنجاح",
+      "deleted": "تم حذف الموظف بنجاح",
+      "error": "حدث خطأ أثناء معالجة طلبك"
     }
+  },
+  "Warehouses": {
+    "title": "المستودعات",
+    "add_new": "إضافة مستودع جديد",
+    "warehouse_details": "تفاصيل المستودع",
+    "name": "الاسم",
+    "name_required": "اسم المستودع مطلوب",
+    "enter_name": "أدخل اسم المستودع",
+    "code": "الرمز",
+    "code_required": "رمز المستودع مطلوب",
+    "enter_code": "أدخل رمز المستودع",
+    "address": "العنوان",
+    "enter_address": "أدخل عنوان المستودع",
+    "city": "المدينة",
+    "enter_city": "أدخل المدينة",
+    "state": "المنطقة/الولاية",
+    "enter_state": "أدخل المنطقة/الولاية",
+    "zip_code": "الرمز البريدي",
+    "enter_zip_code": "أدخل الرمز البريدي",
+    "status": {
+      "title": "الحالة",
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "select_status": "اختر حالة",
+    "status_required": "الحالة مطلوبة",
+    "notes": "ملاحظات",
+    "enter_notes": "أدخل أي ملاحظات إضافية",
+    "create_warehouse": "إنشاء مستودع",
+    "creating": "جاري الإنشاء...",
+    "no_warehouses": "لا توجد مستودعات",
+    "add_first_warehouse": "أضف أول مستودع",
+    "error": {
+      "create": "فشل في إنشاء المستودع",
+      "fetch": "فشل في جلب المستودعات",
+      "title": "خطأ"
+    },
+    "success": {
+      "title": "تم بنجاح",
+      "created": "تم إنشاء المستودع بنجاح"
+    },
+    "submitting": "جاري الإرسال..."
   },
   "Branches": {
     "title": "الفروع",
@@ -1679,8 +1800,7 @@
       "notes": {
         "label": "ملاحظات",
         "placeholder": "أدخل ملاحظات"
-      },
-      "cancel": "إلغاء"
+      }
     },
     "messages": {
       "creating": "جاري إنشاء المورد...",
