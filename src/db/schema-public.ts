@@ -490,7 +490,6 @@ export const vendors = pgTable(
       as: "permissive",
       for: "insert",
       to: ["public"],
-      withCheck: sql`(auth.uid() = user_id)`,
     }),
     pgPolicy("Users can delete their own vendors", {
       as: "permissive",

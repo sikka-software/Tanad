@@ -29,7 +29,7 @@ const createVendorSchema = (t: (key: string) => string) =>
     name: z.string().min(1, t("Vendors.form.name.required")),
     email: z.string().email(t("Vendors.form.email.invalid")),
     phone: z.string().min(1, t("Vendors.form.phone.required")),
-    company: z.string().optional(),
+    company: z.string().min(1, t("Vendors.form.company.required")),
     address: z.string().min(1, t("Vendors.form.address.required")),
     city: z.string().min(1, t("Vendors.form.city.required")),
     state: z.string().min(1, t("Vendors.form.state.required")),
@@ -121,7 +121,7 @@ export function VendorForm({
         name: data.name.trim(),
         email: data.email.trim(),
         phone: data.phone.trim(),
-        company: data.company?.trim() || "",
+        company: data.company.trim(),
         address: data.address.trim(),
         city: data.city.trim(),
         state: data.state.trim(),
@@ -129,6 +129,9 @@ export function VendorForm({
         notes: data.notes?.trim() || null,
         user_id: userId,
       };
+
+      console.log("Submitting Vendor Data:", vendorData);
+      console.log("Current User ID State:", userId);
 
       let result: Vendor;
       if (vendorId) {
@@ -191,7 +194,7 @@ export function VendorForm({
             name="company"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Vendors.form.company.label")}</FormLabel>
+                <FormLabel>{t("Vendors.form.company.label")} *</FormLabel>
                 <FormControl>
                   <Input
                     placeholder={t("Vendors.form.company.placeholder")}

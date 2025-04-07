@@ -33,13 +33,13 @@ CREATE INDEX "quote_items_quote_id_idx" ON "quote_items" USING btree ("quote_id"
 CREATE INDEX "quotes_client_id_idx" ON "quotes" USING btree ("client_id" uuid_ops);--> statement-breakpoint
 CREATE INDEX "quotes_status_idx" ON "quotes" USING btree ("status" text_ops);--> statement-breakpoint
 CREATE INDEX "quotes_user_id_idx" ON "quotes" USING btree ("user_id" uuid_ops);--> statement-breakpoint
-CREATE POLICY "Users can update quote items through quotes" ON "quote_items" AS PERMISSIVE FOR UPDATE TO public USING ((EXISTS ( SELECT 1
-     FROM quotes
-    WHERE ((quotes.id = quote_items.quote_id) AND (quotes.user_id = auth.uid())))));--> statement-breakpoint
-CREATE POLICY "Users can read quote items through quotes" ON "quote_items" AS PERMISSIVE FOR SELECT TO public;--> statement-breakpoint
-CREATE POLICY "Users can insert quote items through quotes" ON "quote_items" AS PERMISSIVE FOR INSERT TO public;--> statement-breakpoint
-CREATE POLICY "Users can delete quote items through quotes" ON "quote_items" AS PERMISSIVE FOR DELETE TO public;--> statement-breakpoint
-CREATE POLICY "Users can update their own quotes" ON "quotes" AS PERMISSIVE FOR UPDATE TO public USING ((auth.uid() = user_id));--> statement-breakpoint
-CREATE POLICY "Users can read their own quotes" ON "quotes" AS PERMISSIVE FOR SELECT TO public;--> statement-breakpoint
-CREATE POLICY "Users can insert their own quotes" ON "quotes" AS PERMISSIVE FOR INSERT TO public;--> statement-breakpoint
-CREATE POLICY "Users can delete their own quotes" ON "quotes" AS PERMISSIVE FOR DELETE TO public;
+-- CREATE POLICY "Users can update quote items through quotes" ON "quote_items" AS PERMISSIVE FOR UPDATE TO public USING ((EXISTS ( SELECT 1
+--      FROM quotes
+--     WHERE ((quotes.id = quote_items.quote_id) AND (quotes.user_id = auth.uid())))));--> statement-breakpoint
+-- CREATE POLICY "Users can read quote items through quotes" ON "quote_items" AS PERMISSIVE FOR SELECT TO public;--> statement-breakpoint
+-- CREATE POLICY "Users can insert quote items through quotes" ON "quote_items" AS PERMISSIVE FOR INSERT TO public;--> statement-breakpoint
+-- CREATE POLICY "Users can delete quote items through quotes" ON "quote_items" AS PERMISSIVE FOR DELETE TO public;--> statement-breakpoint
+-- CREATE POLICY "Users can update their own quotes" ON "quotes" AS PERMISSIVE FOR UPDATE TO public USING ((auth.uid() = user_id));--> statement-breakpoint
+-- CREATE POLICY "Users can read their own quotes" ON "quotes" AS PERMISSIVE FOR SELECT TO public;--> statement-breakpoint
+-- CREATE POLICY "Users can insert their own quotes" ON "quotes" AS PERMISSIVE FOR INSERT TO public;--> statement-breakpoint
+-- CREATE POLICY "Users can delete their own quotes" ON "quotes" AS PERMISSIVE FOR DELETE TO public;

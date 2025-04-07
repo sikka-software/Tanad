@@ -45,18 +45,24 @@ export async function fetchVendorById(id: string): Promise<Vendor> {
   return data;
 }
 
+// Define an explicit type for vendor creation data
+type VendorCreateData = Omit<Vendor, 'id' | 'created_at'> & { user_id: string };
+
 // Ensure the input type matches the database structure, excluding generated fields
 // and including the userId if it needs to be set explicitly (though RLS might handle it)
 // Assuming userId is handled by RLS or session, we omit it here.
-export async function createVendor(vendor: Omit<Vendor, 'id' | 'created_at'>): Promise<Vendor> {
+
+// Updated function signature to accept VendorCreateData
+export async function createVendor(vendor: VendorCreateData): Promise<Vendor> {
   const { data, error } = await supabase
     .from('vendors')
-    .insert([vendor]) // RLS policy should automatically add the correct userId
+    .insert([vendor]) // Pass the vendor data including user_id
     .select()
     .single();
 
   if (error) {
-    console.error('Error creating vendor:', error);
+    // Log the specific error for better debugging
+    console.error('Error creating vendor in API:', error);
     throw new Error(error.message);
   }
 
