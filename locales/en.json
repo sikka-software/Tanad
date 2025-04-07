@@ -1317,7 +1317,9 @@
     "title": "Clients",
     "create_client": "Create Client",
     "no_clients_found": "No clients found",
-    "error_fetching_clients": "An error occurred while fetching clients",
+    "add_client": "Add Client",
+    "back_to_list": "Back to List",
+    "client_details": "Client Details",
     "full_name": "Full Name",
     "enter_full_name": "Enter full name",
     "company": "Company",
@@ -1327,7 +1329,7 @@
     "phone": "Phone",
     "enter_phone": "Enter phone number",
     "address": "Address",
-    "enter_address": "Enter street address",
+    "enter_address": "Enter address",
     "city": "City",
     "enter_city": "Enter city",
     "state": "State",
@@ -1339,9 +1341,9 @@
     "cancel": "Cancel",
     "creating": "Creating...",
     "error": {
-      "not_authenticated": "User not authenticated",
       "title": "Error",
-      "create": "Failed to create client"
+      "create": "An error occurred while creating the client",
+      "not_authenticated": "You must be logged in to create a client"
     },
     "success": {
       "title": "Success",

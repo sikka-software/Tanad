@@ -45,26 +45,38 @@ import { supabase } from "@/lib/supabase";
 const invoiceSchema = z.object({
   client_id: z.string().min(1, "Client is required"),
   invoice_number: z.string().min(1, "Invoice number is required"),
-  amount: z
-    .string()
-    .min(1, "Amount is required")
-    .refine(
-      (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
-      "Amount must be a positive number",
-    ),
+  issue_date: z.string().min(1, "Issue date is required"),
   due_date: z.string().min(1, "Due date is required"),
   status: z.string().min(1, "Status is required"),
+  subtotal: z.number().min(0, "Subtotal must be a positive number"),
+  tax_rate: z.number().min(0, "Tax rate must be a positive number"),
   notes: z.string().optional(),
   items: z
     .array(
       z.object({
         product_id: z.string().optional(),
-        description: z.string().optional(),
-        quantity: z.string().min(1, "Quantity is required"),
-        unit_price: z.string().min(1, "Price is required"),
+        description: z.string().min(1, "Description is required"),
+        quantity: z
+          .string()
+          .min(1, "Quantity is required")
+          .refine(
+            (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
+            "Quantity must be a positive number",
+          ),
+        unit_price: z
+          .string()
+          .min(1, "Price is required")
+          .refine(
+            (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
+            "Price must be a positive number",
+          ),
       }),
     )
-    .optional(),
+    .min(1, "At least one item is required")
+    .refine(
+      (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
+      "Each item must have either a product selected or a description entered",
+    ),
 });
 
 export type InvoiceFormValues = z.infer<typeof invoiceSchema>;
@@ -147,11 +159,13 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
     defaultValues: {
       client_id: "",
       invoice_number: "",
-      amount: "",
+      issue_date: new Date().toISOString().split("T")[0],
       due_date: "",
       status: "draft",
+      subtotal: 0,
+      tax_rate: 0,
       notes: "",
-      items: [{ product_id: "", description: "", quantity: "1", unit_price: "" }],
+      items: [{ product_id: "", description: "", quantity: "1", unit_price: "0" }],
     },
   });
 
@@ -160,9 +174,32 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
     name: "items",
   });
 
+  // Add this new function to calculate subtotal
+  const calculateSubtotal = (items: any[]) => {
+    return items.reduce((sum, item) => {
+      const quantity = parseFloat(item.quantity) || 0;
+      const price = parseFloat(item.unit_price) || 0;
+      return sum + quantity * price;
+    }, 0);
+  };
+
+  // Watch items and tax_rate for changes to update totals
+  const items = form.watch("items");
+  const taxRate = form.watch("tax_rate");
+
+  useEffect(() => {
+    const subtotal = calculateSubtotal(items);
+    form.setValue("subtotal", subtotal);
+  }, [items, form]);
+
   const onSubmit = async (data: InvoiceFormValues) => {
     setLoading(true);
     try {
+      // Calculate final amounts
+      const subtotal = calculateSubtotal(data.items);
+      const taxAmount = (subtotal * data.tax_rate) / 100;
+      const total = subtotal + taxAmount;
+
       // First create the invoice
       const { data: invoice, error: invoiceError } = await supabase
         .from("invoices")
@@ -170,9 +207,11 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
           {
             client_id: data.client_id,
             invoice_number: data.invoice_number.trim(),
-            amount: parseFloat(data.amount),
+            issue_date: data.issue_date,
             due_date: data.due_date,
             status: data.status,
+            subtotal: subtotal,
+            tax_rate: data.tax_rate,
             notes: data.notes?.trim() || null,
           },
         ])
@@ -181,20 +220,18 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
 
       if (invoiceError) throw invoiceError;
 
-      // Then add invoice items if they exist
-      if (data.items && data.items.length > 0) {
-        const invoiceItems = data.items.map((item) => ({
-          invoice_id: invoice.id,
-          description: item.description || "",
-          quantity: parseFloat(item.quantity),
-          unit_price: parseFloat(item.unit_price),
-          amount: parseFloat(item.quantity) * parseFloat(item.unit_price),
-        }));
+      // Then add invoice items
+      const invoiceItems = data.items.map((item) => ({
+        invoice_id: invoice.id,
+        product_id: item.product_id || null,
+        description: item.description || "",
+        quantity: parseFloat(item.quantity),
+        unit_price: parseFloat(item.unit_price),
+      }));
 
-        const { error: itemsError } = await supabase.from("invoice_items").insert(invoiceItems);
+      const { error: itemsError } = await supabase.from("invoice_items").insert(invoiceItems);
 
-        if (itemsError) throw itemsError;
-      }
+      if (itemsError) throw itemsError;
 
       toast.success(t("success.title"), {
         description: t("success.created"),
@@ -464,12 +501,58 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
-              name="amount"
+              name="subtotal"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("amount")} *</FormLabel>
+                  <FormLabel>{t("subtotal")}</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={field.value.toFixed(2)}
+                      readOnly
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="tax_rate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("tax_rate")} (%)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max="100"
+                      {...field}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        field.onChange(isNaN(value) ? 0 : value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="issue_date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("issue_date")} *</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -586,6 +669,19 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
               </FormItem>
             )}
           />
+
+          <div className="mt-4 text-right">
+            <div className="text-sm text-gray-600">
+              Tax Amount: ${((form.watch("subtotal") * form.watch("tax_rate")) / 100).toFixed(2)}
+            </div>
+            <div className="text-lg font-semibold">
+              Total: $
+              {(
+                form.watch("subtotal") +
+                (form.watch("subtotal") * form.watch("tax_rate")) / 100
+              ).toFixed(2)}
+            </div>
+          </div>
 
           <div className="flex justify-end">
             <Button type="submit" disabled={loading}>
