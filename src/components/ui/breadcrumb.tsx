@@ -16,6 +16,7 @@ type RouteMap = {
 const routeMap: RouteMap = {
   "/dashboard": { label: "Dashboard", translationKey: "Dashboard.title" },
   "/invoices": { label: "Invoices", translationKey: "Invoices.title" },
+  "/quotes": { label: "Quotes", translationKey: "Quotes.title" },
   "/clients": { label: "Clients", translationKey: "Clients.title" },
   "/products": { label: "Products", translationKey: "Products.title" },
   "/employees": { label: "Employees", translationKey: "Employees.title" },
@@ -38,6 +39,14 @@ const dynamicRoutePatterns = [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/invoices", labelKey: "Invoices.title" },
       { path: "", labelKey: "Invoices.edit", isActive: true },
+    ],
+  },
+  {
+    pattern: /^\/quotes\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/quotes", labelKey: "Quotes.title" },
+      { path: "/quotes/add", labelKey: "Quotes.add_new", isActive: true },
     ],
   },
   {

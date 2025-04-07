@@ -31,7 +31,9 @@ export default function InvoicesPage() {
     <Card key={invoice.id} className="transition-shadow hover:shadow-lg">
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
-          <h3 className="text-lg font-semibold">{t("invoice_number", { number: invoice.invoice_number })}</h3>
+          <h3 className="text-lg font-semibold">
+            {t("invoice_number", { number: invoice.invoice_number })}
+          </h3>
           <p className="text-sm text-gray-500">{invoice.client.company}</p>
         </div>
         <Badge className={getStatusColor(invoice.status)}>
@@ -63,7 +65,7 @@ export default function InvoicesPage() {
   );
 
   return (
-    <div className="mx-auto space-y-4">
+    <div>
       <PageTitle
         title={t("title")}
         createButtonLink="/invoices/add"
