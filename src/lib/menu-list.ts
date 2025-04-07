@@ -114,6 +114,29 @@ export function getMenuList(pathname: string): Group[] {
             },
           ],
         },
+        {
+          href: "/locations",
+          label: "Locations",
+          translationKey: "Locations.title",
+          icon: LayoutGrid,
+          active: pathname.startsWith("/warehouses") || pathname.startsWith("/branches"),
+          submenus: [
+            {
+              href: "/warehouses",
+              label: "Warehouses",
+              translationKey: "Warehouses.title",
+              active: pathname.startsWith("/warehouses"),
+              plusAction: "/warehouses/add",
+            },
+            {
+              href: "/branches",
+              label: "Branches",
+              translationKey: "Branches.title",
+              active: pathname.startsWith("/branches"),
+              plusAction: "/branches/add",
+            },
+          ],
+        },
       ],
     },
     {

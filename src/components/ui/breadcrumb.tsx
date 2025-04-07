@@ -18,9 +18,12 @@ const routeMap: RouteMap = {
   "/invoices": { label: "Invoices", translationKey: "Invoices.title" },
   "/quotes": { label: "Quotes", translationKey: "Quotes.title" },
   "/clients": { label: "Clients", translationKey: "Clients.title" },
-  "/products": { label: "Products", translationKey: "Products.title" },
-  "/employees": { label: "Employees", translationKey: "Employees.title" },
-  "/settings": { label: "Settings", translationKey: "Settings.title" },
+  "/vendors": { label: "Vendors", translationKey: "Vendors.title" },
+  "/salaries": { label: "Salaries", translationKey: "Salaries.title" },
+  "/calendar": { label: "Calendar", translationKey: "Calendar.title" },
+  "/reports": { label: "Reports", translationKey: "Reports.title" },
+  "/warehouses": { label: "Warehouses", translationKey: "Warehouses.title" },
+  "/branches": { label: "Branches", translationKey: "Branches.title" },
 };
 
 // Dynamic route patterns and their handling
@@ -95,6 +98,38 @@ const dynamicRoutePatterns = [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/employees", labelKey: "Employees.title" },
       { path: "", labelKey: "Employees.edit", isActive: true },
+    ],
+  },
+  {
+    pattern: /^\/warehouses\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/warehouses", labelKey: "Warehouses.title" },
+      { path: "/warehouses/add", labelKey: "Warehouses.add_new", isActive: true },
+    ],
+  },
+  {
+    pattern: /^\/warehouses\/edit\/(.+)$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/warehouses", labelKey: "Warehouses.title" },
+      { path: "", labelKey: "Warehouses.edit", isActive: true },
+    ],
+  },
+  {
+    pattern: /^\/branches\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/branches", labelKey: "Branches.title" },
+      { path: "/branches/add", labelKey: "Branches.add_new", isActive: true },
+    ],
+  },
+  {
+    pattern: /^\/branches\/edit\/(.+)$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/branches", labelKey: "Branches.title" },
+      { path: "", labelKey: "Branches.edit", isActive: true },
     ],
   },
 ];

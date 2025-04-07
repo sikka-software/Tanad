@@ -1422,116 +1422,29 @@
   "Requests": {
     "title": "الطلبات"
   },
-  "Applicants": {
-    "title": "المتقدمون",
-    "add_new": "إضافة متقدم جديد",
-    "applicant_details": "تفاصيل المتقدم",
-    "back_to_list": "العودة إلى القائمة",
-    "no_applicants": "لا يوجد متقدمين",
-    "form": {
-      "name": {
-        "label": "الاسم الكامل",
-        "placeholder": "أدخل الاسم الكامل",
-        "required": "الاسم الكامل مطلوب"
-      },
-      "email": {
-        "label": "البريد الإلكتروني",
-        "placeholder": "أدخل البريد الإلكتروني",
-        "required": "البريد الإلكتروني مطلوب",
-        "invalid": "البريد الإلكتروني غير صالح"
-      },
-      "phone": {
-        "label": "رقم الهاتف",
-        "placeholder": "أدخل رقم الهاتف",
-        "required": "رقم الهاتف مطلوب"
-      },
-      "position": {
-        "label": "الوظيفة المتقدم لها",
-        "placeholder": "أدخل الوظيفة",
-        "required": "الوظيفة مطلوبة"
-      },
-      "resume": {
-        "label": "السيرة الذاتية",
-        "placeholder": "رفع السيرة الذاتية",
-        "required": "السيرة الذاتية مطلوبة"
-      },
-      "cover_letter": {
-        "label": "خطاب التقديم",
-        "placeholder": "أدخل خطاب التقديم"
-      },
-      "experience": {
-        "label": "سنوات الخبرة",
-        "placeholder": "أدخل سنوات الخبرة"
-      },
-      "education": {
-        "label": "التعليم",
-        "placeholder": "أدخل تفاصيل التعليم"
-      },
-      "skills": {
-        "label": "المهارات",
-        "placeholder": "أدخل المهارات"
-      },
-      "availability": {
-        "label": "التوفر",
-        "placeholder": "أدخل أوقات التوفر"
-      },
-      "references": {
-        "label": "المراجع",
-        "placeholder": "أدخل المراجع"
-      },
-      "notes": {
-        "label": "ملاحظات إضافية",
-        "placeholder": "أدخل ملاحظات إضافية"
-      }
-    },
+  "Warehouses": {
+    "title": "المستودعات",
+    "add_new": "إضافة مستودع جديد",
+    "warehouse_details": "تفاصيل المستودع",
+    "create_warehouse": "إنشاء مستودع",
+    "no_warehouses_found": "لا توجد مستودعات",
+    "capacity": "السعة",
+    "manager": "المدير",
+    "edit": "تعديل المستودع",
     "status": {
-      "new": "جديد",
-      "reviewing": "قيد المراجعة",
-      "interviewed": "تمت المقابلة",
-      "offered": "تم عرض",
-      "hired": "تم التوظيف",
-      "rejected": "مرفوض"
+      "active": "نشط",
+      "inactive": "غير نشط"
     },
-    "actions": {
-      "view": "عرض التفاصيل",
-      "edit": "تعديل",
-      "delete": "حذف",
-      "change_status": "تغيير الحالة"
-    },
-    "messages": {
-      "creating": "جاري إنشاء المتقدم...",
-      "create": "إنشاء متقدم",
-      "created": "تم إنشاء المتقدم بنجاح",
-      "updated": "تم تحديث بيانات المتقدم بنجاح",
-      "deleted": "تم حذف المتقدم بنجاح",
-      "error": "حدث خطأ أثناء معالجة طلبك"
-    }
-  },
-  "Clients": {
-    "title": "العملاء",
-    "add_new": "إضافة عميل جديد",
-    "back_to_list": "الرجوع للقائمة",
-    "client_details": "تفاصيل العميل",
     "form": {
       "name": {
         "label": "الاسم",
         "placeholder": "أدخل الاسم",
         "required": "الاسم مطلوب"
       },
-      "company": {
-        "label": "الشركة",
-        "placeholder": "أدخل اسم الشركة"
-      },
-      "email": {
-        "label": "البريد الإلكتروني",
-        "placeholder": "أدخل البريد الإلكتروني",
-        "required": "البريد الإلكتروني مطلوب",
-        "invalid": "البريد الإلكتروني غير صالح"
-      },
-      "phone": {
-        "label": "الهاتف",
-        "placeholder": "أدخل رقم الهاتف",
-        "required": "رقم الهاتف مطلوب"
+      "code": {
+        "label": "الرمز",
+        "placeholder": "أدخل رمز المستودع",
+        "required": "الرمز مطلوب"
       },
       "address": {
         "label": "العنوان",
@@ -1553,24 +1466,98 @@
         "placeholder": "أدخل الرمز البريدي",
         "required": "الرمز البريدي مطلوب"
       },
+      "capacity": {
+        "label": "السعة",
+        "placeholder": "أدخل سعة المستودع"
+      },
+      "is_active": {
+        "label": "الحالة النشطة"
+      },
       "notes": {
         "label": "ملاحظات",
         "placeholder": "أدخل ملاحظات"
       },
-      "cancel": "إلغاء"
+      "update_button": "تحديث المستودع",
+      "create_button": "إنشاء مستودع"
     },
     "messages": {
-      "creating": "جاري إنشاء العميل...",
-      "create": "إنشاء عميل"
+      "error_fetch": "فشل في جلب المستودع",
+      "error_save": "فشل في حفظ المستودع",
+      "success_updated": "تم تحديث المستودع بنجاح",
+      "success_created": "تم إنشاء المستودع بنجاح"
+    }
+  },
+  "Branches": {
+    "title": "الفروع",
+    "add_new": "إضافة فرع جديد",
+    "branch_details": "تفاصيل الفرع",
+    "create_branch": "إنشاء فرع",
+    "no_branches_found": "لا توجد فروع",
+    "manager": "المدير",
+    "edit": "تعديل الفرع",
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
     },
-    "success": {
-      "title": "تم بنجاح",
-      "created": "تم إنشاء العميل بنجاح"
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم الفرع",
+        "required": "الاسم مطلوب"
+      },
+      "code": {
+        "label": "الرمز",
+        "placeholder": "أدخل رمز الفرع",
+        "required": "الرمز مطلوب"
+      },
+      "address": {
+        "label": "العنوان",
+        "placeholder": "أدخل العنوان",
+        "required": "العنوان مطلوب"
+      },
+      "city": {
+        "label": "المدينة",
+        "placeholder": "أدخل المدينة",
+        "required": "المدينة مطلوبة"
+      },
+      "state": {
+        "label": "المنطقة",
+        "placeholder": "أدخل المنطقة",
+        "required": "المنطقة مطلوبة"
+      },
+      "zip_code": {
+        "label": "الرمز البريدي",
+        "placeholder": "أدخل الرمز البريدي",
+        "required": "الرمز البريدي مطلوب"
+      },
+      "phone": {
+        "label": "الهاتف",
+        "placeholder": "أدخل رقم الهاتف"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "manager": {
+        "label": "المدير",
+        "placeholder": "أدخل اسم المدير"
+      },
+      "is_active": {
+        "label": "الحالة النشطة"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظات"
+      },
+      "update_button": "تحديث الفرع",
+      "create_button": "إنشاء فرع"
     },
-    "error": {
-      "title": "خطأ",
-      "create": "حدث خطأ أثناء إنشاء العميل",
-      "not_authenticated": "يجب تسجيل الدخول لإنشاء عميل"
+    "messages": {
+      "error_fetch": "فشل في جلب الفرع",
+      "error_save": "فشل في حفظ الفرع",
+      "success_updated": "تم تحديث الفرع بنجاح",
+      "success_created": "تم إنشاء الفرع بنجاح"
     }
   },
   "Vendors": {
@@ -1758,5 +1745,8 @@
       "password_reset": "تم إرسال رابط إعادة تعيين كلمة المرور بنجاح",
       "error": "حدث خطأ أثناء معالجة طلبك"
     }
+  },
+  "Locations": {
+    "title": "المواقع"
   }
 }

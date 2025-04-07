@@ -550,4 +550,114 @@ export const salaries = pgTable(
       using: sql`(auth.uid() = user_id)`,
     }),
   ],
+);
+
+export const warehouses = pgTable(
+  "warehouses",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text().notNull(),
+    code: text().notNull(),
+    address: text().notNull(),
+    city: text().notNull(),
+    state: text().notNull(),
+    zipCode: text("zip_code").notNull(),
+    capacity: numeric({ precision: 10, scale: 2 }),
+    isActive: boolean("is_active").default(true).notNull(),
+    notes: text(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("warehouses_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("warehouses_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
+    index("warehouses_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+    unique("warehouses_code_key").on(table.code),
+    pgPolicy("Users can update their own warehouses", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can read their own warehouses", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can insert their own warehouses", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+      withCheck: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can delete their own warehouses", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+  ],
+);
+
+export const branches = pgTable(
+  "branches",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text().notNull(),
+    code: text().notNull(),
+    address: text().notNull(),
+    city: text().notNull(),
+    state: text().notNull(),
+    zipCode: text("zip_code").notNull(),
+    phone: text(),
+    email: text(),
+    manager: text(),
+    isActive: boolean("is_active").default(true).notNull(),
+    notes: text(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("branches_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("branches_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
+    index("branches_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+    unique("branches_code_key").on(table.code),
+    pgPolicy("Users can update their own branches", {
+      as: "permissive",
+      for: "update",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can read their own branches", {
+      as: "permissive",
+      for: "select",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can insert their own branches", {
+      as: "permissive",
+      for: "insert",
+      to: ["public"],
+      withCheck: sql`(auth.uid() = user_id)`,
+    }),
+    pgPolicy("Users can delete their own branches", {
+      as: "permissive",
+      for: "delete",
+      to: ["public"],
+      using: sql`(auth.uid() = user_id)`,
+    }),
+  ],
 ); 

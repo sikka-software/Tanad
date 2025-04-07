@@ -1720,5 +1720,146 @@
       "password_reset": "Password reset email sent successfully",
       "error": "An error occurred while processing your request"
     }
+  },
+  "Warehouses": {
+    "title": "Warehouses",
+    "add_new": "Add New Warehouse",
+    "warehouse_details": "Warehouse Details",
+    "create_warehouse": "Create Warehouse",
+    "no_warehouses_found": "No warehouses found",
+    "capacity": "Capacity",
+    "manager": "Manager",
+    "edit": "Edit Warehouse",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter warehouse name",
+        "required": "Name is required"
+      },
+      "code": {
+        "label": "Code",
+        "placeholder": "Enter warehouse code",
+        "required": "Code is required"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Enter address",
+        "required": "Address is required"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city",
+        "required": "City is required"
+      },
+      "state": {
+        "label": "State",
+        "placeholder": "Enter state",
+        "required": "State is required"
+      },
+      "zip_code": {
+        "label": "ZIP Code",
+        "placeholder": "Enter ZIP code",
+        "required": "ZIP code is required"
+      },
+      "capacity": {
+        "label": "Capacity",
+        "placeholder": "Enter warehouse capacity"
+      },
+      "is_active": {
+        "label": "Active Status"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      },
+      "update_button": "Update Warehouse",
+      "create_button": "Create Warehouse"
+    },
+    "messages": {
+      "error_fetch": "Failed to fetch warehouse",
+      "error_save": "Failed to save warehouse",
+      "success_updated": "Warehouse updated successfully",
+      "success_created": "Warehouse created successfully"
+    }
+  },
+  "Branches": {
+    "title": "Branches",
+    "add_new": "Add New Branch",
+    "branch_details": "Branch Details",
+    "create_branch": "Create Branch",
+    "no_branches_found": "No branches found",
+    "manager": "Manager",
+    "edit": "Edit Branch",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter branch name",
+        "required": "Name is required"
+      },
+      "code": {
+        "label": "Code",
+        "placeholder": "Enter branch code",
+        "required": "Code is required"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Enter address",
+        "required": "Address is required"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city",
+        "required": "City is required"
+      },
+      "state": {
+        "label": "State",
+        "placeholder": "Enter state",
+        "required": "State is required"
+      },
+      "zip_code": {
+        "label": "ZIP Code",
+        "placeholder": "Enter ZIP code",
+        "required": "ZIP code is required"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Enter phone number"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter email address",
+        "invalid": "Invalid email format"
+      },
+      "manager": {
+        "label": "Manager",
+        "placeholder": "Enter manager name"
+      },
+      "is_active": {
+        "label": "Active Status"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      },
+      "update_button": "Update Branch",
+      "create_button": "Create Branch"
+    },
+    "messages": {
+      "error_fetch": "Failed to fetch branch",
+      "error_save": "Failed to save branch",
+      "success_updated": "Branch updated successfully",
+      "success_created": "Branch created successfully"
+    }
+  },
+  "Locations": {
+    "title": "Locations"
   }
 }
