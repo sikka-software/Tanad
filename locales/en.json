@@ -1354,10 +1354,7 @@
   "Quotes": {
     "title": "Quotes"
   },
-  "Employees": {
-    "title": "Employees",
-    "allEmployees": "All Employees"
-  },
+
   "Salaries": {
     "title": "Salaries"
   },
@@ -1402,5 +1399,100 @@
     "add_client": "Add Client",
     "add_employee": "Add Employee",
     "add_warehouse": "Add Warehouse"
+  },
+  "Employees": {
+    "title": "Employees",
+    "allEmployees": "All Employees",
+    "add": "Add Employee",
+    "edit": "Edit Employee",
+    "list": "Employee List",
+    "form": {
+      "first_name": {
+        "label": "First Name",
+        "placeholder": "Enter first name",
+        "required": "First name is required",
+        "invalid": "First name is invalid"
+      },
+      "last_name": {
+        "label": "Last Name",
+        "placeholder": "Enter last name",
+        "required": "Last name is required",
+        "invalid": "Last name is invalid"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter email address",
+        "required": "Email is required",
+        "invalid": "Invalid email address"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Enter phone number",
+        "required": "Phone number is required",
+        "invalid": "Invalid phone number"
+      },
+      "position": {
+        "label": "Position",
+        "placeholder": "Enter position",
+        "required": "Position is required",
+        "invalid": "Invalid position"
+      },
+      "department": {
+        "label": "Department",
+        "placeholder": "Enter department",
+        "required": "Department is required",
+        "invalid": "Invalid department"
+      },
+      "hire_date": {
+        "label": "Hire Date",
+        "placeholder": "Enter hire date",
+        "required": "Hire date is required",
+        "invalid": "Invalid hire date"
+      },
+      "salary": {
+        "label": "Salary",
+        "placeholder": "Enter salary",
+        "required": "Salary is required",
+        "invalid": "Invalid salary"
+      },
+      "is_active": {
+        "label": "Status",
+        "required": "Status is required"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter your notes"
+      },
+      "placeholders": {
+        "first_name": "Enter first name",
+        "last_name": "Enter last name",
+        "email": "Enter email address",
+        "phone": "Enter phone number",
+        "position": "Enter position",
+        "department": "Enter department",
+        "hire_date": "Enter hire date",
+        "salary": "Enter salary"
+      },
+      "errors": {
+        "first_name_required": "First name is required",
+        "last_name_required": "Last name is required",
+        "email_required": "Email is required",
+        "email_invalid": "Invalid email address",
+        "position_required": "Position is required",
+        "hire_date_required": "Hire date is required"
+      }
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "messages": {
+      "created": "Employee created successfully",
+      "updated": "Employee updated successfully",
+      "deleted": "Employee deleted successfully",
+      "error": "An error occurred while processing your request",
+      "creating_employee": "Creating employee...",
+      "create_employee": "Create Employee"
+    }
   }
 }

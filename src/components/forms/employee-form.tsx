@@ -19,29 +19,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-
-const employeeFormSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().optional(),
-  position: z.string().min(1, "Position is required"),
-  department: z.string().optional(),
-  hireDate: z.string().min(1, "Hire date is required"),
-  salary: z
-    .string()
-    .optional()
-    .refine(
-      (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
-      "Salary must be a positive number"
-    ),
-  isActive: z.boolean(),
-  notes: z.string().optional(),
-});
-
-type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
+import { Textarea } from "@/components/ui/textarea";
 
 interface EmployeeFormProps {
   onSuccess?: () => void;
@@ -50,7 +29,28 @@ interface EmployeeFormProps {
 export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const t = useTranslations("Employees");
+  const t = useTranslations();
+
+  const employeeFormSchema = z.object({
+    firstName: z.string().min(1, t("Employees.form.first_name.required")),
+    lastName: z.string().min(1, t("Employees.form.last_name.required")),
+    email: z.string().email(t("Employees.form.email.invalid")),
+    phone: z.string().optional(),
+    position: z.string().min(1, t("Employees.form.position.required")),
+    department: z.string().optional(),
+    hireDate: z.string().min(1, t("Employees.form.hire_date.required")),
+    salary: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
+        t("Employees.form.salary.invalid"),
+      ),
+    isActive: z.boolean(),
+    notes: z.string().optional(),
+  });
+
+  type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeFormSchema),
@@ -92,12 +92,10 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || t("error.create"));
+        throw new Error(errorData.error || t("Employees.messages.error"));
       }
 
-      toast.success(t("success.title"), {
-        description: t("success.created"),
-      });
+      toast.success(t("Employees.messages.created"));
 
       if (onSuccess) {
         onSuccess();
@@ -105,8 +103,8 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
         router.push("/employees");
       }
     } catch (error) {
-      toast.error(t("error.title"), {
-        description: error instanceof Error ? error.message : t("error.create"),
+      toast.error(t("Employees.messages.error"), {
+        description: error instanceof Error ? error.message : t("Employees.messages.error"),
       });
     } finally {
       setLoading(false);
@@ -122,9 +120,9 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
             name="firstName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("first_name")} *</FormLabel>
+                <FormLabel>{t("Employees.form.first_name.label")} *</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter_first_name")} {...field} />
+                  <Input placeholder={t("Employees.form.first_name.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -136,9 +134,9 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
             name="lastName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("last_name")} *</FormLabel>
+                <FormLabel>{t("Employees.form.last_name.label")} *</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter_last_name")} {...field} />
+                  <Input placeholder={t("Employees.form.last_name.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -152,9 +150,9 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("email")} *</FormLabel>
+                <FormLabel>{t("Employees.form.email.label")} *</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder={t("enter_email")} {...field} />
+                  <Input type="email" placeholder={t("Employees.form.email.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -166,9 +164,9 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("phone")}</FormLabel>
+                <FormLabel>{t("Employees.form.phone.label")}</FormLabel>
                 <FormControl>
-                  <Input type="tel" placeholder={t("enter_phone")} {...field} />
+                  <Input type="tel" placeholder={t("Employees.form.phone.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -182,9 +180,9 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
             name="position"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("position")} *</FormLabel>
+                <FormLabel>{t("Employees.form.position.label")} *</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter_position")} {...field} />
+                  <Input placeholder={t("Employees.form.position.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -196,9 +194,9 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
             name="department"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("department")}</FormLabel>
+                <FormLabel>{t("Employees.form.department.label")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("enter_department")} {...field} />
+                  <Input placeholder={t("Employees.form.department.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -212,7 +210,7 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
             name="hireDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("hire_date")} *</FormLabel>
+                <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>
                 <FormControl>
                   <Input type="date" {...field} />
                 </FormControl>
@@ -226,14 +224,14 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
             name="salary"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("salary")}</FormLabel>
+                <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                    {...field}
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    min="0" 
+                    placeholder={t("Employees.form.salary.placeholder")} 
+                    {...field} 
                   />
                 </FormControl>
                 <FormMessage />
@@ -248,16 +246,10 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">{t("active_status")}</FormLabel>
-                <div className="text-sm text-muted-foreground">
-                  {t("active_status_description")}
-                </div>
+                <FormLabel className="text-base">{t("Employees.form.is_active.label")}</FormLabel>
               </div>
               <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
             </FormItem>
           )}
@@ -268,10 +260,10 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
           name="notes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("notes")}</FormLabel>
+              <FormLabel>{t("Employees.form.notes.label")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder={t("enter_notes")}
+                  placeholder={t("Employees.form.notes.placeholder")}
                   className="min-h-[100px]"
                   {...field}
                 />
@@ -282,18 +274,16 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
         />
 
         <div className="flex justify-end gap-4 pt-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push("/employees")}
-          >
-            {t("cancel")}
+          <Button type="button" variant="outline" onClick={() => router.push("/employees")}>
+            {t("General.cancel")}
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? t("creating_employee") : t("create_employee")}
+            {loading
+              ? t("Employees.messages.creating_employee")
+              : t("Employees.messages.create_employee")}
           </Button>
         </div>
       </form>
     </Form>
   );
-} 
+}

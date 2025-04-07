@@ -8,13 +8,13 @@ export default function AddEmployeePage() {
   const t = useTranslations("Employees");
 
   return (
-    <div className="container py-10">
+    <div className="">
       <PageTitle
         title={t("add_employee")}
         createButtonLink="/employees"
         createButtonText={t("back_to_list")}
       />
-      <div className="mt-8">
+      <div className="p-4">
         <EmployeeForm />
       </div>
     </div>

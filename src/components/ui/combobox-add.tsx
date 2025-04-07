@@ -161,7 +161,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
           </PopoverTrigger>
           <PopoverContent
             sideOffset={0}
-            className={cn("w-[--radix-popover-trigger-width] p-0", props.helperText && "-mt-4")}
+            className={cn("w-[var(--radix-popover-trigger-width)] p-0", props.helperText && "-mt-4")}
             dir={direction}
             // container={containerRef.current}
           >
@@ -218,7 +218,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                 </CommandGroup>
               </CommandList>
               <div className="flex flex-row items-center gap-2">
-                <Button variant="outline" className="w-full" onClick={props.onAddClick}>
+                <Button variant="outline" className="w-full rounded-t-none" onClick={props.onAddClick}>
                   {addText}
                   <Plus className="size-4" />
                 </Button>

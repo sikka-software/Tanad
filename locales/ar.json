@@ -1357,10 +1357,7 @@
   "Quotes": {
     "title": "عروض الأسعار"
   },
-  "Employees": {
-    "title": "الموظفون",
-    "allEmployees": "جميع الموظفين"
-  },
+
   "Salaries": {
     "title": "الرواتب"
   },
@@ -1384,5 +1381,100 @@
   },
   "Users": {
     "title": "المستخدمون"
+  },
+  "Employees": {
+    "title": "الموظفين",
+    "allEmployees": "جميع الموظفين",
+    "add": "إضافة موظف",
+    "edit": "تعديل موظف",
+    "list": "قائمة الموظفين",
+    "form": {
+      "first_name": {
+        "label": "الاسم الأول",
+        "placeholder": "أدخل الاسم الأول",
+        "required": "الاسم الأول مطلوب",
+        "invalid": "الاسم الأول غير صالح"
+      },
+      "last_name": {
+        "label": "اسم العائلة",
+        "placeholder": "أدخل اسم العائلة",
+        "required": "اسم العائلة مطلوب",
+        "invalid": "اسم العائلة غير صالح"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "phone": {
+        "label": "رقم الهاتف",
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "رقم الهاتف مطلوب",
+        "invalid": "رقم الهاتف غير صالح"
+      },
+      "position": {
+        "label": "المنصب",
+        "placeholder": "أدخل المنصب",
+        "required": "المنصب مطلوب",
+        "invalid": "المنصب غير صالح"
+      },
+      "department": {
+        "label": "القسم",
+        "placeholder": "أدخل القسم",
+        "required": "القسم مطلوب",
+        "invalid": "القسم غير صالح"
+      },
+      "hire_date": {
+        "label": "تاريخ التوظيف",
+        "placeholder": "أدخل تاريخ التوظيف",
+        "required": "تاريخ التوظيف مطلوب",
+        "invalid": "تاريخ التوظيف غير صالح"
+      },
+      "salary": {
+        "label": "الراتب",
+        "placeholder": "أدخل الراتب",
+        "required": "الراتب مطلوب",
+        "invalid": "الراتب غير صالح"
+      },
+      "is_active": {
+        "label": "الحالة",
+        "required": "الحالة مطلوبة"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظاتك"
+      },
+      "placeholders": {
+        "first_name": "أدخل الاسم الأول",
+        "last_name": "أدخل اسم العائلة",
+        "email": "أدخل البريد الإلكتروني",
+        "phone": "أدخل رقم الهاتف",
+        "position": "أدخل المنصب",
+        "department": "أدخل القسم",
+        "hire_date": "أدخل تاريخ التوظيف",
+        "salary": "أدخل الراتب"
+      },
+      "errors": {
+        "first_name_required": "الاسم الأول مطلوب",
+        "last_name_required": "اسم العائلة مطلوب",
+        "email_required": "البريد الإلكتروني مطلوب",
+        "email_invalid": "البريد الإلكتروني غير صالح",
+        "position_required": "المنصب مطلوب",
+        "hire_date_required": "تاريخ التوظيف مطلوب"
+      }
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "messages": {
+      "created": "تم إضافة الموظف بنجاح",
+      "updated": "تم تحديث بيانات الموظف بنجاح",
+      "deleted": "تم حذف الموظف بنجاح",
+      "error": "حدث خطأ أثناء معالجة طلبك",
+      "creating_employee": "جاري إنشاء الموظف...",
+      "create_employee": "إنشاء موظف"
+    }
   }
 }

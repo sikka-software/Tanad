@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -84,6 +84,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
   const [clientsLoading, setClientsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
   const t = useTranslations("Invoices");
+  const locale = useLocale();
 
   useEffect(() => {
     // Get the current user ID and fetch clients
@@ -496,7 +497,11 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("status")} *</FormLabel>
-                <Select defaultValue={field.value} onValueChange={field.onChange}>
+                <Select
+                  defaultValue={field.value}
+                  onValueChange={field.onChange}
+                  dir={locale === "ar" ? "rtl" : "ltr"}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder={t("select_status")} />
