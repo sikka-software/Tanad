@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -23,34 +22,38 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
 interface EmployeeFormProps {
+  id?: string;
   onSuccess?: () => void;
+  onSubmit?: (data: EmployeeFormValues) => Promise<void>;
+  loading?: boolean;
 }
 
-export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
+const employeeFormSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email"),
+  phone: z.string().optional(),
+  position: z.string().min(1, "Position is required"),
+  department: z.string().optional(),
+  hireDate: z.string().min(1, "Hire date is required"),
+  salary: z
+    .string()
+    .optional()
+    .refine((val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), "Invalid salary"),
+  isActive: z.boolean(),
+  notes: z.string().optional(),
+});
+
+export type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
+
+export function EmployeeForm({
+  id,
+  onSuccess,
+  onSubmit: externalSubmit,
+  loading = false,
+}: EmployeeFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const t = useTranslations();
-
-  const employeeFormSchema = z.object({
-    firstName: z.string().min(1, t("Employees.form.first_name.required")),
-    lastName: z.string().min(1, t("Employees.form.last_name.required")),
-    email: z.string().email(t("Employees.form.email.invalid")),
-    phone: z.string().optional(),
-    position: z.string().min(1, t("Employees.form.position.required")),
-    department: z.string().optional(),
-    hireDate: z.string().min(1, t("Employees.form.hire_date.required")),
-    salary: z
-      .string()
-      .optional()
-      .refine(
-        (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
-        t("Employees.form.salary.invalid"),
-      ),
-    isActive: z.boolean(),
-    notes: z.string().optional(),
-  });
-
-  type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeFormSchema),
@@ -69,9 +72,13 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
   });
 
   const onSubmit: SubmitHandler<EmployeeFormValues> = async (data) => {
-    setLoading(true);
+    if (externalSubmit) {
+      await externalSubmit(data);
+      return;
+    }
+
     try {
-      const response = await fetch("/api/employees/add", {
+      const response = await fetch("/api/employees/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -106,14 +113,12 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
       toast.error(t("Employees.messages.error"), {
         description: error instanceof Error ? error.message : t("Employees.messages.error"),
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -152,7 +157,11 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
               <FormItem>
                 <FormLabel>{t("Employees.form.email.label")} *</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder={t("Employees.form.email.placeholder")} {...field} />
+                  <Input
+                    type="email"
+                    placeholder={t("Employees.form.email.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -166,7 +175,11 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
               <FormItem>
                 <FormLabel>{t("Employees.form.phone.label")}</FormLabel>
                 <FormControl>
-                  <Input type="tel" placeholder={t("Employees.form.phone.placeholder")} {...field} />
+                  <Input
+                    type="tel"
+                    placeholder={t("Employees.form.phone.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -226,12 +239,12 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
               <FormItem>
                 <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    step="0.01" 
-                    min="0" 
-                    placeholder={t("Employees.form.salary.placeholder")} 
-                    {...field} 
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder={t("Employees.form.salary.placeholder")}
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -273,7 +286,7 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
           )}
         />
 
-        <div className="flex justify-end gap-4 pt-4">
+        {/* <div className="flex justify-end gap-4 pt-4">
           <Button type="button" variant="outline" onClick={() => router.push("/employees")}>
             {t("General.cancel")}
           </Button>
@@ -282,7 +295,7 @@ export function EmployeeForm({ onSuccess }: EmployeeFormProps) {
               ? t("Employees.messages.creating_employee")
               : t("Employees.messages.create_employee")}
           </Button>
-        </div>
+        </div> */}
       </form>
     </Form>
   );

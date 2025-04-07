@@ -68,7 +68,7 @@ export default function EmployeesPage() {
   );
 
   return (
-    <div className="mx-auto space-y-4">
+    <div>
       <PageTitle
         title={t("title")}
         createButtonLink="/employees/add"

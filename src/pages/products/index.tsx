@@ -128,55 +128,8 @@ export default function ProductsPage() {
     </Card>
   );
 
-  if (isLoading) {
-    return (
-      <div className="mx-auto space-y-4">
-        <PageTitle
-          title={t("title")}
-          createButtonLink="/products/add"
-          createButtonText={t("create_product")}
-          createButtonDisabled
-        />
-        <div className="p-4 pt-0">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-4 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="mb-2 h-4 w-1/2" />
-                  <Skeleton className="h-4 w-1/4" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto">
-        <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-          <p className="font-medium">{errorMessage}</p>
-          <p className="mt-1 text-sm">
-            Database connection issues detected. Check your database connection and ensure it's
-            running properly.
-          </p>
-          <div className="mt-2">
-            <Button variant="outline" size="sm" onClick={() => refetch()}>
-              Try Again
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="mx-auto space-y-4">
+    <div>
       <PageTitle
         title={t("title")}
         createButtonLink="/products/add"

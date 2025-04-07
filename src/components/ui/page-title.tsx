@@ -1,6 +1,8 @@
-import { Plus } from "lucide-react";
-import { Button } from "./button";
 import Link from "next/link";
+
+import { Plus } from "lucide-react";
+
+import { Button } from "./button";
 
 const PageTitle = ({
   title,
@@ -16,13 +18,13 @@ const PageTitle = ({
   customButton?: React.ReactNode;
 }) => {
   return (
-    <div className=" p-4  border-b flex justify-between items-center !min-h-20">
+    <div className="flex !min-h-16 items-center justify-between border-b p-2">
       <h1 className="text-2xl font-bold">{title}</h1>
       {customButton
         ? customButton
         : createButtonLink && (
             <Link href={createButtonLink}>
-              <Button disabled={createButtonDisabled}>
+              <Button disabled={createButtonDisabled} size={"sm"}>
                 <Plus className="h-4 w-4" />
                 {createButtonText}
               </Button>

@@ -1,12 +1,54 @@
+import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 
-import { EmployeeForm } from "@/components/forms/employee-form";
+import { EmployeeForm, type EmployeeFormValues } from "@/components/forms/employee-form";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
 export default function AddEmployeePage() {
   const t = useTranslations("Employees");
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (data: EmployeeFormValues) => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/employees/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: data.firstName.trim(),
+          lastName: data.lastName.trim(),
+          email: data.email.trim(),
+          phone: data.phone?.trim() || null,
+          position: data.position.trim(),
+          department: data.department?.trim() || null,
+          hireDate: data.hireDate,
+          salary: data.salary ? parseFloat(data.salary) : null,
+          isActive: data.isActive,
+          notes: data.notes?.trim() || null,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || t("messages.error"));
+      }
+
+      router.push("/employees");
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -14,6 +56,16 @@ export default function AddEmployeePage() {
         title={t("add_employee")}
         createButtonLink="/employees"
         createButtonText={t("back_to_list")}
+        customButton={
+          <div className="flex gap-4">
+            <Button variant="outline" onClick={() => router.push("/employees")}>
+              {t("cancel")}
+            </Button>
+            <Button type="submit" form="employee-form" disabled={loading}>
+              {loading ? t("messages.creating_employee") : t("messages.create_employee")}
+            </Button>
+          </div>
+        }
       />
       <div className="p-4">
         <Card>
@@ -21,7 +73,7 @@ export default function AddEmployeePage() {
             <CardTitle>{t("employee_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <EmployeeForm />
+            <EmployeeForm id="employee-form" onSubmit={handleSubmit} loading={loading} />
           </CardContent>
         </Card>
       </div>

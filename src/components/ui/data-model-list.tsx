@@ -26,30 +26,26 @@ export default function DataModelList<T>({
 }: DataModelListProps<T>) {
   if (isLoading) {
     return (
-      <div className="p-4 pt-0">
-        <div className={`grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-${gridCols}`}>
-          {Array.from({ length: skeletonCount }).map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-4 w-3/4" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="mb-2 h-4 w-1/2" />
-                <Skeleton className="h-4 w-1/4" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className={`grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-${gridCols}`}>
+        {Array.from({ length: skeletonCount }).map((_, i) => (
+          <Card key={i}>
+            <CardHeader>
+              <Skeleton className="h-4 w-3/4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="mb-2 h-4 w-1/2" />
+              <Skeleton className="h-4 w-1/4" />
+            </CardContent>
+          </Card>
+        ))}
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="mx-auto">
-        <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-          {error.message || "An error occurred while fetching data"}
-        </div>
+      <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+        {error?.message || "An error occurred while fetching data"}
       </div>
     );
   }

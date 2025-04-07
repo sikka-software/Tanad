@@ -65,7 +65,7 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
   const onSubmit = async (data: ProductFormValues) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/products/add", {
+      const response = await fetch("/api/products/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1403,6 +1403,7 @@
     "title": "Employees",
     "allEmployees": "All Employees",
     "add_employee": "Add Employee",
+    "add_new": "Add New Employee",
     "back_to_list": "Back to List",
     "employee_details": "Employee Details",
     "no_employees_found": "No employees found",
