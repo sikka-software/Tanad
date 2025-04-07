@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import type { AppProps } from "next/app";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -33,7 +34,7 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
     router.events.emit("routeChangeComplete", router.asPath);
   }, []);
 
-  const puklaPages = router.pathname === "/[code]";
+  const invoicePages = router.pathname === "/[code]";
   const authPages = ["/auth", "/reset-password"];
   const landingPages = [
     "/",
@@ -88,7 +89,7 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
 
   // This will change to invoice pages
   // to be viewed in example.com/invoices/[id]
-  if (puklaPages) {
+  if (invoicePages) {
     return (
       <QueryClientProvider client={queryClient}>
         <NextIntlClientProvider
@@ -97,7 +98,7 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
           timeZone="Asia/Riyadh"
           now={new Date()}
         >
-          <PuklaPages>{<Component {...pageProps} />}</PuklaPages>
+          <InvoicePages>{<Component {...pageProps} />}</InvoicePages>
           <ReactQueryDevtools initialIsOpen={false} />
         </NextIntlClientProvider>
       </QueryClientProvider>
@@ -120,7 +121,7 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
   );
 }
 
-const PuklaPages = ({ children }: { children: React.ReactNode }) => {
+const InvoicePages = ({ children }: { children: React.ReactNode }) => {
   return (
     <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
       <LoadingBar />

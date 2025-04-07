@@ -1423,38 +1423,16 @@
     "title": "الطلبات"
   },
   "Applicants": {
-    "title": "المتقدمون"
-  },
-  "Attendance": {
-    "title": "الحضور"
-  },
-  "Users": {
-    "title": "المستخدمون"
-  },
-  "Employees": {
-    "title": "الموظفين",
-    "allEmployees": "جميع الموظفين",
-    "add_employee": "إضافة موظف",
-    "add_new": "إضافة موظف جديد",
+    "title": "المتقدمون",
+    "add_new": "إضافة متقدم جديد",
+    "applicant_details": "تفاصيل المتقدم",
     "back_to_list": "العودة إلى القائمة",
-    "employee_details": "تفاصيل الموظف",
-    "no_employees_found": "لم يتم العثور على موظفين",
-    "create_employee": "إضافة موظف",
-    "add": "إضافة موظف",
-    "edit": "تعديل موظف",
-    "list": "قائمة الموظفين",
+    "no_applicants": "لا يوجد متقدمين",
     "form": {
-      "first_name": {
-        "label": "الاسم الأول",
-        "placeholder": "أدخل الاسم الأول",
-        "required": "الاسم الأول مطلوب",
-        "invalid": "الاسم الأول غير صالح"
-      },
-      "last_name": {
-        "label": "اسم العائلة",
-        "placeholder": "أدخل اسم العائلة",
-        "required": "اسم العائلة مطلوب",
-        "invalid": "اسم العائلة غير صالح"
+      "name": {
+        "label": "الاسم الكامل",
+        "placeholder": "أدخل الاسم الكامل",
+        "required": "الاسم الكامل مطلوب"
       },
       "email": {
         "label": "البريد الإلكتروني",
@@ -1465,77 +1443,74 @@
       "phone": {
         "label": "رقم الهاتف",
         "placeholder": "أدخل رقم الهاتف",
-        "required": "رقم الهاتف مطلوب",
-        "invalid": "رقم الهاتف غير صالح"
+        "required": "رقم الهاتف مطلوب"
       },
       "position": {
-        "label": "المنصب",
-        "placeholder": "أدخل المنصب",
-        "required": "المنصب مطلوب",
-        "invalid": "المنصب غير صالح"
+        "label": "الوظيفة المتقدم لها",
+        "placeholder": "أدخل الوظيفة",
+        "required": "الوظيفة مطلوبة"
       },
-      "department": {
-        "label": "القسم",
-        "placeholder": "أدخل القسم",
-        "required": "القسم مطلوب",
-        "invalid": "القسم غير صالح"
+      "resume": {
+        "label": "السيرة الذاتية",
+        "placeholder": "رفع السيرة الذاتية",
+        "required": "السيرة الذاتية مطلوبة"
       },
-      "hire_date": {
-        "label": "تاريخ التوظيف",
-        "placeholder": "أدخل تاريخ التوظيف",
-        "required": "تاريخ التوظيف مطلوب",
-        "invalid": "تاريخ التوظيف غير صالح"
+      "cover_letter": {
+        "label": "خطاب التقديم",
+        "placeholder": "أدخل خطاب التقديم"
       },
-      "salary": {
-        "label": "الراتب",
-        "placeholder": "أدخل الراتب",
-        "required": "الراتب مطلوب",
-        "invalid": "الراتب غير صالح"
+      "experience": {
+        "label": "سنوات الخبرة",
+        "placeholder": "أدخل سنوات الخبرة"
       },
-      "is_active": {
-        "label": "الحالة",
-        "required": "الحالة مطلوبة"
+      "education": {
+        "label": "التعليم",
+        "placeholder": "أدخل تفاصيل التعليم"
+      },
+      "skills": {
+        "label": "المهارات",
+        "placeholder": "أدخل المهارات"
+      },
+      "availability": {
+        "label": "التوفر",
+        "placeholder": "أدخل أوقات التوفر"
+      },
+      "references": {
+        "label": "المراجع",
+        "placeholder": "أدخل المراجع"
       },
       "notes": {
-        "label": "ملاحظات",
-        "placeholder": "أدخل ملاحظاتك"
-      },
-      "placeholders": {
-        "first_name": "أدخل الاسم الأول",
-        "last_name": "أدخل اسم العائلة",
-        "email": "أدخل البريد الإلكتروني",
-        "phone": "أدخل رقم الهاتف",
-        "position": "أدخل المنصب",
-        "department": "أدخل القسم",
-        "hire_date": "أدخل تاريخ التوظيف",
-        "salary": "أدخل الراتب"
-      },
-      "errors": {
-        "first_name_required": "الاسم الأول مطلوب",
-        "last_name_required": "اسم العائلة مطلوب",
-        "email_required": "البريد الإلكتروني مطلوب",
-        "email_invalid": "البريد الإلكتروني غير صالح",
-        "position_required": "المنصب مطلوب",
-        "hire_date_required": "تاريخ التوظيف مطلوب"
+        "label": "ملاحظات إضافية",
+        "placeholder": "أدخل ملاحظات إضافية"
       }
     },
     "status": {
-      "active": "نشط",
-      "inactive": "غير نشط"
+      "new": "جديد",
+      "reviewing": "قيد المراجعة",
+      "interviewed": "تمت المقابلة",
+      "offered": "تم عرض",
+      "hired": "تم التوظيف",
+      "rejected": "مرفوض"
+    },
+    "actions": {
+      "view": "عرض التفاصيل",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "change_status": "تغيير الحالة"
     },
     "messages": {
-      "created": "تم إضافة الموظف بنجاح",
-      "updated": "تم تحديث بيانات الموظف بنجاح",
-      "deleted": "تم حذف الموظف بنجاح",
-      "error": "حدث خطأ أثناء معالجة طلبك",
-      "creating_employee": "جاري إنشاء الموظف...",
-      "create_employee": "إنشاء موظف"
+      "creating": "جاري إنشاء المتقدم...",
+      "create": "إنشاء متقدم",
+      "created": "تم إنشاء المتقدم بنجاح",
+      "updated": "تم تحديث بيانات المتقدم بنجاح",
+      "deleted": "تم حذف المتقدم بنجاح",
+      "error": "حدث خطأ أثناء معالجة طلبك"
     }
   },
   "Clients": {
     "title": "العملاء",
     "add_new": "إضافة عميل جديد",
-    "back_to_list": "العودة للقائمة",
+    "back_to_list": "الرجوع للقائمة",
     "client_details": "تفاصيل العميل",
     "form": {
       "name": {
@@ -1554,7 +1529,7 @@
         "invalid": "البريد الإلكتروني غير صالح"
       },
       "phone": {
-        "label": "رقم الهاتف",
+        "label": "الهاتف",
         "placeholder": "أدخل رقم الهاتف",
         "required": "رقم الهاتف مطلوب"
       },
@@ -1580,7 +1555,7 @@
       },
       "notes": {
         "label": "ملاحظات",
-        "placeholder": "أدخل الملاحظات"
+        "placeholder": "أدخل ملاحظات"
       },
       "cancel": "إلغاء"
     },
@@ -1596,6 +1571,192 @@
       "title": "خطأ",
       "create": "حدث خطأ أثناء إنشاء العميل",
       "not_authenticated": "يجب تسجيل الدخول لإنشاء عميل"
+    }
+  },
+  "Vendors": {
+    "title": "الموردين",
+    "add_new": "إضافة مورد جديد",
+    "back_to_list": "الرجوع للقائمة",
+    "vendor_details": "تفاصيل المورد",
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل الاسم",
+        "required": "الاسم مطلوب"
+      },
+      "company": {
+        "label": "الشركة",
+        "placeholder": "أدخل اسم الشركة"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "phone": {
+        "label": "الهاتف",
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "رقم الهاتف مطلوب"
+      },
+      "address": {
+        "label": "العنوان",
+        "placeholder": "أدخل العنوان",
+        "required": "العنوان مطلوب"
+      },
+      "city": {
+        "label": "المدينة",
+        "placeholder": "أدخل المدينة",
+        "required": "المدينة مطلوبة"
+      },
+      "state": {
+        "label": "المنطقة",
+        "placeholder": "أدخل المنطقة",
+        "required": "المنطقة مطلوبة"
+      },
+      "zip_code": {
+        "label": "الرمز البريدي",
+        "placeholder": "أدخل الرمز البريدي",
+        "required": "الرمز البريدي مطلوب"
+      },
+      "products": {
+        "label": "المنتجات/الخدمات",
+        "placeholder": "أدخل المنتجات أو الخدمات"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظات"
+      },
+      "cancel": "إلغاء"
+    },
+    "messages": {
+      "creating": "جاري إنشاء المورد...",
+      "create": "إنشاء مورد"
+    },
+    "success": {
+      "title": "تم بنجاح",
+      "created": "تم إنشاء المورد بنجاح"
+    },
+    "error": {
+      "title": "خطأ",
+      "create": "حدث خطأ أثناء إنشاء المورد",
+      "not_authenticated": "يجب تسجيل الدخول لإنشاء مورد"
+    },
+    "no_vendors": "لا يوجد موردين",
+    "add_first_vendor": "أضف أول مورد"
+  },
+  "Attendance": {
+    "title": "الحضور",
+    "today": "حضور اليوم",
+    "check_in": "تسجيل الدخول",
+    "check_out": "تسجيل الخروج",
+    "total_hours": "إجمالي الساعات",
+    "history": "سجل الحضور",
+    "date": "التاريخ",
+    "employee": "الموظف",
+    "status": {
+      "present": "حاضر",
+      "absent": "غائب",
+      "late": "متأخر",
+      "half_day": "نصف يوم",
+      "on_leave": "في إجازة"
+    },
+    "report": {
+      "title": "تقرير الحضور",
+      "generate": "إنشاء تقرير",
+      "daily": "تقرير يومي",
+      "weekly": "تقرير أسبوعي",
+      "monthly": "تقرير شهري"
+    },
+    "filter": {
+      "all": "جميع الموظفين",
+      "department": "تصفية حسب القسم",
+      "date_range": "الفترة الزمنية"
+    },
+    "no_records": "لا توجد سجلات حضور",
+    "messages": {
+      "check_in_success": "تم تسجيل الدخول بنجاح",
+      "check_out_success": "تم تسجيل الخروج بنجاح",
+      "already_checked_in": "تم تسجيل الدخول بالفعل اليوم",
+      "not_checked_in": "لم يتم تسجيل الدخول بعد",
+      "error": "حدث خطأ أثناء معالجة طلبك"
+    }
+  },
+  "Users": {
+    "title": "المستخدمون",
+    "add_new": "إضافة مستخدم جديد",
+    "user_details": "تفاصيل المستخدم",
+    "login_details": "تفاصيل تسجيل الدخول",
+    "personal_info": "المعلومات الشخصية",
+    "permissions": "الصلاحيات والأدوار",
+    "no_users": "لا يوجد مستخدمين",
+    "active_users": "المستخدمون النشطون",
+    "inactive_users": "المستخدمون غير النشطين",
+    "form": {
+      "name": {
+        "label": "الاسم الكامل",
+        "placeholder": "أدخل الاسم الكامل",
+        "required": "الاسم الكامل مطلوب"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "password": {
+        "label": "كلمة المرور",
+        "placeholder": "أدخل كلمة المرور",
+        "required": "كلمة المرور مطلوبة",
+        "min_length": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+        "confirm": "تأكيد كلمة المرور",
+        "confirm_placeholder": "تأكيد كلمة المرور",
+        "mismatch": "كلمات المرور غير متطابقة"
+      },
+      "role": {
+        "label": "الدور",
+        "placeholder": "اختر دورًا",
+        "required": "الدور مطلوب",
+        "admin": "مدير النظام",
+        "manager": "مدير",
+        "employee": "موظف",
+        "user": "مستخدم عادي"
+      },
+      "status": {
+        "label": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "suspended": "معلق"
+      },
+      "phone": {
+        "label": "رقم الهاتف",
+        "placeholder": "أدخل رقم الهاتف"
+      },
+      "department": {
+        "label": "القسم",
+        "placeholder": "اختر القسم"
+      },
+      "avatar": {
+        "label": "الصورة الشخصية",
+        "upload": "رفع صورة",
+        "remove": "إزالة الصورة"
+      }
+    },
+    "actions": {
+      "edit": "تعديل المستخدم",
+      "delete": "حذف المستخدم",
+      "activate": "تفعيل المستخدم",
+      "deactivate": "تعطيل المستخدم",
+      "reset_password": "إعادة تعيين كلمة المرور"
+    },
+    "messages": {
+      "created": "تم إنشاء المستخدم بنجاح",
+      "updated": "تم تحديث بيانات المستخدم بنجاح",
+      "deleted": "تم حذف المستخدم بنجاح",
+      "activated": "تم تفعيل المستخدم بنجاح",
+      "deactivated": "تم تعطيل المستخدم بنجاح",
+      "password_reset": "تم إرسال رابط إعادة تعيين كلمة المرور بنجاح",
+      "error": "حدث خطأ أثناء معالجة طلبك"
     }
   }
 }
