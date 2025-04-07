@@ -892,3 +892,19 @@ export const products = pgTable(
   },
   (table) => [unique("products_sku_key").on(table.sku)]
 );
+
+export const employees = pgTable("employees", {
+  id: uuid().primaryKey().defaultRandom(),
+  firstName: varchar("first_name", { length: 255 }).notNull(),
+  lastName: varchar("last_name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  phone: varchar("phone", { length: 50 }),
+  position: varchar("position", { length: 255 }).notNull(),
+  department: varchar("department", { length: 255 }),
+  hireDate: date("hire_date").notNull(),
+  salary: numeric("salary", { precision: 10, scale: 2 }),
+  isActive: boolean("is_active").default(true).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});

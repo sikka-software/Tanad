@@ -15,6 +15,13 @@
       "when": 1742119036370,
       "tag": "0001_petite_jetstream",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1744044233683,
+      "tag": "0002_tidy_squadron_sinister",
+      "breakpoints": true
     }
   ]
 }
