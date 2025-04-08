@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { Employee } from "@/api/employees";
+import { Employee } from "@/types/employee.type";
 
 async function fetchEmployees(): Promise<Employee[]> {
   const response = await fetch("/api/employees");

@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Branch } from '@/api/branches';
+import type { Branch, BranchCreateData } from '@/types/branch.type';
 import {
   createBranch,
   deleteBranch,
   fetchBranchById,
   fetchBranches,
   updateBranch,
-} from '@/api/branches';
+} from '@/services/branchService';
 
 // Query keys for branches
 export const branchKeys = {
@@ -39,8 +39,15 @@ export function useCreateBranch() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newBranch: Omit<Branch, 'id' | 'created_at'> & { user_id: string }) =>
-      createBranch(newBranch),
+    mutationFn: (newBranch: Omit<Branch, 'id' | 'created_at'> & { user_id: string }) => {
+      // Map user_id to userId for the service function
+      const { user_id, ...rest } = newBranch;
+      const branchData: BranchCreateData = {
+        ...rest,
+        userId: user_id,
+      };
+      return createBranch(branchData);
+    },
     onSuccess: () => {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });

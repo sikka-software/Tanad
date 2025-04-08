@@ -9,8 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import type { Branch, BranchCreateData } from "@/api/branches";
-import { createBranch, fetchBranchById, updateBranch } from "@/api/branches";
+import type { Branch, BranchCreateData } from "@/types/branch.type";
+import { createBranch, fetchBranchById, updateBranch } from "@/services/branchService";
 import { Button } from "@/components/ui/button";
 import {
   Form,

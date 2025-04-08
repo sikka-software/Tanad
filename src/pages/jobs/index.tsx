@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import { Building2, MapPin, Calendar, Briefcase, DollarSign } from "lucide-react";
 
-import { Job } from "@/api/jobs";
+import { Job } from "@/types/job.type";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";

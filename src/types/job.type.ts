@@ -12,4 +12,5 @@ export interface Job {
   endDate?: string;
   createdAt: string;
   updatedAt: string;
+  userId: string;
 } 

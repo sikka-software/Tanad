@@ -6,28 +6,14 @@ import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import type { AppProps } from "next/app";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import AppLayout from "@/components/layouts/app-layout";
 import AuthLayout from "@/components/layouts/auth-layout";
 import LandingLayout from "@/components/layouts/landing-layout";
 import { LoadingBar } from "@/components/ui/loading-bar";
+import { QueryProvider } from "@/providers/QueryProvider";
 import "@/styles/globals.css";
-
-// Create a client with better database connection handling
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 3,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
-      staleTime: 60 * 1000, // 1 minute
-      refetchOnWindowFocus: false,
-      refetchOnMount: true,
-      refetchOnReconnect: true,
-    },
-  },
-});
 
 export default function Tanad({ Component, pageProps, router }: AppProps) {
   useEffect(() => {
@@ -56,7 +42,7 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
   // Auth Pages
   if (authPages.includes(router.pathname)) {
     return (
-      <QueryClientProvider client={queryClient}>
+      <QueryProvider>
         <NextIntlClientProvider
           messages={pageProps.messages}
           locale={router.locale}
@@ -66,14 +52,14 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
           <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
           <ReactQueryDevtools initialIsOpen={false} />
         </NextIntlClientProvider>
-      </QueryClientProvider>
+      </QueryProvider>
     );
   }
 
   // Landing Page
   if (landingPages.includes(router.pathname)) {
     return (
-      <QueryClientProvider client={queryClient}>
+      <QueryProvider>
         <NextIntlClientProvider
           messages={pageProps.messages}
           locale={router.locale}
@@ -83,7 +69,7 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
           <LandingLayout>{<Component {...pageProps} />}</LandingLayout>
           <ReactQueryDevtools initialIsOpen={false} />
         </NextIntlClientProvider>
-      </QueryClientProvider>
+      </QueryProvider>
     );
   }
 
@@ -91,7 +77,7 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
   // to be viewed in example.com/invoices/[id]
   if (invoicePages) {
     return (
-      <QueryClientProvider client={queryClient}>
+      <QueryProvider>
         <NextIntlClientProvider
           messages={pageProps.messages}
           locale={router.locale}
@@ -101,13 +87,13 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
           <InvoicePages>{<Component {...pageProps} />}</InvoicePages>
           <ReactQueryDevtools initialIsOpen={false} />
         </NextIntlClientProvider>
-      </QueryClientProvider>
+      </QueryProvider>
     );
   }
 
   // App Pages
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryProvider>
       <NextIntlClientProvider
         messages={pageProps.messages}
         locale={router.locale}
@@ -117,7 +103,7 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
         <AppLayout>{<Component {...pageProps} />}</AppLayout>
         <ReactQueryDevtools initialIsOpen={false} />
       </NextIntlClientProvider>
-    </QueryClientProvider>
+    </QueryProvider>
   );
 }
 

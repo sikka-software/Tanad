@@ -11,7 +11,7 @@ import {
   NotebookText,
 } from "lucide-react";
 
-import type { Branch } from "@/api/branches";
+import type { Branch } from "@/types/branch.type";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
