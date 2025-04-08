@@ -43,7 +43,7 @@ const productSchema = z.object({
 export type ProductFormValues = z.infer<typeof productSchema>;
 
 interface ProductFormProps {
-  onSuccess?: () => void;
+  onSuccess?: (product: any) => void;
 }
 
 export function ProductForm({ onSuccess }: ProductFormProps) {
@@ -84,12 +84,14 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
         throw new Error(errorData.error || t("error.create"));
       }
 
+      const result = await response.json();
+
       toast.success(t("success.title"), {
         description: t("success.created")
       });
 
       if (onSuccess) {
-        onSuccess();
+        onSuccess(result.product);
       } else {
         router.push("/products");
       }

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { toast } from "sonner";
 
@@ -11,12 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 import { supabase } from "@/lib/supabase";
+import { clientKeys } from "@/hooks/useClients";
 
 export default function AddClientPage() {
   const router = useRouter();
   const t = useTranslations();
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const getUserId = async () => {
@@ -39,7 +42,7 @@ export default function AddClientPage() {
         throw new Error(t("Clients.error.not_authenticated"));
       }
 
-      const { error } = await supabase.from("clients").insert([
+      const { data: newClient, error } = await supabase.from("clients").insert([
         {
           name: data.name.trim(),
           email: data.email.trim(),
@@ -52,9 +55,16 @@ export default function AddClientPage() {
           notes: data.notes?.trim() || null,
           user_id: userId,
         },
-      ]);
+      ]).select().single();
 
       if (error) throw error;
+
+      // Update the clients cache to include the new client
+      const previousClients = queryClient.getQueryData(clientKeys.lists()) || [];
+      queryClient.setQueryData(
+        clientKeys.lists(),
+        [...(Array.isArray(previousClients) ? previousClients : []), newClient]
+      );
 
       toast.success(t("Clients.success.title"), {
         description: t("Clients.success.created"),
@@ -78,10 +88,10 @@ export default function AddClientPage() {
         createButtonText={t("Clients.back_to_list")}
         customButton={
           <div className="flex gap-4">
-            <Button variant="outline" onClick={() => router.push("/clients")}>
+            <Button variant="outline" size="sm" onClick={() => router.push("/clients")}>
               {t("Clients.form.cancel")}
             </Button>
-            <Button type="submit" form="client-form" disabled={loading}>
+            <Button type="submit" size="sm" form="client-form" disabled={loading}>
               {loading ? t("Clients.messages.creating") : t("Clients.messages.create")}
             </Button>
           </div>

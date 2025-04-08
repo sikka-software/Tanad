@@ -2,18 +2,21 @@ import { useState, useEffect } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { VendorForm } from "@/components/forms/vendor-form"; // Import VendorForm
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 import { supabase } from "@/lib/supabase"; // Need supabase to get user ID
+import { vendorKeys } from "@/hooks/useVendors";
 
 export default function AddVendorPage() {
   const router = useRouter();
   const t = useTranslations("Vendors"); // Use Vendors namespace
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const queryClient = useQueryClient();
 
   // Fetch user ID on mount
   useEffect(() => {
@@ -33,10 +36,17 @@ export default function AddVendorPage() {
     getUserId();
   }, [router]);
 
-  // Callback for successful form submission (handled within VendorForm)
-  const handleSuccess = () => {
-    // router.push("/vendors"); // VendorForm already handles navigation on success by default
-    // Optionally, you could add specific logic here if needed after creation
+  // Callback for successful form submission
+  const handleSuccess = (vendor: any) => {
+    // Update the vendors cache to include the new vendor
+    const previousVendors = queryClient.getQueryData(vendorKeys.lists()) || [];
+    queryClient.setQueryData(
+      vendorKeys.lists(),
+      [...(Array.isArray(previousVendors) ? previousVendors : []), vendor]
+    );
+    
+    // Navigate to vendors list
+    router.push("/vendors");
   };
 
   return (
@@ -46,15 +56,9 @@ export default function AddVendorPage() {
         // Use customButton for back navigation and potentially submit trigger
         customButton={
           <div className="flex gap-4">
-            <Button variant="outline" onClick={() => router.push("/vendors")}>
+            <Button variant="outline" size="sm" onClick={() => router.push("/vendors")}>
               {t("common.cancel")} {/* Use a common cancel translation */}
             </Button>
-            {/* Submit button is rendered inside VendorForm, so no need here */}
-            {/* Alternatively, trigger form submission from here:
-            <Button type="submit" form="vendor-form" disabled={loadingUser || !userId}>
-               {t("common.create_button")} 
-            </Button> 
-            (Requires passing formId="vendor-form" to VendorForm) */}
           </div>
         }
       />

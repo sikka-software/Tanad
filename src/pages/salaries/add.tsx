@@ -2,18 +2,21 @@ import { useState, useEffect } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { SalaryForm } from "@/components/forms/salary-form"; // Import SalaryForm
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 import { supabase } from "@/lib/supabase";
+import { salaryKeys } from "@/hooks/useSalaries";
 
 export default function AddSalaryPage() {
   const router = useRouter();
   const t = useTranslations("Salaries"); // Use Salaries namespace
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const getUserId = async () => {
@@ -31,8 +34,16 @@ export default function AddSalaryPage() {
     getUserId();
   }, [router]);
 
-  const handleSuccess = () => {
-    // SalaryForm handles navigation
+  const handleSuccess = (salary: any) => {
+    // Update the salaries cache to include the new salary
+    const previousSalaries = queryClient.getQueryData(salaryKeys.lists()) || [];
+    queryClient.setQueryData(
+      salaryKeys.lists(),
+      [...(Array.isArray(previousSalaries) ? previousSalaries : []), salary]
+    );
+    
+    // Navigate to salaries list
+    router.push("/salaries");
   };
 
   return (
@@ -41,7 +52,7 @@ export default function AddSalaryPage() {
         title={t("add_new")} // Salaries.add_new
         customButton={
           <div className="flex gap-4">
-            <Button variant="outline" onClick={() => router.push("/salaries")}>
+            <Button variant="outline" size="sm" onClick={() => router.push("/salaries")}>
               {t("common.cancel")} {/* Common cancel text */}
             </Button>
             {/* Submit button is inside SalaryForm */}

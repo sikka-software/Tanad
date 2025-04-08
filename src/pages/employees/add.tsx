@@ -3,6 +3,7 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/components/forms/employee-form";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ export default function AddEmployeePage() {
   const t = useTranslations("Employees");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (data: EmployeeFormValues) => {
     setLoading(true);
@@ -41,6 +43,16 @@ export default function AddEmployeePage() {
         throw new Error(errorData.error || t("messages.error"));
       }
 
+      // Get the new employee data
+      const newEmployee = await response.json();
+
+      // Update the employees cache to include the new employee
+      const previousEmployees = queryClient.getQueryData(["employees"]) || [];
+      queryClient.setQueryData(
+        ["employees"],
+        [...(Array.isArray(previousEmployees) ? previousEmployees : []), newEmployee]
+      );
+
       router.push("/employees");
     } catch (error) {
       console.error(error);
@@ -58,10 +70,10 @@ export default function AddEmployeePage() {
         createButtonText={t("back_to_list")}
         customButton={
           <div className="flex gap-4">
-            <Button variant="outline" onClick={() => router.push("/employees")}>
+            <Button variant="outline" size="sm" onClick={() => router.push("/employees")}>
               {t("cancel")}
             </Button>
-            <Button type="submit" form="employee-form" disabled={loading}>
+            <Button type="submit" size="sm" form="employee-form" disabled={loading}>
               {loading ? t("messages.creating_employee") : t("messages.create_employee")}
             </Button>
           </div>
