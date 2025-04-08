@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+
 import { v4 as uuid } from "uuid";
 
-const WEBHOOK_URL =
-  "https://n8n.sikka.io/webhook/0b3e87cc-533f-4754-889d-cd23a9b34aa5/appeal";
+const WEBHOOK_URL = "https://n8n.sikka.io/webhook/0b3e87cc-533f-4754-889d-cd23a9b34aa5/appeal";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (!WEBHOOK_URL) {

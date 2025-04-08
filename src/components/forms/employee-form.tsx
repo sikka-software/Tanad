@@ -1,12 +1,8 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import * as z from "zod";
 
 import {
@@ -47,7 +43,6 @@ const employeeFormSchema = z.object({
 export type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
 
 export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: EmployeeFormProps) {
-  const router = useRouter();
   const t = useTranslations();
 
   const form = useForm<EmployeeFormValues>({

@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { UAParser } from "ua-parser-js";
+
 import maxmind from "maxmind";
 import path from "path";
+import { UAParser } from "ua-parser-js";
 
 type Data = {
   userAgent?: string;
@@ -18,12 +19,8 @@ let cityLookup: any;
 
 async function loadDatabases() {
   if (!countryLookup || !cityLookup) {
-    countryLookup = await maxmind.open(
-      path.join(process.cwd(), "GeoLite2-Country.mmdb"),
-    );
-    cityLookup = await maxmind.open(
-      path.join(process.cwd(), "GeoLite2-City.mmdb"),
-    );
+    countryLookup = await maxmind.open(path.join(process.cwd(), "GeoLite2-Country.mmdb"));
+    cityLookup = await maxmind.open(path.join(process.cwd(), "GeoLite2-City.mmdb"));
   }
 }
 
@@ -35,9 +32,7 @@ function getClientIp(req: NextApiRequest): string {
 
   const forwardedFor = req.headers["x-forwarded-for"];
   if (forwardedFor) {
-    return (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor)
-      .split(",")[0]
-      .trim();
+    return (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor).split(",")[0].trim();
   }
 
   const realIp = req.headers["x-real-ip"];
@@ -48,10 +43,7 @@ function getClientIp(req: NextApiRequest): string {
   return req.socket.remoteAddress || "0.0.0.0";
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>,
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -77,8 +69,7 @@ export default async function handler(
   } catch (error) {
     console.error("Error processing user info:", error);
     return res.status(500).json({
-      error:
-        error instanceof Error ? error.message : "Error processing user info",
+      error: error instanceof Error ? error.message : "Error processing user info",
     });
   }
 }
