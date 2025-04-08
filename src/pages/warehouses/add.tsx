@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+
 import { useQueryClient } from "@tanstack/react-query";
 
 import { WarehouseForm } from "@/components/forms/warehouse-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { supabase } from "@/lib/supabase";
 import { warehouseKeys } from "@/hooks/useWarehouses";
+import { supabase } from "@/lib/supabase";
 
 export default function AddWarehousePage() {
   const router = useRouter();
@@ -39,10 +41,10 @@ export default function AddWarehousePage() {
   const handleSuccess = (warehouse: any) => {
     // Update the warehouses cache to include the new warehouse
     const previousWarehouses = queryClient.getQueryData(warehouseKeys.lists()) || [];
-    queryClient.setQueryData(
-      warehouseKeys.lists(),
-      [...(Array.isArray(previousWarehouses) ? previousWarehouses : []), warehouse]
-    );
+    queryClient.setQueryData(warehouseKeys.lists(), [
+      ...(Array.isArray(previousWarehouses) ? previousWarehouses : []),
+      warehouse,
+    ]);
 
     // Navigate to warehouses list
     router.push("/warehouses");
@@ -69,10 +71,7 @@ export default function AddWarehousePage() {
             {loadingUser ? (
               <p>{t("common.loading")}</p>
             ) : userId ? (
-              <WarehouseForm
-                userId={userId}
-                onSuccess={handleSuccess}
-              />
+              <WarehouseForm userId={userId} onSuccess={handleSuccess} />
             ) : (
               <p>{t("error.failed_to_load_user")}</p>
             )}
@@ -84,12 +83,10 @@ export default function AddWarehousePage() {
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? 'en';
+  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (
-        await import(`../../../locales/${effectiveLocale}.json`)
-      ).default,
+      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
     },
   };
-}; 
+};

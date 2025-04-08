@@ -1,6 +1,12 @@
 import { useState } from "react";
+
+import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
-// UI
+
+import { ContactForm } from "@/components/landing/ContactForm";
+import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import SocialIcons from "@/components/landing/SocialIcons";
 import {
   Dialog,
   DialogContent,
@@ -9,15 +15,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-// Components
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
-import SocialIcons from "@/components/landing/SocialIcons";
-import { ContactForm } from "@/components/landing/ContactForm";
-// Hooks
 import { useBreakpoint } from "@/hooks/use-breakpoint";
+
 import settings from "../../landing.config";
-import { GetStaticProps } from "next";
 
 export default function ContactPage() {
   const t = useTranslations();
@@ -46,10 +46,7 @@ export default function ContactPage() {
 
   return (
     <div className="flex flex-col items-center justify-center py-10 pb-32">
-      <CustomPageMeta
-        title={t("SEO.contact.title")}
-        description={t("SEO.contact.description")}
-      />
+      <CustomPageMeta title={t("SEO.contact.title")} description={t("SEO.contact.description")} />
       <div className="flex flex-col items-center justify-center gap-2 p-10 text-center">
         <CustomMotionDiv className="py-10 pb-0 text-5xl font-bold">
           {t("ContactPage.hero.title")}
@@ -58,10 +55,7 @@ export default function ContactPage() {
           {t("ContactPage.hero.subtitle")}
         </CustomMotionDiv>
       </div>
-      <CustomMotionDiv
-        delay={0.2}
-        className="w-full max-w-lg p-4 pt-0 drop-shadow-xl md:p-2"
-      >
+      <CustomMotionDiv delay={0.2} className="w-full max-w-lg p-4 pt-0 drop-shadow-xl md:p-2">
         <ContactForm
           onSubmit={(e) => {
             setOpenSuccessDialog(true);
@@ -101,19 +95,15 @@ export default function ContactPage() {
       <Dialog open={openSuccessDialog} onOpenChange={setOpenSuccessDialog}>
         <DialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
           <DialogHeader>
-            <DialogTitle>
-              {t("ContactPage.contact-form.submitted.title")}
-            </DialogTitle>
+            <DialogTitle>{t("ContactPage.contact-form.submitted.title")}</DialogTitle>
             <DialogDescription>
               {t("ContactPage.contact-form.submitted.subtitle")}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <div className="flex w-full flex-col gap-4 text-center md:text-start">
-              <div>
-                {t("ContactPage.contact-form.submitted.contact-methods")}
-              </div>
-              <div className="flex flex-row gap-2 justify-center md:justify-start">
+              <div>{t("ContactPage.contact-form.submitted.contact-methods")}</div>
+              <div className="flex flex-row justify-center gap-2 md:justify-start">
                 <SocialIcons {...settings.contact} />
               </div>
             </div>

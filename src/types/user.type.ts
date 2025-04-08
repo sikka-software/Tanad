@@ -5,19 +5,14 @@ import {
   MultiLangString,
   ThemeProps,
 } from "@/types/common.type";
+
 import { CommentProps } from "./comment.type";
 import { NoteProps } from "./note.type";
 
 export type UserProps = {
   _id: string;
 
-  status:
-    | "active"
-    | "inactive"
-    | "deactivated"
-    | "blocked"
-    | "verified"
-    | "unverified";
+  status: "active" | "inactive" | "deactivated" | "blocked" | "verified" | "unverified";
 
   email: string;
   phone?: string;

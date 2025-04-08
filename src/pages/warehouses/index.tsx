@@ -1,22 +1,14 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
-import {
-  Building2,
-  Code,
-  MapPin,
-  LayoutGrid,
-  NotebookText,
-  ToggleRight,
-  CircleDashed,
-} from "lucide-react";
+import { Code, MapPin, LayoutGrid, NotebookText } from "lucide-react";
 
-import type { Warehouse } from "@/types/warehouse.type";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
 import { useWarehouses } from "@/hooks/useWarehouses";
-import { Badge } from "@/components/ui/badge";
+import type { Warehouse } from "@/types/warehouse.type";
 
 export default function WarehousesPage() {
   const t = useTranslations("Warehouses");
@@ -90,12 +82,10 @@ export default function WarehousesPage() {
 
 // Add getStaticProps for translations
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? 'en';
+  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (
-        await import(`../../../locales/${effectiveLocale}.json`)
-      ).default,
+      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
     },
   };
-}; 
+};

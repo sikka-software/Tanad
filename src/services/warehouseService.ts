@@ -63,4 +63,4 @@ export async function deleteWarehouse(id: string): Promise<void> {
     console.error(`Error deleting warehouse with id ${id}:`, error);
     throw new Error(error.message);
   }
-} 
+}

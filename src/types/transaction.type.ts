@@ -1,12 +1,7 @@
 import { AcceptedPaymentMethods } from "@/lib/constants/payment-consts";
 import { ClientProps } from "@/types/client.type";
 
-export type TransactionStatus =
-  | "completed"
-  | "pending"
-  | "failed"
-  | "cancelled"
-  | "refunded";
+export type TransactionStatus = "completed" | "pending" | "failed" | "cancelled" | "refunded";
 
 export type TransactionProps = {
   id: string;
@@ -31,9 +26,6 @@ export type TransactionProps = {
   createdAt: string;
 };
 
-export type TransactionInput = Omit<
-  Partial<TransactionProps>,
-  "invoice_client"
-> & {
+export type TransactionInput = Omit<Partial<TransactionProps>, "invoice_client"> & {
   invoice_client: string;
 };

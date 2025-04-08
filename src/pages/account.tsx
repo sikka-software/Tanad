@@ -1,16 +1,19 @@
-import { useLocale, useTranslations } from "next-intl";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
-import { User } from "@supabase/supabase-js";
+
 import { GetStaticProps } from "next";
+import { useLocale, useTranslations } from "next-intl";
+
+import { User } from "@supabase/supabase-js";
 import { EyeOff } from "lucide-react";
 import { Eye } from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/lib/supabase";
 
 interface ProfileFormValues {
   name: string;
@@ -157,21 +160,15 @@ export default function Account() {
   return (
     <div dir={lang === "ar" ? "rtl" : "ltr"}>
       <Tabs defaultValue="general" className="w-full">
-        <TabsList
-          className="grid w-full grid-cols-2"
-          dir={lang === "ar" ? "rtl" : "ltr"}
-        >
+        <TabsList className="grid w-full grid-cols-2" dir={lang === "ar" ? "rtl" : "ltr"}>
           <TabsTrigger value="general">{t("Profile.general")}</TabsTrigger>
           <TabsTrigger value="security">{t("Profile.security")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" dir={lang === "ar" ? "rtl" : "ltr"}>
-          <form
-            onSubmit={handleProfileSubmit(onProfileSubmit)}
-            className="flex flex-col gap-4"
-          >
+          <form onSubmit={handleProfileSubmit(onProfileSubmit)} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <div className="space-y-2 w-full">
+              <div className="w-full space-y-2">
                 <Label htmlFor="name">{t("Profile.name")}</Label>
                 <Input
                   id="name"
@@ -185,15 +182,13 @@ export default function Account() {
                   type="text"
                 />
                 {profileErrors.name && (
-                  <p className="text-sm text-red-500">
-                    {profileErrors.name.message}
-                  </p>
+                  <p className="text-sm text-red-500">{profileErrors.name.message}</p>
                 )}
               </div>
             </div>
 
             <div className="flex flex-row gap-2">
-              <div className="space-y-2 w-full">
+              <div className="w-full space-y-2">
                 <Label htmlFor="email">{t("Profile.email")}</Label>
                 <Input
                   id="email"
@@ -208,46 +203,27 @@ export default function Account() {
                 />
 
                 {profileErrors.email && (
-                  <p className="text-sm text-red-500">
-                    {profileErrors.email.message}
-                  </p>
+                  <p className="text-sm text-red-500">{profileErrors.email.message}</p>
                 )}
               </div>
-              <div className="space-y-2 w-full">
+              <div className="w-full space-y-2">
                 <Label className="text-secondary-foreground" htmlFor="phone">
                   {t("Profile.phone")}
                 </Label>
-                <Input
-                  id="phone"
-                  disabled
-                  {...registerProfile("phone")}
-                  type="tel"
-                />
+                <Input id="phone" disabled {...registerProfile("phone")} type="tel" />
               </div>
             </div>
 
-            <Button
-              className="mt-4"
-              variant="default"
-              type="submit"
-              disabled={loading}
-            >
-              {loading
-                ? t("Profile.saving_changes")
-                : t("Profile.save_changes")}
+            <Button className="mt-4" variant="default" type="submit" disabled={loading}>
+              {loading ? t("Profile.saving_changes") : t("Profile.save_changes")}
             </Button>
           </form>
         </TabsContent>
 
         <TabsContent value="security" dir={lang === "ar" ? "rtl" : "ltr"}>
-          <form
-            onSubmit={handlePasswordSubmit(onPasswordSubmit)}
-            className="flex flex-col gap-4"
-          >
-            <div className="space-y-2 w-full">
-              <Label htmlFor="currentPassword">
-                {t("Profile.current_password")}
-              </Label>
+          <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="flex flex-col gap-4">
+            <div className="w-full space-y-2">
+              <Label htmlFor="currentPassword">{t("Profile.current_password")}</Label>
               <div className="relative">
                 <Input
                   id="currentPassword"
@@ -276,13 +252,11 @@ export default function Account() {
                 </Button>
               </div>
               {passwordErrors.currentPassword && (
-                <p className="text-sm text-red-500">
-                  {passwordErrors.currentPassword.message}
-                </p>
+                <p className="text-sm text-red-500">{passwordErrors.currentPassword.message}</p>
               )}
             </div>
 
-            <div className="space-y-2 w-full">
+            <div className="w-full space-y-2">
               <Label htmlFor="newPassword">{t("Profile.new_password")}</Label>
               <div className="relative">
                 <Input
@@ -304,24 +278,16 @@ export default function Account() {
                   onClick={() => setShowNewPassword(!showNewPassword)}
                   tabIndex={-1}
                 >
-                  {showNewPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
+                  {showNewPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </Button>
               </div>
 
               {passwordErrors.newPassword && (
-                <p className="text-sm text-red-500">
-                  {passwordErrors.newPassword.message}
-                </p>
+                <p className="text-sm text-red-500">{passwordErrors.newPassword.message}</p>
               )}
             </div>
-            <div className="space-y-2 w-full">
-              <Label htmlFor="confirmNewPassword">
-                {t("Profile.confirm_new_password")}
-              </Label>
+            <div className="w-full space-y-2">
+              <Label htmlFor="confirmNewPassword">{t("Profile.confirm_new_password")}</Label>
               <div className="relative">
                 <Input
                   id="confirmNewPassword"
@@ -340,9 +306,7 @@ export default function Account() {
                   variant="ghost"
                   size="icon"
                   className="absolute end-0 top-0 h-10 w-10 px-3 py-2"
-                  onClick={() =>
-                    setShowConfirmNewPassword(!showConfirmNewPassword)
-                  }
+                  onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
                   tabIndex={-1}
                 >
                   {showConfirmNewPassword ? (
@@ -354,21 +318,12 @@ export default function Account() {
               </div>
 
               {passwordErrors.confirmNewPassword && (
-                <p className="text-sm text-red-500">
-                  {passwordErrors.confirmNewPassword.message}
-                </p>
+                <p className="text-sm text-red-500">{passwordErrors.confirmNewPassword.message}</p>
               )}
             </div>
 
-            <Button
-              className="mt-4"
-              variant="default"
-              type="submit"
-              disabled={isUpdatingPassword}
-            >
-              {isUpdatingPassword
-                ? t("Profile.updating_password")
-                : t("Profile.change_password")}
+            <Button className="mt-4" variant="default" type="submit" disabled={isUpdatingPassword}>
+              {isUpdatingPassword ? t("Profile.updating_password") : t("Profile.change_password")}
             </Button>
           </form>
         </TabsContent>

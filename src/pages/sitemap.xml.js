@@ -1,8 +1,7 @@
 // pages/sitemap.xml.js
-
 import { fetchAllPuklas } from "../lib/operations";
 
-const URL = "https://puk.la";
+const URL = "https://tanad.app";
 
 function generateSiteMap(posts) {
   return `<?xml version="1.0" encoding="UTF-8"?>

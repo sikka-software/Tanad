@@ -1,16 +1,14 @@
 // Components
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { useTranslations } from "next-intl";
 import { GetStaticProps } from "next";
+import { useTranslations } from "next-intl";
+
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 export default function Billing() {
   const t = useTranslations();
   return (
     <>
-      <CustomPageMeta
-        title={t("Billing.title")}
-        description={t("Billing.description")}
-      />
+      <CustomPageMeta title={t("Billing.title")} description={t("Billing.description")} />
       <main className={`flex flex-col items-center justify-between`}>
         {t("General.coming_soon")}
       </main>

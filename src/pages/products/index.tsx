@@ -2,16 +2,10 @@ import { useState } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 
-import { Plus } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import PageTitle from "@/components/ui/page-title";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useProducts } from "@/hooks/useProducts";
 import { Product } from "@/types/product.type";
 
@@ -20,7 +14,7 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: products, isLoading, error } = useProducts();
 
-  const filteredProducts = Array.isArray(products) 
+  const filteredProducts = Array.isArray(products)
     ? products.filter(
         (product: Product) =>
           product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

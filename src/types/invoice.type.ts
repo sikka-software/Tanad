@@ -3,7 +3,6 @@ import {
   INVOICE_RECURRENCE,
   INVOICE_STATUSES,
 } from "@/lib/constants/invoice-consts";
-
 import { ClientProps } from "@/types/client.type";
 import { CommentProps } from "@/types/comment.type";
 import { CompanyProps } from "@/types/company.type";
@@ -11,7 +10,8 @@ import { DiscountProps } from "@/types/discount.type";
 import { NoteProps } from "@/types/note.type";
 import { ProductProps } from "@/types/product.type";
 import { TransactionProps } from "@/types/transaction.type";
-import { Client } from './client.type';
+
+import { Client } from "./client.type";
 
 export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
 export type InvoiceRecurrence = (typeof INVOICE_RECURRENCE)[number];
@@ -96,6 +96,6 @@ export interface Invoice {
   client?: Client;
 }
 
-export type InvoiceCreateData = Omit<Invoice, 'id' | 'created_at' | 'client'> & {
+export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "client"> & {
   userId?: string;
 };

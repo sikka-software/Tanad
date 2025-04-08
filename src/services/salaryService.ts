@@ -1,19 +1,19 @@
-import { supabase } from '@/lib/supabase';
-import { Salary, SalaryCreateData } from '@/types/salary.type';
+import { supabase } from "@/lib/supabase";
+import { Salary, SalaryCreateData } from "@/types/salary.type";
 
 export async function fetchSalaries(): Promise<Salary[]> {
   const { data, error } = await supabase
-    .from('salaries')
-    .select('*')
-    .order('payment_date', { ascending: false }); // Order by payment date
+    .from("salaries")
+    .select("*")
+    .order("payment_date", { ascending: false }); // Order by payment date
 
   if (error) {
-    console.error('Error fetching salaries:', error);
+    console.error("Error fetching salaries:", error);
     throw new Error(error.message);
   }
 
   // Ensure numeric fields are parsed correctly if they come as strings
-  return (data || []).map(salary => ({
+  return (data || []).map((salary) => ({
     ...salary,
     gross_amount: parseFloat(salary.gross_amount),
     net_amount: parseFloat(salary.net_amount),
@@ -21,11 +21,7 @@ export async function fetchSalaries(): Promise<Salary[]> {
 }
 
 export async function fetchSalaryById(id: string): Promise<Salary> {
-  const { data, error } = await supabase
-    .from('salaries')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const { data, error } = await supabase.from("salaries").select("*").eq("id", id).single();
 
   if (error) {
     console.error(`Error fetching salary with id ${id}:`, error);
@@ -47,14 +43,10 @@ export async function createSalary(salary: SalaryCreateData): Promise<Salary> {
     delete (dbSalary as any).userId;
   }
 
-  const { data, error } = await supabase
-    .from('salaries')
-    .insert([dbSalary])
-    .select()
-    .single();
+  const { data, error } = await supabase.from("salaries").insert([dbSalary]).select().single();
 
   if (error) {
-    console.error('Error creating salary:', error);
+    console.error("Error creating salary:", error);
     throw new Error(error.message);
   }
 
@@ -65,11 +57,14 @@ export async function createSalary(salary: SalaryCreateData): Promise<Salary> {
   };
 }
 
-export async function updateSalary(id: string, salary: Partial<Omit<Salary, 'id' | 'created_at'>>): Promise<Salary> {
+export async function updateSalary(
+  id: string,
+  salary: Partial<Omit<Salary, "id" | "created_at">>,
+): Promise<Salary> {
   const { data, error } = await supabase
-    .from('salaries')
+    .from("salaries")
     .update(salary)
-    .eq('id', id)
+    .eq("id", id)
     .select()
     .single();
 
@@ -86,13 +81,10 @@ export async function updateSalary(id: string, salary: Partial<Omit<Salary, 'id'
 }
 
 export async function deleteSalary(id: string): Promise<void> {
-  const { error } = await supabase
-    .from('salaries')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from("salaries").delete().eq("id", id);
 
   if (error) {
     console.error(`Error deleting salary with id ${id}:`, error);
     throw new Error(error.message);
   }
-} 
+}

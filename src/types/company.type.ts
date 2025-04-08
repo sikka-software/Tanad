@@ -1,6 +1,6 @@
-import { MultiLangString } from "@/types/common.type";
 import { ClientProps } from "@/types/client.type";
 import { CommentProps } from "@/types/comment.type";
+import { MultiLangString } from "@/types/common.type";
 import { InvoiceProps } from "@/types/invoice.type";
 import { NoteProps } from "@/types/note.type";
 

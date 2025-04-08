@@ -63,4 +63,4 @@ export async function deleteBranch(id: string): Promise<void> {
     console.error(`Error deleting branch with id ${id}:`, error);
     throw new Error(error.message);
   }
-} 
+}

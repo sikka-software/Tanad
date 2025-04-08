@@ -1,10 +1,15 @@
 // TODO: add signature component
 import { useState, useId } from "react";
+import { useForm } from "react-hook-form";
+
+import { GetStaticProps } from "next";
+import { useTranslations, useLocale } from "next-intl";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import Head from "next/head";
 import * as z from "zod";
-import { Controller, useForm } from "react-hook-form";
-// UI
+
+import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,7 +20,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -24,18 +28,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-// import { Radio } from "@/components/ui/radio-group";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Signature } from "@/components/ui/signature";
 import { Textarea } from "@/components/ui/textarea";
-// Components
-import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
-// Utils
 import { cn } from "@/lib/utils";
-import settings from "../../landing.config";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { GetStaticProps } from "next";
-import { useTranslations, useLocale } from "next-intl";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 export default function ReportIPPage() {
   const t = useTranslations();
@@ -327,17 +324,14 @@ export default function ReportIPPage() {
         description={t("SEO.report-ip.description")}
       />
       <div className="flex flex-col items-center justify-center gap-2 p-10 text-center">
-        <CustomMotionDiv className="py-10 pb-0 text-5xl font-bold leading-tight">
+        <CustomMotionDiv className="py-10 pb-0 text-5xl leading-tight font-bold">
           {t("ReportPage.report-ip.title")}
         </CustomMotionDiv>
         <CustomMotionDiv delay={0.1} className="text-md p-0">
           {t("ReportPage.report-ip.subtitle")}
         </CustomMotionDiv>
       </div>
-      <CustomMotionDiv
-        delay={0.2}
-        className="w-full max-w-lg p-4 pt-0 drop-shadow-xl md:p-2"
-      >
+      <CustomMotionDiv delay={0.2} className="w-full max-w-lg p-4 pt-0 drop-shadow-xl md:p-2">
         <Card>
           <CardContent headless>
             <Form {...form}>
@@ -347,14 +341,14 @@ export default function ReportIPPage() {
                 className="flex flex-col gap-2"
               >
                 <div className={cn(ipType && "mb-2")}>
-                  <div className="inline-flex h-9 rounded-lg bg-input/50 p-0.5 w-full">
+                  <div className="bg-input/50 inline-flex h-9 w-full rounded-lg p-0.5">
                     <RadioGroup
                       value={ipType}
                       onValueChange={setIpType}
-                      className="group relative inline-grid grid-cols-[1fr_1fr] items-center gap-0 text-sm font-medium after:absolute after:inset-y-0 after:w-1/2 after:rounded-md after:bg-background after:shadow-sm after:shadow-black/5 after:outline-offset-2 after:transition-transform after:duration-300 after:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] has-[:focus-visible]:after:outline has-[:focus-visible]:after:outline-2 has-[:focus-visible]:after:outline-ring/70 data-[state=copyright-infringment]:after:translate-x-0 data-[state=trademark-infringment]:after:translate-x-full w-full"
+                      className="group after:bg-background has-[:focus-visible]:after:outline-ring/70 relative inline-grid w-full grid-cols-[1fr_1fr] items-center gap-0 text-sm font-medium after:absolute after:inset-y-0 after:w-1/2 after:rounded-md after:shadow-sm after:shadow-black/5 after:outline-offset-2 after:transition-transform after:duration-300 after:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] has-[:focus-visible]:after:outline has-[:focus-visible]:after:outline-2 data-[state=copyright-infringment]:after:translate-x-0 data-[state=trademark-infringment]:after:translate-x-full"
                       data-state={ipType}
                     >
-                      <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer select-none items-center justify-center whitespace-nowrap px-4 transition-colors group-data-[state=annually]:text-muted-foreground/70">
+                      <label className="group-data-[state=annually]:text-muted-foreground/70 relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-4 whitespace-nowrap transition-colors select-none">
                         {t(`ReportPage.copyright-infringment`)}
                         <RadioGroupItem
                           id={`${id}-0`}
@@ -362,7 +356,7 @@ export default function ReportIPPage() {
                           className="sr-only"
                         />
                       </label>
-                      <label className="relative z-10 inline-flex h-full min-w-8 cursor-pointer select-none items-center justify-center whitespace-nowrap px-4 transition-colors group-data-[state=monthly]:text-muted-foreground/70">
+                      <label className="group-data-[state=monthly]:text-muted-foreground/70 relative z-10 inline-flex h-full min-w-8 cursor-pointer items-center justify-center px-4 whitespace-nowrap transition-colors select-none">
                         {t(`ReportPage.trademark-infringment`)}
                         <RadioGroupItem
                           id={`${id}-1`}
@@ -410,9 +404,7 @@ export default function ReportIPPage() {
                           name="copyright_owner"
                           render={({ field }) => (
                             <FormItem className="w-full">
-                              <FormLabel>
-                                {t("ReportPage.copyright-owner.label")}
-                              </FormLabel>
+                              <FormLabel>{t("ReportPage.copyright-owner.label")}</FormLabel>
                               <FormControl>
                                 <Input {...field} />
                               </FormControl>
@@ -426,9 +418,7 @@ export default function ReportIPPage() {
                           render={({ field }) => (
                             <FormItem className="w-full">
                               <FormLabel>
-                                {t(
-                                  "ReportPage.relationship-copyright-owner.label"
-                                )}
+                                {t("ReportPage.relationship-copyright-owner.label")}
                               </FormLabel>
                               <FormControl>
                                 <Input {...field} />
@@ -446,9 +436,7 @@ export default function ReportIPPage() {
                           name="trademark_owner"
                           render={({ field }) => (
                             <FormItem className="w-full">
-                              <FormLabel>
-                                {t("ReportPage.trademark-owner.label")}
-                              </FormLabel>
+                              <FormLabel>{t("ReportPage.trademark-owner.label")}</FormLabel>
                               <FormControl>
                                 <Input {...field} />
                               </FormControl>
@@ -463,9 +451,7 @@ export default function ReportIPPage() {
                           render={({ field }) => (
                             <FormItem className="w-full">
                               <FormLabel>
-                                {t(
-                                  "ReportPage.relationship-trademark-owner.label"
-                                )}
+                                {t("ReportPage.relationship-trademark-owner.label")}
                               </FormLabel>
                               <FormControl>
                                 <Input {...field} />
@@ -495,9 +481,7 @@ export default function ReportIPPage() {
                       name="address_1"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            {t("ReportPage.address-1.label")}
-                          </FormLabel>
+                          <FormLabel>{t("ReportPage.address-1.label")}</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -510,9 +494,7 @@ export default function ReportIPPage() {
                       name="address_2"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            {t("ReportPage.address-2.label")}
-                          </FormLabel>
+                          <FormLabel>{t("ReportPage.address-2.label")}</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -597,9 +579,7 @@ export default function ReportIPPage() {
                           name="trademark_name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>
-                                {t("ReportPage.trademark-name.label")}
-                              </FormLabel>
+                              <FormLabel>{t("ReportPage.trademark-name.label")}</FormLabel>
                               <FormControl>
                                 <Input {...field} />
                               </FormControl>
@@ -612,9 +592,7 @@ export default function ReportIPPage() {
                           name="trademark_industry"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>
-                                {t("ReportPage.trademark-industry.label")}
-                              </FormLabel>
+                              <FormLabel>{t("ReportPage.trademark-industry.label")}</FormLabel>
                               <FormControl>
                                 <Input {...field} />
                               </FormControl>
@@ -627,9 +605,7 @@ export default function ReportIPPage() {
                           name="trademark_country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>
-                                {t("ReportPage.trademark-country.label")}
-                              </FormLabel>
+                              <FormLabel>{t("ReportPage.trademark-country.label")}</FormLabel>
                               <FormControl>
                                 <Input {...field} />
                               </FormControl>
@@ -642,9 +618,7 @@ export default function ReportIPPage() {
                           name="trademark_number"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>
-                                {t("ReportPage.trademark-number.label")}
-                              </FormLabel>
+                              <FormLabel>{t("ReportPage.trademark-number.label")}</FormLabel>
                               <FormControl>
                                 <Input {...field} />
                               </FormControl>
@@ -660,9 +634,7 @@ export default function ReportIPPage() {
                       name="infringment_content"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            {t("ReportPage.infringment-content.label")}
-                          </FormLabel>
+                          <FormLabel>{t("ReportPage.infringment-content.label")}</FormLabel>
                           <FormControl>
                             <Textarea {...field} />
                           </FormControl>
@@ -676,9 +648,7 @@ export default function ReportIPPage() {
                       name="pukla_link"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            {t("ReportPage.pukla-link-to-report")}
-                          </FormLabel>
+                          <FormLabel>{t("ReportPage.pukla-link-to-report")}</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -708,10 +678,7 @@ export default function ReportIPPage() {
                                     onCheckedChange={(e) => field.onChange(e)}
                                   />
                                 </FormControl>
-                                <FormLabel
-                                  htmlFor="good-faith"
-                                  className="ms-2"
-                                >
+                                <FormLabel htmlFor="good-faith" className="ms-2">
                                   {t("ReportPage.statement.good-faith.label")}
                                 </FormLabel>
                                 <FormMessage />
@@ -729,10 +696,7 @@ export default function ReportIPPage() {
                                     onCheckedChange={(e) => field.onChange(e)}
                                   />
                                 </FormControl>
-                                <FormLabel
-                                  htmlFor="authorized"
-                                  className="ms-2"
-                                >
+                                <FormLabel htmlFor="authorized" className="ms-2">
                                   {t("ReportPage.statement.authorized.label")}
                                 </FormLabel>
                                 <FormMessage />
@@ -772,10 +736,7 @@ export default function ReportIPPage() {
                                 onCheckedChange={(e) => field.onChange(e)}
                               />
                             </FormControl>
-                            <FormLabel
-                              htmlFor="my_info_shared"
-                              className="ms-2"
-                            >
+                            <FormLabel htmlFor="my_info_shared" className="ms-2">
                               {t("ReportPage.statement.my-info-shared.label")}
                             </FormLabel>
                             <FormMessage />
@@ -816,13 +777,8 @@ export default function ReportIPPage() {
                                     onCheckedChange={(e) => field.onChange(e)}
                                   />
                                 </FormControl>
-                                <FormLabel
-                                  htmlFor="trademark_good_faith"
-                                  className="ms-2"
-                                >
-                                  {t(
-                                    "ReportPage.statement.trademark-good-faith.label"
-                                  )}
+                                <FormLabel htmlFor="trademark_good_faith" className="ms-2">
+                                  {t("ReportPage.statement.trademark-good-faith.label")}
                                 </FormLabel>
                                 <FormMessage />
                               </FormItem>
@@ -839,13 +795,8 @@ export default function ReportIPPage() {
                                     onCheckedChange={(e) => field.onChange(e)}
                                   />
                                 </FormControl>
-                                <FormLabel
-                                  htmlFor="trademark_authorized"
-                                  className="ms-2"
-                                >
-                                  {t(
-                                    "ReportPage.statement.trademark-authorized.label"
-                                  )}
+                                <FormLabel htmlFor="trademark_authorized" className="ms-2">
+                                  {t("ReportPage.statement.trademark-authorized.label")}
                                 </FormLabel>
                                 <FormMessage />
                               </FormItem>
@@ -868,12 +819,8 @@ export default function ReportIPPage() {
       <Dialog open={openSuccessDialog} onOpenChange={setOpenSuccessDialog}>
         <DialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
           <DialogHeader>
-            <DialogTitle>
-              {t("ReportPage.report-form.submitted.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("ReportPage.report-form.submitted.subtitle")}
-            </DialogDescription>
+            <DialogTitle>{t("ReportPage.report-form.submitted.title")}</DialogTitle>
+            <DialogDescription>{t("ReportPage.report-form.submitted.subtitle")}</DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>

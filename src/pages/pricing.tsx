@@ -1,5 +1,13 @@
 import { useState } from "react";
-// UI
+
+import { GetStaticProps } from "next";
+import { useTranslations, useLocale } from "next-intl";
+
+import BottomCTA from "@/components/landing/BottomCTA";
+import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import HeroSection from "@/components/landing/HeroSection";
+import { PricingPlans } from "@/components/landing/PricingPlans";
 import {
   Accordion,
   AccordionContent,
@@ -7,17 +15,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { PricingCardProps } from "@/components/ui/pricing-card";
-// Components
-import { PricingPlans } from "@/components/landing/PricingPlans";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import HeroSection from "@/components/landing/HeroSection";
-import BottomCTA from "@/components/landing/BottomCTA";
-import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
-// Utils
 import { plan1Price, plan2Price, plan3Price } from "@/lib/utils";
+
 import settings from "../../landing.config";
-import { GetStaticProps } from "next";
-import { useTranslations, useLocale } from "next-intl";
 
 export default function PricingPage() {
   const t = useTranslations();
@@ -193,10 +193,7 @@ export default function PricingPage() {
       trigger: t("FAQ.faq-contact.question"),
       content: t.rich("FAQ.faq-contact.answer", {
         email: (chunks) => (
-          <a
-            href={`mailto:${settings.contact.mail}`}
-            className="clickable-link"
-          >
+          <a href={`mailto:${settings.contact.mail}`} className="clickable-link">
             {chunks}
           </a>
         ),
@@ -255,20 +252,14 @@ export default function PricingPage() {
 
   return (
     <div>
-      <CustomPageMeta
-        title={t("SEO.pricing.title")}
-        description={t("SEO.pricing.description")}
-      />
+      <CustomPageMeta title={t("SEO.pricing.title")} description={t("SEO.pricing.description")} />
       <div className="flex flex-col gap-[150px] px-10 pt-24 md:pt-44">
-        <HeroSection
-          title={t("Pricing.hero.title")}
-          subtitle={t("Pricing.hero.subtitle")}
-        />
+        <HeroSection title={t("Pricing.hero.title")} subtitle={t("Pricing.hero.subtitle")} />
       </div>
 
       <div className="flex flex-col py-28">
         <div className="flex w-full flex-col items-center justify-center">
-          <CustomMotionDiv delay={0.4} className="w-full max-w-[1400px] px-10 ">
+          <CustomMotionDiv delay={0.4} className="w-full max-w-[1400px] px-10">
             <PricingPlans
               onCurrencyChange={(e) => {
                 setPricingCurrency(e);
@@ -295,14 +286,12 @@ export default function PricingPage() {
         </CustomMotionDiv>
       </div>
 
-      <div className="flex flex-col items-center justify-center p-10 md:p-40 md:py-20 ">
+      <div className="flex flex-col items-center justify-center p-10 md:p-40 md:py-20">
         <div className="flex flex-col gap-4 py-10">
           <span className="w-full text-center text-4xl font-bold">
             {t("Pricing.faq.header.title")}
           </span>
-          <span className="w-full text-center">
-            {t("Pricing.faq.header.subtitle")}
-          </span>
+          <span className="w-full text-center">{t("Pricing.faq.header.subtitle")}</span>
         </div>
         <div className="w-full md:max-w-4xl">
           <div className="space-y-4">
@@ -311,12 +300,12 @@ export default function PricingPage() {
                 <AccordionItem
                   value={item.id}
                   key={item.id}
-                  className="rounded-lg border bg-background px-4 py-1"
+                  className="bg-background rounded-lg border px-4 py-1"
                 >
                   <AccordionTrigger className="py-2 text-start text-[15px] leading-6 hover:no-underline">
                     {item.trigger}
                   </AccordionTrigger>
-                  <AccordionContent className="pb-2 text-muted-foreground">
+                  <AccordionContent className="text-muted-foreground pb-2">
                     {item.content}
                   </AccordionContent>
                 </AccordionItem>

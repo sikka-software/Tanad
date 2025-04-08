@@ -1,23 +1,24 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useRouter } from 'next/router'; // Import useRouter if needed for actions
+import { useRouter } from "next/router";
 
-import {
-  User,
-  CalendarDays,
-  CircleDollarSign,
-  ReceiptText,
-  NotebookText,
-} from "lucide-react";
+// Import useRouter if needed for actions
 
-import type { Salary } from "@/types/salary.type";
+import { User, CalendarDays, CircleDollarSign, ReceiptText, NotebookText } from "lucide-react";
+// For actions
+import { toast } from "sonner";
+
+// Import delete hook if adding delete action
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
-import { useSalaries } from "@/hooks/useSalaries"; // Import the salaries hook
-import { useDeleteSalary } from "@/hooks/useSalaries"; // Import delete hook if adding delete action
-import { Button } from "@/components/ui/button"; // For actions
-import { toast } from "sonner"; // For delete feedback
+import { useSalaries } from "@/hooks/useSalaries";
+// Import the salaries hook
+import { useDeleteSalary } from "@/hooks/useSalaries";
+import type { Salary } from "@/types/salary.type";
+
+// For delete feedback
 
 // Helper to format date string (optional)
 const formatDate = (dateString: string | null | undefined) => {
@@ -33,9 +34,9 @@ const formatDate = (dateString: string | null | undefined) => {
 // Helper to format currency (requires Intl object)
 const formatCurrency = (amount: number | null | undefined) => {
   if (amount == null) return "N/A";
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
   // Replace 'en-US' and 'USD' with appropriate locale/currency if needed
-}
+};
 
 export default function SalariesPage() {
   const t = useTranslations("Salaries");
@@ -44,7 +45,8 @@ export default function SalariesPage() {
   const deleteSalaryMutation = useDeleteSalary(); // Hook for deletion
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t("confirm_delete"))) { // Add confirm_delete translation
+    if (window.confirm(t("confirm_delete"))) {
+      // Add confirm_delete translation
       deleteSalaryMutation.mutate(id, {
         onSuccess: () => {
           toast.success(t("success.title"), {
@@ -63,42 +65,40 @@ export default function SalariesPage() {
 
   // Render function for a single salary card
   const renderSalary = (salary: Salary) => (
-    <Card key={salary.id} className="transition-shadow hover:shadow-lg relative">
+    <Card key={salary.id} className="relative transition-shadow hover:shadow-lg">
       {/* Actions Button (Top Right) */}
-       <div className="absolute top-2 right-2 flex gap-1">
-         <Button
-           variant="outline"
-           size="sm"
-           onClick={(e) => {
-             e.stopPropagation(); // Prevent card click
-             router.push(`/salaries/${salary.id}/edit`);
-           }}
-           aria-label={t("edit_salary")} // Add edit_salary translation
-         >
-           Edit
-         </Button>
-         <Button
-           variant="destructive"
-           size="sm"
-           onClick={(e) => {
-             e.stopPropagation(); // Prevent card click
-             handleDelete(salary.id);
-           }}
-           disabled={deleteSalaryMutation.isPending}
-           aria-label={t("delete_salary")} // Add delete_salary translation
-         >
+      <div className="absolute top-2 right-2 flex gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent card click
+            router.push(`/salaries/${salary.id}/edit`);
+          }}
+          aria-label={t("edit_salary")} // Add edit_salary translation
+        >
+          Edit
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent card click
+            handleDelete(salary.id);
+          }}
+          disabled={deleteSalaryMutation.isPending}
+          aria-label={t("delete_salary")} // Add delete_salary translation
+        >
           {deleteSalaryMutation.isPending ? "..." : "Del"}
-         </Button>
-       </div>
+        </Button>
+      </div>
 
       <CardHeader>
         <div className="flex items-center gap-2">
-           <User className="h-5 w-5 text-gray-500" />
-           <CardTitle className="text-lg">{salary.employee_name}</CardTitle>
+          <User className="h-5 w-5 text-gray-500" />
+          <CardTitle className="text-lg">{salary.employee_name}</CardTitle>
         </div>
-        <p className="text-sm text-gray-500 pt-1">
-          Paid on: {formatDate(salary.payment_date)}
-        </p>
+        <p className="pt-1 text-sm text-gray-500">Paid on: {formatDate(salary.payment_date)}</p>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
@@ -116,7 +116,7 @@ export default function SalariesPage() {
           </div>
           {/* Deductions (simplified view) */}
           {salary.deductions && (
-            <div className="flex items-start gap-2 text-sm text-gray-500 border-t pt-3">
+            <div className="flex items-start gap-2 border-t pt-3 text-sm text-gray-500">
               <ReceiptText className="mt-1 h-4 w-4 flex-shrink-0" />
               {/* Displaying keys or count might be better than raw JSON */}
               <p>Deductions included</p>
@@ -127,7 +127,7 @@ export default function SalariesPage() {
           )}
           {/* Notes */}
           {salary.notes && (
-            <div className="flex items-start gap-2 text-sm text-gray-500 border-t pt-3">
+            <div className="flex items-start gap-2 border-t pt-3 text-sm text-gray-500">
               <NotebookText className="mt-1 h-4 w-4 flex-shrink-0" />
               <p className="whitespace-pre-wrap">{salary.notes}</p>
             </div>
@@ -162,12 +162,10 @@ export default function SalariesPage() {
 
 // Add getStaticProps for translations
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? 'en';
+  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (
-        await import(`../../../locales/${effectiveLocale}.json`)
-      ).default,
+      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
     },
   };
-}; 
+};

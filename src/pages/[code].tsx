@@ -1,10 +1,12 @@
-import { GetStaticProps, GetStaticPaths } from "next";
-import { supabase } from "@/lib/supabase";
-import { PuklaView } from "@/components/app/PuklaView";
-import NoPuklaFound from "@/components/app/NoPuklaFound";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { useRouter } from "next/router";
 import { useEffect } from "react";
+
+import { GetStaticProps, GetStaticPaths } from "next";
+import { useRouter } from "next/router";
+
+import NoPuklaFound from "@/components/app/NoPuklaFound";
+import { PuklaView } from "@/components/app/PuklaView";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import { supabase } from "@/lib/supabase";
 
 export default function RedirectPage({ pukla }: { pukla: any }) {
   const router = useRouter();

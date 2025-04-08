@@ -1,10 +1,11 @@
-import { supabase } from '@/lib/supabase';
-import { Quote, QuoteItem, QuoteCreateData, QuoteItemCreateData } from '@/types/quote.type';
+import { supabase } from "@/lib/supabase";
+import { Quote, QuoteItem, QuoteCreateData, QuoteItemCreateData } from "@/types/quote.type";
 
 export async function fetchQuotes(): Promise<Quote[]> {
   const { data, error } = await supabase
-    .from('quotes')
-    .select(`
+    .from("quotes")
+    .select(
+      `
       *,
       clients!quotes_client_id_fkey (
         id,
@@ -13,12 +14,13 @@ export async function fetchQuotes(): Promise<Quote[]> {
         email,
         phone
       )
-    `)
-    .order('created_at', { ascending: false });
+    `,
+    )
+    .order("created_at", { ascending: false });
 
   if (error) {
-    console.error('Error fetching quotes:', error);
-    throw new Error('Failed to fetch quotes');
+    console.error("Error fetching quotes:", error);
+    throw new Error("Failed to fetch quotes");
   }
 
   return data || [];
@@ -26,8 +28,9 @@ export async function fetchQuotes(): Promise<Quote[]> {
 
 export async function fetchQuoteById(id: string): Promise<Quote> {
   const { data, error } = await supabase
-    .from('quotes')
-    .select(`
+    .from("quotes")
+    .select(
+      `
       *,
       clients!quotes_client_id_fkey (
         id,
@@ -36,8 +39,9 @@ export async function fetchQuoteById(id: string): Promise<Quote> {
         email,
         phone
       )
-    `)
-    .eq('id', id)
+    `,
+    )
+    .eq("id", id)
     .single();
 
   if (error) {
@@ -55,15 +59,11 @@ export async function createQuote(quote: QuoteCreateData) {
     delete (dbQuote as any).userId;
   }
 
-  const { data, error } = await supabase
-    .from('quotes')
-    .insert([dbQuote])
-    .select()
-    .single();
+  const { data, error } = await supabase.from("quotes").insert([dbQuote]).select().single();
 
   if (error) {
-    console.error('Error creating quote:', error);
-    throw new Error('Failed to create quote');
+    console.error("Error creating quote:", error);
+    throw new Error("Failed to create quote");
   }
 
   return data;
@@ -71,9 +71,9 @@ export async function createQuote(quote: QuoteCreateData) {
 
 export async function updateQuote(id: string, quote: Partial<Quote>) {
   const { data, error } = await supabase
-    .from('quotes')
+    .from("quotes")
     .update(quote)
-    .eq('id', id)
+    .eq("id", id)
     .select()
     .single();
 
@@ -86,10 +86,7 @@ export async function updateQuote(id: string, quote: Partial<Quote>) {
 }
 
 export async function deleteQuote(id: string) {
-  const { error } = await supabase
-    .from('quotes')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from("quotes").delete().eq("id", id);
 
   if (error) {
     console.error(`Error deleting quote with id ${id}:`, error);
@@ -98,25 +95,21 @@ export async function deleteQuote(id: string) {
 }
 
 export async function createQuoteItem(quoteItem: QuoteItemCreateData) {
-  const { data, error } = await supabase
-    .from('quote_items')
-    .insert([quoteItem])
-    .select()
-    .single();
+  const { data, error } = await supabase.from("quote_items").insert([quoteItem]).select().single();
 
   if (error) {
-    console.error('Error creating quote item:', error);
-    throw new Error('Failed to create quote item');
+    console.error("Error creating quote item:", error);
+    throw new Error("Failed to create quote item");
   }
-  
+
   return data;
 }
 
 export async function updateQuoteItem(id: string, quoteItem: Partial<QuoteItem>) {
   const { data, error } = await supabase
-    .from('quote_items')
+    .from("quote_items")
     .update(quoteItem)
-    .eq('id', id)
+    .eq("id", id)
     .select()
     .single();
 
@@ -124,20 +117,17 @@ export async function updateQuoteItem(id: string, quoteItem: Partial<QuoteItem>)
     console.error(`Error updating quote item with id ${id}:`, error);
     throw new Error(`Failed to update quote item with id ${id}`);
   }
-  
+
   return data;
 }
 
 export async function deleteQuoteItem(id: string) {
-  const { error } = await supabase
-    .from('quote_items')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from("quote_items").delete().eq("id", id);
 
   if (error) {
     console.error(`Error deleting quote item with id ${id}:`, error);
     throw new Error(`Failed to delete quote item with id ${id}`);
   }
-  
+
   return true;
-} 
+}

@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+
 import { useQueryClient } from "@tanstack/react-query";
 
-import { VendorForm } from "@/components/forms/vendor-form"; // Import VendorForm
+import { VendorForm } from "@/components/forms/vendor-form";
+// Import VendorForm
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { supabase } from "@/lib/supabase"; // Need supabase to get user ID
+// Need supabase to get user ID
 import { vendorKeys } from "@/hooks/useVendors";
+import { supabase } from "@/lib/supabase";
 
 export default function AddVendorPage() {
   const router = useRouter();
@@ -40,11 +44,11 @@ export default function AddVendorPage() {
   const handleSuccess = (vendor: any) => {
     // Update the vendors cache to include the new vendor
     const previousVendors = queryClient.getQueryData(vendorKeys.lists()) || [];
-    queryClient.setQueryData(
-      vendorKeys.lists(),
-      [...(Array.isArray(previousVendors) ? previousVendors : []), vendor]
-    );
-    
+    queryClient.setQueryData(vendorKeys.lists(), [
+      ...(Array.isArray(previousVendors) ? previousVendors : []),
+      vendor,
+    ]);
+
     // Navigate to vendors list
     router.push("/vendors");
   };
@@ -88,12 +92,10 @@ export default function AddVendorPage() {
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? 'en';
+  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (
-        await import(`../../../locales/${effectiveLocale}.json`)
-      ).default,
+      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
     },
   };
-}; 
+};

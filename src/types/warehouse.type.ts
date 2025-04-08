@@ -15,4 +15,4 @@ export interface Warehouse {
 }
 
 // Define an explicit type for warehouse creation data
-export type WarehouseCreateData = Omit<Warehouse, "id" | "created_at"> & { userId: string }; 
+export type WarehouseCreateData = Omit<Warehouse, "id" | "created_at"> & { userId: string };

@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
+
 import createMDX from "@next/mdx";
+
 const { version } = require("./package.json");
 
 const nextConfig: NextConfig = {

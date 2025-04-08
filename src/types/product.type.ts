@@ -1,7 +1,4 @@
-import {
-  PRODUCT_CATEGORIES,
-  PRODUCT_STATUSES,
-} from "@/lib/constants/product-consts";
+import { PRODUCT_CATEGORIES, PRODUCT_STATUSES } from "@/lib/constants/product-consts";
 
 import { CommentProps } from "./comment.type";
 import { InvoiceProps } from "./invoice.type";

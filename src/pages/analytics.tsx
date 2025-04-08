@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { DateRange } from "react-day-picker";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { ar } from "date-fns/locale";
-import { CartesianGrid, XAxis, BarChart, Bar } from "recharts";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { DateRange } from "react-day-picker";
+import Link from "next/link";
+import { useRouter } from "next/router";
+
 import {
   format,
   startOfMonth,
@@ -18,19 +18,25 @@ import {
   endOfWeek,
   parseISO,
 } from "date-fns";
-import Link from "next/link";
+import { ar } from "date-fns/locale";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { CartesianGrid, XAxis, BarChart, Bar } from "recharts";
+
+import AnalyticsTable from "@/components/app/AnalyticsTable";
 // Components
 import { CurrentPuklaInfo } from "@/components/app/CurrentPuklaInfo";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import AnalyticsTable from "@/components/app/AnalyticsTable";
 import NoPuklas from "@/components/app/NoPuklas";
-// Store
-import { useMainStore } from "@/hooks/main.store";
-import useUserStore from "@/hooks/use-user-store";
-// Utils
-import { fetchPukla, fetchPuklasWithLinkCount } from "@/lib/operations";
-// UI Components
-import { Skeleton } from "@/components/ui/skeleton";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectValue,
@@ -38,30 +44,15 @@ import {
   SelectItem,
   SelectContent,
 } from "@/components/ui/select";
-
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardDescription,
-} from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
-import { supabase } from "@/lib/supabase";
+// UI Components
+import { Skeleton } from "@/components/ui/skeleton";
+// Store
+import { useMainStore } from "@/hooks/main.store";
+import useUserStore from "@/hooks/use-user-store";
 import { fakeAnalyticsData } from "@/lib/constants";
+// Utils
+import { fetchPukla, fetchPuklasWithLinkCount } from "@/lib/operations";
+import { supabase } from "@/lib/supabase";
 
 export default function Analytics() {
   const t = useTranslations();
@@ -149,7 +140,7 @@ export default function Analytics() {
         JSON.stringify({
           from: date.from.toISOString(),
           to: date.to.toISOString(),
-        })
+        }),
       );
     }
   }, [date]);
@@ -162,27 +153,17 @@ export default function Analytics() {
 
   const getShortFormattedDate = (date: Date) => {
     const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
-    const day =
-      locale === "ar"
-        ? date.getDate().toLocaleString("ar-SA")
-        : format(date, "d");
+    const day = locale === "ar" ? date.getDate().toLocaleString("ar-SA") : format(date, "d");
     const translatedMonth = t(`General.months.${month}`);
     // Keep full month name for Arabic, shortened for English
-    const displayMonth =
-      locale === "ar" ? translatedMonth : translatedMonth.slice(0, 3);
+    const displayMonth = locale === "ar" ? translatedMonth : translatedMonth.slice(0, 3);
     return `${displayMonth} ${day}`;
   };
 
   const getFormattedDate = (date: Date) => {
     const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
-    const day =
-      locale === "ar"
-        ? date.getDate().toLocaleString("ar-SA")
-        : format(date, "dd");
-    const year =
-      locale === "ar"
-        ? date.getFullYear().toLocaleString("ar-SA")
-        : format(date, "y");
+    const day = locale === "ar" ? date.getDate().toLocaleString("ar-SA") : format(date, "dd");
+    const year = locale === "ar" ? date.getFullYear().toLocaleString("ar-SA") : format(date, "y");
     return `${t(`General.months.${month}`)} ${day}, ${year}`;
   };
 
@@ -279,9 +260,7 @@ export default function Analytics() {
       const months = eachMonthOfInterval({ start: from, end: to });
       const grouped = clicks?.reduce((acc: any, click) => {
         const date = new Date(click.clicked_at);
-        const month = date
-          .toLocaleString("en-US", { month: "long" })
-          .toLowerCase();
+        const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
         const device = click.is_mobile ? "mobile" : "desktop";
         acc[month] = acc[month] || { desktop: 0, mobile: 0 };
         acc[month][device]++;
@@ -289,9 +268,7 @@ export default function Analytics() {
       }, {});
 
       chartData = months.map((date) => {
-        const month = date
-          .toLocaleString("en-US", { month: "long" })
-          .toLowerCase();
+        const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
         return {
           label: t(`General.months.${month}`),
           desktop: grouped[month]?.desktop || 0,
@@ -302,9 +279,7 @@ export default function Analytics() {
 
     // Process data for the table
     const tableData = clicks?.reduce((acc: any, click) => {
-      const locationKey = `${click.country || "Unknown"}-${
-        click.city || "Unknown"
-      }`;
+      const locationKey = `${click.country || "Unknown"}-${click.city || "Unknown"}`;
 
       if (!acc[locationKey]) {
         acc[locationKey] = {
@@ -336,21 +311,17 @@ export default function Analytics() {
 
   if (!puklaId) {
     return (
-      <div className="flex flex-col w-full items-center justify-center">
+      <div className="flex w-full flex-col items-center justify-center">
         {isLoading ? (
-          <Skeleton className="w-full h-[100px]" />
+          <Skeleton className="h-[100px] w-full" />
         ) : puklas.length > 0 ? (
-          <Card className="flex flex-col items-center justify-center w-full">
+          <Card className="flex w-full flex-col items-center justify-center">
             <CardContent headless className="w-full">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between w-full">
+              <div className="flex w-full flex-col items-center justify-between gap-4 md:flex-row">
                 <span className="text-2xl font-bold">
                   {t("Analytics.select_pukla_to_view_analytics")}
                 </span>
-                <Select
-                  onValueChange={(value) =>
-                    router.push(`/analytics?id=${value}`)
-                  }
-                >
+                <Select onValueChange={(value) => router.push(`/analytics?id=${value}`)}>
                   <SelectTrigger className="w-full max-w-[200px]">
                     <SelectValue placeholder={t("Analytics.select_pukla")} />
                   </SelectTrigger>
@@ -379,14 +350,10 @@ export default function Analytics() {
         description={t("SEO.analytics.description")}
       />
       <main className="flex flex-col items-center justify-between gap-4">
-        <CurrentPuklaInfo
-          pukla={selectedPukla}
-          allPuklas={puklas}
-          loading={isLoading}
-        />
-        <div className="flex flex-col gap-2 w-full">
+        <CurrentPuklaInfo pukla={selectedPukla} allPuklas={puklas} loading={isLoading} />
+        <div className="flex w-full flex-col gap-2">
           <Card className="w-full">
-            <CardHeader className="flex flex-col md:flex-row justify-between">
+            <CardHeader className="flex flex-col justify-between md:flex-row">
               <div className="flex flex-col gap-2">
                 <CardTitle>{t("Analytics.analytics_overview")}</CardTitle>
                 <CardDescription>{getDateRangeTitle()}</CardDescription>
@@ -402,8 +369,7 @@ export default function Analytics() {
                     {date?.from ? (
                       date.to ? (
                         <>
-                          {getFormattedDate(date.from)} -{" "}
-                          {getFormattedDate(date.to)}
+                          {getFormattedDate(date.from)} - {getFormattedDate(date.to)}
                         </>
                       ) : (
                         getFormattedDate(date.from)
@@ -427,22 +393,19 @@ export default function Analytics() {
               </Popover>
             </CardHeader>
             <CardContent className="">
-              <ChartComponent
-                data={data?.chartData || []}
-                config={chartConfig}
-              />
+              <ChartComponent data={data?.chartData || []} config={chartConfig} />
             </CardContent>
           </Card>
         </div>
 
         {user?.subscribed_to === "pukla_enterprise" ? (
-          <div className="flex flex-col gap-2 w-full">
+          <div className="flex w-full flex-col gap-2">
             <AnalyticsTable data={data?.tableData || []} />
           </div>
         ) : (
-          <div className="relative  min-h-[300px] w-full">
-            <Card className="relative z-[11] bg-transparent  min-h-[300px] flex flex-col justify-center items-center">
-              <CardHeader className="flex flex-col gap-2 justify-center items-center ">
+          <div className="relative min-h-[300px] w-full">
+            <Card className="relative z-[11] flex min-h-[300px] flex-col items-center justify-center bg-transparent">
+              <CardHeader className="flex flex-col items-center justify-center gap-2">
                 <CardTitle className="text-center">
                   {t("Billing.only_for_enterprise_users")}
                 </CardTitle>
@@ -456,10 +419,10 @@ export default function Analytics() {
                 </Link>
               </CardContent>
             </Card>
-            <div className="absolute top-0 w-full h-full bg-background z-[10]  [mask-image:linear-gradient(to_top,white,70%,transparent)]"></div>
+            <div className="bg-background absolute top-0 z-[10] h-full w-full [mask-image:linear-gradient(to_top,white,70%,transparent)]"></div>
 
             <AnalyticsTable
-              className="absolute top-0 w-full h-full !min-h-full opacity-30"
+              className="absolute top-0 h-full !min-h-full w-full opacity-30"
               hidePagination
               fake
               data={fakeAnalyticsData}
@@ -471,23 +434,12 @@ export default function Analytics() {
   );
 }
 
-export function ChartComponent({
-  data,
-  config,
-}: {
-  data: any[];
-  config: ChartConfig;
-}) {
+export function ChartComponent({ data, config }: { data: any[]; config: ChartConfig }) {
   return (
     <ChartContainer config={config} className="max-h-[300px] w-full">
       <BarChart accessibilityLayer data={data} margin={{ left: 12, right: 12 }}>
         <CartesianGrid vertical={false} />
-        <XAxis
-          dataKey="label"
-          tickLine={false}
-          axisLine={false}
-          tickMargin={8}
-        />
+        <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} />
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <Bar dataKey="desktop" fill={config.desktop.color} radius={4} />
         <Bar dataKey="mobile" fill={config.mobile.color} radius={4} />

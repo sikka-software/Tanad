@@ -1,22 +1,14 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
-import {
-  Building2,
-  Code,
-  MapPin,
-  Phone,
-  Mail,
-  User,
-  NotebookText,
-} from "lucide-react";
+import { Code, MapPin, Phone, Mail, User, NotebookText } from "lucide-react";
 
-import type { Branch } from "@/types/branch.type";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
 import { useBranches } from "@/hooks/useBranches";
-import { Badge } from "@/components/ui/badge";
+import type { Branch } from "@/types/branch.type";
 
 export default function BranchesPage() {
   const t = useTranslations("Branches");
@@ -107,12 +99,10 @@ export default function BranchesPage() {
 
 // Add getStaticProps for translations
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? 'en';
+  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (
-        await import(`../../../locales/${effectiveLocale}.json`)
-      ).default,
+      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
     },
   };
-}; 
+};

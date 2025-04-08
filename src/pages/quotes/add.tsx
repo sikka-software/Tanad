@@ -1,13 +1,11 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 
 import { QuoteForm } from "@/components/forms/quote-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
 export default function AddQuotePage() {
-  const router = useRouter();
   const t = useTranslations("Quotes");
 
   return (
@@ -37,4 +35,4 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
       messages: (await import(`../../../locales/${locale}.json`)).default,
     },
   };
-}; 
+};

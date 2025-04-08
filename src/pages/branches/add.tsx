@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+
 import { useQueryClient } from "@tanstack/react-query";
 
 import { BranchForm } from "@/components/forms/branch-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { supabase } from "@/lib/supabase";
 import { branchKeys } from "@/hooks/useBranches";
+import { supabase } from "@/lib/supabase";
 
 export default function AddBranchPage() {
   const router = useRouter();
@@ -39,10 +41,10 @@ export default function AddBranchPage() {
   const handleSuccess = (branch: any) => {
     // Update the branches cache to include the new branch
     const previousBranches = queryClient.getQueryData(branchKeys.lists()) || [];
-    queryClient.setQueryData(
-      branchKeys.lists(),
-      [...(Array.isArray(previousBranches) ? previousBranches : []), branch]
-    );
+    queryClient.setQueryData(branchKeys.lists(), [
+      ...(Array.isArray(previousBranches) ? previousBranches : []),
+      branch,
+    ]);
 
     // Navigate to branches list
     router.push("/branches");
@@ -69,10 +71,7 @@ export default function AddBranchPage() {
             {loadingUser ? (
               <p>{t("common.loading")}</p>
             ) : userId ? (
-              <BranchForm
-                userId={userId}
-                onSuccess={handleSuccess}
-              />
+              <BranchForm userId={userId} onSuccess={handleSuccess} />
             ) : (
               <p>{t("error.failed_to_load_user")}</p>
             )}
@@ -84,12 +83,10 @@ export default function AddBranchPage() {
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? 'en';
+  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (
-        await import(`../../../locales/${effectiveLocale}.json`)
-      ).default,
+      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
     },
   };
-}; 
+};

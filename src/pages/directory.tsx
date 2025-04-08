@@ -1,16 +1,18 @@
-import { useTranslations } from "next-intl";
-import { GetStaticPropsContext } from "next";
 import { useState, useEffect } from "react";
-import { useDebounce } from "use-debounce";
-import { Search } from "lucide-react";
-import { useRouter } from "next/router";
+
+import { GetStaticPropsContext } from "next";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
-// UI
-import { Input } from "@/components/ui/input";
+import { useRouter } from "next/router";
+
+import { Search } from "lucide-react";
+import { useDebounce } from "use-debounce";
+
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/lib/supabase";
 
 type Pukla = {
   id: string;
@@ -47,7 +49,7 @@ export default function DirectoryPage() {
             slug,
             avatar_url,
             created_at
-          `
+          `,
           )
           .eq("is_public", true)
           .order("created_at", { ascending: false });
@@ -55,7 +57,7 @@ export default function DirectoryPage() {
         console.log("puklas are ", query);
         if (debouncedSearchQuery) {
           query = query.or(
-            `title.ilike.%${debouncedSearchQuery}%,bio.ilike.%${debouncedSearchQuery}%`
+            `title.ilike.%${debouncedSearchQuery}%,bio.ilike.%${debouncedSearchQuery}%`,
           );
         }
 
@@ -65,7 +67,7 @@ export default function DirectoryPage() {
         setPuklas(
           data?.map((item) => ({
             ...item,
-          })) as Pukla[]
+          })) as Pukla[],
         );
       } catch (error) {
         console.error("Error fetching puklas:", error);
@@ -80,13 +82,13 @@ export default function DirectoryPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold mb-2">{t("Directory.title")}</h1>
+        <h1 className="mb-2 text-4xl font-bold">{t("Directory.title")}</h1>
         <p className="text-muted-foreground">{t("Directory.subtitle")}</p>
       </div>
 
-      <div className="max-w-xl mx-auto mb-8">
+      <div className="mx-auto mb-8 max-w-xl">
         <div className="relative">
-          <Search className="absolute size-4 start-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute start-3 top-1/2 size-4 -translate-y-1/2" />
           <Input
             placeholder={t("Directory.search_placeholder")}
             value={searchQuery}
@@ -97,12 +99,9 @@ export default function DirectoryPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <Card
-              key={i}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-            >
+            <Card key={i} className="cursor-pointer transition-shadow hover:shadow-lg">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   <Skeleton className="h-12 w-12 rounded-full" />
@@ -117,19 +116,16 @@ export default function DirectoryPage() {
         </div>
       ) : puklas.length > 0 ? (
         <>
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-4 text-sm">
             {t("Directory.total_puklas", { count: puklas.length })}
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {puklas.map((pukla) => (
               <Link href={`/${pukla.slug}`} target="_blank">
-                <Card
-                  key={pukla.id}
-                  className="cursor-pointer hover:shadow-lg transition-shadow"
-                >
+                <Card key={pukla.id} className="cursor-pointer transition-shadow hover:shadow-lg">
                   <CardContent className="p-6">
                     <div className="flex items-center gap-4">
-                      <div className="relative h-12 w-12 rounded-full overflow-hidden bg-muted">
+                      <div className="bg-muted relative h-12 w-12 overflow-hidden rounded-full">
                         {pukla.avatar_url ? (
                           <Image
                             src={pukla.avatar_url}
@@ -138,8 +134,8 @@ export default function DirectoryPage() {
                             className="object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                            <span className="text-xl font-semibold text-primary">
+                          <div className="bg-primary/10 flex h-full w-full items-center justify-center">
+                            <span className="text-primary text-xl font-semibold">
                               {pukla.title[0].toUpperCase()}
                             </span>
                           </div>
@@ -148,7 +144,7 @@ export default function DirectoryPage() {
                       <div>
                         <h3 className="font-semibold">{pukla.title}</h3>
 
-                        <p className="text-sm text-muted-foreground line-clamp-2">
+                        <p className="text-muted-foreground line-clamp-2 text-sm">
                           {pukla.bio || `puk.la/${pukla.slug}`}
                         </p>
                       </div>
@@ -160,13 +156,9 @@ export default function DirectoryPage() {
           </div>
         </>
       ) : (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-semibold mb-2">
-            {t("Directory.no_puklas_found")}
-          </h3>
-          <p className="text-muted-foreground">
-            {t("Directory.no_puklas_found_description")}
-          </p>
+        <div className="py-12 text-center">
+          <h3 className="mb-2 text-lg font-semibold">{t("Directory.no_puklas_found")}</h3>
+          <p className="text-muted-foreground">{t("Directory.no_puklas_found_description")}</p>
         </div>
       )}
     </div>

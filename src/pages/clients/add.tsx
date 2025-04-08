@@ -3,16 +3,16 @@ import { useState, useEffect } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useQueryClient } from "@tanstack/react-query";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { ClientForm, type ClientFormValues } from "@/components/forms/client-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { supabase } from "@/lib/supabase";
 import { clientKeys } from "@/hooks/useClients";
+import { supabase } from "@/lib/supabase";
 
 export default function AddClientPage() {
   const router = useRouter();
@@ -42,29 +42,33 @@ export default function AddClientPage() {
         throw new Error(t("Clients.error.not_authenticated"));
       }
 
-      const { data: newClient, error } = await supabase.from("clients").insert([
-        {
-          name: data.name.trim(),
-          email: data.email.trim(),
-          phone: data.phone.trim(),
-          company: data.company?.trim() || "",
-          address: data.address.trim(),
-          city: data.city.trim(),
-          state: data.state.trim(),
-          zip_code: data.zip_code.trim(),
-          notes: data.notes?.trim() || null,
-          user_id: userId,
-        },
-      ]).select().single();
+      const { data: newClient, error } = await supabase
+        .from("clients")
+        .insert([
+          {
+            name: data.name.trim(),
+            email: data.email.trim(),
+            phone: data.phone.trim(),
+            company: data.company?.trim() || "",
+            address: data.address.trim(),
+            city: data.city.trim(),
+            state: data.state.trim(),
+            zip_code: data.zip_code.trim(),
+            notes: data.notes?.trim() || null,
+            user_id: userId,
+          },
+        ])
+        .select()
+        .single();
 
       if (error) throw error;
 
       // Update the clients cache to include the new client
       const previousClients = queryClient.getQueryData(clientKeys.lists()) || [];
-      queryClient.setQueryData(
-        clientKeys.lists(),
-        [...(Array.isArray(previousClients) ? previousClients : []), newClient]
-      );
+      queryClient.setQueryData(clientKeys.lists(), [
+        ...(Array.isArray(previousClients) ? previousClients : []),
+        newClient,
+      ]);
 
       toast.success(t("Clients.success.title"), {
         description: t("Clients.success.created"),

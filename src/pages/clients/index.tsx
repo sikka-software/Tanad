@@ -8,7 +8,6 @@ import { Building2, Mail, Phone, MapPin } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import PageTitle from "@/components/ui/page-title";
 import { useClients } from "@/hooks/useClients";
 import { Client } from "@/types/client.type";
 

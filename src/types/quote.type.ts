@@ -1,4 +1,4 @@
-import { Client } from './client.type';
+import { Client } from "./client.type";
 
 export interface Quote {
   id: string;
@@ -25,8 +25,8 @@ export interface QuoteItem {
   unit_price: number;
 }
 
-export type QuoteCreateData = Omit<Quote, 'id' | 'created_at' | 'clients'> & {
+export type QuoteCreateData = Omit<Quote, "id" | "created_at" | "clients"> & {
   userId?: string;
 };
 
-export type QuoteItemCreateData = Omit<QuoteItem, 'id'>; 
+export type QuoteItemCreateData = Omit<QuoteItem, "id">;

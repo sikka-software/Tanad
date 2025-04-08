@@ -2,18 +2,20 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
 import {
-  Building2,
   Mail,
   Phone,
   MapPin,
   NotebookText, // Added NotebookText for notes
 } from "lucide-react";
 
-import type { Vendor } from "@/types/vendor.type"; // Import Vendor type
+// Import Vendor type
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
-import { useVendors } from "@/hooks/useVendors"; // Assuming a useVendors hook exists or will be created
+import { useVendors } from "@/hooks/useVendors";
+import type { Vendor } from "@/types/vendor.type";
+
+// Assuming a useVendors hook exists or will be created
 
 export default function VendorsPage() {
   const t = useTranslations("Vendors"); // Use Vendors namespace
@@ -25,9 +27,7 @@ export default function VendorsPage() {
       <CardHeader>
         <h3 className="text-lg font-semibold">{vendor.name}</h3>
         {/* Display company if available */}
-        {vendor.company && (
-          <p className="text-sm text-gray-500">{vendor.company}</p>
-        )}
+        {vendor.company && <p className="text-sm text-gray-500">{vendor.company}</p>}
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
@@ -94,12 +94,10 @@ export default function VendorsPage() {
 // Add getStaticProps for translations
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   // Ensure locale is defined, provide a default if necessary
-  const effectiveLocale = locale ?? 'en'; // Default to 'en' if locale is undefined
+  const effectiveLocale = locale ?? "en"; // Default to 'en' if locale is undefined
   return {
     props: {
-      messages: (
-        await import(`../../../locales/${effectiveLocale}.json`)
-      ).default,
+      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
     },
   };
-}; 
+};

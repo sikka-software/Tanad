@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useTheme } from "next-themes";
-import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/router";
-import { toast } from "sonner";
+
 import { GetStaticProps } from "next";
-// UI
+import { useLocale, useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
+import Image from "next/image";
+import { useRouter } from "next/router";
+
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import LanguageSwitcher from "@/components/ui/language-switcher";
-import ThemeSwitcher from "@/components/ui/theme-switcher";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-// Hooks
+import LanguageSwitcher from "@/components/ui/language-switcher";
+import ThemeSwitcher from "@/components/ui/theme-switcher";
 import useUserStore from "@/hooks/use-user-store";
-// Constants
 import { FREE_PLAN_ID } from "@/lib/constants";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import Image from "next/image";
+import { supabase } from "@/lib/supabase";
 
 export default function Auth() {
   const t = useTranslations();
@@ -78,22 +78,20 @@ export default function Auth() {
       // Create profile for the new user
       if (data.user) {
         try {
-          const { error: profileError } = await supabase
-            .from("profiles")
-            .insert([
-              {
-                id: data.user.id,
-                email: data.user.email,
-                full_name: "Default Full Name",
-                stripe_customer_id: null,
-                avatar_url: null,
-                address: null,
-                user_settings: { currency: "SAR", calendar_type: "gregorian" },
-                username: null,
-                subscribed_to: "pukla_free",
-                price_id: FREE_PLAN_ID,
-              },
-            ]);
+          const { error: profileError } = await supabase.from("profiles").insert([
+            {
+              id: data.user.id,
+              email: data.user.email,
+              full_name: "Default Full Name",
+              stripe_customer_id: null,
+              avatar_url: null,
+              address: null,
+              user_settings: { currency: "SAR", calendar_type: "gregorian" },
+              username: null,
+              subscribed_to: "pukla_free",
+              price_id: FREE_PLAN_ID,
+            },
+          ]);
 
           if (profileError) throw profileError;
         } catch (profileError: any) {
@@ -176,12 +174,9 @@ export default function Auth() {
   return (
     <div
       dir={lang === "ar" ? "rtl" : "ltr"}
-      className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8 items-center"
+      className="bg-background flex min-h-screen flex-col items-center justify-center py-12 sm:px-6 lg:px-8"
     >
-      <CustomPageMeta
-        title={t("SEO.auth.title")}
-        description={t("SEO.auth.description")}
-      />
+      <CustomPageMeta title={t("SEO.auth.title")} description={t("SEO.auth.description")} />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           Tanad
@@ -195,12 +190,10 @@ export default function Auth() {
         </div>
       </div>
       {isForgotPassword ? (
-        <div className="mt-8 flex flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-md  max-w-[90%] w-full">
+        <div className="mt-8 flex w-full max-w-[90%] flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-md">
           <Card>
             <CardHeader>
-              <CardTitle className="text-center">
-                {t("Auth.reset_password")}
-              </CardTitle>
+              <CardTitle className="text-center">{t("Auth.reset_password")}</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleResetPassword} className="space-y-6">
@@ -214,9 +207,7 @@ export default function Auth() {
                     className={lang === "ar" ? "text-right" : ""}
                     required
                     value={email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setEmail(e.target.value)
-                    }
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                   />
                 </div>
 
@@ -232,7 +223,7 @@ export default function Auth() {
               {/* Go back to sign in */}
               <button
                 onClick={() => setIsForgotPassword(false)}
-                className="w-full mt-4 text-sm text-muted-foreground cursor-pointer hover:text-primary"
+                className="text-muted-foreground hover:text-primary mt-4 w-full cursor-pointer text-sm"
               >
                 {t("Auth.go_back_to_sign_in")}
               </button>
@@ -244,20 +235,15 @@ export default function Auth() {
           </div>
         </div>
       ) : (
-        <div className="mt-8 flex flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-md  max-w-[90%] w-full">
+        <div className="mt-8 flex w-full max-w-[90%] flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-md">
           <Card>
             <CardHeader>
               <CardTitle className="text-center">
-                {isSignUp
-                  ? t("Auth.create_your_account")
-                  : t("Auth.sign_in_to_your_account")}
+                {isSignUp ? t("Auth.create_your_account") : t("Auth.sign_in_to_your_account")}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form
-                onSubmit={isSignUp ? handleSignUp : handleSignIn}
-                className="space-y-6"
-              >
+              <form onSubmit={isSignUp ? handleSignUp : handleSignIn} className="space-y-6">
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="email">{t("Auth.email_address")}</Label>
                   <Input
@@ -268,9 +254,7 @@ export default function Auth() {
                     className={lang === "ar" ? "text-right" : ""}
                     required
                     value={email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setEmail(e.target.value)
-                    }
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                   />
                 </div>
 
@@ -295,16 +279,12 @@ export default function Auth() {
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
                     >
-                      {showPassword ? (
-                        <Eye className="h-4 w-4" />
-                      ) : (
-                        <EyeOff className="h-4 w-4" />
-                      )}
+                      {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                     </Button>
                   </div>
                   {!isSignUp && (
                     <p
-                      className="text-sm text-muted-foreground cursor-pointer w-fit"
+                      className="text-muted-foreground w-fit cursor-pointer text-sm"
                       onClick={() => setIsForgotPassword(true)}
                     >
                       {t("Auth.forgot_password")}
@@ -313,9 +293,7 @@ export default function Auth() {
                 </div>
                 {isSignUp && (
                   <div className="flex flex-col gap-2">
-                    <Label htmlFor="confirm-password">
-                      {t("Auth.confirm_password")}
-                    </Label>
+                    <Label htmlFor="confirm-password">{t("Auth.confirm_password")}</Label>
                     <div className="relative">
                       <Input
                         id="confirm-password"
@@ -367,12 +345,10 @@ export default function Auth() {
               <div className="mt-6">
                 <button
                   onClick={() => setIsSignUp(!isSignUp)}
-                  className="w-full text-sm text-muted-foreground cursor-pointer hover:text-primary"
+                  className="text-muted-foreground hover:text-primary w-full cursor-pointer text-sm"
                 >
                   {isSignUp
-                    ? t("Auth.already_have_an_account") +
-                      " " +
-                      t("Auth.sign_in")
+                    ? t("Auth.already_have_an_account") + " " + t("Auth.sign_in")
                     : t("Auth.dont_have_an_account") + " " + t("Auth.sign_up")}
                 </button>
               </div>

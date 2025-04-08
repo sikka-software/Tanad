@@ -3,12 +3,12 @@ import { useTranslations } from "next-intl";
 
 import { format } from "date-fns";
 
-import { Invoice } from "@/types/invoice.type";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
 import { useInvoices } from "@/hooks/useInvoices";
+import { Invoice } from "@/types/invoice.type";
 
 function getStatusColor(status: string): string {
   switch (status.toLowerCase()) {

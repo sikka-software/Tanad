@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -63,15 +64,11 @@ export default function EditVendorPage() {
           <CardContent>
             {loadingUser ? (
               <p>{t("common.loading")}</p>
-            ) : userId && typeof vendorId === 'string' ? (
-              <VendorForm
-                userId={userId}
-                vendorId={vendorId}
-                onSuccess={handleSuccess}
-              />
+            ) : userId && typeof vendorId === "string" ? (
+              <VendorForm userId={userId} vendorId={vendorId} onSuccess={handleSuccess} />
             ) : (
               <p>
-                {typeof vendorId !== 'string'
+                {typeof vendorId !== "string"
                   ? t("error.invalid_vendor_id")
                   : t("error.failed_to_load_user")}
               </p>
@@ -84,16 +81,14 @@ export default function EditVendorPage() {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  return { paths: [], fallback: 'blocking' };
+  return { paths: [], fallback: "blocking" };
 };
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? 'en';
+  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (
-        await import(`../../../../locales/${effectiveLocale}.json`)
-      ).default,
+      messages: (await import(`../../../../locales/${effectiveLocale}.json`)).default,
     },
   };
-}; 
+};

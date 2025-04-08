@@ -1,10 +1,11 @@
-import { supabase } from '@/lib/supabase';
-import { Invoice, InvoiceCreateData } from '@/types/invoice.type';
+import { supabase } from "@/lib/supabase";
+import { Invoice, InvoiceCreateData } from "@/types/invoice.type";
 
 export async function fetchInvoices(): Promise<Invoice[]> {
   const { data, error } = await supabase
-    .from('invoices')
-    .select(`
+    .from("invoices")
+    .select(
+      `
       *,
       client:client_id (
         id,
@@ -13,12 +14,13 @@ export async function fetchInvoices(): Promise<Invoice[]> {
         email,
         phone
       )
-    `)
-    .order('created_at', { ascending: false });
+    `,
+    )
+    .order("created_at", { ascending: false });
 
   if (error) {
-    console.error('Error fetching invoices:', error);
-    throw new Error('Failed to fetch invoices');
+    console.error("Error fetching invoices:", error);
+    throw new Error("Failed to fetch invoices");
   }
 
   return data || [];
@@ -26,8 +28,9 @@ export async function fetchInvoices(): Promise<Invoice[]> {
 
 export async function fetchInvoiceById(id: string): Promise<Invoice> {
   const { data, error } = await supabase
-    .from('invoices')
-    .select(`
+    .from("invoices")
+    .select(
+      `
       *,
       client:client_id (
         id,
@@ -36,8 +39,9 @@ export async function fetchInvoiceById(id: string): Promise<Invoice> {
         email,
         phone
       )
-    `)
-    .eq('id', id)
+    `,
+    )
+    .eq("id", id)
     .single();
 
   if (error) {
@@ -55,28 +59,21 @@ export async function createInvoice(invoice: InvoiceCreateData): Promise<Invoice
     delete (dbInvoice as any).userId;
   }
 
-  const { data, error } = await supabase
-    .from('invoices')
-    .insert([dbInvoice])
-    .select()
-    .single();
+  const { data, error } = await supabase.from("invoices").insert([dbInvoice]).select().single();
 
   if (error) {
-    console.error('Error creating invoice:', error);
-    throw new Error('Failed to create invoice');
+    console.error("Error creating invoice:", error);
+    throw new Error("Failed to create invoice");
   }
 
   return data;
 }
 
-export async function updateInvoice(
-  id: string, 
-  invoice: Partial<Invoice>
-): Promise<Invoice> {
+export async function updateInvoice(id: string, invoice: Partial<Invoice>): Promise<Invoice> {
   const { data, error } = await supabase
-    .from('invoices')
+    .from("invoices")
     .update(invoice)
-    .eq('id', id)
+    .eq("id", id)
     .select()
     .single();
 
@@ -89,13 +86,10 @@ export async function updateInvoice(
 }
 
 export async function deleteInvoice(id: string): Promise<void> {
-  const { error } = await supabase
-    .from('invoices')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from("invoices").delete().eq("id", id);
 
   if (error) {
     console.error(`Error deleting invoice with id ${id}:`, error);
     throw new Error(`Failed to delete invoice with id ${id}`);
   }
-} 
+}

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+
 import { useQueryClient } from "@tanstack/react-query";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/components/forms/employee-form";
@@ -50,7 +51,7 @@ export default function AddEmployeePage() {
       const previousEmployees = queryClient.getQueryData(["employees"]) || [];
       queryClient.setQueryData(
         ["employees"],
-        [...(Array.isArray(previousEmployees) ? previousEmployees : []), newEmployee]
+        [...(Array.isArray(previousEmployees) ? previousEmployees : []), newEmployee],
       );
 
       router.push("/employees");

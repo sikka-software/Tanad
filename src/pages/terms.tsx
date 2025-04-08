@@ -1,7 +1,8 @@
-import { useTranslations, useLocale } from "next-intl";
 import { GetStaticProps } from "next";
-import TOSEn from "@/components/legal/tos-en.mdx";
+import { useTranslations, useLocale } from "next-intl";
+
 import TOSAr from "@/components/legal/tos-ar.mdx";
+import TOSEn from "@/components/legal/tos-en.mdx";
 
 export default function TermsPage() {
   const t = useTranslations();
@@ -10,8 +11,8 @@ export default function TermsPage() {
   return (
     <div className="flex flex-col items-center justify-center py-10">
       <div className="p-10 text-5xl font-bold">{t("General.tos")}</div>
-      <div className="max-w-7xl w-full p-10 md:p-20">
-        <div className="flex flex-row gap-1 text-lg font-bold mb-4">
+      <div className="w-full max-w-7xl p-10 md:p-20">
+        <div className="mb-4 flex flex-row gap-1 text-lg font-bold">
           <span>{t("General.last-updated")}:</span>
           <span>{"01/12/2023"}</span>
         </div>

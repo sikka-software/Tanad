@@ -1,8 +1,15 @@
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
+
+import { GetStaticProps } from "next";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/router";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-// UI
+
+import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
@@ -13,15 +20,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-// Components
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
-import { useBreakpoint } from "@/hooks/use-breakpoint";
-import { GetStaticProps } from "next";
-import { useTranslations, useLocale } from "next-intl";
 import {
   Form,
   FormControl,
@@ -30,7 +28,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useRouter } from "next/router";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useBreakpoint } from "@/hooks/use-breakpoint";
+
 export default function ReportPage() {
   const t = useTranslations();
   const lang = useLocale();
@@ -68,9 +69,7 @@ export default function ReportPage() {
     },
     {
       value: "privacyImpersonationHarassment",
-      label: t(
-        "ReportPage.reporter-reason-options.privacyImpersonationHarassment",
-      ),
+      label: t("ReportPage.reporter-reason-options.privacyImpersonationHarassment"),
     },
     {
       value: "selfHarm",
@@ -174,10 +173,7 @@ export default function ReportPage() {
 
   return (
     <div className="flex flex-col items-center justify-center py-10 pt-0 pb-32">
-      <CustomPageMeta
-        title={t("SEO.report.title")}
-        description={t("SEO.report.description")}
-      />
+      <CustomPageMeta title={t("SEO.report.title")} description={t("SEO.report.description")} />
       <div className="flex flex-col items-center justify-center gap-2 p-10 text-center">
         <CustomMotionDiv className="py-10 pb-0 text-5xl leading-tight font-bold">
           {t("ReportPage.page-title")}
@@ -186,10 +182,7 @@ export default function ReportPage() {
           {t("ReportPage.page-subtitle")}
         </CustomMotionDiv>
       </div>
-      <CustomMotionDiv
-        delay={0.2}
-        className="w-full max-w-lg p-4 pt-0 drop-shadow-xl md:p-2"
-      >
+      <CustomMotionDiv delay={0.2} className="w-full max-w-lg p-4 pt-0 drop-shadow-xl md:p-2">
         <Card>
           <CardContent headless>
             <Form {...form}>
@@ -301,9 +294,7 @@ export default function ReportPage() {
                   name="comments"
                   render={({ field }) => (
                     <FormItem className="w-full">
-                      <FormLabel>
-                        {t("ReportPage.additional-comments.label")}
-                      </FormLabel>
+                      <FormLabel>{t("ReportPage.additional-comments.label")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -323,12 +314,8 @@ export default function ReportPage() {
       <Dialog open={openSuccessDialog} onOpenChange={setOpenSuccessDialog}>
         <DialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
           <DialogHeader>
-            <DialogTitle>
-              {t("ReportPage.report-form.submitted.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("ReportPage.report-form.submitted.subtitle")}
-            </DialogDescription>
+            <DialogTitle>{t("ReportPage.report-form.submitted.title")}</DialogTitle>
+            <DialogDescription>{t("ReportPage.report-form.submitted.subtitle")}</DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>

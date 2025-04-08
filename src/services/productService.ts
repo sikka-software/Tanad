@@ -4,14 +4,14 @@ import { Product } from "@/types/product.type";
 export async function fetchProducts(): Promise<Product[]> {
   try {
     const { data: userData, error: userError } = await supabase.auth.getUser();
-    
+
     if (userError) {
       console.error("Error getting user:", userError);
       throw new Error(userError.message);
     }
-    
+
     const userId = userData.user.id;
-    
+
     // First try with user_id filtering
     const { data, error } = await supabase
       .from("products")
@@ -21,18 +21,19 @@ export async function fetchProducts(): Promise<Product[]> {
 
     if (error) {
       // If error is about the column not existing, fetch all products
-      if (error.code === "42703") { // PostgreSQL code for undefined_column
+      if (error.code === "42703") {
+        // PostgreSQL code for undefined_column
         console.warn("user_id column not found, fetching all products");
         const { data: allData, error: allError } = await supabase
           .from("products")
           .select("*")
           .order("created_at", { ascending: false });
-          
+
         if (allError) {
           console.error("Error fetching all products:", allError);
           throw new Error(allError.message);
         }
-        
+
         return allData || [];
       } else {
         console.error("Error fetching products:", error);
@@ -61,20 +62,20 @@ export async function fetchProductById(id: string): Promise<Product> {
 export async function createProduct(product: Omit<Product, "id" | "created_at">): Promise<Product> {
   try {
     const { data: userData, error: userError } = await supabase.auth.getUser();
-    
+
     if (userError) {
       console.error("Error getting user:", userError);
       throw new Error(userError.message);
     }
-    
+
     const userId = userData.user.id;
-    
+
     // Try to insert with user_id
     const productToInsert = {
       ...product,
       user_id: userId, // Use snake_case for database column name
     };
-    
+
     const { data, error } = await supabase
       .from("products")
       .insert([productToInsert])
@@ -83,23 +84,24 @@ export async function createProduct(product: Omit<Product, "id" | "created_at">)
 
     if (error) {
       // If error is about the column not existing, insert without user_id
-      if (error.code === "42703") { // PostgreSQL code for undefined_column
+      if (error.code === "42703") {
+        // PostgreSQL code for undefined_column
         console.warn("user_id column not found, inserting without user_id");
-        
+
         // Remove the user_id from the product object
         const { user_id, ...productWithoutUserId } = productToInsert;
-        
+
         const { data: insertData, error: insertError } = await supabase
           .from("products")
           .insert([productWithoutUserId])
           .select()
           .single();
-          
+
         if (insertError) {
           console.error("Error creating product without user_id:", insertError);
           throw new Error(insertError.message);
         }
-        
+
         return insertData;
       } else {
         console.error("Error creating product:", error);

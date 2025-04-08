@@ -2,14 +2,14 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
 import { format } from "date-fns";
-import { Building2, MapPin, Calendar, Briefcase, DollarSign } from "lucide-react";
+import { Building2, MapPin, Calendar, DollarSign } from "lucide-react";
 
-import { Job } from "@/types/job.type";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
 import { useJobs } from "@/hooks/useJobs";
+import { Job } from "@/types/job.type";
 
 export default function JobsPage() {
   const t = useTranslations("Jobs");

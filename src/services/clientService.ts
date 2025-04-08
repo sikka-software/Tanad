@@ -1,26 +1,22 @@
-import { supabase } from '@/lib/supabase';
-import { Client, ClientCreateData } from '@/types/client.type';
+import { supabase } from "@/lib/supabase";
+import { Client, ClientCreateData } from "@/types/client.type";
 
 export async function fetchClients(): Promise<Client[]> {
   const { data, error } = await supabase
-    .from('clients')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .from("clients")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   if (error) {
-    console.error('Error fetching clients:', error);
-    throw new Error('Failed to fetch clients');
+    console.error("Error fetching clients:", error);
+    throw new Error("Failed to fetch clients");
   }
 
   return data || [];
 }
 
 export async function fetchClientById(id: string): Promise<Client> {
-  const { data, error } = await supabase
-    .from('clients')
-    .select('*')
-    .eq('id', id)
-    .single();
+  const { data, error } = await supabase.from("clients").select("*").eq("id", id).single();
 
   if (error) {
     console.error(`Error fetching client with id ${id}:`, error);
@@ -38,15 +34,11 @@ export async function createClient(client: ClientCreateData) {
     delete (dbClient as any).userId;
   }
 
-  const { data, error } = await supabase
-    .from('clients')
-    .insert([dbClient])
-    .select()
-    .single();
+  const { data, error } = await supabase.from("clients").insert([dbClient]).select().single();
 
   if (error) {
-    console.error('Error creating client:', error);
-    throw new Error('Failed to create client');
+    console.error("Error creating client:", error);
+    throw new Error("Failed to create client");
   }
 
   return data;
@@ -54,9 +46,9 @@ export async function createClient(client: ClientCreateData) {
 
 export async function updateClient(id: string, client: Partial<Client>) {
   const { data, error } = await supabase
-    .from('clients')
+    .from("clients")
     .update(client)
-    .eq('id', id)
+    .eq("id", id)
     .select()
     .single();
 
@@ -69,13 +61,10 @@ export async function updateClient(id: string, client: Partial<Client>) {
 }
 
 export async function deleteClient(id: string) {
-  const { error } = await supabase
-    .from('clients')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from("clients").delete().eq("id", id);
 
   if (error) {
     console.error(`Error deleting client with id ${id}:`, error);
     throw new Error(`Failed to delete client with id ${id}`);
   }
-} 
+}

@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+
 import { useQueryClient } from "@tanstack/react-query";
 
 import { ProductForm } from "@/components/forms/product-form";
@@ -28,9 +29,9 @@ export default function AddProductPage() {
     const previousProducts = queryClient.getQueryData(["products"]) || [];
     queryClient.setQueryData(
       ["products"],
-      [...(Array.isArray(previousProducts) ? previousProducts : []), newProduct]
+      [...(Array.isArray(previousProducts) ? previousProducts : []), newProduct],
     );
-    
+
     // Navigate to products list
     router.push("/products");
   };

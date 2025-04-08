@@ -1,7 +1,16 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+
+// Hooks
+import { GetStaticProps } from "next";
+import { useLocale, useTranslations } from "next-intl";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
+import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
+// Components
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 // UI
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,13 +21,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-// Components
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
-// Hooks
-import { GetStaticProps } from "next";
 import {
   Form,
   FormControl,
@@ -27,7 +29,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useLocale, useTranslations } from "next-intl";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function AppealPage() {
   const t = useTranslations();
@@ -91,10 +94,7 @@ export default function AppealPage() {
 
   return (
     <div className="flex flex-col items-center justify-center py-10 pb-32">
-      <CustomPageMeta
-        title={t("SEO.appeal.title")}
-        description={t("SEO.appeal.description")}
-      />
+      <CustomPageMeta title={t("SEO.appeal.title")} description={t("SEO.appeal.description")} />
       <div className="flex flex-col items-center justify-center gap-2 p-10 text-center">
         <CustomMotionDiv className="py-10 pb-0 text-5xl font-bold">
           {t("AppealPage.page-title")}
@@ -103,10 +103,7 @@ export default function AppealPage() {
           {t("AppealPage.page-subtitle")}
         </CustomMotionDiv>
       </div>
-      <CustomMotionDiv
-        delay={0.2}
-        className="w-full max-w-lg p-4 pt-0 drop-shadow-xl md:p-2"
-      >
+      <CustomMotionDiv delay={0.2} className="w-full max-w-lg p-4 pt-0 drop-shadow-xl md:p-2">
         <Card>
           <CardContent headless>
             <Form {...form}>
@@ -175,9 +172,7 @@ export default function AppealPage() {
                   name="comments"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
-                        {t("AppealPage.additional-comments.label")}
-                      </FormLabel>
+                      <FormLabel>{t("AppealPage.additional-comments.label")}</FormLabel>
                       <FormControl>
                         <Textarea {...field} />
                       </FormControl>
@@ -197,12 +192,8 @@ export default function AppealPage() {
       <Dialog open={openSuccessDialog} onOpenChange={setOpenSuccessDialog}>
         <DialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
           <DialogHeader>
-            <DialogTitle>
-              {t("AppealPage.appeal-form.submitted.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("AppealPage.appeal-form.submitted.subtitle")}
-            </DialogDescription>
+            <DialogTitle>{t("AppealPage.appeal-form.submitted.title")}</DialogTitle>
+            <DialogDescription>{t("AppealPage.appeal-form.submitted.subtitle")}</DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>

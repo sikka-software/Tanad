@@ -1,24 +1,26 @@
 // This page is used to reset the password. the url will be coming from supabase email and it will have a token
 // we will use the token to reset the password
-
-import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { useTheme } from "next-themes";
+import { useState } from "react";
+
+import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { useTheme } from "next-themes";
+import Image from "next/image";
+import { useRouter } from "next/router";
+
 import { Loader2 } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
 import { supabase } from "@/lib/supabase";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useSearchParams } from "next/navigation";
-import { GetStaticProps } from "next";
-import Image from "next/image";
+
 const ResetPassword = () => {
   const t = useTranslations("Auth");
   const lang = useLocale();
@@ -68,7 +70,7 @@ const ResetPassword = () => {
   return (
     <div
       dir={lang === "ar" ? "rtl" : "ltr"}
-      className="min-h-screen bg-background flex flex-col justify-center py-12 sm:px-6 lg:px-8 items-center"
+      className="bg-background flex min-h-screen flex-col items-center justify-center py-12 sm:px-6 lg:px-8"
     >
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
@@ -82,7 +84,7 @@ const ResetPassword = () => {
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-md  max-w-[90%] w-full">
+      <div className="mt-8 flex w-full max-w-[90%] flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-md">
         <Card>
           <CardHeader>
             <CardTitle className="text-center">{t("reset_password")}</CardTitle>
@@ -110,19 +112,13 @@ const ResetPassword = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
                   >
-                    {showPassword ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
-                    )}
+                    {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="confirm-password">
-                  {t("confirm_password")}
-                </Label>
+                <Label htmlFor="confirm-password">{t("confirm_password")}</Label>
                 <div className="relative">
                   <Input
                     id="confirm-password"
@@ -142,11 +138,7 @@ const ResetPassword = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
                   >
-                    {showPassword ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
-                    )}
+                    {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
@@ -162,10 +154,10 @@ const ResetPassword = () => {
               </div>
             </form>
 
-            <div className="flex flex-col mt-4 justify-center items-center">
+            <div className="mt-4 flex flex-col items-center justify-center">
               <p
                 onClick={() => router.push("/auth")}
-                className="text-sm text-center text-muted-foreground cursor-pointer hover:text-primary"
+                className="text-muted-foreground hover:text-primary cursor-pointer text-center text-sm"
               >
                 {t("go_back_to_sign_in")}
               </p>

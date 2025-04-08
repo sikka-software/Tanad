@@ -1,33 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+
+import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/router";
+
+import ActionLayout from "@/components/app/ActionLayout";
+import ActionLock from "@/components/app/ActionLock";
+import ActionThumbnail from "@/components/app/ActionThumbnail";
 // Components
 import ConfirmDeleteLink from "@/components/app/ConfirmDelete";
+import { CurrentPuklaInfo } from "@/components/app/CurrentPuklaInfo";
+import ActionHighlight from "@/components/app/HighlightLink";
 import LoadingOverlay from "@/components/app/LoadingOverlay";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import SingleHeader from "@/components/app/SingleHeader";
-import SingleLink from "@/components/app/SingleLink";
-import { SortableList } from "@/components/app/SortableList";
 import { NewLinkBox } from "@/components/app/NewLinkBox";
 import { NewLinkContent } from "@/components/app/NewLinkContent";
 import { NewLinkTypes } from "@/components/app/NewLinkTypes";
-// Hooks
-import { usePuklaStore } from "@/hooks/use-pukla-store";
-import useUserStore from "@/hooks/use-user-store";
-// Types
-import { LinkItemProps } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
-import { CurrentPuklaInfo } from "@/components/app/CurrentPuklaInfo";
-import {
-  deletePuklaItem,
-  fetchPuklaItems,
-  fetchPukla,
-  updateItemPositions,
-  fetchPuklasWithLinkCount,
-} from "@/lib/operations";
-import { GetStaticProps } from "next";
+import NoPuklas from "@/components/app/NoPuklas";
+import SingleHeader from "@/components/app/SingleHeader";
+import SingleLink from "@/components/app/SingleLink";
+import { SortableList } from "@/components/app/SortableList";
+import UpgradeDialog from "@/components/app/UpgradeDialog";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
   SelectValue,
@@ -35,13 +29,21 @@ import {
   SelectItem,
   SelectContent,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useMainStore } from "@/hooks/main.store";
-import NoPuklas from "@/components/app/NoPuklas";
-import ActionLock from "@/components/app/ActionLock";
-import ActionLayout from "@/components/app/ActionLayout";
-import ActionHighlight from "@/components/app/HighlightLink";
-import ActionThumbnail from "@/components/app/ActionThumbnail";
-import UpgradeDialog from "@/components/app/UpgradeDialog";
+// Hooks
+import { usePuklaStore } from "@/hooks/use-pukla-store";
+import useUserStore from "@/hooks/use-user-store";
+import {
+  deletePuklaItem,
+  fetchPuklaItems,
+  fetchPukla,
+  updateItemPositions,
+  fetchPuklasWithLinkCount,
+} from "@/lib/operations";
+import { supabase } from "@/lib/supabase";
+// Types
+import { LinkItemProps } from "@/lib/types";
 
 export default function Editor() {
   const t = useTranslations();
@@ -149,9 +151,7 @@ export default function Editor() {
     try {
       // Update loading state in the store
       setPuklaItems((items) =>
-        items.map((item) =>
-          item.id === id ? { ...item, isDeleting: true } : item
-        )
+        items.map((item) => (item.id === id ? { ...item, isDeleting: true } : item)),
       );
 
       await deletePuklaItem(id, puklaId, {
@@ -167,9 +167,7 @@ export default function Editor() {
       console.error("Error deleting item:", error);
       // Reset loading state on error
       setPuklaItems((items) =>
-        items.map((item) =>
-          item.id === id ? { ...item, isDeleting: false } : item
-        )
+        items.map((item) => (item.id === id ? { ...item, isDeleting: false } : item)),
       );
     }
   };
@@ -202,22 +200,15 @@ export default function Editor() {
             onChange={(value) => {
               setPuklaItems((items) =>
                 items.map((item) =>
-                  item.id === item.id
-                    ? { ...item, item_highlight: value }
-                    : item
-                )
+                  item.id === item.id ? { ...item, item_highlight: value } : item,
+                ),
               );
             }}
           />
         );
 
       case "lock":
-        return (
-          <ActionLock
-            onUpgradeNeeded={() => setOpenUpgradeDialog(true)}
-            linkId={item.id}
-          />
-        );
+        return <ActionLock onUpgradeNeeded={() => setOpenUpgradeDialog(true)} linkId={item.id} />;
 
       case "layout":
         return (
@@ -277,19 +268,17 @@ export default function Editor() {
 
   if (!puklaId) {
     return (
-      <div className="flex flex-col w-full items-center justify-center ">
+      <div className="flex w-full flex-col items-center justify-center">
         {isFetchingPuklas ? (
-          <Skeleton className="w-full h-[100px]" />
+          <Skeleton className="h-[100px] w-full" />
         ) : puklas.length > 0 ? (
-          <Card className="flex flex-col items-center justify-center w-full">
+          <Card className="flex w-full flex-col items-center justify-center">
             <CardContent headless className="w-full">
-              <div className="flex flex-col md:flex-row gap-4 items-center justify-between w-full">
+              <div className="flex w-full flex-col items-center justify-between gap-4 md:flex-row">
                 <span className="text-2xl font-bold">
                   {t("Editor.select_pukla_to_start_editing")}
                 </span>
-                <Select
-                  onValueChange={(value) => router.push(`/editor?id=${value}`)}
-                >
+                <Select onValueChange={(value) => router.push(`/editor?id=${value}`)}>
                   <SelectTrigger className="w-full max-w-[200px]">
                     <SelectValue placeholder={t("Editor.select_pukla")} />
                   </SelectTrigger>
@@ -322,11 +311,7 @@ export default function Editor() {
         })}
       />
 
-      <CurrentPuklaInfo
-        pukla={selectedPukla}
-        allPuklas={puklas}
-        loading={isLoading}
-      />
+      <CurrentPuklaInfo pukla={selectedPukla} allPuklas={puklas} loading={isLoading} />
       <div className="flex w-full flex-col gap-10">
         <NewLinkBox
           onAddHeader={() => {
@@ -369,7 +354,7 @@ export default function Editor() {
 
       {/* <Layout> */}
       {/* <ContentLayout> */}
-      <div className="pb-20 w-full">
+      <div className="w-full pb-20">
         {isItemsLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-[68px] w-full rounded-lg" />
@@ -377,7 +362,7 @@ export default function Editor() {
             <Skeleton className="h-[68px] w-full rounded-lg" />
           </div>
         ) : puklaItems.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+          <div className="text-muted-foreground flex flex-col items-center justify-center py-8">
             <p>{t("Editor.no_items_found")}</p>
           </div>
         ) : (
@@ -400,29 +385,17 @@ export default function Editor() {
               if (item.item_type === "header") {
                 return (
                   <div className="relative">
-                    <SingleHeader
-                      puklaId={puklaId}
-                      isDeleting={item.isDeleting}
-                      {...itemProps}
-                    >
-                      {itemAction?.id === item.id &&
-                        itemAction?.action === "delete" && (
-                          <ConfirmDeleteLink
-                            title={item.title}
-                            item_type="header"
-                            onDelete={() =>
-                              handleDelete(item.id, puklaId, "header")
-                            }
-                            onCancel={() => setItemAction(item.id, null)}
-                          />
-                        )}
+                    <SingleHeader puklaId={puklaId} isDeleting={item.isDeleting} {...itemProps}>
+                      {itemAction?.id === item.id && itemAction?.action === "delete" && (
+                        <ConfirmDeleteLink
+                          title={item.title}
+                          item_type="header"
+                          onDelete={() => handleDelete(item.id, puklaId, "header")}
+                          onCancel={() => setItemAction(item.id, null)}
+                        />
+                      )}
                     </SingleHeader>
-                    {
-                      <LoadingOverlay
-                        dir={direction}
-                        isLoading={loadingDelete === item.id}
-                      />
-                    }
+                    {<LoadingOverlay dir={direction} isLoading={loadingDelete === item.id} />}
                   </div>
                 );
               } else if (item.item_type === "link") {
@@ -439,9 +412,7 @@ export default function Editor() {
                     {
                       <LoadingOverlay
                         dir={direction}
-                        isLoading={
-                          loadingDelete === item.id || isLinkLoading === item.id
-                        }
+                        isLoading={loadingDelete === item.id || isLinkLoading === item.id}
                       />
                     }
                   </div>
