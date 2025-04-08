@@ -1,11 +1,9 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -43,13 +41,13 @@ const productSchema = z.object({
 export type ProductFormValues = z.infer<typeof productSchema>;
 
 interface ProductFormProps {
-  onSuccess?: (product: any) => void;
+  onSubmit: (data: ProductFormValues) => Promise<void>;
+  loading?: boolean;
 }
 
-export function ProductForm({ onSuccess }: ProductFormProps) {
+export function ProductForm({ onSubmit, loading = false }: ProductFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const t = useTranslations("Products");
+  const t = useTranslations();
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -62,48 +60,6 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
     },
   });
 
-  const onSubmit = async (data: ProductFormValues) => {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/products/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: data.name.trim(),
-          description: data.description?.trim() || null,
-          price: data.price,
-          sku: data.sku?.trim() || null,
-          stock_quantity: data.stock_quantity,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t("error.create"));
-      }
-
-      const result = await response.json();
-
-      toast.success(t("success.title"), {
-        description: t("success.created")
-      });
-
-      if (onSuccess) {
-        onSuccess(result.product);
-      } else {
-        router.push("/products");
-      }
-    } catch (error) {
-      toast.error(t("error.title"), {
-        description: error instanceof Error ? error.message : t("error.create"),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -112,9 +68,9 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("product_name")} *</FormLabel>
+              <FormLabel>{t("Products.product_name")} *</FormLabel>
               <FormControl>
-                <Input placeholder={t("enter_product_name")} {...field} />
+                <Input placeholder={t("Products.enter_product_name")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -126,9 +82,9 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("description")}</FormLabel>
+              <FormLabel>{t("Products.description")}</FormLabel>
               <FormControl>
-                <Textarea placeholder={t("enter_description")} rows={4} {...field} />
+                <Textarea placeholder={t("Products.enter_description")} rows={4} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -141,7 +97,7 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("price")} *</FormLabel>
+                <FormLabel>{t("Products.price")} *</FormLabel>
                 <FormControl>
                   <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
                 </FormControl>
@@ -155,7 +111,7 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
             name="stock_quantity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("stock_quantity")} *</FormLabel>
+                <FormLabel>{t("Products.stock_quantity")} *</FormLabel>
                 <FormControl>
                   <Input type="number" min="0" placeholder="0" {...field} />
                 </FormControl>
@@ -170,23 +126,14 @@ export function ProductForm({ onSuccess }: ProductFormProps) {
           name="sku"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("sku")}</FormLabel>
+              <FormLabel>{t("Products.sku")}</FormLabel>
               <FormControl>
-                <Input placeholder={t("enter_sku")} {...field} />
+                <Input placeholder={t("Products.enter_sku")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        <div className="flex justify-end gap-4 pt-4">
-          <Button type="button" variant="outline" onClick={() => router.push("/products")}>
-            {t("cancel")}
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading ? t("creating_product") : t("create_product")}
-          </Button>
-        </div>
       </form>
     </Form>
   );

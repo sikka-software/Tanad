@@ -42,19 +42,19 @@ const PageSearchAndFilter = ({
           <Input
             type="text"
             placeholder={searchPlaceholder}
-            className="bg-muted/50 h-9 w-full pl-9 focus-visible:ring-1"
+            className="bg-muted/50 h-9 w-full ps-9 focus-visible:ring-1"
             onChange={(e) => onSearch?.(e.target.value)}
           />
-          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+          <Search className="text-muted-foreground absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2" />
         </div>
       </div>
 
       {/* Right section: Filters & Create Button */}
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" className="h-9">
-          <Filter className="mr-2 h-4 w-4" />
+          <Filter className="me-2 h-4 w-4" />
           <span className="hidden sm:inline">Filters</span>
-          <ChevronDown className="ml-1 h-4 w-4" />
+          <ChevronDown className="ms-1 h-4 w-4" />
         </Button>
 
         <Button variant="outline" size="sm" className="h-9 px-2 sm:px-3">
@@ -64,7 +64,7 @@ const PageSearchAndFilter = ({
 
         <Button size="sm" className="h-9">
           <Link href={createHref} className="flex items-center">
-            <Plus className="mr-1 h-4 w-4" />
+            <Plus className="me-1 h-4 w-4" />
             <span>{createLabel}</span>
           </Link>
         </Button>
