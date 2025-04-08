@@ -1516,6 +1516,15 @@
   "Salaries": {
     "title": "Salaries"
   },
+  "HumanResources": {
+    "title": "Human Resources"
+  },
+  "Administration": {
+    "title": "Administration"
+  },
+  "Accounting": {
+    "title": "Accounting"
+  },
   "Jobs": {
     "title": "Jobs",
     "create_job": "Create Job",

@@ -159,9 +159,9 @@ export function AppSidebar() {
               <SidebarMenu className="mt-4 gap-2">
                 {menuGroups.map((group, groupIndex) => (
                   <div key={groupIndex}>
-                    {group.groupLabel && (
+                    {state !== "collapsed" && group.groupLabelTranslationKey && (
                       <div className="text-muted-foreground px-3 py-2 text-xs font-medium">
-                        {t(group.groupLabel)}
+                        {t(group.groupLabelTranslationKey)}
                       </div>
                     )}
                     <SidebarSeparator className="mb-2" />
@@ -174,7 +174,10 @@ export function AppSidebar() {
                                 className="w-full p-0 hover:no-underline"
                                 hideChevron
                               >
-                                <SidebarMenuButton className="w-full">
+                                <SidebarMenuButton
+                                  className="w-full"
+                                  tooltip={t(menu.translationKey)}
+                                >
                                   {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
                                   <span>{t(menu.translationKey)}</span>
                                   <ChevronDown className="accordion-chevron ms-auto" />
@@ -269,8 +272,8 @@ export function AppSidebar() {
                     side="top"
                     className={
                       !isMobile && state === "collapsed"
-                        ? "w-[--radix-popper-content-width]"
-                        : "w-[--radix-popper-anchor-width]"
+                        ? "w-[var(--radix-popper-content-width)]"
+                        : "w-[var(--radix-popper-anchor-width)]"
                     }
                     align="start"
                   >

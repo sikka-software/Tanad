@@ -30,11 +30,12 @@ type Menu = {
 
 type Group = {
   groupLabel?: string;
+  groupLabelTranslationKey?: string;
   menus: Menu[];
 };
 
 // Main menu items
-function getMainMenus(pathname: string) {
+function getAdministrationMenus(pathname: string) {
   return [
     {
       href: "/dashboard",
@@ -50,36 +51,7 @@ function getMainMenus(pathname: string) {
       icon: BarChart,
       active: pathname === "/analytics",
     },
-    {
-      href: "/products",
-      label: "Sales",
-      translationKey: "Sales.title",
-      icon: Package,
-      active: pathname === "/products",
-      submenus: [
-        {
-          href: "/products",
-          label: "Products",
-          translationKey: "Products.title",
-          active: pathname === "/products",
-          plusAction: "/products/add",
-        },
-        {
-          href: "/invoices",
-          label: "Invoices",
-          translationKey: "Invoices.title",
-          active: pathname === "/invoices",
-          plusAction: "/invoices/add",
-        },
-        {
-          href: "/quotes",
-          label: "Quotes",
-          translationKey: "Quotes.title",
-          active: pathname === "/quotes",
-          plusAction: "/quotes/add",
-        },
-      ],
-    },
+
     {
       href: "/contacts",
       label: "Contacts",
@@ -129,6 +101,42 @@ function getMainMenus(pathname: string) {
           translationKey: "Branches.title",
           active: pathname.startsWith("/branches"),
           plusAction: "/branches/add",
+        },
+      ],
+    },
+  ];
+}
+
+// Accounting menu items
+function getAccountingMenus(pathname: string) {
+  return [
+    {
+      href: "/products",
+      label: "Sales",
+      translationKey: "Sales.title",
+      icon: Package,
+      active: pathname === "/products",
+      submenus: [
+        {
+          href: "/products",
+          label: "Products",
+          translationKey: "Products.title",
+          active: pathname === "/products",
+          plusAction: "/products/add",
+        },
+        {
+          href: "/invoices",
+          label: "Invoices",
+          translationKey: "Invoices.title",
+          active: pathname === "/invoices",
+          plusAction: "/invoices/add",
+        },
+        {
+          href: "/quotes",
+          label: "Quotes",
+          translationKey: "Quotes.title",
+          active: pathname === "/quotes",
+          plusAction: "/quotes/add",
         },
       ],
     },
@@ -204,16 +212,15 @@ function getHrMenus(pathname: string) {
           plusAction: "/jobs/add",
           active: pathname === "/jobs",
         },
+        {
+          href: "/applicants",
+          label: "Applicants",
+          translationKey: "Applicants.title",
+          active: pathname === "/applicants",
+        },
       ],
     },
 
-    {
-      href: "/applicants",
-      label: "Applicants",
-      translationKey: "Applicants.title",
-      icon: Users,
-      active: pathname === "/applicants",
-    },
     {
       href: "/attendance",
       label: "Attendance",
@@ -253,14 +260,23 @@ function getSettingsMenus(pathname: string) {
 export function getMenuList(pathname: string): Group[] {
   return [
     {
-      menus: getMainMenus(pathname),
+      groupLabel: "Administration",
+      groupLabelTranslationKey: "Administration.title",
+      menus: getAdministrationMenus(pathname),
+    },
+    {
+      groupLabel: "Accounting",
+      groupLabelTranslationKey: "Accounting.title",
+      menus: getAccountingMenus(pathname),
     },
     {
       groupLabel: "Human Resources",
+      groupLabelTranslationKey: "HumanResources.title",
       menus: getHrMenus(pathname),
     },
     {
       groupLabel: "Settings",
+      groupLabelTranslationKey: "Settings.title",
       menus: getSettingsMenus(pathname),
     },
   ];

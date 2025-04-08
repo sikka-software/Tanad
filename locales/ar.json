@@ -1946,6 +1946,15 @@
   "Salaries": {
     "title": "الرواتب"
   },
+  "Administration": {
+    "title": "الإدارة"
+  },
+  "Accounting": {
+    "title": "المحاسبة"
+  },
+  "HumanResources": {
+    "title": "الموارد البشرية"
+  },
   "Jobs": {
     "title": "الوظائف",
     "create_job": "إنشاء وظيفة",
