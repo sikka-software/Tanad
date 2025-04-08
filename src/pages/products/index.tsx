@@ -69,15 +69,6 @@ export default function ProductsPage() {
           console.log(`Successfully fetched from ${endpoint}:`, data);
 
           if (data.products && Array.isArray(data.products)) {
-            // Save the source info for display
-            if (data.source) {
-              setDataSource(data.source);
-            } else if (endpoint.includes("fallback")) {
-              setDataSource("fallback");
-            } else {
-              setDataSource("database");
-            }
-
             return data.products;
           }
         }
@@ -104,12 +95,6 @@ export default function ProductsPage() {
     staleTime: 60000,
     refetchOnWindowFocus: false,
   });
-
-  // Debug output
-  console.log("Query state:", { isLoading, error, productsLength: products?.length, dataSource });
-
-  const errorMessage = error instanceof Error ? error.message : t("error.fetch");
-
   const renderProduct = (product: Product) => (
     <Card key={product.id} className="transition-shadow hover:shadow-lg">
       <CardHeader>
@@ -136,15 +121,6 @@ export default function ProductsPage() {
         createButtonText={t("create_product")}
         createButtonDisabled={isLoading}
       />
-
-      {dataSource === "fallback" && (
-        <div className="mx-4 rounded border border-yellow-200 bg-yellow-50 px-4 py-2 text-sm text-yellow-700">
-          Using fallback data due to database connection issues.
-          <Button variant="link" size="sm" className="px-1 py-0" onClick={() => refetch()}>
-            Try again with real database
-          </Button>
-        </div>
-      )}
 
       <div className="p-4">
         <DataModelList

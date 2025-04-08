@@ -3,11 +3,12 @@ import { useTranslations } from "next-intl";
 
 import { Building2, Mail, Phone, MapPin } from "lucide-react";
 
-import { Client } from "@/api/clients";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
+import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import PageTitle from "@/components/ui/page-title";
 import { useClients } from "@/hooks/useClients";
+import { Client } from "@/types/client.type";
 
 export default function ClientsPage() {
   const t = useTranslations("Clients");
@@ -60,6 +61,7 @@ export default function ClientsPage() {
         createButtonText={t("create_client")}
         createButtonDisabled={isLoading}
       />
+      <PageSearchAndFilter />
       <div className="p-4">
         <DataModelList
           data={clients}

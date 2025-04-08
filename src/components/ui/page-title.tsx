@@ -18,8 +18,8 @@ const PageTitle = ({
   customButton?: React.ReactNode;
 }) => {
   return (
-    <div className="flex !min-h-16 items-center justify-between border-b p-2">
-      <h1 className="text-2xl font-bold">{title}</h1>
+    <div className="flex !min-h-14 items-center justify-between border-b p-2">
+      <h1 className="text-xl font-bold">{title}</h1>
       {customButton
         ? customButton
         : createButtonLink && (
