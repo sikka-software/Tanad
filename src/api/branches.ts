@@ -44,7 +44,7 @@ export async function fetchBranchById(id: string): Promise<Branch> {
 }
 
 // Define an explicit type for branch creation data
-export type BranchCreateData = Omit<Branch, "id" | "created_at"> & { user_id: string };
+export type BranchCreateData = Omit<Branch, "id" | "created_at"> & { userId: string };
 
 export async function createBranch(branch: BranchCreateData): Promise<Branch> {
   const { data, error } = await supabase.from("branches").insert([branch]).select().single();

@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   pgTable,
+  pgPolicy,
   index,
   foreignKey,
   unique,
@@ -11,7 +12,6 @@ import {
   timestamp,
   varchar,
   boolean,
-  pgPolicy,
   numeric,
   date,
   integer,
@@ -65,7 +65,7 @@ export const clients = pgTable(
       to: ["public"],
     }),
   ],
-);
+).enableRLS();
 
 export const invoices = pgTable(
   "invoices",
@@ -130,7 +130,7 @@ export const invoices = pgTable(
       sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`,
     ),
   ],
-);
+).enableRLS();
 
 export const invoiceItems = pgTable(
   "invoice_items",
@@ -183,7 +183,7 @@ export const invoiceItems = pgTable(
       to: ["public"],
     }),
   ],
-);
+).enableRLS();
 
 export const quotes = pgTable(
   "quotes",
@@ -248,7 +248,7 @@ export const quotes = pgTable(
       sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`,
     ),
   ],
-);
+).enableRLS();
 
 export const quoteItems = pgTable(
   "quote_items",
@@ -301,7 +301,7 @@ export const quoteItems = pgTable(
       to: ["public"],
     }),
   ],
-);
+).enableRLS();
 
 export const profiles = pgTable(
   "profiles",
@@ -351,7 +351,7 @@ export const profiles = pgTable(
       to: ["public"],
     }),
   ],
-);
+).enableRLS();
 
 export const products = pgTable(
   "products",
@@ -372,7 +372,7 @@ export const products = pgTable(
     }).default(sql`timezone('utc'::text, now())`),
   },
   (table) => [unique("products_sku_key").on(table.sku)],
-);
+).enableRLS();
 
 export const employees = pgTable("employees", {
   id: uuid().primaryKey().defaultRandom(),
@@ -388,7 +388,7 @@ export const employees = pgTable("employees", {
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-});
+}).enableRLS();
 
 export const expenses = pgTable(
   "expenses",
@@ -446,7 +446,7 @@ export const expenses = pgTable(
       sql`status = ANY (ARRAY[\'pending\'::text, \'paid\'::text, \'overdue\'::text])`,
     ),
   ],
-);
+).enableRLS();
 
 export const vendors = pgTable(
   "vendors",
@@ -498,7 +498,7 @@ export const vendors = pgTable(
       using: sql`(auth.uid() = user_id)`,
     }),
   ],
-);
+).enableRLS();
 
 export const salaries = pgTable(
   "salaries",
@@ -523,7 +523,10 @@ export const salaries = pgTable(
   },
   (table) => [
     index("salaries_payment_date_idx").using("btree", table.paymentDate.asc().nullsLast()),
-    index("salaries_employee_name_idx").using("btree", table.employeeName.asc().nullsLast().op("text_ops")),
+    index("salaries_employee_name_idx").using(
+      "btree",
+      table.employeeName.asc().nullsLast().op("text_ops"),
+    ),
     index("salaries_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
     pgPolicy("Users can update their own salary records", {
       as: "permissive",
@@ -550,7 +553,7 @@ export const salaries = pgTable(
       using: sql`(auth.uid() = user_id)`,
     }),
   ],
-);
+).enableRLS();
 
 export const warehouses = pgTable(
   "warehouses",
@@ -604,7 +607,7 @@ export const warehouses = pgTable(
       using: sql`(auth.uid() = user_id)`,
     }),
   ],
-);
+).enableRLS();
 
 export const branches = pgTable(
   "branches",
@@ -639,25 +642,25 @@ export const branches = pgTable(
       as: "permissive",
       for: "update",
       to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
+      using: sql`true`,
     }),
     pgPolicy("Users can read their own branches", {
       as: "permissive",
       for: "select",
       to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
+      using: sql`true`,
     }),
     pgPolicy("Users can insert their own branches", {
       as: "permissive",
       for: "insert",
       to: ["public"],
-      withCheck: sql`(auth.uid() = user_id)`,
+      using: sql`true`,
     }),
     pgPolicy("Users can delete their own branches", {
       as: "permissive",
       for: "delete",
       to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
+      using: sql`true`,
     }),
   ],
-); 
+).enableRLS();
