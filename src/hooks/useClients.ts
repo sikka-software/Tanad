@@ -1,19 +1,20 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { 
-  Client, 
-  createClient, 
-  deleteClient, 
-  fetchClientById, 
-  fetchClients, 
-  updateClient 
-} from '@/api/clients';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import {
+  createClient,
+  deleteClient,
+  fetchClientById,
+  fetchClients,
+  updateClient,
+} from "@/services/clientService";
+import { Client, ClientCreateData } from "@/types/client.type";
 
 // Query keys
 export const clientKeys = {
-  all: ['clients'] as const,
-  lists: () => [...clientKeys.all, 'list'] as const,
+  all: ["clients"] as const,
+  lists: () => [...clientKeys.all, "list"] as const,
   list: (filters: any) => [...clientKeys.lists(), { filters }] as const,
-  details: () => [...clientKeys.all, 'detail'] as const,
+  details: () => [...clientKeys.all, "detail"] as const,
   detail: (id: string) => [...clientKeys.details(), id] as const,
 };
 
@@ -35,10 +36,10 @@ export function useClient(id: string) {
 
 export function useCreateClient() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (newClient: Omit<Client, 'id' | 'created_at'>) => 
-      createClient(newClient),
+    mutationFn: (newClient: Omit<Client, "id" | "created_at">) =>
+      createClient(newClient as ClientCreateData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
     },
@@ -47,10 +48,15 @@ export function useCreateClient() {
 
 export function useUpdateClient() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, client }: { id: string; client: Partial<Omit<Client, 'id' | 'created_at'>> }) => 
-      updateClient(id, client),
+    mutationFn: ({
+      id,
+      client,
+    }: {
+      id: string;
+      client: Partial<Omit<Client, "id" | "created_at">>;
+    }) => updateClient(id, client),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: clientKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
@@ -60,7 +66,7 @@ export function useUpdateClient() {
 
 export function useDeleteClient() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (id: string) => deleteClient(id),
     onSuccess: (_, variables) => {
@@ -68,4 +74,4 @@ export function useDeleteClient() {
       queryClient.removeQueries({ queryKey: clientKeys.detail(variables) });
     },
   });
-} 
+}
