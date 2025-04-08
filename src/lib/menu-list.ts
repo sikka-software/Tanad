@@ -156,12 +156,18 @@ export function getMenuList(pathname: string): Group[] {
               active: pathname === "/employees",
             },
             {
+              href: "/jobs",
+              label: "Jobs",
+              translationKey: "Jobs.title",
+              plusAction: "/jobs/add",
+              active: pathname === "/jobs",
+            },
+            {
               href: "/salaries",
               label: "Salaries",
               translationKey: "Salaries.title",
               active: pathname === "/salaries",
             },
-
             {
               href: "/leave",
               label: "Leave",

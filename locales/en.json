@@ -1516,6 +1516,71 @@
   "Salaries": {
     "title": "Salaries"
   },
+  "Jobs": {
+    "title": "Jobs",
+    "create_job": "Create Job",
+    "add_job": "Add Job",
+    "edit_job": "Edit Job",
+    "job_details": "Job Details",
+    "add_new": "Add New Job",
+    "back_to_list": "Back to List",
+    "no_jobs_found": "No jobs found",
+    "failed_to_fetch_jobs": "Failed to fetch jobs",
+    "cancel": "Cancel",
+    "messages": {
+      "creating_job": "Creating job...",
+      "create_job": "Create Job",
+      "created": "Job created successfully",
+      "updated": "Job updated successfully",
+      "deleted": "Job deleted successfully",
+      "error": "An error occurred while processing your request"
+    },
+    "form": {
+      "title": {
+        "label": "Job Title",
+        "placeholder": "Enter job title",
+        "required": "Job title is required"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter job description"
+      },
+      "requirements": {
+        "label": "Requirements",
+        "placeholder": "Enter job requirements"
+      },
+      "location": {
+        "label": "Location",
+        "placeholder": "Enter job location"
+      },
+      "department": {
+        "label": "Department",
+        "placeholder": "Enter department"
+      },
+      "type": {
+        "label": "Job Type",
+        "placeholder": "Select job type",
+        "full_time": "Full-time",
+        "part_time": "Part-time",
+        "contract": "Contract",
+        "internship": "Internship",
+        "temporary": "Temporary"
+      },
+      "salary": {
+        "label": "Salary",
+        "placeholder": "Enter salary"
+      },
+      "start_date": {
+        "label": "Start Date"
+      },
+      "end_date": {
+        "label": "End Date"
+      },
+      "is_active": {
+        "label": "Is this job active?"
+      }
+    }
+  },
   "Leave": {
     "title": "Leave"
   },

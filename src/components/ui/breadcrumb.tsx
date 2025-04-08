@@ -20,6 +20,7 @@ const routeMap: RouteMap = {
   "/clients": { label: "Clients", translationKey: "Clients.title" },
   "/products": { label: "Products", translationKey: "Products.title" },
   "/employees": { label: "Employees", translationKey: "Employees.title" },
+  "/jobs": { label: "Jobs", translationKey: "Jobs.title" },
   "/settings": { label: "Settings", translationKey: "Settings.title" },
   "/vendors": { label: "Vendors", translationKey: "Vendors.title" },
   "/salaries": { label: "Salaries", translationKey: "Salaries.title" },
@@ -101,6 +102,22 @@ const dynamicRoutePatterns = [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/employees", labelKey: "Employees.title" },
       { path: "", labelKey: "Employees.edit", isActive: true },
+    ],
+  },
+  {
+    pattern: /^\/jobs\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/jobs", labelKey: "Jobs.title" },
+      { path: "/jobs/add", labelKey: "Jobs.add_new", isActive: true },
+    ],
+  },
+  {
+    pattern: /^\/jobs\/edit\/(.+)$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/jobs", labelKey: "Jobs.title" },
+      { path: "", labelKey: "Jobs.edit", isActive: true },
     ],
   },
   {

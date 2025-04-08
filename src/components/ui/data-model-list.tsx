@@ -8,6 +8,7 @@ interface DataModelListProps<T> {
   isLoading: boolean;
   error: Error | null;
   emptyMessage: string;
+  errorMessage?: string;
   addFirstItemMessage?: string;
   renderItem: (item: T) => ReactNode;
   gridCols?: "1" | "2" | "3";
@@ -19,6 +20,7 @@ export default function DataModelList<T>({
   isLoading,
   error,
   emptyMessage,
+  errorMessage,
   addFirstItemMessage,
   renderItem,
   gridCols = "3",
@@ -45,7 +47,7 @@ export default function DataModelList<T>({
   if (error) {
     return (
       <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-        {error?.message || "An error occurred while fetching data"}
+        {errorMessage || "An error occurred while fetching data"}
       </div>
     );
   }

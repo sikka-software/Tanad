@@ -410,3 +410,26 @@ export const branches = pgTable(
     unique("branches_code_key").on(table.code),
   ],
 ).enableRLS();
+
+export const jobs = pgTable("jobs", {
+  id: uuid().primaryKey().defaultRandom(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  requirements: text("requirements"),
+  location: varchar("location", { length: 255 }),
+  department: varchar("department", { length: 255 }),
+  type: varchar("type", { length: 50 }).notNull(), // Full-time, Part-time, Contract, etc.
+  salary: numeric("salary", { precision: 10, scale: 2 }),
+  isActive: boolean("is_active").default(true).notNull(),
+  startDate: date("start_date"),
+  endDate: date("end_date"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  userId: uuid("user_id").notNull(),
+},
+(table) => [
+  index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
+  index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
+  index("jobs_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+]
+).enableRLS();

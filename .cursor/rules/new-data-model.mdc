@@ -1,0 +1,21 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Creating a new data model
+
+When I ask you to create a model, I want you to do the following:
+
+- If it doesn't have a table in [schema.ts](mdc:src/db/schema.ts), make sure to create the table for the new model with the correct columns
+- If the policies don't exist in [policies.sql](mdc:src/db/policies.sql), make sure to create the correct policies for the new model
+- Create a folder in /src/pages name it the plural of the new model name
+- Inside the folder create an index.tsx and a add.tsx and make sure they look similar to [add.tsx](mdc:src/pages/employees/add.tsx) and [index.tsx](mdc:src/pages/employees/index.tsx) 
+- Create the api end point in the api folder of next.js similar to [employees.ts](mdc:src/api/employees.ts)
+- Create a hook for it similar to [useEmployees.ts](mdc:src/hooks/useEmployees.ts)
+- Create the form for that model in /src/components/form
+- Make sure all the UI is consistant
+- Update [menu-list.ts](mdc:src/lib/menu-list.ts) to include the page for the new data model
+- Update [breadcrumb.tsx](mdc:src/components/ui/breadcrumb.tsx) to include the pages of the new data model
+- Make sure the creation happens in the add.tsx folder and not inside the form
+- Make sure all the texts from the ui that were added in index.tsx, add.tsx and the form ui are all added to [ar.json](mdc:locales/ar.json) and [en.json](mdc:locales/en.json) and make sure it's organized in a correct heirarchy

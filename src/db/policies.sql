@@ -12,6 +12,7 @@ ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE salaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE warehouses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
 
 -- BRANCHES POLICIES
 CREATE POLICY "Users can read their own branches" 
@@ -361,4 +362,30 @@ CREATE POLICY "Users can read employees"
 ON employees 
 FOR SELECT 
 TO authenticated 
-USING (true); 
+USING (true);
+
+-- JOBS POLICIES
+CREATE POLICY "Users can read their own jobs" 
+ON jobs 
+FOR SELECT 
+TO authenticated 
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own jobs" 
+ON jobs 
+FOR INSERT 
+TO authenticated 
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own jobs" 
+ON jobs 
+FOR UPDATE 
+TO authenticated 
+USING (auth.uid() = user_id) 
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own jobs" 
+ON jobs 
+FOR DELETE 
+TO authenticated 
+USING (auth.uid() = user_id); 

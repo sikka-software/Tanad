@@ -1942,5 +1942,76 @@
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
     "address": "العنوان"
+  },
+  "Salaries": {
+    "title": "الرواتب"
+  },
+  "Jobs": {
+    "title": "الوظائف",
+    "create_job": "إنشاء وظيفة",
+    "add_job": "إضافة وظيفة",
+    "edit_job": "تعديل وظيفة",
+    "job_details": "تفاصيل الوظيفة",
+    "add_new": "إضافة وظيفة جديدة",
+    "back_to_list": "العودة للقائمة",
+    "no_jobs_found": "لم يتم العثور على وظائف",
+    "failed_to_fetch_jobs": "فشل جلب الوظائف",
+    "cancel": "إلغاء",
+    "messages": {
+      "creating_job": "جاري إنشاء الوظيفة...",
+      "create_job": "إنشاء وظيفة",
+      "created": "تم إنشاء الوظيفة بنجاح",
+      "updated": "تم تحديث الوظيفة بنجاح",
+      "deleted": "تم حذف الوظيفة بنجاح",
+      "error": "حدث خطأ أثناء معالجة طلبك"
+    },
+    "form": {
+      "title": {
+        "label": "عنوان الوظيفة",
+        "placeholder": "أدخل عنوان الوظيفة",
+        "required": "عنوان الوظيفة مطلوب"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل وصف الوظيفة"
+      },
+      "requirements": {
+        "label": "المتطلبات",
+        "placeholder": "أدخل متطلبات الوظيفة"
+      },
+      "location": {
+        "label": "الموقع",
+        "placeholder": "أدخل موقع الوظيفة"
+      },
+      "department": {
+        "label": "القسم",
+        "placeholder": "أدخل القسم"
+      },
+      "type": {
+        "label": "نوع الوظيفة",
+        "placeholder": "اختر نوع الوظيفة",
+        "full_time": "دوام كامل",
+        "part_time": "دوام جزئي",
+        "contract": "عقد",
+        "internship": "تدريب",
+        "temporary": "مؤقت"
+      },
+      "salary": {
+        "label": "الراتب",
+        "placeholder": "أدخل الراتب"
+      },
+      "start_date": {
+        "label": "تاريخ البدء"
+      },
+      "end_date": {
+        "label": "تاريخ الانتهاء"
+      },
+      "is_active": {
+        "label": "هل هذه الوظيفة نشطة؟"
+      }
+    }
+  },
+  "Leave": {
+    "title": "الإجازات"
   }
 }
