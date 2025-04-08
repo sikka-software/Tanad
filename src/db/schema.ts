@@ -43,27 +43,6 @@ export const clients = pgTable(
     index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
     index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("clients_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    pgPolicy("Users can update their own clients", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can read their own clients", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-    }),
-    pgPolicy("Users can insert their own clients", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-    }),
-    pgPolicy("Users can delete their own clients", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-    }),
   ],
 ).enableRLS();
 
@@ -104,27 +83,7 @@ export const invoices = pgTable(
       foreignColumns: [clients.id],
       name: "invoices_client_id_fkey",
     }).onDelete("cascade"),
-    pgPolicy("Users can update their own invoices", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can read their own invoices", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-    }),
-    pgPolicy("Users can insert their own invoices", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-    }),
-    pgPolicy("Users can delete their own invoices", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-    }),
+
     check(
       "invoices_status_check",
       sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`,
@@ -159,29 +118,6 @@ export const invoiceItems = pgTable(
       foreignColumns: [invoices.id],
       name: "invoice_items_invoice_id_fkey",
     }).onDelete("cascade"),
-    pgPolicy("Users can update invoice items through invoices", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`(EXISTS ( SELECT 1
-     FROM invoices
-    WHERE ((invoices.id = invoice_items.invoice_id) AND (invoices.user_id = auth.uid()))))`,
-    }),
-    pgPolicy("Users can read invoice items through invoices", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-    }),
-    pgPolicy("Users can insert invoice items through invoices", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-    }),
-    pgPolicy("Users can delete invoice items through invoices", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-    }),
   ],
 ).enableRLS();
 
@@ -222,27 +158,7 @@ export const quotes = pgTable(
       foreignColumns: [clients.id],
       name: "quotes_client_id_fkey",
     }).onDelete("cascade"),
-    pgPolicy("Users can update their own quotes", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can read their own quotes", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-    }),
-    pgPolicy("Users can insert their own quotes", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-    }),
-    pgPolicy("Users can delete their own quotes", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-    }),
+
     check(
       "quotes_status_check",
       sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`,
@@ -277,29 +193,6 @@ export const quoteItems = pgTable(
       foreignColumns: [quotes.id],
       name: "quote_items_quote_id_fkey",
     }).onDelete("cascade"),
-    pgPolicy("Users can update quote items through quotes", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`(EXISTS ( SELECT 1
-     FROM quotes
-    WHERE ((quotes.id = quote_items.quote_id) AND (quotes.user_id = auth.uid()))))`,
-    }),
-    pgPolicy("Users can read quote items through quotes", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-    }),
-    pgPolicy("Users can insert quote items through quotes", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-    }),
-    pgPolicy("Users can delete quote items through quotes", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-    }),
   ],
 ).enableRLS();
 
@@ -317,40 +210,7 @@ export const profiles = pgTable(
     subscribedTo: text("subscribed_to"),
     priceId: text("price_id"),
   },
-  (table) => [
-    unique("profiles_username_key").on(table.username),
-    pgPolicy("Admin full access", {
-      as: "permissive",
-      for: "all",
-      to: ["service_role"],
-      using: sql`true`,
-    }),
-    pgPolicy("Users can delete their own profile", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-    }),
-    pgPolicy("Users can update their own profile", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-    }),
-    pgPolicy("Users can create their own profile", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-    }),
-    pgPolicy("Public profiles are viewable", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-    }),
-    pgPolicy("Users can view their own profile", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-    }),
-  ],
+  (table) => [unique("profiles_username_key").on(table.username)],
 ).enableRLS();
 
 export const products = pgTable(
@@ -420,27 +280,7 @@ export const expenses = pgTable(
       foreignColumns: [clients.id],
       name: "expenses_client_id_fkey",
     }).onDelete("cascade"),
-    pgPolicy("Users can update their own expenses", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can read their own expenses", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-    }),
-    pgPolicy("Users can insert their own expenses", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-    }),
-    pgPolicy("Users can delete their own expenses", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-    }),
+
     check(
       "expenses_status_check",
       sql`status = ANY (ARRAY[\'pending\'::text, \'paid\'::text, \'overdue\'::text])`,
@@ -474,29 +314,6 @@ export const vendors = pgTable(
     index("vendors_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
     index("vendors_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("vendors_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    pgPolicy("Users can update their own vendors", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can read their own vendors", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can insert their own vendors", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-    }),
-    pgPolicy("Users can delete their own vendors", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
   ],
 ).enableRLS();
 
@@ -528,30 +345,6 @@ export const salaries = pgTable(
       table.employeeName.asc().nullsLast().op("text_ops"),
     ),
     index("salaries_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    pgPolicy("Users can update their own salary records", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can read their own salary records", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can insert their own salary records", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-      withCheck: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can delete their own salary records", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
   ],
 ).enableRLS();
 
@@ -582,30 +375,6 @@ export const warehouses = pgTable(
     index("warehouses_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
     index("warehouses_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
     unique("warehouses_code_key").on(table.code),
-    pgPolicy("Users can update their own warehouses", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can read their own warehouses", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can insert their own warehouses", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-      withCheck: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Users can delete their own warehouses", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
   ],
 ).enableRLS();
 
@@ -638,33 +407,5 @@ export const branches = pgTable(
     index("branches_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
     index("branches_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
     unique("branches_code_key").on(table.code),
-    pgPolicy("Users can update their own branches", {
-      as: "permissive",
-      for: "update",
-      to: ["public"],
-      // using: sql`true`,
-      withCheck: sql`true`,
-    }),
-    pgPolicy("Users can read their own branches", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-      using: sql`true`,
-      // withCheck: sql`true`,
-    }),
-    pgPolicy("Users can insert their own branches", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-      using: sql`true`,
-      // withCheck: sql`true`,
-    }),
-    pgPolicy("Users can delete their own branches", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-      // using: sql`true`,
-      withCheck: sql`true`,
-    }),
   ],
 ).enableRLS();
