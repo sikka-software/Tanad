@@ -4,23 +4,26 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
 import { JobForm, type JobFormValues } from "@/components/forms/job-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 import { createJob } from "@/services/jobService";
-import { toast } from "sonner";
 
 export default function AddJobPage() {
   const t = useTranslations("Jobs");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (data: JobFormValues) => {
     setLoading(true);
     try {
       // Use the jobService function that handles the user ID properly
-      await createJob({
+      const newJob = await createJob({
         title: data.title.trim(),
         description: data.description?.trim() || undefined,
         requirements: data.requirements?.trim() || undefined,
@@ -33,7 +36,15 @@ export default function AddJobPage() {
         endDate: data.endDate || undefined,
       });
 
+      // Update the jobs cache to include the new job
+      const previousJobs = queryClient.getQueryData(["jobs"]) || [];
+      queryClient.setQueryData(
+        ["jobs"],
+        [...(Array.isArray(previousJobs) ? previousJobs : []), newJob],
+      );
+
       toast.success(t("messages.job_created"));
+      // Now we can navigate without the refresh parameter
       router.push("/jobs");
     } catch (error: any) {
       console.error("Error creating job:", error);
@@ -51,10 +62,10 @@ export default function AddJobPage() {
         createButtonText={t("back_to_list")}
         customButton={
           <div className="flex gap-4">
-            <Button variant="outline" onClick={() => router.push("/jobs")}>
+            <Button variant="outline" size="sm" onClick={() => router.push("/jobs")}>
               {t("cancel")}
             </Button>
-            <Button type="submit" form="job-form" disabled={loading}>
+            <Button type="submit" size="sm" form="job-form" disabled={loading}>
               {loading ? t("messages.creating_job") : t("messages.create_job")}
             </Button>
           </div>
