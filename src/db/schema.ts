@@ -107,6 +107,7 @@ export const invoiceItems = pgTable(
     unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
     amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
     invoiceId: uuid("invoice_id").notNull(),
+    productId: uuid("product_id"),
   },
   (table) => [
     index("invoice_items_invoice_id_idx").using(

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -16,10 +16,25 @@ export default function AddInvoicePage() {
   const t = useTranslations("Invoices");
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getUserId = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserId(user.id);
+      }
+    };
+    getUserId();
+  }, []);
 
   const handleSubmit = async (data: InvoiceFormValues) => {
     setLoading(true);
     try {
+      if (!userId) {
+        throw new Error("You must be logged in to create an invoice");
+      }
+
       // Calculate final amounts
       const subtotal = data.subtotal;
       const taxAmount = (subtotal * data.tax_rate) / 100;
@@ -38,6 +53,7 @@ export default function AddInvoicePage() {
             subtotal: subtotal,
             tax_rate: data.tax_rate,
             notes: data.notes?.trim() || null,
+            user_id: userId,
           },
         ])
         .select()
