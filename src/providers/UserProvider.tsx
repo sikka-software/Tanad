@@ -57,15 +57,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
 
     loadUser();
-  }, [initialized, storeUser, fetchUserAndProfile]);
+  }, [initialized, storeUser?.id, fetchUserAndProfile]);
 
-  // Update userId when store changes
+  // Update userId when store changes - only when storeUser.id changes
   useEffect(() => {
     if (storeUser?.id) {
       setUserId(storeUser.id);
       console.log("UserProvider: Updated userId from store:", storeUser.id);
     }
-  }, [storeUser]);
+  }, [storeUser?.id]);
 
   // Provide the user context
   const value = {
