@@ -1951,5 +1951,14 @@
       "deleted": "Employee deleted successfully",
       "error": "An error occurred while processing your request"
     }
+  },
+  "Contacts": {
+    "title": "Contacts",
+    "all": "All Contacts",
+    "add_new": "Add New Contact",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address"
   }
 }
