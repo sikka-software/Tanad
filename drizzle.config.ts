@@ -7,7 +7,7 @@ const connectionString = process.env.DATABASE_URL!;
 const url = new URL(connectionString);
 
 export default {
-  schema: "./src/db/schema-public.ts",
+  schema: "./src/db/schema.ts",
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {

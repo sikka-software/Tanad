@@ -177,7 +177,7 @@ export function BranchForm({
           description: t("Branches.messages.success_updated"),
         });
       } else {
-        result = await createBranch(branchData as BranchCreateData);
+        result = await createBranch(branchData as unknown as BranchCreateData);
         toast.success(t("success.title"), {
           description: t("Branches.messages.success_created"),
         });
