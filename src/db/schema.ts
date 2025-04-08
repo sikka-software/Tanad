@@ -223,6 +223,7 @@ export const products = pgTable(
     price: numeric({ precision: 10, scale: 2 }).notNull(),
     sku: varchar({ length: 50 }),
     stockQuantity: integer("stock_quantity").default(0),
+    userId: uuid("user_id").notNull(),
     createdAt: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
@@ -232,7 +233,10 @@ export const products = pgTable(
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
   },
-  (table) => [unique("products_sku_key").on(table.sku)],
+  (table) => [
+    unique("products_sku_key").on(table.sku),
+    index("products_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+  ],
 ).enableRLS();
 
 export const employees = pgTable("employees", {

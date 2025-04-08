@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
@@ -13,6 +15,14 @@ import { Client } from "@/types/client.type";
 export default function ClientsPage() {
   const t = useTranslations("Clients");
   const { data: clients, isLoading, error } = useClients();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredClients = clients?.filter(
+    (client) =>
+      client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const renderClient = (client: Client) => (
     <Card key={client.id} className="transition-shadow hover:shadow-lg">
@@ -55,16 +65,16 @@ export default function ClientsPage() {
 
   return (
     <div>
-      <PageTitle
+      <PageSearchAndFilter
         title={t("title")}
-        createButtonLink="/clients/add"
-        createButtonText={t("create_client")}
-        createButtonDisabled={isLoading}
+        createHref="/clients/add"
+        createLabel={t("add_new")}
+        onSearch={setSearchQuery}
+        searchPlaceholder={t("search_clients")}
       />
-      <PageSearchAndFilter />
       <div className="p-4">
         <DataModelList
-          data={clients}
+          data={filteredClients || []}
           isLoading={isLoading}
           error={error instanceof Error ? error : null}
           emptyMessage={t("no_clients_found")}

@@ -351,11 +351,30 @@ TO authenticated
 USING (auth.uid() = user_id);
 
 -- PRODUCTS POLICIES  
-CREATE POLICY "Users can read products" 
+CREATE POLICY "Users can read their own products" 
 ON products 
 FOR SELECT 
 TO authenticated 
-USING (true);
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own products" 
+ON products 
+FOR INSERT 
+TO authenticated 
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own products" 
+ON products 
+FOR UPDATE 
+TO authenticated 
+USING (auth.uid() = user_id) 
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own products" 
+ON products 
+FOR DELETE 
+TO authenticated 
+USING (auth.uid() = user_id);
 
 -- EMPLOYEES POLICIES
 CREATE POLICY "Users can read employees" 

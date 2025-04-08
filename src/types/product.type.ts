@@ -9,6 +9,18 @@ import { InvoiceProps } from "./invoice.type";
 export type ProductStatus = (typeof PRODUCT_STATUSES)[number];
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
 
+export type Product = {
+  id: string;
+  name: string;
+  description?: string | null;
+  price: number;
+  sku?: string | null;
+  stockQuantity?: number;
+  userId: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
 export type ProductProps = {
   _id: string;
   name: string;

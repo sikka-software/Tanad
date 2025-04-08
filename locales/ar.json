@@ -1487,6 +1487,8 @@
     "add_new": "إضافة عميل جديد",
     "back_to_list": "الرجوع للقائمة",
     "client_details": "تفاصيل العميل",
+    "search_clients": "بحث عن عملاء...",
+    "no_clients_found": "لا توجد عملاء",
     "form": {
       "name": {
         "label": "الاسم",
