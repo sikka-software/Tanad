@@ -11,7 +11,6 @@ import { z } from "zod";
 
 import AnimationSettings from "@/components/app/AnimationSettings";
 import AppearanceSettings from "@/components/app/AppearanceSettings";
-import { CurrentPuklaInfo } from "@/components/app/CurrentPuklaInfo";
 import { CustomizePuklaTheme } from "@/components/app/CustomizePuklaTheme";
 // Components
 import { PredefinedThemesSection } from "@/components/app/PredefinedThemes";
@@ -319,7 +318,6 @@ export default function Theme() {
     >
       <CustomPageMeta title={t("SEO.theme.title")} description={t("SEO.theme.description")} />
 
-      <CurrentPuklaInfo pukla={selectedPukla} allPuklas={puklas} loading={isLoading} />
       <div className="flex w-full flex-col overflow-hidden">
         <Accordion type="single" collapsible className="w-full space-y-2">
           {/* Social Media Settings */}

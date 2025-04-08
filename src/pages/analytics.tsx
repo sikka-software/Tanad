@@ -23,8 +23,6 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { CartesianGrid, XAxis, BarChart, Bar } from "recharts";
 
 import AnalyticsTable from "@/components/app/AnalyticsTable";
-// Components
-import { CurrentPuklaInfo } from "@/components/app/CurrentPuklaInfo";
 import NoPuklas from "@/components/app/NoPuklas";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
@@ -350,7 +348,6 @@ export default function Analytics() {
         description={t("SEO.analytics.description")}
       />
       <main className="flex flex-col items-center justify-between gap-4">
-        <CurrentPuklaInfo pukla={selectedPukla} allPuklas={puklas} loading={isLoading} />
         <div className="flex w-full flex-col gap-2">
           <Card className="w-full">
             <CardHeader className="flex flex-col justify-between md:flex-row">
