@@ -1,3 +1,4 @@
+import { RefObject } from "react";
 import { useForm } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
@@ -43,9 +44,10 @@ export type ProductFormValues = z.infer<typeof productSchema>;
 interface ProductFormProps {
   onSubmit: (data: ProductFormValues) => Promise<void>;
   loading?: boolean;
+  formRef?: RefObject<HTMLFormElement>;
 }
 
-export function ProductForm({ onSubmit, loading = false }: ProductFormProps) {
+export function ProductForm({ onSubmit, loading = false, formRef }: ProductFormProps) {
   const router = useRouter();
   const t = useTranslations();
 
@@ -62,7 +64,7 @@ export function ProductForm({ onSubmit, loading = false }: ProductFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"

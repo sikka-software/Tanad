@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, RefObject, useEffect } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import { ProductForm, ProductFormValues } from "@/components/forms/product-form"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+import { supabase } from "@/lib/supabase";
 
 // Define the Product type
 interface Product {
@@ -28,6 +29,21 @@ export default function AddProductPage() {
   const t = useTranslations();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getUserId = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        setUserId(data.user.id);
+      } else {
+        router.push("/auth/login");
+      }
+    };
+
+    getUserId();
+  }, [router]);
 
   const handleSuccess = (newProduct: Product) => {
     // Update the products cache to include the new product
@@ -42,6 +58,13 @@ export default function AddProductPage() {
   };
 
   const onSubmit = async (data: ProductFormValues) => {
+    if (!userId) {
+      toast.error(t("Products.error.title"), {
+        description: t("Products.error.not_authenticated"),
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch("/api/products/create", {
@@ -55,6 +78,7 @@ export default function AddProductPage() {
           price: data.price,
           sku: data.sku?.trim() || null,
           stock_quantity: data.stock_quantity,
+          userId: userId,
         }),
       });
 
@@ -79,6 +103,12 @@ export default function AddProductPage() {
     }
   };
 
+  const handleSubmitClick = () => {
+    if (formRef.current) {
+      formRef.current.requestSubmit();
+    }
+  };
+
   return (
     <div className="">
       <PageTitle
@@ -95,7 +125,7 @@ export default function AddProductPage() {
             >
               {t("General.cancel")}
             </Button>
-            <Button type="submit" size="sm" disabled={loading}>
+            <Button type="button" size="sm" disabled={loading} onClick={handleSubmitClick}>
               {loading ? t("Products.creating_product") : t("Products.create_product")}
             </Button>
           </div>
@@ -107,7 +137,11 @@ export default function AddProductPage() {
             <CardTitle>{t("Products.product_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ProductForm onSubmit={onSubmit} loading={loading} />
+            <ProductForm
+              onSubmit={onSubmit}
+              loading={loading}
+              formRef={formRef as RefObject<HTMLFormElement>}
+            />
           </CardContent>
         </Card>
       </div>
