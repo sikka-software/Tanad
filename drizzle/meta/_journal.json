@@ -57,6 +57,20 @@
       "when": 1744075640489,
       "tag": "0007_petite_thena",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1744096233989,
+      "tag": "0008_lush_trish_tilby",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1744096260306,
+      "tag": "0009_left_whirlwind",
+      "breakpoints": true
     }
   ]
 }
