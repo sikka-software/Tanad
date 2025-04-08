@@ -8,6 +8,8 @@ import { JobForm, type JobFormValues } from "@/components/forms/job-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+import { createJob } from "@/services/jobService";
+import { toast } from "sonner";
 
 export default function AddJobPage() {
   const t = useTranslations("Jobs");
@@ -17,34 +19,25 @@ export default function AddJobPage() {
   const handleSubmit = async (data: JobFormValues) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/jobs/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: data.title.trim(),
-          description: data.description?.trim() || null,
-          requirements: data.requirements?.trim() || null,
-          location: data.location?.trim() || null,
-          department: data.department?.trim() || null,
-          type: data.type.trim(),
-          salary: data.salary ? parseFloat(data.salary) : null,
-          isActive: data.isActive,
-          startDate: data.startDate || null,
-          endDate: data.endDate || null,
-        }),
+      // Use the jobService function that handles the user ID properly
+      await createJob({
+        title: data.title.trim(),
+        description: data.description?.trim() || undefined,
+        requirements: data.requirements?.trim() || undefined,
+        location: data.location?.trim() || undefined,
+        department: data.department?.trim() || undefined,
+        type: data.type.trim(),
+        salary: data.salary ? parseFloat(data.salary) : undefined,
+        isActive: data.isActive,
+        startDate: data.startDate || undefined,
+        endDate: data.endDate || undefined,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t("messages.error"));
-      }
-
+      toast.success(t("messages.job_created"));
       router.push("/jobs");
-    } catch (error) {
-      console.error(error);
-      throw error;
+    } catch (error: any) {
+      console.error("Error creating job:", error);
+      toast.error(error.message || t("messages.error"));
     } finally {
       setLoading(false);
     }

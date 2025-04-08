@@ -13,4 +13,5 @@ export interface Job {
   createdAt: string;
   updatedAt: string;
   userId: string;
+  user_id?: string;
 } 

@@ -13,6 +13,8 @@ import AuthLayout from "@/components/layouts/auth-layout";
 import LandingLayout from "@/components/layouts/landing-layout";
 import { LoadingBar } from "@/components/ui/loading-bar";
 import { QueryProvider } from "@/providers/QueryProvider";
+import { UserProvider } from "@/providers/UserProvider";
+
 import "@/styles/globals.css";
 
 export default function Tanad({ Component, pageProps, router }: AppProps) {
@@ -100,7 +102,9 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
         timeZone="Asia/Riyadh"
         now={new Date()}
       >
-        <AppLayout>{<Component {...pageProps} />}</AppLayout>
+        <UserProvider>
+          <AppLayout>{<Component {...pageProps} />}</AppLayout>
+        </UserProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </NextIntlClientProvider>
     </QueryProvider>

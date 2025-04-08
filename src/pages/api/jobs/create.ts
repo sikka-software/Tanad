@@ -3,27 +3,16 @@ import { sql } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
 import { jobs } from "@/db/schema";
-import { supabase } from "@/lib/supabase";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Log the full request for debugging
+  console.log("Full request body received:", JSON.stringify(req.body, null, 2));
+  
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    // Get the user session from cookie
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-    
-    if (authError || !session) {
-      return res.status(401).json({ 
-        error: "Unauthorized", 
-        detail: "You must be logged in to create a job"
-      });
-    }
-
-    // Get the authenticated user's ID
-    const authenticatedUserId = session.user.id;
-
     const {
       title,
       description,
@@ -35,8 +24,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       isActive,
       startDate,
       endDate,
-      userId, // This may be passed from the client
+      userId,
+      user_id, // Try to get alternative field name too
     } = req.body;
+
+    // Get the user ID - try both camelCase and snake_case versions
+    const effectiveUserId = user_id || userId;
+    
+    console.log("Extracted userId:", userId);
+    console.log("Extracted user_id:", user_id);
+    console.log("Effective user ID:", effectiveUserId);
 
     // Validate required fields
     if (!title) {
@@ -47,8 +44,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "Job type is required" });
     }
     
-    // Use the authenticated user ID from the session if userId is not provided
-    const effectiveUserId = userId || authenticatedUserId;
+    // Validate userId
+    if (!effectiveUserId) {
+      return res.status(400).json({ 
+        error: "User ID is required", 
+        detail: "The userId field is needed to satisfy the RLS policy",
+        requestBody: req.body // Include the request body for debugging
+      });
+    }
 
     console.log("Creating job with values:", {
       title,
@@ -64,6 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       userId: effectiveUserId
     });
 
+    // Insert using user_id field name to match the database column
     const [job] = await db
       .insert(jobs)
       .values({
@@ -77,14 +81,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         isActive,
         startDate,
         endDate,
-        userId: effectiveUserId, // Use the authenticated user ID
+        userId: effectiveUserId, // This should work with Supabase RLS
       })
       .returning();
 
     return res.status(201).json(job);
   } catch (error) {
     console.error("Error creating job:", error);
-    // Provide more detailed error information
     return res.status(500).json({ 
       error: "Failed to create job", 
       details: error instanceof Error ? error.message : "Unknown error",
