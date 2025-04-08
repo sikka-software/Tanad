@@ -82,12 +82,20 @@ const invoiceSchema = z.object({
 export type InvoiceFormValues = z.infer<typeof invoiceSchema>;
 
 interface InvoiceFormProps {
+  id?: string;
+  loading?: boolean;
   onSuccess?: () => void;
+  onSubmit: (data: InvoiceFormValues) => Promise<void>;
 }
 
-export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
+export function InvoiceForm({
+  id,
+  loading: externalLoading,
+  onSuccess,
+  onSubmit,
+}: InvoiceFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(externalLoading || false);
   const [clients, setClients] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -191,65 +199,6 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
     const subtotal = calculateSubtotal(items);
     form.setValue("subtotal", subtotal);
   }, [items, form]);
-
-  const onSubmit = async (data: InvoiceFormValues) => {
-    setLoading(true);
-    try {
-      // Calculate final amounts
-      const subtotal = calculateSubtotal(data.items);
-      const taxAmount = (subtotal * data.tax_rate) / 100;
-      const total = subtotal + taxAmount;
-
-      // First create the invoice
-      const { data: invoice, error: invoiceError } = await supabase
-        .from("invoices")
-        .insert([
-          {
-            client_id: data.client_id,
-            invoice_number: data.invoice_number.trim(),
-            issue_date: data.issue_date,
-            due_date: data.due_date,
-            status: data.status,
-            subtotal: subtotal,
-            tax_rate: data.tax_rate,
-            notes: data.notes?.trim() || null,
-          },
-        ])
-        .select()
-        .single();
-
-      if (invoiceError) throw invoiceError;
-
-      // Then add invoice items
-      const invoiceItems = data.items.map((item) => ({
-        invoice_id: invoice.id,
-        product_id: item.product_id || null,
-        description: item.description || "",
-        quantity: parseFloat(item.quantity),
-        unit_price: parseFloat(item.unit_price),
-      }));
-
-      const { error: itemsError } = await supabase.from("invoice_items").insert(invoiceItems);
-
-      if (itemsError) throw itemsError;
-
-      toast.success(t("success.title"), {
-        description: t("success.created"),
-      });
-
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push("/invoices");
-      }
-    } catch (error) {
-      toast.error(t("error.title"), {
-        description: error instanceof Error ? error.message : t("error.create"),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleClientAdded = async () => {
     // Close the dialog
@@ -455,7 +404,7 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -681,12 +630,6 @@ export function InvoiceForm({ onSuccess }: InvoiceFormProps) {
                 (form.watch("subtotal") * form.watch("tax_rate")) / 100
               ).toFixed(2)}
             </div>
-          </div>
-
-          <div className="flex justify-end">
-            <Button type="submit" disabled={loading}>
-              {loading ? t("submitting") : t("create_invoice")}
-            </Button>
           </div>
         </form>
       </Form>

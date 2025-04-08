@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- When creating RLS policies, we put it in [policies.sql](mdc:src/db/policies.sql) and not [schema.ts](mdc:src/db/schema.ts)

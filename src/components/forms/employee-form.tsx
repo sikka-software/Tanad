@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 interface EmployeeFormProps {
   id?: string;
   onSuccess?: () => void;
-  onSubmit?: (data: EmployeeFormValues) => Promise<void>;
+  onSubmit: (data: EmployeeFormValues) => Promise<void>;
   loading?: boolean;
 }
 
@@ -46,12 +46,7 @@ const employeeFormSchema = z.object({
 
 export type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
 
-export function EmployeeForm({
-  id,
-  onSuccess,
-  onSubmit: externalSubmit,
-  loading = false,
-}: EmployeeFormProps) {
+export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: EmployeeFormProps) {
   const router = useRouter();
   const t = useTranslations();
 
@@ -70,51 +65,6 @@ export function EmployeeForm({
       notes: "",
     },
   });
-
-  const onSubmit: SubmitHandler<EmployeeFormValues> = async (data) => {
-    if (externalSubmit) {
-      await externalSubmit(data);
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/employees/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName: data.firstName.trim(),
-          lastName: data.lastName.trim(),
-          email: data.email.trim(),
-          phone: data.phone?.trim() || null,
-          position: data.position.trim(),
-          department: data.department?.trim() || null,
-          hireDate: data.hireDate,
-          salary: data.salary ? parseFloat(data.salary) : null,
-          isActive: data.isActive,
-          notes: data.notes?.trim() || null,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t("Employees.messages.error"));
-      }
-
-      toast.success(t("Employees.messages.created"));
-
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push("/employees");
-      }
-    } catch (error) {
-      toast.error(t("Employees.messages.error"), {
-        description: error instanceof Error ? error.message : t("Employees.messages.error"),
-      });
-    }
-  };
 
   return (
     <Form {...form}>
