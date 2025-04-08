@@ -9,8 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import type { Vendor } from "@/api/vendors"; // Import Vendor type
-import { createVendor, fetchVendorById, updateVendor } from "@/api/vendors"; // Import API functions
+// Import API functions
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,6 +21,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+// Import Vendor type
+import { createVendor, fetchVendorById, updateVendor } from "@/services/vendorService";
+import type { Vendor, VendorCreateData } from "@/types/vendor.type";
 
 // Schema factory for vendor form validation with translations
 const createVendorSchema = (t: (key: string) => string) =>
@@ -141,7 +143,7 @@ export function VendorForm({
           description: t("Vendors.messages.success_updated"),
         });
       } else {
-        result = await createVendor(vendorData);
+        result = await createVendor(vendorData as unknown as VendorCreateData);
         toast.success(t("success.title"), {
           description: t("Vendors.messages.success_created"),
         });
@@ -155,8 +157,7 @@ export function VendorForm({
     } catch (error) {
       console.error("Failed to save vendor:", error);
       toast.error(t("error.title"), {
-        description:
-          error instanceof Error ? error.message : t("Vendors.messages.error_save"),
+        description: error instanceof Error ? error.message : t("Vendors.messages.error_save"),
       });
     } finally {
       setInternalLoading(false);
@@ -165,11 +166,7 @@ export function VendorForm({
 
   return (
     <Form {...form}>
-      <form
-        id={formId}
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
-      >
+      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -353,4 +350,4 @@ export function VendorForm({
       </form>
     </Form>
   );
-} 
+}

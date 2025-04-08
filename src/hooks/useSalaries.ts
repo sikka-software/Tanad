@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Salary } from '@/api/salaries';
+import type { Salary, SalaryCreateData } from '@/types/salary.type';
 import {
   createSalary,
   deleteSalary,
   fetchSalaryById,
   fetchSalaries,
   updateSalary,
-} from '@/api/salaries';
+} from '@/services/salaryService';
 
 // Query keys for salaries
 export const salaryKeys = {

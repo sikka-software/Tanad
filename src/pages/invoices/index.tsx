@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 
 import { format } from "date-fns";
 
-import { Invoice } from "@/api/invoices";
+import { Invoice } from "@/types/invoice.type";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
@@ -34,7 +34,7 @@ export default function InvoicesPage() {
           <h3 className="text-lg font-semibold">
             {t("invoice_number", { number: invoice.invoice_number })}
           </h3>
-          <p className="text-sm text-gray-500">{invoice.client.company}</p>
+          <p className="text-sm text-gray-500">{invoice.client?.company}</p>
         </div>
         <Badge className={getStatusColor(invoice.status)}>
           {t(`status.${invoice.status.toLowerCase()}`)}
@@ -56,7 +56,7 @@ export default function InvoicesPage() {
           </div>
           <div className="border-t pt-2">
             <p className="text-sm text-gray-500">
-              {invoice.client.name} • {invoice.client.email}
+              {invoice.client?.name} • {invoice.client?.email}
             </p>
           </div>
         </div>

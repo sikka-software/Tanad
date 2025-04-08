@@ -11,6 +11,7 @@ import { DiscountProps } from "@/types/discount.type";
 import { NoteProps } from "@/types/note.type";
 import { ProductProps } from "@/types/product.type";
 import { TransactionProps } from "@/types/transaction.type";
+import { Client } from './client.type';
 
 export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
 export type InvoiceRecurrence = (typeof INVOICE_RECURRENCE)[number];
@@ -78,3 +79,23 @@ export type InvoiceProps = {
 };
 
 export type InvoiceInput = Partial<InvoiceProps>;
+
+export interface Invoice {
+  id: string;
+  created_at: string;
+  invoice_number: string;
+  issue_date: string;
+  due_date: string;
+  subtotal: number;
+  tax_rate: number;
+  tax_amount: number;
+  total: number;
+  status: string;
+  notes?: string;
+  client_id: string;
+  client?: Client;
+}
+
+export type InvoiceCreateData = Omit<Invoice, 'id' | 'created_at' | 'client'> & {
+  userId?: string;
+};

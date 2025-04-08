@@ -1,24 +1,25 @@
+import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
 import Link from "next/link";
 
 import { Building2, Mail, Phone, MapPin, NotebookText, Tag } from "lucide-react";
 
-import { Client } from "@/api/clients";
-import { Vendor } from "@/api/vendors";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useClients } from "@/hooks/useClients";
 import { useVendors } from "@/hooks/useVendors";
-import { buttonVariants } from "@/components/ui/button";
+import { Client } from "@/types/client.type";
+import { Vendor } from "@/types/vendor.type";
 
 export default function ContactsPage() {
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState<"clients" | "vendors">("clients");
-  
+
   const { data: clients, isLoading: clientsLoading, error: clientsError } = useClients();
   const { data: vendors, isLoading: vendorsLoading, error: vendorsError } = useVendors();
 
@@ -77,9 +78,7 @@ export default function ContactsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold">{vendor.name}</h3>
-            {vendor.company && (
-              <p className="text-sm text-gray-500">{vendor.company}</p>
-            )}
+            {vendor.company && <p className="text-sm text-gray-500">{vendor.company}</p>}
           </div>
           <span className="rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800">
             {t("Contacts.vendor_label")}
@@ -124,26 +123,20 @@ export default function ContactsPage() {
         title={t("Contacts.title")}
         customButton={
           <div className="flex gap-3">
-            <Link 
-              href="/clients/add" 
-              className={buttonVariants({ variant: "outline" })}
-            >
+            <Link href="/clients/add" className={buttonVariants({ variant: "outline" })}>
               {t("Contacts.add_client")}
             </Link>
-            <Link 
-              href="/vendors/add" 
-              className={buttonVariants({ variant: "default" })}
-            >
+            <Link href="/vendors/add" className={buttonVariants({ variant: "default" })}>
               {t("Contacts.add_vendor")}
             </Link>
           </div>
         }
       />
-      
+
       <div className="p-4">
-        <Tabs 
-          defaultValue="clients" 
-          value={activeTab} 
+        <Tabs
+          defaultValue="clients"
+          value={activeTab}
           onValueChange={(value) => setActiveTab(value as "clients" | "vendors")}
           className="mb-6"
         >
@@ -151,10 +144,10 @@ export default function ContactsPage() {
             <TabsTrigger value="clients">{t("Contacts.clients_tab")}</TabsTrigger>
             <TabsTrigger value="vendors">{t("Contacts.vendors_tab")}</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="clients">
             <DataModelList
-              data={clients}
+              data={clients as Client[]}
               isLoading={clientsLoading}
               error={clientsError instanceof Error ? clientsError : null}
               emptyMessage={t("Clients.no_clients_found")}
@@ -162,10 +155,10 @@ export default function ContactsPage() {
               gridCols="3"
             />
           </TabsContent>
-          
+
           <TabsContent value="vendors">
             <DataModelList
-              data={vendors}
+              data={vendors as Vendor[]}
               isLoading={vendorsLoading}
               error={vendorsError instanceof Error ? vendorsError : null}
               emptyMessage={t("Vendors.no_vendors_found")}
@@ -180,7 +173,7 @@ export default function ContactsPage() {
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? 'en';
+  const effectiveLocale = locale ?? "en";
   return {
     props: {
       messages: (await import(`../../locales/${effectiveLocale}.json`)).default,

@@ -9,7 +9,7 @@ import {
   NotebookText, // Added NotebookText for notes
 } from "lucide-react";
 
-import type { Vendor } from "@/api/vendors"; // Import Vendor type
+import type { Vendor } from "@/types/vendor.type"; // Import Vendor type
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";

@@ -3,12 +3,12 @@ import { useTranslations } from "next-intl";
 
 import { format } from "date-fns";
 
-import { Quote } from "@/api/quotes";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
 import { useQuotes } from "@/hooks/useQuotes";
+import { Quote } from "@/types/quote.type";
 
 function getStatusColor(status: string): string {
   switch (status.toLowerCase()) {
@@ -34,8 +34,10 @@ export default function QuotesPage() {
     <Card key={quote.id} className="transition-shadow hover:shadow-lg">
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
-          <h3 className="text-lg font-semibold">{t("quote_number", { number: quote.quote_number })}</h3>
-          <p className="text-sm text-gray-500">{quote.clients.company}</p>
+          <h3 className="text-lg font-semibold">
+            {t("quote_number", { number: quote.quote_number })}
+          </h3>
+          <p className="text-sm text-gray-500">{quote.clients?.company}</p>
         </div>
         <Badge className={getStatusColor(quote.status)}>
           {t(`status.${quote.status.toLowerCase()}`)}
@@ -63,7 +65,7 @@ export default function QuotesPage() {
           </div>
           <div className="border-t pt-2">
             <p className="text-sm text-gray-500">
-              {quote.clients.name} • {quote.clients.email}
+              {quote.clients?.name} • {quote.clients?.email}
             </p>
           </div>
         </div>

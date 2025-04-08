@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Quote, QuoteCreateData } from '@/types/quote.type';
 import { 
-  Quote, 
   createQuote, 
   deleteQuote, 
   fetchQuoteById, 
   fetchQuotes, 
   updateQuote 
-} from '@/api/quotes';
+} from '@/services/quoteService';
 
 // Query keys
 export const quoteKeys = {
@@ -37,8 +37,7 @@ export function useCreateQuote() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (newQuote: Omit<Quote, 'id' | 'created_at' | 'client'>) => 
-      createQuote(newQuote),
+    mutationFn: (newQuote: QuoteCreateData) => createQuote(newQuote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
     },

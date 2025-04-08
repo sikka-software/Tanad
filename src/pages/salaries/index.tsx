@@ -10,7 +10,7 @@ import {
   NotebookText,
 } from "lucide-react";
 
-import type { Salary } from "@/api/salaries";
+import type { Salary } from "@/types/salary.type";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";

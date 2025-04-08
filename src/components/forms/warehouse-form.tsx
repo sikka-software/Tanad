@@ -9,10 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import type { Warehouse, WarehouseCreateData } from "@/api/warehouses";
-// Import Warehouse type
-import { createWarehouse, fetchWarehouseById, updateWarehouse } from "@/api/warehouses";
-// Import API functions
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,6 +21,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { createWarehouse, fetchWarehouseById, updateWarehouse } from "@/services/warehouseService";
+import type { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
 
 // Define the schema
 const warehouseFormSchema = z.object({
@@ -157,18 +155,20 @@ export function WarehouseForm({
         capacity: data.capacity ? parseFloat(data.capacity) : null,
         is_active: data.is_active,
         notes: data.notes?.trim() || null,
-        user_id: userId,
       };
 
       let result: Warehouse;
       if (warehouseId) {
-        const { user_id, ...updateData } = warehouseData;
-        result = await updateWarehouse(warehouseId, updateData);
+        result = await updateWarehouse(warehouseId, warehouseData);
         toast.success(t("success.title"), {
           description: t("Warehouses.messages.success_updated"),
         });
       } else {
-        result = await createWarehouse(warehouseData as WarehouseCreateData);
+        const warehouseCreateData = {
+          ...warehouseData,
+          userId: userId,
+        };
+        result = await createWarehouse(warehouseCreateData as unknown as WarehouseCreateData);
         toast.success(t("success.title"), {
           description: t("Warehouses.messages.success_created"),
         });

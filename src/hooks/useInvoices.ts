@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Invoice, InvoiceCreateData } from '@/types/invoice.type';
 import { 
-  Invoice, 
   createInvoice, 
   deleteInvoice, 
   fetchInvoiceById, 
   fetchInvoices, 
   updateInvoice 
-} from '@/api/invoices';
+} from '@/services/invoiceService';
 
 // Query keys
 export const invoiceKeys = {
@@ -37,8 +37,7 @@ export function useCreateInvoice() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (newInvoice: Omit<Invoice, 'id' | 'created_at' | 'client'>) => 
-      createInvoice(newInvoice),
+    mutationFn: (newInvoice: InvoiceCreateData) => createInvoice(newInvoice),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
     },
@@ -49,7 +48,7 @@ export function useUpdateInvoice() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ id, invoice }: { id: string; invoice: Partial<Omit<Invoice, 'id' | 'created_at' | 'client'>> }) => 
+    mutationFn: ({ id, invoice }: { id: string; invoice: Partial<Invoice> }) => 
       updateInvoice(id, invoice),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(data.id) });

@@ -1,26 +1,5 @@
 import { supabase } from '@/lib/supabase';
-
-// Define the structure for Deductions if it's consistent
-// For flexibility, using Record<string, any> or a more specific type if known
-interface DeductionDetail {
-  type: string;
-  amount: number;
-  // add other relevant fields if structure is known
-}
-
-export interface Salary {
-  id: string;
-  created_at: string;
-  pay_period_start: string; // Use string for date types from Supabase
-  pay_period_end: string;
-  payment_date: string;
-  gross_amount: number; // Use number for numeric types
-  net_amount: number;
-  deductions: Record<string, DeductionDetail> | DeductionDetail[] | null; // Flexible JSONB type
-  notes: string | null;
-  employee_name: string;
-  // userId might not be needed here if handled by RLS
-}
+import { Salary, SalaryCreateData } from '@/types/salary.type';
 
 export async function fetchSalaries(): Promise<Salary[]> {
   const { data, error } = await supabase
@@ -60,11 +39,17 @@ export async function fetchSalaryById(id: string): Promise<Salary> {
   };
 }
 
-// Input type excludes generated fields like id, created_at
-export async function createSalary(salary: Omit<Salary, 'id' | 'created_at'>): Promise<Salary> {
+export async function createSalary(salary: SalaryCreateData): Promise<Salary> {
+  // Convert userId to user_id if needed
+  const dbSalary = { ...salary };
+  if (salary.userId) {
+    (dbSalary as any).user_id = salary.userId;
+    delete (dbSalary as any).userId;
+  }
+
   const { data, error } = await supabase
     .from('salaries')
-    .insert([salary]) // RLS adds userId
+    .insert([dbSalary])
     .select()
     .single();
 

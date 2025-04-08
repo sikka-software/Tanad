@@ -30,3 +30,19 @@ export type ClientProps = {
 };
 
 export type ClientInput = Partial<ClientProps>;
+
+export interface Client {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  notes: string | null;
+  created_at: string;
+}
+
+export type ClientCreateData = Omit<Client, 'id' | 'created_at'> & { userId?: string };

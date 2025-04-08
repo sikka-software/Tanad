@@ -9,8 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import type { Salary } from "@/api/salaries";
-import { createSalary, fetchSalaryById, updateSalary } from "@/api/salaries";
+import type { Salary, SalaryCreateData } from "@/types/salary.type";
+import { createSalary, fetchSalaryById, updateSalary } from "@/services/salaryService";
 import { Button } from "@/components/ui/button";
 import {
   Form,

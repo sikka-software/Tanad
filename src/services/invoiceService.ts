@@ -1,21 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { Client } from './clients';
-
-export interface Invoice {
-  id: string;
-  invoice_number: string;
-  issue_date: string;
-  due_date: string;
-  subtotal: number;
-  tax_rate: number | null;
-  tax_amount: number | null;
-  total: number;
-  status: string;
-  notes: string | null;
-  client_id: string;
-  client: Client;
-  created_at: string;
-}
+import { Invoice, InvoiceCreateData } from '@/types/invoice.type';
 
 export async function fetchInvoices(): Promise<Invoice[]> {
   const { data, error } = await supabase
@@ -33,7 +17,8 @@ export async function fetchInvoices(): Promise<Invoice[]> {
     .order('created_at', { ascending: false });
 
   if (error) {
-    throw new Error(error.message);
+    console.error('Error fetching invoices:', error);
+    throw new Error('Failed to fetch invoices');
   }
 
   return data || [];
@@ -56,21 +41,29 @@ export async function fetchInvoiceById(id: string): Promise<Invoice> {
     .single();
 
   if (error) {
-    throw new Error(error.message);
+    console.error(`Error fetching invoice with id ${id}:`, error);
+    throw new Error(`Failed to fetch invoice with id ${id}`);
   }
 
   return data;
 }
 
-export async function createInvoice(invoice: Omit<Invoice, 'id' | 'created_at' | 'client'>): Promise<Invoice> {
+export async function createInvoice(invoice: InvoiceCreateData): Promise<Invoice> {
+  const dbInvoice = { ...invoice };
+  if (invoice.userId) {
+    (dbInvoice as any).user_id = invoice.userId;
+    delete (dbInvoice as any).userId;
+  }
+
   const { data, error } = await supabase
     .from('invoices')
-    .insert([invoice])
+    .insert([dbInvoice])
     .select()
     .single();
 
   if (error) {
-    throw new Error(error.message);
+    console.error('Error creating invoice:', error);
+    throw new Error('Failed to create invoice');
   }
 
   return data;
@@ -78,7 +71,7 @@ export async function createInvoice(invoice: Omit<Invoice, 'id' | 'created_at' |
 
 export async function updateInvoice(
   id: string, 
-  invoice: Partial<Omit<Invoice, 'id' | 'created_at' | 'client'>>
+  invoice: Partial<Invoice>
 ): Promise<Invoice> {
   const { data, error } = await supabase
     .from('invoices')
@@ -88,7 +81,8 @@ export async function updateInvoice(
     .single();
 
   if (error) {
-    throw new Error(error.message);
+    console.error(`Error updating invoice with id ${id}:`, error);
+    throw new Error(`Failed to update invoice with id ${id}`);
   }
 
   return data;
@@ -101,6 +95,7 @@ export async function deleteInvoice(id: string): Promise<void> {
     .eq('id', id);
 
   if (error) {
-    throw new Error(error.message);
+    console.error(`Error deleting invoice with id ${id}:`, error);
+    throw new Error(`Failed to delete invoice with id ${id}`);
   }
 } 

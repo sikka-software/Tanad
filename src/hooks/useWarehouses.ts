@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import type { Warehouse } from "@/api/warehouses";
+import type { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
 import {
   createWarehouse,
   deleteWarehouse,
   fetchWarehouseById,
   fetchWarehouses,
   updateWarehouse,
-} from "@/api/warehouses";
+} from "@/services/warehouseService";
 
 // Query keys for warehouses
 export const warehouseKeys = {
@@ -40,8 +40,15 @@ export function useCreateWarehouse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newWarehouse: Omit<Warehouse, "id" | "created_at"> & { user_id: string }) =>
-      createWarehouse(newWarehouse),
+    mutationFn: (newWarehouse: Omit<Warehouse, 'id' | 'created_at'> & { user_id: string }) => {
+      // Map user_id to userId for the service function
+      const { user_id, ...rest } = newWarehouse;
+      const warehouseData: WarehouseCreateData = {
+        ...rest,
+        userId: user_id,
+      };
+      return createWarehouse(warehouseData);
+    },
     onSuccess: () => {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });

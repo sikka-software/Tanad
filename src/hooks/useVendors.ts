@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Vendor } from '@/api/vendors';
+import type { Vendor, VendorCreateData } from '@/types/vendor.type';
 import {
   createVendor,
   deleteVendor,
   fetchVendorById,
   fetchVendors,
   updateVendor,
-} from '@/api/vendors';
+} from '@/services/vendorService';
 
 // Query keys for vendors
 export const vendorKeys = {
@@ -39,10 +39,16 @@ export function useCreateVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newVendor: Omit<Vendor, 'id' | 'created_at'>) =>
-      createVendor(newVendor),
+    mutationFn: (newVendor: Omit<Vendor, 'id' | 'created_at'> & { user_id: string }) => {
+      // Map user_id to userId for the service function
+      const { user_id, ...rest } = newVendor;
+      const vendorData: VendorCreateData = {
+        ...rest,
+        userId: user_id,
+      };
+      return createVendor(vendorData);
+    },
     onSuccess: () => {
-      // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
     },
   });
