@@ -24,7 +24,7 @@ const PageTitle = ({
         ? customButton
         : createButtonLink && (
             <Link href={createButtonLink}>
-              <Button disabled={createButtonDisabled} size={"sm"}>
+              <Button disabled={createButtonDisabled} size="sm">
                 <Plus className="h-4 w-4" />
                 {createButtonText}
               </Button>

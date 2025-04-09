@@ -1208,6 +1208,7 @@
   "Products": {
     "title": "Products",
     "add_new": "Add New Product",
+    "search_products": "Search products",
     "product_details": "Product Details",
     "product_name": "Product Name",
     "product_name_required": "Product name is required",
@@ -1941,6 +1942,9 @@
   },
   "Locations": {
     "title": "Locations"
+  },
+  "Recruitment": {
+    "title": "Recruitment"
   },
   "Employees": {
     "title": "Employees",

@@ -221,13 +221,13 @@ function getHrMenus(pathname: string) {
       ],
     },
 
-    {
-      href: "/attendance",
-      label: "Attendance",
-      translationKey: "Attendance.title",
-      icon: Tag,
-      active: pathname === "/attendance",
-    },
+    // {
+    //   href: "/attendance",
+    //   label: "Attendance",
+    //   translationKey: "Attendance.title",
+    //   icon: Tag,
+    //   active: pathname === "/attendance",
+    // },
   ];
 }
 // Settings menu items

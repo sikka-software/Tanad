@@ -1224,9 +1224,43 @@
     "total_puklas": "تم العثور على {count} بكلة",
     "loading": "جاري تحميل البكلات..."
   },
+
+  "Dashboard": {
+    "title": "لوحة التحكم",
+    "create_product": "إضافة منتج",
+    "total_invoices": "إجمالي الفواتير",
+    "pending": "معلقة",
+    "total_products": "إجمالي المنتجات",
+    "total_revenue": "إجمالي الإيرادات",
+    "pending_invoices": "الفواتير المعلقة",
+    "of_total": "% من الإجمالي",
+    "recent_invoices": "الفواتير الأخيرة",
+    "recent_invoices_list": "قريباً: قائمة الفواتير الأخيرة",
+    "popular_products": "المنتجات الرائجة",
+    "popular_products_list": "قريباً: قائمة المنتجات الرائجة",
+    "create": "إنشاء",
+    "select_create_option": "حدد خيارًا",
+    "add_product": "إضافة منتج",
+    "add_invoice": "إضافة فاتورة",
+    "add_client": "إضافة عميل",
+    "add_employee": "إضافة موظف",
+    "add_warehouse": "إضافة مستودع"
+  },
+  "Help": {
+    "hero": {
+      "title": "صفحة المساعدة",
+      "subtitle": "سنقوم بإضافة محتوى تعليمي قريبا إن شاء الله",
+      "in-the-meantime": "في الوقت حالي, تفضل بالتواصل معنا إذا تحتاج مساعدة"
+    },
+    "contact": {
+      "title": "تواصل معنا",
+      "subtitle": "في خاطرك شي؟ حياك أرسل لنا رسالة "
+    }
+  },
   "Products": {
     "title": "المنتجات",
     "add_new": "إضافة منتج جديد",
+    "search_products": "بحث عن منتجات",
     "product_details": "تفاصيل المنتج",
     "product_name": "اسم المنتج",
     "product_name_required": "اسم المنتج مطلوب",
@@ -1270,39 +1304,6 @@
       "product_description": "وصف المنتج",
       "name": "الاسم",
       "save_product": "حفظ المنتج"
-    }
-  },
-
-  "Dashboard": {
-    "title": "لوحة التحكم",
-    "create_product": "إضافة منتج",
-    "total_invoices": "إجمالي الفواتير",
-    "pending": "معلقة",
-    "total_products": "إجمالي المنتجات",
-    "total_revenue": "إجمالي الإيرادات",
-    "pending_invoices": "الفواتير المعلقة",
-    "of_total": "% من الإجمالي",
-    "recent_invoices": "الفواتير الأخيرة",
-    "recent_invoices_list": "قريباً: قائمة الفواتير الأخيرة",
-    "popular_products": "المنتجات الرائجة",
-    "popular_products_list": "قريباً: قائمة المنتجات الرائجة",
-    "create": "إنشاء",
-    "select_create_option": "حدد خيارًا",
-    "add_product": "إضافة منتج",
-    "add_invoice": "إضافة فاتورة",
-    "add_client": "إضافة عميل",
-    "add_employee": "إضافة موظف",
-    "add_warehouse": "إضافة مستودع"
-  },
-  "Help": {
-    "hero": {
-      "title": "صفحة المساعدة",
-      "subtitle": "سنقوم بإضافة محتوى تعليمي قريبا إن شاء الله",
-      "in-the-meantime": "في الوقت حالي, تفضل بالتواصل معنا إذا تحتاج مساعدة"
-    },
-    "contact": {
-      "title": "تواصل معنا",
-      "subtitle": "في خاطرك شي؟ حياك أرسل لنا رسالة "
     }
   },
   "Invoices": {
@@ -1549,90 +1550,7 @@
       "not_authenticated": "يجب تسجيل الدخول لإنشاء عميل"
     }
   },
-  "Employees": {
-    "title": "الموظفين",
-    "add_new": "إضافة موظف جديد",
-    "add_employee": "إضافة موظف",
-    "cancel": "إلغاء",
-    "employee_details": "تفاصيل الموظف",
-    "edit": "تعديل الموظف",
-    "back_to_list": "الرجوع للقائمة",
-    "allEmployees": "جميع الموظفين",
-    "form": {
-      "first_name": {
-        "label": "الاسم الأول",
-        "placeholder": "أدخل الاسم الأول",
-        "required": "الاسم الأول مطلوب"
-      },
-      "last_name": {
-        "label": "اسم العائلة",
-        "placeholder": "أدخل اسم العائلة",
-        "required": "اسم العائلة مطلوب"
-      },
-      "name": {
-        "label": "الاسم",
-        "placeholder": "أدخل الاسم",
-        "required": "الاسم مطلوب"
-      },
-      "email": {
-        "label": "البريد الإلكتروني",
-        "placeholder": "أدخل البريد الإلكتروني",
-        "required": "البريد الإلكتروني مطلوب",
-        "invalid": "البريد الإلكتروني غير صالح"
-      },
-      "phone": {
-        "label": "رقم الهاتف",
-        "placeholder": "أدخل رقم الهاتف",
-        "required": "رقم الهاتف مطلوب"
-      },
-      "position": {
-        "label": "المنصب",
-        "placeholder": "أدخل المنصب",
-        "required": "المنصب مطلوب"
-      },
-      "department": {
-        "label": "القسم",
-        "placeholder": "أدخل القسم",
-        "required": "القسم مطلوب"
-      },
-      "hire_date": {
-        "label": "تاريخ التعيين",
-        "placeholder": "أدخل تاريخ التعيين",
-        "required": "تاريخ التعيين مطلوب"
-      },
-      "salary": {
-        "label": "الراتب",
-        "placeholder": "أدخل الراتب",
-        "required": "الراتب مطلوب"
-      },
-      "is_active": {
-        "label": "الحالة النشطة"
-      },
-      "status": {
-        "label": "الحالة",
-        "active": "نشط",
-        "inactive": "غير نشط",
-        "on_leave": "في إجازة"
-      },
-      "address": {
-        "label": "العنوان",
-        "placeholder": "أدخل العنوان"
-      },
-      "notes": {
-        "label": "ملاحظات",
-        "placeholder": "أدخل ملاحظات"
-      }
-    },
-    "messages": {
-      "creating": "جاري إنشاء الموظف...",
-      "create": "إنشاء موظف",
-      "create_employee": "إنشاء موظف",
-      "created": "تم إنشاء الموظف بنجاح",
-      "updated": "تم تحديث بيانات الموظف بنجاح",
-      "deleted": "تم حذف الموظف بنجاح",
-      "error": "حدث خطأ أثناء معالجة طلبك"
-    }
-  },
+
   "Warehouses": {
     "title": "المستودعات",
     "add_new": "إضافة مستودع جديد",
@@ -1936,15 +1854,7 @@
   "Locations": {
     "title": "المواقع"
   },
-  "Contacts": {
-    "title": "جهات الاتصال",
-    "all": "جميع جهات الاتصال",
-    "add_new": "إضافة جهة إتصال جديدة",
-    "name": "الاسم",
-    "email": "البريد الإلكتروني",
-    "phone": "الهاتف",
-    "address": "العنوان"
-  },
+
   "Salaries": {
     "title": "الرواتب"
   },
@@ -2022,7 +1932,103 @@
       }
     }
   },
+  "Recruitment": {
+    "title": "التوظيف"
+  },
   "Leave": {
     "title": "الإجازات"
+  },
+  "Employees": {
+    "title": "الموظفين",
+    "add_new": "إضافة موظف جديد",
+    "add_employee": "إضافة موظف",
+    "cancel": "إلغاء",
+    "employee_details": "تفاصيل الموظف",
+    "edit": "تعديل الموظف",
+    "back_to_list": "الرجوع للقائمة",
+    "allEmployees": "جميع الموظفين",
+    "form": {
+      "first_name": {
+        "label": "الاسم الأول",
+        "placeholder": "أدخل الاسم الأول",
+        "required": "الاسم الأول مطلوب"
+      },
+      "last_name": {
+        "label": "اسم العائلة",
+        "placeholder": "أدخل اسم العائلة",
+        "required": "اسم العائلة مطلوب"
+      },
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل الاسم",
+        "required": "الاسم مطلوب"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "phone": {
+        "label": "رقم الهاتف",
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "رقم الهاتف مطلوب"
+      },
+      "position": {
+        "label": "المنصب",
+        "placeholder": "أدخل المنصب",
+        "required": "المنصب مطلوب"
+      },
+      "department": {
+        "label": "القسم",
+        "placeholder": "أدخل القسم",
+        "required": "القسم مطلوب"
+      },
+      "hire_date": {
+        "label": "تاريخ التعيين",
+        "placeholder": "أدخل تاريخ التعيين",
+        "required": "تاريخ التعيين مطلوب"
+      },
+      "salary": {
+        "label": "الراتب",
+        "placeholder": "أدخل الراتب",
+        "required": "الراتب مطلوب"
+      },
+      "is_active": {
+        "label": "الحالة النشطة"
+      },
+      "status": {
+        "label": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "on_leave": "في إجازة"
+      },
+      "address": {
+        "label": "العنوان",
+        "placeholder": "أدخل العنوان"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظات"
+      }
+    },
+    "messages": {
+      "creating": "جاري إنشاء الموظف...",
+      "create": "إنشاء موظف",
+      "create_employee": "إنشاء موظف",
+      "created": "تم إنشاء الموظف بنجاح",
+      "updated": "تم تحديث بيانات الموظف بنجاح",
+      "deleted": "تم حذف الموظف بنجاح",
+      "error": "حدث خطأ أثناء معالجة طلبك"
+    }
+  },
+  "Contacts": {
+    "title": "جهات الاتصال",
+    "all": "جميع جهات الاتصال",
+    "add_new": "إضافة جهة إتصال جديدة",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "address": "العنوان"
   }
 }

@@ -29,14 +29,14 @@ const PageSearchAndFilter = ({
   return (
     <div
       className={cn(
-        "bg-background flex min-h-14 items-center justify-between gap-4 border-b p-3",
+        "bg-background flex !min-h-14 items-center justify-between gap-4 border-b px-2",
         className,
       )}
       {...props}
     >
       {/* Left section: Title & Search */}
       <div className="flex flex-1 items-center gap-4">
-        {title && <h2 className="hidden text-lg font-medium md:block">{title}</h2>}
+        {title && <h2 className="hidden text-xl font-medium md:block">{title}</h2>}
 
         <div className="relative max-w-md flex-1">
           <Input

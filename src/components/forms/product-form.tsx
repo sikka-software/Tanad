@@ -1,10 +1,11 @@
-import { RefObject } from "react";
+import { RefObject, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -42,14 +43,21 @@ const productSchema = z.object({
 export type ProductFormValues = z.infer<typeof productSchema>;
 
 interface ProductFormProps {
-  onSubmit: (data: ProductFormValues) => Promise<void>;
-  loading?: boolean;
+  onSuccess: (product: any) => void;
+  userId: string | null;
   formRef?: RefObject<HTMLFormElement>;
+  hideFormButtons?: boolean;
 }
 
-export function ProductForm({ onSubmit, loading = false, formRef }: ProductFormProps) {
+export function ProductForm({
+  onSuccess,
+  userId,
+  formRef,
+  hideFormButtons = false,
+}: ProductFormProps) {
   const router = useRouter();
   const t = useTranslations();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -62,9 +70,56 @@ export function ProductForm({ onSubmit, loading = false, formRef }: ProductFormP
     },
   });
 
+  const onSubmit = async (data: ProductFormValues) => {
+    if (!userId) {
+      toast.error(t("Products.error.title"), {
+        description: t("Products.error.not_authenticated"),
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/products/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: data.name.trim(),
+          description: data.description?.trim() || null,
+          price: data.price,
+          sku: data.sku?.trim() || null,
+          stock_quantity: data.stock_quantity,
+          userId: userId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || t("Products.error.create"));
+      }
+
+      const result = await response.json();
+
+      toast.success(t("Products.success.title"), {
+        description: t("Products.success.created"),
+      });
+
+      onSuccess(result.product);
+    } catch (error) {
+      toast.error(t("Products.error.title"), {
+        description: error instanceof Error ? error.message : t("Products.error.create"),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Form {...form}>
       <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <input type="submit" hidden />
         <FormField
           control={form.control}
           name="name"
@@ -136,6 +191,17 @@ export function ProductForm({ onSubmit, loading = false, formRef }: ProductFormP
             </FormItem>
           )}
         />
+
+        {!hideFormButtons && (
+          <div className="flex justify-end gap-4 pt-4">
+            <Button type="button" variant="outline" onClick={() => router.push("/products")}>
+              {t("General.cancel")}
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? t("Products.creating_product") : t("Products.create_product")}
+            </Button>
+          </div>
+        )}
       </form>
     </Form>
   );
