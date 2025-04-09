@@ -936,6 +936,7 @@
     "subtitle": "Our Support"
   },
   "Settings": {
+    "title": "Settings",
     "appearance": "Appearance",
     "appearanceDescription": "Customize how Pukla looks for you.",
     "hideAvatar": "Show Avatar",

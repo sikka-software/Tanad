@@ -928,6 +928,7 @@
     "subtitle": "الدعم الخاص بنا"
   },
   "Settings": {
+    "title": "الإعدادات",
     "appearance": "المظهر",
     "appearanceDescription": "خصص كيف يبدو بكلة بالنسبة لك.",
     "hideAvatar": "إظهار الصورة الشخصية",
