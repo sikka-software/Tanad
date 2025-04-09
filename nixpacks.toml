@@ -1,5 +1,6 @@
 # nixpacks.toml
-
+[phase.name]
+nixpkgsArchive = "5d053ff21df2edd995d98d9e5beb62d7302d9249"
 # Phase 1: Setup - Install necessary system packages/tools
 [phases.setup]
 # Add the 'infisical' Nix package.
@@ -11,11 +12,15 @@ pkgs = ["infisical"]
 # Override the default install command (which would just be 'bun install')
 # This command first exports secrets from Infisical to a .env file,
 # and only if that succeeds (due to &&), it runs 'bun install'.
-cmds = ["npx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN bun install"]
+cmds = [
+  "npx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN bun install",
+]
 
 # You might also have build and start phases defined here
 [phases.build]
-cmds = ["npx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN bun run build"]
+cmds = [
+  "npx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN bun run build",
+]
 
 [start]
 cmd = "npx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN bun run start"
