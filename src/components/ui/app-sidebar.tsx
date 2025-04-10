@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { useTranslations, useLocale } from "next-intl";
 import { useTheme } from "next-themes";
@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
+import type { LucideIcon } from "lucide-react";
 import {
   Link2,
   BarChart,
@@ -66,6 +67,115 @@ import { cn } from "@/lib/utils";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
 
+type Menu = {
+  href: string;
+  label: string;
+  translationKey: string;
+  active?: boolean;
+  icon: LucideIcon;
+  submenus?: {
+    href: string;
+    label: string;
+    translationKey: string;
+    active?: boolean;
+    plusAction?: string;
+  }[];
+};
+
+type Group = {
+  groupLabel?: string;
+  groupLabelTranslationKey?: string;
+  menus: Menu[];
+};
+
+// Custom SidebarAccordion component
+function SidebarAccordion({
+  children,
+  value,
+  className,
+  sidebarState,
+}: {
+  children: [React.ReactNode, React.ReactNode];
+  value: string;
+  className?: string;
+  sidebarState: "expanded" | "collapsed";
+}) {
+  const [height, setHeight] = useState<number | undefined>(undefined);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (sidebarState === "collapsed" && isOpen) {
+      // Start closing animation when sidebar collapses
+      setIsAnimating(true);
+      const startHeight = contentRef.current?.scrollHeight;
+      setHeight(startHeight);
+
+      // Trigger the animation by setting height to 0
+      requestAnimationFrame(() => {
+        setHeight(0);
+      });
+
+      // Reset after animation
+      const timer = setTimeout(() => {
+        setIsOpen(false);
+        setIsAnimating(false);
+        setHeight(undefined);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [sidebarState, isOpen]);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setIsAnimating(true);
+    if (!isOpen) {
+      setIsOpen(true);
+      setHeight(contentRef.current?.scrollHeight);
+    } else {
+      setHeight(contentRef.current?.scrollHeight);
+      requestAnimationFrame(() => {
+        setHeight(0);
+      });
+    }
+
+    const timer = setTimeout(() => {
+      if (!isOpen) {
+        setHeight(undefined);
+      }
+      setIsAnimating(false);
+      if (isOpen) {
+        setIsOpen(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  };
+
+  return (
+    <div
+      className={cn("overflow-hidden transition-all duration-300", className)}
+      data-state={isOpen ? "open" : "closed"}
+    >
+      <div onClick={handleClick}>{children[0]}</div>
+      <div
+        ref={contentRef}
+        style={{ height: height === undefined ? (isOpen ? "auto" : 0) : height }}
+        className={cn(
+          "overflow-hidden transition-all duration-300",
+          isAnimating && "pointer-events-none",
+        )}
+      >
+        {children[1]}
+      </div>
+    </div>
+  );
+}
+
 // Add a custom style for the chevron rotation
 const accordionChevronStyles = `
   .accordion-chevron {
@@ -74,6 +184,24 @@ const accordionChevronStyles = `
   
   [data-state="open"] .accordion-chevron {
     transform: rotate(180deg);
+  }
+
+  /* Ensure smooth accordion animations */
+  [data-radix-accordion-content] {
+    transition: height 0.3s ease-out;
+    will-change: height;
+  }
+
+  /* Prevent content from being cut off during animation */
+  [data-radix-accordion-content][data-state="open"] {
+    height: var(--radix-accordion-content-height);
+    overflow: hidden;
+  }
+
+  /* Ensure content is visible during sidebar collapse */
+  .group-data-[collapsible=icon] [data-radix-accordion-content][data-state="open"] {
+    animation: none;
+    transition: height 0.3s ease-out;
   }
 `;
 
@@ -96,8 +224,6 @@ export function AppSidebar() {
   const logoSrc = `/assets/pukla-logo-full-${
     !isMounted || resolvedTheme === "dark" ? "green" : "purple"
   }${lang === "en" ? "-en" : ""}.png`;
-
-  const sidebarIsOpen = state !== "collapsed" && !isMobile;
 
   return (
     <>
@@ -129,113 +255,109 @@ export function AppSidebar() {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            {/* <SidebarHeader className="p-0">
-              <Link
-                href={user ? "/dashboard" : "/"}
-                className="flex items-center"
-              >
-                <span className="text-xl my-2 font-bold w-full flex justify-center overflow-hidden">
-                  {!isMobile && state === "collapsed" ? (
-                    <Image
-                      src={`/assets/pukla-logo-symbol-${resolvedTheme === "dark" ? "green" : "purple"}.png`}
-                      alt="Pukla"
-                      className="h-6 w-auto min-w-max"
-                      width={512}
-                      height={512}
-                    />
-                  ) : (
-                    <Image
-                      src={logoSrc}
-                      alt="Pukla"
-                      className="h-6 w-auto min-w-max"
-                      width={512}
-                      height={512}
-                    />
-                  )}
-                </span>
-              </Link>
-            </SidebarHeader> */}
             <SidebarGroupContent>
               <SidebarMenu className="mt-4 gap-2">
                 {menuGroups.map((group, groupIndex) => (
-                  <div key={groupIndex} className="overflow-hidden">
-                    {/* {state !== "collapsed" && group.groupLabelTranslationKey ? (
-                      <div className="text-muted-foreground px-3 py-2 text-xs font-medium text-nowrap">
-                        {t(group.groupLabelTranslationKey)}
-                      </div>
-                    ) : (
-                      <div className="text-muted-foreground min-h-8 px-3 py-2 text-xs font-medium" />
-                    )} */}
+                  <div key={groupIndex}>
                     <SidebarSeparator className="mb-2" />
-                    <Accordion type="single" collapsible className="w-full">
-                      {group.menus.map((menu, menuIndex) => (
-                        <SidebarMenuItem key={menuIndex}>
-                          {menu.submenus && menu.submenus.length > 0 ? (
-                            <AccordionItem value={`item-${menuIndex}`} className="border-none">
-                              <AccordionTrigger
-                                className="w-full p-0 hover:no-underline"
-                                hideChevron
-                                onClick={(e) => {
-                                  if (state === "collapsed" && !isMobile) {
-                                    setSidebarOpen(true);
-                                  }
-                                }}
-                              >
-                                <SidebarMenuButton
-                                  className="w-full overflow-hidden"
-                                  tooltip={t(menu.translationKey)}
+                    <SidebarAccordion
+                      value={`group-${groupIndex}`}
+                      className="border-none"
+                      sidebarState={state}
+                    >
+                      <div>
+                        <SidebarMenuButton
+                          className="w-full overflow-hidden"
+                          tooltip={group.groupLabelTranslationKey || ""}
+                          onClick={(e) => {
+                            if (state === "collapsed" && !isMobile) {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setSidebarOpen(true);
+                            }
+                          }}
+                        >
+                          <span className="text-nowrap">
+                            {t(group.groupLabelTranslationKey || "")}
+                          </span>
+                          <ChevronDown className="accordion-chevron ms-auto" />
+                        </SidebarMenuButton>
+                      </div>
+                      <div>
+                        <div className="w-full">
+                          {group.menus.map((menu, menuIndex) => (
+                            <SidebarMenuItem key={menuIndex}>
+                              {menu.submenus && menu.submenus.length > 0 ? (
+                                <SidebarAccordion
+                                  value={`item-${groupIndex}-${menuIndex}`}
+                                  className="border-none"
+                                  sidebarState={state}
                                 >
-                                  {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                                  <span className="text-nowrap">{t(menu.translationKey)}</span>
-                                  <ChevronDown className="accordion-chevron ms-auto" />
-                                </SidebarMenuButton>
-                              </AccordionTrigger>
-                              <AccordionContent className="m-0 p-0">
-                                <SidebarMenuSub className="!ms-2 w-full">
-                                  {menu.submenus.map((submenu, submenuIndex) => (
-                                    <Link href={submenu.href} key={submenuIndex}>
-                                      <SidebarMenuSubButton className="w-full">
-                                        <span>{t(submenu.translationKey)}</span>
-                                        {submenu.plusAction && (
-                                          <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="ms-auto !size-5 cursor-pointer !p-2"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              e.preventDefault();
-                                              if (submenu.plusAction) {
-                                                router.push(submenu.plusAction);
-                                              }
-                                            }}
-                                          >
-                                            <Plus className="!size-3" />
-                                          </Button>
-                                        )}
-                                      </SidebarMenuSubButton>
-                                    </Link>
-                                  ))}
-                                </SidebarMenuSub>
-                              </AccordionContent>
-                            </AccordionItem>
-                          ) : (
-                            <Link href={menu.href}>
-                              <SidebarMenuButton
-                                dir={lang === "ar" ? "rtl" : "ltr"}
-                                tooltip={t(menu.translationKey)}
-                                className={cn(
-                                  menu.active &&
-                                    "bg-primary text-background hover:bg-primary hover:text-background",
-                                )}
-                              >
-                                {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                                <span>{t(menu.translationKey)}</span>
-                              </SidebarMenuButton>
-                            </Link>
-                          )}
-                        </SidebarMenuItem>
-                      ))}
-                    </Accordion>
+                                  <div>
+                                    <SidebarMenuButton
+                                      className="w-full overflow-hidden"
+                                      tooltip={menu.translationKey}
+                                      onClick={(e) => {
+                                        if (state === "collapsed" && !isMobile) {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          setSidebarOpen(true);
+                                        }
+                                      }}
+                                    >
+                                      {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
+                                      <span className="text-nowrap">{t(menu.translationKey)}</span>
+                                      <ChevronDown className="accordion-chevron ms-auto" />
+                                    </SidebarMenuButton>
+                                  </div>
+                                  <div>
+                                    <SidebarMenuSub className="!ms-2 w-full">
+                                      {menu.submenus.map((submenu, submenuIndex) => (
+                                        <Link href={submenu.href} key={submenuIndex}>
+                                          <SidebarMenuSubButton className="w-full">
+                                            <span>{t(submenu.translationKey)}</span>
+                                            {submenu.plusAction && (
+                                              <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="ms-auto !size-5 cursor-pointer !p-2"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  e.preventDefault();
+                                                  if (submenu.plusAction) {
+                                                    router.push(submenu.plusAction);
+                                                  }
+                                                }}
+                                              >
+                                                <Plus className="!size-3" />
+                                              </Button>
+                                            )}
+                                          </SidebarMenuSubButton>
+                                        </Link>
+                                      ))}
+                                    </SidebarMenuSub>
+                                  </div>
+                                </SidebarAccordion>
+                              ) : (
+                                <Link href={menu.href}>
+                                  <SidebarMenuButton
+                                    dir={lang === "ar" ? "rtl" : "ltr"}
+                                    tooltip={menu.translationKey}
+                                    className={cn(
+                                      menu.active &&
+                                        "bg-primary text-background hover:bg-primary hover:text-background",
+                                    )}
+                                  >
+                                    {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
+                                    <span>{t(menu.translationKey)}</span>
+                                  </SidebarMenuButton>
+                                </Link>
+                              )}
+                            </SidebarMenuItem>
+                          ))}
+                        </div>
+                      </div>
+                    </SidebarAccordion>
                   </div>
                 ))}
               </SidebarMenu>
