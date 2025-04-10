@@ -104,22 +104,28 @@ function SidebarAccordion({
   value,
   className,
   sidebarState,
+  parentValue,
 }: {
   children: [React.ReactNode, React.ReactNode];
   value: string;
   className?: string;
   sidebarState: "expanded" | "collapsed";
+  parentValue?: string;
 }) {
   const [height, setHeight] = useState<number | undefined>(undefined);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const { openAccordions, handleAccordionChange } = useContext(AccordionContext);
   const isOpen = openAccordions.has(value);
+  const isParentOpen = parentValue ? openAccordions.has(parentValue) : true;
+  const shouldBeOpen = isOpen && (!parentValue || isParentOpen) && !isClosing;
 
   useEffect(() => {
-    if (sidebarState === "collapsed" && isOpen) {
+    if (sidebarState === "collapsed" && isOpen && (!parentValue || isParentOpen)) {
       // Start closing animation when sidebar collapses
       setIsAnimating(true);
+      setIsClosing(true);
       const startHeight = contentRef.current?.scrollHeight;
       setHeight(startHeight);
 
@@ -135,16 +141,22 @@ function SidebarAccordion({
       }, 300);
 
       return () => clearTimeout(timer);
+    } else if (sidebarState === "expanded") {
+      setIsClosing(false);
     }
-  }, [sidebarState, isOpen]);
+  }, [sidebarState, isOpen, parentValue, isParentOpen]);
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
+    if (sidebarState === "collapsed" || (parentValue && !isParentOpen)) {
+      return; // Don't allow toggling if sidebar is collapsed or parent is closed
+    }
+
     setIsAnimating(true);
     const newIsOpen = !isOpen;
-    
+
     if (newIsOpen) {
       setHeight(contentRef.current?.scrollHeight);
     } else {
@@ -169,15 +181,15 @@ function SidebarAccordion({
   return (
     <div
       className={cn("overflow-hidden transition-all duration-300", className)}
-      data-state={isOpen ? "open" : "closed"}
+      data-state={shouldBeOpen ? "open" : "closed"}
     >
       <div onClick={handleClick}>{children[0]}</div>
       <div
         ref={contentRef}
-        style={{ height: height === undefined ? (isOpen ? "auto" : 0) : height }}
+        style={{ height: height === undefined ? (shouldBeOpen ? "auto" : 0) : height }}
         className={cn(
           "overflow-hidden transition-all duration-300",
-          isAnimating && "pointer-events-none"
+          isAnimating && "pointer-events-none",
         )}
       >
         {children[1]}
@@ -237,7 +249,7 @@ export function AppSidebar() {
   }, [state]);
 
   const handleAccordionChange = (value: string, isOpen: boolean) => {
-    setOpenAccordions(prev => {
+    setOpenAccordions((prev) => {
       const newSet = new Set(prev);
       if (isOpen) {
         newSet.add(value);
@@ -327,6 +339,7 @@ export function AppSidebar() {
                                     value={`item-${groupIndex}-${menuIndex}`}
                                     className="border-none"
                                     sidebarState={state}
+                                    parentValue={`group-${groupIndex}`}
                                   >
                                     <div>
                                       <SidebarMenuButton
@@ -341,7 +354,9 @@ export function AppSidebar() {
                                         }}
                                       >
                                         {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                                        <span className="text-nowrap">{t(menu.translationKey)}</span>
+                                        <span className="text-nowrap">
+                                          {t(menu.translationKey)}
+                                        </span>
                                         <ChevronDown className="accordion-chevron ms-auto" />
                                       </SidebarMenuButton>
                                     </div>
@@ -349,13 +364,16 @@ export function AppSidebar() {
                                       <SidebarMenuSub className="!ms-2 w-full">
                                         {menu.submenus.map((submenu, submenuIndex) => (
                                           <Link href={submenu.href} key={submenuIndex}>
-                                            <SidebarMenuSubButton 
+                                            <SidebarMenuSubButton
                                               className={cn(
                                                 "w-full",
-                                                submenu.active && "bg-primary text-background hover:bg-primary hover:text-background"
+                                                submenu.active &&
+                                                  "bg-primary text-background hover:bg-primary hover:text-background",
                                               )}
                                             >
-                                              <span>{t(submenu.translationKey)}</span>
+                                              <span className="text-nowrap">
+                                                {t(submenu.translationKey)}
+                                              </span>
                                               {submenu.plusAction && (
                                                 <Button
                                                   variant="ghost"
