@@ -140,7 +140,7 @@ function SidebarAccordion({
       const timer = setTimeout(() => {
         setIsAnimating(false);
         setContentHeight(undefined);
-      }, 300);
+      }, 400);
 
       return () => clearTimeout(timer);
     } else if (sidebarState === "expanded" && isOpen) {
@@ -151,19 +151,25 @@ function SidebarAccordion({
       // Start with height 0
       setContentHeight(0);
       
-      // Then animate to full height
-      requestAnimationFrame(() => {
+      // For child accordions, delay the animation slightly to let parent expand first
+      const animationDelay = parentValue ? 150 : 0;
+      
+      // Then animate to full height with appropriate delay
+      const timer1 = setTimeout(() => {
         const targetHeight = contentRef.current?.scrollHeight;
         setContentHeight(targetHeight);
-      });
+      }, animationDelay);
 
       // Reset after animation
-      const timer = setTimeout(() => {
+      const timer2 = setTimeout(() => {
         setIsAnimating(false);
         setContentHeight(undefined);
-      }, 300);
+      }, 300 + animationDelay);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
     }
   }, [sidebarState, isOpen, parentValue, isParentOpen]);
 
