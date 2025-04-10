@@ -9,6 +9,8 @@ import {
   BarChart,
   CreditCard,
   Briefcase,
+  Building2,
+  SaudiRiyal,
 } from "lucide-react";
 
 type Submenu = {
@@ -31,6 +33,7 @@ type Menu = {
 type Group = {
   groupLabel?: string;
   groupLabelTranslationKey?: string;
+  icon: LucideIcon;
   menus: Menu[];
 };
 
@@ -262,21 +265,25 @@ export function getMenuList(pathname: string): Group[] {
     {
       groupLabel: "Administration",
       groupLabelTranslationKey: "Administration.title",
+      icon: Building2,
       menus: getAdministrationMenus(pathname),
     },
     {
       groupLabel: "Accounting",
       groupLabelTranslationKey: "Accounting.title",
+      icon: SaudiRiyal,
       menus: getAccountingMenus(pathname),
     },
     {
       groupLabel: "Human Resources",
       groupLabelTranslationKey: "HumanResources.title",
+      icon: Users,
       menus: getHrMenus(pathname),
     },
     {
       groupLabel: "Settings",
       groupLabelTranslationKey: "Settings.title",
+      icon: Settings,
       menus: getSettingsMenus(pathname),
     },
   ];

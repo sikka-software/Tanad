@@ -86,6 +86,7 @@ type Menu = {
 type Group = {
   groupLabel?: string;
   groupLabelTranslationKey?: string;
+  icon: LucideIcon;
   menus: Menu[];
 };
 
@@ -232,7 +233,7 @@ export function AppSidebar() {
   const lang = useLocale();
   const [open, setOpen] = useState(false);
   const { resolvedTheme } = useTheme();
-  const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
+  const { state, isMobile, setOpen: setSidebarOpen, open: isSidebarOpen } = useSidebar();
   const { user } = useUserStore();
   const router = useRouter();
   const [openAccordions, setOpenAccordions] = useState<Set<string>>(new Set());
@@ -324,9 +325,12 @@ export function AppSidebar() {
                               }
                             }}
                           >
-                            <span className="text-nowrap">
-                              {t(group.groupLabelTranslationKey || "")}
-                            </span>
+                            {group.icon && <group.icon className="!size-6 md:!size-4" />}
+                            {(!isMobile && state !== "collapsed") && (
+                              <span className="text-nowrap">
+                                {t(group.groupLabelTranslationKey || "")}
+                              </span>
+                            )}
                             <ChevronDown className="accordion-chevron ms-auto" />
                           </SidebarMenuButton>
                         </div>
@@ -354,9 +358,11 @@ export function AppSidebar() {
                                         }}
                                       >
                                         {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                                        <span className="text-nowrap">
-                                          {t(menu.translationKey)}
-                                        </span>
+                                        {(!isMobile && state !== "collapsed") && (
+                                          <span className="text-nowrap">
+                                            {t(menu.translationKey)}
+                                          </span>
+                                        )}
                                         <ChevronDown className="accordion-chevron ms-auto" />
                                       </SidebarMenuButton>
                                     </div>
@@ -371,9 +377,11 @@ export function AppSidebar() {
                                                   "bg-primary text-background hover:bg-primary hover:text-background",
                                               )}
                                             >
-                                              <span className="text-nowrap">
-                                                {t(submenu.translationKey)}
-                                              </span>
+                                              {(!isMobile && state !== "collapsed") && (
+                                                <span className="text-nowrap">
+                                                  {t(submenu.translationKey)}
+                                                </span>
+                                              )}
                                               {submenu.plusAction && (
                                                 <Button
                                                   variant="ghost"
