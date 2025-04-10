@@ -167,7 +167,7 @@ function SidebarAccordion({
         style={{ height: height === undefined ? (isOpen ? "auto" : 0) : height }}
         className={cn(
           "overflow-hidden transition-all duration-300",
-          isAnimating && "pointer-events-none",
+          isAnimating && "pointer-events-none"
         )}
       >
         {children[1]}
@@ -314,7 +314,12 @@ export function AppSidebar() {
                                     <SidebarMenuSub className="!ms-2 w-full">
                                       {menu.submenus.map((submenu, submenuIndex) => (
                                         <Link href={submenu.href} key={submenuIndex}>
-                                          <SidebarMenuSubButton className="w-full">
+                                          <SidebarMenuSubButton 
+                                            className={cn(
+                                              "w-full",
+                                              submenu.active && "bg-primary text-background hover:bg-primary hover:text-background"
+                                            )}
+                                          >
                                             <span>{t(submenu.translationKey)}</span>
                                             {submenu.plusAction && (
                                               <Button
