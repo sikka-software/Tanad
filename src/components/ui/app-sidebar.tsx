@@ -113,7 +113,7 @@ function SidebarAccordion({
   sidebarState: "expanded" | "collapsed";
   parentValue?: string;
 }) {
-  const [height, setHeight] = useState<number | undefined>(undefined);
+  const height = useRef<number | undefined>(undefined);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -121,6 +121,7 @@ function SidebarAccordion({
   const isOpen = openAccordions.has(value);
   const isParentOpen = parentValue ? openAccordions.has(parentValue) : true;
   const shouldBeOpen = isOpen && (!parentValue || isParentOpen) && !isClosing;
+  const [contentHeight, setContentHeight] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (sidebarState === "collapsed" && isOpen && (!parentValue || isParentOpen)) {
@@ -128,22 +129,41 @@ function SidebarAccordion({
       setIsAnimating(true);
       setIsClosing(true);
       const startHeight = contentRef.current?.scrollHeight;
-      setHeight(startHeight);
+      setContentHeight(startHeight);
 
       // Trigger the animation by setting height to 0
       requestAnimationFrame(() => {
-        setHeight(0);
+        setContentHeight(0);
       });
 
       // Reset after animation
       const timer = setTimeout(() => {
         setIsAnimating(false);
-        setHeight(undefined);
+        setContentHeight(undefined);
       }, 300);
 
       return () => clearTimeout(timer);
-    } else if (sidebarState === "expanded") {
+    } else if (sidebarState === "expanded" && isOpen) {
+      // Handle opening animation when sidebar expands
       setIsClosing(false);
+      setIsAnimating(true);
+      
+      // Start with height 0
+      setContentHeight(0);
+      
+      // Then animate to full height
+      requestAnimationFrame(() => {
+        const targetHeight = contentRef.current?.scrollHeight;
+        setContentHeight(targetHeight);
+      });
+
+      // Reset after animation
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+        setContentHeight(undefined);
+      }, 300);
+
+      return () => clearTimeout(timer);
     }
   }, [sidebarState, isOpen, parentValue, isParentOpen]);
 
@@ -159,11 +179,16 @@ function SidebarAccordion({
     const newIsOpen = !isOpen;
 
     if (newIsOpen) {
-      setHeight(contentRef.current?.scrollHeight);
-    } else {
-      setHeight(contentRef.current?.scrollHeight);
+      const targetHeight = contentRef.current?.scrollHeight;
+      setContentHeight(0);
       requestAnimationFrame(() => {
-        setHeight(0);
+        setContentHeight(targetHeight);
+      });
+    } else {
+      const startHeight = contentRef.current?.scrollHeight;
+      setContentHeight(startHeight);
+      requestAnimationFrame(() => {
+        setContentHeight(0);
       });
     }
 
@@ -171,7 +196,7 @@ function SidebarAccordion({
 
     const timer = setTimeout(() => {
       if (newIsOpen) {
-        setHeight(undefined);
+        setContentHeight(undefined);
       }
       setIsAnimating(false);
     }, 300);
@@ -187,7 +212,7 @@ function SidebarAccordion({
       <div onClick={handleClick}>{children[0]}</div>
       <div
         ref={contentRef}
-        style={{ height: height === undefined ? (shouldBeOpen ? "auto" : 0) : height }}
+        style={{ height: contentHeight === undefined ? (shouldBeOpen ? "auto" : 0) : contentHeight }}
         className={cn(
           "overflow-hidden transition-all duration-300",
           isAnimating && "pointer-events-none",
@@ -322,6 +347,10 @@ export function AppSidebar() {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 setSidebarOpen(true);
+                                // Wait for sidebar expansion animation to start
+                                requestAnimationFrame(() => {
+                                  handleAccordionChange(`group-${groupIndex}`, true);
+                                });
                               }
                             }}
                           >
@@ -354,6 +383,11 @@ export function AppSidebar() {
                                             e.preventDefault();
                                             e.stopPropagation();
                                             setSidebarOpen(true);
+                                            // Wait for sidebar expansion animation to start
+                                            requestAnimationFrame(() => {
+                                              handleAccordionChange(`group-${groupIndex}`, true);
+                                              handleAccordionChange(`item-${groupIndex}-${menuIndex}`, true);
+                                            });
                                           }
                                         }}
                                       >
