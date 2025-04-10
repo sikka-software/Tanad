@@ -82,7 +82,7 @@ export function AppSidebar() {
   const lang = useLocale();
   const [open, setOpen] = useState(false);
   const { resolvedTheme } = useTheme();
-  const { state, isMobile } = useSidebar();
+  const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
   const { user } = useUserStore();
   const router = useRouter();
 
@@ -158,12 +158,14 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu className="mt-4 gap-2">
                 {menuGroups.map((group, groupIndex) => (
-                  <div key={groupIndex}>
-                    {state !== "collapsed" && group.groupLabelTranslationKey && (
-                      <div className="text-muted-foreground px-3 py-2 text-xs font-medium">
+                  <div key={groupIndex} className="overflow-hidden">
+                    {/* {state !== "collapsed" && group.groupLabelTranslationKey ? (
+                      <div className="text-muted-foreground px-3 py-2 text-xs font-medium text-nowrap">
                         {t(group.groupLabelTranslationKey)}
                       </div>
-                    )}
+                    ) : (
+                      <div className="text-muted-foreground min-h-8 px-3 py-2 text-xs font-medium" />
+                    )} */}
                     <SidebarSeparator className="mb-2" />
                     <Accordion type="single" collapsible className="w-full">
                       {group.menus.map((menu, menuIndex) => (
@@ -173,13 +175,18 @@ export function AppSidebar() {
                               <AccordionTrigger
                                 className="w-full p-0 hover:no-underline"
                                 hideChevron
+                                onClick={(e) => {
+                                  if (state === "collapsed" && !isMobile) {
+                                    setSidebarOpen(true);
+                                  }
+                                }}
                               >
                                 <SidebarMenuButton
-                                  className="w-full"
+                                  className="w-full overflow-hidden"
                                   tooltip={t(menu.translationKey)}
                                 >
                                   {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                                  <span>{t(menu.translationKey)}</span>
+                                  <span className="text-nowrap">{t(menu.translationKey)}</span>
                                   <ChevronDown className="accordion-chevron ms-auto" />
                                 </SidebarMenuButton>
                               </AccordionTrigger>
