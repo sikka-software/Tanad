@@ -16,6 +16,7 @@ export default function ClientsPage() {
   const t = useTranslations("Clients");
   const { data: clients, isLoading, error } = useClients();
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
 
   const filteredClients = clients?.filter(
     (client) =>
@@ -75,19 +76,24 @@ export default function ClientsPage() {
         createLabel={t("add_new")}
         onSearch={setSearchQuery}
         searchPlaceholder={t("search_clients")}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
       <div>
-        <ClientsTable />
-        <div className="p-4">
-          <DataModelList
-            data={filteredClients || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
-            emptyMessage={t("no_clients_found")}
-            renderItem={renderClient}
-            gridCols="3"
-          />
-        </div>
+        {viewMode === "table" ? (
+          <ClientsTable />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredClients || []}
+              isLoading={isLoading}
+              error={error instanceof Error ? error : null}
+              emptyMessage={t("no_clients_found")}
+              renderItem={renderClient}
+              gridCols="3"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
