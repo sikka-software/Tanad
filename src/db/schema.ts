@@ -31,7 +31,7 @@ export const clients = pgTable(
     name: text().notNull(),
     email: text().notNull(),
     phone: text().notNull(),
-    company: text().notNull(),
+    company: uuid("company").references(() => companies.id, { onDelete: "set null" }),
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
@@ -43,6 +43,11 @@ export const clients = pgTable(
     index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
     index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("clients_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.company],
+      foreignColumns: [companies.id],
+      name: "clients_company_fkey"
+    })
   ],
 ).enableRLS();
 

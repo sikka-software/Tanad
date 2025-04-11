@@ -4,7 +4,12 @@ import { Client, ClientCreateData } from "@/types/client.type";
 export async function fetchClients(): Promise<Client[]> {
   const { data, error } = await supabase
     .from("clients")
-    .select("*")
+    .select(
+      `
+      *,
+      company_details:companies (name)
+    `,
+    )
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -16,7 +21,16 @@ export async function fetchClients(): Promise<Client[]> {
 }
 
 export async function fetchClientById(id: string): Promise<Client> {
-  const { data, error } = await supabase.from("clients").select("*").eq("id", id).single();
+  const { data, error } = await supabase
+    .from("clients")
+    .select(
+      `
+      *,
+      company_details:companies (name)
+    `,
+    )
+    .eq("id", id)
+    .single();
 
   if (error) {
     console.error(`Error fetching client with id ${id}:`, error);

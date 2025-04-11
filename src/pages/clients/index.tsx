@@ -19,50 +19,57 @@ export default function ClientsPage() {
   const filteredClients = clients?.filter(
     (client) =>
       client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (client.company_details?.name || "Unknown Company")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       client.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const renderClient = (client: Client) => (
-    <Card key={client.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <h3 className="text-lg font-semibold">{client.name}</h3>
-        <p className="text-sm text-gray-500">{client.company}</p>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Mail className="h-4 w-4" />
-            <a href={`mailto:${client.email}`} className="hover:text-primary">
-              {client.email}
-            </a>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Phone className="h-4 w-4" />
-            <a href={`tel:${client.phone}`} className="hover:text-primary">
-              {client.phone}
-            </a>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <Building2 className="h-4 w-4" />
-            <span>{client.company}</span>
-          </div>
-          <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <MapPin className="mt-1 h-4 w-4" />
-            <div>
-              <p>{client.address}</p>
-              <p>{`${client.city}, ${client.state} ${client.zip_code}`}</p>
+  const renderClient = (client: Client) => {
+    console.log("col", client);
+    return (
+      <Card key={client.id} className="transition-shadow hover:shadow-lg">
+        <CardHeader>
+          <h3 className="text-lg font-semibold">{client.name}</h3>
+          <p className="text-sm text-gray-500">
+            {client.company_details?.name || "Unknown Company"}
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Mail className="h-4 w-4" />
+              <a href={`mailto:${client.email}`} className="hover:text-primary">
+                {client.email}
+              </a>
             </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Phone className="h-4 w-4" />
+              <a href={`tel:${client.phone}`} className="hover:text-primary">
+                {client.phone}
+              </a>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Building2 className="h-4 w-4" />
+              <span>{client.company_details?.name || "Unknown Company"}</span>
+            </div>
+            <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <MapPin className="mt-1 h-4 w-4" />
+              <div>
+                <p>{client.address}</p>
+                <p>{`${client.city}, ${client.state} ${client.zip_code}`}</p>
+              </div>
+            </div>
+            {client.notes && (
+              <p className="mt-2 border-t pt-2 text-sm text-gray-500 dark:text-gray-400">
+                {client.notes}
+              </p>
+            )}
           </div>
-          {client.notes && (
-            <p className="mt-2 border-t pt-2 text-sm text-gray-500 dark:text-gray-400">
-              {client.notes}
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div>

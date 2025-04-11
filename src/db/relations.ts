@@ -15,6 +15,7 @@ import {
   warehouses,
   branches,
   jobs,
+  companies,
 } from "./schema";
 
 export const clientsRelations = relations(clients, ({ many, one }) => ({
@@ -24,6 +25,10 @@ export const clientsRelations = relations(clients, ({ many, one }) => ({
   profile: one(profiles, {
     fields: [clients.userId],
     references: [profiles.id],
+  }),
+  company: one(companies, {
+    fields: [clients.company],
+    references: [companies.id],
   }),
 }));
 

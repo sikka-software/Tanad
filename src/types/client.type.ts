@@ -3,6 +3,7 @@ import { CompanyProps } from "./company.type";
 import { InvoiceProps } from "./invoice.type";
 import { NoteProps } from "./note.type";
 import { UserProps } from "./user.type";
+import { Company } from "./company.type";
 
 export type ClientProps = {
   _id: string;
@@ -37,6 +38,7 @@ export interface Client {
   email: string;
   phone: string;
   company: string;
+  company_details?: Company;
   address: string;
   city: string;
   state: string;
@@ -45,4 +47,4 @@ export interface Client {
   created_at: string;
 }
 
-export type ClientCreateData = Omit<Client, "id" | "created_at"> & { userId?: string };
+export type ClientCreateData = Omit<Client, "id" | "created_at" | "company_details"> & { userId?: string };
