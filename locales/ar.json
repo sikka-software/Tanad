@@ -2098,5 +2098,10 @@
       "state_required": "المنطقة مطلوبة",
       "zip_code_required": "الرمز البريدي مطلوب"
     }
+  },
+  "Navigation": {
+    "main": "التنقل الرئيسي",
+    "resources": "الموارد",
+    "organization": "المؤسسة"
   }
 }

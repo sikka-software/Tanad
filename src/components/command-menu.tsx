@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import {
@@ -31,6 +32,9 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
+  const t = useTranslations();
+  const tGeneral = useTranslations("General");
+
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -55,59 +59,59 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
           className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-item]_svg]:w-5] [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5"
           dir={dir}
         >
-          <CommandInput placeholder="Type a command or search..." />
+          <CommandInput placeholder={tGeneral("search")} />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
-            <CommandGroup heading="Main Navigation">
+            <CommandEmpty>{tGeneral("no_results")}</CommandEmpty>
+            <CommandGroup heading={t("Navigation.main")}>
               <CommandItem onSelect={() => runCommand(() => router.push("/dashboard"))}>
                 <LayoutDashboard className="mr-2 h-4 w-4" />
-                <span>Dashboard</span>
+                <span>{t("Dashboard.title")}</span>
                 <CommandShortcut>⌘D</CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => runCommand(() => router.push("/clients"))}>
                 <Users className="mr-2 h-4 w-4" />
-                <span>Clients</span>
+                <span>{t("Clients.title")}</span>
                 <CommandShortcut>⌘C</CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => runCommand(() => router.push("/jobs"))}>
                 <Briefcase className="mr-2 h-4 w-4" />
-                <span>Jobs</span>
+                <span>{t("Jobs.title")}</span>
                 <CommandShortcut>⌘J</CommandShortcut>
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
-            <CommandGroup heading="Resources">
+            <CommandGroup heading={t("Navigation.resources")}>
               <CommandItem onSelect={() => runCommand(() => router.push("/employees"))}>
                 <Building2 className="mr-2 h-4 w-4" />
-                <span>Employees</span>
+                <span>{t("HumanResources.title")}</span>
                 <CommandShortcut>⌘E</CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => runCommand(() => router.push("/expenses"))}>
                 <CircleDollarSign className="mr-2 h-4 w-4" />
-                <span>Expenses</span>
+                <span>{t("Expenses.title")}</span>
                 <CommandShortcut>⌘X</CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => runCommand(() => router.push("/invoices"))}>
                 <FileText className="mr-2 h-4 w-4" />
-                <span>Invoices</span>
+                <span>{t("Invoices.title")}</span>
                 <CommandShortcut>⌘I</CommandShortcut>
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
-            <CommandGroup heading="Organization">
+            <CommandGroup heading={t("Navigation.organization")}>
               <CommandItem onSelect={() => runCommand(() => router.push("/companies"))}>
                 <Building className="mr-2 h-4 w-4" />
-                <span>Companies</span>
+                <span>{t("Companies.title")}</span>
                 <CommandShortcut>⌘O</CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => runCommand(() => router.push("/calendar"))}>
                 <Calendar className="mr-2 h-4 w-4" />
-                <span>Calendar</span>
+                <span>{t("Calendar.title")}</span>
                 <CommandShortcut>⌘L</CommandShortcut>
               </CommandItem>
               <CommandItem onSelect={() => runCommand(() => router.push("/settings"))}>
                 <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
+                <span>{t("Settings.title")}</span>
                 <CommandShortcut>⌘S</CommandShortcut>
               </CommandItem>
             </CommandGroup>

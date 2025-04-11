@@ -2140,5 +2140,10 @@
         "email_invalid": "Invalid email address"
       }
     }
+  },
+  "Navigation": {
+    "main": "Main Navigation",
+    "resources": "Resources",
+    "organization": "Organization"
   }
 }
