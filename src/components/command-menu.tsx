@@ -28,6 +28,12 @@ import {
 } from "@/components/ui/command";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
+type ShortcutCommand = {
+  key: string;
+  path: string;
+  metaKey?: boolean;
+};
+
 export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -35,17 +41,43 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
   const t = useTranslations();
   const tGeneral = useTranslations("General");
 
+  // Define all shortcuts and their corresponding paths
+  const shortcuts: ShortcutCommand[] = [
+    { key: "k", path: "", metaKey: true }, // Command menu toggle
+    { key: "d", path: "/dashboard", metaKey: true },
+    { key: "c", path: "/clients", metaKey: true },
+    { key: "j", path: "/jobs", metaKey: true },
+    { key: "e", path: "/employees", metaKey: true },
+    { key: "x", path: "/expenses", metaKey: true },
+    { key: "i", path: "/invoices", metaKey: true },
+    { key: "o", path: "/companies", metaKey: true },
+    { key: "l", path: "/calendar", metaKey: true },
+    { key: "s", path: "/settings", metaKey: true },
+  ];
+
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+      // Find matching shortcut
+      const shortcut = shortcuts.find(
+        (s) =>
+          s.key.toLowerCase() === e.key.toLowerCase() &&
+          (!s.metaKey || (e.metaKey || e.ctrlKey))
+      );
+
+      if (shortcut) {
         e.preventDefault();
-        setOpen((open) => !open);
+        if (shortcut.path) {
+          router.push(shortcut.path);
+        } else {
+          // Toggle command menu for ⌘K
+          setOpen((open) => !open);
+        }
       }
     };
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [router, shortcuts]);
 
   const runCommand = (command: () => void) => {
     setOpen(false);
