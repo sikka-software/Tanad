@@ -17,6 +17,8 @@
  */
 import React, { useState, useCallback } from "react";
 
+import { useTranslations } from "next-intl";
+
 import {
   useReactTable,
   getCoreRowModel,
@@ -332,6 +334,8 @@ function SheetTable<
     handleAddRowFunction,
     handleRemoveRowFunction,
   } = props;
+
+  const t = useTranslations();
 
   /**
    * If column sizing is enabled, we track sizes in state.
@@ -668,9 +672,9 @@ function SheetTable<
               if (colDef.minSize) style.minWidth = `${colDef.minSize}px`;
               if (colDef.maxSize) style.maxWidth = `${colDef.maxSize}px`;
             }
-            if (cellIndex === 0) {
-              style.paddingLeft = `${level * 20}px`;
-            }
+            // if (cellIndex === 0) {
+            //   style.paddingLeft = `${level * 20}px`;
+            // }
 
             // Render cell content with customizations for the first cell
             const rawCellContent = flexRender(cell.column.columnDef.cell, cell.getContext());
@@ -915,8 +919,8 @@ function SheetTable<
                   }
 
                   return (
-                    <TableHead key={header.id} className="border text-left" style={style}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    <TableHead key={header.id} className="border text-start" style={style}>
+                      {t(flexRender(header.column.columnDef.header, header.getContext()) as string)}
                     </TableHead>
                   );
                 }),

@@ -1,5 +1,7 @@
 import React from "react";
 
+import { useTranslations } from "next-intl";
+
 import { z } from "zod";
 
 import SheetTable from "@/components/ui/sheet-table";
@@ -24,17 +26,6 @@ const stateSchema = z.string().min(1, "Required");
 const zipCodeSchema = z.string().min(1, "Required");
 const notesSchema = z.string().optional();
 
-const columns = [
-  { accessorKey: "name", header: "Name", validationSchema: nameSchema },
-  { accessorKey: "email", header: "Email", validationSchema: emailSchema },
-  { accessorKey: "phone", header: "Phone", validationSchema: phoneSchema },
-  { accessorKey: "address", header: "Address", validationSchema: addressSchema },
-  { accessorKey: "city", header: "City", validationSchema: citySchema },
-  { accessorKey: "state", header: "State", validationSchema: stateSchema },
-  { accessorKey: "zip_code", header: "ZIP Code", validationSchema: zipCodeSchema },
-  { accessorKey: "notes", header: "Notes", validationSchema: notesSchema },
-];
-
 interface ClientsTableProps {
   data: Client[];
   isLoading?: boolean;
@@ -42,7 +33,19 @@ interface ClientsTableProps {
 }
 
 const ClientsTable = ({ data, isLoading, error }: ClientsTableProps) => {
+  const t = useTranslations("Clients");
   const { updateClient } = useClientsStore();
+
+  const columns = [
+    { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
+    { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
+    { accessorKey: "phone", header: t("form.phone.label"), validationSchema: phoneSchema },
+    { accessorKey: "address", header: t("form.address.label"), validationSchema: addressSchema },
+    { accessorKey: "city", header: t("form.city.label"), validationSchema: citySchema },
+    { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
+    { accessorKey: "zip_code", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
+    { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
+  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateClient(rowId, { [columnId]: value });
@@ -78,7 +81,7 @@ const ClientsTable = ({ data, isLoading, error }: ClientsTableProps) => {
   if (error) {
     return (
       <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
-        Error loading clients: {error.message}
+        {t("errorLoadingClients")}: {error.message}
       </div>
     );
   }
