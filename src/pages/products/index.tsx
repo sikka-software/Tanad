@@ -52,17 +52,19 @@ export default function ProductsPage() {
         searchPlaceholder={t("search_products")}
       />
 
-      <div className="p-0">
+      <div>
         <ProductsTable />
-        <DataModelList
-          data={filteredProducts}
-          isLoading={isLoading}
-          error={error as Error | null}
-          emptyMessage={t("no_products")}
-          addFirstItemMessage={t("add_first_product")}
-          renderItem={renderProduct}
-          gridCols="3"
-        />
+        <div className="p-4">
+          <DataModelList
+            data={filteredProducts}
+            isLoading={isLoading}
+            error={error as Error | null}
+            emptyMessage={t("no_products")}
+            addFirstItemMessage={t("add_first_product")}
+            renderItem={renderProduct}
+            gridCols="3"
+          />
+        </div>
       </div>
     </div>
   );

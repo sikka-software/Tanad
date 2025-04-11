@@ -1,0 +1,95 @@
+import {
+  LayoutDashboard,
+  Users,
+  Briefcase,
+  Building2,
+  CircleDollarSign,
+  FileText,
+  Calendar,
+  Settings,
+  Filter,
+} from "lucide-react";
+
+export const commandList = [
+  {
+    heading: "Administration.title",
+    items: [
+      {
+        icon: LayoutDashboard,
+        label: "Dashboard.title",
+        shortcut: "⌘D",
+        href: "/dashboard",
+      },
+      {
+        icon: Users,
+        label: "Clients.title",
+        shortcut: "⌘C",
+        href: "/clients",
+      },
+    ],
+  },
+  {
+    heading: "Sales.title",
+    items: [
+      {
+        icon: FileText,
+        label: "Invoices.title",
+        shortcut: "⌘I",
+        href: "/invoices",
+      },
+
+      {
+        icon: Filter,
+        label: "Products.title",
+        shortcut: "⌘P",
+        href: "/products",
+      },
+    ],
+  },
+  {
+    heading: "HumanResources.title",
+    items: [
+      {
+        icon: Briefcase,
+        label: "Jobs.title",
+        shortcut: "⌘J",
+        href: "/jobs",
+      },
+      {
+        icon: Building2,
+        label: "HumanResources.title",
+        shortcut: "⌘E",
+        href: "/employees",
+      },
+      {
+        icon: CircleDollarSign,
+        label: "Expenses.title",
+        shortcut: "⌘X",
+        href: "/expenses",
+      },
+    ],
+  },
+  {
+    heading: "Navigation.organization",
+    items: [
+      {
+        icon: Building2,
+        label: "Companies.title",
+        shortcut: "⌘O",
+        href: "/companies",
+      },
+      {
+        icon: Calendar,
+        label: "Calendar.title",
+        shortcut: "⌘L",
+        href: "/calendar",
+      },
+      {
+        icon: Settings,
+        label: "Settings.title",
+        shortcut: "⌘S",
+        href: "/settings",
+      },
+    ],
+  },
+];

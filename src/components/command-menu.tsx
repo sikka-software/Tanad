@@ -27,6 +27,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { commandList } from "@/lib/command-list";
 
 type ShortcutCommand = {
   key: string;
@@ -49,6 +50,7 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
     { key: "j", path: "/jobs", metaKey: true },
     { key: "e", path: "/employees", metaKey: true },
     { key: "x", path: "/expenses", metaKey: true },
+    { key: "p", path: "/products", metaKey: true },
     { key: "i", path: "/invoices", metaKey: true },
     { key: "o", path: "/companies", metaKey: true },
     { key: "l", path: "/calendar", metaKey: true },
@@ -60,24 +62,28 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
       // Find matching shortcut
       const shortcut = shortcuts.find(
         (s) =>
-          s.key.toLowerCase() === e.key.toLowerCase() &&
-          (!s.metaKey || (e.metaKey || e.ctrlKey))
+          s.key.toLowerCase() === e.key.toLowerCase() && (!s.metaKey || e.metaKey || e.ctrlKey),
       );
 
-      if (shortcut) {
+      if (!shortcut) return;
+
+      // Handle command menu toggle (⌘K) separately
+      if (!shortcut.path) {
         e.preventDefault();
-        if (shortcut.path) {
-          router.push(shortcut.path);
-        } else {
-          // Toggle command menu for ⌘K
-          setOpen((open) => !open);
-        }
+        setOpen((open) => !open);
+        return;
+      }
+
+      // Only handle other shortcuts when menu is open
+      if (open) {
+        e.preventDefault();
+        router.push(shortcut.path);
       }
     };
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [router, shortcuts]);
+  }, [router, shortcuts, open]);
 
   const runCommand = (command: () => void) => {
     setOpen(false);
@@ -94,59 +100,23 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
           <CommandInput placeholder={tGeneral("search")} />
           <CommandList>
             <CommandEmpty>{tGeneral("no_results")}</CommandEmpty>
-            <CommandGroup heading={t("Navigation.main")}>
-              <CommandItem onSelect={() => runCommand(() => router.push("/dashboard"))}>
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-                <span>{t("Dashboard.title")}</span>
-                <CommandShortcut>⌘D</CommandShortcut>
-              </CommandItem>
-              <CommandItem onSelect={() => runCommand(() => router.push("/clients"))}>
-                <Users className="mr-2 h-4 w-4" />
-                <span>{t("Clients.title")}</span>
-                <CommandShortcut>⌘C</CommandShortcut>
-              </CommandItem>
-              <CommandItem onSelect={() => runCommand(() => router.push("/jobs"))}>
-                <Briefcase className="mr-2 h-4 w-4" />
-                <span>{t("Jobs.title")}</span>
-                <CommandShortcut>⌘J</CommandShortcut>
-              </CommandItem>
-            </CommandGroup>
-            <CommandSeparator />
-            <CommandGroup heading={t("Navigation.resources")}>
-              <CommandItem onSelect={() => runCommand(() => router.push("/employees"))}>
-                <Building2 className="mr-2 h-4 w-4" />
-                <span>{t("HumanResources.title")}</span>
-                <CommandShortcut>⌘E</CommandShortcut>
-              </CommandItem>
-              <CommandItem onSelect={() => runCommand(() => router.push("/expenses"))}>
-                <CircleDollarSign className="mr-2 h-4 w-4" />
-                <span>{t("Expenses.title")}</span>
-                <CommandShortcut>⌘X</CommandShortcut>
-              </CommandItem>
-              <CommandItem onSelect={() => runCommand(() => router.push("/invoices"))}>
-                <FileText className="mr-2 h-4 w-4" />
-                <span>{t("Invoices.title")}</span>
-                <CommandShortcut>⌘I</CommandShortcut>
-              </CommandItem>
-            </CommandGroup>
-            <CommandSeparator />
-            <CommandGroup heading={t("Navigation.organization")}>
-              <CommandItem onSelect={() => runCommand(() => router.push("/companies"))}>
-                <Building className="mr-2 h-4 w-4" />
-                <span>{t("Companies.title")}</span>
-                <CommandShortcut>⌘O</CommandShortcut>
-              </CommandItem>
-              <CommandItem onSelect={() => runCommand(() => router.push("/calendar"))}>
-                <Calendar className="mr-2 h-4 w-4" />
-                <span>{t("Calendar.title")}</span>
-                <CommandShortcut>⌘L</CommandShortcut>
-              </CommandItem>
-              <CommandItem onSelect={() => runCommand(() => router.push("/settings"))}>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>{t("Settings.title")}</span>
-                <CommandShortcut>⌘S</CommandShortcut>
-              </CommandItem>
-            </CommandGroup>
+            {commandList.map((group) => (
+              <>
+                <CommandGroup heading={group.heading}>
+                  {group.items.map((item) => (
+                    <CommandItem
+                      key={item.href}
+                      onSelect={() => runCommand(() => router.push(item.href))}
+                    >
+                      <item.icon className="ms-2 h-4 w-4" />
+                      <span>{t(item.label)}</span>
+                      <CommandShortcut>{item.shortcut}</CommandShortcut>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+                <CommandSeparator />
+              </>
+            ))}
           </CommandList>
         </Command>
       </DialogContent>

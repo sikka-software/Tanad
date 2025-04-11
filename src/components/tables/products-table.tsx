@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 
 import { z } from "zod";
 
 import SheetTable from "@/components/ui/sheet-table";
+import { useProductsStore } from "@/stores/products.store";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().optional();
@@ -15,52 +16,29 @@ const columns = [
   { accessorKey: "description", header: "Description", validationSchema: descriptionSchema },
   { accessorKey: "price", header: "Price", validationSchema: priceSchema },
   { accessorKey: "sku", header: "SKU", validationSchema: skuSchema },
-  { accessorKey: "stockQuantity", header: "Stock Quantity", validationSchema: stockQuantitySchema },
+  { accessorKey: "stock_quantity", header: "Stock Quantity", validationSchema: stockQuantitySchema },
 ];
-
-const initialData = [
-  {
-    id: "1",
-    name: "Sample Product 1",
-    description: "A sample product description",
-    price: 99.99,
-    sku: "PROD001",
-    stockQuantity: 100,
-  },
-  {
-    id: "2",
-    name: "Sample Product 2",
-    description: "Another sample product",
-    price: 149.99,
-    sku: "PROD002",
-    stockQuantity: 50,
-  },
-];
-
-type RowData = {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  sku?: string;
-  stockQuantity?: number;
-};
 
 const ProductsTable = () => {
-  const [data, setData] = useState<RowData[]>(initialData);
+  const { products, isLoading, error, fetchProducts, updateProduct } = useProductsStore();
 
-  /**
-   * onEdit callback: updates local state if the new value is valid.
-   */
-  const handleEdit = <K extends keyof RowData>(rowId: string, columnId: K, value: RowData[K]) => {
-    setData((prevData) =>
-      prevData.map((row) => (row.id === rowId ? { ...row, [columnId]: value } : row)),
-    );
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
-    console.log(`State updated [row id=${rowId}, column=${columnId}, value=${value}]`, value);
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await updateProduct(rowId, { [columnId]: value });
   };
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+  if (isLoading) {
+    return <div>Loading products...</div>;
+  }
+
+  if (error) {
+    return <div className="bg-red-800 rounded p-2 m-4 mb-0 text-center">Error loading products: {error}</div>;
+  }
+
+  return <SheetTable columns={columns} data={products} onEdit={handleEdit} showHeader={true} />;
 };
 
 export default ProductsTable;
