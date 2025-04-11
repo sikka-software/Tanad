@@ -3,6 +3,8 @@ import React from "react";
 import { z } from "zod";
 
 import SheetTable from "@/components/ui/sheet-table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useClientsStore } from "@/stores/clients.store";
 import { Client } from "@/types/client.type";
 
@@ -40,7 +42,30 @@ const ClientsTable = ({ data, isLoading, error }: ClientsTableProps) => {
   };
 
   if (isLoading) {
-    return <div>Loading clients...</div>;
+    return (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {columns.map((column, index) => (
+              <TableHead key={index}>
+                <Skeleton className="h-4 w-full" />
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: 5 }).map((_, rowIndex) => (
+            <TableRow key={rowIndex}>
+              {columns.map((_, colIndex) => (
+                <TableCell key={colIndex}>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
   }
 
   if (error) {

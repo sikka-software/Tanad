@@ -3,6 +3,8 @@ import React from "react";
 import { z } from "zod";
 
 import SheetTable from "@/components/ui/sheet-table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useProductsStore } from "@/stores/products.store";
 import { Product } from "@/types/product.type";
 
@@ -34,7 +36,30 @@ const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
   };
 
   if (isLoading) {
-    return <div>Loading products...</div>;
+    return (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {columns.map((column, index) => (
+              <TableHead key={index}>
+                <Skeleton className="h-4 w-full" />
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: 5 }).map((_, rowIndex) => (
+            <TableRow key={rowIndex}>
+              {columns.map((_, colIndex) => (
+                <TableCell key={colIndex}>
+                  <Skeleton className="h-4 w-full" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
   }
 
   if (error) {
