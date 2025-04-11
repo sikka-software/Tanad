@@ -23,7 +23,8 @@
     "db:sync": "tsx src/db/sync.ts",
     "db:generate-migration": "tsx src/db/generate-migration.ts",
     "db:setup-new": "tsx src/db/setup-new.ts",
-    "db:policies": "tsx src/db/apply-policies.ts"
+    "db:policies": "tsx src/db/apply-policies.ts",
+    "db:update": "db:push && db:policies"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

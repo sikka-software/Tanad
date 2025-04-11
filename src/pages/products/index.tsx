@@ -52,7 +52,7 @@ export default function ProductsPage() {
         searchPlaceholder={t("search_products")}
       />
 
-      <div className="p-4">
+      <div className="p-0">
         <ProductsTable />
         <DataModelList
           data={filteredProducts}

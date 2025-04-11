@@ -887,7 +887,7 @@ function SheetTable<
   }
 
   return (
-    <div className="p-4">
+    <div className="p-0">
       <Table>
         <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption>
         {/* Primary header */}
