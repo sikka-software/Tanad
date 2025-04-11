@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
+import { ComboboxAdd } from "@/components/ui/combobox-add";
 import {
   Form,
   FormControl,
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useCompanies } from "@/hooks/useCompanies";
 import { supabase } from "@/lib/supabase";
 
 // We'll create a schema factory to handle translations
@@ -55,6 +57,8 @@ export function ClientForm({
 }: ClientFormProps) {
   const router = useRouter();
   const t = useTranslations();
+  const { locale } = useRouter();
+  const { data: companies, isLoading: companiesLoading } = useCompanies();
 
   const clientSchema = createClientSchema(t);
 
@@ -73,6 +77,13 @@ export function ClientForm({
     },
   });
 
+  // Format companies for ComboboxAdd
+  const companyOptions =
+    companies?.map((company) => ({
+      label: company.name,
+      value: company.id,
+    })) || [];
+
   const onSubmit: SubmitHandler<ClientFormValues> = async (data) => {
     if (externalSubmit) {
       await externalSubmit(data);
@@ -85,20 +96,24 @@ export function ClientForm({
         throw new Error(t("error.not_authenticated"));
       }
 
-      const { error } = await supabase.from("clients").insert([
-        {
-          name: data.name.trim(),
-          email: data.email.trim(),
-          phone: data.phone.trim(),
-          company: data.company?.trim() || "",
-          address: data.address.trim(),
-          city: data.city.trim(),
-          state: data.state.trim(),
-          zip_code: data.zip_code.trim(),
-          notes: data.notes?.trim() || null,
-          user_id: userId,
-        },
-      ]).select().single();
+      const { error } = await supabase
+        .from("clients")
+        .insert([
+          {
+            name: data.name.trim(),
+            email: data.email.trim(),
+            phone: data.phone.trim(),
+            company: data.company?.trim() || "",
+            address: data.address.trim(),
+            city: data.city.trim(),
+            state: data.state.trim(),
+            zip_code: data.zip_code.trim(),
+            notes: data.notes?.trim() || null,
+            user_id: userId,
+          },
+        ])
+        .select()
+        .single();
 
       if (error) throw error;
 
@@ -143,7 +158,20 @@ export function ClientForm({
               <FormItem>
                 <FormLabel>{t("Clients.form.company.label")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("Clients.form.company.placeholder")} {...field} />
+                  <ComboboxAdd
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    data={companyOptions}
+                    isLoading={companiesLoading}
+                    defaultValue={field.value}
+                    onChange={field.onChange}
+                    texts={{
+                      placeholder: t("Clients.form.company.placeholder"),
+                      searchPlaceholder: t("Clients.form.company.search_placeholder"),
+                      noItems: t("Clients.form.company.no_companies"),
+                    }}
+                    addText={t("Companies.add_company")}
+                    onAddClick={() => router.push("/companies/add")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

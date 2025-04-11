@@ -53,7 +53,7 @@ export default function EditSalaryPage() {
         customButton={
           <div className="flex gap-4">
             <Button variant="outline" onClick={() => router.push("/salaries")}>
-              {t("common.cancel")}
+              {t("General.cancel")}
             </Button>
             {/* SalaryForm has its own update button */}
           </div>

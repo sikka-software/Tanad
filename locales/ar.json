@@ -1499,7 +1499,8 @@
       },
       "company": {
         "label": "الشركة",
-        "placeholder": "أدخل اسم الشركة"
+        "placeholder": "أدخل اسم الشركة",
+        "search_placeholder": "ابحث عن شركة..."
       },
       "email": {
         "label": "البريد الإلكتروني",

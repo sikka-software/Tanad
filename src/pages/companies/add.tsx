@@ -13,7 +13,7 @@ import PageTitle from "@/components/ui/page-title";
 import { useUser } from "@/providers/UserProvider";
 
 export default function AddCompanyPage() {
-  const t = useTranslations("Companies");
+  const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -51,7 +51,7 @@ export default function AddCompanyPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || t("messages.error"));
+        throw new Error(errorData.error || t("Companies.messages.error"));
       }
 
       // Get the new company data
@@ -76,16 +76,18 @@ export default function AddCompanyPage() {
   return (
     <div>
       <PageTitle
-        title={t("add_company")}
+        title={t("Companies.add_company")}
         createButtonLink="/companies"
-        createButtonText={t("back_to_list")}
+        createButtonText={t("Companies.back_to_list")}
         customButton={
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => router.push("/companies")}>
-              {t("cancel")}
+              {t("General.cancel")}
             </Button>
             <Button type="submit" size="sm" form="company-form" disabled={loading}>
-              {loading ? t("messages.creating_company") : t("messages.create_company")}
+              {loading
+                ? t("Companies.messages.creating_company")
+                : t("Companies.messages.create_company")}
             </Button>
           </div>
         }
@@ -93,7 +95,7 @@ export default function AddCompanyPage() {
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>{t("company_details")}</CardTitle>
+            <CardTitle>{t("Companies.company_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <CompanyForm id="company-form" onSubmit={handleSubmit} loading={loading} />
@@ -110,4 +112,4 @@ export const getStaticProps: GetStaticProps = async ({ locale }) => {
       messages: (await import(`../../../locales/${locale}.json`)).default,
     },
   };
-}; 
+};

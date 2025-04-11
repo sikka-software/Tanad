@@ -57,7 +57,7 @@ export default function AddBranchPage() {
         customButton={
           <div className="flex gap-4">
             <Button variant="outline" size="sm" onClick={() => router.push("/branches")}>
-              {t("common.cancel")}
+              {t("General.cancel")}
             </Button>
           </div>
         }

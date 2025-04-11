@@ -57,7 +57,7 @@ export default function AddWarehousePage() {
         customButton={
           <div className="flex gap-4">
             <Button variant="outline" size="sm" onClick={() => router.push("/warehouses")}>
-              {t("common.cancel")}
+              {t("General.cancel")}
             </Button>
           </div>
         }

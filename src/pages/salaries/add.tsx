@@ -56,7 +56,7 @@ export default function AddSalaryPage() {
         customButton={
           <div className="flex gap-4">
             <Button variant="outline" size="sm" onClick={() => router.push("/salaries")}>
-              {t("common.cancel")} {/* Common cancel text */}
+              {t("General.cancel")} {/* Common cancel text */}
             </Button>
             {/* Submit button is inside SalaryForm */}
           </div>

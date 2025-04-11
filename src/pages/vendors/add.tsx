@@ -61,7 +61,7 @@ export default function AddVendorPage() {
         customButton={
           <div className="flex gap-4">
             <Button variant="outline" size="sm" onClick={() => router.push("/vendors")}>
-              {t("common.cancel")} {/* Use a common cancel translation */}
+              {t("General.cancel")} {/* Use a common cancel translation */}
             </Button>
           </div>
         }

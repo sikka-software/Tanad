@@ -1336,7 +1336,8 @@
       },
       "company": {
         "label": "Company",
-        "placeholder": "Enter company name"
+        "placeholder": "Enter company name",
+        "search_placeholder": "Search companies..."
       },
       "email": {
         "label": "Email",
