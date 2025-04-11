@@ -30,10 +30,14 @@ export default function ProductsPage() {
         <h3 className="text-lg font-semibold">{product.name}</h3>
       </CardHeader>
       <CardContent>
-        <p className="mb-2 text-gray-600">{product.description || t("no_description")}</p>
+        <p className="mb-2 text-gray-600 dark:text-gray-400">
+          {product.description || t("no_description")}
+        </p>
         <p className="text-lg font-bold">${Number(product.price).toFixed(2)}</p>
-        <p className="text-sm text-gray-500">{t("sku_label", { value: product.sku || "N/A" })}</p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {t("sku_label", { value: product.sku || "N/A" })}
+        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           {t("stock_label", {
             value: product.stockQuantity || 0,
           })}
