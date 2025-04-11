@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
 import { useTranslations, useLocale } from "next-intl";
 import { useTheme } from "next-themes";
@@ -83,6 +83,54 @@ export function AppSidebar() {
   const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
   const { user } = useUserStore();
   const router = useRouter();
+  const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
+  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
+  const previousStateRef = useRef<{ groups: Set<number>; menus: Set<string> }>({
+    groups: new Set(),
+    menus: new Set(),
+  });
+
+  // Store and clear expanded states when sidebar collapses
+  useEffect(() => {
+    if (state === "collapsed" && !isMobile) {
+      // Store current state before clearing
+      previousStateRef.current = {
+        groups: new Set(expandedGroups),
+        menus: new Set(expandedMenus),
+      };
+      // Clear all expanded states
+      setExpandedGroups(new Set());
+      setExpandedMenus(new Set());
+    } else if (state === "expanded" && !isMobile) {
+      // Restore previous state
+      setExpandedGroups(previousStateRef.current.groups);
+      setExpandedMenus(previousStateRef.current.menus);
+    }
+  }, [state, isMobile]);
+
+  const handleItemClick = useCallback(
+    (groupIndex: number, menuIndex?: number) => {
+      if (state === "collapsed" && !isMobile) {
+        // First open the sidebar
+        setSidebarOpen(true);
+        // Then restore previous state and add the clicked items
+        const newGroups = new Set(previousStateRef.current.groups);
+        const newMenus = new Set(previousStateRef.current.menus);
+
+        newGroups.add(groupIndex);
+        if (menuIndex !== undefined) {
+          newMenus.add(`${groupIndex}-${menuIndex}`);
+        }
+
+        // Update states with a slight delay to ensure sidebar transition has started
+        requestAnimationFrame(() => {
+          setExpandedGroups(newGroups);
+          setExpandedMenus(newMenus);
+        });
+      }
+    },
+    [state, isMobile, setSidebarOpen],
+  );
 
   const menuGroups = getMenuList(router.pathname);
 
@@ -121,16 +169,31 @@ export function AppSidebar() {
             {menuGroups.map((group, groupIndex) => (
               <div key={groupIndex}>
                 <SidebarSeparator className="mb-2" />
-                <Collapsible defaultOpen className="group/collapsible">
+                <Collapsible
+                  defaultOpen={!isMobile}
+                  open={expandedGroups.has(groupIndex)}
+                  onOpenChange={(isOpen) => {
+                    setExpandedGroups((prev) => {
+                      const next = new Set(prev);
+                      if (isOpen) {
+                        next.add(groupIndex);
+                      } else {
+                        next.delete(groupIndex);
+                      }
+                      return next;
+                    });
+                  }}
+                  className="group/collapsible"
+                >
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton
                         className="w-full overflow-hidden"
-                        tooltip={group.groupLabelTranslationKey || ""}
+                        tooltip={t(group.groupLabelTranslationKey || "")}
                         onClick={(e) => {
                           if (state === "collapsed" && !isMobile) {
                             e.preventDefault();
-                            setSidebarOpen(true);
+                            handleItemClick(groupIndex);
                           }
                         }}
                       >
@@ -149,7 +212,21 @@ export function AppSidebar() {
                         {group.menus.map((menu, menuIndex) => (
                           <SidebarMenuItem key={menuIndex}>
                             {menu.submenus && menu.submenus.length > 0 ? (
-                              <Collapsible className="group/submenu-collapsible w-full">
+                              <Collapsible
+                                className="group/submenu-collapsible w-full"
+                                open={expandedMenus.has(`${groupIndex}-${menuIndex}`)}
+                                onOpenChange={(isOpen) => {
+                                  setExpandedMenus((prev) => {
+                                    const next = new Set(prev);
+                                    if (isOpen) {
+                                      next.add(`${groupIndex}-${menuIndex}`);
+                                    } else {
+                                      next.delete(`${groupIndex}-${menuIndex}`);
+                                    }
+                                    return next;
+                                  });
+                                }}
+                              >
                                 <CollapsibleTrigger asChild>
                                   <SidebarMenuButton
                                     className="w-full overflow-hidden"
@@ -157,7 +234,7 @@ export function AppSidebar() {
                                     onClick={(e) => {
                                       if (state === "collapsed" && !isMobile) {
                                         e.preventDefault();
-                                        setSidebarOpen(true);
+                                        handleItemClick(groupIndex, menuIndex);
                                       }
                                     }}
                                   >
@@ -178,7 +255,7 @@ export function AppSidebar() {
                                             className={cn(
                                               submenu.active &&
                                                 "bg-primary text-background hover:bg-primary hover:text-background",
-                                                'p-0 ps-2 pe-1'
+                                              "p-0 ps-2 pe-1",
                                             )}
                                           >
                                             <span className="text-nowrap">
