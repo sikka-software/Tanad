@@ -127,6 +127,12 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         className="w-full overflow-hidden"
                         tooltip={group.groupLabelTranslationKey || ""}
+                        onClick={(e) => {
+                          if (state === "collapsed" && !isMobile) {
+                            e.preventDefault();
+                            setSidebarOpen(true);
+                          }
+                        }}
                       >
                         {group.icon && <group.icon className="!size-6 md:!size-4" />}
                         {!isMobile && state !== "collapsed" && (
@@ -148,6 +154,12 @@ export function AppSidebar() {
                                   <SidebarMenuButton
                                     className="w-full overflow-hidden"
                                     tooltip={menu.translationKey}
+                                    onClick={(e) => {
+                                      if (state === "collapsed" && !isMobile) {
+                                        e.preventDefault();
+                                        setSidebarOpen(true);
+                                      }
+                                    }}
                                   >
                                     {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
                                     {!isMobile && state !== "collapsed" && (
