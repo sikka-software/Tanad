@@ -407,4 +407,30 @@ CREATE POLICY "Users can delete their own jobs"
 ON jobs 
 FOR DELETE 
 TO authenticated 
+USING (auth.uid() = user_id);
+
+-- COMPANIES POLICIES
+CREATE POLICY "Users can read their own companies" 
+ON companies 
+FOR SELECT 
+TO authenticated 
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own companies" 
+ON companies 
+FOR INSERT 
+TO authenticated 
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own companies" 
+ON companies 
+FOR UPDATE 
+TO authenticated 
+USING (auth.uid() = user_id) 
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own companies" 
+ON companies 
+FOR DELETE 
+TO authenticated 
 USING (auth.uid() = user_id); 

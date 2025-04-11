@@ -50,3 +50,21 @@ export type CompanyProps = {
 };
 
 export type CompanyInput = Partial<CompanyProps>;
+
+export interface Company {
+  id: string;
+  createdAt: string;
+  name: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  industry?: string;
+  size?: string;
+  notes?: string;
+  isActive: boolean;
+  userId: string;
+}

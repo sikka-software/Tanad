@@ -69,6 +69,13 @@ function getAdministrationMenus(pathname: string) {
           active: pathname === "/contacts",
         },
         {
+          href: "/companies",
+          label: "Companies",
+          translationKey: "Companies.title",
+          active: pathname === "/companies",
+          plusAction: "/companies/add",
+        },
+        {
           href: "/clients",
           label: "Clients",
           translationKey: "Clients.title",

@@ -2031,5 +2031,41 @@
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
     "address": "العنوان"
+  },
+  "Companies": {
+    "title": "الشركات",
+    "add_company": "إضافة شركة",
+    "company_details": "تفاصيل الشركة",
+    "create_company": "إنشاء شركة",
+    "back_to_list": "العودة للقائمة",
+    "no_companies_found": "لم يتم العثور على شركات",
+    "name": "الاسم",
+    "name_placeholder": "أدخل اسم الشركة",
+    "email": "البريد الإلكتروني",
+    "email_placeholder": "أدخل البريد الإلكتروني للشركة",
+    "phone": "الهاتف",
+    "phone_placeholder": "أدخل هاتف الشركة",
+    "website": "الموقع الإلكتروني",
+    "website_placeholder": "أدخل الموقع الإلكتروني للشركة",
+    "address": "العنوان",
+    "address_placeholder": "أدخل عنوان الشركة",
+    "city": "المدينة",
+    "city_placeholder": "أدخل المدينة",
+    "state": "المنطقة",
+    "state_placeholder": "أدخل المنطقة",
+    "zip_code": "الرمز البريدي",
+    "zip_code_placeholder": "أدخل الرمز البريدي",
+    "industry": "المجال",
+    "industry_placeholder": "أدخل مجال الشركة",
+    "size": "حجم الشركة",
+    "size_placeholder": "أدخل حجم الشركة",
+    "notes": "ملاحظات",
+    "notes_placeholder": "أدخل الملاحظات",
+    "is_active": "حالة النشاط",
+    "messages": {
+      "error": "حدث خطأ",
+      "creating_company": "جاري إنشاء الشركة...",
+      "create_company": "إنشاء شركة"
+    }
   }
 }
