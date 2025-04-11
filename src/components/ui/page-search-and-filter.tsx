@@ -2,7 +2,7 @@ import * as React from "react";
 
 import Link from "next/link";
 
-import { Search, Filter, ChevronDown, SlidersHorizontal, Plus } from "lucide-react";
+import { Search, Filter, ChevronDown, SlidersHorizontal, Plus, LayoutGrid, Table2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,8 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   createHref?: string;
   createLabel?: string;
   searchPlaceholder?: string;
+  viewMode?: "table" | "cards";
+  onViewModeChange?: (mode: "table" | "cards") => void;
 }
 
 const PageSearchAndFilter = ({
@@ -24,6 +26,8 @@ const PageSearchAndFilter = ({
   createHref = "#",
   createLabel = "Create",
   searchPlaceholder = "Search...",
+  viewMode = "table",
+  onViewModeChange,
   ...props
 }: PageSearchAndFilterProps) => {
   return (
@@ -49,8 +53,26 @@ const PageSearchAndFilter = ({
         </div>
       </div>
 
-      {/* Right section: Filters & Create Button */}
+      {/* Right section: View Toggle, Filters & Create Button */}
       <div className="flex items-center gap-2">
+        {onViewModeChange && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-9"
+            onClick={() => onViewModeChange(viewMode === "table" ? "cards" : "table")}
+          >
+            {viewMode === "table" ? (
+              <LayoutGrid className="h-4 w-4" />
+            ) : (
+              <Table2 className="h-4 w-4" />
+            )}
+            <span className="sr-only">
+              {viewMode === "table" ? "Switch to cards view" : "Switch to table view"}
+            </span>
+          </Button>
+        )}
+
         <Button variant="outline" size="sm" className="h-9">
           <Filter className="me-2 h-4 w-4" />
           <span className="hidden sm:inline">Filters</span>

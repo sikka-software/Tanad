@@ -13,6 +13,7 @@ import { Product } from "@/types/product.type";
 export default function ProductsPage() {
   const t = useTranslations("Products");
   const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const { data: products, isLoading, error } = useProducts();
 
   const filteredProducts = Array.isArray(products)
@@ -54,21 +55,26 @@ export default function ProductsPage() {
         createLabel={t("add_new")}
         onSearch={setSearchQuery}
         searchPlaceholder={t("search_products")}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
 
       <div>
-        <ProductsTable />
-        <div className="p-4">
-          <DataModelList
-            data={filteredProducts}
-            isLoading={isLoading}
-            error={error as Error | null}
-            emptyMessage={t("no_products")}
-            addFirstItemMessage={t("add_first_product")}
-            renderItem={renderProduct}
-            gridCols="3"
-          />
-        </div>
+        {viewMode === "table" ? (
+          <ProductsTable />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredProducts}
+              isLoading={isLoading}
+              error={error as Error | null}
+              emptyMessage={t("no_products")}
+              addFirstItemMessage={t("add_first_product")}
+              renderItem={renderProduct}
+              gridCols="3"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
