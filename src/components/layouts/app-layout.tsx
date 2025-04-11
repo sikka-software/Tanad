@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { Toaster } from "sonner";
 
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { CommandMenu } from "@/components/command-menu";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import LanguageSwitcher from "@/components/ui/language-switcher";
@@ -22,6 +23,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
         <SidebarProvider dir={lang === "ar" ? "rtl" : "ltr"} defaultOpen={defaultOpen}>
           <LoadingBar />
           <AppSidebar />
+          <CommandMenu dir={lang === "ar" ? "rtl" : "ltr"} />
           <Toaster
             toastOptions={{ className: "rtl:!start-8 rtl:xs:!start-0" }}
             richColors

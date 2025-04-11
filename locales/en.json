@@ -212,6 +212,28 @@
       "subtitle": "From social media platforms to delivery apps and even communication methods like WhatsApp or direct calls!"
     }
   },
+
+  "Dashboard": {
+    "title": "Dashboard",
+    "create_product": "Add Product",
+    "total_invoices": "Total Invoices",
+    "pending": "Pending",
+    "total_products": "Total Products",
+    "total_revenue": "Total Revenue",
+    "pending_invoices": "Pending Invoices",
+    "of_total": "% of Total",
+    "recent_invoices": "Recent Invoices",
+    "recent_invoices_list": "Coming Soon: Recent Invoices List",
+    "popular_products": "Popular Products",
+    "popular_products_list": "Coming Soon: Popular Products List",
+    "create": "Create",
+    "select_create_option": "Select an Option",
+    "add_product": "Add Product",
+    "add_invoice": "Add Invoice",
+    "add_client": "Add Client",
+    "add_employee": "Add Employee",
+    "add_warehouse": "Add Warehouse"
+  },
   "Features": {
     "title": "Pukla Features",
     "subtitle": "Discover a world of possibilities",
