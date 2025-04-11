@@ -25,7 +25,6 @@ type ShortcutCommand = {
 export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
 
   const t = useTranslations();
   const tGeneral = useTranslations("General");
@@ -78,13 +77,9 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
     command();
   };
 
-  // Helper function to check if an item matches the search term in either language
-  const itemMatchesSearch = (item: { label: string }, searchTerm: string) => {
-    const normalizedSearch = searchTerm.toLowerCase();
-    const translatedLabel = t(item.label).toLowerCase();
-    const originalLabel = item.label.split(".")[0].toLowerCase(); // Get original English label
-    
-    return translatedLabel.includes(normalizedSearch) || originalLabel.includes(normalizedSearch);
+  // Get the English label from the translation key
+  const getEnglishLabel = (translationKey: string) => {
+    return translationKey.split(".")[0];
   };
 
   return (
@@ -94,30 +89,30 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
           className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-item]_svg]:w-5] [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5"
           dir={dir}
         >
-          <CommandInput 
-            placeholder={tGeneral("search")} 
-            onValueChange={setSearchTerm}
-          />
+          <CommandInput placeholder={tGeneral("search")} />
           <CommandList>
             <CommandEmpty>{tGeneral("no_results")}</CommandEmpty>
-            {commandList.map((group) => (
-              <>
-                <CommandGroup heading={group.heading}>
-                  {group.items
-                    .filter((item) => !searchTerm || itemMatchesSearch(item, searchTerm))
-                    .map((item) => (
+            {commandList.map((group, groupIndex) => (
+              <div key={groupIndex}>
+                <CommandGroup heading={t(group.heading)}>
+                  {group.items.map((item) => {
+                    const englishLabel = getEnglishLabel(item.label);
+                    const arabicLabel = t(item.label);
+                    return (
                       <CommandItem
                         key={item.href}
                         onSelect={() => runCommand(() => router.push(item.href))}
+                        value={`${englishLabel} ${arabicLabel}`}
                       >
                         <item.icon className="ms-2 h-4 w-4" />
-                        <span>{t(item.label)}</span>
+                        <span>{arabicLabel}</span>
                         <CommandShortcut>{item.shortcut}</CommandShortcut>
                       </CommandItem>
-                    ))}
+                    );
+                  })}
                 </CommandGroup>
                 <CommandSeparator />
-              </>
+              </div>
             ))}
           </CommandList>
         </Command>
