@@ -61,7 +61,11 @@ export default function ProductsPage() {
 
       <div>
         {viewMode === "table" ? (
-          <ProductsTable />
+          <ProductsTable
+            data={filteredProducts}
+            isLoading={isLoading}
+            error={error as Error | null}
+          />
         ) : (
           <div className="p-4">
             <DataModelList

@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { z } from "zod";
 
 import SheetTable from "@/components/ui/sheet-table";
 import { useProductsStore } from "@/stores/products.store";
+import { Product } from "@/types/product.type";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().optional();
@@ -19,12 +20,14 @@ const columns = [
   { accessorKey: "stock_quantity", header: "Stock Quantity", validationSchema: stockQuantitySchema },
 ];
 
-const ProductsTable = () => {
-  const { products, isLoading, error, fetchProducts, updateProduct } = useProductsStore();
+interface ProductsTableProps {
+  data: Product[];
+  isLoading?: boolean;
+  error?: Error | null;
+}
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
+  const { updateProduct } = useProductsStore();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateProduct(rowId, { [columnId]: value });
@@ -35,10 +38,10 @@ const ProductsTable = () => {
   }
 
   if (error) {
-    return <div className="bg-red-800 rounded p-2 m-4 mb-0 text-center">Error loading products: {error}</div>;
+    return <div className="bg-red-800 rounded p-2 m-4 mb-0 text-center">Error loading products: {error.message}</div>;
   }
 
-  return <SheetTable columns={columns} data={products} onEdit={handleEdit} showHeader={true} />;
+  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
 };
 
 export default ProductsTable;

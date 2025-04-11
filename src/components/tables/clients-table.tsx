@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { z } from "zod";
 
 import SheetTable from "@/components/ui/sheet-table";
 import { useClientsStore } from "@/stores/clients.store";
+import { Client } from "@/types/client.type";
 
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");
@@ -25,12 +26,14 @@ const columns = [
   { accessorKey: "notes", header: "Notes", validationSchema: notesSchema },
 ];
 
-const ClientsTable = () => {
-  const { clients, isLoading, error, fetchClients, updateClient } = useClientsStore();
+interface ClientsTableProps {
+  data: Client[];
+  isLoading?: boolean;
+  error?: Error | null;
+}
 
-  useEffect(() => {
-    fetchClients();
-  }, [fetchClients]);
+const ClientsTable = ({ data, isLoading, error }: ClientsTableProps) => {
+  const { updateClient } = useClientsStore();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateClient(rowId, { [columnId]: value });
@@ -43,12 +46,12 @@ const ClientsTable = () => {
   if (error) {
     return (
       <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
-        Error loading clients: {error}
+        Error loading clients: {error.message}
       </div>
     );
   }
 
-  return <SheetTable columns={columns} data={clients} onEdit={handleEdit} showHeader={true} />;
+  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
 };
 
 export default ClientsTable;

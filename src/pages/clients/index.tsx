@@ -81,7 +81,11 @@ export default function ClientsPage() {
       />
       <div>
         {viewMode === "table" ? (
-          <ClientsTable />
+          <ClientsTable 
+            data={filteredClients || []} 
+            isLoading={isLoading} 
+            error={error instanceof Error ? error : null} 
+          />
         ) : (
           <div className="p-4">
             <DataModelList
