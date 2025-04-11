@@ -3,6 +3,7 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
+import ProductsTable from "@/components/tables/products-table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
@@ -52,6 +53,7 @@ export default function ProductsPage() {
       />
 
       <div className="p-4">
+        <ProductsTable />
         <DataModelList
           data={filteredProducts}
           isLoading={isLoading}
