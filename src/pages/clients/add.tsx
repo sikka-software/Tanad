@@ -97,7 +97,11 @@ export default function AddClientPage() {
               {t("General.cancel")}
             </Button>
             <Button type="submit" size="sm" form="client-form" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Clients.create")}
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("Clients.create_client")
+              )}
             </Button>
           </div>
         }

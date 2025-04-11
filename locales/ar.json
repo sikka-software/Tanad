@@ -1487,69 +1487,60 @@
   "Clients": {
     "title": "العملاء",
     "add_new": "إضافة عميل جديد",
+    "create_client": "إضافة عميل",
     "back_to_list": "الرجوع للقائمة",
     "client_details": "تفاصيل العميل",
     "search_clients": "بحث عن عملاء...",
     "no_clients_found": "لا توجد عملاء",
     "form": {
+      "validation": {
+        "name_required": "الاسم مطلوب",
+        "email_required": "البريد الإلكتروني مطلوب",
+        "email_invalid": "البريد الإلكتروني غير صالح",
+        "phone_required": "رقم الهاتف مطلوب",
+        "address_required": "العنوان مطلوب",
+        "city_required": "المدينة مطلوبة",
+        "state_required": "المنطقة مطلوبة",
+        "zip_code_required": "الرمز البريدي مطلوب"
+      },
       "name": {
         "label": "الاسم",
-        "placeholder": "أدخل الاسم",
-        "required": "الاسم مطلوب"
-      },
-      "company": {
-        "label": "الشركة",
-        "placeholder": "أدخل اسم الشركة",
-        "search_placeholder": "ابحث عن شركة..."
+        "placeholder": "أدخل اسم العميل"
       },
       "email": {
         "label": "البريد الإلكتروني",
-        "placeholder": "أدخل البريد الإلكتروني",
-        "required": "البريد الإلكتروني مطلوب",
-        "invalid": "البريد الإلكتروني غير صالح"
+        "placeholder": "أدخل البريد الإلكتروني للعميل"
       },
       "phone": {
         "label": "الهاتف",
-        "placeholder": "أدخل رقم الهاتف",
-        "required": "رقم الهاتف مطلوب"
+        "placeholder": "أدخل رقم الهاتف"
+      },
+      "company": {
+        "label": "الشركة",
+        "placeholder": "اختر أو أضف شركة",
+        "search_placeholder": "ابحث عن الشركات...",
+        "no_companies": "لم يتم العثور على شركات"
       },
       "address": {
         "label": "العنوان",
-        "placeholder": "أدخل العنوان",
-        "required": "العنوان مطلوب"
+        "placeholder": "أدخل العنوان"
       },
       "city": {
         "label": "المدينة",
-        "placeholder": "أدخل المدينة",
-        "required": "المدينة مطلوبة"
+        "placeholder": "أدخل المدينة"
       },
       "state": {
         "label": "المنطقة",
-        "placeholder": "أدخل المنطقة",
-        "required": "المنطقة مطلوبة"
+        "placeholder": "أدخل المنطقة"
       },
       "zip_code": {
         "label": "الرمز البريدي",
-        "placeholder": "أدخل الرمز البريدي",
-        "required": "الرمز البريدي مطلوب"
+        "placeholder": "أدخل الرمز البريدي"
       },
       "notes": {
         "label": "ملاحظات",
-        "placeholder": "أدخل ملاحظات"
+        "placeholder": "أدخل أي ملاحظات إضافية"
       }
-    },
-    "messages": {
-      "creating": "جاري إنشاء العميل...",
-      "create": "إنشاء عميل"
-    },
-    "success": {
-      "title": "تم بنجاح",
-      "created": "تم إنشاء العميل بنجاح"
-    },
-    "error": {
-      "title": "خطأ",
-      "create": "حدث خطأ أثناء إنشاء العميل",
-      "not_authenticated": "يجب تسجيل الدخول لإنشاء عميل"
     }
   },
 

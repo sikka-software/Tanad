@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
 import { ComboboxAdd } from "@/components/ui/combobox-add";
 import {
   Form,
@@ -41,7 +40,7 @@ const createClientSchema = (t: (key: string) => string) =>
     notes: z.string().optional(),
   });
 
-export type ClientFormValues = z.infer<ReturnType<typeof createClientSchema>>;
+export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
 
 interface ClientFormProps {
   id?: string;

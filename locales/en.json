@@ -1326,53 +1326,57 @@
   "Clients": {
     "title": "Clients",
     "add_new": "Add New Client",
+    "add_client": "Add Client",
     "back_to_list": "Back to List",
     "client_details": "Client Details",
     "form": {
+      "validation": {
+        "name_required": "Name is required",
+        "email_required": "Email is required",
+        "email_invalid": "Invalid email address",
+        "phone_required": "Phone number is required",
+        "address_required": "Address is required",
+        "city_required": "City is required",
+        "state_required": "State is required",
+        "zip_code_required": "ZIP code is required"
+      },
       "name": {
         "label": "Name",
-        "placeholder": "Enter name",
-        "required": "Name is required"
-      },
-      "company": {
-        "label": "Company",
-        "placeholder": "Enter company name",
-        "search_placeholder": "Search companies..."
+        "placeholder": "Enter client name"
       },
       "email": {
         "label": "Email",
-        "placeholder": "Enter email address",
-        "required": "Email is required",
-        "invalid": "Invalid email address"
+        "placeholder": "Enter client email"
       },
       "phone": {
         "label": "Phone",
-        "placeholder": "Enter phone number",
-        "required": "Phone number is required"
+        "placeholder": "Enter phone number"
+      },
+      "company": {
+        "label": "Company",
+        "placeholder": "Select or add a company",
+        "search_placeholder": "Search companies...",
+        "no_companies": "No companies found"
       },
       "address": {
         "label": "Address",
-        "placeholder": "Enter address",
-        "required": "Address is required"
+        "placeholder": "Enter address"
       },
       "city": {
         "label": "City",
-        "placeholder": "Enter city",
-        "required": "City is required"
+        "placeholder": "Enter city"
       },
       "state": {
         "label": "State",
-        "placeholder": "Enter state",
-        "required": "State is required"
+        "placeholder": "Enter state"
       },
       "zip_code": {
         "label": "ZIP Code",
-        "placeholder": "Enter ZIP code",
-        "required": "ZIP code is required"
+        "placeholder": "Enter ZIP code"
       },
       "notes": {
         "label": "Notes",
-        "placeholder": "Enter notes"
+        "placeholder": "Enter any additional notes"
       }
     },
     "messages": {
