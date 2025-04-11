@@ -2038,35 +2038,74 @@
     "add_company": "إضافة شركة",
     "company_details": "تفاصيل الشركة",
     "create_company": "إنشاء شركة",
+    "creating_company": "جاري إنشاء الشركة...",
     "back_to_list": "العودة للقائمة",
     "no_companies_found": "لم يتم العثور على شركات",
-    "name": "الاسم",
-    "name_placeholder": "أدخل اسم الشركة",
-    "email": "البريد الإلكتروني",
-    "email_placeholder": "أدخل البريد الإلكتروني للشركة",
-    "phone": "الهاتف",
-    "phone_placeholder": "أدخل هاتف الشركة",
-    "website": "الموقع الإلكتروني",
-    "website_placeholder": "أدخل الموقع الإلكتروني للشركة",
-    "address": "العنوان",
-    "address_placeholder": "أدخل عنوان الشركة",
-    "city": "المدينة",
-    "city_placeholder": "أدخل المدينة",
-    "state": "المنطقة",
-    "state_placeholder": "أدخل المنطقة",
-    "zip_code": "الرمز البريدي",
-    "zip_code_placeholder": "أدخل الرمز البريدي",
-    "industry": "المجال",
-    "industry_placeholder": "أدخل مجال الشركة",
-    "size": "حجم الشركة",
-    "size_placeholder": "أدخل حجم الشركة",
-    "notes": "ملاحظات",
-    "notes_placeholder": "أدخل الملاحظات",
-    "is_active": "حالة النشاط",
-    "messages": {
-      "error": "حدث خطأ",
-      "creating_company": "جاري إنشاء الشركة...",
-      "create_company": "إنشاء شركة"
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم الشركة"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني للشركة"
+      },
+      "phone": {
+        "label": "الهاتف",
+        "placeholder": "أدخل رقم هاتف الشركة"
+      },
+      "website": {
+        "label": "الموقع الإلكتروني",
+        "placeholder": "أدخل الموقع الإلكتروني للشركة"
+      },
+      "address": {
+        "label": "العنوان",
+        "placeholder": "أدخل عنوان الشركة"
+      },
+      "city": {
+        "label": "المدينة",
+        "placeholder": "أدخل المدينة"
+      },
+      "state": {
+        "label": "المنطقة",
+        "placeholder": "أدخل المنطقة"
+      },
+      "zipCode": {
+        "label": "الرمز البريدي",
+        "placeholder": "أدخل الرمز البريدي"
+      },
+      "industry": {
+        "label": "المجال",
+        "placeholder": "أدخل مجال الشركة"
+      },
+      "size": {
+        "label": "حجم الشركة",
+        "placeholder": "أدخل حجم الشركة"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل الملاحظات"
+      },
+      "isActive": {
+        "label": "حالة النشاط"
+      },
+      "validation": {
+        "name_required": "اسم الشركة مطلوب",
+        "email_required": "البريد الإلكتروني مطلوب",
+        "email_invalid": "البريد الإلكتروني غير صالح"
+      }
+    }
+  },
+  "form": {
+    "validation": {
+      "name_required": "الاسم مطلوب",
+      "email_required": "البريد الإلكتروني مطلوب",
+      "email_invalid": "عنوان البريد الإلكتروني غير صالح",
+      "phone_required": "رقم الهاتف مطلوب",
+      "address_required": "العنوان مطلوب",
+      "city_required": "المدينة مطلوبة",
+      "state_required": "المنطقة مطلوبة",
+      "zip_code_required": "الرمز البريدي مطلوب"
     }
   }
 }

@@ -17,22 +17,27 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
-const companyFormSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address").min(1, "Email is required"),
-  phone: z.string().optional(),
-  website: z.string().optional(),
-  address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-  industry: z.string().optional(),
-  size: z.string().optional(),
-  notes: z.string().optional(),
-  isActive: z.boolean().default(true),
-});
+// Create schema factory to handle translations
+const createCompanySchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("Companies.form.validation.name_required")),
+    email: z
+      .string()
+      .min(1, t("Companies.form.validation.email_required"))
+      .email(t("Companies.form.validation.email_invalid")),
+    phone: z.string().optional(),
+    website: z.string().optional(),
+    address: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zipCode: z.string().optional(),
+    industry: z.string().optional(),
+    size: z.string().optional(),
+    notes: z.string().optional(),
+    isActive: z.boolean().default(true),
+  });
 
-export type CompanyFormValues = z.input<typeof companyFormSchema>;
+export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
 
 interface CompanyFormProps {
   id?: string;
@@ -42,9 +47,11 @@ interface CompanyFormProps {
 }
 
 export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFormProps) {
-  const t = useTranslations("Companies");
+  const t = useTranslations();
+  const companySchema = createCompanySchema(t);
+
   const form = useForm<CompanyFormValues>({
-    resolver: zodResolver(companyFormSchema),
+    resolver: zodResolver(companySchema),
     defaultValues: {
       name: "",
       email: "",
@@ -71,9 +78,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("name")}</FormLabel>
+                <FormLabel>{t("Companies.form.name.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("name_placeholder")} {...field} />
+                  <Input disabled={loading} placeholder={t("Companies.form.name.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -84,12 +91,12 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("email")}</FormLabel>
+                <FormLabel>{t("Companies.form.email.label")}</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
                     disabled={loading}
-                    placeholder={t("email_placeholder")}
+                    placeholder={t("Companies.form.email.placeholder")}
                     {...field}
                   />
                 </FormControl>
@@ -102,9 +109,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("phone")}</FormLabel>
+                <FormLabel>{t("Companies.form.phone.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("phone_placeholder")} {...field} />
+                  <Input disabled={loading} placeholder={t("Companies.form.phone.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -115,9 +122,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="website"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("website")}</FormLabel>
+                <FormLabel>{t("Companies.form.website.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("website_placeholder")} {...field} />
+                  <Input disabled={loading} placeholder={t("Companies.form.website.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -128,9 +135,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("address")}</FormLabel>
+                <FormLabel>{t("Companies.form.address.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("address_placeholder")} {...field} />
+                  <Input disabled={loading} placeholder={t("Companies.form.address.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -141,9 +148,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("city")}</FormLabel>
+                <FormLabel>{t("Companies.form.city.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("city_placeholder")} {...field} />
+                  <Input disabled={loading} placeholder={t("Companies.form.city.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -154,9 +161,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("state")}</FormLabel>
+                <FormLabel>{t("Companies.form.state.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("state_placeholder")} {...field} />
+                  <Input disabled={loading} placeholder={t("Companies.form.state.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -167,9 +174,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="zipCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("zip_code")}</FormLabel>
+                <FormLabel>{t("Companies.form.zipCode.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("zip_code_placeholder")} {...field} />
+                  <Input disabled={loading} placeholder={t("Companies.form.zipCode.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -180,9 +187,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="industry"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("industry")}</FormLabel>
+                <FormLabel>{t("Companies.form.industry.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("industry_placeholder")} {...field} />
+                  <Input disabled={loading} placeholder={t("Companies.form.industry.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -193,9 +200,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="size"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("size")}</FormLabel>
+                <FormLabel>{t("Companies.form.size.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("size_placeholder")} {...field} />
+                  <Input disabled={loading} placeholder={t("Companies.form.size.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -207,9 +214,9 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
           name="notes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("notes")}</FormLabel>
+              <FormLabel>{t("Companies.form.notes.label")}</FormLabel>
               <FormControl>
-                <Textarea disabled={loading} placeholder={t("notes_placeholder")} {...field} />
+                <Textarea disabled={loading} placeholder={t("Companies.form.notes.placeholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -221,7 +228,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">{t("is_active")}</FormLabel>
+                <FormLabel className="text-base">{t("Companies.form.isActive.label")}</FormLabel>
               </div>
               <FormControl>
                 <Switch disabled={loading} checked={field.value} onCheckedChange={field.onChange} />

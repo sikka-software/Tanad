@@ -2040,5 +2040,79 @@
     "email": "Email",
     "phone": "Phone",
     "address": "Address"
+  },
+  "form": {
+    "validation": {
+      "name_required": "Name is required",
+      "email_required": "Email is required",
+      "email_invalid": "Invalid email address",
+      "phone_required": "Phone number is required",
+      "address_required": "Address is required",
+      "city_required": "City is required",
+      "state_required": "State is required",
+      "zip_code_required": "ZIP code is required"
+    }
+  },
+  "Companies": {
+    "title": "Companies",
+    "add_company": "Add Company",
+    "company_details": "Company Details",
+    "create_company": "Create Company",
+    "back_to_list": "Back to List",
+    "no_companies_found": "No companies found",
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter company name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter company email"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Enter company phone"
+      },
+      "website": {
+        "label": "Website",
+        "placeholder": "Enter company website"
+      },
+      "address": {
+        "label": "Address",
+        "placeholder": "Enter company address"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city"
+      },
+      "state": {
+        "label": "State",
+        "placeholder": "Enter state"
+      },
+      "zipCode": {
+        "label": "ZIP Code",
+        "placeholder": "Enter ZIP code"
+      },
+      "industry": {
+        "label": "Industry",
+        "placeholder": "Enter industry"
+      },
+      "size": {
+        "label": "Company Size",
+        "placeholder": "Enter company size"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      },
+      "isActive": {
+        "label": "Active Status"
+      },
+      "validation": {
+        "name_required": "Company name is required",
+        "email_required": "Email is required",
+        "email_invalid": "Invalid email address"
+      }
+    }
   }
 }

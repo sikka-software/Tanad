@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 import { CompanyForm, type CompanyFormValues } from "@/components/forms/company-form";
 import { Button } from "@/components/ui/button";
@@ -84,10 +85,12 @@ export default function AddCompanyPage() {
             <Button variant="outline" size="sm" onClick={() => router.push("/companies")}>
               {t("General.cancel")}
             </Button>
-            <Button type="submit" size="sm" form="company-form" disabled={loading}>
-              {loading
-                ? t("Companies.messages.creating_company")
-                : t("Companies.messages.create_company")}
+            <Button type="submit" className="min-w-24" size="sm" form="company-form" disabled={loading}>
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("Companies.create_company")
+              )}
             </Button>
           </div>
         }

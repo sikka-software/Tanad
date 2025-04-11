@@ -27,14 +27,17 @@ import { supabase } from "@/lib/supabase";
 // We'll create a schema factory to handle translations
 const createClientSchema = (t: (key: string) => string) =>
   z.object({
-    name: z.string().min(1, t("Clients.form.name.required")),
-    email: z.string().email(t("Clients.form.email.invalid")),
-    phone: z.string().min(1, t("Clients.form.phone.required")),
+    name: z.string().min(1, t("Clients.form.validation.name_required")),
+    email: z
+      .string()
+      .min(1, t("Clients.form.validation.email_required"))
+      .email(t("Clients.form.validation.email_invalid")),
+    phone: z.string().min(1, t("Clients.form.validation.phone_required")),
     company: z.string().optional(),
-    address: z.string().min(1, t("Clients.form.address.required")),
-    city: z.string().min(1, t("Clients.form.city.required")),
-    state: z.string().min(1, t("Clients.form.state.required")),
-    zip_code: z.string().min(1, t("Clients.form.zip_code.required")),
+    address: z.string().min(1, t("Clients.form.validation.address_required")),
+    city: z.string().min(1, t("Clients.form.validation.city_required")),
+    state: z.string().min(1, t("Clients.form.validation.state_required")),
+    zip_code: z.string().min(1, t("Clients.form.validation.zip_code_required")),
     notes: z.string().optional(),
   });
 

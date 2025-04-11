@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { ClientForm, type ClientFormValues } from "@/components/forms/client-form";
@@ -96,7 +97,7 @@ export default function AddClientPage() {
               {t("General.cancel")}
             </Button>
             <Button type="submit" size="sm" form="client-form" disabled={loading}>
-              {loading ? t("Clients.messages.creating") : t("Clients.messages.create")}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Clients.create")}
             </Button>
           </div>
         }
@@ -106,7 +107,7 @@ export default function AddClientPage() {
           <CardHeader>
             <CardTitle>{t("Clients.client_details")}</CardTitle>
           </CardHeader>
-          <CardContent >
+          <CardContent>
             <ClientForm
               id="client-form"
               userId={userId}
