@@ -4,7 +4,14 @@ import { z } from "zod";
 
 import SheetTable from "@/components/ui/sheet-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useClientsStore } from "@/stores/clients.store";
 import { Client } from "@/types/client.type";
 
