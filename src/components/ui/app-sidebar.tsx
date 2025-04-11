@@ -143,7 +143,7 @@ export function AppSidebar() {
                         {group.menus.map((menu, menuIndex) => (
                           <SidebarMenuItem key={menuIndex}>
                             {menu.submenus && menu.submenus.length > 0 ? (
-                              <Collapsible defaultOpen className="group/submenu-collapsible w-full">
+                              <Collapsible className="group/submenu-collapsible w-full">
                                 <CollapsibleTrigger asChild>
                                   <SidebarMenuButton
                                     className="w-full overflow-hidden"
@@ -158,7 +158,7 @@ export function AppSidebar() {
                                   </SidebarMenuButton>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
-                                  <SidebarMenuSub>
+                                  <SidebarMenuSub className="w-[calc(100%-1rem)] !px-0">
                                     {menu.submenus.map((submenu, submenuIndex) => (
                                       <SidebarMenuSubItem key={submenuIndex}>
                                         <Link href={submenu.href}>
@@ -166,6 +166,7 @@ export function AppSidebar() {
                                             className={cn(
                                               submenu.active &&
                                                 "bg-primary text-background hover:bg-primary hover:text-background",
+                                                'p-0 ps-2 pe-1'
                                             )}
                                           >
                                             <span className="text-nowrap">
@@ -175,7 +176,7 @@ export function AppSidebar() {
                                               <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="ms-auto !size-5 cursor-pointer !p-2"
+                                                className="ms-auto !size-5 cursor-pointer !p-2 hover:border"
                                                 onClick={(e) => {
                                                   e.stopPropagation();
                                                   e.preventDefault();
