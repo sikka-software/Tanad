@@ -91,9 +91,9 @@ export default function AddClientPage() {
         createButtonLink="/clients"
         createButtonText={t("Clients.back_to_list")}
         customButton={
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => router.push("/clients")}>
-              {t("Clients.form.cancel")}
+              {t("General.cancel")}
             </Button>
             <Button type="submit" size="sm" form="client-form" disabled={loading}>
               {loading ? t("Clients.messages.creating") : t("Clients.messages.create")}
@@ -102,11 +102,11 @@ export default function AddClientPage() {
         }
       />
       <div className="p-4">
-        <Card>
+        <Card className="max-w-2xl">
           <CardHeader>
             <CardTitle>{t("Clients.client_details")}</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent >
             <ClientForm
               id="client-form"
               userId={userId}

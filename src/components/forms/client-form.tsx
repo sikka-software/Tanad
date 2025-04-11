@@ -121,7 +121,7 @@ export function ClientForm({
   return (
     <Form {...form}>
       <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
           <FormField
             control={form.control}
             name="name"
@@ -151,7 +151,7 @@ export function ClientForm({
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
           <FormField
             control={form.control}
             name="email"
@@ -199,7 +199,7 @@ export function ClientForm({
           )}
         />
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
           <FormField
             control={form.control}
             name="city"
