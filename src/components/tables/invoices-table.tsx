@@ -29,9 +29,8 @@ const statusSchema = z.enum(["paid", "pending", "overdue"]);
 
 const columns: ColumnDef<Invoice>[] = [
   {
-    accessorKey: "invoice_number",
+    accessorKey: "invoiceNumber",
     header: "Invoice #",
-    validationSchema: invoiceNumberSchema,
   },
   {
     accessorKey: "client.company",
@@ -39,27 +38,23 @@ const columns: ColumnDef<Invoice>[] = [
     cell: ({ row }) => row.original.client?.company || "N/A",
   },
   {
-    accessorKey: "issue_date",
+    accessorKey: "issueDate",
     header: "Issue Date",
-    cell: ({ row }) => format(new Date(row.original.issue_date), "MMM dd, yyyy"),
-    validationSchema: issueDateSchema,
+    cell: ({ row }) => format(new Date(row.original.issueDate), "MMM dd, yyyy"),
   },
   {
-    accessorKey: "due_date",
+    accessorKey: "dueDate",
     header: "Due Date",
-    cell: ({ row }) => format(new Date(row.original.due_date), "MMM dd, yyyy"),
-    validationSchema: dueDateSchema,
+    cell: ({ row }) => format(new Date(row.original.dueDate), "MMM dd, yyyy"),
   },
   {
     accessorKey: "total",
     header: "Total",
     cell: ({ row }) => `$${row.original.total.toFixed(2)}`,
-    validationSchema: totalSchema,
   },
   {
     accessorKey: "status",
     header: "Status",
-    validationSchema: statusSchema,
   },
   {
     id: "actions",
@@ -90,7 +85,7 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     let processedValue = value;
-    if (columnId === "issue_date" || columnId === "due_date") {
+    if (columnId === "issueDate" || columnId === "dueDate") {
       processedValue = new Date(value as string).toISOString();
     }
 

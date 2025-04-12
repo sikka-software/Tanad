@@ -92,7 +92,8 @@ export type Invoice = {
   total: number;
   notes?: string;
   clientId?: string;
+  client?: Client;
   createdAt: Date;
 };
 
-export type InvoiceCreateData = Omit<Invoice, "id" | "createdAt">;
+export type InvoiceCreateData = Omit<Invoice, "id" | "createdAt" | "client">;

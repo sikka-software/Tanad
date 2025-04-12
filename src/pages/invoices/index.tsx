@@ -1,17 +1,19 @@
 import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
+
 import { format } from "date-fns";
 
+import InvoicesTable from "@/components/tables/invoices-table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { useInvoices } from "@/hooks/useInvoices";
 import { Invoice } from "@/types/invoice.type";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import InvoicesTable from "@/components/tables/invoices-table";
 
 function getStatusColor(status: string): string {
   switch (status.toLowerCase()) {
@@ -35,9 +37,9 @@ export default function InvoicesPage() {
   const filteredInvoices = Array.isArray(invoices)
     ? invoices.filter(
         (invoice: Invoice) =>
-          invoice.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
           invoice.client?.company?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
-          invoice.client?.name?.toLowerCase()?.includes(searchQuery.toLowerCase())
+          invoice.client?.name?.toLowerCase()?.includes(searchQuery.toLowerCase()),
       )
     : [];
 
@@ -46,7 +48,7 @@ export default function InvoicesPage() {
       <CardHeader className="flex flex-row items-start justify-between">
         <div>
           <h3 className="text-lg font-semibold">
-            {t("invoice_number", { number: invoice.invoice_number })}
+            {t("invoice_number", { number: invoice.invoiceNumber })}
           </h3>
           <p className="text-sm text-gray-500">{invoice.client?.company}</p>
         </div>
@@ -58,11 +60,11 @@ export default function InvoicesPage() {
         <div className="space-y-2">
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">{t("issue_date")}</span>
-            <span className="text-sm">{format(new Date(invoice.issue_date), "MMM dd, yyyy")}</span>
+            <span className="text-sm">{format(new Date(invoice.issueDate), "MMM dd, yyyy")}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">{t("due_date")}</span>
-            <span className="text-sm">{format(new Date(invoice.due_date), "MMM dd, yyyy")}</span>
+            <span className="text-sm">{format(new Date(invoice.dueDate), "MMM dd, yyyy")}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">{t("amount")}</span>

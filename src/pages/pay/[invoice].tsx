@@ -1,7 +1,10 @@
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
+
 import { format } from "date-fns";
+
 import { Invoice } from "@/types/invoice.type";
+import { fetchInvoiceById } from "@/services/invoiceService";
 
 interface Props {
   invoice: Invoice;
@@ -11,25 +14,25 @@ export default function InvoicePreviewPage({ invoice }: Props) {
   const t = useTranslations("Invoices");
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="flex justify-between items-start mb-8">
+    <div className="mx-auto max-w-4xl p-8">
+      <div className="mb-8 flex items-start justify-between">
         <h1 className="text-2xl font-bold">
-          {t("invoice_number", { number: invoice.invoice_number })}
+          {t("invoice_number", { number: invoice.invoiceNumber })}
         </h1>
         <div className="text-right">
           <p className="text-sm text-gray-500">{t("issue_date")}</p>
-          <p>{format(new Date(invoice.issue_date), "MMM dd, yyyy")}</p>
+          <p>{format(new Date(invoice.issueDate), "MMM dd, yyyy")}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-8 mb-8">
+      <div className="mb-8 grid grid-cols-2 gap-8">
         <div>
-          <h2 className="text-lg font-semibold mb-2">{t("from")}</h2>
+          <h2 className="mb-2 text-lg font-semibold">{t("from")}</h2>
           <p>Your Company Name</p>
           <p>Your Company Address</p>
         </div>
         <div>
-          <h2 className="text-lg font-semibold mb-2">{t("to")}</h2>
+          <h2 className="mb-2 text-lg font-semibold">{t("to")}</h2>
           <p>{invoice.client?.company}</p>
           <p>{invoice.client?.name}</p>
           <p>{invoice.client?.email}</p>
@@ -53,8 +56,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const invoiceId = params?.invoice as string;
 
   try {
-    // You'll need to implement getInvoiceById similar to getProductById
-    const invoice = await getInvoiceById(invoiceId);
+    const invoice = await fetchInvoiceById(invoiceId);
     if (!invoice) {
       return { notFound: true };
     }
@@ -68,4 +70,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   } catch (error) {
     return { notFound: true };
   }
-}; 
+};

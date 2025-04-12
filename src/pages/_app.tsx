@@ -46,7 +46,7 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
     "/directory",
   ];
 
-  const shouldUseLayout = !router.pathname.startsWith('/pay/');
+  const shouldUseLayout = !router.pathname.startsWith("/pay/");
 
   // Auth Pages
   if (authPages.includes(router.pathname)) {

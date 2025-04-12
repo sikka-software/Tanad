@@ -8,9 +8,13 @@ import { Quote, QuoteItem, QuoteCreateData, QuoteItemCreateData } from "@/types/
 function convertDrizzleQuote(
   data: typeof quotes.$inferSelect & { clients?: typeof clients.$inferSelect | null },
 ): Quote {
+  if (!data.createdAt) {
+    throw new Error("Quote must have a creation date");
+  }
+
   return {
     id: data.id,
-    created_at: data.createdAt?.toString() || "",
+    created_at: data.createdAt.toString(),
     quote_number: data.quoteNumber,
     issue_date: data.issueDate,
     expiry_date: data.expiryDate,
@@ -19,7 +23,7 @@ function convertDrizzleQuote(
     tax_amount: Number(data.taxAmount),
     total: Number(data.total),
     status: data.status,
-    notes: data.notes,
+    notes: data.notes || undefined,
     client_id: data.clientId,
     clients: data.clients
       ? {
@@ -120,7 +124,7 @@ export async function createQuote(quote: QuoteCreateData) {
     taxAmount: quote.tax_amount.toString(),
     total: quote.total.toString(),
     status: quote.status,
-    notes: quote.notes,
+    notes: quote.notes || null,
     clientId: quote.client_id,
     userId: quote.userId || "",
   };

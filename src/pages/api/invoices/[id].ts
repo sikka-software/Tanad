@@ -1,10 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Invoice } from "@/types/invoice.type";
+
 import { supabase } from "@/lib/supabase";
+import { Invoice } from "@/types/invoice.type";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Invoice | { error: string }>
+  res: NextApiResponse<Invoice | { error: string }>,
 ) {
   const { id } = req.query;
 
@@ -13,11 +14,7 @@ export default async function handler(
   }
 
   try {
-    const { data, error } = await supabase
-      .from("invoices")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const { data, error } = await supabase.from("invoices").select("*").eq("id", id).single();
 
     if (error) throw error;
     if (!data) return res.status(404).json({ error: "Invoice not found" });
@@ -26,4 +23,4 @@ export default async function handler(
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }
-} 
+}
