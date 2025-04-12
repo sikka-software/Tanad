@@ -596,7 +596,7 @@ export function QuoteForm({ onSuccess }: QuoteFormProps) {
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("status")} *</FormLabel>
+                <FormLabel>{t("status.title")} *</FormLabel>
                 <Select
                   defaultValue={field.value}
                   onValueChange={field.onChange}

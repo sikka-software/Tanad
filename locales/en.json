@@ -1507,9 +1507,9 @@
     "tax_rate": "Tax Rate (%)",
     "issue_date": "Issue Date",
     "expiry_date": "Expiry Date",
-    "status": "Status",
     "select_status": "Select status",
     "status": {
+      "title": "Status",
       "draft": "Draft",
       "sent": "Sent",
       "accepted": "Accepted",
