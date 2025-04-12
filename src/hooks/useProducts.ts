@@ -21,7 +21,7 @@ export const productKeys = {
 // Hook to fetch all products
 export function useProducts() {
   return useQuery({
-    queryKey: productKeys.lists(),
+    queryKey: ["products"],
     queryFn: fetchProducts,
   });
 }
