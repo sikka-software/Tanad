@@ -1487,7 +1487,24 @@
       "load_clients": "فشل في تحميل العملاء"
     },
     "tax_amount": "مبلغ الضريبة",
-    "total": "الإجمالي"
+    "total": "الإجمالي",
+    "validation": {
+      "client_required": "العميل مطلوب",
+      "quote_number_required": "رقم عرض السعر مطلوب",
+      "issue_date_required": "تاريخ الإصدار مطلوب",
+      "expiry_date_required": "تاريخ الانتهاء مطلوب",
+      "status_required": "الحالة مطلوبة",
+      "subtotal_positive": "المجموع الفرعي يجب أن يكون رقماً موجباً",
+      "tax_rate_positive": "نسبة الضريبة يجب أن تكون رقماً موجباً",
+      "items_required": "يجب إضافة منتج واحد على الأقل",
+      "item_description_required": "الوصف مطلوب",
+      "item_quantity_required": "الكمية مطلوبة",
+      "item_quantity_positive": "الكمية يجب أن تكون رقماً موجباً",
+      "item_price_required": "السعر مطلوب",
+      "item_price_positive": "السعر يجب أن يكون رقماً موجباً",
+      "item_description_or_product": "يجب اختيار منتج أو إدخال وصف لكل عنصر"
+    },
+    "cancel": "إلغاء"
   },
   "Holidays": {
     "title": "العطلات الرسمية"

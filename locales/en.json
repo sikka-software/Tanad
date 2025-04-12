@@ -1544,7 +1544,24 @@
       "load_clients": "Failed to load clients"
     },
     "tax_amount": "Tax Amount",
-    "total": "Total"
+    "total": "Total",
+    "validation": {
+      "client_required": "Client is required",
+      "quote_number_required": "Quote number is required",
+      "issue_date_required": "Issue date is required",
+      "expiry_date_required": "Expiry date is required",
+      "status_required": "Status is required",
+      "subtotal_positive": "Subtotal must be a positive number",
+      "tax_rate_positive": "Tax rate must be a positive number",
+      "items_required": "At least one item is required",
+      "item_description_required": "Description is required",
+      "item_quantity_required": "Quantity is required",
+      "item_quantity_positive": "Quantity must be a positive number",
+      "item_price_required": "Price is required",
+      "item_price_positive": "Price must be a positive number",
+      "item_description_or_product": "Each item must have either a product selected or a description entered"
+    },
+    "cancel": "Cancel"
   },
   "Salaries": {
     "title": "Salaries"

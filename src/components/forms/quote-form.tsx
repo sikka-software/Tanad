@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, RefObject } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { useLocale, useTranslations } from "next-intl";
@@ -8,6 +8,7 @@ import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-tabl
 import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { ComboboxAdd } from "@/components/ui/combobox-add";
@@ -41,50 +42,32 @@ import { supabase } from "@/lib/supabase";
 
 import { ClientForm } from "./client-form";
 
-const quoteSchema = z.object({
-  client_id: z.string().min(1, "Client is required"),
-  quote_number: z.string().min(1, "Quote number is required"),
-  issue_date: z.string().min(1, "Issue date is required"),
-  expiry_date: z.string().min(1, "Expiry date is required"),
-  status: z.string().min(1, "Status is required"),
-  subtotal: z.number().min(0, "Subtotal must be a positive number"),
-  tax_rate: z.number().min(0, "Tax rate must be a positive number"),
-  notes: z.string().optional(),
-  items: z
-    .array(
-      z.object({
-        product_id: z.string().optional(),
-        description: z.string().min(1, "Description is required"),
-        quantity: z
-          .string()
-          .min(1, "Quantity is required")
-          .refine(
-            (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
-            "Quantity must be a positive number",
-          ),
-        unit_price: z
-          .string()
-          .min(1, "Price is required")
-          .refine(
-            (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
-            "Price must be a positive number",
-          ),
-      }),
-    )
-    .min(1, "At least one item is required")
-    .refine(
-      (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
-      "Each item must have either a product selected or a description entered",
-    ),
-});
+interface QuoteItem {
+  product_id?: string;
+  description: string;
+  quantity: string;
+  unit_price: string;
+}
 
-export type QuoteFormValues = z.infer<typeof quoteSchema>;
+interface QuoteFormValues {
+  client_id: string;
+  quote_number: string;
+  issue_date: string;
+  expiry_date: string;
+  status: string;
+  subtotal: number;
+  tax_rate: number;
+  notes?: string;
+  items: QuoteItem[];
+}
 
 interface QuoteFormProps {
   onSuccess?: () => void;
+  formRef?: RefObject<HTMLFormElement>;
+  hideFormButtons?: boolean;
 }
 
-export function QuoteForm({ onSuccess }: QuoteFormProps) {
+export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState<any[]>([]);
@@ -97,7 +80,45 @@ export function QuoteForm({ onSuccess }: QuoteFormProps) {
   const t = useTranslations("Quotes");
   const locale = useLocale();
 
+  const quoteSchema = z.object({
+    client_id: z.string().min(1, t("validation.client_required")),
+    quote_number: z.string().min(1, t("validation.quote_number_required")),
+    issue_date: z.string().min(1, t("validation.issue_date_required")),
+    expiry_date: z.string().min(1, t("validation.expiry_date_required")),
+    status: z.string().min(1, t("validation.status_required")),
+    subtotal: z.number().min(0, t("validation.subtotal_positive")),
+    tax_rate: z.number().min(0, t("validation.tax_rate_positive")),
+    notes: z.string().optional(),
+    items: z
+      .array(
+        z.object({
+          product_id: z.string().optional(),
+          description: z.string().min(1, t("validation.item_description_required")),
+          quantity: z
+            .string()
+            .min(1, t("validation.item_quantity_required"))
+            .refine(
+              (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
+              t("validation.item_quantity_positive"),
+            ),
+          unit_price: z
+            .string()
+            .min(1, t("validation.item_price_required"))
+            .refine(
+              (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
+              t("validation.item_price_positive"),
+            ),
+        }),
+      )
+      .min(1, t("validation.items_required"))
+      .refine(
+        (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
+        t("validation.item_description_or_product"),
+      ),
+  });
+
   const form = useForm<QuoteFormValues>({
+    resolver: zodResolver(quoteSchema),
     defaultValues: {
       client_id: "",
       quote_number: "",
@@ -233,8 +254,8 @@ export function QuoteForm({ onSuccess }: QuoteFormProps) {
     }
   };
 
-  const calculateSubtotal = (items: any[]) => {
-    return items.reduce((acc, item) => {
+  const calculateSubtotal = (items: QuoteItem[]) => {
+    return items.reduce((acc: number, item: QuoteItem) => {
       const quantity = parseFloat(item.quantity) || 0;
       const unitPrice = parseFloat(item.unit_price) || 0;
       return acc + quantity * unitPrice;
@@ -463,7 +484,7 @@ export function QuoteForm({ onSuccess }: QuoteFormProps) {
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -700,11 +721,13 @@ export function QuoteForm({ onSuccess }: QuoteFormProps) {
             </div>
           </div>
 
-          <div className="flex justify-end">
-            <Button type="submit" disabled={loading}>
-              {loading ? t("submitting") : t("create_quote")}
-            </Button>
-          </div>
+          {!hideFormButtons && (
+            <div className="flex justify-end">
+              <Button type="submit" disabled={loading}>
+                {loading ? t("submitting") : t("create_quote")}
+              </Button>
+            </div>
+          )}
         </form>
       </Form>
 
