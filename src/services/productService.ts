@@ -32,7 +32,7 @@ export async function createProduct(product: Omit<Product, "id" | "created_at">)
 
 export async function updateProduct(
   id: string,
-  product: Partial<Omit<Product, "id" | "created_at">>
+  product: Partial<Omit<Product, "id" | "created_at">>,
 ): Promise<Product> {
   const response = await fetch(`/api/products/${id}`, {
     method: "PUT",
