@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, RefObject } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { format } from "date-fns";
 
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -43,6 +44,7 @@ import { Client } from "@/types/client.type";
 import { Product } from "@/types/product.type";
 
 import { ClientForm } from "./client-form";
+import { DatePicker } from "@/components/ui/date-picker";
 
 export interface QuoteItem {
   product_id?: string;
@@ -469,7 +471,6 @@ export function QuoteForm({
           id={id}
           ref={formRef}
           onSubmit={form.handleSubmit((data) => {
-            // Convert string values to numbers for submission
             const formattedData: QuoteFormValues = {
               ...data,
               items: data.items.map((item) => ({
@@ -568,9 +569,11 @@ export function QuoteForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("issue_date")} *</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
+                  <DatePicker
+                    date={field.value ? new Date(field.value) : undefined}
+                    onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+                    placeholder={t("select_issue_date")}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
@@ -582,9 +585,11 @@ export function QuoteForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("expiry_date")} *</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
+                  <DatePicker
+                    date={field.value ? new Date(field.value) : undefined}
+                    onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+                    placeholder={t("select_expiry_date")}
+                  />
                   <FormMessage />
                 </FormItem>
               )}

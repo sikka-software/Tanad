@@ -1435,7 +1435,7 @@
   "Quotes": {
     "title": "عروض الأسعار",
     "create_quote": "إنشاء عرض سعر",
-    "add_new_quote": "إضافة عرض سعر جديد",
+    "add_new": "إضافة عرض سعر جديد",
     "back_to_list": "العودة إلى عروض الأسعار",
     "quote_details": "تفاصيل عرض السعر",
     "submitting": "جاري الإرسال...",
@@ -1451,6 +1451,8 @@
     "issue_date": "تاريخ الإصدار",
     "expiry_date": "تاريخ انتهاء الصلاحية",
     "select_status": "اختر الحالة",
+    "select_issue_date": "اختر تاريخ الإصدار",
+    "select_expiry_date": "اختر تاريخ انتهاء الصلاحية",
     "status": {
       "title": "الحالة",
       "draft": "مسودة",

@@ -1492,7 +1492,7 @@
   "Quotes": {
     "title": "Quotes",
     "create_quote": "Create Quote",
-    "add_new_quote": "Add New Quote",
+    "add_new": "Add New Quote",
     "back_to_list": "Back to Quotes",
     "quote_details": "Quote Details",
     "submitting": "Submitting...",
@@ -1508,6 +1508,8 @@
     "issue_date": "Issue Date",
     "expiry_date": "Expiry Date",
     "select_status": "Select status",
+    "select_issue_date": "Select issue date",
+    "select_expiry_date": "Select expiry date",
     "status": {
       "title": "Status",
       "draft": "Draft",

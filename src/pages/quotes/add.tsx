@@ -98,7 +98,7 @@ export default function AddQuotePage() {
   return (
     <div>
       <PageTitle
-        title={t("Quotes.add_new_quote")}
+        title={t("Quotes.add_new")}
         createButtonLink="/quotes"
         createButtonText={t("Quotes.back_to_list")}
         customButton={
