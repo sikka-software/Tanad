@@ -76,7 +76,7 @@ Fill in the required environment variables:
 npm run dev
 ```
 
-The application will be available at [http://localhost:3036](http://localhost:3036)
+The application will be available at [http://localhost:3037](http://localhost:3037)
 
 ### Docker Deployment
 
@@ -85,8 +85,8 @@ The application will be available at [http://localhost:3036](http://localhost:30
 ```bash
 docker-compose up -d
 ```
-
-2. The application will be available at port 3036
+  
+2. The application will be available at port 3037
 
 ## Project Structure
 
