@@ -4,11 +4,11 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { ComboboxAdd } from "@/components/ui/combobox-add";
@@ -39,42 +39,53 @@ import {
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
+import { Client } from "@/types/client.type";
+import { Product } from "@/types/product.type";
 
 import { ClientForm } from "./client-form";
 
-interface QuoteItem {
+export interface QuoteItem {
   product_id?: string;
   description: string;
   quantity: string;
   unit_price: string;
 }
 
-interface QuoteFormValues {
+export interface QuoteFormValues {
   client_id: string;
   quote_number: string;
   issue_date: string;
   expiry_date: string;
   status: string;
-  subtotal: number;
   tax_rate: number;
+  subtotal?: number;
   notes?: string;
   items: QuoteItem[];
 }
 
-interface QuoteFormProps {
-  onSuccess?: () => void;
+export interface QuoteFormProps {
+  id?: string;
   formRef?: RefObject<HTMLFormElement>;
+  loading?: boolean;
+  userId?: string | null;
+  onSubmit?: (data: QuoteFormValues) => void;
   hideFormButtons?: boolean;
 }
 
-export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProps) {
+export function QuoteForm({
+  id,
+  formRef,
+  loading,
+  userId,
+  onSubmit,
+  hideFormButtons,
+}: QuoteFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [clients, setClients] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
   const [clientsLoading, setClientsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
   const t = useTranslations("Quotes");
@@ -86,7 +97,6 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
     issue_date: z.string().min(1, t("validation.issue_date_required")),
     expiry_date: z.string().min(1, t("validation.expiry_date_required")),
     status: z.string().min(1, t("validation.status_required")),
-    subtotal: z.number().min(0, t("validation.subtotal_positive")),
     tax_rate: z.number().min(0, t("validation.tax_rate_positive")),
     notes: z.string().optional(),
     items: z
@@ -117,7 +127,7 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
       ),
   });
 
-  const form = useForm<QuoteFormValues>({
+  const form = useForm<z.input<typeof quoteSchema>>({
     resolver: zodResolver(quoteSchema),
     defaultValues: {
       client_id: "",
@@ -125,17 +135,9 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
       issue_date: "",
       expiry_date: "",
       status: "draft",
-      subtotal: 0,
       tax_rate: 0,
       notes: "",
-      items: [
-        {
-          product_id: "",
-          description: "",
-          quantity: "1",
-          unit_price: "",
-        },
-      ],
+      items: [],
     },
   });
 
@@ -144,27 +146,38 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
     name: "items",
   });
 
+  const items = form.watch("items") || [];
+  const taxRate = form.watch("tax_rate") || 0;
+
+  const subtotal = items.reduce((acc: number, item: QuoteItem) => {
+    const quantity = parseFloat(item.quantity || "0");
+    const unitPrice = parseFloat(item.unit_price || "0");
+    return acc + quantity * unitPrice;
+  }, 0);
+
+  const tax = (subtotal * taxRate) / 100;
+  const total = subtotal + tax;
+
   useEffect(() => {
     // Get the current user ID and fetch clients
     const getUserIdAndClients = async () => {
       setClientsLoading(true);
 
-      // Get user ID
-      const { data: userData } = await supabase.auth.getUser();
-      if (userData.user) {
-        setUserId(userData.user.id);
-      }
-
-      // Fetch clients
+      // Fetch clients with all fields and company details
       try {
         const { data, error } = await supabase
           .from("clients")
-          .select("id, name, company")
+          .select(
+            `
+            *,
+            company_details:companies (name)
+          `,
+          )
           .order("name");
 
         if (error) throw error;
 
-        setClients(data || []);
+        setClients(data as Client[]);
       } catch (error) {
         console.error("Error fetching clients:", error);
         toast.error(t("error.load_clients"));
@@ -181,17 +194,14 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
     const fetchProducts = async () => {
       setProductsLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("products")
-          .select("id, name, description, price")
-          .order("name");
+        const { data, error } = await supabase.from("products").select("*").order("name");
 
         if (error) throw error;
 
         setProducts(data || []);
       } catch (error) {
         console.error("Error fetching products:", error);
-        toast.error("Failed to load products");
+        toast.error(t("error.load_products"));
       } finally {
         setProductsLoading(false);
       }
@@ -203,17 +213,15 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
   // Calculate subtotal whenever items change
   useEffect(() => {
     const calculateSubtotal = () => {
-      const subtotal = form.watch("items").reduce((acc, item) => {
-        const quantity = parseFloat(item.quantity) || 0;
-        const unitPrice = parseFloat(item.unit_price) || 0;
+      const subtotal = items.reduce((acc: number, item: QuoteItem) => {
+        const quantity = parseFloat(item.quantity || "0");
+        const unitPrice = parseFloat(item.unit_price || "0");
         return acc + quantity * unitPrice;
       }, 0);
-
-      form.setValue("subtotal", subtotal);
     };
 
     calculateSubtotal();
-  }, [form.watch("items")]);
+  }, [items]);
 
   const clientOptions = useMemo(
     () =>
@@ -235,13 +243,8 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
     [products],
   );
 
-  const handleClientAdded = (newClient: any) => {
-    const clientForList = {
-      id: newClient.id,
-      name: newClient.name,
-      company: newClient.company,
-    };
-    setClients((prev) => [...prev, clientForList]);
+  const handleClientAdded = (newClient: Client) => {
+    setClients((prev) => [...prev, newClient]);
     form.setValue("client_id", newClient.id);
     setIsDialogOpen(false);
   };
@@ -249,7 +252,7 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
   const handleProductSelection = (index: number, productId: string) => {
     const product = products.find((p) => p.id === productId);
     if (product) {
-      form.setValue(`items.${index}.description`, product.description);
+      form.setValue(`items.${index}.description`, product.description || "");
       form.setValue(`items.${index}.unit_price`, product.price.toString());
     }
   };
@@ -262,63 +265,33 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
     }, 0);
   };
 
-  const onSubmit = async (data: QuoteFormValues) => {
-    setLoading(true);
+  const handleSubmit = async (data: QuoteFormValues) => {
+    if (loading) return;
+
     try {
-      // Calculate final amounts
-      const subtotal = calculateSubtotal(data.items);
-      const taxAmount = (subtotal * data.tax_rate) / 100;
-      const total = subtotal + taxAmount;
+      setIsLoading(true);
 
-      // First create the quote
-      const { data: quote, error: quoteError } = await supabase
-        .from("quotes")
-        .insert([
-          {
-            client_id: data.client_id,
-            quote_number: data.quote_number.trim(),
-            issue_date: data.issue_date,
-            expiry_date: data.expiry_date,
-            status: data.status,
-            subtotal: subtotal,
-            tax_rate: data.tax_rate,
-            notes: data.notes?.trim() || null,
-            user_id: userId,
-          },
-        ])
-        .select()
-        .single();
-
-      if (quoteError) throw quoteError;
-
-      // Then add quote items
-      const quoteItems = data.items.map((item) => ({
-        quote_id: quote.id,
-        product_id: item.product_id || null,
-        description: item.description || "",
-        quantity: parseFloat(item.quantity),
-        unit_price: parseFloat(item.unit_price),
-      }));
-
-      const { error: itemsError } = await supabase.from("quote_items").insert(quoteItems);
-
-      if (itemsError) throw itemsError;
-
-      toast.success(t("success.title"), {
-        description: t("success.created"),
-      });
-
-      if (onSuccess) {
-        onSuccess();
+      if (onSubmit) {
+        await onSubmit(data);
       } else {
+        // Handle default submission logic
+        const { error } = await supabase.from("quotes").upsert({
+          ...data,
+          user_id: userId,
+        });
+
+        if (error) throw error;
+
+        toast.success(
+          id ? t("quotes.quote_updated_successfully") : t("quotes.quote_created_successfully"),
+        );
         router.push("/quotes");
       }
     } catch (error) {
-      toast.error(t("error.title"), {
-        description: error instanceof Error ? error.message : t("error.create"),
-      });
+      console.error(error);
+      toast.error(t("common.something_went_wrong"));
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -481,10 +454,34 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
     getCoreRowModel: getCoreRowModel(),
   });
 
+  // Remove the subtotal form field since it's calculated
+  const SubtotalDisplay = () => (
+    <div className="flex flex-col space-y-2">
+      <span className="text-sm font-medium">{t("subtotal")}</span>
+      <Input type="text" value={`${subtotal.toFixed(2)}`} readOnly disabled />
+    </div>
+  );
+
   return (
     <>
       <Form {...form}>
-        <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          id={id}
+          ref={formRef}
+          onSubmit={form.handleSubmit((data) => {
+            // Convert string values to numbers for submission
+            const formattedData: QuoteFormValues = {
+              ...data,
+              items: data.items.map((item) => ({
+                ...item,
+                quantity: item.quantity,
+                unit_price: item.unit_price,
+              })),
+            };
+            handleSubmit(formattedData);
+          })}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -537,25 +534,7 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="subtotal"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("subtotal")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={field.value.toFixed(2)}
-                      readOnly
-                      disabled
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <SubtotalDisplay />
 
             <FormField
               control={form.control}
@@ -708,23 +687,25 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
             )}
           />
 
-          <div className="mt-4 text-right">
-            <div className="text-sm text-gray-600">
-              Tax Amount: ${((form.watch("subtotal") * form.watch("tax_rate")) / 100).toFixed(2)}
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="flex items-center justify-between md:col-start-2">
+              <span className="text-sm font-medium">{t("common.subtotal")}</span>
+              <span className="text-sm">${subtotal.toFixed(2)}</span>
             </div>
-            <div className="text-lg font-semibold">
-              Total: $
-              {(
-                form.watch("subtotal") +
-                (form.watch("subtotal") * form.watch("tax_rate")) / 100
-              ).toFixed(2)}
+            <div className="flex items-center justify-between md:col-start-2">
+              <span className="text-sm font-medium">{t("common.tax")}</span>
+              <span className="text-sm">${tax.toFixed(2)}</span>
+            </div>
+            <div className="flex items-center justify-between md:col-start-2">
+              <span className="text-sm font-medium">{t("common.total")}</span>
+              <span className="text-sm font-bold">${total.toFixed(2)}</span>
             </div>
           </div>
 
           {!hideFormButtons && (
             <div className="flex justify-end">
-              <Button type="submit" disabled={loading}>
-                {loading ? t("submitting") : t("create_quote")}
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? t("submitting") : t("create_quote")}
               </Button>
             </div>
           )}
@@ -738,7 +719,7 @@ export function QuoteForm({ onSuccess, formRef, hideFormButtons }: QuoteFormProp
           </DialogHeader>
           <ClientForm
             onSuccess={(newClient: any) => handleClientAdded(newClient)}
-            userId={userId}
+            userId={userId || null}
           />
         </DialogContent>
       </Dialog>
