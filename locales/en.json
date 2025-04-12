@@ -1491,16 +1491,24 @@
   },
   "Quotes": {
     "title": "Quotes",
-    "add_new": "Add New Quote",
-    "quote_details": "Quote Details",
-    "back_to_list": "Back to Quotes",
     "create_quote": "Create Quote",
-    "no_quotes_found": "No quotes found",
-    "quote_number": "Quote #{number}",
+    "add_new_quote": "Add New Quote",
+    "back_to_list": "Back to Quotes",
+    "quote_details": "Quote Details",
+    "submitting": "Submitting...",
+    "client": "Client",
+    "select_client": "Select a client",
+    "search_clients": "Search clients",
+    "no_clients": "No clients found",
+    "add_new_client": "Add New Client",
+    "quote_number": "Quote Number",
     "enter_quote_number": "Enter quote number",
+    "subtotal": "Subtotal",
+    "tax_rate": "Tax Rate (%)",
     "issue_date": "Issue Date",
     "expiry_date": "Expiry Date",
-    "amount": "Amount",
+    "status": "Status",
+    "select_status": "Select status",
     "status": {
       "draft": "Draft",
       "sent": "Sent",
@@ -1508,13 +1516,6 @@
       "rejected": "Rejected",
       "expired": "Expired"
     },
-    "client": "Client",
-    "select_client": "Select a client",
-    "search_clients": "Search clients",
-    "no_clients": "No clients found",
-    "add_new_client": "Add New Client",
-    "subtotal": "Subtotal",
-    "tax_rate": "Tax Rate",
     "notes": "Notes",
     "enter_notes": "Enter notes",
     "products": {
@@ -1525,13 +1526,14 @@
       "no_products_found": "No products found",
       "add_new_product": "Add New Product",
       "add_product": "Add Product",
-      "no_products": "No products added yet",
       "quantity": "Quantity",
       "unit_price": "Unit Price",
       "subtotal": "Subtotal",
-      "product_description": "Product description"
+      "product_description": "Product description",
+      "no_products": "No products added",
+      "description": "Description"
     },
-    "submitting": "Submitting...",
+    "description": "Description",
     "success": {
       "title": "Success",
       "created": "Quote created successfully"
@@ -1540,7 +1542,9 @@
       "title": "Error",
       "create": "Failed to create quote",
       "load_clients": "Failed to load clients"
-    }
+    },
+    "tax_amount": "Tax Amount",
+    "total": "Total"
   },
   "Salaries": {
     "title": "Salaries"

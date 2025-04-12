@@ -1434,46 +1434,60 @@
   },
   "Quotes": {
     "title": "عروض الأسعار",
-    "add_new": "إضافة عرض سعر جديد",
-    "quote_details": "تفاصيل عرض السعر",
-    "quote_number": "عرض سعر #{number}",
-    "enter_quote_number": "أدخل رقم عرض السعر",
-    "description": "الوصف",
-    "enter_description": "أدخل وصف عرض السعر",
     "create_quote": "إنشاء عرض سعر",
-    "creating": "جاري الإنشاء...",
-    "no_quotes": "لا توجد عروض أسعار",
-    "add_first_quote": "أضف أول عرض سعر",
+    "add_new_quote": "إضافة عرض سعر جديد",
+    "back_to_list": "العودة إلى عروض الأسعار",
+    "quote_details": "تفاصيل عرض السعر",
+    "submitting": "جاري الإرسال...",
     "client": "العميل",
     "select_client": "اختر عميل",
-    "search_clients": "بحث عن عملاء...",
-    "no_clients": "لا يوجد عملاء",
+    "search_clients": "البحث عن عملاء",
+    "no_clients": "لم يتم العثور على عملاء",
     "add_new_client": "إضافة عميل جديد",
-    "amount": "المبلغ",
+    "quote_number": "رقم عرض السعر",
+    "enter_quote_number": "أدخل رقم عرض السعر",
+    "subtotal": "المجموع الفرعي",
+    "tax_rate": "نسبة الضريبة (%)",
+    "issue_date": "تاريخ الإصدار",
     "expiry_date": "تاريخ انتهاء الصلاحية",
-    "select_status": "اختر حالة",
+    "status": "الحالة",
+    "select_status": "اختر الحالة",
     "status": {
-      "title": "الحالة",
       "draft": "مسودة",
-      "sent": "مرسل",
+      "sent": "تم الإرسال",
       "accepted": "مقبول",
-      "declined": "مرفوض",
+      "rejected": "مرفوض",
       "expired": "منتهي الصلاحية"
     },
     "notes": "ملاحظات",
-    "enter_notes": "أدخل أي ملاحظات إضافية",
-    "client_added": "تمت إضافة العميل بنجاح",
-    "error": {
-      "load_clients": "فشل في تحميل العملاء",
-      "create": "فشل في إنشاء عرض السعر",
-      "fetch": "فشل في جلب عروض الأسعار",
-      "title": "خطأ"
+    "enter_notes": "أدخل الملاحظات",
+    "products": {
+      "title": "المنتجات",
+      "product": "المنتج",
+      "select_product": "اختر منتج",
+      "search_products": "البحث عن منتجات",
+      "no_products_found": "لم يتم العثور على منتجات",
+      "add_new_product": "إضافة منتج جديد",
+      "add_product": "إضافة منتج",
+      "quantity": "الكمية",
+      "unit_price": "سعر الوحدة",
+      "subtotal": "المجموع الفرعي",
+      "product_description": "وصف المنتج",
+      "no_products": "لم يتم إضافة منتجات",
+      "description": "الوصف"
     },
+    "description": "الوصف",
     "success": {
       "title": "تم بنجاح",
-      "created": "تم إنشاء الإجازة بنجاح"
+      "created": "تم إنشاء عرض السعر بنجاح"
     },
-    "submitting": "جاري الإرسال..."
+    "error": {
+      "title": "خطأ",
+      "create": "فشل في إنشاء عرض السعر",
+      "load_clients": "فشل في تحميل العملاء"
+    },
+    "tax_amount": "مبلغ الضريبة",
+    "total": "الإجمالي"
   },
   "Holidays": {
     "title": "العطلات الرسمية"
