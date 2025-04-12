@@ -1,18 +1,19 @@
 import { useEffect, useMemo, useState, RefObject } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { format } from "date-fns";
 
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import { format } from "date-fns";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { ComboboxAdd } from "@/components/ui/combobox-add";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
@@ -44,7 +45,6 @@ import { Client } from "@/types/client.type";
 import { Product } from "@/types/product.type";
 
 import { ClientForm } from "./client-form";
-import { DatePicker } from "@/components/ui/date-picker";
 
 export interface QuoteItem {
   product_id?: string;
@@ -90,42 +90,42 @@ export function QuoteForm({
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
   const [clientsLoading, setClientsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
-  const t = useTranslations("Quotes");
+  const t = useTranslations();
   const locale = useLocale();
 
   const quoteSchema = z.object({
-    client_id: z.string().min(1, t("validation.client_required")),
-    quote_number: z.string().min(1, t("validation.quote_number_required")),
-    issue_date: z.string().min(1, t("validation.issue_date_required")),
-    expiry_date: z.string().min(1, t("validation.expiry_date_required")),
-    status: z.string().min(1, t("validation.status_required")),
-    tax_rate: z.number().min(0, t("validation.tax_rate_positive")),
+    client_id: z.string().min(1, t("Quotes.validation.client_required")),
+    quote_number: z.string().min(1, t("Quotes.validation.quote_number_required")),
+    issue_date: z.string().min(1, t("Quotes.validation.issue_date_required")),
+    expiry_date: z.string().min(1, t("Quotes.validation.expiry_date_required")),
+    status: z.string().min(1, t("Quotes.validation.status_required")),
+    tax_rate: z.number().min(0, t("Quotes.validation.tax_rate_positive")),
     notes: z.string().optional(),
     items: z
       .array(
         z.object({
           product_id: z.string().optional(),
-          description: z.string().min(1, t("validation.item_description_required")),
+          description: z.string().min(1, t("Quotes.validation.item_description_required")),
           quantity: z
             .string()
-            .min(1, t("validation.item_quantity_required"))
+            .min(1, t("Quotes.validation.item_quantity_required"))
             .refine(
               (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
-              t("validation.item_quantity_positive"),
+              t("Quotes.validation.item_quantity_positive"),
             ),
           unit_price: z
             .string()
-            .min(1, t("validation.item_price_required"))
+            .min(1, t("Quotes.validation.item_price_required"))
             .refine(
               (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
-              t("validation.item_price_positive"),
+              t("Quotes.validation.item_price_positive"),
             ),
         }),
       )
-      .min(1, t("validation.items_required"))
+      .min(1, t("Quotes.validation.items_required"))
       .refine(
         (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
-        t("validation.item_description_or_product"),
+        t("Quotes.validation.item_description_or_product"),
       ),
   });
 
@@ -182,7 +182,7 @@ export function QuoteForm({
         setClients(data as Client[]);
       } catch (error) {
         console.error("Error fetching clients:", error);
-        toast.error(t("error.load_clients"));
+        toast.error(t("Quotes.error.load_clients"));
       } finally {
         setClientsLoading(false);
       }
@@ -203,7 +203,7 @@ export function QuoteForm({
         setProducts(data || []);
       } catch (error) {
         console.error("Error fetching products:", error);
-        toast.error(t("error.load_products"));
+        toast.error(t("Quotes.error.load_products"));
       } finally {
         setProductsLoading(false);
       }
@@ -285,13 +285,13 @@ export function QuoteForm({
         if (error) throw error;
 
         toast.success(
-          id ? t("quotes.quote_updated_successfully") : t("quotes.quote_created_successfully"),
+          id ? t("Quotes.quote_updated_successfully") : t("Quotes.quote_created_successfully"),
         );
         router.push("/quotes");
       }
     } catch (error) {
       console.error(error);
-      toast.error(t("common.something_went_wrong"));
+      toast.error(t("Quotes.error.something_went_wrong"));
     } finally {
       setIsLoading(false);
     }
@@ -302,7 +302,7 @@ export function QuoteForm({
     () => [
       {
         id: "product",
-        header: t("products.product"),
+        header: t("Quotes.products.product"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -321,11 +321,11 @@ export function QuoteForm({
                         handleProductSelection(index, value);
                       }}
                       texts={{
-                        placeholder: t("products.select_product"),
-                        searchPlaceholder: t("products.search_products"),
-                        noItems: t("products.no_products_found"),
+                        placeholder: t("Quotes.products.select_product"),
+                        searchPlaceholder: t("Quotes.products.search_products"),
+                        noItems: t("Quotes.products.no_products_found"),
                       }}
-                      addText={t("products.add_new_product")}
+                      addText={t("Quotes.products.add_new_product")}
                       onAddClick={() => setIsNewProductDialogOpen(true)}
                     />
                   </FormControl>
@@ -338,7 +338,7 @@ export function QuoteForm({
       },
       {
         id: "quantity",
-        header: t("products.quantity"),
+        header: t("Quotes.products.quantity"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -359,7 +359,7 @@ export function QuoteForm({
       },
       {
         id: "unitPrice",
-        header: t("products.unit_price"),
+        header: t("Quotes.products.unit_price"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -387,7 +387,7 @@ export function QuoteForm({
       },
       {
         id: "description",
-        header: t("description"),
+        header: t("Quotes.products.description"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -397,7 +397,7 @@ export function QuoteForm({
               render={({ field }) => (
                 <FormItem className="space-y-0">
                   <FormControl>
-                    <Input placeholder={t("products.product_description")} {...field} />
+                    <Input placeholder={t("Quotes.products.product_description")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -408,7 +408,7 @@ export function QuoteForm({
       },
       {
         id: "subtotal",
-        header: t("products.subtotal"),
+        header: t("Quotes.products.subtotal"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -459,7 +459,7 @@ export function QuoteForm({
   // Remove the subtotal form field since it's calculated
   const SubtotalDisplay = () => (
     <div className="flex flex-col space-y-2">
-      <span className="text-sm font-medium">{t("subtotal")}</span>
+      <span className="text-sm font-medium">{t("Quotes.products.subtotal")}</span>
       <Input type="text" value={`${subtotal.toFixed(2)}`} readOnly disabled />
     </div>
   );
@@ -489,7 +489,7 @@ export function QuoteForm({
               name="client_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("client")} *</FormLabel>
+                  <FormLabel>{t("Quotes.clients.client")} *</FormLabel>
                   <FormControl>
                     <ComboboxAdd
                       data={clientOptions}
@@ -506,11 +506,11 @@ export function QuoteForm({
                         );
                       }}
                       texts={{
-                        placeholder: t("select_client"),
-                        searchPlaceholder: t("search_clients"),
-                        noItems: t("no_clients"),
+                        placeholder: t("Clients.select_client"),
+                        searchPlaceholder: t("Quotes.clients.search_clients"),
+                        noItems: t("Quotes.clients.no_clients"),
                       }}
-                      addText={t("add_new_client")}
+                      addText={t("Clients.add_new")}
                       onAddClick={() => setIsDialogOpen(true)}
                     />
                   </FormControl>
@@ -524,9 +524,9 @@ export function QuoteForm({
               name="quote_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("quote_number")} *</FormLabel>
+                  <FormLabel>{t("Quotes.quote_number")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("enter_quote_number")} {...field} />
+                    <Input placeholder={t("Quotes.enter_quote_number")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -542,7 +542,7 @@ export function QuoteForm({
               name="tax_rate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("tax_rate")} (%)</FormLabel>
+                  <FormLabel>{t("Quotes.tax_rate")} (%)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -568,11 +568,11 @@ export function QuoteForm({
               name="issue_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("issue_date")} *</FormLabel>
+                  <FormLabel>{t("Quotes.issue_date")} *</FormLabel>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
-                    placeholder={t("select_issue_date")}
+                    placeholder={t("Quotes.select_issue_date")}
                   />
                   <FormMessage />
                 </FormItem>
@@ -584,11 +584,11 @@ export function QuoteForm({
               name="expiry_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("expiry_date")} *</FormLabel>
+                  <FormLabel>{t("Quotes.expiry_date")} *</FormLabel>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
-                    placeholder={t("select_expiry_date")}
+                    placeholder={t("Quotes.select_expiry_date")}
                   />
                   <FormMessage />
                 </FormItem>
@@ -601,7 +601,7 @@ export function QuoteForm({
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("status.title")} *</FormLabel>
+                <FormLabel>{t("Quotes.status.title")} *</FormLabel>
                 <Select
                   defaultValue={field.value}
                   onValueChange={field.onChange}
@@ -609,15 +609,15 @@ export function QuoteForm({
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder={t("select_status")} />
+                      <SelectValue placeholder={t("Quotes.status.select_status")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="draft">{t("status.draft")}</SelectItem>
-                    <SelectItem value="sent">{t("status.sent")}</SelectItem>
-                    <SelectItem value="accepted">{t("status.accepted")}</SelectItem>
-                    <SelectItem value="rejected">{t("status.rejected")}</SelectItem>
-                    <SelectItem value="expired">{t("status.expired")}</SelectItem>
+                    <SelectItem value="draft">{t("Quotes.status.draft")}</SelectItem>
+                    <SelectItem value="sent">{t("Quotes.status.sent")}</SelectItem>
+                    <SelectItem value="accepted">{t("Quotes.status.accepted")}</SelectItem>
+                    <SelectItem value="rejected">{t("Quotes.status.rejected")}</SelectItem>
+                    <SelectItem value="expired">{t("Quotes.status.expired")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -628,7 +628,7 @@ export function QuoteForm({
           {/* Products Section with Table */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">{t("products.title")}</h3>
+              <h3 className="text-lg font-medium">{t("Quotes.products.title")}</h3>
               <Button
                 type="button"
                 variant="outline"
@@ -638,7 +638,7 @@ export function QuoteForm({
                 }
               >
                 <PlusCircle className="mr-2 h-4 w-4" />
-                {t("products.add_product")}
+                {t("Quotes.products.add_product")}
               </Button>
             </div>
 
@@ -669,7 +669,7 @@ export function QuoteForm({
                   ) : (
                     <TableRow>
                       <TableCell colSpan={columns.length} className="h-24 text-center">
-                        {t("products.no_products")}
+                        {t("Quotes.products.no_products")}
                       </TableCell>
                     </TableRow>
                   )}
@@ -683,9 +683,9 @@ export function QuoteForm({
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("notes")}</FormLabel>
+                <FormLabel>{t("Quotes.notes")}</FormLabel>
                 <FormControl>
-                  <Textarea placeholder={t("enter_notes")} {...field} />
+                  <Textarea placeholder={t("Quotes.enter_notes")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -694,15 +694,15 @@ export function QuoteForm({
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex items-center justify-between md:col-start-2">
-              <span className="text-sm font-medium">{t("common.subtotal")}</span>
+              <span className="text-sm font-medium">{t("Quotes.common.subtotal")}</span>
               <span className="text-sm">${subtotal.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between md:col-start-2">
-              <span className="text-sm font-medium">{t("common.tax")}</span>
+              <span className="text-sm font-medium">{t("Quotes.common.tax")}</span>
               <span className="text-sm">${tax.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between md:col-start-2">
-              <span className="text-sm font-medium">{t("common.total")}</span>
+              <span className="text-sm font-medium">{t("Quotes.common.total")}</span>
               <span className="text-sm font-bold">${total.toFixed(2)}</span>
             </div>
           </div>
@@ -710,7 +710,7 @@ export function QuoteForm({
           {!hideFormButtons && (
             <div className="flex justify-end">
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? t("submitting") : t("create_quote")}
+                {isLoading ? t("Quotes.submitting") : t("Quotes.create_quote")}
               </Button>
             </div>
           )}
@@ -718,14 +718,27 @@ export function QuoteForm({
       </Form>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>{t("add_new_client")}</DialogTitle>
+        <DialogContent
+          className="overflow-y-auto p-0 sm:max-w-xl"
+          dir={locale === "ar" ? "rtl" : "ltr"}
+        >
+          <DialogHeader className="bg-background sticky top-0 z-10 border-b p-4">
+            <DialogTitle>{t("Clients.add_new")}</DialogTitle>
           </DialogHeader>
-          <ClientForm
-            onSuccess={(newClient: any) => handleClientAdded(newClient)}
-            userId={userId || null}
-          />
+          <div className="overflow-y-auto p-4 pt-0">
+            <ClientForm
+              onSuccess={(newClient: any) => handleClientAdded(newClient)}
+              userId={userId || null}
+            />
+          </div>
+          <div className="bg-background sticky bottom-0 mt-4 flex justify-end gap-2 border-t p-4">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              {t("General.cancel")}
+            </Button>
+            <Button type="submit" form="client-form">
+              {t("General.save")}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>
