@@ -1,66 +1,99 @@
-import { supabase } from "@/lib/supabase";
+import { desc, eq } from "drizzle-orm";
+
+import { db } from "@/db/drizzle";
+import { warehouses } from "@/db/schema";
 import { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
 
+// Helper to convert Drizzle warehouse to our Warehouse type
+function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehouse {
+  return {
+    id: data.id,
+    name: data.name,
+    code: data.code,
+    address: data.address,
+    city: data.city,
+    state: data.state,
+    zip_code: data.zipCode,
+    capacity: data.capacity ? Number(data.capacity) : null,
+    is_active: data.isActive,
+    notes: data.notes,
+    created_at: data.createdAt?.toString() || "",
+  };
+}
+
 export async function fetchWarehouses(): Promise<Warehouse[]> {
-  const { data, error } = await supabase
-    .from("warehouses")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
+  try {
+    const data = await db.query.warehouses.findMany({
+      orderBy: desc(warehouses.createdAt),
+    });
+    return data.map(convertDrizzleWarehouse);
+  } catch (error) {
     console.error("Error fetching warehouses:", error);
-    throw new Error(error.message);
+    throw error;
   }
-
-  return data || [];
 }
 
 export async function fetchWarehouseById(id: string): Promise<Warehouse> {
-  const { data, error } = await supabase.from("warehouses").select("*").eq("id", id).single();
+  const data = await db.query.warehouses.findFirst({
+    where: eq(warehouses.id, id),
+  });
 
-  if (error) {
-    console.error(`Error fetching warehouse with id ${id}:`, error);
-    throw new Error(error.message);
+  if (!data) {
+    throw new Error(`Warehouse with id ${id} not found`);
   }
 
-  return data;
+  return convertDrizzleWarehouse(data);
 }
 
 export async function createWarehouse(warehouse: WarehouseCreateData): Promise<Warehouse> {
-  const { data, error } = await supabase.from("warehouses").insert([warehouse]).select().single();
+  // Map warehouse data to match Drizzle schema
+  const dbWarehouse = {
+    name: warehouse.name,
+    code: warehouse.code,
+    address: warehouse.address,
+    city: warehouse.city,
+    state: warehouse.state,
+    zipCode: warehouse.zip_code,
+    capacity: warehouse.capacity?.toString(),
+    isActive: warehouse.is_active,
+    notes: warehouse.notes,
+    userId: warehouse.userId,
+  };
 
-  if (error) {
-    console.error("Error creating warehouse in API:", error);
-    throw new Error(error.message);
+  const [data] = await db.insert(warehouses).values(dbWarehouse).returning();
+
+  if (!data) {
+    throw new Error("Failed to create warehouse");
   }
 
-  return data;
+  return convertDrizzleWarehouse(data);
 }
 
 export async function updateWarehouse(
   id: string,
   warehouse: Partial<Omit<Warehouse, "id" | "created_at">>,
 ): Promise<Warehouse> {
-  const { data, error } = await supabase
-    .from("warehouses")
-    .update(warehouse)
-    .eq("id", id)
-    .select()
-    .single();
+  // Map warehouse data to match Drizzle schema
+  const dbWarehouse = {
+    ...warehouse,
+    zipCode: warehouse.zip_code,
+    isActive: warehouse.is_active,
+    capacity: warehouse.capacity?.toString(),
+  };
 
-  if (error) {
-    console.error(`Error updating warehouse with id ${id}:`, error);
-    throw new Error(error.message);
+  const [data] = await db
+    .update(warehouses)
+    .set(dbWarehouse)
+    .where(eq(warehouses.id, id))
+    .returning();
+
+  if (!data) {
+    throw new Error(`Failed to update warehouse with id ${id}`);
   }
 
-  return data;
+  return convertDrizzleWarehouse(data);
 }
 
 export async function deleteWarehouse(id: string): Promise<void> {
-  const { error } = await supabase.from("warehouses").delete().eq("id", id);
-
-  if (error) {
-    console.error(`Error deleting warehouse with id ${id}:`, error);
-    throw new Error(error.message);
-  }
+  await db.delete(warehouses).where(eq(warehouses.id, id));
 }

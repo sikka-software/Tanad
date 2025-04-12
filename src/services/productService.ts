@@ -1,47 +1,30 @@
-import { supabase } from "@/lib/supabase";
+import { desc, eq } from "drizzle-orm";
+
+import { db } from "@/db/drizzle";
+import { products } from "@/db/schema";
 import { Product } from "@/types/product.type";
+
+// Helper to convert Drizzle product to our Product type
+function convertDrizzleProduct(data: typeof products.$inferSelect): Product {
+  return {
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    price: Number(data.price),
+    sku: data.sku,
+    stockQuantity: data.stockQuantity ?? undefined,
+    userId: data.userId,
+    created_at: data.createdAt?.toString(),
+    updated_at: data.updatedAt?.toString(),
+  };
+}
 
 export async function fetchProducts(): Promise<Product[]> {
   try {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-
-    if (userError) {
-      console.error("Error getting user:", userError);
-      throw new Error(userError.message);
-    }
-
-    const userId = userData.user.id;
-
-    // First try with user_id filtering
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      // If error is about the column not existing, fetch all products
-      if (error.code === "42703") {
-        // PostgreSQL code for undefined_column
-        console.warn("user_id column not found, fetching all products");
-        const { data: allData, error: allError } = await supabase
-          .from("products")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        if (allError) {
-          console.error("Error fetching all products:", allError);
-          throw new Error(allError.message);
-        }
-
-        return allData || [];
-      } else {
-        console.error("Error fetching products:", error);
-        throw new Error(error.message);
-      }
-    }
-
-    return data || [];
+    const data = await db.query.products.findMany({
+      orderBy: desc(products.createdAt),
+    });
+    return data.map(convertDrizzleProduct);
   } catch (error) {
     console.error("Error in fetchProducts:", error);
     return [];
@@ -49,67 +32,32 @@ export async function fetchProducts(): Promise<Product[]> {
 }
 
 export async function fetchProductById(id: string): Promise<Product> {
-  const { data, error } = await supabase.from("products").select("*").eq("id", id).single();
+  const data = await db.query.products.findFirst({
+    where: eq(products.id, id),
+  });
 
-  if (error) {
-    console.error(`Error fetching product with id ${id}:`, error);
-    throw new Error(error.message);
+  if (!data) {
+    throw new Error(`Product with id ${id} not found`);
   }
 
-  return data;
+  return convertDrizzleProduct(data);
 }
 
 export async function createProduct(product: Omit<Product, "id" | "created_at">): Promise<Product> {
   try {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
+    const [data] = await db
+      .insert(products)
+      .values({
+        ...product,
+        price: product.price.toString(), // Convert number to string for Drizzle
+      })
+      .returning();
 
-    if (userError) {
-      console.error("Error getting user:", userError);
-      throw new Error(userError.message);
+    if (!data) {
+      throw new Error("Failed to create product");
     }
 
-    const userId = userData.user.id;
-
-    // Try to insert with user_id
-    const productToInsert = {
-      ...product,
-      user_id: userId, // Use snake_case for database column name
-    };
-
-    const { data, error } = await supabase
-      .from("products")
-      .insert([productToInsert])
-      .select()
-      .single();
-
-    if (error) {
-      // If error is about the column not existing, insert without user_id
-      if (error.code === "42703") {
-        // PostgreSQL code for undefined_column
-        console.warn("user_id column not found, inserting without user_id");
-
-        // Remove the user_id from the product object
-        const { user_id, ...productWithoutUserId } = productToInsert;
-
-        const { data: insertData, error: insertError } = await supabase
-          .from("products")
-          .insert([productWithoutUserId])
-          .select()
-          .single();
-
-        if (insertError) {
-          console.error("Error creating product without user_id:", insertError);
-          throw new Error(insertError.message);
-        }
-
-        return insertData;
-      } else {
-        console.error("Error creating product:", error);
-        throw new Error(error.message);
-      }
-    }
-
-    return data;
+    return convertDrizzleProduct(data);
   } catch (error) {
     console.error("Error in createProduct:", error);
     throw error;
@@ -120,26 +68,22 @@ export async function updateProduct(
   id: string,
   product: Partial<Omit<Product, "id" | "created_at">>,
 ): Promise<Product> {
-  const { data, error } = await supabase
-    .from("products")
-    .update(product)
-    .eq("id", id)
-    .select()
-    .single();
+  const [data] = await db
+    .update(products)
+    .set({
+      ...product,
+      price: product.price?.toString(), // Convert number to string for Drizzle if price is provided
+    })
+    .where(eq(products.id, id))
+    .returning();
 
-  if (error) {
-    console.error(`Error updating product with id ${id}:`, error);
-    throw new Error(error.message);
+  if (!data) {
+    throw new Error(`Failed to update product with id ${id}`);
   }
 
-  return data;
+  return convertDrizzleProduct(data);
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  const { error } = await supabase.from("products").delete().eq("id", id);
-
-  if (error) {
-    console.error(`Error deleting product with id ${id}:`, error);
-    throw new Error(error.message);
-  }
+  await db.delete(products).where(eq(products.id, id));
 }

@@ -7,8 +7,6 @@ import {
   fetchInvoices, 
   updateInvoice 
 } from '@/services/invoiceService';
-import { useEffect } from "react";
-import { useInvoicesStore } from "@/stores/invoices.store";
 
 // Query keys
 export const invoiceKeys = {
@@ -21,20 +19,10 @@ export const invoiceKeys = {
 
 // Hooks
 export function useInvoices() {
-  const { invoices, isLoading, error, fetchInvoices } = useInvoicesStore();
-
-  useEffect(() => {
-    if (invoices.length === 0 && !isLoading) {
-      fetchInvoices();
-    }
-  }, [fetchInvoices, invoices.length, isLoading]);
-
-  return {
-    data: invoices,
-    isLoading,
-    error,
-    refetch: fetchInvoices,
-  };
+  return useQuery({
+    queryKey: invoiceKeys.lists(),
+    queryFn: fetchInvoices,
+  });
 }
 
 export function useInvoice(id: string) {
@@ -49,7 +37,7 @@ export function useCreateInvoice() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (newInvoice: InvoiceCreateData) => createInvoice(newInvoice),
+    mutationFn: createInvoice,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
     },
@@ -73,7 +61,7 @@ export function useDeleteInvoice() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (id: string) => deleteInvoice(id),
+    mutationFn: deleteInvoice,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
       queryClient.removeQueries({ queryKey: invoiceKeys.detail(variables) });

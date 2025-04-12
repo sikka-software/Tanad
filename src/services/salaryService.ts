@@ -1,90 +1,97 @@
-import { supabase } from "@/lib/supabase";
+import { desc, eq } from "drizzle-orm";
+
+import { db } from "@/db/drizzle";
+import { salaries } from "@/db/schema";
 import { Salary, SalaryCreateData } from "@/types/salary.type";
 
+// Helper to convert Drizzle salary to our Salary type
+function convertDrizzleSalary(data: typeof salaries.$inferSelect): Salary {
+  return {
+    id: data.id,
+    created_at: data.createdAt?.toString() || "",
+    pay_period_start: data.payPeriodStart,
+    pay_period_end: data.payPeriodEnd,
+    payment_date: data.paymentDate,
+    gross_amount: Number(data.grossAmount),
+    net_amount: Number(data.netAmount),
+    deductions: data.deductions as Salary["deductions"],
+    notes: data.notes,
+    employee_name: data.employeeName,
+  };
+}
+
 export async function fetchSalaries(): Promise<Salary[]> {
-  const { data, error } = await supabase
-    .from("salaries")
-    .select("*")
-    .order("payment_date", { ascending: false }); // Order by payment date
-
-  if (error) {
+  try {
+    const data = await db.query.salaries.findMany({
+      orderBy: desc(salaries.paymentDate),
+    });
+    return data.map(convertDrizzleSalary);
+  } catch (error) {
     console.error("Error fetching salaries:", error);
-    throw new Error(error.message);
+    throw error;
   }
-
-  // Ensure numeric fields are parsed correctly if they come as strings
-  return (data || []).map((salary) => ({
-    ...salary,
-    gross_amount: parseFloat(salary.gross_amount),
-    net_amount: parseFloat(salary.net_amount),
-  }));
 }
 
 export async function fetchSalaryById(id: string): Promise<Salary> {
-  const { data, error } = await supabase.from("salaries").select("*").eq("id", id).single();
+  const data = await db.query.salaries.findFirst({
+    where: eq(salaries.id, id),
+  });
 
-  if (error) {
-    console.error(`Error fetching salary with id ${id}:`, error);
-    throw new Error(error.message);
+  if (!data) {
+    throw new Error(`Salary with id ${id} not found`);
   }
 
-  return {
-    ...data,
-    gross_amount: parseFloat(data.gross_amount),
-    net_amount: parseFloat(data.net_amount),
-  };
+  return convertDrizzleSalary(data);
 }
 
 export async function createSalary(salary: SalaryCreateData): Promise<Salary> {
-  // Convert userId to user_id if needed
-  const dbSalary = { ...salary };
-  if (salary.userId) {
-    (dbSalary as any).user_id = salary.userId;
-    delete (dbSalary as any).userId;
-  }
-
-  const { data, error } = await supabase.from("salaries").insert([dbSalary]).select().single();
-
-  if (error) {
-    console.error("Error creating salary:", error);
-    throw new Error(error.message);
-  }
-
-  return {
-    ...data,
-    gross_amount: parseFloat(data.gross_amount),
-    net_amount: parseFloat(data.net_amount),
+  // Map salary data to match Drizzle schema
+  const dbSalary = {
+    payPeriodStart: salary.pay_period_start,
+    payPeriodEnd: salary.pay_period_end,
+    paymentDate: salary.payment_date,
+    grossAmount: salary.gross_amount.toString(),
+    netAmount: salary.net_amount.toString(),
+    deductions: salary.deductions,
+    notes: salary.notes,
+    employeeName: salary.employee_name,
+    userId: salary.userId || "",
   };
+
+  const [data] = await db.insert(salaries).values(dbSalary).returning();
+
+  if (!data) {
+    throw new Error("Failed to create salary");
+  }
+
+  return convertDrizzleSalary(data);
 }
 
 export async function updateSalary(
   id: string,
   salary: Partial<Omit<Salary, "id" | "created_at">>,
 ): Promise<Salary> {
-  const { data, error } = await supabase
-    .from("salaries")
-    .update(salary)
-    .eq("id", id)
-    .select()
-    .single();
+  // Map salary data to match Drizzle schema
+  const dbSalary = {
+    ...(salary.pay_period_start && { payPeriodStart: salary.pay_period_start }),
+    ...(salary.pay_period_end && { payPeriodEnd: salary.pay_period_end }),
+    ...(salary.payment_date && { paymentDate: salary.payment_date }),
+    ...(salary.gross_amount && { grossAmount: salary.gross_amount.toString() }),
+    ...(salary.net_amount && { netAmount: salary.net_amount.toString() }),
+    ...(salary.deductions && { deductions: salary.deductions }),
+    ...(salary.notes !== undefined && { notes: salary.notes }),
+    ...(salary.employee_name && { employeeName: salary.employee_name }),
+  };
 
-  if (error) {
-    console.error(`Error updating salary with id ${id}:`, error);
-    throw new Error(error.message);
+  const [data] = await db.update(salaries).set(dbSalary).where(eq(salaries.id, id)).returning();
+
+  if (!data) {
+    throw new Error(`Failed to update salary with id ${id}`);
   }
 
-  return {
-    ...data,
-    gross_amount: parseFloat(data.gross_amount),
-    net_amount: parseFloat(data.net_amount),
-  };
+  return convertDrizzleSalary(data);
 }
 
 export async function deleteSalary(id: string): Promise<void> {
-  const { error } = await supabase.from("salaries").delete().eq("id", id);
-
-  if (error) {
-    console.error(`Error deleting salary with id ${id}:`, error);
-    throw new Error(error.message);
-  }
+  await db.delete(salaries).where(eq(salaries.id, id));
 }

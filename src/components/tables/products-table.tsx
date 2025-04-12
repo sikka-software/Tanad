@@ -4,7 +4,14 @@ import { z } from "zod";
 
 import SheetTable from "@/components/ui/sheet-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useProductsStore } from "@/stores/products.store";
 import { Product } from "@/types/product.type";
 
@@ -19,7 +26,11 @@ const columns = [
   { accessorKey: "description", header: "Description", validationSchema: descriptionSchema },
   { accessorKey: "price", header: "Price", validationSchema: priceSchema },
   { accessorKey: "sku", header: "SKU", validationSchema: skuSchema },
-  { accessorKey: "stock_quantity", header: "Stock Quantity", validationSchema: stockQuantitySchema },
+  {
+    accessorKey: "stock_quantity",
+    header: "Stock Quantity",
+    validationSchema: stockQuantitySchema,
+  },
 ];
 
 interface ProductsTableProps {
@@ -63,7 +74,11 @@ const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
   }
 
   if (error) {
-    return <div className="bg-red-800 rounded p-2 m-4 mb-0 text-center">Error loading products: {error.message}</div>;
+    return (
+      <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
+        Error loading products: {error.message}
+      </div>
+    );
   }
 
   return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;

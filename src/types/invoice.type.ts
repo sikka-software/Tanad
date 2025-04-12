@@ -80,22 +80,19 @@ export type InvoiceProps = {
 
 export type InvoiceInput = Partial<InvoiceProps>;
 
-export interface Invoice {
+export type Invoice = {
   id: string;
-  created_at: string;
-  invoice_number: string;
-  issue_date: string;
-  due_date: string;
+  userId: string;
+  invoiceNumber: string;
+  issueDate: Date;
+  dueDate: Date;
+  status: "paid" | "pending" | "overdue";
   subtotal: number;
-  tax_rate: number;
-  tax_amount: number;
+  taxRate?: number;
   total: number;
-  status: string;
   notes?: string;
-  client_id: string;
-  client?: Client;
-}
-
-export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "client"> & {
-  userId?: string;
+  clientId?: string;
+  createdAt: Date;
 };
+
+export type InvoiceCreateData = Omit<Invoice, "id" | "createdAt">;

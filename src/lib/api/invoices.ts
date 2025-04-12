@@ -10,4 +10,4 @@ export async function getInvoiceById(id: string): Promise<Invoice | null> {
   } catch (error) {
     return null;
   }
-} 
+}

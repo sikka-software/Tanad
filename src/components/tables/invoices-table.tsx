@@ -1,16 +1,25 @@
 import React from "react";
+
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+
 import { ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
 import { z } from "zod";
 
+import { Button } from "@/components/ui/button";
 import SheetTable from "@/components/ui/sheet-table";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useUpdateInvoice } from "@/hooks/useInvoices";
 import { Invoice } from "@/types/invoice.type";
-import { format } from "date-fns";
-import { useTranslations } from "next-intl";
-import { useInvoicesStore } from "@/stores/invoices.store";
 
 const invoiceNumberSchema = z.string().min(1, "Required");
 const issueDateSchema = z.date();
@@ -19,38 +28,38 @@ const totalSchema = z.number().min(0, "Must be >= 0");
 const statusSchema = z.enum(["paid", "pending", "overdue"]);
 
 const columns: ColumnDef<Invoice>[] = [
-  { 
-    accessorKey: "invoice_number", 
+  {
+    accessorKey: "invoice_number",
     header: "Invoice #",
-    validationSchema: invoiceNumberSchema
+    validationSchema: invoiceNumberSchema,
   },
-  { 
-    accessorKey: "client.company", 
+  {
+    accessorKey: "client.company",
     header: "Client",
-    cell: ({ row }) => row.original.client?.company || "N/A"
+    cell: ({ row }) => row.original.client?.company || "N/A",
   },
-  { 
-    accessorKey: "issue_date", 
+  {
+    accessorKey: "issue_date",
     header: "Issue Date",
     cell: ({ row }) => format(new Date(row.original.issue_date), "MMM dd, yyyy"),
-    validationSchema: issueDateSchema
+    validationSchema: issueDateSchema,
   },
-  { 
-    accessorKey: "due_date", 
+  {
+    accessorKey: "due_date",
     header: "Due Date",
     cell: ({ row }) => format(new Date(row.original.due_date), "MMM dd, yyyy"),
-    validationSchema: dueDateSchema
+    validationSchema: dueDateSchema,
   },
-  { 
-    accessorKey: "total", 
+  {
+    accessorKey: "total",
     header: "Total",
     cell: ({ row }) => `$${row.original.total.toFixed(2)}`,
-    validationSchema: totalSchema
+    validationSchema: totalSchema,
   },
-  { 
-    accessorKey: "status", 
+  {
+    accessorKey: "status",
     header: "Status",
-    validationSchema: statusSchema
+    validationSchema: statusSchema,
   },
   {
     id: "actions",
@@ -77,15 +86,15 @@ interface InvoicesTableProps {
 
 const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
   const t = useTranslations("Invoices");
-  const { updateInvoice } = useInvoicesStore();
+  const { mutate: updateInvoice } = useUpdateInvoice();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     let processedValue = value;
     if (columnId === "issue_date" || columnId === "due_date") {
       processedValue = new Date(value as string).toISOString();
     }
-    
-    await updateInvoice(rowId, { [columnId]: processedValue });
+
+    await updateInvoice({ id: rowId, invoice: { [columnId]: processedValue } });
   };
 
   if (isLoading) {
@@ -116,12 +125,14 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
   }
 
   if (error) {
-    return <div className="bg-red-800 rounded p-2 m-4 mb-0 text-center">
-      {t("error_loading_invoices")}: {error.message}
-    </div>;
+    return (
+      <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
+        {t("error_loading_invoices")}: {error.message}
+      </div>
+    );
   }
 
   return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
 };
 
-export default InvoicesTable; 
+export default InvoicesTable;

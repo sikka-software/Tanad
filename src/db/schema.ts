@@ -20,18 +20,15 @@ import {
 export const clients = pgTable(
   "clients",
   {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
+    id: uuid("id").primaryKey().defaultRandom(),
     createdAt: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
-    name: text().notNull(),
-    email: text().notNull(),
+    name: text("name").notNull(),
+    email: text("email"),
     phone: text().notNull(),
-    company: uuid("company").references(() => companies.id, { onDelete: "set null" }),
+    company: text("company"),
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
@@ -51,50 +48,20 @@ export const clients = pgTable(
   ],
 ).enableRLS();
 
-export const invoices = pgTable(
-  "invoices",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    createdAt: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    invoiceNumber: text("invoice_number").notNull(),
-    issueDate: date("issue_date").notNull(),
-    dueDate: date("due_date").notNull(),
-    status: text().default("draft").notNull(),
-    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
-    taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
-    taxAmount: numeric("tax_amount", {
-      precision: 10,
-      scale: 2,
-    }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
-    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(
-      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`,
-    ),
-    notes: text(),
-    clientId: uuid("client_id").notNull(),
-    userId: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("invoices_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
-    index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
-    index("invoices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.clientId],
-      foreignColumns: [clients.id],
-      name: "invoices_client_id_fkey",
-    }).onDelete("cascade"),
-
-    check(
-      "invoices_status_check",
-      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`,
-    ),
-  ],
-).enableRLS();
+export const invoices = pgTable("invoices", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  invoiceNumber: text("invoice_number").notNull(),
+  issueDate: timestamp("issue_date").notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  status: text("status").$type<"paid" | "pending" | "overdue">().notNull(),
+  subtotal: numeric("subtotal").notNull(),
+  taxRate: numeric("tax_rate"),
+  total: numeric("total").notNull(),
+  notes: text("notes"),
+  clientId: uuid("client_id").references(() => clients.id),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
 export const invoiceItems = pgTable(
   "invoice_items",

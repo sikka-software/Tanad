@@ -1,95 +1,52 @@
-import { supabase } from "@/lib/supabase";
-import { Invoice, InvoiceCreateData } from "@/types/invoice.type";
+import { db } from "@/db/drizzle";
+import { Invoice } from "@/types/invoice.type";
+import { eq, desc } from "drizzle-orm";
+import { invoices, clients } from "@/db/schema";
 
-export async function fetchInvoices(): Promise<Invoice[]> {
-  const { data, error } = await supabase
-    .from("invoices")
-    .select(
-      `
-      *,
-      client:client_id (
-        id,
-        name,
-        company,
-        email,
-        phone
-      )
-    `,
-    )
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching invoices:", error);
-    throw new Error("Failed to fetch invoices");
-  }
-
-  return data || [];
-}
-
-export async function fetchInvoiceById(id: string): Promise<Invoice> {
-  const { data, error } = await supabase
-    .from("invoices")
-    .select(
-      `
-      *,
-      client:client_id (
-        id,
-        name,
-        company,
-        email,
-        phone
-      )
-    `,
-    )
-    .eq("id", id)
-    .single();
-
-  if (error) {
-    console.error(`Error fetching invoice with id ${id}:`, error);
-    throw new Error(`Failed to fetch invoice with id ${id}`);
-  }
-
-  return data;
-}
-
-export async function createInvoice(invoice: InvoiceCreateData): Promise<Invoice> {
-  const dbInvoice = { ...invoice };
-  if (invoice.userId) {
-    (dbInvoice as any).user_id = invoice.userId;
-    delete (dbInvoice as any).userId;
-  }
-
-  const { data, error } = await supabase.from("invoices").insert([dbInvoice]).select().single();
-
-  if (error) {
-    console.error("Error creating invoice:", error);
-    throw new Error("Failed to create invoice");
-  }
-
-  return data;
-}
-
-export async function updateInvoice(id: string, invoice: Partial<Invoice>): Promise<Invoice> {
-  const { data, error } = await supabase
-    .from("invoices")
-    .update(invoice)
-    .eq("id", id)
+export async function fetchInvoices() {
+  return await db
     .select()
-    .single();
-
-  if (error) {
-    console.error(`Error updating invoice with id ${id}:`, error);
-    throw new Error(`Failed to update invoice with id ${id}`);
-  }
-
-  return data;
+    .from(invoices)
+    .leftJoin(clients, eq(invoices.clientId, clients.id))
+    .orderBy(desc(invoices.createdAt));
 }
 
-export async function deleteInvoice(id: string): Promise<void> {
-  const { error } = await supabase.from("invoices").delete().eq("id", id);
+export async function fetchInvoiceById(id: string) {
+  const [result] = await db
+    .select()
+    .from(invoices)
+    .leftJoin(clients, eq(invoices.clientId, clients.id))
+    .where(eq(invoices.id, id))
+    .limit(1);
 
-  if (error) {
-    console.error(`Error deleting invoice with id ${id}:`, error);
-    throw new Error(`Failed to delete invoice with id ${id}`);
-  }
+  return result || null;
+}
+
+export async function createInvoice(newInvoice: InvoiceCreateData) {
+  const [result] = await db.insert(invoices).values({
+    ...newInvoice,
+    issueDate: new Date(newInvoice.issueDate),
+    dueDate: new Date(newInvoice.dueDate),
+  }).returning();
+  return result;
+}
+
+export async function updateInvoice(id: string, invoice: Partial<InvoiceCreateData>) {
+  const updateData = {
+    ...invoice,
+    ...(invoice.issueDate && { issueDate: new Date(invoice.issueDate) }),
+    ...(invoice.dueDate && { dueDate: new Date(invoice.dueDate) }),
+  };
+  
+  const [result] = await db.update(invoices)
+    .set(updateData)
+    .where(eq(invoices.id, id))
+    .returning();
+  return result;
+}
+
+export async function deleteInvoice(id: string) {
+  await db
+    .delete(invoices)
+    .where(eq(invoices.id, id));
 }
