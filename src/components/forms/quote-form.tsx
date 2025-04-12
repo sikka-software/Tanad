@@ -198,7 +198,7 @@ export function QuoteForm({ onSuccess }: QuoteFormProps) {
     () =>
       clients.map((client) => ({
         value: client.id,
-        label: `${client.name} (${client.company})`,
+        label: `${client.name}`,
       })),
     [clients],
   );
@@ -477,6 +477,15 @@ export function QuoteForm({ onSuccess }: QuoteFormProps) {
                       isLoading={clientsLoading}
                       defaultValue={field.value}
                       onChange={field.onChange}
+                      renderOption={(option) => {
+                        console.log(option);
+                        return (
+                          <div className="flex items-center gap-2">
+                            <span>{option.label}</span>
+                            <span className="text-sm text-gray-500">{option.description}</span>
+                          </div>
+                        );
+                      }}
                       texts={{
                         placeholder: t("select_client"),
                         searchPlaceholder: t("search_clients"),
@@ -704,9 +713,9 @@ export function QuoteForm({ onSuccess }: QuoteFormProps) {
           <DialogHeader>
             <DialogTitle>{t("add_new_client")}</DialogTitle>
           </DialogHeader>
-          <ClientForm 
-            onSuccess={(newClient: any) => handleClientAdded(newClient)} 
-            userId={userId} 
+          <ClientForm
+            onSuccess={(newClient: any) => handleClientAdded(newClient)}
+            userId={userId}
           />
         </DialogContent>
       </Dialog>

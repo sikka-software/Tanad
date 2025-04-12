@@ -8,6 +8,7 @@ import {
   Calendar,
   Settings,
   Filter,
+  FileInput,
 } from "lucide-react";
 
 export const commandList = [
@@ -36,6 +37,12 @@ export const commandList = [
         label: "Invoices.title",
         shortcut: "⌘I",
         href: "/invoices",
+      },
+      {
+        icon: FileInput,
+        label: "Quotes.title",
+        shortcut: "⌘Q",
+        href: "/quotes",
       },
 
       {

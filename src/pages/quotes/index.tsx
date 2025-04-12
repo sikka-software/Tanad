@@ -86,7 +86,7 @@ export default function QuotesPage() {
           data={quotes}
           isLoading={isLoading}
           error={error instanceof Error ? error : null}
-          emptyMessage={t("no_quotes_found")}
+          emptyMessage={t("no_quotes")}
           renderItem={renderQuote}
           gridCols="2"
         />

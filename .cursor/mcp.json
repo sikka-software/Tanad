@@ -1,17 +1,18 @@
 {
   "mcpServers": {
-    "Supabase Tanad Project": {
+    "supabase-tanad": {
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-postgres",
-        "postgresql://postgres:Ux1maCYOQf8TTYM4@db.jbyougyxkvhffbnqstiq.supabase.co:5432/postgres"
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_c49275fbc99ee4c355cf2fbb124363131570a57c"
       ]
     },
+
     "tanad-write-access-db": {
-        "command": "uv",
-        "args": ["run", "/Users/zakhermasri/.local/bin/supabase-mcp-server"]
-      
+      "command": "uv",
+      "args": ["run", "/Users/zakhermasri/.local/bin/supabase-mcp-server"]
     }
   }
 }
