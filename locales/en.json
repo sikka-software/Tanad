@@ -2104,7 +2104,7 @@
   },
   "Companies": {
     "title": "Companies",
-    "add_company": "Add Company",
+    "add_new": "Add Company",
     "company_details": "Company Details",
     "create_company": "Create Company",
     "back_to_list": "Back to List",

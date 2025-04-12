@@ -180,6 +180,16 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                 />
               )}
               <CommandEmpty>{props.texts?.noItems || "No items found."}</CommandEmpty>
+              <div className="flex flex-row items-center gap-2">
+                <Button
+                  variant="outline"
+                  className="w-full rounded-none !text-blue-500 dark:!text-blue-400"
+                  onClick={props.onAddClick}
+                >
+                  {addText}
+                  <Plus className="size-4" />
+                </Button>
+              </div>
               <CommandList>
                 <CommandGroup className={cn("max-h-[200px]", data.length > 0 && "overflow-y-auto")}>
                   {data.map((item: any, i) => (
@@ -218,16 +228,6 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                   ))}
                 </CommandGroup>
               </CommandList>
-              <div className="flex flex-row items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="w-full rounded-t-none"
-                  onClick={props.onAddClick}
-                >
-                  {addText}
-                  <Plus className="size-4" />
-                </Button>
-              </div>
             </Command>
           </PopoverContent>
         </PopoverPrimitive.Root>

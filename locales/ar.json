@@ -2059,7 +2059,7 @@
   },
   "Companies": {
     "title": "الشركات",
-    "add_company": "إضافة شركة",
+    "add_new": "إضافة شركة",
     "company_details": "تفاصيل الشركة",
     "create_company": "إنشاء شركة",
     "creating_company": "جاري إنشاء الشركة...",

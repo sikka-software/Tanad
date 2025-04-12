@@ -77,7 +77,7 @@ export default function AddCompanyPage() {
   return (
     <div>
       <PageTitle
-        title={t("Companies.add_company")}
+        title={t("Companies.add_new")}
         createButtonLink="/companies"
         createButtonText={t("Companies.back_to_list")}
         customButton={
@@ -85,7 +85,13 @@ export default function AddCompanyPage() {
             <Button variant="outline" size="sm" onClick={() => router.push("/companies")}>
               {t("General.cancel")}
             </Button>
-            <Button type="submit" className="min-w-24" size="sm" form="company-form" disabled={loading}>
+            <Button
+              type="submit"
+              className="min-w-24"
+              size="sm"
+              form="company-form"
+              disabled={loading}
+            >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
