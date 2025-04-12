@@ -7,6 +7,8 @@ import {
   fetchInvoices, 
   updateInvoice 
 } from '@/services/invoiceService';
+import { useEffect } from "react";
+import { useInvoicesStore } from "@/stores/invoices.store";
 
 // Query keys
 export const invoiceKeys = {
@@ -19,10 +21,20 @@ export const invoiceKeys = {
 
 // Hooks
 export function useInvoices() {
-  return useQuery({
-    queryKey: invoiceKeys.lists(),
-    queryFn: fetchInvoices,
-  });
+  const { invoices, isLoading, error, fetchInvoices } = useInvoicesStore();
+
+  useEffect(() => {
+    if (invoices.length === 0 && !isLoading) {
+      fetchInvoices();
+    }
+  }, [fetchInvoices, invoices.length, isLoading]);
+
+  return {
+    data: invoices,
+    isLoading,
+    error,
+    refetch: fetchInvoices,
+  };
 }
 
 export function useInvoice(id: string) {

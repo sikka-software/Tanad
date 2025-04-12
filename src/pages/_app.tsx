@@ -46,6 +46,8 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
     "/directory",
   ];
 
+  const shouldUseLayout = !router.pathname.startsWith('/pay/');
+
   // Auth Pages
   if (authPages.includes(router.pathname)) {
     return (
@@ -115,7 +117,13 @@ export default function Tanad({ Component, pageProps, router }: AppProps) {
           now={new Date()}
         >
           <UserProvider>
-            <AppLayout>{<Component {...pageProps} />}</AppLayout>
+            {shouldUseLayout ? (
+              <AppLayout>
+                <Component {...pageProps} />
+              </AppLayout>
+            ) : (
+              <Component {...pageProps} />
+            )}
           </UserProvider>
           <ReactQueryDevtools initialIsOpen={false} />
         </NextIntlClientProvider>

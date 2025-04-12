@@ -1,64 +1,51 @@
 import { create } from "zustand";
-
 import { supabase } from "@/lib/supabase";
+import { Invoice } from "@/types/invoice.type";
 
-export type Product = {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  sku?: string;
-  stock_quantity?: number;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
-  userId: string;
-};
-
-type ProductsStore = {
-  products: Product[];
+type InvoicesStore = {
+  invoices: Invoice[];
   isLoading: boolean;
   error: string | null;
-  fetchProducts: () => Promise<void>;
-  createProduct: (product: Omit<Product, "id" | "user_id" | "created_at" | "updated_at">) => Promise<void>;
-  updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
-  deleteProduct: (id: string) => Promise<void>;
+  fetchInvoices: () => Promise<void>;
+  createInvoice: (invoice: Omit<Invoice, "id" | "created_at" | "updated_at">) => Promise<void>;
+  updateInvoice: (id: string, invoice: Partial<Invoice>) => Promise<void>;
+  deleteInvoice: (id: string) => Promise<void>;
 };
 
-export const useProductsStore = create<ProductsStore>((set, get) => ({
-  products: [],
+export const useInvoicesStore = create<InvoicesStore>((set, get) => ({
+  invoices: [],
   isLoading: false,
   error: null,
 
-  fetchProducts: async () => {
+  fetchInvoices: async () => {
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase
-        .from("products")
-        .select("*")
+        .from("invoices")
+        .select("*, client:clients(*)")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
 
-      set({ products: data as Product[], isLoading: false });
+      set({ invoices: data as Invoice[], isLoading: false });
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
     }
   },
 
-  createProduct: async (product) => {
+  createInvoice: async (invoice) => {
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase
-        .from("products")
-        .insert([product])
-        .select()
+        .from("invoices")
+        .insert([invoice])
+        .select("*, client:clients(*)")
         .single();
 
       if (error) throw error;
 
       set((state) => ({
-        products: [data as Product, ...state.products],
+        invoices: [data as Invoice, ...state.invoices],
         isLoading: false,
       }));
     } catch (error) {
@@ -66,20 +53,20 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     }
   },
 
-  updateProduct: async (id, product) => {
+  updateInvoice: async (id, invoice) => {
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase
-        .from("products")
-        .update(product)
+        .from("invoices")
+        .update(invoice)
         .eq("id", id)
-        .select()
+        .select("*, client:clients(*)")
         .single();
 
       if (error) throw error;
 
       set((state) => ({
-        products: state.products.map((p) => (p.id === id ? (data as Product) : p)),
+        invoices: state.invoices.map((i) => (i.id === id ? (data as Invoice) : i)),
         isLoading: false,
       }));
     } catch (error) {
@@ -87,15 +74,15 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     }
   },
 
-  deleteProduct: async (id) => {
+  deleteInvoice: async (id) => {
     try {
       set({ isLoading: true, error: null });
-      const { error } = await supabase.from("products").delete().eq("id", id);
+      const { error } = await supabase.from("invoices").delete().eq("id", id);
 
       if (error) throw error;
 
       set((state) => ({
-        products: state.products.filter((p) => p.id !== id),
+        invoices: state.invoices.filter((i) => i.id !== id),
         isLoading: false,
       }));
     } catch (error) {

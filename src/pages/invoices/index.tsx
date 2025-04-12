@@ -1,14 +1,17 @@
+import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-
 import { format } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
-import PageTitle from "@/components/ui/page-title";
+import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { useInvoices } from "@/hooks/useInvoices";
 import { Invoice } from "@/types/invoice.type";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import InvoicesTable from "@/components/tables/invoices-table";
 
 function getStatusColor(status: string): string {
   switch (status.toLowerCase()) {
@@ -25,7 +28,18 @@ function getStatusColor(status: string): string {
 
 export default function InvoicesPage() {
   const t = useTranslations("Invoices");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const { data: invoices, isLoading, error } = useInvoices();
+
+  const filteredInvoices = Array.isArray(invoices)
+    ? invoices.filter(
+        (invoice: Invoice) =>
+          invoice.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          invoice.client?.company?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
+          invoice.client?.name?.toLowerCase()?.includes(searchQuery.toLowerCase())
+      )
+    : [];
 
   const renderInvoice = (invoice: Invoice) => (
     <Card key={invoice.id} className="transition-shadow hover:shadow-lg">
@@ -60,27 +74,49 @@ export default function InvoicesPage() {
             </p>
           </div>
         </div>
+        <div className="mt-4 flex justify-end">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/pay/${invoice.id}`} target="_blank">
+              Preview
+            </Link>
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
 
   return (
     <div>
-      <PageTitle
+      <PageSearchAndFilter
         title={t("title")}
-        createButtonLink="/invoices/add"
-        createButtonText={t("create_invoice")}
-        createButtonDisabled={isLoading}
+        createHref="/invoices/add"
+        createLabel={t("create_invoice")}
+        onSearch={setSearchQuery}
+        searchPlaceholder={t("search_invoices")}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
-      <div className="p-4">
-        <DataModelList
-          data={invoices}
-          isLoading={isLoading}
-          error={error instanceof Error ? error : null}
-          emptyMessage={t("no_invoices_found")}
-          renderItem={renderInvoice}
-          gridCols="2"
-        />
+
+      <div>
+        {viewMode === "table" ? (
+          <InvoicesTable
+            data={filteredInvoices}
+            isLoading={isLoading}
+            error={error as Error | null}
+          />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredInvoices}
+              isLoading={isLoading}
+              error={error as Error | null}
+              emptyMessage={t("no_invoices_found")}
+              addFirstItemMessage={t("add_first_invoice")}
+              renderItem={renderInvoice}
+              gridCols="2"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
