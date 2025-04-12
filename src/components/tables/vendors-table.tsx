@@ -13,54 +13,45 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useCompaniesStore } from "@/stores/companies.store";
-import { Company } from "@/types/company.type";
+import { useVendorsStore } from "@/stores/vendors.store";
+import { Vendor } from "@/types/vendor.type";
 
 const nameSchema = z.string().min(1, "Required");
-const industrySchema = z.string().optional();
+const companySchema = z.string().optional();
 const emailSchema = z.string().email("Invalid email").min(1, "Required");
-const phoneSchema = z.string().optional();
-const websiteSchema = z.string().url("Invalid URL").optional();
-const addressSchema = z.string().optional();
-const citySchema = z.string().optional();
-const stateSchema = z.string().optional();
-const zipCodeSchema = z.string().optional();
-const sizeSchema = z.number().min(0, "Must be >= 0").optional();
-const isActiveSchema = z.boolean();
+const phoneSchema = z.string().min(1, "Required");
+const addressSchema = z.string().min(1, "Required");
+const citySchema = z.string().min(1, "Required");
+const stateSchema = z.string().min(1, "Required");
+const zipCodeSchema = z.string().min(1, "Required");
+const productsSchema = z.string().optional();
 const notesSchema = z.string().optional();
 
-interface CompaniesTableProps {
-  data: Company[];
+interface VendorsTableProps {
+  data: Vendor[];
   isLoading?: boolean;
   error?: Error | null;
 }
 
-const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
-  const t = useTranslations("Companies");
-  const { updateCompany } = useCompaniesStore();
+const VendorsTable = ({ data, isLoading, error }: VendorsTableProps) => {
+  const t = useTranslations("Vendors");
+  const { updateVendor } = useVendorsStore();
 
   const columns = [
     { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "industry", header: t("form.industry.label"), validationSchema: industrySchema },
+    { accessorKey: "company", header: t("form.company.label"), validationSchema: companySchema },
     { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
     { accessorKey: "phone", header: t("form.phone.label"), validationSchema: phoneSchema },
-    { accessorKey: "website", header: t("form.website.label"), validationSchema: websiteSchema },
     { accessorKey: "address", header: t("form.address.label"), validationSchema: addressSchema },
     { accessorKey: "city", header: t("form.city.label"), validationSchema: citySchema },
     { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
     { accessorKey: "zipCode", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
-    { accessorKey: "size", header: t("form.size.label"), validationSchema: sizeSchema },
-    { 
-      accessorKey: "isActive", 
-      header: t("form.is_active.label"), 
-      validationSchema: isActiveSchema,
-      type: "boolean"
-    },
+    { accessorKey: "products", header: t("form.products.label"), validationSchema: productsSchema },
     { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateCompany(rowId, { [columnId]: value });
+    await updateVendor(rowId, { [columnId]: value });
   };
 
   if (isLoading) {
@@ -93,7 +84,7 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
   if (error) {
     return (
       <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
-        {t("error_loading_companies")}: {error.message}
+        {t("error.create")}: {error.message}
       </div>
     );
   }
@@ -101,4 +92,4 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
   return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
 };
 
-export default CompaniesTable;
+export default VendorsTable; 

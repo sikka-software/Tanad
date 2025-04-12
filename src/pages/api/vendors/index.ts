@@ -1,55 +1,49 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { db } from "@/lib/db";
+import { vendors } from "@/schema";
 import { desc } from "drizzle-orm";
+import { Vendor } from "@/types/vendor";
 
-import { db } from "@/db/drizzle";
-import { vendors } from "@/db/schema";
-import { Vendor } from "@/types/vendor.type";
-
-// Helper to convert Drizzle vendor to our Vendor type
-function convertDrizzleVendor(data: typeof vendors.$inferSelect): Vendor {
-  return {
-    id: data.id,
-    name: data.name,
-    email: data.email,
-    phone: data.phone,
-    company: data.company,
-    address: data.address,
-    city: data.city,
-    state: data.state,
-    zip_code: data.zipCode,
-    notes: data.notes,
-    created_at: data.createdAt?.toString() || ""
-  };
-}
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method === "GET") {
     try {
-      const vendorsList = await db.query.vendors.findMany({
-        orderBy: desc(vendors.createdAt)
-      });
-      return res.status(200).json(vendorsList.map(convertDrizzleVendor));
-    } catch (error) {
-      console.error("Error fetching vendors:", error);
-      return res.status(500).json({ message: "Error fetching vendors" });
-    }
-  }
+      const vendorsList = await db
+        .select()
+        .from(vendors)
+        .orderBy(desc(vendors.created_at));
 
-  if (req.method === "POST") {
+      res.status(200).json(vendorsList);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch vendors" });
+    }
+  } else if (req.method === "POST") {
     try {
-      // Map vendor data to match Drizzle schema
-      const dbVendor = {
-        ...req.body,
-        zipCode: req.body.zip_code,
-      };
+      const data = req.body;
+      const [newVendor] = await db
+        .insert(vendors)
+        .values({
+          name: data.name,
+          company: data.company,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          zip_code: data.zip_code,
+          products: data.products,
+          notes: data.notes,
+        })
+        .returning();
 
-      const [vendor] = await db.insert(vendors).values(dbVendor).returning();
-      return res.status(201).json(convertDrizzleVendor(vendor));
+      res.status(201).json(newVendor);
     } catch (error) {
-      console.error("Error creating vendor:", error);
-      return res.status(500).json({ message: "Error creating vendor" });
+      res.status(500).json({ error: "Failed to create vendor" });
     }
+  } else {
+    res.setHeader("Allow", ["GET", "POST"]);
+    res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
-
-  return res.status(405).json({ message: "Method not allowed" });
 } 

@@ -1418,13 +1418,20 @@
   "Vendors": {
     "title": "Vendors",
     "add_new": "Add New Vendor",
-    "back_to_list": "Back to List",
-    "vendor_details": "Vendor Details",
+    "search_vendors": "Search vendors",
+    "error": {
+      "loading": "Failed to load vendors",
+      "create": "Failed to create vendor",
+      "update": "Failed to update vendor",
+      "delete": "Failed to delete vendor"
+    },
     "form": {
       "name": {
         "label": "Name",
-        "placeholder": "Enter name",
-        "required": "Name is required"
+        "placeholder": "Enter vendor name",
+        "validation": {
+          "required": "Name is required"
+        }
       },
       "company": {
         "label": "Company",
@@ -1433,58 +1440,55 @@
       "email": {
         "label": "Email",
         "placeholder": "Enter email address",
-        "required": "Email is required",
-        "invalid": "Invalid email address"
+        "validation": {
+          "required": "Email is required",
+          "invalid": "Invalid email address"
+        }
       },
       "phone": {
         "label": "Phone",
         "placeholder": "Enter phone number",
-        "required": "Phone number is required"
+        "validation": {
+          "required": "Phone number is required"
+        }
       },
       "address": {
         "label": "Address",
-        "placeholder": "Enter address",
-        "required": "Address is required"
+        "placeholder": "Enter street address",
+        "validation": {
+          "required": "Address is required"
+        }
       },
       "city": {
         "label": "City",
         "placeholder": "Enter city",
-        "required": "City is required"
+        "validation": {
+          "required": "City is required"
+        }
       },
       "state": {
         "label": "State",
         "placeholder": "Enter state",
-        "required": "State is required"
+        "validation": {
+          "required": "State is required"
+        }
       },
       "zip_code": {
         "label": "ZIP Code",
         "placeholder": "Enter ZIP code",
-        "required": "ZIP code is required"
+        "validation": {
+          "required": "ZIP code is required"
+        }
       },
       "products": {
-        "label": "Products/Services",
-        "placeholder": "Enter products or services"
+        "label": "Products",
+        "placeholder": "Enter products/services"
       },
       "notes": {
         "label": "Notes",
-        "placeholder": "Enter notes"
+        "placeholder": "Enter any additional notes"
       }
-    },
-    "messages": {
-      "creating": "Creating vendor...",
-      "create": "Create Vendor"
-    },
-    "success": {
-      "title": "Success",
-      "created": "Vendor created successfully"
-    },
-    "error": {
-      "title": "Error",
-      "create": "An error occurred while creating the vendor",
-      "not_authenticated": "You must be logged in to create a vendor"
-    },
-    "no_vendors": "No vendors found",
-    "add_first_vendor": "Add your first vendor"
+    }
   },
   "Sales": {
     "title": "Sales"
@@ -2104,63 +2108,50 @@
   },
   "Companies": {
     "title": "Companies",
-    "add_new": "Add Company",
-    "company_details": "Company Details",
-    "create_company": "Create Company",
-    "back_to_list": "Back to List",
+    "add_new": "Add New Company",
+    "search_companies": "Search companies",
     "no_companies_found": "No companies found",
+    "error_loading_companies": "Error loading companies",
     "form": {
       "name": {
         "label": "Name",
-        "placeholder": "Enter company name"
+        "required": "Name is required"
+      },
+      "industry": {
+        "label": "Industry"
       },
       "email": {
         "label": "Email",
-        "placeholder": "Enter company email"
+        "required": "Email is required",
+        "invalid": "Invalid email"
       },
       "phone": {
-        "label": "Phone",
-        "placeholder": "Enter company phone"
+        "label": "Phone"
       },
       "website": {
         "label": "Website",
-        "placeholder": "Enter company website"
+        "invalid": "Invalid URL"
       },
       "address": {
-        "label": "Address",
-        "placeholder": "Enter company address"
+        "label": "Address"
       },
       "city": {
-        "label": "City",
-        "placeholder": "Enter city"
+        "label": "City"
       },
       "state": {
-        "label": "State",
-        "placeholder": "Enter state"
+        "label": "State"
       },
-      "zipCode": {
-        "label": "ZIP Code",
-        "placeholder": "Enter ZIP code"
-      },
-      "industry": {
-        "label": "Industry",
-        "placeholder": "Enter industry"
+      "zip_code": {
+        "label": "Zip Code"
       },
       "size": {
-        "label": "Company Size",
-        "placeholder": "Enter company size"
+        "label": "Size"
+      },
+      "is_active": {
+        "label": "Status"
       },
       "notes": {
-        "label": "Notes",
-        "placeholder": "Enter notes"
-      },
-      "isActive": {
-        "label": "Active Status"
-      },
-      "validation": {
-        "name_required": "Company name is required",
-        "email_required": "Email is required",
-        "email_invalid": "Invalid email address"
+        "label": "Notes"
       }
     }
   },

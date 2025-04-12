@@ -1,6 +1,7 @@
 import React from "react";
 
 import { useTranslations } from "next-intl";
+
 import { z } from "zod";
 
 import SheetTable from "@/components/ui/sheet-table";
@@ -13,54 +14,51 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useCompaniesStore } from "@/stores/companies.store";
-import { Company } from "@/types/company.type";
+import { useBranchesStore } from "@/stores/branches.store";
+import { Branch } from "@/types/branch.type";
 
 const nameSchema = z.string().min(1, "Required");
-const industrySchema = z.string().optional();
-const emailSchema = z.string().email("Invalid email").min(1, "Required");
-const phoneSchema = z.string().optional();
-const websiteSchema = z.string().url("Invalid URL").optional();
-const addressSchema = z.string().optional();
-const citySchema = z.string().optional();
-const stateSchema = z.string().optional();
-const zipCodeSchema = z.string().optional();
-const sizeSchema = z.number().min(0, "Must be >= 0").optional();
-const isActiveSchema = z.boolean();
+const codeSchema = z.string().min(1, "Required");
+const addressSchema = z.string().min(1, "Required");
+const citySchema = z.string().min(1, "Required");
+const stateSchema = z.string().min(1, "Required");
+const zipCodeSchema = z.string().min(1, "Required");
+const phoneSchema = z.string().min(1, "Required");
+const emailSchema = z.string().email("Invalid email");
+const managerSchema = z.string().min(1, "Required");
 const notesSchema = z.string().optional();
 
-interface CompaniesTableProps {
-  data: Company[];
+interface BranchesTableProps {
+  data: Branch[];
   isLoading?: boolean;
   error?: Error | null;
 }
 
-const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
-  const t = useTranslations("Companies");
-  const { updateCompany } = useCompaniesStore();
+const BranchesTable = ({ data, isLoading, error }: BranchesTableProps) => {
+  const t = useTranslations("Branches");
+  const { updateBranch } = useBranchesStore();
 
   const columns = [
     { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "industry", header: t("form.industry.label"), validationSchema: industrySchema },
-    { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "phone", header: t("form.phone.label"), validationSchema: phoneSchema },
-    { accessorKey: "website", header: t("form.website.label"), validationSchema: websiteSchema },
+    { accessorKey: "code", header: t("form.code.label"), validationSchema: codeSchema },
     { accessorKey: "address", header: t("form.address.label"), validationSchema: addressSchema },
     { accessorKey: "city", header: t("form.city.label"), validationSchema: citySchema },
     { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
-    { accessorKey: "zipCode", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
-    { accessorKey: "size", header: t("form.size.label"), validationSchema: sizeSchema },
+    { accessorKey: "zip_code", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
+    { accessorKey: "phone", header: t("form.phone.label"), validationSchema: phoneSchema },
+    { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
+    { accessorKey: "manager", header: t("form.manager.label"), validationSchema: managerSchema },
+    { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
     { 
-      accessorKey: "isActive", 
+      accessorKey: "is_active", 
       header: t("form.is_active.label"), 
-      validationSchema: isActiveSchema,
+      validationSchema: z.boolean(),
       type: "boolean"
     },
-    { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateCompany(rowId, { [columnId]: value });
+    await updateBranch(rowId, { [columnId]: value });
   };
 
   if (isLoading) {
@@ -93,7 +91,7 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
   if (error) {
     return (
       <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
-        {t("error_loading_companies")}: {error.message}
+        {t("error_loading_branches")}: {error.message}
       </div>
     );
   }
@@ -101,4 +99,4 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
   return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
 };
 
-export default CompaniesTable;
+export default BranchesTable; 

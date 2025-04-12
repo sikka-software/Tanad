@@ -35,8 +35,8 @@ const createVendorSchema = (t: (key: string) => string) =>
     address: z.string().min(1, t("Vendors.form.address.required")),
     city: z.string().min(1, t("Vendors.form.city.required")),
     state: z.string().min(1, t("Vendors.form.state.required")),
-    zip_code: z.string().min(1, t("Vendors.form.zip_code.required")),
-    notes: z.string().optional(),
+    zipCode: z.string().min(5, t("Vendors.form.zip_code.required")),
+    notes: z.string().nullable(),
   });
 
 export type VendorFormValues = z.infer<ReturnType<typeof createVendorSchema>>;
@@ -73,7 +73,7 @@ export function VendorForm({
       address: "",
       city: "",
       state: "",
-      zip_code: "",
+      zipCode: "",
       notes: "",
     },
   });
@@ -92,7 +92,7 @@ export function VendorForm({
             address: vendor.address,
             city: vendor.city,
             state: vendor.state,
-            zip_code: vendor.zip_code,
+            zipCode: vendor.zipCode,
             notes: vendor.notes || "",
           });
         })
@@ -127,7 +127,7 @@ export function VendorForm({
         address: data.address.trim(),
         city: data.city.trim(),
         state: data.state.trim(),
-        zip_code: data.zip_code.trim(),
+        zipCode: data.zipCode.trim(),
         notes: data.notes?.trim() || null,
         user_id: userId,
       };
@@ -302,16 +302,12 @@ export function VendorForm({
 
           <FormField
             control={form.control}
-            name="zip_code"
+            name="zipCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Vendors.form.zip_code.label")} *</FormLabel>
+                <FormLabel>ZIP Code</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t("Vendors.form.zip_code.placeholder")}
-                    {...field}
-                    disabled={loading}
-                  />
+                  <Input {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
