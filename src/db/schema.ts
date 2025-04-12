@@ -17,6 +17,38 @@ import {
   integer,
 } from "drizzle-orm/pg-core";
 
+export const companies = pgTable(
+  "companies",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text().notNull(),
+    email: text().notNull(),
+    phone: text(),
+    website: text(),
+    address: text(),
+    city: text(),
+    state: text(),
+    zipCode: text("zip_code"),
+    industry: text(),
+    size: text(),
+    notes: text(),
+    isActive: boolean().default(true).notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("companies_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+  ],
+).enableRLS();
+
 export const clients = pgTable(
   "clients",
   {
@@ -408,36 +440,4 @@ export const jobs = pgTable("jobs", {
   index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
   index("jobs_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
 ]
-).enableRLS();
-
-export const companies = pgTable(
-  "companies",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    createdAt: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    name: text().notNull(),
-    email: text().notNull(),
-    phone: text(),
-    website: text(),
-    address: text(),
-    city: text(),
-    state: text(),
-    zipCode: text("zip_code"),
-    industry: text(),
-    size: text(),
-    notes: text(),
-    isActive: boolean().default(true).notNull(),
-    userId: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("companies_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-  ],
 ).enableRLS();

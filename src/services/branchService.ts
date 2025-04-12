@@ -25,10 +25,11 @@ function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {
 
 export async function fetchBranches(): Promise<Branch[]> {
   try {
-    const data = await db.query.branches.findMany({
-      orderBy: desc(branches.createdAt),
-    });
-    return data.map(convertDrizzleBranch);
+    const response = await fetch("/api/branches");
+    if (!response.ok) {
+      throw new Error("Failed to fetch branches");
+    }
+    return response.json();
   } catch (error) {
     console.error("Error fetching branches:", error);
     throw error;
@@ -36,63 +37,54 @@ export async function fetchBranches(): Promise<Branch[]> {
 }
 
 export async function fetchBranchById(id: string): Promise<Branch> {
-  const data = await db.query.branches.findFirst({
-    where: eq(branches.id, id),
-  });
-
-  if (!data) {
+  const response = await fetch(`/api/branches/${id}`);
+  if (!response.ok) {
     throw new Error(`Branch with id ${id} not found`);
   }
-
-  return convertDrizzleBranch(data);
+  return response.json();
 }
 
 export async function createBranch(branch: BranchCreateData): Promise<Branch> {
-  // Map branch data to match Drizzle schema
-  const dbBranch = {
-    name: branch.name,
-    code: branch.code,
-    address: branch.address,
-    city: branch.city,
-    state: branch.state,
-    zipCode: branch.zip_code,
-    phone: branch.phone,
-    email: branch.email,
-    manager: branch.manager,
-    isActive: branch.is_active,
-    notes: branch.notes,
-    userId: branch.userId,
-  };
+  const response = await fetch("/api/branches", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(branch),
+  });
 
-  const [data] = await db.insert(branches).values(dbBranch).returning();
-
-  if (!data) {
+  if (!response.ok) {
     throw new Error("Failed to create branch");
   }
 
-  return convertDrizzleBranch(data);
+  return response.json();
 }
 
 export async function updateBranch(
   id: string,
   branch: Partial<Omit<Branch, "id" | "created_at">>,
 ): Promise<Branch> {
-  // Map branch data to match Drizzle schema
-  const dbBranch = {
-    ...branch,
-    zipCode: branch.zip_code,
-    isActive: branch.is_active,
-  };
+  const response = await fetch(`/api/branches/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(branch),
+  });
 
-  const [data] = await db.update(branches).set(dbBranch).where(eq(branches.id, id)).returning();
-
-  if (!data) {
+  if (!response.ok) {
     throw new Error(`Failed to update branch with id ${id}`);
   }
 
-  return convertDrizzleBranch(data);
+  return response.json();
 }
 
 export async function deleteBranch(id: string): Promise<void> {
-  await db.delete(branches).where(eq(branches.id, id));
+  const response = await fetch(`/api/branches/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete branch with id ${id}`);
+  }
 }
