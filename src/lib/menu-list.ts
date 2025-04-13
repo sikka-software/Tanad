@@ -11,6 +11,7 @@ import {
   Briefcase,
   Building2,
   SaudiRiyal,
+  File,
 } from "lucide-react";
 
 type Submenu = {
@@ -292,6 +293,20 @@ export function getMenuList(pathname: string): Group[] {
       groupLabelTranslationKey: "Settings.title",
       icon: Settings,
       menus: getSettingsMenus(pathname),
+    },
+    {
+      groupLabel: "Templates",
+      groupLabelTranslationKey: "Templates.title",
+      icon: File,
+      menus: [
+        {
+          href: "/templates",
+          label: "Templates",
+          translationKey: "Templates.title",
+          icon: File,
+          active: pathname === "/templates",
+        },
+      ],
     },
   ];
 }

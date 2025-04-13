@@ -88,6 +88,40 @@ DROP POLICY IF EXISTS "Users can insert their own warehouses" ON warehouses;
 DROP POLICY IF EXISTS "Users can update their own warehouses" ON warehouses;
 DROP POLICY IF EXISTS "Users can delete their own warehouses" ON warehouses;
 
+-- Templates policies
+alter table templates enable row level security;
+
+create policy "Users can view their own templates."
+  on templates for select
+  to authenticated
+  using (
+    auth.uid() = user_id
+  );
+
+create policy "Users can create their own templates."
+  on templates for insert
+  to authenticated
+  with check (
+    auth.uid() = user_id
+  );
+
+create policy "Users can update their own templates."
+  on templates for update
+  to authenticated
+  using (
+    auth.uid() = user_id
+  )
+  with check (
+    auth.uid() = user_id
+  );
+
+create policy "Users can delete their own templates."
+  on templates for delete
+  to authenticated
+  using (
+    auth.uid() = user_id
+  );
+
 -- BRANCHES POLICIES
 CREATE POLICY "Users can read their own branches" ON branches FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert their own branches" ON branches FOR INSERT WITH CHECK (auth.uid() = user_id);

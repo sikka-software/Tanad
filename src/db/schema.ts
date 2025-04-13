@@ -74,49 +74,52 @@ export const clients = pgTable(
     foreignKey({
       columns: [table.company],
       foreignColumns: [companies.id],
-      name: "clients_company_fkey"
-    })
+      name: "clients_company_fkey",
+    }),
   ],
 ).enableRLS();
 
-export const invoices = pgTable("invoices", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-    mode: "string",
-  }).default(sql`timezone('utc'::text, now())`),
-  invoiceNumber: text("invoice_number").notNull(),
-  issueDate: date("issue_date").notNull(),
-  dueDate: date("due_date").notNull(),
-  status: text("status").$type<"paid" | "pending" | "overdue">().notNull(),
-  subtotal: numeric("subtotal", { precision: 10, scale: 2 }).default("0").notNull(),
-  taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
-  taxAmount: numeric("tax_amount", {
-    precision: 10,
-    scale: 2,
-  }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
-  total: numeric("total", { precision: 10, scale: 2 }).generatedAlwaysAs(
-    sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`
-  ),
-  notes: text("notes"),
-  clientId: uuid("client_id").notNull(),
-  userId: uuid("user_id").notNull(),
-},
-(table) => [
-  index("invoices_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
-  index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
-  index("invoices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-  foreignKey({
-    columns: [table.clientId],
-    foreignColumns: [clients.id],
-    name: "invoices_client_id_fkey",
-  }).onDelete("cascade"),
+export const invoices = pgTable(
+  "invoices",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    invoiceNumber: text("invoice_number").notNull(),
+    issueDate: date("issue_date").notNull(),
+    dueDate: date("due_date").notNull(),
+    status: text("status").$type<"paid" | "pending" | "overdue">().notNull(),
+    subtotal: numeric("subtotal", { precision: 10, scale: 2 }).default("0").notNull(),
+    taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
+    taxAmount: numeric("tax_amount", {
+      precision: 10,
+      scale: 2,
+    }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
+    total: numeric("total", { precision: 10, scale: 2 }).generatedAlwaysAs(
+      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`,
+    ),
+    notes: text("notes"),
+    clientId: uuid("client_id").notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("invoices_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+    index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+    index("invoices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.clientId],
+      foreignColumns: [clients.id],
+      name: "invoices_client_id_fkey",
+    }).onDelete("cascade"),
 
-  check(
-    "invoices_status_check",
-    sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`,
-  ),
-]).enableRLS();
+    check(
+      "invoices_status_check",
+      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`,
+    ),
+  ],
+).enableRLS();
 
 export const invoiceItems = pgTable(
   "invoice_items",
@@ -171,7 +174,7 @@ export const quotes = pgTable(
       scale: 2,
     }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
     total: numeric("total", { precision: 10, scale: 2 }).generatedAlwaysAs(
-      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`
+      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`,
     ),
     notes: text(),
     clientId: uuid("client_id").notNull(),
@@ -442,25 +445,52 @@ export const branches = pgTable(
   ],
 ).enableRLS();
 
-export const jobs = pgTable("jobs", {
-  id: uuid().primaryKey().defaultRandom(),
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description"),
-  requirements: text("requirements"),
-  location: varchar("location", { length: 255 }),
-  department: varchar("department", { length: 255 }),
-  type: varchar("type", { length: 50 }).notNull(), // Full-time, Part-time, Contract, etc.
-  salary: numeric("salary", { precision: 10, scale: 2 }),
-  isActive: boolean("is_active").default(true).notNull(),
-  startDate: date("start_date"),
-  endDate: date("end_date"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-  userId: uuid("user_id").notNull(),
-},
-(table) => [
-  index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
-  index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
-  index("jobs_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-]
+export const jobs = pgTable(
+  "jobs",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    requirements: text("requirements"),
+    location: varchar("location", { length: 255 }),
+    department: varchar("department", { length: 255 }),
+    type: varchar("type", { length: 50 }).notNull(), // Full-time, Part-time, Contract, etc.
+    salary: numeric("salary", { precision: 10, scale: 2 }),
+    isActive: boolean("is_active").default(true).notNull(),
+    startDate: date("start_date"),
+    endDate: date("end_date"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
+    index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
+    index("jobs_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+  ],
+).enableRLS();
+
+export const templates = pgTable(
+  "templates",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text().notNull(),
+    type: text("type").$type<"invoice" | "quote">().notNull(),
+    content: jsonb("content").notNull(), // Store the template content as JSON
+    isDefault: boolean("is_default").default(false).notNull(),
+    user_id: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("templates_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("templates_type_idx").using("btree", table.type.asc().nullsLast().op("text_ops")),
+    index("templates_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    check("templates_type_check", sql`type = ANY (ARRAY['invoice'::text, 'quote'::text])`),
+  ],
 ).enableRLS();
