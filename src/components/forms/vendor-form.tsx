@@ -11,7 +11,13 @@ import * as z from "zod";
 import { CompanyForm, type CompanyFormValues } from "@/components/forms/company-form";
 import { Button } from "@/components/ui/button";
 import { ComboboxAdd } from "@/components/ui/combobox-add";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -358,21 +364,25 @@ export function VendorForm({
       </Form>
 
       <Dialog open={isCompanyDialogOpen} onOpenChange={setIsCompanyDialogOpen}>
-        <DialogContent className="p-0 sm:max-w-xl" dir={locale === "ar" ? "rtl" : "ltr"}>
-          <DialogHeader className="bg-background sticky top-0 z-10 rounded-t-lg border-b p-4">
+        <DialogContent
+          className="flex h-[80vh] max-h-[80vh] flex-col gap-0 overflow-hidden !p-0"
+          dir={locale === "ar" ? "rtl" : "ltr"}
+        >
+          <DialogHeader className="sticky top-0 z-10 border-b p-4">
             <DialogTitle>{t("Companies.add_new")}</DialogTitle>
           </DialogHeader>
-          <div className="p-4 pt-0 bg-red-400 flex">
+
+          <div className="flex-1 overflow-y-auto p-4">
             <CompanyForm id="company-form" onSubmit={handleCompanySubmit} loading={loading} />
           </div>
-          <div className="bg-green-300 sticky bottom-0 mt-4 flex justify-end gap-2 border-t p-4">
+          <DialogFooter className="sticky bottom-0 flex justify-end gap-2 border-t p-4">
             <Button variant="outline" onClick={() => setIsCompanyDialogOpen(false)}>
               {t("General.cancel")}
             </Button>
             <Button type="submit" form="company-form">
               {t("General.save")}
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
