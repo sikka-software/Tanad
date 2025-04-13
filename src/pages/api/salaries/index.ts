@@ -1,76 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { createSalary, deleteSalary, fetchSalaries, fetchSalaryById, updateSalary } from "@/services/salaryService";
-import { SalaryCreateData } from "@/types/salary.type";
+
+import { fetchSalaries } from "@/services/salaryService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    switch (req.method) {
-      case "GET": {
-        const { id } = req.query;
-        if (id && typeof id === "string") {
-          const salary = await fetchSalaryById(id);
-          return res.status(200).json(salary);
-        }
-        const salaries = await fetchSalaries();
-        return res.status(200).json(salaries);
-      }
-
-      case "POST": {
-        const salary = await createSalary(req.body as SalaryCreateData);
-        return res.status(201).json(salary);
-      }
-
-      case "PUT": {
-        const { id } = req.query;
-        if (!id || typeof id !== "string") {
-          return res.status(400).json({ error: "Missing salary ID" });
-        }
-        const salary = await updateSalary(id, req.body);
-        return res.status(200).json(salary);
-      }
-
-      case "DELETE": {
-        const { id } = req.query;
-        if (!id || typeof id !== "string") {
-          return res.status(400).json({ error: "Missing salary ID" });
-        }
-        await deleteSalary(id);
-        return res.status(200).json({ success: true });
-      }
-
-      default:
-        res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
-        return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
+  if (req.method === "GET") {
+    try {
+      const salaries = await fetchSalaries();
+      res.status(200).json(salaries);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch salaries" });
     }
-  } catch (error) {
-    console.error("Error in salary API:", error);
-    return res.status(500).json({ error: "Internal server error" });
+  } else {
+    res.setHeader("Allow", ["GET"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
-
-//
-//
-// import { NextApiRequest, NextApiResponse } from 'next';
-// import { createSalary, fetchSalaries } from '@/services/salaryService';
-// import { SalaryCreateData } from '@/types/salary.type';
-
-// export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-//   try {
-//     switch (req.method) {
-//       case 'GET':
-//         const salaries = await fetchSalaries();
-//         return res.status(200).json(salaries);
-
-//       case 'POST':
-//         const newSalary = await createSalary(req.body as SalaryCreateData);
-//         return res.status(201).json(newSalary);
-
-//       default:
-//         res.setHeader('Allow', ['GET', 'POST']);
-//         return res.status(405).end(`Method ${req.method} Not Allowed`);
-//     }
-//   } catch (error) {
-//     console.error('Salary API error:', error);
-//     return res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// }

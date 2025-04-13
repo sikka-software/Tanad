@@ -21,7 +21,7 @@ export const salaryKeys = {
 // Hook to fetch all salaries
 export function useSalaries() {
   return useQuery({
-    queryKey: salaryKeys.lists(),
+    queryKey: ["salaries"],
     queryFn: fetchSalaries,
   });
 }
@@ -40,9 +40,9 @@ export function useCreateSalary() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newSalary: SalaryCreateData) => createSalary(newSalary),
+    mutationFn: createSalary,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ["salaries"] });
     },
   });
 }
@@ -71,10 +71,9 @@ export function useDeleteSalary() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteSalary(id),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
-      queryClient.removeQueries({ queryKey: salaryKeys.detail(variables) });
+    mutationFn: deleteSalary,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["salaries"] });
     },
   });
 }
