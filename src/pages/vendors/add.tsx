@@ -1,56 +1,110 @@
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import * as z from "zod";
 
-import { VendorForm } from "@/components/forms/vendor-form";
-// Import VendorForm
+import { VendorForm, VendorFormValues } from "@/components/forms/vendor-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-// Need supabase to get user ID
-import { vendorKeys } from "@/hooks/useVendors";
 import { supabase } from "@/lib/supabase";
+import { createVendor } from "@/services/vendorService";
+import type { VendorCreateData } from "@/types/vendor.type";
+
+// Schema factory for vendor form validation with translations
+const createVendorSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("Vendors.form.name.required")),
+    email: z.string().email(t("Vendors.form.email.invalid")),
+    phone: z.string().min(1, t("Vendors.form.phone.required")),
+    company: z.string().min(1, t("Vendors.form.company.required")),
+    address: z.string().min(1, t("Vendors.form.address.required")),
+    city: z.string().min(1, t("Vendors.form.city.required")),
+    state: z.string().min(1, t("Vendors.form.state.required")),
+    zipCode: z.string().min(5, t("Vendors.form.zip_code.required")),
+    notes: z.string().nullable(),
+  });
 
 export default function AddVendorPage() {
   const router = useRouter();
-  const t = useTranslations(); // Use Vendors namespace
+  const t = useTranslations();
   const [userId, setUserId] = useState<string | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-  const queryClient = useQueryClient();
+  const [loading, setLoading] = useState(true);
+
+  const form = useForm<VendorFormValues>({
+    resolver: zodResolver(createVendorSchema(t)),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      company: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      notes: "",
+    },
+  });
 
   // Fetch user ID on mount
   useEffect(() => {
     const getUserId = async () => {
-      setLoadingUser(true);
+      setLoading(true);
       const { data, error } = await supabase.auth.getUser();
       if (data.user) {
         setUserId(data.user.id);
       } else {
-        // Redirect to login if not authenticated
         console.error("User not authenticated:", error);
-        router.push("/auth/login"); // Adjust login path if different
+        router.push("/auth/login");
       }
-      setLoadingUser(false);
+      setLoading(false);
     };
 
     getUserId();
   }, [router]);
 
-  // Callback for successful form submission
-  const handleSuccess = (vendor: any) => {
-    // Update the vendors cache to include the new vendor
-    const previousVendors = queryClient.getQueryData(vendorKeys.lists()) || [];
-    queryClient.setQueryData(vendorKeys.lists(), [
-      ...(Array.isArray(previousVendors) ? previousVendors : []),
-      vendor,
-    ]);
+  const onSubmit = async (data: VendorFormValues) => {
+    if (!userId) {
+      toast.error(t("error.title"), {
+        description: t("error.not_authenticated"),
+      });
+      return;
+    }
 
-    // Navigate to vendors list
-    router.push("/vendors");
+    setLoading(true);
+    try {
+      const vendorData = {
+        name: data.name.trim(),
+        email: data.email.trim(),
+        phone: data.phone.trim(),
+        company: data.company.trim(),
+        address: data.address.trim(),
+        city: data.city.trim(),
+        state: data.state.trim(),
+        zipCode: data.zipCode.trim(),
+        notes: data.notes?.trim() || null,
+        user_id: userId,
+      };
+
+      await createVendor(vendorData as unknown as VendorCreateData);
+      toast.success(t("success.title"), {
+        description: t("Vendors.messages.success_created"),
+      });
+      router.push("/vendors");
+    } catch (error) {
+      console.error("Failed to save vendor:", error);
+      toast.error(t("error.title"), {
+        description: error instanceof Error ? error.message : t("Vendors.messages.error_save"),
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,9 +112,12 @@ export default function AddVendorPage() {
       <PageTitle
         title={t("Vendors.add_new")}
         customButton={
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => router.push("/vendors")}>
               {t("General.cancel")}
+            </Button>
+            <Button type="submit" size="sm" form="vendor-form" disabled={loading}>
+              {loading ? t("General.saving") : t("Vendors.add_new")}
             </Button>
           </div>
         }
@@ -68,16 +125,10 @@ export default function AddVendorPage() {
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>{t("Vendors.vendor_details")}</CardTitle> {/* Vendors.vendor_details */}
+            <CardTitle>{t("Vendors.vendor_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            {loadingUser ? (
-              <p>{t("General.loading")}</p>
-            ) : userId ? (
-              <VendorForm userId={userId} onSuccess={handleSuccess} />
-            ) : (
-              <p>{t("Vendors.error.failed_to_load_user")}</p>
-            )}
+            <VendorForm formId="vendor-form" userId={userId} loading={loading} form={form} />
           </CardContent>
         </Card>
       </div>

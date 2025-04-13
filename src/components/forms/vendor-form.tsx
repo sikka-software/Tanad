@@ -1,16 +1,11 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-// Import API functions
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -21,11 +16,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-// Import Vendor type
-import { createVendor, fetchVendorById, updateVendor } from "@/services/vendorService";
-import type { Vendor, VendorCreateData } from "@/types/vendor.type";
+import { fetchVendorById } from "@/services/vendorService";
 
-// Schema factory for vendor form validation with translations
 const createVendorSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Vendors.form.name.required")),
@@ -44,39 +36,21 @@ export type VendorFormValues = z.infer<ReturnType<typeof createVendorSchema>>;
 interface VendorFormProps {
   formId?: string;
   vendorId?: string;
-  onSuccess?: (vendor: Vendor) => void;
   loading?: boolean;
   userId: string | null;
+  form: ReturnType<typeof useForm<VendorFormValues>>;
 }
 
 export function VendorForm({
   formId,
   vendorId,
-  onSuccess,
   loading: externalLoading = false,
   userId,
+  form,
 }: VendorFormProps) {
-  const router = useRouter();
   const t = useTranslations();
   const [internalLoading, setInternalLoading] = useState(false);
   const loading = externalLoading || internalLoading;
-
-  const vendorSchema = createVendorSchema(t);
-
-  const form = useForm<VendorFormValues>({
-    resolver: zodResolver(vendorSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      notes: "",
-    },
-  });
 
   // Fetch vendor data if vendorId is provided (edit mode)
   useEffect(() => {
@@ -108,65 +82,9 @@ export function VendorForm({
     }
   }, [vendorId, form, t]);
 
-  const onSubmit: SubmitHandler<VendorFormValues> = async (data) => {
-    setInternalLoading(true);
-    if (!userId) {
-      toast.error(t("error.title"), {
-        description: t("error.not_authenticated"),
-      });
-      setInternalLoading(false);
-      return;
-    }
-
-    try {
-      const vendorData = {
-        name: data.name.trim(),
-        email: data.email.trim(),
-        phone: data.phone.trim(),
-        company: data.company.trim(),
-        address: data.address.trim(),
-        city: data.city.trim(),
-        state: data.state.trim(),
-        zipCode: data.zipCode.trim(),
-        notes: data.notes?.trim() || null,
-        user_id: userId,
-      };
-
-      console.log("Submitting Vendor Data:", vendorData);
-      console.log("Current User ID State:", userId);
-
-      let result: Vendor;
-      if (vendorId) {
-        const { user_id, ...updateData } = vendorData;
-        result = await updateVendor(vendorId, updateData);
-        toast.success(t("success.title"), {
-          description: t("Vendors.messages.success_updated"),
-        });
-      } else {
-        result = await createVendor(vendorData as unknown as VendorCreateData);
-        toast.success(t("success.title"), {
-          description: t("Vendors.messages.success_created"),
-        });
-      }
-
-      if (onSuccess) {
-        onSuccess(result);
-      } else {
-        router.push("/vendors");
-      }
-    } catch (error) {
-      console.error("Failed to save vendor:", error);
-      toast.error(t("error.title"), {
-        description: error instanceof Error ? error.message : t("Vendors.messages.error_save"),
-      });
-    } finally {
-      setInternalLoading(false);
-    }
-  };
-
   return (
     <Form {...form}>
-      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={formId} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -333,16 +251,6 @@ export function VendorForm({
             </FormItem>
           )}
         />
-
-        {!formId && (
-          <Button type="submit" disabled={loading}>
-            {loading
-              ? t("common.saving")
-              : vendorId
-                ? t("common.update_button")
-                : t("common.create_button")}
-          </Button>
-        )}
       </form>
     </Form>
   );

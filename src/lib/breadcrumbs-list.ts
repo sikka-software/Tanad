@@ -163,4 +163,20 @@ export const dynamicRoutePatterns = [
       { path: "", labelKey: "Companies.edit", isActive: true },
     ],
   },
+  {
+    pattern: /^\/vendors\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/vendors", labelKey: "Vendors.title" },
+      { path: "/vendors/add", labelKey: "Vendors.add_new", isActive: true },
+    ],
+  },
+  {
+    pattern: /^\/vendors\/edit\/(.+)$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/vendors", labelKey: "Vendors.title" },
+      { path: "", labelKey: "Vendors.edit", isActive: true },
+    ],
+  },
 ];
