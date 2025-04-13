@@ -12,7 +12,6 @@ import { ClientForm, type ClientFormValues } from "@/components/forms/client-for
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { clientKeys } from "@/hooks/useClients";
 import { supabase } from "@/lib/supabase";
 
 export default function AddClientPage() {
@@ -65,11 +64,11 @@ export default function AddClientPage() {
       if (error) throw error;
 
       // Update the clients cache to include the new client
-      const previousClients = queryClient.getQueryData(clientKeys.lists()) || [];
-      queryClient.setQueryData(clientKeys.lists(), [
-        ...(Array.isArray(previousClients) ? previousClients : []),
-        newClient,
-      ]);
+      const previousClients = queryClient.getQueryData(["clients"]) || [];
+      queryClient.setQueryData(
+        ["clients"],
+        [...(Array.isArray(previousClients) ? previousClients : []), newClient],
+      );
 
       toast.success(t("Clients.success.title"), {
         description: t("Clients.success.created"),
@@ -97,11 +96,7 @@ export default function AddClientPage() {
               {t("General.cancel")}
             </Button>
             <Button type="submit" size="sm" form="client-form" disabled={loading}>
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                t("Clients.create_client")
-              )}
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Clients.create_client")}
             </Button>
           </div>
         }

@@ -2063,6 +2063,7 @@
     "company_details": "تفاصيل الشركة",
     "create_company": "إنشاء شركة",
     "creating_company": "جاري إنشاء الشركة...",
+    "search_companies": "بحث عن شركات",
     "back_to_list": "العودة للقائمة",
     "no_companies_found": "لم يتم العثور على شركات",
     "form": {
@@ -2094,7 +2095,7 @@
         "label": "المنطقة",
         "placeholder": "أدخل المنطقة"
       },
-      "zipCode": {
+      "zip_code": {
         "label": "الرمز البريدي",
         "placeholder": "أدخل الرمز البريدي"
       },
@@ -2110,7 +2111,7 @@
         "label": "ملاحظات",
         "placeholder": "أدخل الملاحظات"
       },
-      "isActive": {
+      "is_active": {
         "label": "حالة النشاط"
       },
       "validation": {

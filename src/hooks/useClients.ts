@@ -9,26 +9,17 @@ import {
 } from "@/services/clientService";
 import { Client, ClientCreateData } from "@/types/client.type";
 
-// Query keys
-export const clientKeys = {
-  all: ["clients"] as const,
-  lists: () => [...clientKeys.all, "list"] as const,
-  list: (filters: any) => [...clientKeys.lists(), { filters }] as const,
-  details: () => [...clientKeys.all, "detail"] as const,
-  detail: (id: string) => [...clientKeys.details(), id] as const,
-};
-
 // Hooks
 export function useClients() {
   return useQuery({
-    queryKey: clientKeys.lists(),
+    queryKey: ["clients"],
     queryFn: fetchClients,
   });
 }
 
 export function useClient(id: string) {
   return useQuery({
-    queryKey: clientKeys.detail(id),
+    queryKey: ["clients", id],
     queryFn: () => fetchClientById(id),
     enabled: !!id,
   });
@@ -41,7 +32,7 @@ export function useCreateClient() {
     mutationFn: (newClient: Omit<Client, "id" | "created_at">) =>
       createClient(newClient as ClientCreateData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
     },
   });
 }
@@ -58,8 +49,8 @@ export function useUpdateClient() {
       client: Partial<Omit<Client, "id" | "created_at">>;
     }) => updateClient(id, client),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: clientKeys.detail(data.id) });
-      queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ["clients", data.id] });
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
     },
   });
 }
@@ -70,8 +61,8 @@ export function useDeleteClient() {
   return useMutation({
     mutationFn: (id: string) => deleteClient(id),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
-      queryClient.removeQueries({ queryKey: clientKeys.detail(variables) });
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      queryClient.removeQueries({ queryKey: ["clients", variables] });
     },
   });
 }

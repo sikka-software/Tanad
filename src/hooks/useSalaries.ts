@@ -1,26 +1,27 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Salary, SalaryCreateData } from '@/types/salary.type';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import {
   createSalary,
   deleteSalary,
   fetchSalaryById,
   fetchSalaries,
   updateSalary,
-} from '@/services/salaryService';
+} from "@/services/salaryService";
+import type { Salary, SalaryCreateData } from "@/types/salary.type";
 
 // Query keys for salaries
 export const salaryKeys = {
-  all: ['salaries'] as const,
-  lists: () => [...salaryKeys.all, 'list'] as const,
+  all: ["salaries"] as const,
+  lists: () => [...salaryKeys.all, "list"] as const,
   list: (filters: any) => [...salaryKeys.lists(), { filters }] as const,
-  details: () => [...salaryKeys.all, 'detail'] as const,
+  details: () => [...salaryKeys.all, "detail"] as const,
   detail: (id: string) => [...salaryKeys.details(), id] as const,
 };
 
 // Hook to fetch all salaries
 export function useSalaries() {
   return useQuery({
-    queryKey: salaryKeys.lists(),
+    queryKey: ["salaries"],
     queryFn: fetchSalaries,
   });
 }
@@ -28,7 +29,7 @@ export function useSalaries() {
 // Hook to fetch a single salary by ID
 export function useSalary(id: string) {
   return useQuery({
-    queryKey: salaryKeys.detail(id),
+    queryKey: ["salaries", id],
     queryFn: () => fetchSalaryById(id),
     enabled: !!id,
   });
@@ -39,8 +40,7 @@ export function useCreateSalary() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newSalary: Omit<Salary, 'id' | 'created_at'>) =>
-      createSalary(newSalary),
+    mutationFn: (newSalary: Omit<Salary, "id" | "created_at">) => createSalary(newSalary),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
     },
@@ -52,8 +52,13 @@ export function useUpdateSalary() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, salary }: { id: string; salary: Partial<Omit<Salary, 'id' | 'created_at'>> }) =>
-      updateSalary(id, salary),
+    mutationFn: ({
+      id,
+      salary,
+    }: {
+      id: string;
+      salary: Partial<Omit<Salary, "id" | "created_at">>;
+    }) => updateSalary(id, salary),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: salaryKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
@@ -72,4 +77,4 @@ export function useDeleteSalary() {
       queryClient.removeQueries({ queryKey: salaryKeys.detail(variables) });
     },
   });
-} 
+}

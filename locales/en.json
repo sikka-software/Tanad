@@ -2142,14 +2142,16 @@
         "label": "State"
       },
       "zip_code": {
-        "label": "Zip Code"
-      },
-      "size": {
-        "label": "Size"
+        "label": "Zip Code",
+        "required": "Zip code is required"
       },
       "is_active": {
         "label": "Status"
       },
+      "size": {
+        "label": "Size"
+      },
+
       "notes": {
         "label": "Notes"
       }
