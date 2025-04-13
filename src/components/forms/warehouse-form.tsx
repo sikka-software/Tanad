@@ -49,7 +49,7 @@ interface WarehouseFormProps {
 }
 
 export function WarehouseForm({
-  formId,
+  formId = "warehouse-form",
   warehouseId,
   onSuccess,
   loading: externalLoading = false,
@@ -365,10 +365,6 @@ export function WarehouseForm({
             </FormItem>
           )}
         />
-
-        <Button type="submit" disabled={loading} className="w-full">
-          {warehouseId ? t("Warehouses.form.update_button") : t("Warehouses.form.create_button")}
-        </Button>
       </form>
     </Form>
   );

@@ -55,9 +55,18 @@ export default function AddWarehousePage() {
       <PageTitle
         title={t("Warehouses.add_new")}
         customButton={
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => router.push("/warehouses")}>
               {t("General.cancel")}
+            </Button>
+            <Button
+              type="submit"
+              form="warehouse-form"
+              size="sm"
+              disabled={loadingUser}
+              className="w-full"
+            >
+              {t("Warehouses.form.create_button")}
             </Button>
           </div>
         }
