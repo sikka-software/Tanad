@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -67,17 +68,17 @@ export default function EditSalaryPage() {
           <CardContent>
             {loadingUser ? (
               <p>{t("common.loading")}</p>
-            ) : userId && typeof salaryId === 'string' ? (
+            ) : userId && typeof salaryId === "string" ? (
               <SalaryForm
-                userId={userId}
                 salaryId={salaryId} // Pass salaryId for edit mode
                 onSuccess={handleSuccess}
               />
             ) : (
               <p>
-                {typeof salaryId !== 'string'
+                {typeof salaryId !== "string"
                   ? t("error.invalid_salary_id") /* Salaries.error.invalid_salary_id */
-                  : t("error.failed_to_load_user")} /* Salaries.error.failed_to_load_user */
+                  : t("error.failed_to_load_user")}{" "}
+                /* Salaries.error.failed_to_load_user */
               </p>
             )}
           </CardContent>
@@ -89,16 +90,14 @@ export default function EditSalaryPage() {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // Use fallback: 'blocking'
-  return { paths: [], fallback: 'blocking' };
+  return { paths: [], fallback: "blocking" };
 };
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? 'en';
+  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (
-        await import(`../../../../locales/${effectiveLocale}.json`) // Adjust path depth
-      ).default,
+      messages: (await import(`../../../../locales/${effectiveLocale}.json`)).default, // Adjust path depth
     },
   };
-}; 
+};

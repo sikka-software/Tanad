@@ -234,8 +234,16 @@ export function SalaryForm({
                 <FormLabel>{t("Salaries.form.pay_period_start.label")} *</FormLabel>
                 <FormControl>
                   <DatePicker
-                    date={field.value ? new Date(field.value) : undefined}
-                    onSelect={(date) => field.onChange(date?.toISOString().split("T")[0])}
+                    date={field.value ? new Date(field.value + "T00:00:00") : undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        // Ensure we're working with the local date
+                        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                        field.onChange(localDate.toISOString().split('T')[0]);
+                      } else {
+                        field.onChange("");
+                      }
+                    }}
                     placeholder={t("Salaries.form.pay_period_start.placeholder")}
                   />
                 </FormControl>
@@ -251,8 +259,16 @@ export function SalaryForm({
                 <FormLabel>{t("Salaries.form.pay_period_end.label")} *</FormLabel>
                 <FormControl>
                   <DatePicker
-                    date={field.value ? new Date(field.value) : undefined}
-                    onSelect={(date) => field.onChange(date?.toISOString().split("T")[0])}
+                    date={field.value ? new Date(field.value + "T00:00:00") : undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        // Ensure we're working with the local date
+                        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                        field.onChange(localDate.toISOString().split('T')[0]);
+                      } else {
+                        field.onChange("");
+                      }
+                    }}
                     placeholder={t("Salaries.form.pay_period_end.placeholder")}
                   />
                 </FormControl>
@@ -271,8 +287,16 @@ export function SalaryForm({
               <FormLabel>{t("Salaries.form.payment_date.label")} *</FormLabel>
               <FormControl>
                 <DatePicker
-                  date={field.value ? new Date(field.value) : undefined}
-                  onSelect={(date) => field.onChange(date?.toISOString().split("T")[0])}
+                  date={field.value ? new Date(field.value + "T00:00:00") : undefined}
+                  onSelect={(date) => {
+                    if (date) {
+                      // Ensure we're working with the local date
+                      const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                      field.onChange(localDate.toISOString().split('T')[0]);
+                    } else {
+                      field.onChange("");
+                    }
+                  }}
                   placeholder={t("Salaries.form.payment_date.placeholder")}
                 />
               </FormControl>

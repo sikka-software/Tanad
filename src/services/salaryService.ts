@@ -1,24 +1,4 @@
-import { desc, eq } from "drizzle-orm";
-
-import { db } from "@/db/drizzle";
-import { salaries } from "@/db/schema";
 import { Salary, SalaryCreateData } from "@/types/salary.type";
-
-// Helper to convert Drizzle salary to our Salary type
-function convertDrizzleSalary(data: typeof salaries.$inferSelect): Salary {
-  return {
-    id: data.id,
-    created_at: data.createdAt?.toString() || "",
-    pay_period_start: data.payPeriodStart,
-    pay_period_end: data.payPeriodEnd,
-    payment_date: data.paymentDate,
-    gross_amount: Number(data.grossAmount),
-    net_amount: Number(data.netAmount),
-    deductions: data.deductions as Salary["deductions"],
-    notes: data.notes,
-    employee_name: data.employeeName,
-  };
-}
 
 export async function fetchSalaries(): Promise<Salary[]> {
   try {
