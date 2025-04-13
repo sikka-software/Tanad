@@ -32,6 +32,8 @@ import { useCompanies } from "@/hooks/useCompanies";
 import { supabase } from "@/lib/supabase";
 import { fetchVendorById } from "@/services/vendorService";
 
+import { FormDialog } from "../ui/form-dialog";
+
 export const createVendorSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Vendors.form.name.required")),
@@ -363,28 +365,16 @@ export function VendorForm({
         </form>
       </Form>
 
-      <Dialog open={isCompanyDialogOpen} onOpenChange={setIsCompanyDialogOpen}>
-        <DialogContent
-          className="flex h-[80vh] max-h-[80vh] flex-col gap-0 overflow-hidden !p-0"
-          dir={locale === "ar" ? "rtl" : "ltr"}
-        >
-          <DialogHeader className="sticky top-0 z-10 border-b p-4">
-            <DialogTitle>{t("Companies.add_new")}</DialogTitle>
-          </DialogHeader>
-
-          <div className="flex-1 overflow-y-auto p-4">
-            <CompanyForm id="company-form" onSubmit={handleCompanySubmit} loading={loading} />
-          </div>
-          <DialogFooter className="sticky bottom-0 flex justify-end gap-2 border-t p-4">
-            <Button variant="outline" onClick={() => setIsCompanyDialogOpen(false)}>
-              {t("General.cancel")}
-            </Button>
-            <Button type="submit" form="company-form">
-              {t("General.save")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <FormDialog
+        open={isCompanyDialogOpen}
+        onOpenChange={setIsCompanyDialogOpen}
+        title={t("Companies.add_new")}
+        formId="company-form"
+        cancelText={t("General.cancel")}
+        submitText={t("General.save")}
+      >
+        <CompanyForm id="company-form" onSubmit={handleCompanySubmit} loading={loading} />
+      </FormDialog>
     </>
   );
 }

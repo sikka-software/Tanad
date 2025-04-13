@@ -26,6 +26,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCompanies } from "@/hooks/useCompanies";
 import { supabase } from "@/lib/supabase";
 
+import { FormDialog } from "../ui/form-dialog";
+
 // We'll create a schema factory to handle translations
 export const createClientSchema = (t: (key: string) => string) =>
   z.object({
@@ -82,7 +84,7 @@ export function ClientForm({
   });
 
   // Expose form methods for external use (like dummy data)
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     (window as any).clientForm = form;
   }
 
@@ -150,10 +152,10 @@ export function ClientForm({
                 <FormItem>
                   <FormLabel>{t("Clients.form.name.label")} *</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder={t("Clients.form.name.placeholder")} 
+                    <Input
+                      placeholder={t("Clients.form.name.placeholder")}
                       {...field}
-                      disabled={loading} 
+                      disabled={loading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -301,27 +303,16 @@ export function ClientForm({
         </form>
       </Form>
 
-      <Dialog open={isCompanyDialogOpen} onOpenChange={setIsCompanyDialogOpen}>
-        <DialogContent className="p-0 sm:max-w-xl" dir={locale === "ar" ? "rtl" : "ltr"}>
-          <DialogHeader className="bg-background sticky top-0 z-10 rounded-t-lg border-b p-4">
-            <DialogTitle>{t("Companies.add_new")}</DialogTitle>
-          </DialogHeader>
-          <div className="overflow-y-auto p-4 pt-0">
-            <CompanyForm 
-              id="company-form" 
-              onSubmit={handleCompanySubmit}
-            />
-          </div>
-          <div className="bg-background sticky bottom-0 mt-4 flex justify-end gap-2 border-t p-4">
-            <Button variant="outline" onClick={() => setIsCompanyDialogOpen(false)}>
-              {t("General.cancel")}
-            </Button>
-            <Button type="submit" form="company-form">
-              {t("General.save")}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <FormDialog
+        open={isCompanyDialogOpen}
+        onOpenChange={setIsCompanyDialogOpen}
+        title={t("Companies.add_new")}
+        formId="company-form"
+        cancelText={t("General.cancel")}
+        submitText={t("General.save")}
+      >
+        <CompanyForm id="company-form" onSubmit={handleCompanySubmit} />
+      </FormDialog>
     </>
   );
 }

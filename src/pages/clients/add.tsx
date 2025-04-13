@@ -118,7 +118,7 @@ export default function AddClientPage() {
       />
       <div className="p-4">
         <Card className="max-w-2xl">
-          <CardHeader>
+          <CardHeader className="relative">
             {process.env.NODE_ENV === "development" && (
               <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
                 Dummy Data
