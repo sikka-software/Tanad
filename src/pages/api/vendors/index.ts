@@ -1,19 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { db } from "@/lib/db";
-import { vendors } from "@/schema";
+
 import { desc } from "drizzle-orm";
+
+import { db } from "@/db/drizzle";
+import { vendors } from "@/db/schema";
 import { Vendor } from "@/types/vendor";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
-      const vendorsList = await db
-        .select()
-        .from(vendors)
-        .orderBy(desc(vendors.created_at));
+      const vendorsList = await db.query.vendors.findMany({
+        orderBy: [desc(vendors.createdAt)],
+      });
 
       res.status(200).json(vendorsList);
     } catch (error) {
@@ -32,9 +30,9 @@ export default async function handler(
           address: data.address,
           city: data.city,
           state: data.state,
-          zip_code: data.zip_code,
-          products: data.products,
+          zipCode: data.zipCode,
           notes: data.notes,
+          userId: data.userId,
         })
         .returning();
 
@@ -46,4 +44,4 @@ export default async function handler(
     res.setHeader("Allow", ["GET", "POST"]);
     res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
-} 
+}

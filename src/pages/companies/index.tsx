@@ -2,11 +2,12 @@ import { useState } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+
 import { Building2, Mail, Phone, Globe, MapPin } from "lucide-react";
 
+import CompaniesTable from "@/components/tables/companies-table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import CompaniesTable from "@/components/tables/companies-table";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -97,7 +98,7 @@ export default function CompaniesPage() {
   );
 
   return (
-    <div>
+    <div className="">
       <PageSearchAndFilter
         title={t("title")}
         createHref="/companies/add"
