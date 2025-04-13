@@ -39,14 +39,8 @@ export function useCreateVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newVendor: Omit<Vendor, 'id' | 'created_at'> & { user_id: string }) => {
-      // Map user_id to userId for the service function
-      const { user_id, ...rest } = newVendor;
-      const vendorData: VendorCreateData = {
-        ...rest,
-        userId: user_id,
-      };
-      return createVendor(vendorData);
+    mutationFn: (newVendor: VendorCreateData & { userId: string }) => {
+      return createVendor(newVendor);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });

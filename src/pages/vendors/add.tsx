@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 import { supabase } from "@/lib/supabase";
-import { createVendor } from "@/services/vendorService";
+import { useCreateVendor } from "@/hooks/useVendors";
 import type { VendorCreateData } from "@/types/vendor.type";
 
 // Schema factory for vendor form validation with translations
@@ -36,7 +36,7 @@ export default function AddVendorPage() {
   const t = useTranslations();
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const createVendorMutation = useCreateVendor();
 
   const form = useForm<VendorFormValues>({
     resolver: zodResolver(createVendorSchema(t)),
@@ -78,13 +78,12 @@ export default function AddVendorPage() {
       return;
     }
 
-    setSubmitting(true);
     try {
       const vendorData = {
         name: data.name.trim(),
         email: data.email.trim(),
         phone: data.phone.trim(),
-        company: data.company?.trim() || null,
+        company: data.company?.trim() || '',
         address: data.address.trim(),
         city: data.city.trim(),
         state: data.state.trim(),
@@ -93,7 +92,7 @@ export default function AddVendorPage() {
         userId: userId,
       };
 
-      await createVendor(vendorData as unknown as VendorCreateData);
+      await createVendorMutation.mutateAsync(vendorData);
       toast.success(t("success.title"), {
         description: t("Vendors.messages.success_created"),
       });
@@ -103,8 +102,6 @@ export default function AddVendorPage() {
       toast.error(t("error.title"), {
         description: error instanceof Error ? error.message : t("Vendors.messages.error_save"),
       });
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -117,8 +114,13 @@ export default function AddVendorPage() {
             <Button variant="outline" size="sm" onClick={() => router.push("/vendors")}>
               {t("General.cancel")}
             </Button>
-            <Button type="submit" size="sm" form="vendor-form" disabled={submitting}>
-              {submitting ? t("General.saving") : t("Vendors.add_new")}
+            <Button 
+              type="submit" 
+              size="sm" 
+              form="vendor-form" 
+              disabled={createVendorMutation.isPending}
+            >
+              {createVendorMutation.isPending ? t("General.saving") : t("Vendors.add_new")}
             </Button>
           </div>
         }
@@ -132,7 +134,7 @@ export default function AddVendorPage() {
             <VendorForm
               formId="vendor-form"
               userId={userId}
-              loading={submitting}
+              loading={createVendorMutation.isPending}
               form={form}
               onSubmit={onSubmit}
             />
