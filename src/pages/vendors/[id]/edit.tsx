@@ -65,7 +65,7 @@ export default function EditVendorPage() {
             {loadingUser ? (
               <p>{t("common.loading")}</p>
             ) : userId && typeof vendorId === "string" ? (
-              <VendorForm userId={userId} vendorId={vendorId} onSuccess={handleSuccess} />
+              <VendorForm userId={userId} vendorId={vendorId} />
             ) : (
               <p>
                 {typeof vendorId !== "string"

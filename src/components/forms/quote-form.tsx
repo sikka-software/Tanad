@@ -44,7 +44,8 @@ import { supabase } from "@/lib/supabase";
 import { Client } from "@/types/client.type";
 import { Product } from "@/types/product.type";
 
-import { ClientForm } from "./client-form";
+import { FormDialog } from "../ui/form-dialog";
+import { ClientForm, type ClientFormValues } from "./client-form";
 
 export interface QuoteItem {
   product_id?: string;
@@ -245,10 +246,26 @@ export function QuoteForm({
     [products],
   );
 
-  const handleClientAdded = (newClient: Client) => {
-    setClients((prev) => [...prev, newClient]);
-    form.setValue("client_id", newClient.id);
-    setIsDialogOpen(false);
+  const handleClientAdded = async (data: ClientFormValues) => {
+    try {
+      const { data: newClient, error } = await supabase
+        .from("clients")
+        .insert([{
+          ...data,
+          user_id: userId,
+        }])
+        .select("*")
+        .single();
+
+      if (error) throw error;
+
+      setClients((prev) => [...prev, newClient]);
+      form.setValue("client_id", newClient.id);
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Error creating client:", error);
+      toast.error(t("Quotes.error.create_client"));
+    }
   };
 
   const handleProductSelection = (index: number, productId: string) => {
@@ -717,30 +734,16 @@ export function QuoteForm({
         </form>
       </Form>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent
-          className="overflow-y-auto p-0 sm:max-w-xl"
-          dir={locale === "ar" ? "rtl" : "ltr"}
-        >
-          <DialogHeader className="bg-background sticky top-0 z-10 border-b p-4">
-            <DialogTitle>{t("Clients.add_new")}</DialogTitle>
-          </DialogHeader>
-          <div className="overflow-y-auto p-4 pt-0">
-            <ClientForm
-              onSuccess={(newClient: any) => handleClientAdded(newClient)}
-              userId={userId || null}
-            />
-          </div>
-          <div className="bg-background sticky bottom-0 mt-4 flex justify-end gap-2 border-t p-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              {t("General.cancel")}
-            </Button>
-            <Button type="submit" form="client-form">
-              {t("General.save")}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <FormDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        title={t("Clients.add_new")}
+        formId="client-form"
+        cancelText={t("General.cancel")}
+        submitText={t("General.save")}
+      >
+        <ClientForm id="client-form" onSubmit={handleClientAdded} userId={userId || null} />
+      </FormDialog>
     </>
   );
 }
