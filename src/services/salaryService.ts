@@ -21,87 +21,64 @@ function convertDrizzleSalary(data: typeof salaries.$inferSelect): Salary {
 }
 
 export async function fetchSalaries(): Promise<Salary[]> {
-  if (!db) throw new Error("Database connection not initialized");
-
   try {
-    const data = await db.query.salaries.findMany({
-      orderBy: desc(salaries.paymentDate),
-    });
-    return data.map(convertDrizzleSalary);
+    const response = await fetch("/api/salaries");
+    if (!response.ok) {
+      throw new Error("Failed to fetch salaries");
+    }
+    return response.json();
   } catch (error) {
     console.error("Error fetching salaries:", error);
-    throw error;
+    throw new Error("Failed to fetch salaries");
   }
 }
 
 export async function fetchSalaryById(id: string): Promise<Salary> {
-  if (!db) throw new Error("Database connection not initialized");
-
-  const data = await db.query.salaries.findFirst({
-    where: eq(salaries.id, id),
-  });
-
-  if (!data) {
+  const response = await fetch(`/api/salaries/${id}`);
+  if (!response.ok) {
     throw new Error(`Salary with id ${id} not found`);
   }
-
-  return convertDrizzleSalary(data);
+  return response.json();
 }
 
-export async function createSalary(salary: SalaryCreateData): Promise<Salary> {
-  if (!db) throw new Error("Database connection not initialized");
+export async function createSalary(salary: SalaryCreateData) {
+  const response = await fetch("/api/salaries", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(salary),
+  });
 
-  // Map salary data to match Drizzle schema
-  const dbSalary = {
-    payPeriodStart: salary.pay_period_start,
-    payPeriodEnd: salary.pay_period_end,
-    paymentDate: salary.payment_date,
-    grossAmount: salary.gross_amount.toString(),
-    netAmount: salary.net_amount.toString(),
-    deductions: salary.deductions,
-    notes: salary.notes,
-    employeeName: salary.employee_name,
-    userId: salary.userId || "",
-  };
-
-  const [data] = await db.insert(salaries).values(dbSalary).returning();
-
-  if (!data) {
+  if (!response.ok) {
     throw new Error("Failed to create salary");
   }
 
-  return convertDrizzleSalary(data);
+  return response.json();
 }
 
-export async function updateSalary(
-  id: string,
-  salary: Partial<Omit<Salary, "id" | "created_at">>,
-): Promise<Salary> {
-  if (!db) throw new Error("Database connection not initialized");
+export async function updateSalary(id: string, salary: Partial<Salary>) {
+  const response = await fetch(`/api/salaries/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(salary),
+  });
 
-  // Map salary data to match Drizzle schema
-  const dbSalary = {
-    ...(salary.pay_period_start && { payPeriodStart: salary.pay_period_start }),
-    ...(salary.pay_period_end && { payPeriodEnd: salary.pay_period_end }),
-    ...(salary.payment_date && { paymentDate: salary.payment_date }),
-    ...(salary.gross_amount && { grossAmount: salary.gross_amount.toString() }),
-    ...(salary.net_amount && { netAmount: salary.net_amount.toString() }),
-    ...(salary.deductions && { deductions: salary.deductions }),
-    ...(salary.notes !== undefined && { notes: salary.notes }),
-    ...(salary.employee_name && { employeeName: salary.employee_name }),
-  };
-
-  const [data] = await db.update(salaries).set(dbSalary).where(eq(salaries.id, id)).returning();
-
-  if (!data) {
+  if (!response.ok) {
     throw new Error(`Failed to update salary with id ${id}`);
   }
 
-  return convertDrizzleSalary(data);
+  return response.json();
 }
 
-export async function deleteSalary(id: string): Promise<void> {
-  if (!db) throw new Error("Database connection not initialized");
+export async function deleteSalary(id: string) {
+  const response = await fetch(`/api/salaries/${id}`, {
+    method: "DELETE",
+  });
 
-  await db.delete(salaries).where(eq(salaries.id, id));
+  if (!response.ok) {
+    throw new Error(`Failed to delete salary with id ${id}`);
+  }
 }
