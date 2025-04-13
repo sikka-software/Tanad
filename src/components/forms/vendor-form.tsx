@@ -132,8 +132,8 @@ export function VendorForm({
 
       if (error) throw error;
 
-      // Set the new company as the selected company
-      form.setValue("company", newCompany.id);
+      // Set the new company name as the selected company
+      form.setValue("company", newCompany.name);
 
       // Close the dialog
       setIsCompanyDialogOpen(false);
@@ -184,7 +184,7 @@ export function VendorForm({
                   <FormControl>
                     <ComboboxAdd
                       direction={locale === "ar" ? "rtl" : "ltr"}
-                      data={companyOptions}
+                      data={companyOptions.map(opt => ({ ...opt, value: opt.label }))}
                       isLoading={companiesLoading}
                       defaultValue={field.value}
                       onChange={field.onChange}
