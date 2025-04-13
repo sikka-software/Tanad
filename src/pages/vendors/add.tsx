@@ -23,7 +23,7 @@ const createVendorSchema = (t: (key: string) => string) =>
     name: z.string().min(1, t("Vendors.form.name.required")),
     email: z.string().email(t("Vendors.form.email.invalid")),
     phone: z.string().min(1, t("Vendors.form.phone.required")),
-    company: z.string().min(1, t("Vendors.form.company.required")),
+    company: z.string().optional(),
     address: z.string().min(1, t("Vendors.form.address.required")),
     city: z.string().min(1, t("Vendors.form.city.required")),
     state: z.string().min(1, t("Vendors.form.state.required")),
@@ -84,7 +84,7 @@ export default function AddVendorPage() {
         name: data.name.trim(),
         email: data.email.trim(),
         phone: data.phone.trim(),
-        company: data.company.trim(),
+        company: data.company?.trim() || null,
         address: data.address.trim(),
         city: data.city.trim(),
         state: data.state.trim(),
@@ -129,18 +129,13 @@ export default function AddVendorPage() {
             <CardTitle>{t("Vendors.vendor_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            {loadingUser ? (
-              <p>{t("General.loading")}</p>
-            ) : userId ? (
-              <VendorForm
-                formId="vendor-form"
-                userId={userId}
-                loading={submitting}
-                form={form}
-              />
-            ) : (
-              <p>{t("Vendors.error.failed_to_load_user")}</p>
-            )}
+            <VendorForm
+              formId="vendor-form"
+              userId={userId}
+              loading={submitting}
+              form={form}
+              onSubmit={onSubmit}
+            />
           </CardContent>
         </Card>
       </div>
