@@ -1617,7 +1617,59 @@
       "title": "تم بنجاح",
       "created": "تم إنشاء المستودع بنجاح"
     },
-    "submitting": "جاري الإرسال..."
+    "submitting": "جاري الإرسال...",
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم المستودع",
+        "required": "الاسم مطلوب"
+      },
+      "code": {
+        "label": "الرمز",
+        "placeholder": "أدخل رمز المستودع",
+        "required": "الرمز مطلوب"
+      },
+      "address": {
+        "label": "العنوان",
+        "placeholder": "أدخل العنوان",
+        "required": "العنوان مطلوب"
+      },
+      "city": {
+        "label": "المدينة",
+        "placeholder": "أدخل المدينة",
+        "required": "المدينة مطلوبة"
+      },
+      "state": {
+        "label": "المنطقة",
+        "placeholder": "أدخل المنطقة",
+        "required": "المنطقة مطلوبة"
+      },
+      "zip_code": {
+        "label": "الرمز البريدي",
+        "placeholder": "أدخل الرمز البريدي",
+        "required": "الرمز البريدي مطلوب"
+      },
+      "capacity": {
+        "label": "السعة",
+        "placeholder": "أدخل سعة المستودع"
+      },
+      "is_active": {
+        "label": "نشط"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل الملاحظات"
+      },
+      "create_button": "إنشاء مستودع",
+      "update_button": "تحديث المستودع"
+    },
+    "messages": {
+      "error_fetch": "فشل في جلب بيانات المستودع",
+      "error_save": "فشل في حفظ المستودع",
+      "success_updated": "تم تحديث المستودع بنجاح",
+      "success_created": "تم إنشاء المستودع بنجاح"
+    },
+    "errorLoadingWarehouses": "خطأ في تحميل المستودعات"
   },
   "Branches": {
     "title": "الفروع",

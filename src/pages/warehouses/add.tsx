@@ -15,7 +15,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function AddWarehousePage() {
   const router = useRouter();
-  const t = useTranslations("Warehouses");
+  const t = useTranslations();
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const queryClient = useQueryClient();
@@ -53,7 +53,7 @@ export default function AddWarehousePage() {
   return (
     <div>
       <PageTitle
-        title={t("add_new")}
+        title={t("Warehouses.add_new")}
         customButton={
           <div className="flex gap-4">
             <Button variant="outline" size="sm" onClick={() => router.push("/warehouses")}>
@@ -65,16 +65,10 @@ export default function AddWarehousePage() {
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>{t("warehouse_details")}</CardTitle>
+            <CardTitle>{t("Warehouses.warehouse_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            {loadingUser ? (
-              <p>{t("common.loading")}</p>
-            ) : userId ? (
-              <WarehouseForm userId={userId} onSuccess={handleSuccess} />
-            ) : (
-              <p>{t("error.failed_to_load_user")}</p>
-            )}
+            <WarehouseForm userId={userId} onSuccess={handleSuccess} />
           </CardContent>
         </Card>
       </div>

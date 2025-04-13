@@ -1977,21 +1977,22 @@
         "placeholder": "Enter warehouse capacity"
       },
       "is_active": {
-        "label": "Active Status"
+        "label": "Active"
       },
       "notes": {
         "label": "Notes",
         "placeholder": "Enter notes"
       },
-      "update_button": "Update Warehouse",
-      "create_button": "Create Warehouse"
+      "create_button": "Create Warehouse",
+      "update_button": "Update Warehouse"
     },
     "messages": {
       "error_fetch": "Failed to fetch warehouse",
       "error_save": "Failed to save warehouse",
       "success_updated": "Warehouse updated successfully",
       "success_created": "Warehouse created successfully"
-    }
+    },
+    "errorLoadingWarehouses": "Error loading warehouses"
   },
   "Branches": {
     "title": "Branches",
