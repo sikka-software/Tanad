@@ -90,7 +90,7 @@ export default function AddVendorPage() {
         state: data.state.trim(),
         zipCode: data.zipCode.trim(),
         notes: data.notes?.trim() || null,
-        user_id: userId,
+        userId: userId,
       };
 
       await createVendor(vendorData as unknown as VendorCreateData);
