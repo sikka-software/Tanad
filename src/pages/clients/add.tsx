@@ -50,7 +50,7 @@ export default function AddClientPage() {
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone.trim(),
-            company: data.company?.trim() || "",
+            company: data.company || null,
             address: data.address.trim(),
             city: data.city.trim(),
             state: data.state.trim(),
