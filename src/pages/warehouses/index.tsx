@@ -1,19 +1,31 @@
+import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
 import { Code, MapPin, LayoutGrid, NotebookText } from "lucide-react";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import WarehouseTable from "@/components/tables/warehouse-table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
-import PageTitle from "@/components/ui/page-title";
+import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { useWarehouses } from "@/hooks/useWarehouses";
 import type { Warehouse } from "@/types/warehouse.type";
 
 export default function WarehousesPage() {
   const t = useTranslations("Warehouses");
   const { data: warehouses, isLoading, error } = useWarehouses();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+
+  const filteredWarehouses = warehouses?.filter(
+    (warehouse) =>
+      warehouse.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      warehouse.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      warehouse.address.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   // Render function for a single warehouse card
   const renderWarehouse = (warehouse: Warehouse) => (
@@ -61,21 +73,34 @@ export default function WarehousesPage() {
 
   return (
     <DataPageLayout>
-      <PageTitle
+      <PageSearchAndFilter
         title={t("title")}
-        createButtonLink="/warehouses/add"
-        createButtonText={t("create_warehouse")}
-        createButtonDisabled={isLoading}
+        createHref="/warehouses/add"
+        createLabel={t("create_warehouse")}
+        onSearch={setSearchQuery}
+        searchPlaceholder={t("search_warehouses")}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
-      <div className="p-4">
-        <DataModelList
-          data={warehouses}
-          isLoading={isLoading}
-          error={error instanceof Error ? error : null}
-          emptyMessage={t("no_warehouses_found")}
-          renderItem={renderWarehouse}
-          gridCols="3"
-        />
+      <div>
+        {viewMode === "table" ? (
+          <WarehouseTable
+            data={filteredWarehouses || []}
+            isLoading={isLoading}
+            error={error instanceof Error ? error : null}
+          />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredWarehouses || []}
+              isLoading={isLoading}
+              error={error instanceof Error ? error : null}
+              emptyMessage={t("no_warehouses_found")}
+              renderItem={renderWarehouse}
+              gridCols="3"
+            />
+          </div>
+        )}
       </div>
     </DataPageLayout>
   );
