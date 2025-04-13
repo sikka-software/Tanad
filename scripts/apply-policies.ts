@@ -19,8 +19,8 @@ async function applyPolicies() {
   try {
     console.log("Connecting to database...");
 
-    // Read the SQL file
-    const sqlFilePath = resolve(__dirname, "policies.sql");
+    // Read the SQL file from src/db directory
+    const sqlFilePath = resolve(__dirname, "../src/db/policies.sql");
     const sqlContent = readFileSync(sqlFilePath, "utf8");
 
     // Split the SQL content by semicolons and filter out empty statements
