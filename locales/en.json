@@ -1419,6 +1419,7 @@
     "title": "Vendors",
     "add_new": "Add New Vendor",
     "search_vendors": "Search vendors",
+    "no_vendors": "No vendors found",
     "error": {
       "loading": "Failed to load vendors",
       "create": "Failed to create vendor",

@@ -1698,6 +1698,7 @@
     "back_to_list": "الرجوع للقائمة",
     "vendor_details": "تفاصيل المورد",
     "no_vendors": "لا يوجد موردين",
+    "search_vendors": "بحث عن موردين...",
     "add_first_vendor": "أضف أول مورد",
     "form": {
       "name": {

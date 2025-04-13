@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
@@ -9,16 +11,26 @@ import {
 } from "lucide-react";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import VendorsTable from "@/components/tables/vendors-table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
-import PageTitle from "@/components/ui/page-title";
+import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { useVendors } from "@/hooks/useVendors";
 import type { Vendor } from "@/types/vendor.type";
 
 // Assuming a useVendors hook exists or will be created
 export default function VendorsPage() {
-  const t = useTranslations(); // Use Vendors namespace
-  const { data: vendors, isLoading, error } = useVendors(); // Use the hook
+  const t = useTranslations("Vendors");
+  const { data: vendors, isLoading, error } = useVendors();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+
+  const filteredVendors = vendors?.filter(
+    (vendor) =>
+      vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (vendor.company || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vendor.email.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   // Render function for a single vendor card
   const renderVendor = (vendor: Vendor) => (
@@ -31,21 +43,21 @@ export default function VendorsPage() {
       <CardContent>
         <div className="space-y-3">
           {/* Email */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Mail className="h-4 w-4" />
             <a href={`mailto:${vendor.email}`} className="hover:text-primary">
               {vendor.email}
             </a>
           </div>
           {/* Phone */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Phone className="h-4 w-4" />
             <a href={`tel:${vendor.phone}`} className="hover:text-primary">
               {vendor.phone}
             </a>
           </div>
           {/* Address */}
-          <div className="flex items-start gap-2 text-sm text-gray-600">
+          <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
             <MapPin className="mt-1 h-4 w-4 flex-shrink-0" />
             <div>
               <p>{vendor.address}</p>
@@ -54,7 +66,7 @@ export default function VendorsPage() {
           </div>
           {/* Notes */}
           {vendor.notes && (
-            <div className="flex items-start gap-2 border-t pt-3 text-sm text-gray-500">
+            <div className="flex items-start gap-2 border-t pt-3 text-sm text-gray-500 dark:text-gray-400">
               <NotebookText className="mt-1 h-4 w-4 flex-shrink-0" />
               <p className="whitespace-pre-wrap">{vendor.notes}</p>
             </div>
@@ -67,24 +79,34 @@ export default function VendorsPage() {
 
   return (
     <DataPageLayout>
-      <PageTitle
-        title={t("Vendors.title")} // Ensure translation key exists
-        createButtonLink="/vendors/add" // Link to add vendor page
-        createButtonText={t("Vendors.add_new")} // Ensure translation key exists
-        createButtonDisabled={isLoading}
+      <PageSearchAndFilter
+        title={t("title")}
+        createHref="/vendors/add"
+        createLabel={t("add_new")}
+        onSearch={setSearchQuery}
+        searchPlaceholder={t("search_vendors")}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
-      <div className="p-4">
-        <DataModelList
-          data={vendors}
-          isLoading={isLoading}
-          error={error instanceof Error ? error : null}
-          emptyMessage={t("Vendors.no_vendors")} // Ensure translation key exists
-          renderItem={renderVendor}
-          gridCols="3" // Adjust grid columns as needed
-          // Assuming DataModelList has props for edit/delete actions if needed
-          // editAction={(item) => router.push(`/vendors/${item.id}/edit`)}
-          // deleteAction={(item) => handleDelete(item.id)} // Requires a delete handler
-        />
+      <div>
+        {viewMode === "table" ? (
+          <VendorsTable
+            data={filteredVendors || []}
+            isLoading={isLoading}
+            error={error instanceof Error ? error : null}
+          />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredVendors || []}
+              isLoading={isLoading}
+              error={error instanceof Error ? error : null}
+              emptyMessage={t("no_vendors")}
+              renderItem={renderVendor}
+              gridCols="3"
+            />
+          </div>
+        )}
       </div>
     </DataPageLayout>
   );
@@ -92,11 +114,9 @@ export default function VendorsPage() {
 
 // Add getStaticProps for translations
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  // Ensure locale is defined, provide a default if necessary
-  const effectiveLocale = locale ?? "en"; // Default to 'en' if locale is undefined
   return {
     props: {
-      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
+      messages: (await import(`../../../locales/${locale}.json`)).default,
     },
   };
 };
