@@ -100,7 +100,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
           <PopoverTrigger asChild>
             {props.isLoading ? (
               <div className="pb-2">
-                <Skeleton className="h-[40px] w-full" />
+                <Skeleton className="h-[40px] min-h-[40px] w-full" />
               </div>
             ) : (
               <div className="flex flex-col items-start gap-2">

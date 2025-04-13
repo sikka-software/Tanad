@@ -23,9 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useEmployees } from "@/hooks/useEmployees";
+import { useUser } from "@/providers/UserProvider";
 import type { Salary, SalaryCreateData } from "@/types/salary.type";
-
-import { useAuth } from "../UserContext";
 
 // Assuming a DatePicker component exists, if not, use Input type="date"
 // import { DatePicker } from "@/components/ui/date-picker";
@@ -82,7 +81,7 @@ export function SalaryForm({
   const t = useTranslations();
   const [internalLoading, setInternalLoading] = useState(false);
   const loading = externalLoading || internalLoading;
-  const { user } = useAuth();
+  const { userId, isAuthenticated } = useUser();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
 
   const salarySchema = createSalarySchema(t);
@@ -139,7 +138,7 @@ export function SalaryForm({
   // Data is SalaryFormValues (numbers for amounts)
   const onSubmit: SubmitHandler<SalaryFormValues> = async (data) => {
     setInternalLoading(true);
-    if (!user?.id) {
+    if (!isAuthenticated || !userId) {
       toast.error(t("Salaries.error.title"), {
         description: t("Salaries.messages.error_not_authenticated"),
       });
@@ -153,7 +152,7 @@ export function SalaryForm({
         ...data,
         deductions: data.deductions ? JSON.parse(data.deductions) : null,
         notes: data.notes?.trim() || null,
-        userId: user.id,
+        userId: userId,
       };
 
       let result: Salary;
