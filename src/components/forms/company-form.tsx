@@ -70,7 +70,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
   });
 
   // Expose form methods for external use (like dummy data)
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     (window as any).companyForm = form;
   }
 
@@ -203,11 +203,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             name="zipCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Companies.form.zipCode.label")}</FormLabel>
+                <FormLabel>{t("Companies.form.zip_code.label")}</FormLabel>
                 <FormControl>
                   <Input
                     disabled={loading}
-                    placeholder={t("Companies.form.zipCode.placeholder")}
+                    placeholder={t("Companies.form.zip_code.placeholder")}
                     {...field}
                   />
                 </FormControl>
@@ -273,7 +273,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">{t("Companies.form.isActive.label")}</FormLabel>
+                <FormLabel className="text-base">{t("Companies.form.is_active.label")}</FormLabel>
               </div>
               <FormControl>
                 <Switch disabled={loading} checked={field.value} onCheckedChange={field.onChange} />

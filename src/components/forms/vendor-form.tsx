@@ -78,6 +78,11 @@ export function VendorForm({
     },
   });
 
+  // Expose form methods for external use (like dummy data)
+  if (typeof window !== "undefined") {
+    (window as any).vendorForm = form;
+  }
+
   // Format companies for ComboboxAdd
   const companyOptions =
     companies?.map((company) => ({
@@ -357,29 +362,10 @@ export function VendorForm({
           <DialogHeader className="bg-background sticky top-0 z-10 rounded-t-lg border-b p-4">
             <DialogTitle>{t("Companies.add_new")}</DialogTitle>
           </DialogHeader>
-          <div className="overflow-y-auto p-4 pt-0">
-            <CompanyForm 
-              id="company-form" 
-              onSubmit={handleCompanySubmit}
-              form={useForm<CompanyFormValues>({
-                defaultValues: {
-                  name: "",
-                  email: "",
-                  phone: "",
-                  website: "",
-                  address: "",
-                  city: "",
-                  state: "",
-                  zipCode: "",
-                  industry: "",
-                  size: "",
-                  notes: "",
-                  isActive: true,
-                }
-              })}
-            />
+          <div className="p-4 pt-0 bg-red-400 flex">
+            <CompanyForm id="company-form" onSubmit={handleCompanySubmit} loading={loading} />
           </div>
-          <div className="bg-background sticky bottom-0 mt-4 flex justify-end gap-2 border-t p-4">
+          <div className="bg-green-300 sticky bottom-0 mt-4 flex justify-end gap-2 border-t p-4">
             <Button variant="outline" onClick={() => setIsCompanyDialogOpen(false)}>
               {t("General.cancel")}
             </Button>

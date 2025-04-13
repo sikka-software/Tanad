@@ -73,6 +73,20 @@ export default function AddVendorPage() {
     }
   };
 
+  const handleDummyData = () => {
+    const dummyData = generateDummyData();
+    const form = (window as any).vendorForm;
+    if (form) {
+      form.setValue("name", dummyData.name);
+      form.setValue("email", dummyData.email);
+      form.setValue("phone", dummyData.phone);
+      form.setValue("address", dummyData.address);
+      form.setValue("city", dummyData.city);
+      form.setValue("state", dummyData.state);
+      form.setValue("zipCode", dummyData.zipCode);
+    }
+  };
+
   return (
     <div>
       <PageTitle
@@ -97,9 +111,7 @@ export default function AddVendorPage() {
         <Card>
           <CardHeader className="relative">
             {process.env.NODE_ENV === "development" && (
-              <Button variant="outline" className="absolute end-4 top-4" onClick={() => {
-                // TODO: Add dummy data handling through form ref if needed
-              }}>
+              <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
                 Dummy Data
               </Button>
             )}
