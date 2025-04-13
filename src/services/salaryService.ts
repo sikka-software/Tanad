@@ -21,6 +21,8 @@ function convertDrizzleSalary(data: typeof salaries.$inferSelect): Salary {
 }
 
 export async function fetchSalaries(): Promise<Salary[]> {
+  if (!db) throw new Error("Database connection not initialized");
+
   try {
     const data = await db.query.salaries.findMany({
       orderBy: desc(salaries.paymentDate),
@@ -33,6 +35,8 @@ export async function fetchSalaries(): Promise<Salary[]> {
 }
 
 export async function fetchSalaryById(id: string): Promise<Salary> {
+  if (!db) throw new Error("Database connection not initialized");
+
   const data = await db.query.salaries.findFirst({
     where: eq(salaries.id, id),
   });
@@ -45,6 +49,8 @@ export async function fetchSalaryById(id: string): Promise<Salary> {
 }
 
 export async function createSalary(salary: SalaryCreateData): Promise<Salary> {
+  if (!db) throw new Error("Database connection not initialized");
+
   // Map salary data to match Drizzle schema
   const dbSalary = {
     payPeriodStart: salary.pay_period_start,
@@ -71,6 +77,8 @@ export async function updateSalary(
   id: string,
   salary: Partial<Omit<Salary, "id" | "created_at">>,
 ): Promise<Salary> {
+  if (!db) throw new Error("Database connection not initialized");
+
   // Map salary data to match Drizzle schema
   const dbSalary = {
     ...(salary.pay_period_start && { payPeriodStart: salary.pay_period_start }),
@@ -93,5 +101,7 @@ export async function updateSalary(
 }
 
 export async function deleteSalary(id: string): Promise<void> {
+  if (!db) throw new Error("Database connection not initialized");
+
   await db.delete(salaries).where(eq(salaries.id, id));
 }

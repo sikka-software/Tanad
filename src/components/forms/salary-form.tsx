@@ -10,7 +10,6 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import type { Salary, SalaryCreateData } from "@/types/salary.type";
-import { createSalary, fetchSalaryById, updateSalary } from "@/services/salaryService";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -34,14 +33,14 @@ const createSalarySchema = (t: (key: string) => string) =>
     pay_period_start: z.string().min(1, t("Salaries.form.pay_period_start.required")),
     pay_period_end: z.string().min(1, t("Salaries.form.pay_period_end.required")),
     payment_date: z.string().min(1, t("Salaries.form.payment_date.required")),
-    gross_amount: z.coerce // Coerce input value to number
+    gross_amount: z.coerce
       .number()
       .positive(t("Salaries.form.gross_amount.positive"))
-      .or(z.literal(0)), // Allow 0
+      .or(z.literal(0)),
     net_amount: z.coerce
       .number()
       .positive(t("Salaries.form.net_amount.positive"))
-      .or(z.literal(0)), // Allow 0
+      .or(z.literal(0)),
     deductions: z
       .string()
       .optional()
@@ -104,8 +103,12 @@ export function SalaryForm({
   useEffect(() => {
     if (salaryId) {
       setInternalLoading(true);
-      fetchSalaryById(salaryId)
-        .then((salary) => {
+      fetch(`/api/salaries/${salaryId}`)
+        .then((res) => {
+          if (!res.ok) throw new Error('Failed to fetch salary');
+          return res.json();
+        })
+        .then((salary: Salary) => {
           // Reset with numbers for amounts
           form.reset({
             employee_name: salary.employee_name,
@@ -148,18 +151,29 @@ export function SalaryForm({
         ...data,
         deductions: data.deductions ? JSON.parse(data.deductions) : null,
         notes: data.notes?.trim() || null,
-        user_id: userId,
+        userId,
       };
 
       let result: Salary;
       if (salaryId) {
-        const { user_id, ...updateData } = salaryData;
-        result = await updateSalary(salaryId, updateData);
+        const response = await fetch(`/api/salaries/${salaryId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(salaryData),
+        });
+        if (!response.ok) throw new Error('Failed to update salary');
+        result = await response.json();
         toast.success(t("success.title"), {
           description: t("Salaries.messages.success_updated"),
         });
       } else {
-        result = await createSalary(salaryData);
+        const response = await fetch('/api/salaries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(salaryData),
+        });
+        if (!response.ok) throw new Error('Failed to create salary');
+        result = await response.json();
         toast.success(t("success.title"), {
           description: t("Salaries.messages.success_created"),
         });
