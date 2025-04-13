@@ -17,7 +17,7 @@ import type { Vendor } from "@/types/vendor.type";
 
 // Assuming a useVendors hook exists or will be created
 export default function VendorsPage() {
-  const t = useTranslations("Vendors"); // Use Vendors namespace
+  const t = useTranslations(); // Use Vendors namespace
   const { data: vendors, isLoading, error } = useVendors(); // Use the hook
 
   // Render function for a single vendor card
@@ -68,9 +68,9 @@ export default function VendorsPage() {
   return (
     <DataPageLayout>
       <PageTitle
-        title={t("title")} // Ensure translation key exists
+        title={t("Vendors.title")} // Ensure translation key exists
         createButtonLink="/vendors/add" // Link to add vendor page
-        createButtonText={t("create_vendor")} // Ensure translation key exists
+        createButtonText={t("Vendors.add_new")} // Ensure translation key exists
         createButtonDisabled={isLoading}
       />
       <div className="p-4">
@@ -78,7 +78,7 @@ export default function VendorsPage() {
           data={vendors}
           isLoading={isLoading}
           error={error instanceof Error ? error : null}
-          emptyMessage={t("no_vendors_found")} // Ensure translation key exists
+          emptyMessage={t("Vendors.no_vendors")} // Ensure translation key exists
           renderItem={renderVendor}
           gridCols="3" // Adjust grid columns as needed
           // Assuming DataModelList has props for edit/delete actions if needed

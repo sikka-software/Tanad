@@ -1697,6 +1697,8 @@
     "add_new": "إضافة مورد جديد",
     "back_to_list": "الرجوع للقائمة",
     "vendor_details": "تفاصيل المورد",
+    "no_vendors": "لا يوجد موردين",
+    "add_first_vendor": "أضف أول مورد",
     "form": {
       "name": {
         "label": "الاسم",
@@ -1759,9 +1761,7 @@
       "title": "خطأ",
       "create": "حدث خطأ أثناء إنشاء المورد",
       "not_authenticated": "يجب تسجيل الدخول لإنشاء مورد"
-    },
-    "no_vendors": "لا يوجد موردين",
-    "add_first_vendor": "أضف أول مورد"
+    }
   },
   "Attendance": {
     "title": "الحضور",

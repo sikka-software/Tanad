@@ -17,7 +17,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function AddVendorPage() {
   const router = useRouter();
-  const t = useTranslations("Vendors"); // Use Vendors namespace
+  const t = useTranslations(); // Use Vendors namespace
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const queryClient = useQueryClient();
@@ -56,12 +56,11 @@ export default function AddVendorPage() {
   return (
     <div>
       <PageTitle
-        title={t("add_new")} // Vendors.add_new
-        // Use customButton for back navigation and potentially submit trigger
+        title={t("Vendors.add_new")}
         customButton={
           <div className="flex gap-4">
             <Button variant="outline" size="sm" onClick={() => router.push("/vendors")}>
-              {t("General.cancel")} {/* Use a common cancel translation */}
+              {t("General.cancel")}
             </Button>
           </div>
         }
@@ -69,20 +68,15 @@ export default function AddVendorPage() {
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>{t("vendor_details")}</CardTitle> {/* Vendors.vendor_details */}
+            <CardTitle>{t("Vendors.vendor_details")}</CardTitle> {/* Vendors.vendor_details */}
           </CardHeader>
           <CardContent>
             {loadingUser ? (
-              <p>{t("common.loading")}</p> // Show loading state while fetching user
+              <p>{t("General.loading")}</p>
             ) : userId ? (
-              <VendorForm
-                userId={userId}
-                onSuccess={handleSuccess} // Pass success handler if needed
-                // The form manages its own loading state internally
-              />
+              <VendorForm userId={userId} onSuccess={handleSuccess} />
             ) : (
-              // Handle case where userId failed to load but didn't redirect (shouldn't happen with current logic)
-              <p>{t("error.failed_to_load_user")}</p> /* Vendors.error.failed_to_load_user */
+              <p>{t("Vendors.error.failed_to_load_user")}</p>
             )}
           </CardContent>
         </Card>
