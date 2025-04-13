@@ -8,7 +8,7 @@ import {
   NotebookText, // Added NotebookText for notes
 } from "lucide-react";
 
-// Import Vendor type
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
@@ -16,7 +16,6 @@ import { useVendors } from "@/hooks/useVendors";
 import type { Vendor } from "@/types/vendor.type";
 
 // Assuming a useVendors hook exists or will be created
-
 export default function VendorsPage() {
   const t = useTranslations("Vendors"); // Use Vendors namespace
   const { data: vendors, isLoading, error } = useVendors(); // Use the hook
@@ -50,7 +49,7 @@ export default function VendorsPage() {
             <MapPin className="mt-1 h-4 w-4 flex-shrink-0" />
             <div>
               <p>{vendor.address}</p>
-              <p>{`${vendor.city}, ${vendor.state} ${vendor.zip_code}`}</p>
+              <p>{`${vendor.city}, ${vendor.state} ${vendor.zipCode}`}</p>
             </div>
           </div>
           {/* Notes */}
@@ -67,7 +66,7 @@ export default function VendorsPage() {
   );
 
   return (
-    <div>
+    <DataPageLayout>
       <PageTitle
         title={t("title")} // Ensure translation key exists
         createButtonLink="/vendors/add" // Link to add vendor page
@@ -87,7 +86,7 @@ export default function VendorsPage() {
           // deleteAction={(item) => handleDelete(item.id)} // Requires a delete handler
         />
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 

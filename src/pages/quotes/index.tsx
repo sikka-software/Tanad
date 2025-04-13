@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 
 import { format } from "date-fns";
 
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
@@ -74,7 +75,7 @@ export default function QuotesPage() {
   );
 
   return (
-    <div>
+    <DataPageLayout>
       <PageTitle
         title={t("title")}
         createButtonLink="/quotes/add"
@@ -91,7 +92,7 @@ export default function QuotesPage() {
           gridCols="2"
         />
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 

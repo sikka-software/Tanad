@@ -8,7 +8,7 @@ const DataPageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className={cn(
-        "w-full transition-all duration-300",
+        "w-full transition-all duration-200 ease-linear ",
 
         {
           "w-full max-w-[calc(100vw)]": isMobile,

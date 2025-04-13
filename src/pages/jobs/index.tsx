@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import { Building2, MapPin, Calendar, DollarSign } from "lucide-react";
 
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
@@ -65,7 +66,7 @@ export default function JobsPage() {
   );
 
   return (
-    <div>
+    <DataPageLayout>
       <PageTitle
         title={t("title")}
         createButtonLink="/jobs/add"
@@ -83,7 +84,7 @@ export default function JobsPage() {
           gridCols="3"
         />
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 

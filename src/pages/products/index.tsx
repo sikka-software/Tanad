@@ -3,6 +3,7 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import ProductsTable from "@/components/tables/products-table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
@@ -48,7 +49,7 @@ export default function ProductsPage() {
   );
 
   return (
-    <div>
+    <DataPageLayout>
       <PageSearchAndFilter
         title={t("title")}
         createHref="/products/add"
@@ -80,7 +81,7 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 

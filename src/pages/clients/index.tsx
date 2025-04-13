@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { Building2, Mail, Phone, MapPin } from "lucide-react";
 
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import ClientsTable from "@/components/tables/clients-table";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
@@ -69,7 +70,7 @@ export default function ClientsPage() {
   );
 
   return (
-    <div>
+    <DataPageLayout>
       <PageSearchAndFilter
         title={t("title")}
         createHref="/clients/add"
@@ -81,10 +82,10 @@ export default function ClientsPage() {
       />
       <div>
         {viewMode === "table" ? (
-          <ClientsTable 
-            data={filteredClients || []} 
-            isLoading={isLoading} 
-            error={error instanceof Error ? error : null} 
+          <ClientsTable
+            data={filteredClients || []}
+            isLoading={isLoading}
+            error={error instanceof Error ? error : null}
           />
         ) : (
           <div className="p-4">
@@ -99,7 +100,7 @@ export default function ClientsPage() {
           </div>
         )}
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 

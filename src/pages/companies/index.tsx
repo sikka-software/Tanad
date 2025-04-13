@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { Building2, Mail, Phone, Globe, MapPin } from "lucide-react";
 
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import CompaniesTable from "@/components/tables/companies-table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -98,7 +99,7 @@ export default function CompaniesPage() {
   );
 
   return (
-    <div className="">
+    <DataPageLayout>
       <PageSearchAndFilter
         title={t("title")}
         createHref="/companies/add"
@@ -129,7 +130,7 @@ export default function CompaniesPage() {
           </div>
         )}
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 

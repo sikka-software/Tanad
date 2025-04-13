@@ -3,11 +3,12 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
-import { Building2, Mail, Phone, MapPin, User } from "lucide-react";
+import { Mail, Phone, MapPin, User } from "lucide-react";
 
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import BranchesTable from "@/components/tables/branches-table";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { useBranches } from "@/hooks/useBranches";
@@ -82,7 +83,7 @@ export default function BranchesPage() {
   );
 
   return (
-    <div>
+    <DataPageLayout>
       <PageSearchAndFilter
         title={t("title")}
         createHref="/branches/add"
@@ -94,10 +95,10 @@ export default function BranchesPage() {
       />
       <div>
         {viewMode === "table" ? (
-          <BranchesTable 
-            data={filteredBranches || []} 
-            isLoading={isLoading} 
-            error={error instanceof Error ? error : null} 
+          <BranchesTable
+            data={filteredBranches || []}
+            isLoading={isLoading}
+            error={error instanceof Error ? error : null}
           />
         ) : (
           <div className="p-4">
@@ -112,7 +113,7 @@ export default function BranchesPage() {
           </div>
         )}
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 

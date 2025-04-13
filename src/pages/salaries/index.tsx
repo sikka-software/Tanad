@@ -2,13 +2,10 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
-// Import useRouter if needed for actions
-
 import { User, CalendarDays, CircleDollarSign, ReceiptText, NotebookText } from "lucide-react";
-// For actions
 import { toast } from "sonner";
 
-// Import delete hook if adding delete action
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
@@ -138,7 +135,7 @@ export default function SalariesPage() {
   );
 
   return (
-    <div>
+    <DataPageLayout>
       <PageTitle
         title={t("title")} // Salaries.title
         createButtonLink="/salaries/add"
@@ -156,7 +153,7 @@ export default function SalariesPage() {
           // Add key prop if not handled internally by DataModelList
         />
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 

@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 
 import { Code, MapPin, LayoutGrid, NotebookText } from "lucide-react";
 
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
@@ -59,7 +60,7 @@ export default function WarehousesPage() {
   );
 
   return (
-    <div>
+    <DataPageLayout>
       <PageTitle
         title={t("title")}
         createButtonLink="/warehouses/add"
@@ -76,7 +77,7 @@ export default function WarehousesPage() {
           gridCols="3"
         />
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 

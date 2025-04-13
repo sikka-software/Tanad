@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { format } from "date-fns";
 
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import InvoicesTable from "@/components/tables/invoices-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -88,7 +89,7 @@ export default function InvoicesPage() {
   );
 
   return (
-    <div>
+    <DataPageLayout>
       <PageSearchAndFilter
         title={t("title")}
         createHref="/invoices/add"
@@ -120,7 +121,7 @@ export default function InvoicesPage() {
           </div>
         )}
       </div>
-    </div>
+    </DataPageLayout>
   );
 }
 
