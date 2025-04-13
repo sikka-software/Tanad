@@ -66,14 +66,14 @@ const createSalarySchema = (t: (key: string) => string) =>
 export type SalaryFormValues = z.infer<ReturnType<typeof createSalarySchema>>;
 
 interface SalaryFormProps {
-  formId?: string;
+  id?: string;
   salaryId?: string;
   onSuccess?: (salary: Salary) => void;
   loading?: boolean;
 }
 
 export function SalaryForm({
-  formId,
+  id,
   salaryId,
   onSuccess,
   loading: externalLoading = false,
@@ -126,7 +126,7 @@ export function SalaryForm({
         })
         .catch((error) => {
           console.error("Failed to fetch salary:", error);
-          toast.error(t("error.title"), {
+          toast.error(t("Salaries.error.title"), {
             description: t("Salaries.messages.error_fetch"),
           });
         })
@@ -140,8 +140,8 @@ export function SalaryForm({
   const onSubmit: SubmitHandler<SalaryFormValues> = async (data) => {
     setInternalLoading(true);
     if (!user?.id) {
-      toast.error(t("error.title"), {
-        description: t("error.not_authenticated"),
+      toast.error(t("Salaries.error.title"), {
+        description: t("Salaries.messages.error_not_authenticated"),
       });
       setInternalLoading(false);
       return;
@@ -165,7 +165,7 @@ export function SalaryForm({
         });
         if (!response.ok) throw new Error("Failed to update salary");
         result = await response.json();
-        toast.success(t("success.title"), {
+        toast.success(t("Salaries.success.title"), {
           description: t("Salaries.messages.success_updated"),
         });
       } else {
@@ -176,7 +176,7 @@ export function SalaryForm({
         });
         if (!response.ok) throw new Error("Failed to create salary");
         result = await response.json();
-        toast.success(t("success.title"), {
+        toast.success(t("Salaries.success.title"), {
           description: t("Salaries.messages.success_created"),
         });
       }
@@ -194,7 +194,7 @@ export function SalaryForm({
           : error instanceof Error
             ? error.message
             : t("Salaries.messages.error_save");
-      toast.error(t("error.title"), {
+      toast.error(t("Salaries.error.title"), {
         description,
       });
     } finally {
@@ -204,7 +204,7 @@ export function SalaryForm({
 
   return (
     <Form {...form}>
-      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {/* Employee Name */}
         <FormField
           control={form.control}
@@ -245,7 +245,7 @@ export function SalaryForm({
                 <FormControl>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
-                    onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                    onSelect={(date) => field.onChange(date?.toISOString().split("T")[0])}
                     placeholder={t("Salaries.form.pay_period_start.placeholder")}
                   />
                 </FormControl>
@@ -262,7 +262,7 @@ export function SalaryForm({
                 <FormControl>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
-                    onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                    onSelect={(date) => field.onChange(date?.toISOString().split("T")[0])}
                     placeholder={t("Salaries.form.pay_period_end.placeholder")}
                   />
                 </FormControl>
@@ -282,7 +282,7 @@ export function SalaryForm({
               <FormControl>
                 <DatePicker
                   date={field.value ? new Date(field.value) : undefined}
-                  onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                  onSelect={(date) => field.onChange(date?.toISOString().split("T")[0])}
                   placeholder={t("Salaries.form.payment_date.placeholder")}
                 />
               </FormControl>
@@ -377,16 +377,6 @@ export function SalaryForm({
             </FormItem>
           )}
         />
-
-        {!formId && (
-          <Button type="submit" disabled={loading}>
-            {loading
-              ? t("common.saving")
-              : salaryId
-                ? t("common.update_button")
-                : t("common.create_button")}
-          </Button>
-        )}
       </form>
     </Form>
   );
