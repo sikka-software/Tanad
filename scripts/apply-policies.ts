@@ -1,38 +1,38 @@
-import { config } from 'dotenv';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
-import postgres from 'postgres';
+import { config } from "dotenv";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+import postgres from "postgres";
 
 // Load environment variables
-config({ path: '.env' });
+config({ path: ".env" });
 
 async function applyPolicies() {
   const connectionString = process.env.DATABASE_URL;
-  
+
   if (!connectionString) {
-    throw new Error('DATABASE_URL is not set in environment variables');
+    throw new Error("DATABASE_URL is not set in environment variables");
   }
-  
+
   // Create a Postgres client
   const sql = postgres(connectionString, { max: 1 });
-  
+
   try {
-    console.log('Connecting to database...');
-    
+    console.log("Connecting to database...");
+
     // Read the SQL file
-    const sqlFilePath = resolve(__dirname, 'policies.sql');
-    const sqlContent = readFileSync(sqlFilePath, 'utf8');
-    
+    const sqlFilePath = resolve(__dirname, "policies.sql");
+    const sqlContent = readFileSync(sqlFilePath, "utf8");
+
     // Split the SQL content by semicolons and filter out empty statements
     const statements = sqlContent
-      .split(';')
-      .map(statement => statement.trim())
-      .filter(statement => statement.length > 0);
-    
+      .split(";")
+      .map((statement) => statement.trim())
+      .filter((statement) => statement.length > 0);
+
     console.log(`Found ${statements.length} SQL statements to execute`);
-    
+
     // First drop existing policies to avoid conflicts
-    console.log('Dropping existing policies...');
+    console.log("Dropping existing policies...");
     await sql.unsafe(`
       DO $$
       DECLARE
@@ -47,7 +47,7 @@ async function applyPolicies() {
         END LOOP;
       END $$;
     `);
-    
+
     // Execute each statement
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i];
@@ -60,10 +60,10 @@ async function applyPolicies() {
         // Continue with next statement despite errors
       }
     }
-    
-    console.log('Policy application completed');
+
+    console.log("Policy application completed");
   } catch (error) {
-    console.error('Error applying policies:', error);
+    console.error("Error applying policies:", error);
     process.exit(1);
   } finally {
     // Close the database connection
@@ -72,4 +72,4 @@ async function applyPolicies() {
 }
 
 // Run the function
-applyPolicies().catch(console.error); 
+applyPolicies().catch(console.error);
