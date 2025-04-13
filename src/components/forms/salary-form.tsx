@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Form,
   FormControl,
@@ -20,6 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useEmployees } from "@/hooks/useEmployees";
 import type { Salary, SalaryCreateData } from "@/types/salary.type";
 
 import { useAuth } from "../UserContext";
@@ -80,6 +83,7 @@ export function SalaryForm({
   const [internalLoading, setInternalLoading] = useState(false);
   const loading = externalLoading || internalLoading;
   const { user } = useAuth();
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
 
   const salarySchema = createSalarySchema(t);
 
@@ -209,10 +213,20 @@ export function SalaryForm({
             <FormItem>
               <FormLabel>{t("Salaries.form.employee_name.label")} *</FormLabel>
               <FormControl>
-                <Input
-                  placeholder={t("Salaries.form.employee_name.placeholder")}
-                  {...field}
-                  disabled={loading}
+                <Combobox
+                  data={employees.map((emp) => ({
+                    label: `${emp.firstName} ${emp.lastName}`,
+                    value: `${emp.firstName} ${emp.lastName}`,
+                  }))}
+                  labelKey="label"
+                  valueKey="value"
+                  defaultValue={field.value}
+                  onChange={field.onChange}
+                  preview={loading || employeesLoading}
+                  isLoading={employeesLoading}
+                  texts={{
+                    placeholder: t("Salaries.form.employee_name.placeholder"),
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -229,7 +243,11 @@ export function SalaryForm({
               <FormItem>
                 <FormLabel>{t("Salaries.form.pay_period_start.label")} *</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} disabled={loading} />
+                  <DatePicker
+                    date={field.value ? new Date(field.value) : undefined}
+                    onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                    placeholder={t("Salaries.form.pay_period_start.placeholder")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -242,7 +260,11 @@ export function SalaryForm({
               <FormItem>
                 <FormLabel>{t("Salaries.form.pay_period_end.label")} *</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} disabled={loading} />
+                  <DatePicker
+                    date={field.value ? new Date(field.value) : undefined}
+                    onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                    placeholder={t("Salaries.form.pay_period_end.placeholder")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -258,7 +280,11 @@ export function SalaryForm({
             <FormItem>
               <FormLabel>{t("Salaries.form.payment_date.label")} *</FormLabel>
               <FormControl>
-                <Input type="date" {...field} disabled={loading} />
+                <DatePicker
+                  date={field.value ? new Date(field.value) : undefined}
+                  onSelect={(date) => field.onChange(date?.toISOString().split('T')[0])}
+                  placeholder={t("Salaries.form.payment_date.placeholder")}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
