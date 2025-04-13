@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
 import { Combobox } from "@/components/ui/combobox";
 import { DatePicker } from "@/components/ui/date-picker";
 import {
@@ -24,14 +23,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useEmployees } from "@/hooks/useEmployees";
 import { useUser } from "@/providers/UserProvider";
-import type { Salary, SalaryCreateData } from "@/types/salary.type";
+import type { Salary } from "@/types/salary.type";
 
-// Assuming a DatePicker component exists, if not, use Input type="date"
-// import { DatePicker } from "@/components/ui/date-picker";
-// If using React JSON editor for deductions
-// import { JsonEditor } from '@/components/ui/json-editor'; // Example path
-
-// Zod schema using z.coerce.number()
 const createSalarySchema = (t: (key: string) => string) =>
   z.object({
     employee_name: z.string().min(1, t("Salaries.form.employee_name.required")),
@@ -204,7 +197,6 @@ export function SalaryForm({
   return (
     <Form {...form}>
       <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {/* Employee Name */}
         <FormField
           control={form.control}
           name="employee_name"
@@ -221,7 +213,6 @@ export function SalaryForm({
                   valueKey="value"
                   defaultValue={field.value}
                   onChange={field.onChange}
-                  preview={loading || employeesLoading}
                   isLoading={employeesLoading}
                   texts={{
                     placeholder: t("Salaries.form.employee_name.placeholder"),
