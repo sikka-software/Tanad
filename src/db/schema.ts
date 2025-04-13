@@ -1,7 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
   pgTable,
-  pgPolicy,
   index,
   foreignKey,
   unique,
@@ -60,7 +59,7 @@ export const clients = pgTable(
     name: text("name").notNull(),
     email: text("email"),
     phone: text().notNull(),
-    company: text("company"),
+    company: uuid("company"),
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
@@ -82,18 +81,42 @@ export const clients = pgTable(
 
 export const invoices = pgTable("invoices", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
+  createdAt: timestamp("created_at", {
+    withTimezone: true,
+    mode: "string",
+  }).default(sql`timezone('utc'::text, now())`),
   invoiceNumber: text("invoice_number").notNull(),
-  issueDate: timestamp("issue_date").notNull(),
-  dueDate: timestamp("due_date").notNull(),
+  issueDate: date("issue_date").notNull(),
+  dueDate: date("due_date").notNull(),
   status: text("status").$type<"paid" | "pending" | "overdue">().notNull(),
-  subtotal: numeric("subtotal").notNull(),
-  taxRate: numeric("tax_rate"),
-  total: numeric("total").notNull(),
+  subtotal: numeric("subtotal", { precision: 10, scale: 2 }).default("0").notNull(),
+  taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
+  taxAmount: numeric("tax_amount", {
+    precision: 10,
+    scale: 2,
+  }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
+  total: numeric("total", { precision: 10, scale: 2 }).generatedAlwaysAs(
+    sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`
+  ),
   notes: text("notes"),
-  clientId: uuid("client_id").references(() => clients.id),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+  clientId: uuid("client_id").notNull(),
+  userId: uuid("user_id").notNull(),
+},
+(table) => [
+  index("invoices_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+  index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+  index("invoices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+  foreignKey({
+    columns: [table.clientId],
+    foreignColumns: [clients.id],
+    name: "invoices_client_id_fkey",
+  }).onDelete("cascade"),
+
+  check(
+    "invoices_status_check",
+    sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`,
+  ),
+]).enableRLS();
 
 export const invoiceItems = pgTable(
   "invoice_items",
@@ -141,14 +164,14 @@ export const quotes = pgTable(
     issueDate: date("issue_date").notNull(),
     expiryDate: date("expiry_date").notNull(),
     status: text().default("draft").notNull(),
-    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
+    subtotal: numeric("subtotal", { precision: 10, scale: 2 }).default("0").notNull(),
     taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
     taxAmount: numeric("tax_amount", {
       precision: 10,
       scale: 2,
     }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
-    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(
-      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`,
+    total: numeric("total", { precision: 10, scale: 2 }).generatedAlwaysAs(
+      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`
     ),
     notes: text(),
     clientId: uuid("client_id").notNull(),
@@ -292,7 +315,7 @@ export const expenses = pgTable(
 
     check(
       "expenses_status_check",
-      sql`status = ANY (ARRAY[\'pending\'::text, \'paid\'::text, \'overdue\'::text])`,
+      sql`status = ANY (ARRAY['pending'::text, 'paid'::text, 'overdue'::text])`,
     ),
   ],
 ).enableRLS();
@@ -307,7 +330,7 @@ export const vendors = pgTable(
     createdAt: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
-    }).default(sql`timezone(\'utc\'::text, now())`),
+    }).default(sql`timezone('utc'::text, now())`),
     name: text().notNull(),
     email: text().notNull(),
     phone: text().notNull(),
@@ -336,7 +359,7 @@ export const salaries = pgTable(
     createdAt: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
-    }).default(sql`timezone(\'utc\'::text, now())`),
+    }).default(sql`timezone('utc'::text, now())`),
     payPeriodStart: date("pay_period_start").notNull(),
     payPeriodEnd: date("pay_period_end").notNull(),
     paymentDate: date("payment_date").notNull(),
