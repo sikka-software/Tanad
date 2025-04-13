@@ -27,6 +27,13 @@ export const commandList = [
         shortcut: "⌘C",
         href: "/clients",
       },
+      // Vendors
+      {
+        icon: Users,
+        label: "Vendors.title",
+        shortcut: "⌘V",
+        href: "/vendors",
+      },
     ],
   },
   {

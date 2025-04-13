@@ -1752,7 +1752,8 @@
     },
     "messages": {
       "creating": "جاري إنشاء المورد...",
-      "create": "إنشاء مورد"
+      "create": "إنشاء مورد",
+      "success_created": "تم إنشاء المورد بنجاح"
     },
     "success": {
       "title": "تم بنجاح",

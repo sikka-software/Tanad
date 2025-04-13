@@ -18,7 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
 // Create schema factory to handle translations
-const createCompanySchema = (t: (key: string) => string) =>
+export const createCompanySchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Companies.form.validation.name_required")),
     email: z
@@ -69,6 +69,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
     },
   });
 
+  // Expose form methods for external use (like dummy data)
+  if (typeof window !== 'undefined') {
+    (window as any).companyForm = form;
+  }
+
   return (
     <Form {...form}>
       <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -80,7 +85,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormItem>
                 <FormLabel>{t("Companies.form.name.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("Companies.form.name.placeholder")} {...field} />
+                  <Input
+                    disabled={loading}
+                    placeholder={t("Companies.form.name.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,7 +120,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormItem>
                 <FormLabel>{t("Companies.form.phone.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("Companies.form.phone.placeholder")} {...field} />
+                  <Input
+                    disabled={loading}
+                    placeholder={t("Companies.form.phone.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -124,7 +137,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormItem>
                 <FormLabel>{t("Companies.form.website.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("Companies.form.website.placeholder")} {...field} />
+                  <Input
+                    disabled={loading}
+                    placeholder={t("Companies.form.website.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -137,7 +154,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormItem>
                 <FormLabel>{t("Companies.form.address.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("Companies.form.address.placeholder")} {...field} />
+                  <Input
+                    disabled={loading}
+                    placeholder={t("Companies.form.address.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -150,7 +171,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormItem>
                 <FormLabel>{t("Companies.form.city.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("Companies.form.city.placeholder")} {...field} />
+                  <Input
+                    disabled={loading}
+                    placeholder={t("Companies.form.city.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -163,7 +188,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormItem>
                 <FormLabel>{t("Companies.form.state.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("Companies.form.state.placeholder")} {...field} />
+                  <Input
+                    disabled={loading}
+                    placeholder={t("Companies.form.state.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -176,7 +205,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormItem>
                 <FormLabel>{t("Companies.form.zipCode.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("Companies.form.zipCode.placeholder")} {...field} />
+                  <Input
+                    disabled={loading}
+                    placeholder={t("Companies.form.zipCode.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -189,7 +222,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormItem>
                 <FormLabel>{t("Companies.form.industry.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("Companies.form.industry.placeholder")} {...field} />
+                  <Input
+                    disabled={loading}
+                    placeholder={t("Companies.form.industry.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -202,7 +239,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormItem>
                 <FormLabel>{t("Companies.form.size.label")}</FormLabel>
                 <FormControl>
-                  <Input disabled={loading} placeholder={t("Companies.form.size.placeholder")} {...field} />
+                  <Input
+                    disabled={loading}
+                    placeholder={t("Companies.form.size.placeholder")}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -216,7 +257,11 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             <FormItem>
               <FormLabel>{t("Companies.form.notes.label")}</FormLabel>
               <FormControl>
-                <Textarea disabled={loading} placeholder={t("Companies.form.notes.placeholder")} {...field} />
+                <Textarea
+                  disabled={loading}
+                  placeholder={t("Companies.form.notes.placeholder")}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

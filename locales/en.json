@@ -1489,6 +1489,11 @@
         "label": "Notes",
         "placeholder": "Enter any additional notes"
       }
+    },
+    "messages": {
+      "creating": "Creating vendor...",
+      "create": "Create Vendor",
+      "success_created": "Vendor created successfully"
     }
   },
   "Sales": {

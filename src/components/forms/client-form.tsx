@@ -27,7 +27,7 @@ import { useCompanies } from "@/hooks/useCompanies";
 import { supabase } from "@/lib/supabase";
 
 // We'll create a schema factory to handle translations
-const createClientSchema = (t: (key: string) => string) =>
+export const createClientSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Clients.form.validation.name_required")),
     email: z
@@ -47,29 +47,26 @@ export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
 
 interface ClientFormProps {
   id?: string;
-  onSuccess?: (client: any) => void;
-  onSubmit?: (data: ClientFormValues) => Promise<void>;
+  onSubmit: (data: ClientFormValues) => Promise<void>;
   loading?: boolean;
   userId: string | null;
+  defaultValues?: Partial<ClientFormValues>;
 }
 
 export function ClientForm({
   id,
-  onSuccess,
-  onSubmit: externalSubmit,
+  onSubmit,
   loading = false,
   userId,
+  defaultValues,
 }: ClientFormProps) {
-  const router = useRouter();
   const t = useTranslations();
   const { locale } = useRouter();
   const { data: companies, isLoading: companiesLoading } = useCompanies();
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
 
-  const clientSchema = createClientSchema(t);
-
   const form = useForm<ClientFormValues>({
-    resolver: zodResolver(clientSchema),
+    resolver: zodResolver(createClientSchema(t)),
     defaultValues: {
       name: "",
       email: "",
@@ -80,8 +77,14 @@ export function ClientForm({
       state: "",
       zip_code: "",
       notes: "",
+      ...defaultValues,
     },
   });
+
+  // Expose form methods for external use (like dummy data)
+  if (typeof window !== 'undefined') {
+    (window as any).clientForm = form;
+  }
 
   // Format companies for ComboboxAdd
   const companyOptions =
@@ -89,55 +92,6 @@ export function ClientForm({
       label: company.name,
       value: company.id,
     })) || [];
-
-  const onSubmit: SubmitHandler<ClientFormValues> = async (data) => {
-    if (externalSubmit) {
-      await externalSubmit(data);
-      return;
-    }
-
-    try {
-      // Check if user ID is available
-      if (!userId) {
-        throw new Error(t("error.not_authenticated"));
-      }
-
-      const { error } = await supabase
-        .from("clients")
-        .insert([
-          {
-            name: data.name.trim(),
-            email: data.email.trim(),
-            phone: data.phone.trim(),
-            company: data.company?.trim() || "",
-            address: data.address.trim(),
-            city: data.city.trim(),
-            state: data.state.trim(),
-            zip_code: data.zip_code.trim(),
-            notes: data.notes?.trim() || null,
-            user_id: userId,
-          },
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      toast.success(t("success.title"), {
-        description: t("success.created"),
-      });
-
-      if (onSuccess) {
-        onSuccess(data);
-      } else {
-        router.push("/clients");
-      }
-    } catch (error) {
-      toast.error(t("error.title"), {
-        description: error instanceof Error ? error.message : t("error.create"),
-      });
-    }
-  };
 
   const handleCompanySubmit = async (data: CompanyFormValues) => {
     try {
@@ -171,7 +125,7 @@ export function ClientForm({
       if (error) throw error;
 
       // Set the new company as the selected company
-      form.setValue("company", newCompany.id);
+      form.setValue("company", newCompany.name);
 
       // Close the dialog
       setIsCompanyDialogOpen(false);
@@ -186,7 +140,7 @@ export function ClientForm({
 
   return (
     <>
-      <Form {...form} >
+      <Form {...form}>
         <form id={id || "client-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
             <FormField
@@ -196,7 +150,11 @@ export function ClientForm({
                 <FormItem>
                   <FormLabel>{t("Clients.form.name.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("Clients.form.name.placeholder")} {...field} />
+                    <Input 
+                      placeholder={t("Clients.form.name.placeholder")} 
+                      {...field}
+                      disabled={loading} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -345,11 +303,14 @@ export function ClientForm({
 
       <Dialog open={isCompanyDialogOpen} onOpenChange={setIsCompanyDialogOpen}>
         <DialogContent className="p-0 sm:max-w-xl" dir={locale === "ar" ? "rtl" : "ltr"}>
-          <DialogHeader className="bg-background sticky top-0 z-10 border-b p-4">
+          <DialogHeader className="bg-background sticky top-0 z-10 rounded-t-lg border-b p-4">
             <DialogTitle>{t("Companies.add_new")}</DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto p-4 pt-0">
-            <CompanyForm id="company-form" onSubmit={handleCompanySubmit} />
+            <CompanyForm 
+              id="company-form" 
+              onSubmit={handleCompanySubmit}
+            />
           </div>
           <div className="bg-background sticky bottom-0 mt-4 flex justify-end gap-2 border-t p-4">
             <Button variant="outline" onClick={() => setIsCompanyDialogOpen(false)}>

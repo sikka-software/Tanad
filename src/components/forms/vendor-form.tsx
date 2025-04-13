@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -25,7 +26,7 @@ import { useCompanies } from "@/hooks/useCompanies";
 import { supabase } from "@/lib/supabase";
 import { fetchVendorById } from "@/services/vendorService";
 
-const createVendorSchema = (t: (key: string) => string) =>
+export const createVendorSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Vendors.form.name.required")),
     email: z.string().email(t("Vendors.form.email.invalid")),
@@ -45,7 +46,6 @@ interface VendorFormProps {
   vendorId?: string;
   loading?: boolean;
   userId: string | null;
-  form: ReturnType<typeof useForm<VendorFormValues>>;
   onSubmit?: (data: VendorFormValues) => void;
 }
 
@@ -54,7 +54,6 @@ export function VendorForm({
   vendorId,
   loading: externalLoading = false,
   userId,
-  form,
   onSubmit,
 }: VendorFormProps) {
   const t = useTranslations();
@@ -63,6 +62,21 @@ export function VendorForm({
   const loading = externalLoading || internalLoading;
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
   const { data: companies, isLoading: companiesLoading } = useCompanies();
+
+  const form = useForm<VendorFormValues>({
+    resolver: zodResolver(createVendorSchema(t)),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      company: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      notes: "",
+    },
+  });
 
   // Format companies for ComboboxAdd
   const companyOptions =
@@ -184,7 +198,7 @@ export function VendorForm({
                   <FormControl>
                     <ComboboxAdd
                       direction={locale === "ar" ? "rtl" : "ltr"}
-                      data={companyOptions.map(opt => ({ ...opt, value: opt.label }))}
+                      data={companyOptions.map((opt) => ({ ...opt, value: opt.label }))}
                       isLoading={companiesLoading}
                       defaultValue={field.value}
                       onChange={field.onChange}
@@ -340,11 +354,30 @@ export function VendorForm({
 
       <Dialog open={isCompanyDialogOpen} onOpenChange={setIsCompanyDialogOpen}>
         <DialogContent className="p-0 sm:max-w-xl" dir={locale === "ar" ? "rtl" : "ltr"}>
-          <DialogHeader className="bg-background rounded-t-lg sticky top-0 z-10 border-b p-4">
+          <DialogHeader className="bg-background sticky top-0 z-10 rounded-t-lg border-b p-4">
             <DialogTitle>{t("Companies.add_new")}</DialogTitle>
           </DialogHeader>
           <div className="overflow-y-auto p-4 pt-0">
-            <CompanyForm id="company-form" onSubmit={handleCompanySubmit} />
+            <CompanyForm 
+              id="company-form" 
+              onSubmit={handleCompanySubmit}
+              form={useForm<CompanyFormValues>({
+                defaultValues: {
+                  name: "",
+                  email: "",
+                  phone: "",
+                  website: "",
+                  address: "",
+                  city: "",
+                  state: "",
+                  zipCode: "",
+                  industry: "",
+                  size: "",
+                  notes: "",
+                  isActive: true,
+                }
+              })}
+            />
           </div>
           <div className="bg-background sticky bottom-0 mt-4 flex justify-end gap-2 border-t p-4">
             <Button variant="outline" onClick={() => setIsCompanyDialogOpen(false)}>

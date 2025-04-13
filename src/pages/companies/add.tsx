@@ -11,6 +11,7 @@ import { CompanyForm, type CompanyFormValues } from "@/components/forms/company-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+import { generateDummyData } from "@/lib/dummy-generator";
 import { useUser } from "@/providers/UserProvider";
 
 export default function AddCompanyPage() {
@@ -74,6 +75,18 @@ export default function AddCompanyPage() {
     }
   };
 
+  const handleDummyData = () => {
+    const dummyData = generateDummyData();
+    // Access form through window since it's exposed by the form component
+    const form = (window as any).companyForm;
+    if (form) {
+      form.setValue("name", dummyData.name);
+      form.setValue("email", dummyData.email);
+      form.setValue("phone", dummyData.phone);
+      form.setValue("address", dummyData.address);
+    }
+  };
+
   return (
     <div>
       <PageTitle
@@ -103,7 +116,12 @@ export default function AddCompanyPage() {
       />
       <div className="p-4">
         <Card>
-          <CardHeader>
+          <CardHeader className="relative">
+            {process.env.NODE_ENV === "development" && (
+              <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
+                Dummy Data
+              </Button>
+            )}
             <CardTitle>{t("Companies.company_details")}</CardTitle>
           </CardHeader>
           <CardContent>

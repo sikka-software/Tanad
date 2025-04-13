@@ -12,6 +12,7 @@ import { ClientForm, type ClientFormValues } from "@/components/forms/client-for
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
 
 export default function AddClientPage() {
@@ -84,6 +85,20 @@ export default function AddClientPage() {
     }
   };
 
+  const handleDummyData = () => {
+    const dummyData = generateDummyData();
+    const form = (window as any).clientForm;
+    if (form) {
+      form.setValue("name", dummyData.name);
+      form.setValue("email", dummyData.email);
+      form.setValue("phone", dummyData.phone);
+      form.setValue("address", dummyData.address);
+      form.setValue("city", dummyData.city);
+      form.setValue("state", dummyData.state);
+      form.setValue("zip_code", dummyData.zipCode);
+    }
+  };
+
   return (
     <div>
       <PageTitle
@@ -104,6 +119,11 @@ export default function AddClientPage() {
       <div className="p-4">
         <Card className="max-w-2xl">
           <CardHeader>
+            {process.env.NODE_ENV === "development" && (
+              <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
+                Dummy Data
+              </Button>
+            )}
             <CardTitle>{t("Clients.client_details")}</CardTitle>
           </CardHeader>
           <CardContent>

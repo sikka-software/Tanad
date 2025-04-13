@@ -1,35 +1,18 @@
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import * as z from "zod";
 
-import { VendorForm, VendorFormValues } from "@/components/forms/vendor-form";
+import { VendorForm, type VendorFormValues } from "@/components/forms/vendor-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { supabase } from "@/lib/supabase";
 import { useCreateVendor } from "@/hooks/useVendors";
-import type { VendorCreateData } from "@/types/vendor.type";
-
-// Schema factory for vendor form validation with translations
-const createVendorSchema = (t: (key: string) => string) =>
-  z.object({
-    name: z.string().min(1, t("Vendors.form.name.required")),
-    email: z.string().email(t("Vendors.form.email.invalid")),
-    phone: z.string().min(1, t("Vendors.form.phone.required")),
-    company: z.string().optional(),
-    address: z.string().min(1, t("Vendors.form.address.required")),
-    city: z.string().min(1, t("Vendors.form.city.required")),
-    state: z.string().min(1, t("Vendors.form.state.required")),
-    zipCode: z.string().min(5, t("Vendors.form.zip_code.required")),
-    notes: z.string().nullable(),
-  });
+import { generateDummyData } from "@/lib/dummy-generator";
+import { supabase } from "@/lib/supabase";
 
 export default function AddVendorPage() {
   const router = useRouter();
@@ -37,21 +20,6 @@ export default function AddVendorPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const createVendorMutation = useCreateVendor();
-
-  const form = useForm<VendorFormValues>({
-    resolver: zodResolver(createVendorSchema(t)),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      notes: "",
-    },
-  });
 
   // Fetch user ID on mount
   useEffect(() => {
@@ -83,7 +51,7 @@ export default function AddVendorPage() {
         name: data.name.trim(),
         email: data.email.trim(),
         phone: data.phone.trim(),
-        company: data.company?.trim() || '',
+        company: data.company?.trim() || "",
         address: data.address.trim(),
         city: data.city.trim(),
         state: data.state.trim(),
@@ -114,10 +82,10 @@ export default function AddVendorPage() {
             <Button variant="outline" size="sm" onClick={() => router.push("/vendors")}>
               {t("General.cancel")}
             </Button>
-            <Button 
-              type="submit" 
-              size="sm" 
-              form="vendor-form" 
+            <Button
+              type="submit"
+              size="sm"
+              form="vendor-form"
               disabled={createVendorMutation.isPending}
             >
               {createVendorMutation.isPending ? t("General.saving") : t("Vendors.add_new")}
@@ -127,7 +95,14 @@ export default function AddVendorPage() {
       />
       <div className="p-4">
         <Card>
-          <CardHeader>
+          <CardHeader className="relative">
+            {process.env.NODE_ENV === "development" && (
+              <Button variant="outline" className="absolute end-4 top-4" onClick={() => {
+                // TODO: Add dummy data handling through form ref if needed
+              }}>
+                Dummy Data
+              </Button>
+            )}
             <CardTitle>{t("Vendors.vendor_details")}</CardTitle>
           </CardHeader>
           <CardContent>
@@ -135,7 +110,6 @@ export default function AddVendorPage() {
               formId="vendor-form"
               userId={userId}
               loading={createVendorMutation.isPending}
-              form={form}
               onSubmit={onSubmit}
             />
           </CardContent>
