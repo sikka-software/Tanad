@@ -1884,7 +1884,68 @@
   },
 
   "Salaries": {
-    "title": "الرواتب"
+    "title": "الرواتب",
+    "add_new": "إضافة راتب جديد",
+    "create_salary": "إضافة راتب",
+    "edit_salary": "تعديل الراتب",
+    "delete_salary": "حذف الراتب",
+    "search_salaries": "البحث في الرواتب...",
+    "confirm_delete": "هل أنت متأكد من حذف هذا الراتب؟",
+    "no_salaries_found": "لم يتم العثور على رواتب",
+    "success": {
+      "title": "تم بنجاح",
+      "deleted": "تم حذف الراتب بنجاح"
+    },
+    "error": {
+      "title": "خطأ",
+      "delete": "فشل في حذف الراتب"
+    },
+    "messages": {
+      "success_deleted": "تم حذف الراتب بنجاح",
+      "error_delete": "فشل في حذف الراتب"
+    },
+    "table": {
+      "employee_name": "اسم الموظف",
+      "gross_amount": "المبلغ الإجمالي",
+      "net_amount": "المبلغ الصافي",
+      "payment_date": "تاريخ الدفع",
+      "pay_period_start": "بداية فترة الدفع",
+      "pay_period_end": "نهاية فترة الدفع",
+      "actions": "الإجراءات"
+    },
+    "form": {
+      "employee_name": {
+        "label": "اسم الموظف",
+        "placeholder": "أدخل اسم الموظف",
+        "required": "اسم الموظف مطلوب"
+      },
+      "gross_amount": {
+        "label": "المبلغ الإجمالي",
+        "placeholder": "أدخل المبلغ الإجمالي",
+        "required": "المبلغ الإجمالي مطلوب"
+      },
+      "net_amount": {
+        "label": "المبلغ الصافي",
+        "placeholder": "أدخل المبلغ الصافي",
+        "required": "المبلغ الصافي مطلوب"
+      },
+      "payment_date": {
+        "label": "تاريخ الدفع",
+        "required": "تاريخ الدفع مطلوب"
+      },
+      "pay_period_start": {
+        "label": "بداية فترة الدفع",
+        "required": "تاريخ بداية فترة الدفع مطلوب"
+      },
+      "pay_period_end": {
+        "label": "نهاية فترة الدفع",
+        "required": "تاريخ نهاية فترة الدفع مطلوب"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل أي ملاحظات إضافية"
+      }
+    }
   },
   "Administration": {
     "title": "الإدارة"

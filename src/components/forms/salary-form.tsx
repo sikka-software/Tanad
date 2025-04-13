@@ -9,7 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import type { Salary, SalaryCreateData } from "@/types/salary.type";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,6 +20,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import type { Salary, SalaryCreateData } from "@/types/salary.type";
+
+import { useAuth } from "../UserContext";
+
 // Assuming a DatePicker component exists, if not, use Input type="date"
 // import { DatePicker } from "@/components/ui/date-picker";
 // If using React JSON editor for deductions
@@ -37,10 +40,7 @@ const createSalarySchema = (t: (key: string) => string) =>
       .number()
       .positive(t("Salaries.form.gross_amount.positive"))
       .or(z.literal(0)),
-    net_amount: z.coerce
-      .number()
-      .positive(t("Salaries.form.net_amount.positive"))
-      .or(z.literal(0)),
+    net_amount: z.coerce.number().positive(t("Salaries.form.net_amount.positive")).or(z.literal(0)),
     deductions: z
       .string()
       .optional()
@@ -54,7 +54,7 @@ const createSalarySchema = (t: (key: string) => string) =>
             return false;
           }
         },
-        { message: t("Salaries.form.deductions.invalid_json") }
+        { message: t("Salaries.form.deductions.invalid_json") },
       ),
     notes: z.string().optional(),
   });
@@ -67,7 +67,6 @@ interface SalaryFormProps {
   salaryId?: string;
   onSuccess?: (salary: Salary) => void;
   loading?: boolean;
-  userId: string | null;
 }
 
 export function SalaryForm({
@@ -75,12 +74,12 @@ export function SalaryForm({
   salaryId,
   onSuccess,
   loading: externalLoading = false,
-  userId,
 }: SalaryFormProps) {
   const router = useRouter();
   const t = useTranslations();
   const [internalLoading, setInternalLoading] = useState(false);
   const loading = externalLoading || internalLoading;
+  const { user } = useAuth();
 
   const salarySchema = createSalarySchema(t);
 
@@ -105,20 +104,19 @@ export function SalaryForm({
       setInternalLoading(true);
       fetch(`/api/salaries/${salaryId}`)
         .then((res) => {
-          if (!res.ok) throw new Error('Failed to fetch salary');
+          if (!res.ok) throw new Error("Failed to fetch salary");
           return res.json();
         })
         .then((salary: Salary) => {
           // Reset with numbers for amounts
           form.reset({
             employee_name: salary.employee_name,
-            pay_period_start: salary.pay_period_start?.split('T')[0] || "",
-            pay_period_end: salary.pay_period_end?.split('T')[0] || "",
-            payment_date: salary.payment_date?.split('T')[0] || "",
+            pay_period_start: salary.pay_period_start?.split("T")[0] || "",
+            pay_period_end: salary.pay_period_end?.split("T")[0] || "",
+            payment_date: salary.payment_date?.split("T")[0] || "",
             gross_amount: salary.gross_amount ?? 0, // Reset with number
             net_amount: salary.net_amount ?? 0, // Reset with number
-            deductions:
-              salary.deductions ? JSON.stringify(salary.deductions, null, 2) : "",
+            deductions: salary.deductions ? JSON.stringify(salary.deductions, null, 2) : "",
             notes: salary.notes || "",
           });
         })
@@ -137,7 +135,7 @@ export function SalaryForm({
   // Data is SalaryFormValues (numbers for amounts)
   const onSubmit: SubmitHandler<SalaryFormValues> = async (data) => {
     setInternalLoading(true);
-    if (!userId) {
+    if (!user?.id) {
       toast.error(t("error.title"), {
         description: t("error.not_authenticated"),
       });
@@ -151,28 +149,28 @@ export function SalaryForm({
         ...data,
         deductions: data.deductions ? JSON.parse(data.deductions) : null,
         notes: data.notes?.trim() || null,
-        userId,
+        userId: user.id,
       };
 
       let result: Salary;
       if (salaryId) {
         const response = await fetch(`/api/salaries/${salaryId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(salaryData),
         });
-        if (!response.ok) throw new Error('Failed to update salary');
+        if (!response.ok) throw new Error("Failed to update salary");
         result = await response.json();
         toast.success(t("success.title"), {
           description: t("Salaries.messages.success_updated"),
         });
       } else {
-        const response = await fetch('/api/salaries', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/salaries", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(salaryData),
         });
-        if (!response.ok) throw new Error('Failed to create salary');
+        if (!response.ok) throw new Error("Failed to create salary");
         result = await response.json();
         toast.success(t("success.title"), {
           description: t("Salaries.messages.success_created"),
@@ -202,11 +200,7 @@ export function SalaryForm({
 
   return (
     <Form {...form}>
-      <form
-        id={formId}
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4"
-      >
+      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         {/* Employee Name */}
         <FormField
           control={form.control}
@@ -370,4 +364,4 @@ export function SalaryForm({
       </form>
     </Form>
   );
-} 
+}

@@ -179,4 +179,20 @@ export const dynamicRoutePatterns = [
       { path: "", labelKey: "Vendors.edit", isActive: true },
     ],
   },
+  {
+    pattern: /^\/salaries\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/salaries", labelKey: "Salaries.title" },
+      { path: "/salaries/add", labelKey: "Salaries.add_new", isActive: true },
+    ],
+  },
+  {
+    pattern: /^\/salaries\/edit\/(.+)$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/salaries", labelKey: "Salaries.title" },
+      { path: "", labelKey: "Salaries.edit", isActive: true },
+    ],
+  },
 ];
