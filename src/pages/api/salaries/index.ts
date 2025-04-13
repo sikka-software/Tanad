@@ -1,73 +1,50 @@
-import { NextResponse } from "next/server";
-
-import {
-  createSalary,
-  deleteSalary,
-  fetchSalaries,
-  fetchSalaryById,
-  updateSalary,
-} from "@/services/salaryService";
+import { NextApiRequest, NextApiResponse } from "next";
+import { createSalary, deleteSalary, fetchSalaries, fetchSalaryById, updateSalary } from "@/services/salaryService";
 import { SalaryCreateData } from "@/types/salary.type";
 
-export async function GET(request: Request) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    switch (req.method) {
+      case "GET": {
+        const { id } = req.query;
+        if (id && typeof id === "string") {
+          const salary = await fetchSalaryById(id);
+          return res.status(200).json(salary);
+        }
+        const salaries = await fetchSalaries();
+        return res.status(200).json(salaries);
+      }
 
-    if (id) {
-      const salary = await fetchSalaryById(id);
-      return NextResponse.json(salary);
+      case "POST": {
+        const salary = await createSalary(req.body as SalaryCreateData);
+        return res.status(201).json(salary);
+      }
+
+      case "PUT": {
+        const { id } = req.query;
+        if (!id || typeof id !== "string") {
+          return res.status(400).json({ error: "Missing salary ID" });
+        }
+        const salary = await updateSalary(id, req.body);
+        return res.status(200).json(salary);
+      }
+
+      case "DELETE": {
+        const { id } = req.query;
+        if (!id || typeof id !== "string") {
+          return res.status(400).json({ error: "Missing salary ID" });
+        }
+        await deleteSalary(id);
+        return res.status(200).json({ success: true });
+      }
+
+      default:
+        res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+        return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
     }
-
-    const salaries = await fetchSalaries();
-    return NextResponse.json(salaries);
   } catch (error) {
-    console.error("Error in GET /api/salaries:", error);
-    return NextResponse.json({ error: "Failed to fetch salaries" }, { status: 500 });
-  }
-}
-
-export async function POST(request: Request) {
-  try {
-    const data = await request.json();
-    const salary = await createSalary(data as SalaryCreateData);
-    return NextResponse.json(salary);
-  } catch (error) {
-    console.error("Error in POST /api/salaries:", error);
-    return NextResponse.json({ error: "Failed to create salary" }, { status: 500 });
-  }
-}
-
-export async function PUT(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    if (!id) {
-      return NextResponse.json({ error: "Missing salary ID" }, { status: 400 });
-    }
-
-    const data = await request.json();
-    const salary = await updateSalary(id, data);
-    return NextResponse.json(salary);
-  } catch (error) {
-    console.error("Error in PUT /api/salaries:", error);
-    return NextResponse.json({ error: "Failed to update salary" }, { status: 500 });
-  }
-}
-
-export async function DELETE(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    if (!id) {
-      return NextResponse.json({ error: "Missing salary ID" }, { status: 400 });
-    }
-
-    await deleteSalary(id);
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Error in DELETE /api/salaries:", error);
-    return NextResponse.json({ error: "Failed to delete salary" }, { status: 500 });
+    console.error("Error in salary API:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 }
 
