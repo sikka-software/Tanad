@@ -4,10 +4,22 @@ import { useTranslations } from "next-intl";
 
 import { useAuth } from "@/components/UserContext";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSubscription } from "@/hooks/use-subscription";
 
 export default function Billing() {
   const t = useTranslations();
   const { user } = useAuth();
+  const subscription = useSubscription();
+
+  // Show subscription management for active subscriptions (including canceled ones)
+  const showSubscriptionManagement =
+    subscription.status === "active" && subscription.name !== t("plans.hobby.title");
+
+  if (subscription.loading || !user) {
+    return <Skeleton className="h-[300px] w-full" />;
+  }
+
   return (
     <>
       <CustomPageMeta title={t("Billing.title")} description={t("Billing.description")} />
