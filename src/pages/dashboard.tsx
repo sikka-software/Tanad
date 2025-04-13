@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
 import PageTitle from "@/components/ui/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
+import useUserStore from "@/hooks/use-user-store";
 import { supabase } from "@/lib/supabase";
 
 interface DashboardStats {
@@ -27,10 +28,11 @@ export default function Dashboard() {
     totalRevenue: 0,
     pendingInvoices: 0,
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
   const router = useRouter();
+  const { user, initialized } = useUserStore();
 
   const createOptions = [
     {
@@ -63,22 +65,43 @@ export default function Dashboard() {
     }
   };
 
+  // Fetch dashboard stats
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchDashboardStats() {
+      // Don't fetch if component is unmounted or we don't have necessary data
+      if (!isMounted || !initialized || !user?.id) {
+        console.log("[Dashboard] Skipping fetch - conditions not met:", {
+          isMounted,
+          initialized,
+          hasUser: !!user?.id,
+        });
+        return;
+      }
+
+      console.log("[Dashboard] Starting stats fetch for user:", user.id);
+      setLoading(true);
+      setError(null);
+
       try {
         // Fetch total invoices and revenue
         const { data: invoiceStats, error: invoiceError } = await supabase
           .from("invoices")
-          .select("id, total, status");
+          .select("id, total, status")
+          .eq("user_id", user.id);
 
         if (invoiceError) throw invoiceError;
 
         // Fetch total products
         const { count: productCount, error: productError } = await supabase
           .from("products")
-          .select("id", { count: "exact" });
+          .select("id", { count: "exact" })
+          .eq("user_id", user.id);
 
         if (productError) throw productError;
+
+        if (!isMounted) return;
 
         const totalRevenue =
           invoiceStats?.reduce((sum, invoice) => sum + (invoice.total || 0), 0) || 0;
@@ -92,21 +115,57 @@ export default function Dashboard() {
           pendingInvoices,
         });
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An error occurred while fetching dashboard stats",
-        );
+        console.error("[Dashboard] Error fetching stats:", err);
+        if (isMounted) {
+          setError(
+            err instanceof Error ? err.message : "An error occurred while fetching dashboard stats",
+          );
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
+    // Attempt to fetch stats whenever initialization state changes
     fetchDashboardStats();
-  }, []);
 
-  if (loading) {
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id, initialized]);
+
+  // Show loading state while waiting for initialization
+  if (!initialized) {
+    console.log("[Dashboard] Waiting for user store initialization");
     return (
       <div className="">
-        <PageTitle title={t("Dashboard.title")} />{" "}
+        <PageTitle title={t("Dashboard.title")} />
+        <div className="p-4">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i}>
+                <CardHeader>
+                  <Skeleton className="h-4 w-3/4" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-1/2" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading state while fetching stats
+  if (loading) {
+    console.log("[Dashboard] Loading stats...");
+    return (
+      <div className="">
+        <PageTitle title={t("Dashboard.title")} />
         <div className="p-4">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
@@ -127,9 +186,10 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="mx-auto">
-        <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-          {error}
+      <div className="">
+        <PageTitle title={t("Dashboard.title")} />
+        <div className="p-4">
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
         </div>
       </div>
     );
@@ -214,7 +274,7 @@ export default function Dashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.pendingInvoices}</div>
               <p className="mt-1 text-xs text-gray-500">
-                {((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}
+                {((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}%{" "}
                 {t("Dashboard.of_total")}
               </p>
             </CardContent>

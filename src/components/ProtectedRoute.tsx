@@ -10,19 +10,42 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const user = useUserStore((state: any) => state.user);
-  const loading = useUserStore((state: any) => state.loading);
+  const user = useUserStore((state) => state.user);
+  const loading = useUserStore((state) => state.loading);
+  const initialized = useUserStore((state) => state.initialized);
+  const fetchUserAndProfile = useUserStore((state) => state.fetchUserAndProfile);
   const router = useRouter();
   const [isRedirecting, setIsRedirecting] = useState(false);
 
+  // Initialize user data if needed
   useEffect(() => {
-    // Always fetch on initial mount to handle page refreshes
-    useUserStore.getState().fetchUserAndProfile();
-  }, []);
+    let mounted = true;
 
+    async function initializeUser() {
+      // Skip if already initialized and we have a user
+      if (initialized && user) {
+        return;
+      }
+
+      try {
+        await fetchUserAndProfile();
+      } catch (err) {
+        console.error("[ProtectedRoute] Error initializing user:", err);
+      }
+    }
+
+    initializeUser();
+
+    return () => {
+      mounted = false;
+    };
+  }, []); // Only run on mount
+
+  // Handle auth redirects
   useEffect(() => {
-    if (!loading && !user && !isRedirecting) {
+    if (!loading && !user && !isRedirecting && initialized) {
       setIsRedirecting(true);
+
       // Store the intended URL to redirect back after auth
       const currentPath = router.asPath;
       if (currentPath !== "/auth") {
@@ -33,10 +56,15 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
         setIsRedirecting(false);
       });
     }
-  }, [user, loading, router, isRedirecting]);
+  }, [user, loading, router, isRedirecting, initialized]);
 
   // Show nothing while loading or redirecting
-  if (loading || isRedirecting || !user) {
+  if (loading || isRedirecting || !initialized) {
+    return null;
+  }
+
+  // If we have no user after initialization, return null (redirect effect will handle it)
+  if (!user) {
     return null;
   }
 

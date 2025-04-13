@@ -9,13 +9,10 @@ interface WarehousesState {
 
 export const useWarehousesStore = create<WarehousesState>((set) => ({
   updateWarehouse: async (id: string, updates: Partial<Warehouse>) => {
-    const { error } = await supabase
-      .from("warehouses")
-      .update(updates)
-      .eq("id", id);
+    const { error } = await supabase.from("warehouses").update(updates).eq("id", id);
 
     if (error) {
       throw new Error(`Failed to update warehouse: ${error.message}`);
     }
   },
-})); 
+}));

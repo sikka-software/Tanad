@@ -33,13 +33,13 @@ export default function Auth() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { user, isAuthenticated } = useUserStore();
+  const { isAuthenticated, loading: storeLoading } = useUserStore();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace("/dashboard", undefined, { shallow: true });
+    if (isAuthenticated && !storeLoading) {
+      router.replace("/dashboard");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, storeLoading, router]);
 
   useEffect(() => {
     router.events.emit("routeChangeComplete", router.asPath);
@@ -54,6 +54,7 @@ export default function Auth() {
         password,
       });
       if (error) throw error;
+      // Don't redirect here, let the useEffect handle it
     } catch (error: any) {
       toast.error(t("Auth." + error.code));
       setLoading(false);
