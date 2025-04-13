@@ -1902,7 +1902,8 @@
     },
     "messages": {
       "success_deleted": "تم حذف الراتب بنجاح",
-      "error_delete": "فشل في حذف الراتب"
+      "error_delete": "فشل في حذف الراتب",
+      "error_not_authenticated": "يجب تسجيل الدخول لإنشاء راتب"
     },
     "table": {
       "employee_name": "اسم الموظف",
@@ -1931,15 +1932,18 @@
       },
       "payment_date": {
         "label": "تاريخ الدفع",
-        "required": "تاريخ الدفع مطلوب"
+        "required": "تاريخ الدفع مطلوب",
+        "placeholder": "اختر تاريخ الدفع"
       },
       "pay_period_start": {
         "label": "بداية فترة الدفع",
-        "required": "تاريخ بداية فترة الدفع مطلوب"
+        "required": "تاريخ بداية فترة الدفع مطلوب",
+        "placeholder": "اختر تاريخ بداية فترة الدفع"
       },
       "pay_period_end": {
         "label": "نهاية فترة الدفع",
-        "required": "تاريخ نهاية فترة الدفع مطلوب"
+        "required": "تاريخ نهاية فترة الدفع مطلوب",
+        "placeholder": "اختر تاريخ نهاية فترة الدفع"
       },
       "notes": {
         "label": "ملاحظات",

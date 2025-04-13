@@ -1590,7 +1590,8 @@
     },
     "error": {
       "title": "Error",
-      "delete": "Failed to delete salary"
+      "delete": "Failed to delete salary",
+      "error_not_authenticated": "You must be logged in to create a salary"
     },
     "messages": {
       "success_deleted": "Salary deleted successfully",
@@ -1623,15 +1624,18 @@
       },
       "payment_date": {
         "label": "Payment Date",
-        "required": "Payment date is required"
+        "required": "Payment date is required",
+        "placeholder": "Select payment date"
       },
       "pay_period_start": {
         "label": "Pay Period Start",
-        "required": "Pay period start date is required"
+        "required": "Pay period start date is required",
+        "placeholder": "Select pay period start date"
       },
       "pay_period_end": {
         "label": "Pay Period End",
-        "required": "Pay period end date is required"
+        "required": "Pay period end date is required",
+        "placeholder": "Select pay period end date"
       },
       "notes": {
         "label": "Notes",
