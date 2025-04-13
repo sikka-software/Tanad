@@ -35,7 +35,8 @@ export default function AddVendorPage() {
   const router = useRouter();
   const t = useTranslations();
   const [userId, setUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const form = useForm<VendorFormValues>({
     resolver: zodResolver(createVendorSchema(t)),
@@ -55,7 +56,7 @@ export default function AddVendorPage() {
   // Fetch user ID on mount
   useEffect(() => {
     const getUserId = async () => {
-      setLoading(true);
+      setLoadingUser(true);
       const { data, error } = await supabase.auth.getUser();
       if (data.user) {
         setUserId(data.user.id);
@@ -63,7 +64,7 @@ export default function AddVendorPage() {
         console.error("User not authenticated:", error);
         router.push("/auth/login");
       }
-      setLoading(false);
+      setLoadingUser(false);
     };
 
     getUserId();
@@ -77,7 +78,7 @@ export default function AddVendorPage() {
       return;
     }
 
-    setLoading(true);
+    setSubmitting(true);
     try {
       const vendorData = {
         name: data.name.trim(),
@@ -103,7 +104,7 @@ export default function AddVendorPage() {
         description: error instanceof Error ? error.message : t("Vendors.messages.error_save"),
       });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -116,8 +117,8 @@ export default function AddVendorPage() {
             <Button variant="outline" size="sm" onClick={() => router.push("/vendors")}>
               {t("General.cancel")}
             </Button>
-            <Button type="submit" size="sm" form="vendor-form" disabled={loading}>
-              {loading ? t("General.saving") : t("Vendors.add_new")}
+            <Button type="submit" size="sm" form="vendor-form" disabled={submitting}>
+              {submitting ? t("General.saving") : t("Vendors.add_new")}
             </Button>
           </div>
         }
@@ -128,7 +129,18 @@ export default function AddVendorPage() {
             <CardTitle>{t("Vendors.vendor_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <VendorForm formId="vendor-form" userId={userId} loading={loading} form={form} />
+            {loadingUser ? (
+              <p>{t("General.loading")}</p>
+            ) : userId ? (
+              <VendorForm
+                formId="vendor-form"
+                userId={userId}
+                loading={submitting}
+                form={form}
+              />
+            ) : (
+              <p>{t("Vendors.error.failed_to_load_user")}</p>
+            )}
           </CardContent>
         </Card>
       </div>
