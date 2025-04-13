@@ -1,27 +1,24 @@
 <div align="center">
-  <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./public/assets/pukla-logo-full-green.png" style="max-width: 200px; width: 100%;" width="200">
-  <img alt="Pukla Logo'" src="./public/assets/pukla-logo-full-purple.png" style="max-width: 200px; width: 100%;" width="200">
-</picture>
-  <p><strong>One link to rule them all</strong></p>
-  <a href="https://puk.la">puk.la</a>
+  <h1>Tanad (تند)</h1>
+  <p><strong>Enterprise System | CRM | ERP</strong></p>
+  <a href="https://tanad.app">tanad.app</a>
 </div>
 
 ---
 
-# Pukla (بكلة)
+# Tanad (تند)
 
-Pukla is a modern link-in-bio platform that allows users to create a single, customizable page containing all their important links. Built with Next.js and powered by cutting-edge technologies, Pukla provides a seamless experience for managing and sharing your online presence.
+Tanad is a comprehensive enterprise system offering CRM, ERP, and additional business management functionalities. Built with Next.js and powered by cutting-edge technologies, Tanad provides businesses with a complete suite of tools to manage their operations efficiently.
 
 ## Features
 
-- 🎨 **Customizable Design**: Take full control of your page design with custom colors, layouts, and themes
-- 🌐 **Multi-Platform Support**: Integration with major social media, delivery apps, and professional platforms
+- 💼 **Enterprise Management**: Complete suite of tools for business management
+- 🔄 **CRM & ERP Integration**: Customer relationship and enterprise resource planning in one platform
 - 📱 **Responsive Design**: Perfect viewing experience across all devices - mobile, tablet, and desktop
-- 📊 **Analytics**: Track your success with real-time analytics and engagement metrics
+- 📊 **Advanced Analytics**: Track business metrics with real-time analytics and reporting
 - 🔒 **Secure**: Built with modern security practices
 - 🌍 **Multi-language Support**: Full support for Arabic and English
-- 📱 **QR Code Generation**: Generate QR codes for easy offline sharing
+- 📋 **Workflow Automation**: Streamline business processes with automated workflows
 - ⚡ **Fast Performance**: Optimized for speed and reliability
 
 ## Tech Stack
@@ -48,8 +45,8 @@ Pukla is a modern link-in-bio platform that allows users to create a single, cus
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/pukla.git
-cd pukla
+git clone https://github.com/your-username/tanad.git
+cd tanad
 ```
 
 2. Install dependencies:
@@ -108,6 +105,4 @@ Proprietary - © Sikka Software
 
 - Email: hello@sikka.io
 - Website: https://sikka.io
-- Twitter: [@pukla_app](https://twitter.com/pukla_app)
-- Instagram: [@pukla_app](https://instagram.com/pukla_app)
 - WhatsApp: [+966531045453](https://wa.me/966531045453)
