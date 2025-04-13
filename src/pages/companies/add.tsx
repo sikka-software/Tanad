@@ -11,18 +11,18 @@ import { CompanyForm, type CompanyFormValues } from "@/components/forms/company-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+import useUserStore from "@/hooks/use-user-store";
 import { generateDummyData } from "@/lib/dummy-generator";
-import { useUser } from "@/providers/UserProvider";
 
 export default function AddCompanyPage() {
   const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-  const { userId } = useUser();
+  const { user } = useUserStore();
 
   const handleSubmit = async (data: CompanyFormValues) => {
-    if (!userId) {
+    if (!user?.id) {
       router.push("/auth");
       return;
     }
@@ -47,7 +47,7 @@ export default function AddCompanyPage() {
           size: data.size?.trim() || null,
           notes: data.notes?.trim() || null,
           isActive: data.isActive,
-          userId,
+          userId: user.id,
         }),
       });
 
@@ -60,9 +60,9 @@ export default function AddCompanyPage() {
       const newCompany = await response.json();
 
       // Update the companies cache to include the new company
-      const previousCompanies = queryClient.getQueryData(["companies", userId]) || [];
+      const previousCompanies = queryClient.getQueryData(["companies", user.id]) || [];
       queryClient.setQueryData(
-        ["companies", userId],
+        ["companies", user.id],
         [...(Array.isArray(previousCompanies) ? previousCompanies : []), newCompany],
       );
 

@@ -33,13 +33,13 @@ export default function Auth() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const user = useUserStore((state: any) => state.user);
+  const { user, isAuthenticated } = useUserStore();
 
   useEffect(() => {
-    if (user) {
+    if (isAuthenticated) {
       router.replace("/dashboard", undefined, { shallow: true });
     }
-  }, [user, router]);
+  }, [isAuthenticated, router]);
 
   useEffect(() => {
     router.events.emit("routeChangeComplete", router.asPath);
@@ -94,12 +94,17 @@ export default function Auth() {
           ]);
 
           if (profileError) throw profileError;
+
+          // After successful signup and profile creation, let the store handle the session
+          await useUserStore.getState().fetchUserAndProfile();
         } catch (profileError: any) {
           console.error("Error creating profile:", profileError);
+          toast.error(t("Auth.error_creating_profile"));
         }
       }
     } catch (error: any) {
       toast.error(t("Auth." + error.code));
+    } finally {
       setLoading(false);
     }
   };

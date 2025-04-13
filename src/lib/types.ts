@@ -19,7 +19,7 @@ export interface UserSettings {
   calendar_type: string;
 }
 
-export type PuklaUser = User & {
+export type TanadUser = User & {
   id: string;
   email: string;
   phone: string;

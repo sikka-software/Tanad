@@ -1,37 +1,61 @@
-import { create } from "zustand";
-import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
-import { Profile, PuklaUser } from "@/lib/types";
+import { create } from "zustand";
 
-const useUserStore = create<{
-  user: PuklaUser | null;
+import { supabase } from "@/lib/supabase";
+
+// Define strong types for our user data
+export interface Profile {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  stripe_customer_id: string | null;
+  avatar_url: string | null;
+  address: string | null;
+  user_settings: {
+    currency: string;
+    calendar_type: string;
+  };
+  username: string | null;
+  subscribed_to: string | null;
+  price_id: string | null;
+  phone: string | null;
+}
+
+export interface UserState {
+  user: User | null;
   profile: Profile | null;
   loading: boolean;
   initialized: boolean;
-  setUser: (user: PuklaUser) => void;
-  setProfile: (profile: Profile) => void;
+  isAuthenticated: boolean;
+  setUser: (user: User | null) => void;
+  setProfile: (profile: Profile | null) => void;
   fetchUserAndProfile: () => Promise<void>;
-}>((set, get) => ({
+  refreshProfile: () => Promise<void>;
+  signOut: () => Promise<void>;
+}
+
+const useUserStore = create<UserState>((set, get) => ({
   user: null,
   profile: null,
   loading: true,
   initialized: false,
-  setUser: (user: PuklaUser) => set({ user }),
-  setProfile: (profile: Profile) => set({ profile }),
+  isAuthenticated: false,
+
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  setProfile: (profile) => set({ profile }),
+
   fetchUserAndProfile: async () => {
     // Only fetch if not initialized or explicitly forced
     if (get().initialized) return;
 
     set({ loading: true });
     try {
-      // Fetch the authenticated user
       const {
         data: { session },
       } = await supabase.auth.getSession();
       const user = session?.user || null;
-      set({ user: user as PuklaUser });
+      set({ user, isAuthenticated: !!user });
 
-      // Fetch the profile info if user exists
       if (user) {
         const { data: profile, error } = await supabase
           .from("profiles")
@@ -39,52 +63,57 @@ const useUserStore = create<{
           .eq("id", user.id)
           .single();
 
-        if (error) console.error("Error fetching profile:", error);
+        if (error) throw error;
         set({ profile });
       } else {
         set({ profile: null });
       }
+    } catch (error) {
+      console.error("Error fetching user and profile:", error);
+      set({ user: null, profile: null, isAuthenticated: false });
     } finally {
       set({ loading: false, initialized: true });
+    }
+  },
+
+  refreshProfile: async () => {
+    const user = get().user;
+    if (!user) return;
+
+    try {
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      set({ profile });
+    } catch (error) {
+      console.error("Error refreshing profile:", error);
+    }
+  },
+
+  signOut: async () => {
+    try {
+      await supabase.auth.signOut();
+      set({ user: null, profile: null, isAuthenticated: false });
+    } catch (error) {
+      console.error("Error signing out:", error);
     }
   },
 }));
 
 // Set up auth state change listener
-supabase.auth.onAuthStateChange((event, session) => {
+supabase.auth.onAuthStateChange(async (event, session) => {
+  const store = useUserStore.getState();
+
   if (session?.user) {
-    // Don't reset the entire state, just update what changed
-    const currentState = useUserStore.getState();
-    if (currentState.user?.id === session.user.id) {
-      // If it's the same user, don't do anything
-      return;
-    }
-    // If it's a different user, update with full profile
-    supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", session.user.id)
-      .single()
-      .then(({ data: profile }) => {
-        useUserStore.setState({
-          user: {
-            ...session.user,
-            stripe_customer_id: profile?.stripe_customer_id,
-            full_name: profile?.full_name,
-            subscribed_to: profile?.subscribed_to,
-            price_id: profile?.price_id,
-            profile: profile?.profile,
-            user_settings: profile?.user_settings,
-            address: profile?.address,
-            phone: profile?.phone,
-            email: profile?.email,
-            avatar_url: profile?.avatar_url,
-          } as PuklaUser,
-          profile,
-        });
-      });
+    store.setUser(session.user);
+    await store.refreshProfile();
   } else {
-    useUserStore.setState({ user: null, profile: null });
+    store.setUser(null);
+    store.setProfile(null);
   }
 });
 

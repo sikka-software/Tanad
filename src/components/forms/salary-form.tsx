@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import useUserStore from "@/hooks/use-user-store";
 import { useEmployees } from "@/hooks/useEmployees";
-import { useUser } from "@/providers/UserProvider";
 import type { Salary } from "@/types/salary.type";
 
 const createSalarySchema = (t: (key: string) => string) =>
@@ -74,7 +74,7 @@ export function SalaryForm({
   const t = useTranslations();
   const [internalLoading, setInternalLoading] = useState(false);
   const loading = externalLoading || internalLoading;
-  const { userId, isAuthenticated } = useUser();
+  const { user } = useUserStore();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
 
   const salarySchema = createSalarySchema(t);
@@ -131,7 +131,7 @@ export function SalaryForm({
   // Data is SalaryFormValues (numbers for amounts)
   const onSubmit: SubmitHandler<SalaryFormValues> = async (data) => {
     setInternalLoading(true);
-    if (!isAuthenticated || !userId) {
+    if (!user?.id) {
       toast.error(t("Salaries.error.title"), {
         description: t("Salaries.messages.error_not_authenticated"),
       });
@@ -145,7 +145,7 @@ export function SalaryForm({
         ...data,
         deductions: data.deductions ? JSON.parse(data.deductions) : null,
         notes: data.notes?.trim() || null,
-        userId: userId,
+        userId: user.id,
       };
 
       let result: Salary;
@@ -238,8 +238,10 @@ export function SalaryForm({
                     onSelect={(date) => {
                       if (date) {
                         // Ensure we're working with the local date
-                        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-                        field.onChange(localDate.toISOString().split('T')[0]);
+                        const localDate = new Date(
+                          date.getTime() - date.getTimezoneOffset() * 60000,
+                        );
+                        field.onChange(localDate.toISOString().split("T")[0]);
                       } else {
                         field.onChange("");
                       }
@@ -263,8 +265,10 @@ export function SalaryForm({
                     onSelect={(date) => {
                       if (date) {
                         // Ensure we're working with the local date
-                        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-                        field.onChange(localDate.toISOString().split('T')[0]);
+                        const localDate = new Date(
+                          date.getTime() - date.getTimezoneOffset() * 60000,
+                        );
+                        field.onChange(localDate.toISOString().split("T")[0]);
                       } else {
                         field.onChange("");
                       }
@@ -292,7 +296,7 @@ export function SalaryForm({
                     if (date) {
                       // Ensure we're working with the local date
                       const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-                      field.onChange(localDate.toISOString().split('T')[0]);
+                      field.onChange(localDate.toISOString().split("T")[0]);
                     } else {
                       field.onChange("");
                     }
