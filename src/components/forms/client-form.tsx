@@ -37,7 +37,7 @@ export const createClientSchema = (t: (key: string) => string) =>
       .min(1, t("Clients.form.validation.email_required"))
       .email(t("Clients.form.validation.email_invalid")),
     phone: z.string().min(1, t("Clients.form.validation.phone_required")),
-    company: z.string().optional(),
+    company: z.string().nullable(),
     address: z.string().min(1, t("Clients.form.validation.address_required")),
     city: z.string().min(1, t("Clients.form.validation.city_required")),
     state: z.string().min(1, t("Clients.form.validation.state_required")),
@@ -73,7 +73,7 @@ export function ClientForm({
       name: "",
       email: "",
       phone: "",
-      company: "",
+      company: null,
       address: "",
       city: "",
       state: "",
@@ -174,8 +174,8 @@ export function ClientForm({
                       direction={locale === "ar" ? "rtl" : "ltr"}
                       data={companyOptions}
                       isLoading={companiesLoading}
-                      defaultValue={field.value}
-                      onChange={field.onChange}
+                      defaultValue={field.value || ""}
+                      onChange={(value) => field.onChange(value || null)}
                       texts={{
                         placeholder: t("Clients.form.company.placeholder"),
                         searchPlaceholder: t("Clients.form.company.search_placeholder"),

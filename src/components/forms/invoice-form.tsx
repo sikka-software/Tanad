@@ -42,6 +42,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/lib/supabase";
 
+import { FormDialog } from "../ui/form-dialog";
+
 const invoiceSchema = z.object({
   client_id: z.string().min(1, "Client is required"),
   invoice_number: z.string().min(1, "Invoice number is required"),
@@ -634,14 +636,16 @@ export function InvoiceForm({
         </form>
       </Form>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>{t("add_new_client")}</DialogTitle>
-          </DialogHeader>
-          <ClientForm onSuccess={handleClientAdded} userId={userId} />
-        </DialogContent>
-      </Dialog>
+      <FormDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        title={t("add_new_client")}
+        formId="client-form"
+        cancelText={t("cancel")}
+        submitText={t("save")}
+      >
+        <ClientForm id="client-form" onSubmit={handleClientAdded} userId={userId} />
+      </FormDialog>
 
       <Dialog open={isNewProductDialogOpen} onOpenChange={setIsNewProductDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
