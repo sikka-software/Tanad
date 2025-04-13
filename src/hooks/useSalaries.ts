@@ -1,4 +1,3 @@
-import { useCallback, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -21,120 +20,19 @@ export const salaryKeys = {
 
 // Hook to fetch all salaries
 export function useSalaries() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  return useQuery({
+    queryKey: salaryKeys.lists(),
+    queryFn: fetchSalaries,
+  });
+}
 
-  const fetchSalaries = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/salaries");
-      if (!response.ok) {
-        throw new Error("Failed to fetch salaries");
-      }
-      const data = await response.json();
-      return data as Salary[];
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const fetchSalaryById = useCallback(async (id: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/salaries?id=${id}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch salary");
-      }
-      const data = await response.json();
-      return data as Salary;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const createSalary = useCallback(async (salary: SalaryCreateData) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/salaries", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(salary),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create salary");
-      }
-      const data = await response.json();
-      return data as Salary;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const updateSalary = useCallback(async (id: string, salary: Partial<Omit<Salary, "id" | "created_at">>) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/salaries?id=${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(salary),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update salary");
-      }
-      const data = await response.json();
-      return data as Salary;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const deleteSalary = useCallback(async (id: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`/api/salaries?id=${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to delete salary");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  return {
-    isLoading,
-    error,
-    fetchSalaries,
-    fetchSalaryById,
-    createSalary,
-    updateSalary,
-    deleteSalary,
-  };
+// Hook to fetch a single salary by ID
+export function useSalary(id: string) {
+  return useQuery({
+    queryKey: salaryKeys.detail(id),
+    queryFn: () => fetchSalaryById(id),
+    enabled: !!id,
+  });
 }
 
 // Hook for creating a new salary
@@ -142,7 +40,7 @@ export function useCreateSalary() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newSalary: Omit<Salary, "id" | "created_at">) => createSalary(newSalary),
+    mutationFn: (newSalary: SalaryCreateData) => createSalary(newSalary),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
     },

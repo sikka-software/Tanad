@@ -38,7 +38,7 @@ const formatCurrency = (amount: number | null | undefined) => {
 export default function SalariesPage() {
   const t = useTranslations("Salaries");
   const router = useRouter(); // Get router for navigation
-  const { data: salaries, ,isLoading, error } = useSalaries();
+  const { data: salaries, isLoading, error } = useSalaries();
   const deleteSalaryMutation = useDeleteSalary(); // Hook for deletion
 
   const handleDelete = (id: string) => {
