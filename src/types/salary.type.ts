@@ -7,16 +7,14 @@ export interface DeductionDetail {
 
 export interface Salary {
   id: string;
-  created_at: string;
-  pay_period_start: string; // Use string for date types from Supabase
-  pay_period_end: string;
-  payment_date: string;
-  gross_amount: number; // Use number for numeric types
-  net_amount: number;
-  deductions: Record<string, DeductionDetail> | DeductionDetail[] | null; // Flexible JSONB type
-  notes: string | null;
   employee_name: string;
-  // userId might not be needed here if handled by RLS
+  gross_amount: number;
+  net_amount: number;
+  payment_date: string;
+  pay_period_start: string;
+  pay_period_end: string;
+  deductions?: Record<string, number>;
+  notes?: string;
 }
 
 // For creating a new salary entry
