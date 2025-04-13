@@ -44,6 +44,21 @@ export async function getStripePlans(): Promise<StripePlan[]> {
 }
 
 /**
+ * Fetches a specific subscription from Stripe
+ */
+export async function getSubscription(subscriptionId: string): Promise<Stripe.Subscription | null> {
+  try {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+      expand: ["default_payment_method", "items.data.price.product"],
+    });
+    return subscription;
+  } catch (error) {
+    console.error(`Error fetching subscription ${subscriptionId}:`, error);
+    return null;
+  }
+}
+
+/**
  * Helper function to format price based on currency and billing interval
  */
 function formatPrice(price: Stripe.Price): string {
