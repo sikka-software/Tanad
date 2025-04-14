@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import Image from "next/image";
 import { useRouter } from "next/router";
 
 import { Eye, EyeOff, Loader2 } from "lucide-react";
@@ -11,13 +10,14 @@ import { toast } from "sonner";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
 import useUserStore from "@/hooks/use-user-store";
 import { FREE_PLAN_ID } from "@/lib/constants";
+import { createStripeCustomer } from "@/lib/stripe";
 import { supabase } from "@/lib/supabase";
 
 export default function Auth() {
@@ -75,6 +75,12 @@ export default function Auth() {
       });
       if (error) throw error;
 
+      // Create Stripe customer
+      let stripeCustomerId = null;
+      if (data.user) {
+        stripeCustomerId = await createStripeCustomer(data.user.email || "");
+      }
+
       // Create profile for the new user
       if (data.user) {
         try {
@@ -83,12 +89,12 @@ export default function Auth() {
               id: data.user.id,
               email: data.user.email,
               full_name: "Default Full Name",
-              stripe_customer_id: null,
+              stripe_customer_id: stripeCustomerId,
               avatar_url: null,
               address: null,
               user_settings: { currency: "SAR", calendar_type: "gregorian" },
               username: null,
-              subscribed_to: "pukla_free",
+              subscribed_to: "tanad_free",
               price_id: FREE_PLAN_ID,
             },
           ]);
@@ -182,7 +188,7 @@ export default function Auth() {
           Tanad
           {/* <Image
             src={`/assets/pukla-logo-full-${resolvedTheme === "dark" ? "green" : "purple"}.png`}
-            alt="Pukla"
+            alt="Tanad"
             className="h-12 w-auto"
             width={512}
             height={512}
