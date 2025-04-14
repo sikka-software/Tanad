@@ -22,51 +22,59 @@ export default function EmployeesPage() {
   const { data: employees, isLoading, error } = useEmployees();
 
   const filteredEmployees = Array.isArray(employees)
-    ? employees.filter(
-        (employee: Employee) =>
-          employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          employee.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          employee.department?.toLowerCase()?.includes(searchQuery.toLowerCase()),
-      )
+    ? employees.filter((employee: Employee) => {
+        if (!employee) return false;
+        
+        const searchLower = searchQuery.toLowerCase();
+        return (
+          employee.name?.toLowerCase().includes(searchLower) ||
+          employee.email?.toLowerCase().includes(searchLower) ||
+          employee.position?.toLowerCase().includes(searchLower) ||
+          employee.department?.toLowerCase()?.includes(searchLower)
+        );
+      })
     : [];
 
-  const renderEmployee = (employee: Employee) => (
-    <Card key={employee.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">{employee.name}</h3>
-            <p className="text-sm text-gray-500">{employee.position}</p>
+  const renderEmployee = (employee: Employee) => {
+    if (!employee) return null;
+    
+    return (
+      <Card key={employee.id} className="transition-shadow hover:shadow-lg">
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-lg font-semibold">{employee.name}</h3>
+              <p className="text-sm text-gray-500">{employee.position}</p>
+            </div>
           </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Mail className="h-4 w-4" />
-            <a href={`mailto:${employee.email}`} className="hover:text-primary">
-              {employee.email}
-            </a>
-          </div>
-          {employee.phone && (
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Phone className="h-4 w-4" />
-              <a href={`tel:${employee.phone}`} className="hover:text-primary">
-                {employee.phone}
+              <Mail className="h-4 w-4" />
+              <a href={`mailto:${employee.email}`} className="hover:text-primary">
+                {employee.email}
               </a>
             </div>
-          )}
-          {employee.department && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Building2 className="h-4 w-4" />
-              <span>{employee.department}</span>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
+            {employee.phone && (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Phone className="h-4 w-4" />
+                <a href={`tel:${employee.phone}`} className="hover:text-primary">
+                  {employee.phone}
+                </a>
+              </div>
+            )}
+            {employee.department && (
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <Building2 className="h-4 w-4" />
+                <span>{employee.department}</span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <DataPageLayout>
