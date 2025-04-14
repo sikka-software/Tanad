@@ -7,12 +7,11 @@ import { format } from "date-fns";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import ErrorComponent from "@/components/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import { useUpdateInvoice } from "@/hooks/useInvoices";
+import TableSkeleton from "@/components/ui/table-skeleton";
+import { useInvoicesStore } from "@/stores/invoices.store";
 import { Invoice } from "@/types/invoice.type";
-
-import ErrorComponent from "../ui/error-component";
-import TableSkeleton from "../ui/table-skeleton";
 
 const invoiceNumberSchema = z.string().min(1, "Required");
 const issueDateSchema = z.date();
@@ -28,45 +27,49 @@ interface InvoicesTableProps {
 
 const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
   const t = useTranslations("Invoices");
-  const { mutate: updateInvoice } = useUpdateInvoice();
+  const { updateInvoice } = useInvoicesStore();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     let processedValue = value;
     if (columnId === "issueDate" || columnId === "dueDate") {
       processedValue = new Date(value as string).toISOString();
     }
-
-    await updateInvoice({ id: rowId, invoice: { [columnId]: processedValue } });
+    await updateInvoice(rowId, { [columnId]: processedValue });
   };
 
   const columns: ExtendedColumnDef<Invoice>[] = [
     {
       accessorKey: "invoiceNumber",
-      header: "Invoice #",
+      header: t("form.invoice_number.label"),
+      validationSchema: invoiceNumberSchema,
     },
     {
       accessorKey: "client.company",
-      header: "Client",
+      header: t("form.client.label"),
       cell: ({ row }) => row.original.client?.company || "N/A",
     },
     {
       accessorKey: "issueDate",
-      header: "Issue Date",
+      header: t("form.issue_date.label"),
+      validationSchema: issueDateSchema,
       cell: ({ row }) => format(new Date(row.original.issueDate), "MMM dd, yyyy"),
     },
     {
       accessorKey: "dueDate",
-      header: "Due Date",
+      header: t("form.due_date.label"),
+      validationSchema: dueDateSchema,
       cell: ({ row }) => format(new Date(row.original.dueDate), "MMM dd, yyyy"),
     },
     {
       accessorKey: "total",
-      header: "Total",
+      header: t("form.total.label"),
+      validationSchema: totalSchema,
       cell: ({ row }) => `$${row.original.total.toFixed(2)}`,
     },
     {
       accessorKey: "status",
-      header: "Status",
+      header: t("form.status.label"),
+      validationSchema: statusSchema,
     },
     {
       id: "actions",
@@ -76,7 +79,7 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" asChild>
               <Link href={`/pay/${invoice.id}`} target="_blank">
-                Preview
+                {t("actions.preview")}
               </Link>
             </Button>
           </div>
