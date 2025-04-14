@@ -41,19 +41,21 @@ const warehouseFormSchema = z.object({
 type WarehouseFormValues = z.input<typeof warehouseFormSchema>;
 
 interface WarehouseFormProps {
-  formId?: string;
+  id?: string;
   warehouseId?: string;
   onSuccess?: (warehouse: Warehouse) => void;
   loading?: boolean;
   userId: string | null;
+  setLoading?: (loading: boolean) => void;
 }
 
 export function WarehouseForm({
-  formId = "warehouse-form",
+  id = "warehouse-form",
   warehouseId,
   onSuccess,
   loading: externalLoading = false,
   userId,
+  setLoading,
 }: WarehouseFormProps) {
   const router = useRouter();
   const t = useTranslations();
@@ -191,7 +193,7 @@ export function WarehouseForm({
 
   return (
     <Form {...form}>
-      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}

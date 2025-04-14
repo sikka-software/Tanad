@@ -16,6 +16,7 @@ import { supabase } from "@/lib/supabase";
 export default function AddWarehousePage() {
   const router = useRouter();
   const t = useTranslations();
+  const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const queryClient = useQueryClient();
@@ -39,6 +40,7 @@ export default function AddWarehousePage() {
   }, [router]);
 
   const handleSuccess = (warehouse: any) => {
+    setLoading(false);
     // Update the warehouses cache to include the new warehouse
     const previousWarehouses = queryClient.getQueryData(warehouseKeys.lists()) || [];
     queryClient.setQueryData(warehouseKeys.lists(), [
@@ -56,7 +58,7 @@ export default function AddWarehousePage() {
         title={t("Warehouses.add_new")}
         formButtons
         formId="warehouse-form"
-        // loading={loading}
+        loading={loading}
         onCancel={() => router.push("/warehouses")}
         texts={{
           submit_form: t("Warehouses.add_new"),
@@ -70,7 +72,13 @@ export default function AddWarehousePage() {
             <CardTitle>{t("Warehouses.warehouse_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <WarehouseForm userId={userId} onSuccess={handleSuccess} />
+            <WarehouseForm 
+              id="warehouse-form"
+              userId={userId} 
+              onSuccess={handleSuccess}
+              loading={loading}
+              setLoading={setLoading}
+            />
           </CardContent>
         </Card>
       </div>
