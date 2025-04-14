@@ -888,13 +888,17 @@
     "analytics_overview_description": "عرض التحليلات العامة بالنسبة لبكلتك",
     "select_date_range": "اختر نطاق التاريخ"
   },
-  "Billing": {
-    "pro_plan": "الباقة الإحترافية",
+  "billing": {
+    "tanad_free": "الباقة المجانية",
+    "tanad_business": "الباقة التجارية",
+    "tanad_premium": "الباقة الممتازة",
+    "tanad_pro": "الباقة الإحترافية",
     "only_for_enterprise_users": "لباقة المؤسسات فقط",
     "upgrade_to_enterprise_for_advanced_analytics": "قم بالترقية لباقة المؤسسات للوصول إلى التحليلات المتقدمة",
-    "enterprise_plan": "باقة المؤسسات",
+    "tanad_enterprise": "باقة المؤسسات",
     "title": "الدفع",
     "description": "إدارة جميع طرق الدفع الخاصة بك",
+    "subscription_plans": "الباقات",
     "upgrade_dialog": {
       "title": "ترقية إلى المستوى التالي",
       "description": "قم بترقية خطتك لإنشاء المزيد من البكلات",
@@ -902,7 +906,67 @@
       "custom_design_and_colors": "تصميم خاص وألوان مخصصة",
       "advanced_analytics": "تحليلات متقدمة ودعم بالبريد الإلكتروني"
     },
-    "upgrade_now": "ترقية الآن"
+    "upgrade_now": "ترقية الآن",
+    "current_plan": "الباقة الحالية",
+    "select_plan_button": "اختر الباقة",
+    "update_plan": "تحديث الباقة",
+    "payment_details": "تفاصيل الدفع",
+    "complete_subscription": "إكمال الاشتراك",
+    "choose_the_right_plan": "اختر الباقة الصحيحة لأعمالك",
+    "payment_dialog_description": "قم بإكمال الاشتراك بإعطاء تفاصيل الدفع",
+    "current_plan_button": "الباقة الحالية",
+    "features": {
+      "basic_access": "الوصول الأساسي للوحة التحكم",
+      "limited_projects": "حتى 3 مشاريع نشطة",
+      "standard_support": "دعم عبر البريد الإلكتروني",
+      "community_access": "الوصول إلى المنتدى المجتمعي",
+      "limited_clients": "إدارة عملاء محدودة (5 عملاء كحد أقصى)",
+      "basic_invoicing": "وظيفة الفواتير الأساسية",
+      "limited_employees": "ملفات الموظفين (5 كحد أقصى)",
+      "basic_attendance": "تتبع الحضور الأساسي",
+
+      "unlimited_projects": "عدد غير محدود من المشاريع",
+      "priority_support": "دعم ذو أولوية",
+      "advanced_analytics": "تحليلات وتقارير متقدمة",
+      "custom_branding": "تخصيص العلامة التجارية",
+      "api_access": "وصول إلى واجهة برمجة التطبيقات (API)",
+      "client_portal": "بوابة عملاء كاملة",
+      "invoice_customization": "تخصيص كامل للفواتير",
+      "employee_management": "إدارة الموظفين (25 كحد أقصى)",
+      "payroll_processing": "معالجة كشوف المرتبات",
+      "vendor_management": "إدارة الموردين",
+      "product_catalog": "إدارة كتالوج المنتجات",
+
+      "dedicated_support": "دعم مخصص",
+      "advanced_reports": "تقارير مخصصة متقدمة",
+      "white_label": "إمكانيات العلامة البيضاء",
+      "team_collaboration": "أدوات تعاون الفريق",
+      "extended_api": "وصول موسع لواجهة برمجة التطبيقات",
+      "sso_auth": "الدخول الموحد (SSO)",
+      "enterprise_integrations": "تكاملات المؤسسات",
+      "unlimited_employees": "عدد غير محدود من الموظفين والعملاء",
+      "multi_branch": "إدارة متعددة الفروع",
+      "warehouse_management": "إدارة مخزون المستودعات",
+      "job_listings": "قوائم الوظائف وتتبع المتقدمين",
+      "purchase_management": "إدارة مشتريات متقدمة",
+      "company_management": "إدارة هيكل الشركة",
+
+      "unlimited_access": "وصول كامل للمنصة",
+      "premium_support": "دعم متميز على مدار الساعة",
+      "ai_analytics": "تحليلات مدعومة بالذكاء الاصطناعي",
+      "complete_white_label": "تجربة علامة بيضاء كاملة",
+      "advanced_permissions": "صلاحيات متقدمة للأدوار",
+      "unlimited_api": "وصول غير محدود لواجهة برمجة التطبيقات",
+      "advanced_sso": "خيارات دخول موحد متقدمة",
+      "custom_integrations": "وصلات تكامل مخصصة",
+      "account_manager": "مدير حسابات مخصص",
+      "custom_development": "تطوير ميزات مخصصة",
+      "advanced_security": "ميزات أمان متقدمة",
+      "data_management": "خيارات تصدير البيانات والنسخ الاحتياطي",
+      "custom_automation": "أتمتة سير العمل المخصصة",
+      "biometric_auth": "المصادقة البيومترية",
+      "multiple_payment_gateways": "بوابات دفع متعددة"
+    }
   },
   "Account": {
     "title": "الحساب",
@@ -2023,6 +2087,21 @@
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
     "address": "العنوان"
+  },
+  "Applications": {
+    "title": "الطلبات"
+  },
+  "JobListing": {
+    "title": "الوظائف"
+  },
+  "Applicants": {
+    "title": "المتقدمين"
+  },
+  "Calendar": {
+    "title": "التقويم"
+  },
+  "Expenses": {
+    "title": "المصروفات"
   },
   "Companies": {
     "title": "الشركات",

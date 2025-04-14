@@ -918,13 +918,18 @@
     "analytics_overview_description": "View general analytics for your Pukla",
     "select_date_range": "Pick a date range"
   },
-  "Billing": {
-    "pro_plan": "Pro Plan",
+  "billing": {
+    "tanad_free": "Free Plan",
+    "tanad_pro": "Pro Plan",
+    "tanad_business": "Business Plan",
+    "tanad_premium": "Premium Plan",
+    "tanad_enterprise": "Enterprise Plan",
     "only_for_enterprise_users": "For Enterprise Users Only",
     "upgrade_to_enterprise_for_advanced_analytics": "Upgrade to Enterprise plan to access advanced analytics",
-    "enterprise_plan": "Enterprise Plan",
     "title": "Billing",
     "description": "Manage all your payment methods",
+    "subscription_plans": "Subscription Plans",
+
     "upgrade_dialog": {
       "title": "Upgrade to Next Level",
       "description": "Upgrade your plan to create more Puklas",
@@ -932,7 +937,62 @@
       "custom_design_and_colors": "Custom design and colors",
       "advanced_analytics": "Advanced analytics and email support"
     },
-    "upgrade_now": "Upgrade Now"
+    "upgrade_now": "Upgrade Now",
+    "current_plan": "Current Plan",
+    "select_plan_button": "Select Plan",
+    "update_plan": "Update Plan",
+    "features": {
+      "basic_access": "Basic dashboard access",
+      "limited_projects": "Up to 3 active projects",
+      "standard_support": "Standard email support",
+      "community_access": "Community forum access",
+      "limited_clients": "Limited client management (5 clients)",
+      "basic_invoicing": "Basic invoicing functionality",
+      "limited_employees": "Employee profiles (5 max)",
+      "basic_attendance": "Basic attendance tracking",
+
+      "unlimited_projects": "Unlimited projects",
+      "priority_support": "Priority support",
+      "advanced_analytics": "Advanced analytics & reporting",
+      "custom_branding": "Custom branding",
+      "api_access": "API access",
+      "client_portal": "Complete client portal",
+      "invoice_customization": "Full invoice customization",
+      "employee_management": "Employee management (25 max)",
+      "payroll_processing": "Payroll processing",
+      "vendor_management": "Vendor management",
+      "product_catalog": "Product catalog management",
+
+      "dedicated_support": "Dedicated support",
+      "advanced_reports": "Advanced custom reports",
+      "white_label": "White-label capabilities",
+      "team_collaboration": "Team collaboration tools",
+      "extended_api": "Extended API access",
+      "sso_auth": "Single Sign-On (SSO)",
+      "enterprise_integrations": "Enterprise integrations",
+      "unlimited_employees": "Unlimited employees & clients",
+      "multi_branch": "Multi-branch management",
+      "warehouse_management": "Warehouse inventory management",
+      "job_listings": "Job listings & applicant tracking",
+      "purchase_management": "Advanced purchase management",
+      "company_management": "Company structure management",
+
+      "unlimited_access": "Complete platform access",
+      "premium_support": "24/7 premium support",
+      "ai_analytics": "AI-powered analytics",
+      "complete_white_label": "Complete white-label experience",
+      "advanced_permissions": "Advanced role permissions",
+      "unlimited_api": "Unlimited API access",
+      "advanced_sso": "Advanced SSO options",
+      "custom_integrations": "Custom integration connectors",
+      "account_manager": "Dedicated account manager",
+      "custom_development": "Custom feature development",
+      "advanced_security": "Advanced security features",
+      "data_management": "Data export & backup options",
+      "custom_automation": "Custom workflow automation",
+      "biometric_auth": "Biometric authentication",
+      "multiple_payment_gateways": "Multiple payment gateways"
+    }
   },
   "Account": {
     "title": "Account",
@@ -2067,6 +2127,20 @@
     "phone": "Phone",
     "address": "Address"
   },
+  "Applications": {
+    "title": "Applications"
+  },
+  "JobListing": {
+    "title": "Job Listing"
+  },
+
+  "Calendar": {
+    "title": "Calendar"
+  },
+  "Expenses": {
+    "title": "Expenses"
+  },
+
   "form": {
     "validation": {
       "name_required": "Name is required",
