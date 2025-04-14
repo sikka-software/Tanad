@@ -14,6 +14,7 @@ import { ClientForm } from "@/components/forms/client-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ComboboxAdd } from "@/components/ui/combobox-add";
+import { DatePicker } from "@/components/ui/date-picker";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
@@ -47,8 +48,12 @@ import { FormDialog } from "../ui/form-dialog";
 const invoiceSchema = z.object({
   client_id: z.string().min(1, "Client is required"),
   invoice_number: z.string().min(1, "Invoice number is required"),
-  issue_date: z.string().min(1, "Issue date is required"),
-  due_date: z.string().min(1, "Due date is required"),
+  issue_date: z.date({
+    required_error: "Issue date is required",
+  }),
+  due_date: z.date({
+    required_error: "Due date is required",
+  }),
   status: z.string().min(1, "Status is required"),
   subtotal: z.number().min(0, "Subtotal must be a positive number"),
   tax_rate: z.number().min(0, "Tax rate must be a positive number"),
@@ -169,8 +174,8 @@ export function InvoiceForm({
     defaultValues: {
       client_id: "",
       invoice_number: "",
-      issue_date: new Date().toISOString().split("T")[0],
-      due_date: "",
+      issue_date: new Date(),
+      due_date: undefined,
       status: "draft",
       subtotal: 0,
       tax_rate: 0,
@@ -499,11 +504,15 @@ export function InvoiceForm({
             <FormField
               control={form.control}
               name="issue_date"
-              render={({ field }) => (
+              render={({ field: { value, onChange, ...field } }) => (
                 <FormItem>
                   <FormLabel>{t("issue_date")} *</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <DatePicker
+                      date={value}
+                      onSelect={onChange}
+                      placeholder={t("select_issue_date")}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -513,11 +522,15 @@ export function InvoiceForm({
             <FormField
               control={form.control}
               name="due_date"
-              render={({ field }) => (
+              render={({ field: { value, onChange, ...field } }) => (
                 <FormItem>
                   <FormLabel>{t("due_date")} *</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <DatePicker
+                      date={value}
+                      onSelect={onChange}
+                      placeholder={t("select_due_date")}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Form,
   FormControl,
@@ -31,7 +32,9 @@ const employeeFormSchema = z.object({
   phone: z.string().optional(),
   position: z.string().min(1, "Position is required"),
   department: z.string().optional(),
-  hireDate: z.string().min(1, "Hire date is required"),
+  hireDate: z.date({
+    required_error: "Hire date is required",
+  }),
   salary: z
     .string()
     .optional()
@@ -54,7 +57,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
       phone: "",
       position: "",
       department: "",
-      hireDate: "",
+      hireDate: undefined,
       salary: "",
       isActive: true,
       notes: "",
@@ -170,7 +173,11 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
               <FormItem>
                 <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <DatePicker
+                    date={field.value}
+                    onSelect={field.onChange}
+                    placeholder={t("Employees.form.hire_date.placeholder")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

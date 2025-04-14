@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Form,
   FormControl,
@@ -39,8 +40,8 @@ const jobFormSchema = z.object({
     .string()
     .optional()
     .refine((val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), "Invalid salary"),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
   isActive: z.boolean(),
 });
 
@@ -60,8 +61,8 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
       department: "",
       type: "Full-time",
       salary: "",
-      startDate: "",
-      endDate: "",
+      startDate: undefined,
+      endDate: undefined,
       isActive: true,
     },
   });
@@ -148,11 +149,15 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
           <FormField
             control={form.control}
             name="startDate"
-            render={({ field }) => (
+            render={({ field: { value, onChange, ...field } }) => (
               <FormItem>
                 <FormLabel>{t("Jobs.form.start_date.label")}</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <DatePicker
+                    date={value}
+                    onSelect={onChange}
+                    placeholder={t("Jobs.form.start_date.placeholder")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -162,11 +167,15 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
           <FormField
             control={form.control}
             name="endDate"
-            render={({ field }) => (
+            render={({ field: { value, onChange, ...field } }) => (
               <FormItem>
                 <FormLabel>{t("Jobs.form.end_date.label")}</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <DatePicker
+                    date={value}
+                    onSelect={onChange}
+                    placeholder={t("Jobs.form.end_date.placeholder")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
