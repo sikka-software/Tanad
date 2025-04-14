@@ -1,9 +1,9 @@
 import Stripe from "stripe";
 
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-03-31.basil", // Use the latest API version
-});
+import { getStripeInstance } from "./stripe-admin";
+
+// Use the shared Stripe instance
+const stripe = getStripeInstance();
 
 export interface StripePlan {
   priceId: string;

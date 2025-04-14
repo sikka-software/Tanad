@@ -13,7 +13,7 @@ export function getStripeInstance() {
   }
 
   stripeInstance = new Stripe(key, {
-    typescript: true,
+    apiVersion: "2025-03-31.basil",
     appInfo: {
       name: "Lazim",
       version: "0.1.0",
