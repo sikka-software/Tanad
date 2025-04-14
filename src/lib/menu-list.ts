@@ -1,16 +1,15 @@
 import {
-  Tag,
-  Users,
-  Settings,
-  LayoutGrid,
-  LucideIcon,
-  LayoutDashboard,
-  Package,
   BarChart,
-  CreditCard,
   Briefcase,
   Building2,
+  CreditCard,
+  LayoutDashboard,
+  LayoutGrid,
+  LucideIcon,
+  Package,
   SaudiRiyal,
+  Settings,
+  Users,
 } from "lucide-react";
 
 type Submenu = {
@@ -253,7 +252,7 @@ function getSettingsMenus(pathname: string) {
     {
       href: "/billing",
       label: "Billing",
-      translationKey: "Billing.title",
+      translationKey: "billing.title",
       icon: CreditCard,
       active: pathname === "/billing",
     },
