@@ -43,21 +43,28 @@ const productSchema = z.object({
 export type ProductFormValues = z.infer<typeof productSchema>;
 
 interface ProductFormProps {
+  id?: string;
   onSuccess: (product: any) => void;
   userId: string | null;
   formRef?: RefObject<HTMLFormElement>;
   hideFormButtons?: boolean;
+  loading?: boolean;
+  setLoading?: (loading: boolean) => void;
 }
 
 export function ProductForm({
+  id,
   onSuccess,
   userId,
   formRef,
   hideFormButtons = false,
+  loading: externalLoading = false,
+  setLoading,
 }: ProductFormProps) {
   const router = useRouter();
   const t = useTranslations();
-  const [loading, setLoading] = useState(false);
+  const [internalLoading, setInternalLoading] = useState(false);
+  const loading = externalLoading || internalLoading;
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -78,7 +85,8 @@ export function ProductForm({
       return;
     }
 
-    setLoading(true);
+    setInternalLoading(true);
+    setLoading?.(true);
     try {
       const response = await fetch("/api/products/create", {
         method: "POST",
@@ -112,13 +120,14 @@ export function ProductForm({
         description: error instanceof Error ? error.message : t("Products.error.create"),
       });
     } finally {
-      setLoading(false);
+      setInternalLoading(false);
+      setLoading?.(false);
     }
   };
 
   return (
     <Form {...form}>
-      <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form ref={formRef} id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <input type="submit" hidden />
         <FormField
           control={form.control}
@@ -127,7 +136,11 @@ export function ProductForm({
             <FormItem>
               <FormLabel>{t("Products.product_name")} *</FormLabel>
               <FormControl>
-                <Input placeholder={t("Products.enter_product_name")} {...field} />
+                <Input
+                  placeholder={t("Products.enter_product_name")}
+                  {...field}
+                  disabled={loading}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -141,7 +154,12 @@ export function ProductForm({
             <FormItem>
               <FormLabel>{t("Products.description")}</FormLabel>
               <FormControl>
-                <Textarea placeholder={t("Products.enter_description")} rows={4} {...field} />
+                <Textarea
+                  placeholder={t("Products.enter_description")}
+                  rows={4}
+                  {...field}
+                  disabled={loading}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -156,7 +174,14 @@ export function ProductForm({
               <FormItem>
                 <FormLabel>{t("Products.price")} *</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} />
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    {...field}
+                    disabled={loading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -170,7 +195,7 @@ export function ProductForm({
               <FormItem>
                 <FormLabel>{t("Products.stock_quantity")} *</FormLabel>
                 <FormControl>
-                  <Input type="number" min="0" placeholder="0" {...field} />
+                  <Input type="number" min="0" placeholder="0" {...field} disabled={loading} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -185,7 +210,7 @@ export function ProductForm({
             <FormItem>
               <FormLabel>{t("Products.sku")}</FormLabel>
               <FormControl>
-                <Input placeholder={t("Products.enter_sku")} {...field} />
+                <Input placeholder={t("Products.enter_sku")} {...field} disabled={loading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -194,7 +219,12 @@ export function ProductForm({
 
         {!hideFormButtons && (
           <div className="flex justify-end gap-4 pt-4">
-            <Button type="button" variant="outline" onClick={() => router.push("/products")}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push("/products")}
+              disabled={loading}
+            >
               {t("General.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>

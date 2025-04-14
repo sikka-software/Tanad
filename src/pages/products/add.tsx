@@ -1,4 +1,4 @@
-import { useState, useRef, RefObject, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -27,8 +27,8 @@ export default function AddProductPage() {
   const router = useRouter();
   const t = useTranslations();
   const queryClient = useQueryClient();
-  const formRef = useRef<HTMLFormElement>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getUserId = async () => {
@@ -55,19 +55,13 @@ export default function AddProductPage() {
     router.push("/products");
   };
 
-  const handleSubmitClick = () => {
-    if (formRef.current) {
-      formRef.current.requestSubmit();
-    }
-  };
-
   return (
     <div className="">
       <PageTitle
         title={t("Products.add_new")}
         formButtons
         formId="product-form"
-        // loading={loading}
+        loading={loading}
         onCancel={() => router.push("/products")}
         texts={{
           submit_form: t("Products.add_new"),
@@ -82,9 +76,11 @@ export default function AddProductPage() {
           </CardHeader>
           <CardContent>
             <ProductForm
+              id="product-form"
               onSuccess={handleSuccess}
               userId={userId}
-              formRef={formRef as RefObject<HTMLFormElement>}
+              loading={loading}
+              setLoading={setLoading}
               hideFormButtons
             />
           </CardContent>
