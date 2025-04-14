@@ -1,22 +1,16 @@
 import React from "react";
 
+import { useTranslations } from "next-intl";
+
 import { type CellContext } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { z } from "zod";
 
-import SheetTable from "@/components/ui/sheet-table";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import ErrorComponent from "@/components/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import TableSkeleton from "@/components/ui/table-skeleton";
 import { useQuotesStore } from "@/stores/quotes.store";
 import { Quote } from "@/types/quote.type";
-import { useTranslations } from "next-intl";
 
 const quoteNumberSchema = z.string().min(1, "Required");
 const statusSchema = z.enum(["draft", "sent", "accepted", "rejected", "expired"]);
@@ -40,7 +34,7 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
     await updateQuote(rowId, { [columnId]: value });
   };
 
-  const columns = [
+  const columns: ExtendedColumnDef<Quote>[] = [
     {
       accessorKey: "quote_number",
       header: t("Quotes.quote_number"),
@@ -95,37 +89,12 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
 
   if (isLoading) {
     return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columns.map((column, index) => (
-              <TableHead key={index}>
-                <Skeleton className="h-4 w-full" />
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: 5 }).map((_, rowIndex) => (
-            <TableRow key={rowIndex}>
-              {columns.map((_, colIndex) => (
-                <TableCell key={colIndex}>
-                  <Skeleton className="h-4 w-full" />
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
     );
   }
 
   if (error) {
-    return (
-      <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
-        Error loading quotes: {error.message}
-      </div>
-    );
+    return <ErrorComponent errorMessage={error.message} />;
   }
 
   return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;

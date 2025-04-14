@@ -14,7 +14,6 @@
     },
     "sidebar_search": "ابحث عن صفحة",
     "saving": "جاري الحفظ...",
-    "error": "خطأ",
     "cancel": "إلغاء",
     "save": "حفظ",
     "preview": "معاينة",
@@ -90,7 +89,23 @@
     "add": "إضافة",
     "loading": "جاري التحميل...",
     "success": "تم بنجاح",
-    "create": "إنشاء"
+    "create": "إنشاء",
+    "submit_report": "إرسال الإبلاغ",
+    "error": {
+      "title": "خطأ",
+      "error_detected": "تم الكشف عن خطأ",
+      "error_message": "رسالة الخطأ",
+      "error_code": "كود الخطأ",
+      "error_details": "تفاصيل الخطأ",
+      "error_details_question": "ماذا كنت تحاول القيام به عندما قد يحدث هذا الخطأ؟",
+      "submitting": "جاري الإرسال...",
+      "submit_report": "إرسال الإبلاغ"
+    },
+    "report_issue": "إبلاغ عن خطأ",
+    "report_issue_title": "إبلاغ عن خطأ",
+    "report_issue_description": "مساعدتنا بتزويد تفاصيل إضافية عن ما قد يحدث",
+    "report_issue_thank_you": "شكراً لك على إبلاغك",
+    "report_issue_description_thank_you": "تم إبلاغ فريقنا وسيتم التحقق من هذا الخطأ في الميعاد القريب."
   },
 
   "SEO": {

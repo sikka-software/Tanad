@@ -1,18 +1,12 @@
 import React from "react";
 
 import { useTranslations } from "next-intl";
+
 import { z } from "zod";
 
-import SheetTable from "@/components/ui/sheet-table";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import ErrorComponent from "@/components/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import TableSkeleton from "@/components/ui/table-skeleton";
 import { useCompaniesStore } from "@/stores/companies.store";
 import { Company } from "@/types/company.type";
 
@@ -39,7 +33,11 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
   const t = useTranslations("Companies");
   const { updateCompany } = useCompaniesStore();
 
-  const columns = [
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await updateCompany(rowId, { [columnId]: value });
+  };
+
+  const columns: ExtendedColumnDef<Company>[] = [
     { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
     { accessorKey: "industry", header: t("form.industry.label"), validationSchema: industrySchema },
     { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
@@ -50,52 +48,23 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
     { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
     { accessorKey: "zipCode", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
     { accessorKey: "size", header: t("form.size.label"), validationSchema: sizeSchema },
-    { 
-      accessorKey: "isActive", 
-      header: t("form.is_active.label"), 
+    {
+      accessorKey: "isActive",
+      header: t("form.is_active.label"),
       validationSchema: isActiveSchema,
-      type: "boolean"
+      // type: "boolean",
     },
     { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
   ];
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateCompany(rowId, { [columnId]: value });
-  };
-
   if (isLoading) {
     return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columns.map((column, index) => (
-              <TableHead key={index}>
-                <Skeleton className="h-4 w-full" />
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: 5 }).map((_, rowIndex) => (
-            <TableRow key={rowIndex}>
-              {columns.map((_, colIndex) => (
-                <TableCell key={colIndex}>
-                  <Skeleton className="h-4 w-full" />
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
     );
   }
 
   if (error) {
-    return (
-      <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
-        {t("error_loading_companies")}: {error.message}
-      </div>
-    );
+    return <ErrorComponent errorMessage={error.message} />;
   }
 
   return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;

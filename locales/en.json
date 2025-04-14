@@ -2,7 +2,6 @@
   "General": {
     "sikka": "Sikka",
     "language": "Language",
-    "error": "Error",
     "delete": "Delete",
     "edit": "Edit",
     "share": "Share",
@@ -89,7 +88,23 @@
     "done": "Done",
     "loading": "Loading...",
     "success": "Success",
-    "create": "Create"
+    "create": "Create",
+    "submit_report": "Submit report",
+    "error": {
+      "title": "Error",
+      "error_detected": "Error Detected",
+      "error_message": "Error Message",
+      "error_code": "Error Code",
+      "error_details": "Error Details",
+      "error_details_question": "What were you trying to do when this error occurred?",
+      "submitting": "Submitting...",
+      "submit_report": "Submit report"
+    },
+    "report_issue": "Report Issue",
+    "report_issue_title": "Report Issue",
+    "report_issue_description": "Help us improve by providing additional details about what happened.",
+    "report_issue_thank_you": "Thank you for your report",
+    "report_issue_description_thank_you": "Our team has been notified and will investigate this issue promptly."
   },
   "SEO": {
     "landing": {

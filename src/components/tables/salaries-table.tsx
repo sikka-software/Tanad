@@ -2,19 +2,11 @@ import React from "react";
 
 import { useTranslations } from "next-intl";
 
-import { CellContext, ColumnDef } from "@tanstack/react-table";
 import { z } from "zod";
 
-import SheetTable from "@/components/ui/sheet-table";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import ErrorComponent from "@/components/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import TableSkeleton from "@/components/ui/table-skeleton";
 import { useSalariesStore } from "@/stores/salaries.store";
 import { Salary } from "@/types/salary.type";
 
@@ -44,7 +36,11 @@ const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const columns = [
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await updateSalary(rowId, { [columnId]: value });
+  };
+
+  const columns: ExtendedColumnDef<Salary>[] = [
     {
       accessorKey: "employee_name",
       header: t("form.employee_name.label"),
@@ -87,43 +83,14 @@ const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
     },
   ];
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateSalary(rowId, { [columnId]: value });
-  };
-
   if (isLoading) {
     return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columns.map((column, index) => (
-              <TableHead key={index}>
-                <Skeleton className="h-4 w-full" />
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: 5 }).map((_, rowIndex) => (
-            <TableRow key={rowIndex}>
-              {columns.map((_, colIndex) => (
-                <TableCell key={colIndex}>
-                  <Skeleton className="h-4 w-full" />
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
     );
   }
 
   if (error) {
-    return (
-      <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
-        {t("errorLoadingSalaries")}: {error.message}
-      </div>
-    );
+    return <ErrorComponent errorMessage={error.message} />;
   }
 
   return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;

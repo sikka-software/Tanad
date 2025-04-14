@@ -6,16 +6,9 @@ import { format } from "date-fns";
 import { z } from "zod";
 
 import { Badge } from "@/components/ui/badge";
-import SheetTable from "@/components/ui/sheet-table";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import ErrorComponent from "@/components/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
+import TableSkeleton from "@/components/ui/table-skeleton";
 import { useEmployeeRequestsStore } from "@/stores/employee-requests.store";
 import { EmployeeRequest } from "@/types/employee-request.type";
 
@@ -37,7 +30,7 @@ const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTable
     await updateRequest(rowId, { [columnId]: value });
   };
 
-  const columns = [
+  const columns: ExtendedColumnDef<EmployeeRequest>[] = [
     {
       accessorKey: "employeeName",
       header: t("EmployeeRequests.table.employee"),
@@ -106,37 +99,12 @@ const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTable
 
   if (isLoading) {
     return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {Array.from({ length: 8 }).map((_, index) => (
-              <TableHead key={index}>
-                <Skeleton className="h-4 w-full" />
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: 5 }).map((_, rowIndex) => (
-            <TableRow key={rowIndex}>
-              {Array.from({ length: 8 }).map((_, colIndex) => (
-                <TableCell key={colIndex}>
-                  <Skeleton className="h-4 w-full" />
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
     );
   }
 
   if (error) {
-    return (
-      <div className="m-4 mb-0 max-w-md rounded bg-red-800 p-2 text-center text-white mx-auto">
-        {t("General.error")}: {error.message}
-      </div>
-    );
+    return <ErrorComponent errorMessage={error.message} />;
   }
 
   return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
