@@ -98,7 +98,7 @@ export default function AddInvoicePage() {
         createButtonLink="/invoices"
         createButtonText={t("back_to_list")}
         customButton={
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button variant="outline" onClick={() => router.push("/invoices")}>
               {t("cancel")}
             </Button>

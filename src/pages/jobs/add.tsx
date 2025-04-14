@@ -32,8 +32,8 @@ export default function AddJobPage() {
         type: data.type.trim(),
         salary: data.salary ? parseFloat(data.salary) : undefined,
         isActive: data.isActive,
-        startDate: data.startDate || undefined,
-        endDate: data.endDate || undefined,
+        startDate: data.startDate?.toISOString() || undefined,
+        endDate: data.endDate?.toISOString() || undefined,
       });
 
       // Update the jobs cache to include the new job
@@ -61,7 +61,7 @@ export default function AddJobPage() {
         createButtonLink="/jobs"
         createButtonText={t("back_to_list")}
         customButton={
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => router.push("/jobs")}>
               {t("cancel")}
             </Button>

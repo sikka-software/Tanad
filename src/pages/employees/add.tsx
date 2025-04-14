@@ -70,7 +70,7 @@ export default function AddEmployeePage() {
         createButtonLink="/employees"
         createButtonText={t("back_to_list")}
         customButton={
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => router.push("/employees")}>
               {t("cancel")}
             </Button>

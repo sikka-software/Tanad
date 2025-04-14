@@ -49,7 +49,7 @@ export default function EditVendorPage() {
       <PageTitle
         title={t("edit_vendor")}
         customButton={
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button variant="outline" onClick={() => router.push("/vendors")}>
               {t("General.cancel")}
             </Button>

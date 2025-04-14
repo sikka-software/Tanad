@@ -12,7 +12,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function EditSalaryPage() {
   const router = useRouter();
-  const t = useTranslations("Salaries");
+  const t = useTranslations();
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
@@ -50,20 +50,19 @@ export default function EditSalaryPage() {
   return (
     <div>
       <PageTitle
-        title={t("edit_salary")} // Salaries.edit_salary
+        title={t("Salaries.edit_salary")}
         customButton={
-          <div className="flex gap-4">
+          <div className="flex gap-2">
             <Button variant="outline" onClick={() => router.push("/salaries")}>
               {t("General.cancel")}
             </Button>
-            {/* SalaryForm has its own update button */}
           </div>
         }
       />
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>{t("salary_details")}</CardTitle> {/* Salaries.salary_details */}
+            <CardTitle>{t("Salaries.salary_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <SalaryForm salaryId={salaryId as string} onSuccess={handleSuccess} />
