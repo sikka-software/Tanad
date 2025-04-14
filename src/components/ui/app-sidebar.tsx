@@ -3,23 +3,13 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
 import { useTranslations, useLocale } from "next-intl";
-import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 import type { LucideIcon } from "lucide-react";
-import {
-  ChevronDown,
-  ChevronUp,
-  User2,
-  LogOut,
-  MessageSquareWarning,
-  CreditCard,
-  Plus,
-} from "lucide-react";
+import { User2, LogOut, MessageSquareWarning, CreditCard } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -33,26 +23,18 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarSeparator,
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
 import useUserStore from "@/hooks/use-user-store";
 import { CACHE_KEY } from "@/lib/constants";
-import { getMenuList, getRegularMenuList } from "@/lib/menu-list";
+import { getMenuList } from "@/lib/sidebar-list";
 import { supabase } from "@/lib/supabase";
-import { cn } from "@/lib/utils";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
-import { NavMain } from "./navbar-main";
+import { NavMain } from "./sidebar-menu";
 
 type Menu = {
   href: string;
@@ -165,7 +147,10 @@ export function AppSidebar() {
       </SidebarHeader>
       */}
       <SidebarContent>
-        <NavMain title="Platform" items={menuGroups.Administration} />
+        <NavMain title={t("Administration.title")} items={menuGroups.Administration} />
+        <NavMain title={t("Accounting.title")} items={menuGroups.Accounting} />
+        <NavMain title={t("HumanResources.title")} items={menuGroups.HumanResources} />
+        <NavMain title={t("Settings.title")} items={menuGroups.Settings} />
         {/* <SidebarGroup>
           <SidebarMenu className="mt-4 gap-2">
             {menuGroups.map((group, groupIndex) => (

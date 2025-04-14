@@ -96,12 +96,14 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
           title: "Companies",
           translationKey: "Companies.title",
           isActive: pathname === "/companies",
+          action: "/companies/add",
           url: "/companies",
         },
         {
           title: "Clients",
           translationKey: "Clients.title",
           isActive: pathname === "/clients",
+          action: "/clients/add",
           url: "/clients",
         },
         {
@@ -124,35 +126,35 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
 }
 
 // Accounting menu items
-function getAccountingMenus(pathname: string) {
+function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
     {
-      href: "/products",
-      label: "Sales",
+      title: "Sales",
       translationKey: "Sales.title",
+      url: "",
       icon: Package,
-      active: pathname === "/products",
-      submenus: [
+      isActive: pathname === "/products",
+      items: [
         {
-          href: "/products",
-          label: "Products",
+          title: "Products",
           translationKey: "Products.title",
-          active: pathname === "/products",
-          plusAction: "/products/add",
+          isActive: pathname === "/products",
+          url: "/products",
+          action: "/products/add",
         },
         {
-          href: "/invoices",
-          label: "Invoices",
+          title: "Invoices",
           translationKey: "Invoices.title",
-          active: pathname === "/invoices",
-          plusAction: "/invoices/add",
+          isActive: pathname === "/invoices",
+          url: "/invoices",
+          action: "/invoices/add",
         },
         {
-          href: "/quotes",
-          label: "Quotes",
+          title: "Quotes",
           translationKey: "Quotes.title",
-          active: pathname === "/quotes",
-          plusAction: "/quotes/add",
+          isActive: pathname === "/quotes",
+          url: "/quotes",
+          action: "/quotes/add",
         },
       ],
     },
@@ -160,79 +162,86 @@ function getAccountingMenus(pathname: string) {
 }
 
 // HR menu items
-function getHrMenus(pathname: string) {
+function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
     {
-      href: "",
-      label: "Employees",
+      title: "Employees",
       translationKey: "Employees.title",
+      url: "",
       icon: Users,
-      active: pathname.startsWith("/employees"),
-      submenus: [
+      isActive: pathname.startsWith("/employees"),
+      items: [
         {
-          href: "/employees",
-          label: "All Employees",
+          title: "All Employees",
           translationKey: "Employees.allEmployees",
-          plusAction: "/employees/add",
-          active: pathname === "/employees",
+          url: "/employees",
+          action: "/employees/add",
+          isActive: pathname === "/employees",
         },
         {
-          href: "/salaries",
-          label: "Salaries",
+          title: "Salaries",
           translationKey: "Salaries.title",
-          active: pathname === "/salaries",
+          url: "/salaries",
+          action: "/salaries/add",
+          isActive: pathname === "/salaries",
         },
         {
-          href: "/leave",
-          label: "Leave",
+          title: "Leave",
           translationKey: "Leave.title",
-          active: pathname === "/leave",
+          url: "/leave",
+          action: "/leave/add",
+          isActive: pathname === "/leave",
         },
         {
-          href: "/holidays",
-          label: "Holidays",
+          title: "Holidays",
           translationKey: "Holidays.title",
-          active: pathname === "/holidays",
+          url: "/holidays",
+          action: "/holidays/add",
+          isActive: pathname === "/holidays",
         },
         {
-          href: "/reports",
-          label: "Reports",
+          title: "Reports",
           translationKey: "Reports.title",
-          active: pathname === "/reports",
+          url: "/reports",
+          action: "/reports/add",
+          isActive: pathname === "/reports",
         },
         {
-          href: "/requests",
-          label: "Requests",
+          title: "Requests",
           translationKey: "Requests.title",
-          active: pathname === "/requests",
+          url: "/requests",
+          action: "/requests/add",
+          isActive: pathname === "/requests",
         },
       ],
     },
     {
-      href: "",
-      label: "Recruitment",
+      title: "Recruitment",
       translationKey: "Recruitment.title",
+      url: "",
       icon: Briefcase,
-      active: pathname.startsWith("/recruitment"),
-      submenus: [
+      isActive: pathname.startsWith("/recruitment"),
+      items: [
         {
-          href: "/job-listing",
-          label: "Job Listing",
+          title: "Job Listing",
           translationKey: "JobListing.title",
-          active: pathname === "/job-listing",
+          url: "/job-listing",
+          action: "/job-listing/add",
+          isActive: pathname === "/job-listing",
         },
         {
-          href: "/jobs",
-          label: "Jobs",
+          title: "Jobs",
           translationKey: "Jobs.title",
-          plusAction: "/jobs/add",
-          active: pathname === "/jobs",
+          url: "/jobs",
+          action: "/jobs/add",
+          isActive: pathname === "/jobs",
         },
         {
-          href: "/applicants",
-          label: "Applicants",
+          title: "Applicants",
           translationKey: "Applicants.title",
-          active: pathname === "/applicants",
+          url: "/applicants",
+          action: "/applicants/add",
+          isActive: pathname === "/applicants",
         },
       ],
     },
@@ -247,141 +256,37 @@ function getHrMenus(pathname: string) {
   ];
 }
 // Settings menu items
-function getSettingsMenus(pathname: string) {
+function getSettingsMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
     {
-      href: "/users",
-      label: "Users",
+      title: "Users",
       translationKey: "Users.title",
       icon: Users,
-      active: pathname === "/users",
+      url: "/users",
+      isActive: pathname === "/users",
     },
     {
-      href: "/billing",
-      label: "Billing",
+      title: "Billing",
       translationKey: "Billing.title",
       icon: CreditCard,
-      active: pathname === "/billing",
+      url: "/billing",
+      isActive: pathname === "/billing",
     },
     {
-      href: "/account",
-      label: "Account",
+      title: "Account",
       translationKey: "Account.title",
       icon: Settings,
-      active: pathname === "/account",
+      url: "/account",
+      isActive: pathname === "/account",
     },
   ];
 }
 
-export function getRegularMenuList(pathname: string): {
-  // href: string;
-  // label: string;
-  // translationKey: string;
-  // icon: LucideIcon;
-  // active: boolean;
-  // submenus?: Submenu[];
-  title: string;
-  url: string;
-  icon?: LucideIcon;
-  isActive?: boolean;
-  items?: {
-    title: string;
-    url: string;
-  }[];
-}[] {
-  return [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ];
-}
 export function getMenuList(pathname: string) {
-  // return [
   return {
     Administration: getAdministrationMenus(pathname),
     Accounting: getAccountingMenus(pathname),
     HumanResources: getHrMenus(pathname),
+    Settings: getSettingsMenus(pathname),
   };
 }

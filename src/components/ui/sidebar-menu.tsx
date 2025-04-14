@@ -1,7 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 
 import { ChevronRight, Plus } from "lucide-react";
 
@@ -17,10 +16,8 @@ import {
   SidebarMenuSubItem,
   SidebarMenuAction,
 } from "@/components/ui/sidebar";
-import { SidebarMenuGroupProps } from "@/lib/menu-list";
+import { SidebarMenuGroupProps } from "@/lib/sidebar-list";
 import { cn } from "@/lib/utils";
-
-import { Button } from "./button";
 
 export function NavMain({ title, items }: SidebarMenuGroupProps) {
   return (
@@ -41,7 +38,7 @@ export function NavMain({ title, items }: SidebarMenuGroupProps) {
 
 const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]) => {
   const t = useTranslations();
-  const router = useRouter();
+  const locale = useLocale();
   return (
     <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
       <SidebarMenuItem>
@@ -56,9 +53,9 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
           </SidebarMenuButton>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <SidebarMenuSub >
+          <SidebarMenuSub dir={locale === "ar" ? "rtl" : "ltr"}>
             {item.items?.map((subItem) => (
-              <SidebarMenuSubItem key={subItem.title} >
+              <SidebarMenuSubItem key={subItem.title} className="relative">
                 <SidebarMenuSubButton
                   asChild
                   className={cn(
@@ -71,7 +68,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                   </a>
                 </SidebarMenuSubButton>
                 {subItem.action && (
-                  <SidebarMenuAction showOnHover className="absolute !right-0">
+                  <SidebarMenuAction className="absolute !end-1 top-1/2 -translate-y-1/2">
                     <Plus className="!size-3" />
                     <span className="sr-only">More</span>
                   </SidebarMenuAction>
@@ -110,7 +107,12 @@ const NonCollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][numb
         {item.icon && <item.icon />}
         <span>{t(item.translationKey)}</span>
       </SidebarMenuButton>
-      {item.action && <SidebarMenuAction>{item.action}</SidebarMenuAction>}
+      {item.action && (
+        <SidebarMenuAction className="absolute !end-1 top-1/2 -translate-y-1/2">
+          <Plus className="!size-3" />
+          <span className="sr-only">More</span>
+        </SidebarMenuAction>
+      )}
     </SidebarMenuItem>
   );
 };
