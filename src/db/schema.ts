@@ -213,6 +213,7 @@ export const quoteItems = pgTable(
     unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
     amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
     quoteId: uuid("quote_id").notNull(),
+    productId: uuid("product_id"),
   },
   (table) => [
     index("quote_items_quote_id_idx").using(
@@ -224,6 +225,11 @@ export const quoteItems = pgTable(
       foreignColumns: [quotes.id],
       name: "quote_items_quote_id_fkey",
     }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.productId],
+      foreignColumns: [products.id],
+      name: "quote_items_product_id_fkey",
+    }),
   ],
 ).enableRLS();
 
