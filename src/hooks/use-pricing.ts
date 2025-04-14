@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 
 import { StripePlan, getStripePlans } from "@/lib/stripe";
 
-export function usePricing() {
+export function usePricing(productId?: string) {
   const t = useTranslations();
   const [plans, setPlans] = useState<StripePlan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +13,7 @@ export function usePricing() {
     const fetchPlans = async () => {
       try {
         // Fetch plans directly from Stripe
-        const stripePlans = await getStripePlans();
+        const stripePlans = await getStripePlans(productId);
         setPlans(stripePlans);
       } catch (error) {
         console.error("Error fetching plans:", error);
@@ -23,7 +23,7 @@ export function usePricing() {
     };
 
     fetchPlans();
-  }, [t]);
+  }, [t, productId]);
 
   const getPlans = () => {
     return plans;
@@ -33,7 +33,7 @@ export function usePricing() {
   const refreshPlans = async () => {
     setLoading(true);
     try {
-      const stripePlans = await getStripePlans();
+      const stripePlans = await getStripePlans(productId);
       setPlans(stripePlans);
     } catch (error) {
       console.error("Error refreshing plans:", error);
