@@ -1,10 +1,12 @@
 import { PuklaThemeProps } from "./types";
+
 // Validation
 export const DOMAIN_REGEX = /^[a-zA-Z0-9-]+$/; // Allows letters, numbers, and hyphens
 export const MAX_SLUG_LENGTH = 32;
 
 export const CACHE_KEY = (userId: string) => `user_cache_${userId}`;
 export const FREE_PLAN_ID = "price_1QfPy8CVtUnAWEKBdr1JAb5w";
+export const TANAD_PRODUCT_ID = "prod_S80hJ1M1Fvoow3";
 
 export const fakeAnalyticsData = [
   {

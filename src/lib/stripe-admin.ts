@@ -7,15 +7,17 @@ export function getStripeInstance() {
     return stripeInstance;
   }
 
-  const key = process.env.STRIPE_SECRET_KEY;
+  const key = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
   if (!key) {
-    throw new Error("Stripe secret key is missing. Set STRIPE_SECRET_KEY in your .env file.");
+    throw new Error(
+      "Stripe secret key is missing. Set NEXT_PUBLIC_STRIPE_SECRET_KEY in your .env file.",
+    );
   }
 
   stripeInstance = new Stripe(key, {
     apiVersion: "2025-03-31.basil",
     appInfo: {
-      name: "Lazim",
+      name: "Tanad",
       version: "0.1.0",
     },
   });
