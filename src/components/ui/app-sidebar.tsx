@@ -26,6 +26,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarRail,
+  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
 import useUserStore from "@/hooks/use-user-store";
@@ -124,26 +125,8 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"}>
       {/* <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  Select Workspace
-                  <ChevronDown className="ms-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[var(--radix-popper-anchor-width)]">
-                <DropdownMenuItem>
-                  <span>Acme Inc</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>Acme Corp.</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      //  Search bar to filter the menu items
+      
       </SidebarHeader>
       */}
       <SidebarContent>
@@ -151,151 +134,6 @@ export function AppSidebar() {
         <NavMain title={t("Accounting.title")} items={menuGroups.Accounting} />
         <NavMain title={t("HumanResources.title")} items={menuGroups.HumanResources} />
         <NavMain title={t("Settings.title")} items={menuGroups.Settings} />
-        {/* <SidebarGroup>
-          <SidebarMenu className="mt-4 gap-2">
-            {menuGroups.map((group, groupIndex) => (
-              <div key={groupIndex}>
-                <SidebarSeparator className="mb-2" />
-                <Collapsible
-                  defaultOpen={!isMobile}
-                  open={expandedGroups.has(groupIndex)}
-                  onOpenChange={(isOpen) => {
-                    setExpandedGroups((prev) => {
-                      const next = new Set(prev);
-                      if (isOpen) {
-                        next.add(groupIndex);
-                      } else {
-                        next.delete(groupIndex);
-                      }
-                      return next;
-                    });
-                  }}
-                  className="group/collapsible"
-                >
-                  <SidebarMenuItem>
-                    <CollapsibleTrigger asChild>
-                      <SidebarMenuButton
-                        className="w-full overflow-hidden"
-                        tooltip={t(group.groupLabelTranslationKey || "")}
-                        onClick={(e) => {
-                          if (state === "collapsed" && !isMobile) {
-                            e.preventDefault();
-                            handleItemClick(groupIndex);
-                          }
-                        }}
-                      >
-                        {group.icon && <group.icon className="!size-6 md:!size-4" />}
-                        {!isMobile && state !== "collapsed" && (
-                          <span className="text-nowrap">
-                            {t(group.groupLabelTranslationKey || "")}
-                          </span>
-                        )}
-                        <ChevronDown className="ms-auto group-data-[state=open]/collapsible:hidden" />
-                        <ChevronUp className="ms-auto group-data-[state=closed]/collapsible:hidden" />
-                      </SidebarMenuButton>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className={state !== "collapsed" ? "ms-4 border-s" : ""}>
-                      <div className="w-full">
-                        {group.menus.map((menu, menuIndex) => (
-                          <SidebarMenuItem key={menuIndex}>
-                            {menu.submenus && menu.submenus.length > 0 ? (
-                              <Collapsible
-                                className="group/submenu-collapsible w-full"
-                                open={expandedMenus.has(`${groupIndex}-${menuIndex}`)}
-                                onOpenChange={(isOpen) => {
-                                  setExpandedMenus((prev) => {
-                                    const next = new Set(prev);
-                                    if (isOpen) {
-                                      next.add(`${groupIndex}-${menuIndex}`);
-                                    } else {
-                                      next.delete(`${groupIndex}-${menuIndex}`);
-                                    }
-                                    return next;
-                                  });
-                                }}
-                              >
-                                <CollapsibleTrigger asChild>
-                                  <SidebarMenuButton
-                                    className="w-full overflow-hidden"
-                                    tooltip={menu.translationKey}
-                                    onClick={(e) => {
-                                      if (state === "collapsed" && !isMobile) {
-                                        e.preventDefault();
-                                        handleItemClick(groupIndex, menuIndex);
-                                      }
-                                    }}
-                                  >
-                                    {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                                    {!isMobile && state !== "collapsed" && (
-                                      <span className="text-nowrap">{t(menu.translationKey)}</span>
-                                    )}
-                                    <ChevronDown className="ms-auto group-data-[state=open]/submenu-collapsible:hidden" />
-                                    <ChevronUp className="ms-auto group-data-[state=closed]/submenu-collapsible:hidden" />
-                                  </SidebarMenuButton>
-                                </CollapsibleTrigger>
-                                <CollapsibleContent>
-                                  <SidebarMenuSub className="w-[calc(100%-1rem)] !px-0">
-                                    {menu.submenus.map((submenu, submenuIndex) => (
-                                      <SidebarMenuSubItem key={submenuIndex}>
-                                        <Link href={submenu.href}>
-                                          <SidebarMenuSubButton
-                                            className={cn(
-                                              submenu.active &&
-                                                "bg-primary text-background hover:bg-primary hover:text-background",
-                                              "p-0 ps-2 pe-1",
-                                            )}
-                                          >
-                                            <span className="text-nowrap">
-                                              {t(submenu.translationKey)}
-                                            </span>
-                                            {submenu.plusAction && (
-                                              <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="ms-auto !size-5 cursor-pointer !p-2 hover:border"
-                                                onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  e.preventDefault();
-                                                  if (submenu.plusAction) {
-                                                    router.push(submenu.plusAction);
-                                                  }
-                                                }}
-                                              >
-                                                <Plus className="!size-3" />
-                                              </Button>
-                                            )}
-                                          </SidebarMenuSubButton>
-                                        </Link>
-                                      </SidebarMenuSubItem>
-                                    ))}
-                                  </SidebarMenuSub>
-                                </CollapsibleContent>
-                              </Collapsible>
-                            ) : (
-                              <Link href={menu.href}>
-                                <SidebarMenuButton
-                                  dir={lang === "ar" ? "rtl" : "ltr"}
-                                  tooltip={menu.translationKey}
-                                  className={cn(
-                                    menu.active &&
-                                      "bg-primary text-background hover:bg-primary hover:text-background",
-                                  )}
-                                >
-                                  {menu.icon && <menu.icon className="!size-6 md:!size-4" />}
-                                  <span>{t(menu.translationKey)}</span>
-                                </SidebarMenuButton>
-                              </Link>
-                            )}
-                          </SidebarMenuItem>
-                        ))}
-                      </div>
-                    </CollapsibleContent>
-                  </SidebarMenuItem>
-                </Collapsible>
-              </div>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup> */}
       </SidebarContent>
       <SidebarFooter className="px-0">
         <div className="flex flex-col gap-2 p-2">

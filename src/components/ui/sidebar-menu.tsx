@@ -1,14 +1,18 @@
 "use client";
 
+import React from "react";
+
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { ChevronRight, Plus } from "lucide-react";
+import { motion } from "motion/react";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  useCollapsible,
 } from "@/components/animate-ui/radix-collapsible";
 import {
   SidebarGroup,
@@ -20,6 +24,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarMenuAction,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { SidebarMenuGroupProps } from "@/lib/sidebar-list";
 import { cn } from "@/lib/utils";
@@ -28,6 +33,8 @@ export function NavMain({ title, items }: SidebarMenuGroupProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
+      <SidebarSeparator className="mb-2" />
+
       <SidebarMenu>
         {items.map((item, i) =>
           item.items ? (
@@ -45,8 +52,16 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
+  const [isOpen, setIsOpen] = React.useState(item.isActive);
+
   return (
-    <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
+    <Collapsible
+      key={item.title}
+      asChild
+      defaultOpen={item.isActive}
+      open={isOpen}
+      onOpenChange={setIsOpen}
+    >
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
           <SidebarMenuButton tooltip={item.title}>
@@ -54,7 +69,14 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
             <span>{t(item.translationKey)}</span>
 
             {item.items && (
-              <ChevronRight className="ms-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 rtl:rotate-180" />
+              <motion.div
+                initial={{ rotate: 0 }}
+                animate={{ rotate: isOpen ? (locale === "ar" ? -90 : 90) : 0 }}
+                transition={{ duration: 0.2 }}
+                className="ms-auto"
+              >
+                <ChevronRight className="size-4 rtl:-rotate-180" />
+              </motion.div>
             )}
           </SidebarMenuButton>
         </CollapsibleTrigger>
