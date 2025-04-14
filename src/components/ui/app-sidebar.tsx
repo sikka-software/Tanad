@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -11,11 +11,11 @@ import type { LucideIcon } from "lucide-react";
 import {
   ChevronDown,
   ChevronUp,
-  User2,
+  CreditCard,
   LogOut,
   MessageSquareWarning,
-  CreditCard,
   Plus,
+  User2,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -41,8 +41,8 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarSeparator,
   SidebarRail,
+  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
 import useUserStore from "@/hooks/use-user-store";
@@ -367,7 +367,7 @@ export function AppSidebar() {
                   <Link href="/billing">
                     <DropdownMenuItem className="cursor-pointer">
                       <CreditCard className="!size-4" />
-                      <span>{t("Billing.title")}</span>
+                      <span>{t("billing.title")}</span>
                     </DropdownMenuItem>
                   </Link>
                   <DropdownMenuItem
