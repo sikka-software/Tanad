@@ -1,12 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import Stripe from "stripe";
-
+import { getStripeInstance } from "@/lib/stripe-admin";
 import { supabase } from "@/lib/supabase";
-
-const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY || "", {
-  apiVersion: "2025-03-31.basil",
-});
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -14,6 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    const stripe = getStripeInstance();
     const { subscriptionId, priceId, userId } = req.body;
 
     if (!subscriptionId || !priceId || !userId) {
