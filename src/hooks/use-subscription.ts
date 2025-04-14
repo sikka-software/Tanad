@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
-import { useAuth } from "@/components/UserContext";
 import { usePricing } from "@/hooks/use-pricing";
+import useUserStore from "@/hooks/use-user-store";
+import { TANAD_PRODUCT_ID } from "@/lib/constants";
 
 interface SubscriptionData {
   id: string | null;
@@ -50,10 +51,10 @@ interface CancelSubscriptionResponse {
 
 export function useSubscription() {
   const t = useTranslations();
-  const { getPlans, loading: plansLoading } = usePricing();
+  const { getPlans, loading: plansLoading } = usePricing(TANAD_PRODUCT_ID);
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData>({
     id: null,
-    name: t("plans.hobby.title"),
+    name: t("billing.free_plan", { fallback: "Free Plan" }),
     price: "0 SAR",
     billingCycle: "-",
     nextBillingDate: "-",
@@ -63,7 +64,7 @@ export function useSubscription() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user, loading: userLoading, refreshUser } = useAuth();
+  const { user, loading: userLoading, fetchUserAndProfile } = useUserStore();
 
   const fetchSubscription = async () => {
     setLoading(true);
@@ -80,7 +81,7 @@ export function useSubscription() {
 
       // Find free plan
       const freePlan = plans.find(
-        (plan) => plan.lookup_key === "lazim_free" || plan.lookup_key?.includes("free"),
+        (plan) => plan.lookup_key === "tanad_free" || plan.lookup_key?.includes("free"),
       );
 
       // If no user or customer ID, return free plan
@@ -229,7 +230,7 @@ export function useSubscription() {
       const data = await response.json();
 
       // Refresh user data and subscription data
-      await refreshUser();
+      await fetchUserAndProfile();
       await fetchSubscription();
 
       return data;
@@ -273,7 +274,7 @@ export function useSubscription() {
       const data = await response.json();
 
       // Refresh user data and subscription data
-      await refreshUser();
+      await fetchUserAndProfile();
       await fetchSubscription();
 
       return data;
@@ -319,7 +320,7 @@ export function useSubscription() {
       const data = await response.json();
 
       // Refresh user data and subscription data
-      await refreshUser();
+      await fetchUserAndProfile();
       await fetchSubscription();
 
       return data;
