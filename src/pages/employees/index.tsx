@@ -24,10 +24,11 @@ export default function EmployeesPage() {
   const filteredEmployees = Array.isArray(employees)
     ? employees.filter((employee: Employee) => {
         if (!employee) return false;
-        
+
         const searchLower = searchQuery.toLowerCase();
         return (
-          employee.name?.toLowerCase().includes(searchLower) ||
+          employee.firstName?.toLowerCase().includes(searchLower) ||
+          employee.lastName?.toLowerCase().includes(searchLower) ||
           employee.email?.toLowerCase().includes(searchLower) ||
           employee.position?.toLowerCase().includes(searchLower) ||
           employee.department?.toLowerCase()?.includes(searchLower)
@@ -37,13 +38,15 @@ export default function EmployeesPage() {
 
   const renderEmployee = (employee: Employee) => {
     if (!employee) return null;
-    
+
     return (
       <Card key={employee.id} className="transition-shadow hover:shadow-lg">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="text-lg font-semibold">{employee.name}</h3>
+              <h3 className="text-lg font-semibold">
+                {employee.firstName} {employee.lastName}
+              </h3>
               <p className="text-sm text-gray-500">{employee.position}</p>
             </div>
           </div>

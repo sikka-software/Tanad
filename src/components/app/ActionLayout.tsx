@@ -24,7 +24,7 @@ const ActionLayout = ({ linkId, puklaId, onUpgradeNeeded }: ActionLayoutProps) =
   const router = useRouter();
   const { setItemAction } = useMainStore();
   const { puklaItems } = usePuklaStore();
-  const { user } = useUserStore();
+  const { user, profile } = useUserStore();
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
 
   // Find the current item's layout from puklaItems
@@ -35,7 +35,7 @@ const ActionLayout = ({ linkId, puklaId, onUpgradeNeeded }: ActionLayoutProps) =
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
-    if (user?.subscribed_to === "pukla_free") {
+    if (profile?.subscribed_to === "pukla_free") {
       onUpgradeNeeded?.();
       return;
     }

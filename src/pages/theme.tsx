@@ -52,7 +52,7 @@ export default function Theme() {
   const t = useTranslations();
   const lang = useLocale();
   const router = useRouter();
-  const { user } = useUserStore();
+  const { profile } = useUserStore();
 
   const { customTheme, setCustomTheme } = usePuklaStore();
   const [puklas, setPuklas] = useState<Pukla[]>([]);
@@ -91,8 +91,8 @@ export default function Theme() {
   useEffect(() => {
     const getPuklas = async () => {
       try {
-        if (!user?.id) return;
-        const puklas = await fetchPuklas(user?.id, {
+        if (!profile?.id) return;
+        const puklas = await fetchPuklas(profile?.id, {
           toasts: {
             error: t("MyPuklas.error_fetching_puklas"),
             success: t("MyPuklas.success_fetching_puklas"),
@@ -121,7 +121,7 @@ export default function Theme() {
     };
 
     getPuklas();
-  }, [user?.id]);
+  }, [profile?.id]);
 
   // Update form values when selectedPukla changes
   useEffect(() => {
@@ -227,7 +227,7 @@ export default function Theme() {
       return;
     }
 
-    if (user?.subscribed_to === "pukla_free") {
+    if (profile?.subscribed_to === "pukla_free") {
       setOpenUpgradeDialog(true);
       return;
     }
@@ -514,7 +514,7 @@ export default function Theme() {
               <span className="flex flex-col space-y-1 text-start">
                 <div className="flex flex-row items-center gap-2">
                   <span className="text-lg font-bold">{t("Theme.custom_theme")}</span>
-                  {user?.subscribed_to === "pukla_free" && (
+                  {profile?.subscribed_to === "pukla_free" && (
                     <Badge variant="default">{t("Billing.pro_plan")}</Badge>
                   )}
                 </div>
@@ -526,7 +526,7 @@ export default function Theme() {
               <div className="mb-4 flex flex-row items-start justify-between p-0">
                 <Button
                   onClick={() => {
-                    if (user?.subscribed_to === "pukla_free") {
+                    if (profile?.subscribed_to === "pukla_free") {
                       setOpenUpgradeDialog(true);
                       return;
                     }

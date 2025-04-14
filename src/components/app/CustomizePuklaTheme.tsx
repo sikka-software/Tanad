@@ -1,21 +1,23 @@
-import { Loader2, Upload, X } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { toast } from "sonner";
+
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
-import { PuklaThemeProps } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
-import { usePuklaStore } from "@/hooks/use-pukla-store";
-import useMainStore from "@/hooks/main.store";
-import useUserStore from "@/hooks/use-user-store";
+import { Loader2, Upload, X } from "lucide-react";
+import { toast } from "sonner";
+
 // Components
 import { CustomThemePreview } from "@/components/app/CustomThemePreview";
 // UI
 import { Button } from "@/components/ui/button";
-import SliderWithInput from "@/components/ui/slider-with-input";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import SliderWithInput from "@/components/ui/slider-with-input";
+import useMainStore from "@/hooks/main.store";
+import { usePuklaStore } from "@/hooks/use-pukla-store";
+import useUserStore from "@/hooks/use-user-store";
+import { supabase } from "@/lib/supabase";
+import { PuklaThemeProps } from "@/lib/types";
 
 interface ThemeColorPickersProps {
   handleUpdateTheme: (theme: PuklaThemeProps) => void;
@@ -23,15 +25,13 @@ interface ThemeColorPickersProps {
   onUpgradeNeeded?: () => void;
 }
 
-export function CustomizePuklaTheme({
-  onUpgradeNeeded,
-}: ThemeColorPickersProps) {
+export function CustomizePuklaTheme({ onUpgradeNeeded }: ThemeColorPickersProps) {
   const t = useTranslations();
   const { currentPukla } = usePuklaStore();
   const { selectedPukla } = useMainStore();
   const { customTheme, setCustomTheme } = usePuklaStore();
   const [uploadingImage, setUploadingImage] = useState(false);
-  const { user } = useUserStore();
+  const { profile } = useUserStore();
   const router = useRouter();
 
   // Initialize theme with current Pukla's theme values
@@ -69,10 +69,8 @@ export function CustomizePuklaTheme({
     });
   };
 
-  const handleBackgroundImageUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (user?.subscribed_to === "pukla_free") {
+  const handleBackgroundImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (profile?.subscribed_to === "pukla_free") {
       onUpgradeNeeded?.();
       return;
     }
@@ -130,15 +128,15 @@ export function CustomizePuklaTheme({
   };
 
   return (
-    <div className="flex flex-col justify-between md:flex-row gap-8">
+    <div className="flex flex-col justify-between gap-8 md:flex-row">
       <div className="relative w-full">
-        <div className="flex flex-col space-y-4 mb-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mb-4 flex flex-col space-y-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label>{t("Theme.background_color")}</Label>
               <Input
                 type="color"
-                className="w-full h-10 rounded-md cursor-pointer p-0"
+                className="h-10 w-full cursor-pointer rounded-md p-0"
                 value={customTheme.background_color}
                 onChange={(e) =>
                   setCustomTheme({
@@ -155,24 +153,18 @@ export function CustomizePuklaTheme({
                   variant="outline"
                   className="w-full"
                   disabled={uploadingImage}
-                  onClick={() =>
-                    document.getElementById("background-image-upload")?.click()
-                  }
+                  onClick={() => document.getElementById("background-image-upload")?.click()}
                 >
                   {uploadingImage ? (
-                    <Loader2 className="w-4 h-4 animate-spin me-2" />
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <Upload className="w-4 h-4 me-2" />
+                    <Upload className="me-2 h-4 w-4" />
                   )}
                   {t("Theme.upload_background")}
                 </Button>
                 {customTheme.background_image && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={removeBackgroundImage}
-                  >
-                    <X className="w-4 h-4" />
+                  <Button variant="outline" size="icon" onClick={removeBackgroundImage}>
+                    <X className="h-4 w-4" />
                   </Button>
                 )}
                 <input
@@ -190,7 +182,7 @@ export function CustomizePuklaTheme({
                   <Label>{t("Theme.overlay_color")}</Label>
                   <Input
                     type="color"
-                    className="w-full h-10 rounded-md cursor-pointer p-0"
+                    className="h-10 w-full cursor-pointer rounded-md p-0"
                     value={customTheme.overlay_color || "#000000"}
                     onChange={(e) =>
                       setCustomTheme({
@@ -203,11 +195,7 @@ export function CustomizePuklaTheme({
                 <div className="space-y-2">
                   <Label>{t("Theme.overlay_opacity")}</Label>
                   <SliderWithInput
-                    value={[
-                      customTheme.overlay_opacity
-                        ? customTheme.overlay_opacity * 100
-                        : 50,
-                    ]}
+                    value={[customTheme.overlay_opacity ? customTheme.overlay_opacity * 100 : 50]}
                     onValueChange={(value) =>
                       setCustomTheme({
                         ...customTheme,
@@ -222,7 +210,7 @@ export function CustomizePuklaTheme({
               <Label>{t("Theme.text_color")}</Label>
               <Input
                 type="color"
-                className="w-full h-10 rounded-md cursor-pointer p-0"
+                className="h-10 w-full cursor-pointer rounded-md p-0"
                 value={customTheme.text_color}
                 onChange={(e) =>
                   setCustomTheme({
@@ -236,7 +224,7 @@ export function CustomizePuklaTheme({
               <Label>{t("Theme.button_color")}</Label>
               <Input
                 type="color"
-                className="w-full h-10 rounded-md cursor-pointer p-0"
+                className="h-10 w-full cursor-pointer rounded-md p-0"
                 value={customTheme.button_color}
                 onChange={(e) =>
                   setCustomTheme({
@@ -250,7 +238,7 @@ export function CustomizePuklaTheme({
               <Label>{t("Theme.button_text_color")}</Label>
               <Input
                 type="color"
-                className="w-full h-10 rounded-md cursor-pointer p-0"
+                className="h-10 w-full cursor-pointer rounded-md p-0"
                 value={customTheme.button_text_color}
                 onChange={(e) =>
                   setCustomTheme({
@@ -264,7 +252,7 @@ export function CustomizePuklaTheme({
               <Label>{t("Theme.border_color")}</Label>
               <Input
                 type="color"
-                className="w-full h-10 p-0 rounded-md cursor-pointer"
+                className="h-10 w-full cursor-pointer rounded-md p-0"
                 value={customTheme.border_color}
                 onChange={(e) =>
                   setCustomTheme({
@@ -290,9 +278,7 @@ export function CustomizePuklaTheme({
               <SliderWithInput
                 minValue={0}
                 maxValue={32}
-                initialValue={[
-                  parseInt(customTheme.avatar_border_radius || "0"),
-                ]}
+                initialValue={[parseInt(customTheme.avatar_border_radius || "0")]}
                 defaultValue={[0]}
                 value={[parseInt(customTheme.avatar_border_radius || "0")]}
                 label={t("Theme.avatar_border_radius")}
@@ -305,7 +291,7 @@ export function CustomizePuklaTheme({
 
       <div className="w-fit">
         <div className="sticky top-4">
-          <h3 className="text-sm font-medium mb-2">{t("Theme.preview")}</h3>
+          <h3 className="mb-2 text-sm font-medium">{t("Theme.preview")}</h3>
           <CustomThemePreview
             sample_text={selectedPukla?.title}
             colors={customTheme}

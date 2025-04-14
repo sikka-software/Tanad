@@ -55,7 +55,7 @@ import { supabase } from "@/lib/supabase";
 export default function Analytics() {
   const t = useTranslations();
   const router = useRouter();
-  const { user } = useUserStore();
+  const { profile } = useUserStore();
   const { puklas, setPuklas, selectedPukla, setSelectedPukla } = useMainStore();
   const [isLoading, setIsLoading] = useState(true);
   const puklaId = (router.query.id || selectedPukla?.id) as string;
@@ -63,11 +63,11 @@ export default function Analytics() {
 
   useEffect(() => {
     const initializePuklas = async () => {
-      if (!user?.id) return;
+      if (!profile?.id) return;
 
       try {
         // Fetch all puklas with link count
-        const fetchedPuklas = await fetchPuklasWithLinkCount(user?.id, {
+        const fetchedPuklas = await fetchPuklasWithLinkCount(profile?.id, {
           toasts: {
             error: t("MyPuklas.error_fetching_puklas"),
             success: t("MyPuklas.success_fetching_puklas"),
@@ -100,7 +100,7 @@ export default function Analytics() {
     };
 
     initializePuklas();
-  }, [user?.id, puklaId]);
+  }, [profile?.id, puklaId]);
 
   let chartConfig = {
     desktop: { label: t("General.desktop"), color: "#2563eb" },
@@ -395,7 +395,7 @@ export default function Analytics() {
           </Card>
         </div>
 
-        {user?.subscribed_to === "pukla_enterprise" ? (
+        {profile?.subscribed_to === "pukla_enterprise" ? (
           <div className="flex w-full flex-col gap-2">
             <AnalyticsTable data={data?.tableData || []} />
           </div>

@@ -63,10 +63,10 @@ const AppearanceSettings = ({
 }) => {
   const t = useTranslations();
   const [isPending, setIsPending] = useState(false);
-  const { user } = useUserStore();
+  const { profile } = useUserStore();
 
   // TODO: Replace with actual user subscription check
-  const isFreePlan = user?.subscribed_to === "pukla_free";
+  const isFreePlan = profile?.subscribed_to === "pukla_free";
 
   // Use external form if provided, otherwise create a new one
   const form =
@@ -215,7 +215,7 @@ const AppearanceSettings = ({
                 <div className="space-y-0.5">
                   <FormLabel className="text-primary flex flex-row items-center text-base">
                     <span>{t("Settings.hideWatermark")}</span>
-                    {user?.subscribed_to === "pukla_free" && (
+                    {profile?.subscribed_to === "pukla_free" && (
                       <Badge variant="outline" className="ms-2">
                         {t("Billing.pro_plan")}
                       </Badge>

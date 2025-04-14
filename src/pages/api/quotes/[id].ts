@@ -1,13 +1,13 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from "next";
+
 import { eq } from "drizzle-orm";
+
 import { db } from "@/db/drizzle";
 import { quotes } from "@/db/schema";
 import { Quote } from "@/types/quote.type";
 
 // Helper to convert Drizzle quote to our Quote type
-function convertDrizzleQuote(
-  data: typeof quotes.$inferSelect & { clients?: any }
-): Quote {
+function convertDrizzleQuote(data: typeof quotes.$inferSelect & { clients?: any }): Quote {
   if (!data.createdAt) {
     throw new Error("Quote must have a creation date");
   }
@@ -45,18 +45,18 @@ function convertDrizzleQuote(
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
-  
-  if (!id || typeof id !== 'string') {
-    return res.status(400).json({ message: 'Invalid quote ID' });
+
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({ message: "Invalid quote ID" });
   }
 
   try {
     switch (req.method) {
-      case 'GET':
+      case "GET":
         const quote = await db.query.quotes.findFirst({
           where: eq(quotes.id, id),
           with: {
-            clients: {
+            client: {
               columns: {
                 id: true,
                 name: true,
@@ -75,12 +75,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
 
         if (!quote) {
-          return res.status(404).json({ message: 'Quote not found' });
+          return res.status(404).json({ message: "Quote not found" });
         }
 
         return res.status(200).json(convertDrizzleQuote(quote));
 
-      case 'PUT':
+      case "PUT":
         const [updatedQuote] = await db
           .update(quotes)
           .set(req.body)
@@ -88,20 +88,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .returning();
 
         if (!updatedQuote) {
-          return res.status(404).json({ message: 'Quote not found' });
+          return res.status(404).json({ message: "Quote not found" });
         }
 
         return res.status(200).json(convertDrizzleQuote(updatedQuote));
 
-      case 'DELETE':
+      case "DELETE":
         await db.delete(quotes).where(eq(quotes.id, id));
         return res.status(204).end();
 
       default:
-        return res.status(405).json({ message: 'Method not allowed' });
+        return res.status(405).json({ message: "Method not allowed" });
     }
   } catch (error) {
-    console.error('Error handling quote:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    console.error("Error handling quote:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
-} 
+}

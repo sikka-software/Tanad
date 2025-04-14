@@ -1,15 +1,16 @@
 import React, { useState } from "react";
+
 import { useTranslations } from "next-intl";
-import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import { useRouter } from "next/router";
 
-import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
-import useUserStore from "@/hooks/use-user-store";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import useUserStore from "@/hooks/use-user-store";
+import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 type HighlightAnimation = "outline" | "border" | "scale" | "none";
 
@@ -32,49 +33,47 @@ const HighlightLink: React.FC<HighlightLinkProps> = ({
 }) => {
   const t = useTranslations();
   const router = useRouter();
-  const { user } = useUserStore();
+  const { profile } = useUserStore();
   const [isSaving, setIsSaving] = useState(false);
-  const [selectedAnimation, setSelectedAnimation] =
-    useState<HighlightAnimation>(value);
+  const [selectedAnimation, setSelectedAnimation] = useState<HighlightAnimation>(value);
 
-  const animations: { value: HighlightAnimation; preview: React.ReactNode }[] =
-    [
-      {
-        value: "none",
-        preview: (
-          <div className="w-full h-10 bg-primary text-primary-foreground rounded-lg flex items-center justify-center">
-            {t("Theme.none")}
-          </div>
-        ),
-      },
-      {
-        value: "outline",
-        preview: (
-          <div className="w-full h-10 bg-primary text-primary-foreground rounded-lg flex items-center justify-center animate-highlight_outline">
-            {t("Theme.outline")}
-          </div>
-        ),
-      },
-      {
-        value: "border",
-        preview: (
-          <div className="w-full h-10 bg-primary text-primary-foreground rounded-lg flex items-center justify-center animate-highlight_border">
-            {t("Theme.border")}
-          </div>
-        ),
-      },
-      {
-        value: "scale",
-        preview: (
-          <div className="w-full h-10 bg-primary text-primary-foreground rounded-lg flex items-center justify-center animate-highlight_scale">
-            {t("Theme.scale")}
-          </div>
-        ),
-      },
-    ];
+  const animations: { value: HighlightAnimation; preview: React.ReactNode }[] = [
+    {
+      value: "none",
+      preview: (
+        <div className="bg-primary text-primary-foreground flex h-10 w-full items-center justify-center rounded-lg">
+          {t("Theme.none")}
+        </div>
+      ),
+    },
+    {
+      value: "outline",
+      preview: (
+        <div className="bg-primary text-primary-foreground animate-highlight_outline flex h-10 w-full items-center justify-center rounded-lg">
+          {t("Theme.outline")}
+        </div>
+      ),
+    },
+    {
+      value: "border",
+      preview: (
+        <div className="bg-primary text-primary-foreground animate-highlight_border flex h-10 w-full items-center justify-center rounded-lg">
+          {t("Theme.border")}
+        </div>
+      ),
+    },
+    {
+      value: "scale",
+      preview: (
+        <div className="bg-primary text-primary-foreground animate-highlight_scale flex h-10 w-full items-center justify-center rounded-lg">
+          {t("Theme.scale")}
+        </div>
+      ),
+    },
+  ];
 
   const handleSave = async (newAnimation: HighlightAnimation) => {
-    if (user?.subscribed_to === "pukla_free") {
+    if (profile?.subscribed_to === "pukla_free") {
       onUpgradeNeeded?.();
       return;
     }
@@ -128,13 +127,13 @@ const HighlightLink: React.FC<HighlightLinkProps> = ({
             <Label
               htmlFor={`highlight-${animation.value}`}
               className={cn(
-                "flex flex-col gap-2 rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer",
-                (disabled || isSaving) && "cursor-not-allowed opacity-50"
+                "border-muted bg-popover hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary flex cursor-pointer flex-col gap-2 rounded-lg border-2 p-4",
+                (disabled || isSaving) && "cursor-not-allowed opacity-50",
               )}
             >
               {animation.preview}
               {isSaving && selectedAnimation === animation.value && (
-                <div className="absolute inset-0 flex items-center justify-center bg-popover/50 rounded-lg">
+                <div className="bg-popover/50 absolute inset-0 flex items-center justify-center rounded-lg">
                   <Loader2 className="h-4 w-4 animate-spin" />
                 </div>
               )}

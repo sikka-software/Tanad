@@ -1,9 +1,9 @@
 import React from "react";
 
-import { PuklaThemeProps } from "@/lib/types";
-import useUserStore from "@/hooks/use-user-store";
 // Components
 import { SingleThemeThumbnail } from "@/components/app/SingleThemeThumbnail";
+import useUserStore from "@/hooks/use-user-store";
+import { PuklaThemeProps } from "@/lib/types";
 
 interface PredefinedThemesSectionProps {
   allThemes: PuklaThemeProps[];
@@ -12,17 +12,16 @@ interface PredefinedThemesSectionProps {
   onUpgradeClick: () => void;
 }
 
-export const PredefinedThemesSection: React.FC<
-  PredefinedThemesSectionProps
-> = ({ allThemes, selectedTheme, onThemeSelect, onUpgradeClick }) => {
-  const { user } = useUserStore();
+export const PredefinedThemesSection: React.FC<PredefinedThemesSectionProps> = ({
+  allThemes,
+  selectedTheme,
+  onThemeSelect,
+  onUpgradeClick,
+}) => {
+  const { profile } = useUserStore();
 
   const handleThumbnailClick = (theme: PuklaThemeProps) => {
-    if (
-      !theme.is_free &&
-      user?.subscribed_to === "pukla_free" &&
-      onUpgradeClick
-    ) {
+    if (!theme.is_free && profile?.subscribed_to === "pukla_free" && onUpgradeClick) {
       onUpgradeClick();
     } else {
       onThemeSelect(theme);
@@ -36,7 +35,7 @@ export const PredefinedThemesSection: React.FC<
           <div className="flex-none" key={index}>
             <SingleThemeThumbnail
               sample_text={theme.theme_name}
-              locked={!theme.is_free && user?.subscribed_to === "pukla_free"}
+              locked={!theme.is_free && profile?.subscribed_to === "pukla_free"}
               isSelected={selectedTheme?.theme_name === theme.theme_name}
               onSelect={() => handleThumbnailClick(theme)}
               colors={{
