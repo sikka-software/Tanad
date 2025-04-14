@@ -18,6 +18,7 @@ export default function AddBranchPage() {
   const t = useTranslations();
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch user ID on mount
@@ -39,6 +40,7 @@ export default function AddBranchPage() {
   }, [router]);
 
   const handleSuccess = (branch: any) => {
+    setLoading(false);
     // Update the branches cache to include the new branch
     const previousBranches = queryClient.getQueryData(branchKeys.lists()) || [];
     queryClient.setQueryData(branchKeys.lists(), [
@@ -56,7 +58,7 @@ export default function AddBranchPage() {
         title={t("Branches.add_new")}
         formButtons
         formId="branch-form"
-        // loading={loading}
+        loading={loading}
         onCancel={() => router.push("/branches")}
         texts={{
           submit_form: t("Branches.add_new"),
@@ -70,7 +72,13 @@ export default function AddBranchPage() {
             <CardTitle>{t("Branches.branch_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <BranchForm userId={userId} onSuccess={handleSuccess} />
+            <BranchForm
+              id="branch-form"
+              userId={userId}
+              onSuccess={handleSuccess}
+              loading={loading}
+              setLoading={setLoading}
+            />
           </CardContent>
         </Card>
       </div>

@@ -9,8 +9,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import type { Branch, BranchCreateData } from "@/types/branch.type";
-import { createBranch, fetchBranchById, updateBranch } from "@/services/branchService";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -23,6 +21,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { createBranch, fetchBranchById, updateBranch } from "@/services/branchService";
+import type { Branch, BranchCreateData } from "@/types/branch.type";
 
 // Define the schema
 const branchFormSchema = z.object({
@@ -43,19 +43,21 @@ const branchFormSchema = z.object({
 type BranchFormValues = z.input<typeof branchFormSchema>;
 
 interface BranchFormProps {
-  formId?: string;
+  id?: string;
   branchId?: string;
   onSuccess?: (branch: Branch) => void;
   loading?: boolean;
   userId: string | null;
+  setLoading?: (loading: boolean) => void;
 }
 
 export function BranchForm({
-  formId,
+  id,
   branchId,
   onSuccess,
   loading: externalLoading = false,
   userId,
+  setLoading,
 }: BranchFormProps) {
   const router = useRouter();
   const t = useTranslations();
@@ -145,11 +147,13 @@ export function BranchForm({
 
   const onSubmit: SubmitHandler<BranchFormValues> = async (data) => {
     setInternalLoading(true);
+    setLoading?.(true);
     if (!userId) {
       toast.error(t("error.title"), {
         description: t("error.not_authenticated"),
       });
       setInternalLoading(false);
+      setLoading?.(false);
       return;
     }
 
@@ -195,12 +199,13 @@ export function BranchForm({
       });
     } finally {
       setInternalLoading(false);
+      setLoading?.(false);
     }
   };
 
   return (
     <Form {...form}>
-      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
