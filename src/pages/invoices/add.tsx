@@ -13,7 +13,7 @@ import PageTitle from "@/components/ui/page-title";
 import { supabase } from "@/lib/supabase";
 
 export default function AddInvoicePage() {
-  const t = useTranslations("Invoices");
+  const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -76,15 +76,15 @@ export default function AddInvoicePage() {
 
       if (itemsError) throw itemsError;
 
-      toast.success(t("success.title"), {
-        description: t("success.created"),
+      toast.success(t("Invoices.success.title"), {
+        description: t("Invoices.success.created"),
       });
 
       router.push("/invoices");
     } catch (error) {
       console.error(error);
-      toast.error(t("error.title"), {
-        description: error instanceof Error ? error.message : t("error.create"),
+      toast.error(t("Invoices.error.title"), {
+        description: error instanceof Error ? error.message : t("Invoices.error.create"),
       });
     } finally {
       setLoading(false);
@@ -94,20 +94,17 @@ export default function AddInvoicePage() {
   return (
     <div>
       <PageTitle
-        title={t("add_new")}
-        createButtonLink="/invoices"
-        createButtonText={t("back_to_list")}
-        customButton={
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => router.push("/invoices")}>
-              {t("cancel")}
-            </Button>
-            <Button type="submit" form="invoice-form" disabled={loading}>
-              {loading ? t("saving") : t("save")}
-            </Button>
-          </div>
-        }
+        title={t("Invoices.add_new")}
+        formButtons
+        formId="invoice-form"
+        loading={loading}
+        onCancel={() => router.push("/invoices")}
+        texts={{
+          submit_form: t("Invoices.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
+
       <div className="p-4">
         <Card>
           <CardHeader>

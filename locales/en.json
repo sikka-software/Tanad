@@ -1349,6 +1349,29 @@
     "submitting": "Submitting...",
     "invoice_hash": "Invoice #{number}",
     "issue_date": "Issue Date",
+    "form": {
+      "invoice_number": {
+        "label": "Invoice #"
+      },
+      "client": {
+        "label": "Client"
+      },
+      "issue_date": {
+        "label": "Issue Date"
+      },
+      "due_date": {
+        "label": "Due Date"
+      },
+      "total": {
+        "label": "Total"
+      },
+      "status": {
+        "label": "Status"
+      }
+    },
+    "actions": {
+      "preview": "Preview"
+    },
     "products": {
       "title": "Products",
       "add_product": "Add Product",

@@ -99,19 +99,16 @@ export default function AddQuotePage() {
     <div>
       <PageTitle
         title={t("Quotes.add_new")}
-        createButtonLink="/quotes"
-        createButtonText={t("Quotes.back_to_list")}
-        customButton={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/quotes")}>
-              {t("General.cancel")}
-            </Button>
-            <Button type="submit" size="sm" form="quote-form" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Quotes.create_quote")}
-            </Button>
-          </div>
-        }
+        formButtons
+        formId="quote-form"
+        loading={loading}
+        onCancel={() => router.push("/quotes")}
+        texts={{
+          submit_form: t("Quotes.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
+
       <div className="p-4">
         <Card>
           <CardHeader>

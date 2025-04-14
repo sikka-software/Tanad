@@ -91,22 +91,16 @@ export default function AddVendorPage() {
     <div>
       <PageTitle
         title={t("Vendors.add_new")}
-        customButton={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/vendors")}>
-              {t("General.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              form="vendor-form"
-              disabled={createVendorMutation.isPending}
-            >
-              {createVendorMutation.isPending ? t("General.saving") : t("Vendors.add_new")}
-            </Button>
-          </div>
-        }
+        formButtons
+        formId="vendor-form"
+        loading={createVendorMutation.isPending}
+        onCancel={() => router.push("/vendors")}
+        texts={{
+          submit_form: t("Vendors.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
+
       <div className="p-4">
         <Card>
           <CardHeader className="relative">

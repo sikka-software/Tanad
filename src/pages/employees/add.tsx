@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
 export default function AddEmployeePage() {
-  const t = useTranslations("Employees");
+  const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -41,7 +41,7 @@ export default function AddEmployeePage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || t("messages.error"));
+        throw new Error(errorData.error || t("Employees.messages.error"));
       }
 
       // Get the new employee data
@@ -66,24 +66,20 @@ export default function AddEmployeePage() {
   return (
     <div>
       <PageTitle
-        title={t("add_employee")}
-        createButtonLink="/employees"
-        createButtonText={t("back_to_list")}
-        customButton={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/employees")}>
-              {t("cancel")}
-            </Button>
-            <Button type="submit" size="sm" form="employee-form" disabled={loading}>
-              {loading ? t("messages.creating_employee") : t("messages.create_employee")}
-            </Button>
-          </div>
-        }
+        title={t("Employees.add_new")}
+        formButtons
+        formId="employee-form"
+        loading={loading}
+        onCancel={() => router.push("/employees")}
+        texts={{
+          submit_form: t("Employees.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>{t("employee_details")}</CardTitle>
+            <CardTitle>{t("Employees.employee_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <EmployeeForm id="employee-form" onSubmit={handleSubmit} loading={loading} />

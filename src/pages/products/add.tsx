@@ -65,24 +65,16 @@ export default function AddProductPage() {
     <div className="">
       <PageTitle
         title={t("Products.add_new")}
-        createButtonLink="/products"
-        createButtonText={t("Products.back_to_list")}
-        customButton={
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => router.push("/products")}
-            >
-              {t("General.cancel")}
-            </Button>
-            <Button type="button" size="sm" onClick={handleSubmitClick}>
-              {t("Products.create_product")}
-            </Button>
-          </div>
-        }
+        formButtons
+        formId="product-form"
+        // loading={loading}
+        onCancel={() => router.push("/products")}
+        texts={{
+          submit_form: t("Products.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
+
       <div className="p-4">
         <Card>
           <CardHeader>

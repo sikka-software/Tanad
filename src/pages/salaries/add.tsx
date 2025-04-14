@@ -34,17 +34,16 @@ export default function AddSalaryPage() {
     <div>
       <PageTitle
         title={t("Salaries.add_new")}
-        customButton={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/salaries")}>
-              {t("General.cancel")}
-            </Button>
-            <Button type="submit" size="sm" form="salary-form">
-              {t("Salaries.add_new")}
-            </Button>
-          </div>
-        }
+        formButtons
+        formId="salary-form"
+        // loading={loading}
+        onCancel={() => router.push("/salaries")}
+        texts={{
+          submit_form: t("Salaries.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
+
       <div className="p-4">
         <Card>
           <CardHeader>

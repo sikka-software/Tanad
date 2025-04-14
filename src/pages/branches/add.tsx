@@ -15,7 +15,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function AddBranchPage() {
   const router = useRouter();
-  const t = useTranslations("Branches");
+  const t = useTranslations();
   const [userId, setUserId] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const queryClient = useQueryClient();
@@ -53,19 +53,21 @@ export default function AddBranchPage() {
   return (
     <div>
       <PageTitle
-        title={t("add_new")}
-        customButton={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/branches")}>
-              {t("General.cancel")}
-            </Button>
-          </div>
-        }
+        title={t("Branches.add_new")}
+        formButtons
+        formId="branch-form"
+        // loading={loading}
+        onCancel={() => router.push("/branches")}
+        texts={{
+          submit_form: t("Branches.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
+
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>{t("branch_details")}</CardTitle>
+            <CardTitle>{t("Branches.branch_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <BranchForm userId={userId} onSuccess={handleSuccess} />

@@ -103,19 +103,16 @@ export default function AddClientPage() {
     <div>
       <PageTitle
         title={t("Clients.add_new")}
-        createButtonLink="/clients"
-        createButtonText={t("Clients.back_to_list")}
-        customButton={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/clients")}>
-              {t("General.cancel")}
-            </Button>
-            <Button type="submit" size="sm" form="client-form" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("Clients.create_client")}
-            </Button>
-          </div>
-        }
+        formButtons
+        formId="client-form"
+        loading={loading}
+        onCancel={() => router.push("/clients")}
+        texts={{
+          submit_form: t("Clients.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
+
       <div className="p-4">
         <Card className="max-w-2xl">
           <CardHeader className="relative">

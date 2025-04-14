@@ -14,7 +14,7 @@ import PageTitle from "@/components/ui/page-title";
 import { createJob } from "@/services/jobService";
 
 export default function AddJobPage() {
-  const t = useTranslations("Jobs");
+  const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
@@ -43,12 +43,12 @@ export default function AddJobPage() {
         [...(Array.isArray(previousJobs) ? previousJobs : []), newJob],
       );
 
-      toast.success(t("messages.job_created"));
+      toast.success(t("Jobs.messages.job_created"));
       // Now we can navigate without the refresh parameter
       router.push("/jobs");
     } catch (error: any) {
       console.error("Error creating job:", error);
-      toast.error(error.message || t("messages.error"));
+      toast.error(error.message || t("Jobs.messages.error"));
     } finally {
       setLoading(false);
     }
@@ -57,24 +57,21 @@ export default function AddJobPage() {
   return (
     <div>
       <PageTitle
-        title={t("add_job")}
-        createButtonLink="/jobs"
-        createButtonText={t("back_to_list")}
-        customButton={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/jobs")}>
-              {t("cancel")}
-            </Button>
-            <Button type="submit" size="sm" form="job-form" disabled={loading}>
-              {loading ? t("messages.creating_job") : t("messages.create_job")}
-            </Button>
-          </div>
-        }
+        title={t("Jobs.add_new")}
+        formButtons
+        formId="job-form"
+        loading={loading}
+        onCancel={() => router.push("/jobs")}
+        texts={{
+          submit_form: t("Jobs.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
+
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>{t("job_details")}</CardTitle>
+            <CardTitle>{t("Jobs.job_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <JobForm id="job-form" onSubmit={handleSubmit} loading={loading} />

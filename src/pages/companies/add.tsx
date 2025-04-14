@@ -91,29 +91,16 @@ export default function AddCompanyPage() {
     <div>
       <PageTitle
         title={t("Companies.add_new")}
-        createButtonLink="/companies"
-        createButtonText={t("Companies.back_to_list")}
-        customButton={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => router.push("/companies")}>
-              {t("General.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              className="min-w-24"
-              size="sm"
-              form="company-form"
-              disabled={loading}
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                t("Companies.create_company")
-              )}
-            </Button>
-          </div>
-        }
+        formButtons
+        formId="company-form"
+        loading={loading}
+        onCancel={() => router.push("/companies")}
+        texts={{
+          submit_form: t("Companies.add_new"),
+          cancel: t("General.cancel"),
+        }}
       />
+
       <div className="p-4">
         <Card>
           <CardHeader className="relative">

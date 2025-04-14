@@ -1337,16 +1337,16 @@
     "enter_description": "أدخل وصف الفاتورة",
     "price": "السعر",
     "price_required": "السعر مطلوب",
-    "stock_quantity": "الكمية المتوفرة",
-    "stock_quantity_required": "الكمية المتوفرة مطلوبة",
+    "stock_quantity": "كمية المخزون",
+    "stock_quantity_required": "كمية المخزون مطلوبة",
     "sku": "رمز المنتج",
     "enter_sku": "أدخل رمز المنتج (اختياري)",
     "no_description": "لا يوجد وصف",
     "sku_label": "رمز المنتج: {value}",
-    "stock_label": "متوفر: {value}",
+    "stock_label": "المخزون: {value}",
     "create_invoice": "إنشاء فاتورة",
     "creating": "جاري الإنشاء...",
-    "no_invoices_found": "لا توجد فواتير",
+    "no_invoices_found": "لم يتم العثور على فواتير",
     "add_first_invoice": "أضف أول فاتورة",
     "client": "العميل",
     "select_client": "اختر عميل",
@@ -1380,6 +1380,29 @@
     "submitting": "جاري الإرسال...",
     "invoice_hash": "فاتورة #{number}",
     "issue_date": "تاريخ الإصدار",
+    "form": {
+      "invoice_number": {
+        "label": "رقم الفاتورة"
+      },
+      "client": {
+        "label": "العميل"
+      },
+      "issue_date": {
+        "label": "تاريخ الإصدار"
+      },
+      "due_date": {
+        "label": "تاريخ الاستحقاق"
+      },
+      "total": {
+        "label": "المجموع"
+      },
+      "status": {
+        "label": "الحالة"
+      }
+    },
+    "actions": {
+      "preview": "معاينة"
+    },
     "products": {
       "title": "المنتجات",
       "add_product": "إضافة منتج",
@@ -1390,7 +1413,7 @@
       "subtotal": "المجموع الفرعي",
       "select_product": "اختر منتج",
       "search_products": "بحث عن منتجات",
-      "no_products_found": "لا توجد منتجات",
+      "no_products_found": "لم يتم العثور على منتجات",
       "add_new_product": "إضافة منتج جديد",
       "product_description": "وصف المنتج"
     }
