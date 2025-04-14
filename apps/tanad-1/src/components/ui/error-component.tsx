@@ -4,8 +4,8 @@ import { useState } from "react";
 
 import { useLocale, useTranslations } from "next-intl";
 
-import { motion } from "framer-motion";
 import { Send, X, AlertTriangle, ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
 
 import { Button } from "@/components/ui/button";
 import {
