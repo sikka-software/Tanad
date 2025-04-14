@@ -1,19 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
-import { Employee } from "@/types/employee.type";
+import { useEmployeesStore } from "@/stores/employees.store";
 
-async function fetchEmployees(): Promise<Employee[]> {
-  const response = await fetch("/api/employees");
-  if (!response.ok) {
-    throw new Error("Failed to fetch employees");
-  }
-  const data = await response.json();
-  return data.employees;
-}
+export const useEmployees = () => {
+  const { employees, isLoading, error, fetchEmployees } = useEmployeesStore();
 
-export function useEmployees() {
-  return useQuery({
-    queryKey: ["employees"],
-    queryFn: fetchEmployees,
-  });
-}
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
+
+  return {
+    data: employees,
+    isLoading,
+    error,
+  };
+};

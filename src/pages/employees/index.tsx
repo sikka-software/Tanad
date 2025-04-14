@@ -1,34 +1,44 @@
+import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
 import { format } from "date-fns";
-import { Building2, Mail, Phone, Calendar } from "lucide-react";
+import { Building2, Mail, Phone } from "lucide-react";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import EmployeesTable from "@/components/tables/employees-table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
-import PageTitle from "@/components/ui/page-title";
+import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { useEmployees } from "@/hooks/useEmployees";
 import { Employee } from "@/types/employee.type";
 
 export default function EmployeesPage() {
   const t = useTranslations("Employees");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const { data: employees, isLoading, error } = useEmployees();
+
+  const filteredEmployees = Array.isArray(employees)
+    ? employees.filter(
+        (employee: Employee) =>
+          employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          employee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          employee.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          employee.department?.toLowerCase()?.includes(searchQuery.toLowerCase()),
+      )
+    : [];
 
   const renderEmployee = (employee: Employee) => (
     <Card key={employee.id} className="transition-shadow hover:shadow-lg">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-lg font-semibold">
-              {employee.firstName} {employee.lastName}
-            </h3>
+            <h3 className="text-lg font-semibold">{employee.name}</h3>
             <p className="text-sm text-gray-500">{employee.position}</p>
           </div>
-          <Badge variant={employee.isActive ? "default" : "secondary"}>
-            {employee.isActive ? "Active" : "Inactive"}
-          </Badge>
         </div>
       </CardHeader>
       <CardContent>
@@ -53,16 +63,6 @@ export default function EmployeesPage() {
               <span>{employee.department}</span>
             </div>
           )}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Calendar className="h-4 w-4" />
-            <span>Hired {format(new Date(employee.hireDate), "MMM dd, yyyy")}</span>
-          </div>
-          {employee.salary && (
-            <p className="text-sm text-gray-600">Salary: ${employee.salary.toLocaleString()}</p>
-          )}
-          {employee.notes && (
-            <p className="mt-2 border-t pt-2 text-sm text-gray-500">{employee.notes}</p>
-          )}
         </div>
       </CardContent>
     </Card>
@@ -70,21 +70,36 @@ export default function EmployeesPage() {
 
   return (
     <DataPageLayout>
-      <PageTitle
+      <PageSearchAndFilter
         title={t("title")}
-        createButtonLink="/employees/add"
-        createButtonText={t("create_employee")}
-        createButtonDisabled={isLoading}
+        createHref="/employees/add"
+        createLabel={t("add_new")}
+        onSearch={setSearchQuery}
+        searchPlaceholder={t("search_employees")}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
-      <div className="p-4">
-        <DataModelList
-          data={employees}
-          isLoading={isLoading}
-          error={error instanceof Error ? error : null}
-          emptyMessage={t("no_employees_found")}
-          renderItem={renderEmployee}
-          gridCols="3"
-        />
+
+      <div>
+        {viewMode === "table" ? (
+          <EmployeesTable
+            data={filteredEmployees}
+            isLoading={isLoading}
+            error={error as Error | null}
+          />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredEmployees}
+              isLoading={isLoading}
+              error={error as Error | null}
+              emptyMessage={t("no_employees")}
+              addFirstItemMessage={t("add_first_employee")}
+              renderItem={renderEmployee}
+              gridCols="3"
+            />
+          </div>
+        )}
       </div>
     </DataPageLayout>
   );
