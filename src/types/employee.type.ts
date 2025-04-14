@@ -1,10 +1,15 @@
 export interface Employee {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone?: string;
   position: string;
   department?: string;
+  hireDate: string;
+  salary?: number;
+  isActive: boolean;
+  notes?: string;
   created_at: string;
   updated_at: string;
 }

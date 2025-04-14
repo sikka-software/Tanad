@@ -62,6 +62,8 @@ interface SalaryFormProps {
   salaryId?: string;
   onSuccess?: (salary: Salary) => void;
   loading?: boolean;
+  setLoading?: (loading: boolean) => void;
+  userId?: string | null;
 }
 
 export function SalaryForm({
@@ -69,6 +71,8 @@ export function SalaryForm({
   salaryId,
   onSuccess,
   loading: externalLoading = false,
+  setLoading,
+  userId,
 }: SalaryFormProps) {
   const router = useRouter();
   const t = useTranslations();
@@ -131,11 +135,13 @@ export function SalaryForm({
   // Data is SalaryFormValues (numbers for amounts)
   const onSubmit: SubmitHandler<SalaryFormValues> = async (data) => {
     setInternalLoading(true);
+    setLoading?.(true);
     if (!user?.id) {
       toast.error(t("Salaries.error.title"), {
         description: t("Salaries.messages.error_not_authenticated"),
       });
       setInternalLoading(false);
+      setLoading?.(false);
       return;
     }
 
@@ -191,6 +197,7 @@ export function SalaryForm({
       });
     } finally {
       setInternalLoading(false);
+      setLoading?.(false);
     }
   };
 

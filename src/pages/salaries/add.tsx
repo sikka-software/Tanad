@@ -12,13 +12,34 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 import { salaryKeys } from "@/hooks/useSalaries";
+import { supabase } from "@/lib/supabase";
 
 export default function AddSalaryPage() {
   const router = useRouter();
   const t = useTranslations();
   const queryClient = useQueryClient();
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
+
+  useEffect(() => {
+    const getUserId = async () => {
+      setLoadingUser(true);
+      const { data, error } = await supabase.auth.getUser();
+      if (data.user) {
+        setUserId(data.user.id);
+      } else {
+        console.error("User not authenticated:", error);
+        router.push("/auth/login");
+      }
+      setLoadingUser(false);
+    };
+
+    getUserId();
+  }, [router]);
 
   const handleSuccess = (salary: any) => {
+    setLoading(false);
     // Update the salaries cache to include the new salary
     const previousSalaries = queryClient.getQueryData(salaryKeys.lists()) || [];
     queryClient.setQueryData(salaryKeys.lists(), [
@@ -36,7 +57,7 @@ export default function AddSalaryPage() {
         title={t("Salaries.add_new")}
         formButtons
         formId="salary-form"
-        // loading={loading}
+        loading={loading}
         onCancel={() => router.push("/salaries")}
         texts={{
           submit_form: t("Salaries.add_new"),
@@ -50,7 +71,13 @@ export default function AddSalaryPage() {
             <CardTitle>{t("Salaries.salary_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <SalaryForm id="salary-form" onSuccess={handleSuccess} />
+            <SalaryForm
+              id="salary-form"
+              onSuccess={handleSuccess}
+              loading={loading}
+              setLoading={setLoading}
+              userId={userId}
+            />
           </CardContent>
         </Card>
       </div>
