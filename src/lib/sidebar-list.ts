@@ -121,6 +121,22 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       url: "/locations",
       icon: LayoutGrid,
       isActive: pathname.startsWith("/warehouses") || pathname.startsWith("/branches"),
+      items: [
+        {
+          title: "Warehouses",
+          translationKey: "Warehouses.title",
+          url: "/warehouses",
+          action: "/warehouses/add",
+          isActive: pathname === "/warehouses",
+        },
+        {
+          title: "Branches",
+          translationKey: "Branches.title",
+          url: "/branches",
+          action: "/branches/add",
+          isActive: pathname === "/branches",
+        },
+      ],
     },
   ];
 }

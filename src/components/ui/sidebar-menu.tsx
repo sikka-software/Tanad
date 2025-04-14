@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 
 import { ChevronRight, Plus } from "lucide-react";
 
@@ -39,6 +40,7 @@ export function NavMain({ title, items }: SidebarMenuGroupProps) {
 const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]) => {
   const t = useTranslations();
   const locale = useLocale();
+  const router = useRouter();
   return (
     <Collapsible key={item.title} asChild defaultOpen={item.isActive} className="group/collapsible">
       <SidebarMenuItem>
@@ -53,7 +55,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
           </SidebarMenuButton>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <SidebarMenuSub dir={locale === "ar" ? "rtl" : "ltr"}>
+          <SidebarMenuSub className="me-0 pe-0" dir={locale === "ar" ? "rtl" : "ltr"}>
             {item.items?.map((subItem) => (
               <SidebarMenuSubItem key={subItem.title} className="relative">
                 <SidebarMenuSubButton
@@ -68,7 +70,16 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                   </a>
                 </SidebarMenuSubButton>
                 {subItem.action && (
-                  <SidebarMenuAction className="absolute !end-1 top-1/2 -translate-y-1/2">
+                  <SidebarMenuAction
+                    className="absolute !end-1 top-1/2 -translate-y-1/2 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      if (subItem.action) {
+                        router.push(subItem.action);
+                      }
+                    }}
+                  >
                     <Plus className="!size-3" />
                     <span className="sr-only">More</span>
                   </SidebarMenuAction>
