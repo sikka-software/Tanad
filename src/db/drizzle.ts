@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
+import * as relations from "@/db/relations";
 import * as schema from "@/db/schema";
 
 // This file is only imported by server-side code
@@ -15,4 +16,6 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
 });
 
-export const db = drizzle(pool, { schema });
+export const db = drizzle(pool, {
+  schema: { ...schema, ...relations },
+});

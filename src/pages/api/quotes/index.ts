@@ -6,9 +6,7 @@ import { db } from "@/db/drizzle";
 import { quotes } from "@/db/schema";
 
 // Helper to convert Drizzle quote to our Quote type
-function convertDrizzleQuote(
-  data: typeof quotes.$inferSelect & { client?: any }
-): any {
+function convertDrizzleQuote(data: any): any {
   if (!data.createdAt) {
     throw new Error("Quote must have a creation date");
   }
@@ -52,9 +50,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           with: {
             client: true,
           },
-          orderBy: desc(quotes.createdAt),
+          orderBy: [desc(quotes.createdAt)],
         });
-        
+
         const data = result.map(convertDrizzleQuote);
         return res.status(200).json(data);
 
@@ -70,6 +68,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } catch (error) {
     console.error("Error handling quotes:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }
