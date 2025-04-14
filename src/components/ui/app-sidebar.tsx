@@ -47,11 +47,12 @@ import {
 } from "@/components/ui/sidebar";
 import useUserStore from "@/hooks/use-user-store";
 import { CACHE_KEY } from "@/lib/constants";
-import { getMenuList } from "@/lib/menu-list";
+import { getMenuList, getRegularMenuList } from "@/lib/menu-list";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
+import { NavMain } from "./navbar-main";
 
 type Menu = {
   href: string;
@@ -79,7 +80,6 @@ export function AppSidebar() {
   const t = useTranslations();
   const lang = useLocale();
   const [open, setOpen] = useState(false);
-  const { resolvedTheme } = useTheme();
   const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
   const { user } = useUserStore();
   const router = useRouter();
@@ -141,7 +141,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"}>
-      <SidebarHeader>
+      {/* <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
@@ -163,8 +163,10 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+      */}
       <SidebarContent>
-        <SidebarGroup>
+        <NavMain title="Platform" items={menuGroups.Administration} />
+        {/* <SidebarGroup>
           <SidebarMenu className="mt-4 gap-2">
             {menuGroups.map((group, groupIndex) => (
               <div key={groupIndex}>
@@ -308,7 +310,7 @@ export function AppSidebar() {
               </div>
             ))}
           </SidebarMenu>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
       <SidebarFooter className="px-0">
         <div className="flex flex-col gap-2 p-2">
