@@ -86,7 +86,10 @@
     "error_updating_avatar": "Error while updating avatar",
     "next": "Next",
     "previous": "Previous",
-    "done": "Done"
+    "done": "Done",
+    "loading": "Loading...",
+    "success": "Success",
+    "create": "Create"
   },
   "SEO": {
     "landing": {
@@ -2083,6 +2086,19 @@
     "edit": "Edit Employee",
     "back_to_list": "Back to List",
     "allEmployees": "All Employees",
+    "search_employees": "Search employees...",
+    "no_employees": "No employees found",
+    "add_first_employee": "Add your first employee",
+    "email_label": "Email: {value}",
+    "phone_label": "Phone: {value}",
+    "department_label": "Department: {value}",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "position": "Position",
+      "department": "Department"
+    },
     "form": {
       "first_name": {
         "label": "First Name",
@@ -2234,35 +2250,5 @@
     "main": "Main Navigation",
     "resources": "Resources",
     "organization": "Organization"
-  },
-  "Common": {
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "create": "Create"
-  },
-  "Employees": {
-    "title": "Employees",
-    "add_new": "Add Employee",
-    "search_employees": "Search employees...",
-    "no_employees": "No employees found",
-    "add_first_employee": "Add your first employee",
-    "email_label": "Email: {value}",
-    "phone_label": "Phone: {value}",
-    "department_label": "Department: {value}"
-  },
-  "Products": {
-    "title": "Products",
-    "add_new": "Add Product",
-    "search_products": "Search products...",
-    "no_products": "No products found",
-    "add_first_product": "Add your first product",
-    "sku_label": "SKU: {value}",
-    "stock_label": "Stock: {value}",
-    "no_description": "No description available"
   }
 }
