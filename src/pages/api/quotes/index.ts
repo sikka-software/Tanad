@@ -4,10 +4,11 @@ import { desc } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
 import { quotes } from "@/db/schema";
-import { Quote } from "@/types/quote.type";
 
 // Helper to convert Drizzle quote to our Quote type
-function convertDrizzleQuote(data: typeof quotes.$inferSelect & { clients?: any }): Quote {
+function convertDrizzleQuote(
+  data: typeof quotes.$inferSelect & { client?: any }
+): any {
   if (!data.createdAt) {
     throw new Error("Quote must have a creation date");
   }
@@ -25,19 +26,19 @@ function convertDrizzleQuote(data: typeof quotes.$inferSelect & { clients?: any 
     status: data.status,
     notes: data.notes || undefined,
     client_id: data.clientId,
-    clients: data.clients
+    clients: data.client
       ? {
-          id: data.clients.id,
-          name: data.clients.name,
-          company: data.clients.company || "No Company",
-          email: data.clients.email || "",
-          phone: data.clients.phone,
-          address: data.clients.address,
-          city: data.clients.city,
-          state: data.clients.state,
-          zip_code: data.clients.zipCode,
-          notes: data.clients.notes || null,
-          created_at: data.clients.createdAt?.toString() || "",
+          id: data.client.id,
+          name: data.client.name,
+          company: data.client.company || "No Company",
+          email: data.client.email || "",
+          phone: data.client.phone,
+          address: data.client.address,
+          city: data.client.city,
+          state: data.client.state,
+          zip_code: data.client.zipCode,
+          notes: data.client.notes || null,
+          created_at: data.client.createdAt?.toString() || "",
         }
       : undefined,
   };
@@ -47,34 +48,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     switch (req.method) {
       case "GET":
-        const data = await db.query.quotes.findMany({
+        const result = await db.query.quotes.findMany({
           with: {
-            clients: {
-              columns: {
-                id: true,
-                name: true,
-                company: true,
-                email: true,
-                phone: true,
-                address: true,
-                city: true,
-                state: true,
-                zipCode: true,
-                notes: true,
-                createdAt: true,
-              },
-            },
+            client: true,
           },
           orderBy: desc(quotes.createdAt),
         });
-        return res.status(200).json(data.map(convertDrizzleQuote));
+        
+        const data = result.map(convertDrizzleQuote);
+        return res.status(200).json(data);
 
       case "POST":
         const [newQuote] = await db.insert(quotes).values(req.body).returning();
         if (!newQuote) {
           return res.status(400).json({ message: "Failed to create quote" });
         }
-        return res.status(201).json(convertDrizzleQuote(newQuote));
+        return res.status(201).json(newQuote);
 
       default:
         return res.status(405).json({ message: "Method not allowed" });
