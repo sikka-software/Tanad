@@ -1,13 +1,15 @@
+import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-
 import { format } from "date-fns";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import QuotesTable from "@/components/tables/quotes-table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
-import PageTitle from "@/components/ui/page-title";
+import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { useQuotes } from "@/hooks/useQuotes";
 import { Quote } from "@/types/quote.type";
 
@@ -29,7 +31,19 @@ function getStatusColor(status: string): string {
 
 export default function QuotesPage() {
   const t = useTranslations("Quotes");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const { data: quotes, isLoading, error } = useQuotes();
+
+  const filteredQuotes = Array.isArray(quotes)
+    ? quotes.filter(
+        (quote: Quote) =>
+          quote.quote_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          quote.clients?.company?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
+          quote.clients?.name?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
+          quote.clients?.email?.toLowerCase()?.includes(searchQuery.toLowerCase()),
+      )
+    : [];
 
   const renderQuote = (quote: Quote) => (
     <Card key={quote.id} className="transition-shadow hover:shadow-lg">
@@ -76,21 +90,36 @@ export default function QuotesPage() {
 
   return (
     <DataPageLayout>
-      <PageTitle
+      <PageSearchAndFilter
         title={t("title")}
-        createButtonLink="/quotes/add"
-        createButtonText={t("create_quote")}
-        createButtonDisabled={isLoading}
+        createHref="/quotes/add"
+        createLabel={t("create_quote")}
+        onSearch={setSearchQuery}
+        searchPlaceholder={t("search_quotes")}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
-      <div className="p-4">
-        <DataModelList
-          data={quotes}
-          isLoading={isLoading}
-          error={error instanceof Error ? error : null}
-          emptyMessage={t("no_quotes")}
-          renderItem={renderQuote}
-          gridCols="2"
-        />
+
+      <div>
+        {viewMode === "table" ? (
+          <QuotesTable
+            data={filteredQuotes}
+            isLoading={isLoading}
+            error={error as Error | null}
+          />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredQuotes}
+              isLoading={isLoading}
+              error={error as Error | null}
+              emptyMessage={t("no_quotes")}
+              addFirstItemMessage={t("add_first_quote")}
+              renderItem={renderQuote}
+              gridCols="2"
+            />
+          </div>
+        )}
       </div>
     </DataPageLayout>
   );
