@@ -500,3 +500,33 @@ export const templates = pgTable(
     check("templates_type_check", sql`type = ANY (ARRAY['invoice'::text, 'quote'::text])`),
   ],
 ).enableRLS();
+
+export const employeeRequests = pgTable(
+  "employee_requests",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    employeeId: uuid("employee_id")
+      .notNull()
+      .references(() => employees.id),
+    employeeName: text("employee_name").notNull(),
+    type: text("type", { enum: ["leave", "expense", "document", "other"] }).notNull(),
+    status: text("status", { enum: ["pending", "approved", "rejected"] })
+      .notNull()
+      .default("pending"),
+    title: text("title").notNull(),
+    description: text("description"),
+    startDate: date("start_date"),
+    endDate: date("end_date"),
+    amount: numeric("amount", { precision: 10, scale: 2 }),
+    attachments: jsonb("attachments").default([]),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    employeeIdIdx: index("employee_requests_employee_id_idx").on(table.employeeId),
+    typeIdx: index("employee_requests_type_idx").on(table.type),
+    statusIdx: index("employee_requests_status_idx").on(table.status),
+    createdAtIdx: index("employee_requests_created_at_idx").on(table.createdAt),
+  }),
+).enableRLS();

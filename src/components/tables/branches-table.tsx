@@ -90,7 +90,7 @@ const BranchesTable = ({ data, isLoading, error }: BranchesTableProps) => {
 
   if (error) {
     return (
-      <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center">
+      <div className="m-4 mb-0 rounded bg-red-800 p-2 text-center text-white">
         {t("error_loading_branches")}: {error.message}
       </div>
     );
