@@ -1,4 +1,4 @@
-import useTranslation from "next-translate/useTranslation";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Loader2 } from "lucide-react";
 
@@ -24,7 +24,8 @@ const ConfirmCancelSubscription = ({
   setIsCanceling: (isCanceling: boolean) => void;
   handleCancelSubscription: () => void;
 }) => {
-  const { t, lang } = useTranslation("common");
+  const t = useTranslations();
+  const locale = useLocale();
 
   return (
     <AlertDialog>
@@ -33,7 +34,7 @@ const ConfirmCancelSubscription = ({
           {t("cancel_subscription.cancel_button")}
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
+      <AlertDialogContent dir={locale === "ar" ? "rtl" : "ltr"}>
         <AlertDialogHeader>
           <AlertDialogTitle>{t("cancel_subscription.confirm_title")}</AlertDialogTitle>
           <AlertDialogDescription>
