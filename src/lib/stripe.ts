@@ -14,25 +14,94 @@ export interface StripePlan {
 }
 
 /**
+ * Creates a new customer in Stripe
+ */
+export async function createStripeCustomer(email: string): Promise<string | null> {
+  try {
+    const customer = await stripe.customers.create({
+      email,
+    });
+    return customer.id;
+  } catch (error) {
+    console.error("Error creating Stripe customer:", error);
+    return null;
+  }
+}
+
+/**
  * Fetches all pricing plans from Stripe
  */
-export async function getStripePlans(): Promise<StripePlan[]> {
+export async function getStripePlans(productId?: string): Promise<StripePlan[]> {
   try {
     // Fetch prices from Stripe
     const prices = await stripe.prices.list({
       expand: ["data.product"],
+      active: true,
+      ...(productId ? { product: productId } : {}),
     });
 
     // Transform the Stripe response into our application format
     const plans = prices.data.map((price) => {
       const product = price.product as Stripe.Product;
 
+      // Check for features in both price metadata and product metadata
+      let features: string[] = [];
+
+      // First try to get features from price metadata
+      if (price.metadata) {
+        // Look for individual feature entries (feature_1, feature_2, etc.)
+        const featureEntries = Object.entries(price.metadata)
+          .filter(([key]) => key.startsWith("feature_"))
+          .sort(([keyA], [keyB]) => {
+            // Sort by feature number if possible
+            const numA = parseInt(keyA.split("_")[1]);
+            const numB = parseInt(keyB.split("_")[1]);
+            return numA - numB;
+          });
+
+        if (featureEntries.length > 0) {
+          features = featureEntries.map(([_, value]) => value);
+        }
+        // Also check for legacy format (JSON array in 'features' field)
+        else if (price.metadata.features) {
+          try {
+            features = JSON.parse(price.metadata.features);
+          } catch (e) {
+            console.error("Error parsing price features metadata:", e);
+          }
+        }
+      }
+
+      // If no features in price metadata, try product metadata
+      if (features.length === 0 && product.metadata) {
+        // First check for individual feature entries
+        const featureEntries = Object.entries(product.metadata)
+          .filter(([key]) => key.startsWith("feature_"))
+          .sort(([keyA], [keyB]) => {
+            const numA = parseInt(keyA.split("_")[1]);
+            const numB = parseInt(keyB.split("_")[1]);
+            return numA - numB;
+          });
+
+        if (featureEntries.length > 0) {
+          features = featureEntries.map(([_, value]) => value);
+        }
+        // Also check for legacy format
+        else if (product.metadata.features) {
+          try {
+            features = JSON.parse(product.metadata.features);
+          } catch (e) {
+            console.error("Error parsing product features metadata:", e);
+          }
+        }
+      }
+
       return {
         priceId: price.id,
         lookup_key: price.lookup_key || "",
         name: product.name,
         price: formatPrice(price),
-        features: product.metadata.features ? JSON.parse(product.metadata.features) : [],
+        features,
       };
     });
 
@@ -67,4 +136,55 @@ function formatPrice(price: Stripe.Price): string {
   const interval = price.recurring?.interval;
 
   return `${amount} ${currency}${interval ? `/${interval}` : ""}`;
+}
+
+/**
+ * Updates features in a Stripe price's metadata using individual key-value pairs
+ */
+export async function updatePriceFeatures(priceId: string, features: string[]): Promise<boolean> {
+  try {
+    // Create metadata object with feature_1, feature_2, etc. keys
+    const metadata: Record<string, string> = {};
+
+    // Add features as individual entries
+    features.forEach((feature, index) => {
+      metadata[`feature_${index + 1}`] = feature;
+    });
+
+    const updatedPrice = await stripe.prices.update(priceId, {
+      metadata,
+    });
+
+    return !!updatedPrice?.id;
+  } catch (error) {
+    console.error(`Error updating features for price ${priceId}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Updates features in a Stripe product's metadata using individual key-value pairs
+ */
+export async function updateProductFeatures(
+  productId: string,
+  features: string[],
+): Promise<boolean> {
+  try {
+    // Create metadata object with feature_1, feature_2, etc. keys
+    const metadata: Record<string, string> = {};
+
+    // Add features as individual entries
+    features.forEach((feature, index) => {
+      metadata[`feature_${index + 1}`] = feature;
+    });
+
+    const updatedProduct = await stripe.products.update(productId, {
+      metadata,
+    });
+
+    return !!updatedProduct?.id;
+  } catch (error) {
+    console.error(`Error updating features for product ${productId}:`, error);
+    return false;
+  }
 }
