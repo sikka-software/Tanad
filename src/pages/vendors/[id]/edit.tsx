@@ -62,17 +62,7 @@ export default function EditVendorPage() {
             <CardTitle>{t("vendor_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            {loadingUser ? (
-              <p>{t("common.loading")}</p>
-            ) : userId && typeof vendorId === "string" ? (
-              <VendorForm userId={userId} vendorId={vendorId} />
-            ) : (
-              <p>
-                {typeof vendorId !== "string"
-                  ? t("error.invalid_vendor_id")
-                  : t("error.failed_to_load_user")}
-              </p>
-            )}
+            <VendorForm userId={userId} vendorId={vendorId as string} />
           </CardContent>
         </Card>
       </div>

@@ -3,6 +3,7 @@
 import React from "react";
 
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
 import { ChevronRight, Plus } from "lucide-react";
@@ -12,7 +13,6 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-  useCollapsible,
 } from "@/components/animate-ui/radix-collapsible";
 import {
   SidebarGroup,
@@ -91,9 +91,9 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                       "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
                   )}
                 >
-                  <a href={subItem.url}>
+                  <Link href={subItem.url}>
                     <span>{t(subItem.translationKey)}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuSubButton>
                 {subItem.action && (
                   <SidebarMenuAction

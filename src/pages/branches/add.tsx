@@ -68,13 +68,7 @@ export default function AddBranchPage() {
             <CardTitle>{t("branch_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            {loadingUser ? (
-              <p>{t("common.loading")}</p>
-            ) : userId ? (
-              <BranchForm userId={userId} onSuccess={handleSuccess} />
-            ) : (
-              <p>{t("error.failed_to_load_user")}</p>
-            )}
+            <BranchForm userId={userId} onSuccess={handleSuccess} />
           </CardContent>
         </Card>
       </div>

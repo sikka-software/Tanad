@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import type { LucideIcon } from "lucide-react";
-import { User2, LogOut, MessageSquareWarning, CreditCard } from "lucide-react";
+import { User2, LogOut, MessageSquareWarning, CreditCard, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -19,10 +19,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarRail,
@@ -68,6 +70,7 @@ export function AppSidebar() {
   const router = useRouter();
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState("");
   const previousStateRef = useRef<{ groups: Set<number>; menus: Set<string> }>({
     groups: new Set(),
     menus: new Set(),
@@ -117,6 +120,72 @@ export function AppSidebar() {
 
   const menuGroups = getMenuList(router.pathname);
 
+  const filterMenuItems = (items: any, query: string) => {
+    if (!query) return items;
+
+    const searchLower = query.toLowerCase();
+
+    // Get the English label from the translation key
+    const getEnglishLabel = (translationKey: string) => {
+      return translationKey.split(".")[0];
+    };
+
+    const filterGroup = (group: any) => {
+      if (!group) return null;
+
+      const filteredItems = group
+        .map((item: any) => {
+          // Check both English and translated labels for main item
+          const englishLabel = getEnglishLabel(item.translationKey);
+          const translatedLabel = t(item.translationKey).toLowerCase();
+          const matchesTitle =
+            englishLabel.toLowerCase().includes(searchLower) ||
+            translatedLabel.includes(searchLower);
+
+          // Check both English and translated labels for sub-items
+          const matchesSubItems = item.items?.some((subItem: any) => {
+            const subEnglishLabel = getEnglishLabel(subItem.translationKey);
+            const subTranslatedLabel = t(subItem.translationKey).toLowerCase();
+            return (
+              subEnglishLabel.toLowerCase().includes(searchLower) ||
+              subTranslatedLabel.includes(searchLower)
+            );
+          });
+
+          if (matchesTitle) return item;
+
+          if (item.items) {
+            const filteredSubItems = item.items.filter((subItem: any) => {
+              const subEnglishLabel = getEnglishLabel(subItem.translationKey);
+              const subTranslatedLabel = t(subItem.translationKey).toLowerCase();
+              return (
+                subEnglishLabel.toLowerCase().includes(searchLower) ||
+                subTranslatedLabel.includes(searchLower)
+              );
+            });
+
+            if (filteredSubItems.length > 0) {
+              return { ...item, items: filteredSubItems };
+            }
+          }
+
+          return null;
+        })
+        .filter(Boolean);
+
+      return filteredItems.length > 0 ? filteredItems : null;
+    };
+
+    return {
+      Administration: filterGroup(items.Administration),
+      Accounting: filterGroup(items.Accounting),
+      HumanResources: filterGroup(items.HumanResources),
+      Settings: filterGroup(items.Settings),
+    };
+  };
+
+  const filteredMenuGroups = filterMenuItems(menuGroups, searchQuery);
+
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
     setIsMounted(true);
@@ -124,16 +193,33 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"}>
-      {/* <SidebarHeader>
-      //  Search bar to filter the menu items
-      
-      </SidebarHeader>
-      */}
+      {state === "expanded" && (
+        <SidebarHeader className="px-2 py-2">
+          <div className="relative flex items-center gap-2 px-1.5">
+            <Search className="text-muted-foreground absolute start-4 size-4" />
+            <Input
+              type="text"
+              placeholder={t("General.sidebar_search")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-8 ps-8"
+            />
+          </div>
+        </SidebarHeader>
+      )}
       <SidebarContent>
-        <NavMain title={t("Administration.title")} items={menuGroups.Administration} />
-        <NavMain title={t("Accounting.title")} items={menuGroups.Accounting} />
-        <NavMain title={t("HumanResources.title")} items={menuGroups.HumanResources} />
-        <NavMain title={t("Settings.title")} items={menuGroups.Settings} />
+        {filteredMenuGroups.Administration && (
+          <NavMain title={t("Administration.title")} items={filteredMenuGroups.Administration} />
+        )}
+        {filteredMenuGroups.Accounting && (
+          <NavMain title={t("Accounting.title")} items={filteredMenuGroups.Accounting} />
+        )}
+        {filteredMenuGroups.HumanResources && (
+          <NavMain title={t("HumanResources.title")} items={filteredMenuGroups.HumanResources} />
+        )}
+        {filteredMenuGroups.Settings && (
+          <NavMain title={t("Settings.title")} items={filteredMenuGroups.Settings} />
+        )}
       </SidebarContent>
       <SidebarFooter className="px-0">
         <div className="flex flex-col gap-2 p-2">

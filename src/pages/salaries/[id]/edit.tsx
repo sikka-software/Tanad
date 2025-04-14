@@ -66,21 +66,7 @@ export default function EditSalaryPage() {
             <CardTitle>{t("salary_details")}</CardTitle> {/* Salaries.salary_details */}
           </CardHeader>
           <CardContent>
-            {loadingUser ? (
-              <p>{t("common.loading")}</p>
-            ) : userId && typeof salaryId === "string" ? (
-              <SalaryForm
-                salaryId={salaryId} // Pass salaryId for edit mode
-                onSuccess={handleSuccess}
-              />
-            ) : (
-              <p>
-                {typeof salaryId !== "string"
-                  ? t("error.invalid_salary_id") /* Salaries.error.invalid_salary_id */
-                  : t("error.failed_to_load_user")}{" "}
-                /* Salaries.error.failed_to_load_user */
-              </p>
-            )}
+            <SalaryForm salaryId={salaryId as string} onSuccess={handleSuccess} />
           </CardContent>
         </Card>
       </div>
