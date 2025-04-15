@@ -14,13 +14,10 @@ ALTER TABLE quote_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE salaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE warehouses ENABLE ROW LEVEL SECURITY;
-
--- Enable RLS for job listings tables
+ALTER TABLE offices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_listings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_listing_jobs ENABLE ROW LEVEL SECURITY;
 
--- Enable RLS for offices table
-ALTER TABLE offices ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies before recreating
 DROP POLICY IF EXISTS "Users can read their own branches" ON branches;
@@ -320,9 +317,9 @@ USING (
     WHERE job_listings.id = job_listing_jobs.job_listing_id
     AND job_listings.user_id = auth.uid()
   )
-);
+); 
 
--- OFFICES POLICIES
+
 CREATE POLICY "Users can read their own offices" ON offices FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert their own offices" ON offices FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update their own offices" ON offices FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);

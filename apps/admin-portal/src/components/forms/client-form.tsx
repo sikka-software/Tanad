@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -10,9 +9,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { CompanyForm, type CompanyFormValues } from "@/components/forms/company-form";
-import { Button } from "@/components/ui/button";
 import { ComboboxAdd } from "@/components/ui/combobox-add";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -28,7 +25,6 @@ import { supabase } from "@/lib/supabase";
 
 import { FormDialog } from "../ui/form-dialog";
 
-// We'll create a schema factory to handle translations
 export const createClientSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Clients.form.validation.name_required")),

@@ -14,68 +14,86 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { useCompanies } from "@/hooks/useCompanies";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Office } from "@/types/office.type";
 
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  address: z.string().min(1, "Address is required"),
-  city: z.string().min(1, "City is required"),
-  state: z.string().min(1, "State is required"),
-  zip_code: z.string().min(1, "ZIP code is required"),
-  phone: z.string().optional(),
-  email: z.string().email("Invalid email format").optional().or(z.literal("")),
-  is_active: z.boolean().default(true),
-});
+export const createOfficeSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("Na me is required")),
+    email: z.string().email().optional().or(z.literal("")),
+    phone: z.string().optional().or(z.literal("")),
+    address: z.string().min(1, t("Address is required")),
+    city: z.string().min(1, t("City is required")),
+    state: z.string().min(1, t("State is required")),
+    zip_code: z.string().min(1, t("Zip code is required")),
+  });
 
-export type OfficeFormData = z.infer<typeof formSchema>;
+export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
 
-interface OfficeFormProps {
-  onSubmit: (data: OfficeFormData) => void;
-  defaultValues?: Partial<Office>;
-  isLoading?: boolean;
+export interface OfficeFormProps {
+  id?: string;
+  userId: string | null;
+  onSubmit: (data: OfficeFormValues) => void;
+  loading?: boolean;
 }
 
-export function OfficeForm({
-  onSubmit,
-  defaultValues,
-  isLoading = false,
-}: OfficeFormProps) {
-  const t = useTranslations();
-  const { data: companies = [] } = useCompanies();
-
-  const form = useForm<OfficeFormData>({
-    resolver: zodResolver(formSchema),
+export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
+  const t = useTranslations("Offices");
+  const form = useForm<OfficeFormValues>({
+    resolver: zodResolver(createOfficeSchema(t)),
     defaultValues: {
       name: "",
+      email: "",
+      phone: "",
       address: "",
       city: "",
       state: "",
       zip_code: "",
-      phone: "",
-      email: "",
-      is_active: true,
-      ...defaultValues,
     },
   });
 
+  // Expose form methods for external use (like dummy data)
+  if (typeof window !== "undefined") {
+    (window as any).officeForm = form;
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form id={id || "office-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Offices.form.name.label")}</FormLabel>
+              <FormLabel>{t("name")}</FormLabel>
               <FormControl>
-                <Input
-                  placeholder={t("Offices.form.name.placeholder")}
-                  {...field}
-                />
+                <Input {...field} disabled={loading} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("email")}</FormLabel>
+              <FormControl>
+                <Input {...field} type="email" disabled={loading} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("phone")}</FormLabel>
+              <FormControl>
+                <Input {...field} type="tel" disabled={loading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -87,30 +105,24 @@ export function OfficeForm({
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Offices.form.address.label")}</FormLabel>
+              <FormLabel>{t("address")}</FormLabel>
               <FormControl>
-                <Input
-                  placeholder={t("Offices.form.address.placeholder")}
-                  {...field}
-                />
+                <Input {...field} disabled={loading} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Offices.form.city.label")}</FormLabel>
+                <FormLabel>{t("city")}</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t("Offices.form.city.placeholder")}
-                    {...field}
-                  />
+                  <Input {...field} disabled={loading} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -122,48 +134,9 @@ export function OfficeForm({
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Offices.form.state.label")}</FormLabel>
+                <FormLabel>{t("state")}</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t("Offices.form.state.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
-          name="zip_code"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Offices.form.zip_code.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t("Offices.form.zip_code.placeholder")}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Offices.form.phone.placeholder")}
-                    {...field}
-                  />
+                  <Input {...field} disabled={loading} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -172,51 +145,19 @@ export function OfficeForm({
 
           <FormField
             control={form.control}
-            name="email"
+            name="zip_code"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Offices.form.email.label")}</FormLabel>
+                <FormLabel>{t("zip_code")}</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t("Offices.form.email.placeholder")}
-                    type="email"
-                    {...field}
-                  />
+                  <Input {...field} disabled={loading} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-
-        <FormField
-          control={form.control}
-          name="is_active"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">
-                  {t("Offices.form.is_active.label")}
-                </FormLabel>
-              </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading
-            ? t("General.saving")
-            : defaultValues
-            ? t("General.update")
-            : t("General.create")}
-        </Button>
       </form>
     </Form>
   );
-} 
+}

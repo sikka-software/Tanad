@@ -1,0 +1,144 @@
+import { useState, useEffect } from "react";
+
+import { GetStaticProps } from "next";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
+
+import { useQueryClient } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+import { OfficeForm, type OfficeFormValues } from "@/components/forms/office-form";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PageTitle from "@/components/ui/page-title";
+import { generateDummyData } from "@/lib/dummy-generator";
+import { supabase } from "@/lib/supabase";
+
+export default function AddOfficePage() {
+  const router = useRouter();
+  const t = useTranslations();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const getUserId = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        setUserId(data.user.id);
+      } else {
+        router.push("/auth/login");
+      }
+    };
+
+    getUserId();
+  }, [router]);
+
+  const handleSubmit = async (data: OfficeFormValues) => {
+    setLoading(true);
+    try {
+      // Check if user ID is available
+      if (!userId) {
+        throw new Error(t("Offices.error.not_authenticated"));
+      }
+
+      const { data: newOffice, error } = await supabase
+        .from("offices")
+        .insert([
+          {
+            name: data.name.trim(),
+            email: data.email?.trim(),
+            phone: data.phone?.trim(),
+            address: data.address.trim(),
+            city: data.city.trim(),
+            state: data.state.trim(),
+            zip_code: data.zip_code.trim(),
+            user_id: userId,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      //     Update the clients cache to include the new client
+      const previousOffices = queryClient.getQueryData(["offices"]) || [];
+      queryClient.setQueryData(
+        ["offices"],
+        [...(Array.isArray(previousOffices) ? previousOffices : []), newOffice],
+      );
+
+      toast.success(t("Offices.success.title"), {
+        description: t("Offices.success.created"),
+      });
+
+      router.push("/offices");
+    } catch (error) {
+      toast.error(t("Offices.error.title"), {
+        description: error instanceof Error ? error.message : t("Offices.error.create"),
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDummyData = () => {
+    const dummyData = generateDummyData();
+    const form = (window as any).officeForm;
+    if (form) {
+      form.setValue("name", dummyData.name);
+      form.setValue("email", dummyData.email);
+      form.setValue("phone", dummyData.phone);
+      form.setValue("address", dummyData.address);
+      form.setValue("city", dummyData.city);
+      form.setValue("state", dummyData.state);
+      form.setValue("zip_code", dummyData.zipCode);
+    }
+  };
+
+  return (
+    <div>
+      <PageTitle
+        title={t("Offices.add_new")}
+        formButtons
+        formId="office-form"
+        loading={loading}
+        onCancel={() => router.push("/offices")}
+        texts={{
+          submit_form: t("Offices.add_new"),
+          cancel: t("General.cancel"),
+        }}
+      />
+
+      <div className="p-4">
+        <Card className="max-w-2xl">
+          <CardHeader className="relative">
+            {process.env.NODE_ENV === "development" && (
+              <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
+                Dummy Data
+              </Button>
+            )}
+            <CardTitle>{t("Offices.office_details")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <OfficeForm
+              id="office-form"
+              userId={userId}
+              onSubmit={handleSubmit}
+              loading={loading}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`../../../locales/${locale}.json`)).default,
+    },
+  };
+};

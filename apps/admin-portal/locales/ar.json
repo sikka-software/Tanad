@@ -105,9 +105,7 @@
     "report_issue_title": "إبلاغ عن خطأ",
     "report_issue_description": "مساعدتنا بتزويد تفاصيل إضافية عن ما قد يحدث",
     "report_issue_thank_you": "شكراً لك على إبلاغك",
-    "report_issue_description_thank_you": "تم إبلاغ فريقنا وسيتم التحقق من هذا الخطأ في الميعاد القريب.",
-    "active": "نشط",
-    "inactive": "غير نشط"
+    "report_issue_description_thank_you": "تم إبلاغ فريقنا وسيتم التحقق من هذا الخطأ في الميعاد القريب."
   },
 
   "SEO": {
@@ -2303,66 +2301,5 @@
     "main": "التنقل الرئيسي",
     "resources": "الموارد",
     "organization": "المؤسسة"
-  },
-  "Offices": {
-    "title": "المكاتب",
-    "add_new": "إضافة مكتب جديد",
-    "office_details": "تفاصيل المكتب",
-    "back_to_list": "العودة إلى القائمة",
-    "no_offices": "لم يتم العثور على مكاتب",
-    "table": {
-      "name": "الاسم",
-      "address": "العنوان",
-      "phone": "الهاتف",
-      "email": "البريد الإلكتروني",
-      "status": "الحالة"
-    },
-    "form": {
-      "name": {
-        "label": "الاسم",
-        "placeholder": "أدخل اسم المكتب",
-        "required": "الاسم مطلوب"
-      },
-      "address": {
-        "label": "العنوان",
-        "placeholder": "أدخل العنوان",
-        "required": "العنوان مطلوب"
-      },
-      "city": {
-        "label": "المدينة",
-        "placeholder": "أدخل المدينة",
-        "required": "المدينة مطلوبة"
-      },
-      "state": {
-        "label": "المنطقة",
-        "placeholder": "أدخل المنطقة",
-        "required": "المنطقة مطلوبة"
-      },
-      "zip_code": {
-        "label": "الرمز البريدي",
-        "placeholder": "أدخل الرمز البريدي",
-        "required": "الرمز البريدي مطلوب"
-      },
-      "phone": {
-        "label": "الهاتف",
-        "placeholder": "أدخل رقم الهاتف"
-      },
-      "email": {
-        "label": "البريد الإلكتروني",
-        "placeholder": "أدخل البريد الإلكتروني",
-        "invalid": "صيغة البريد الإلكتروني غير صحيحة"
-      },
-      "is_active": {
-        "label": "حالة النشاط"
-      }
-    },
-    "messages": {
-      "creating": "جاري إنشاء المكتب...",
-      "create": "إنشاء مكتب",
-      "created": "تم إنشاء المكتب بنجاح",
-      "updated": "تم تحديث المكتب بنجاح",
-      "deleted": "تم حذف المكتب بنجاح",
-      "error": "حدث خطأ أثناء معالجة طلبك"
-    }
   }
 }

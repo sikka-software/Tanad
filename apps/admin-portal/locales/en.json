@@ -104,9 +104,7 @@
     "report_issue_title": "Report Issue",
     "report_issue_description": "Help us improve by providing additional details about what happened.",
     "report_issue_thank_you": "Thank you for your report",
-    "report_issue_description_thank_you": "Our team has been notified and will investigate this issue promptly.",
-    "active": "Active",
-    "inactive": "Inactive"
+    "report_issue_description_thank_you": "Our team has been notified and will investigate this issue promptly."
   },
   "SEO": {
     "landing": {
@@ -2292,66 +2290,5 @@
     "main": "Main Navigation",
     "resources": "Resources",
     "organization": "Organization"
-  },
-  "Offices": {
-    "title": "Offices",
-    "add_new": "Add New Office",
-    "office_details": "Office Details",
-    "back_to_list": "Back to List",
-    "no_offices": "No offices found",
-    "table": {
-      "name": "Name",
-      "address": "Address",
-      "phone": "Phone",
-      "email": "Email",
-      "status": "Status"
-    },
-    "form": {
-      "name": {
-        "label": "Name",
-        "placeholder": "Enter office name",
-        "required": "Name is required"
-      },
-      "address": {
-        "label": "Address",
-        "placeholder": "Enter address",
-        "required": "Address is required"
-      },
-      "city": {
-        "label": "City",
-        "placeholder": "Enter city",
-        "required": "City is required"
-      },
-      "state": {
-        "label": "State",
-        "placeholder": "Enter state",
-        "required": "State is required"
-      },
-      "zip_code": {
-        "label": "ZIP Code",
-        "placeholder": "Enter ZIP code",
-        "required": "ZIP code is required"
-      },
-      "phone": {
-        "label": "Phone",
-        "placeholder": "Enter phone number"
-      },
-      "email": {
-        "label": "Email",
-        "placeholder": "Enter email address",
-        "invalid": "Invalid email format"
-      },
-      "is_active": {
-        "label": "Active Status"
-      }
-    },
-    "messages": {
-      "creating": "Creating office...",
-      "create": "Create Office",
-      "created": "Office created successfully",
-      "updated": "Office updated successfully",
-      "deleted": "Office deleted successfully",
-      "error": "An error occurred while processing your request"
-    }
   }
 }

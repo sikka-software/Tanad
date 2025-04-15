@@ -6,14 +6,12 @@ import { Office } from "@/types/office.type";
 interface OfficesStore {
   offices: Office[];
   isLoading: boolean;
-  error: Error | null;
+  error: string | null;
   fetchOffices: () => Promise<void>;
   updateOffice: (id: string, updates: Partial<Office>) => Promise<void>;
-  addOffice: (office: Omit<Office, "id" | "created_at">) => Promise<void>;
-  deleteOffice: (id: string) => Promise<void>;
 }
 
-export const useOfficesStore = create<OfficesStore>((set, get) => ({
+export const useOfficesStore = create<OfficesStore>((set) => ({
   offices: [],
   isLoading: false,
   error: null,
@@ -25,40 +23,23 @@ export const useOfficesStore = create<OfficesStore>((set, get) => ({
       if (error) throw error;
       set({ offices: data as Office[], isLoading: false });
     } catch (error) {
-      set({ error: error as Error, isLoading: false });
+      set({ error: (error as Error).message, isLoading: false });
     }
   },
 
   updateOffice: async (id: string, updates: Partial<Office>) => {
     try {
-      const { error } = await supabase
-        .from("offices")
-        .update(updates)
-        .eq("id", id);
-      if (error) throw error;
-      await get().fetchOffices();
-    } catch (error) {
-      set({ error: error as Error });
-    }
-  },
+      const { error } = await supabase.from("offices").update(updates).eq("id", id);
 
-  addOffice: async (office) => {
-    try {
-      const { error } = await supabase.from("offices").insert([office]);
       if (error) throw error;
-      await get().fetchOffices();
-    } catch (error) {
-      set({ error: error as Error });
-    }
-  },
 
-  deleteOffice: async (id: string) => {
-    try {
-      const { error } = await supabase.from("offices").delete().eq("id", id);
-      if (error) throw error;
-      await get().fetchOffices();
+      set((state) => ({
+        offices: state.offices.map((office) =>
+          office.id === id ? { ...office, ...updates } : office,
+        ),
+      }));
     } catch (error) {
-      set({ error: error as Error });
+      set({ error: (error as Error).message });
     }
   },
-})); 
+}));
