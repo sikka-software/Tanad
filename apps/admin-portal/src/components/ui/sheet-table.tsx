@@ -920,7 +920,7 @@ function SheetTable<
 
                   return (
                     <TableHead key={header.id} className="border text-start" style={style}>
-                      {t(flexRender(header.column.columnDef.header, header.getContext()) as string)}
+                      {flexRender(header.column.columnDef.header, header.getContext()) as string}
                     </TableHead>
                   );
                 }),

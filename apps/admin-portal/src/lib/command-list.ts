@@ -105,12 +105,6 @@ export const commandList = [
         href: "/companies",
       },
       {
-        icon: Calendar,
-        label: "Calendar.title",
-        shortcut: "⌘L",
-        href: "/calendar",
-      },
-      {
         icon: Settings,
         label: "Settings.title",
         shortcut: "⌘S",

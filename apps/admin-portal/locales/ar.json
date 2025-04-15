@@ -2135,6 +2135,97 @@
       }
     }
   },
+  "JobListings": {
+    "title": "صفحات التوظيف"
+  },
+  "Expenses": {
+    "title": "المصروفات"
+  },
+  "Applicants": {
+    "title": "المتقدمين",
+    "add_new": "إضافة متقدم جديد",
+    "applicant_details": "تفاصيل المتقدم",
+    "back_to_list": "العودة إلى القائمة",
+    "no_applicants": "لم يتم العثور على متقدمين",
+    "form": {
+      "name": {
+        "label": "الاسم الكامل",
+        "placeholder": "أدخل الاسم الكامل",
+        "required": "الاسم الكامل مطلوب"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل عنوان البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "عنوان البريد الإلكتروني غير صالح"
+      },
+      "phone": {
+        "label": "الهاتف",
+        "placeholder": "أدخل رقم الهاتف",
+        "required": "رقم الهاتف مطلوب"
+      },
+      "position": {
+        "label": "الوظيفة المتقدم لها",
+        "placeholder": "أدخل الوظيفة",
+        "required": "الوظيفة مطلوبة"
+      },
+      "resume": {
+        "label": "السيرة الذاتية",
+        "placeholder": "رفع السيرة الذاتية",
+        "required": "السيرة الذاتية مطلوبة"
+      },
+      "cover_letter": {
+        "label": "خطاب التقديم",
+        "placeholder": "أدخل خطاب التقديم"
+      },
+      "experience": {
+        "label": "سنوات الخبرة",
+        "placeholder": "أدخل سنوات الخبرة"
+      },
+      "education": {
+        "label": "التعليم",
+        "placeholder": "أدخل تفاصيل التعليم"
+      },
+      "skills": {
+        "label": "المهارات",
+        "placeholder": "أدخل المهارات"
+      },
+      "availability": {
+        "label": "التوفر",
+        "placeholder": "أدخل التوفر"
+      },
+      "references": {
+        "label": "المراجع",
+        "placeholder": "أدخل المراجع"
+      },
+      "notes": {
+        "label": "ملاحظات إضافية",
+        "placeholder": "أدخل ملاحظات إضافية"
+      }
+    },
+    "status": {
+      "new": "جديد",
+      "reviewing": "قيد المراجعة",
+      "interviewed": "تمت المقابلة",
+      "offered": "تم تقديم عرض",
+      "hired": "تم التعيين",
+      "rejected": "مرفوض"
+    },
+    "actions": {
+      "view": "عرض التفاصيل",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "change_status": "تغيير الحالة"
+    },
+    "messages": {
+      "creating": "جاري إنشاء المتقدم...",
+      "create": "إنشاء متقدم",
+      "created": "تم إنشاء المتقدم بنجاح",
+      "updated": "تم تحديث المتقدم بنجاح",
+      "deleted": "تم حذف المتقدم بنجاح",
+      "error": "حدث خطأ أثناء معالجة طلبك"
+    }
+  },
   "Recruitment": {
     "title": "التوظيف"
   },

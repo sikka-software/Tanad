@@ -1769,6 +1769,12 @@
       }
     }
   },
+  "JobListings": {
+    "title": "Job Listings"
+  },
+  "Expenses": {
+    "title": "Expenses"
+  },
   "Leave": {
     "title": "Leave"
   },
