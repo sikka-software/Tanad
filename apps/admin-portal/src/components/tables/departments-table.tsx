@@ -2,8 +2,16 @@ import React from "react";
 
 import { useTranslations } from "next-intl";
 
+import { X } from "lucide-react";
 import { z } from "zod";
 
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import ErrorComponent from "@/components/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import TableSkeleton from "@/components/ui/table-skeleton";
@@ -62,7 +70,41 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
       validationSchema: locationSchema,
       cell: ({ row }) => {
         const locationIds = row.original.locations || [];
-        return locationIds.map(getLocationName).join(", ");
+
+        if (locationIds.length === 0) {
+          return "No locations";
+        } else if (locationIds.length === 1) {
+          return getLocationName(locationIds[0]);
+        } else {
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 px-2 py-1">
+                  {locationIds.length} locations
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {locationIds.map((locationId) => (
+                  <DropdownMenuItem key={locationId} className="flex justify-between">
+                    <span>{getLocationName(locationId)}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const updatedLocations = locationIds.filter((id) => id !== locationId);
+                        updateDepartment(row.original.id, { locations: updatedLocations });
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        }
       },
     },
     {

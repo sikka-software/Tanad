@@ -1,6 +1,5 @@
 import { create } from "zustand";
 
-import { supabase } from "@/lib/supabase";
 import { Department } from "@/types/department.type";
 
 interface DepartmentsState {
@@ -19,9 +18,12 @@ export const useDepartmentsStore = create<DepartmentsState>((set) => ({
   fetchDepartments: async () => {
     set({ isLoading: true, error: null });
     try {
-      const { data, error } = await supabase.from("departments").select("*");
-      if (error) throw error;
-      set({ departments: data as Department[], isLoading: false });
+      const response = await fetch("/api/departments");
+      if (!response.ok) {
+        throw new Error("Failed to fetch departments");
+      }
+      const data = await response.json();
+      set({ departments: data, isLoading: false });
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
     }
@@ -29,13 +31,23 @@ export const useDepartmentsStore = create<DepartmentsState>((set) => ({
 
   updateDepartment: async (id: string, updates: Partial<Department>) => {
     try {
-      const { error } = await supabase.from("departments").update(updates).eq("id", id);
+      const response = await fetch(`/api/departments/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updates),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`Failed to update department with id ${id}`);
+      }
+
+      const updatedDepartment = await response.json();
 
       set((state) => ({
         departments: state.departments.map((department) =>
-          department.id === id ? { ...department, ...updates } : department,
+          department.id === id ? updatedDepartment : department,
         ),
       }));
     } catch (error) {

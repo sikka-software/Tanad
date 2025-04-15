@@ -46,25 +46,54 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "PUT") {
     try {
-      // Convert snake_case to camelCase if zip_code is provided
-      const dbDepartment = req.body.locations
-        ? {
-            ...req.body,
-            locations: req.body.locations,
-          }
-        : req.body;
+      // Extract locations from the request body
+      const { locations, ...departmentData } = req.body;
 
-      const [department] = await db
-        .update(departments)
-        .set(dbDepartment)
-        .where(eq(departments.id, id as string))
-        .returning();
+      // Update department data if there are fields to update
+      if (Object.keys(departmentData).length > 0) {
+        const [updatedDepartment] = await db
+          .update(departments)
+          .set(departmentData)
+          .where(eq(departments.id, id as string))
+          .returning();
 
-      if (!department) {
+        if (!updatedDepartment) {
+          return res.status(404).json({ message: "Department not found" });
+        }
+      }
+
+      // Handle locations update if provided
+      if (locations !== undefined) {
+        // Delete removed locations
+        await db
+          .delete(departmentLocations)
+          .where(eq(departmentLocations.departmentId, id as string));
+
+        // Insert new locations if any
+        if (locations && locations.length > 0) {
+          await db.insert(departmentLocations).values(
+            locations.map((locationId: string) => ({
+              departmentId: id as string,
+              locationId,
+              locationType: "office", // Default to office type
+            }))
+          );
+        }
+      }
+
+      // Fetch the updated department with its locations
+      const updatedDepartment = await db.query.departments.findFirst({
+        where: eq(departments.id, id as string),
+        with: {
+          locations: true,
+        },
+      });
+
+      if (!updatedDepartment) {
         return res.status(404).json({ message: "Department not found" });
       }
 
-      return res.status(200).json(convertDrizzleDepartment(department));
+      return res.status(200).json(convertDrizzleDepartment(updatedDepartment));
     } catch (error) {
       console.error("Error updating department:", error);
       return res.status(500).json({ message: "Error updating department" });
