@@ -2,6 +2,8 @@
 ALTER TABLE branches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE departments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE department_locations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
@@ -106,6 +108,16 @@ DROP POLICY IF EXISTS "Users can read their own offices" ON offices;
 DROP POLICY IF EXISTS "Users can insert their own offices" ON offices;
 DROP POLICY IF EXISTS "Users can update their own offices" ON offices;
 DROP POLICY IF EXISTS "Users can delete their own offices" ON offices;
+
+DROP POLICY IF EXISTS "Users can read their own departments" ON departments;
+DROP POLICY IF EXISTS "Users can insert their own departments" ON departments;
+DROP POLICY IF EXISTS "Users can update their own departments" ON departments;
+DROP POLICY IF EXISTS "Users can delete their own departments" ON departments;
+
+DROP POLICY IF EXISTS "Users can read department locations through departments" ON department_locations;
+DROP POLICY IF EXISTS "Users can insert department locations through departments" ON department_locations;
+DROP POLICY IF EXISTS "Users can update department locations through departments" ON department_locations;
+DROP POLICY IF EXISTS "Users can delete department locations through departments" ON department_locations;
 
 -- Templates policies
 alter table templates enable row level security;
@@ -324,3 +336,48 @@ CREATE POLICY "Users can read their own offices" ON offices FOR SELECT USING (au
 CREATE POLICY "Users can insert their own offices" ON offices FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update their own offices" ON offices FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can delete their own offices" ON offices FOR DELETE USING (auth.uid() = user_id); 
+
+-- DEPARTMENTS POLICIES
+CREATE POLICY "Users can read their own departments" ON departments FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own departments" ON departments FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own departments" ON departments FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own departments" ON departments FOR DELETE USING (auth.uid() = user_id);
+
+-- DEPARTMENT LOCATIONS POLICIES
+CREATE POLICY "Users can read department locations through departments" ON department_locations FOR SELECT USING (
+    EXISTS (
+        SELECT 1 FROM departments
+        WHERE departments.id = department_locations.department_id
+        AND departments.user_id = auth.uid()
+    )
+);
+
+CREATE POLICY "Users can insert department locations through departments" ON department_locations FOR INSERT WITH CHECK (
+    EXISTS (
+        SELECT 1 FROM departments
+        WHERE departments.id = department_locations.department_id
+        AND departments.user_id = auth.uid()
+    )
+);
+
+CREATE POLICY "Users can update department locations through departments" ON department_locations FOR UPDATE USING (
+    EXISTS (
+        SELECT 1 FROM departments
+        WHERE departments.id = department_locations.department_id
+        AND departments.user_id = auth.uid()
+    )
+) WITH CHECK (
+    EXISTS (
+        SELECT 1 FROM departments
+        WHERE departments.id = department_locations.department_id
+        AND departments.user_id = auth.uid()
+    )
+);
+
+CREATE POLICY "Users can delete department locations through departments" ON department_locations FOR DELETE USING (
+    EXISTS (
+        SELECT 1 FROM departments
+        WHERE departments.id = department_locations.department_id
+        AND departments.user_id = auth.uid()
+    )
+); 
