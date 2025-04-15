@@ -2,6 +2,7 @@ import React from "react";
 
 import { useTranslations } from "next-intl";
 
+import { Row } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { z } from "zod";
 
@@ -16,11 +17,10 @@ import ErrorComponent from "@/components/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import TableSkeleton from "@/components/ui/table-skeleton";
 import { useBranches } from "@/hooks/useBranches";
-import { useOffices } from "@/hooks/useOffices";
 import { useUpdateDepartment } from "@/hooks/useDepartments";
+import { useOffices } from "@/hooks/useOffices";
 import { useWarehouses } from "@/hooks/useWarehouses";
 import { Department } from "@/types/department.type";
-import { ColumnDef, Row } from "@tanstack/react-table";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().min(1, "Required");

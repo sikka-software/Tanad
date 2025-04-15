@@ -32,7 +32,7 @@ export async function createDepartment(department: DepartmentCreateData): Promis
 
 export async function updateDepartment(
   id: string,
-  updates: Partial<Department>
+  updates: Partial<Department>,
 ): Promise<Department> {
   const response = await fetch(`/api/departments/${id}`, {
     method: "PUT",

@@ -8,7 +8,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import DepartmentForm, { type DepartmentFormValues } from "@/components/forms/department-form";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 import { generateDummyData } from "@/lib/dummy-generator";

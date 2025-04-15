@@ -41,13 +41,8 @@ export function useUpdateDepartment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      updates,
-    }: {
-      id: string;
-      updates: Partial<Department>;
-    }) => updateDepartment(id, updates),
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<Department> }) =>
+      updateDepartment(id, updates),
     onMutate: async ({ id, updates }) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: DEPARTMENTS_QUERY_KEY });

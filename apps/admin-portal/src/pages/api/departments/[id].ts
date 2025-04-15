@@ -76,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               departmentId: id as string,
               locationId,
               locationType: "office", // Default to office type
-            }))
+            })),
           );
         }
       }
