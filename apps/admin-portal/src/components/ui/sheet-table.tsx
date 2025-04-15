@@ -736,6 +736,9 @@ function SheetTable<
 
             // if cell type is select, show a select element
             if (colDef.cellType === "select" && colDef.options) {
+              const cellValue = cell.getValue() as string | number;
+              const selectedOption = colDef.options.find((opt) => opt.value === cellValue);
+
               return (
                 <TableCell
                   key={cell.id}
@@ -750,11 +753,18 @@ function SheetTable<
                       : colDef.className,
                   )}
                 >
-                  <Select>
+                  <Select
+                    value={String(cellValue)}
+                    onValueChange={(value) => {
+                      if (onEdit) {
+                        onEdit(rowId, colKey as keyof T, value as T[keyof T]);
+                      }
+                    }}
+                  >
                     <SelectTrigger
                       defaultStyles={false}
                       className={cn(
-                        "focus:ring-none blur:outline-none relative border-none ring-0 outline-0 focus:ring-offset-0 focus:outline-none", // 'relative' for absolute icons if you prefer
+                        "focus:ring-none blur:outline-none relative border-none ring-0 outline-0 focus:ring-offset-0 focus:outline-none",
                         {
                           "bg-muted": isDisabled,
                           "bg-destructive/25": errorMsg,
@@ -765,7 +775,7 @@ function SheetTable<
                       )}
                       hideIcon={true}
                     >
-                      <SelectValue>{cellContent}</SelectValue>
+                      <SelectValue>{selectedOption?.label ?? cellValue}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {colDef.options.map((option) => (
