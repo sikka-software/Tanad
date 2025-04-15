@@ -1,48 +1,34 @@
 import { useState } from "react";
-
-import { GetStaticProps } from "next";
-import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { JobListingForm, type JobListingFormValues } from "@/components/forms/job-listing-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { supabase } from "@/lib/supabase";
+import { useJobListings } from "@/hooks/useJobListings";
+import useUserStore from "@/hooks/use-user-store";
 
 export default function AddJobListingPage() {
   const t = useTranslations();
   const router = useRouter();
+  const user = useUserStore((state) => state.user);
+  const { createJobListing } = useJobListings();
   const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
 
   const handleSubmit = async (data: JobListingFormValues) => {
+    if (!user?.id) {
+      toast.error(t("Jobs.messages.auth_required"));
+      return;
+    }
+
     setLoading(true);
     try {
-      const { data: newListing, error } = await supabase
-        .from("job_listings")
-        .insert([
-          {
-            title: data.title.trim(),
-            description: data.description?.trim() || null,
-            jobs: data.jobs,
-            is_active: true,
-          },
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Update the job listings cache to include the new listing
-      const previousListings = queryClient.getQueryData(["job_listings"]) || [];
-      queryClient.setQueryData(
-        ["job_listings"],
-        [...(Array.isArray(previousListings) ? previousListings : []), newListing],
-      );
+      await createJobListing.mutateAsync({
+        ...data,
+        userId: user.id,
+      });
 
       toast.success(t("Jobs.messages.listing_created"));
       router.push("/jobs/listings");
@@ -82,7 +68,7 @@ export default function AddJobListingPage() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {
     props: {
       messages: (await import(`../../../../locales/${locale}.json`)).default,

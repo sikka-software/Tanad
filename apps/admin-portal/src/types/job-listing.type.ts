@@ -3,7 +3,7 @@ import { Job } from "./job.type";
 export interface JobListing {
   id: string;
   title: string;
-  description?: string;
+  description: string | null;
   isActive: boolean;
   slug: string;
   createdAt: string;
@@ -18,4 +18,11 @@ export interface JobListingJob {
   jobId: string;
   createdAt: string;
   job?: Job; // Optional related job
+}
+
+export interface JobListingFormValues {
+  title: string;
+  description?: string;
+  jobs?: string[];
+  userId?: string;
 } 

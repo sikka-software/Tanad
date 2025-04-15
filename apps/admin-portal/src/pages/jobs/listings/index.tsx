@@ -33,7 +33,7 @@ export default function JobListingsPage() {
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-semibold">{listing.title}</h3>
-            <p className="text-sm text-gray-500">{listing.jobs.length} jobs</p>
+            <p className="text-sm text-gray-500">{listing.jobs?.length || 0} jobs</p>
           </div>
           <Badge variant={listing.isActive ? "default" : "secondary"}>
             {listing.isActive ? "Active" : "Inactive"}
