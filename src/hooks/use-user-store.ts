@@ -1,6 +1,6 @@
 import { create } from "zustand";
+
 import { supabase } from "@/lib/supabase";
-import type { User } from "@supabase/supabase-js";
 import { Profile, PuklaUser } from "@/lib/types";
 
 const useUserStore = create<{
@@ -29,7 +29,7 @@ const useUserStore = create<{
         data: { session },
       } = await supabase.auth.getSession();
       const user = session?.user || null;
-      set({ user: user as PuklaUser });
+      set({ user: user as any });
 
       // Fetch the profile info if user exists
       if (user) {
