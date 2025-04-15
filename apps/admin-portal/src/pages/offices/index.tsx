@@ -64,7 +64,7 @@ export default function OfficesPage() {
   return (
     <DataPageLayout>
       <PageSearchAndFilter
-        title={t("title")}
+        title={t("Offices.title")}
         createHref="/offices/add"
         createLabel={t("Offices.add_new")}
         onSearch={setSearchQuery}
