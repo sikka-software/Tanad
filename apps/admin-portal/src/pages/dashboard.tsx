@@ -5,13 +5,22 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-import { Plus } from "lucide-react";
+import { Plus, Users, Building2, Briefcase, Package, MapPin } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
 import PageTitle from "@/components/ui/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import useUserStore from "@/hooks/use-user-store";
+import { useBranches } from "@/hooks/useBranches";
+import { useClients } from "@/hooks/useClients";
+import { useCompanies } from "@/hooks/useCompanies";
+import { useDepartments } from "@/hooks/useDepartments";
+import { useEmployees } from "@/hooks/useEmployees";
+import { useJobs } from "@/hooks/useJobs";
+import { useOffices } from "@/hooks/useOffices";
+import { useVendors } from "@/hooks/useVendors";
+import { useWarehouses } from "@/hooks/useWarehouses";
 import { supabase } from "@/lib/supabase";
 
 interface DashboardStats {
@@ -19,6 +28,15 @@ interface DashboardStats {
   totalProducts: number;
   totalRevenue: number;
   pendingInvoices: number;
+  totalEmployees: number;
+  totalDepartments: number;
+  totalJobs: number;
+  totalClients: number;
+  totalCompanies: number;
+  totalVendors: number;
+  totalOffices: number;
+  totalWarehouses: number;
+  totalBranches: number;
 }
 
 export default function Dashboard() {
@@ -27,12 +45,32 @@ export default function Dashboard() {
     totalProducts: 0,
     totalRevenue: 0,
     pendingInvoices: 0,
+    totalEmployees: 0,
+    totalDepartments: 0,
+    totalJobs: 0,
+    totalClients: 0,
+    totalCompanies: 0,
+    totalVendors: 0,
+    totalOffices: 0,
+    totalWarehouses: 0,
+    totalBranches: 0,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
   const router = useRouter();
   const { user, initialized } = useUserStore();
+
+  // Use our existing hooks
+  const { data: employees } = useEmployees();
+  const { data: departments } = useDepartments();
+  const { data: jobs } = useJobs();
+  const { data: clients } = useClients();
+  const { data: companies } = useCompanies();
+  const { data: vendors } = useVendors();
+  const { data: offices } = useOffices();
+  const { data: warehouses } = useWarehouses();
+  const { data: branches } = useBranches();
 
   const createOptions = [
     {
@@ -70,7 +108,6 @@ export default function Dashboard() {
     let isMounted = true;
 
     async function fetchDashboardStats() {
-      // Don't fetch if component is unmounted or we don't have necessary data
       if (!isMounted || !initialized || !user?.id) {
         console.log("[Dashboard] Skipping fetch - conditions not met:", {
           isMounted,
@@ -113,6 +150,15 @@ export default function Dashboard() {
           totalProducts: productCount || 0,
           totalRevenue,
           pendingInvoices,
+          totalEmployees: employees?.length || 0,
+          totalDepartments: departments?.length || 0,
+          totalJobs: jobs?.length || 0,
+          totalClients: clients?.length || 0,
+          totalCompanies: companies?.length || 0,
+          totalVendors: vendors?.length || 0,
+          totalOffices: offices?.length || 0,
+          totalWarehouses: warehouses?.length || 0,
+          totalBranches: branches?.length || 0,
         });
       } catch (err) {
         console.error("[Dashboard] Error fetching stats:", err);
@@ -128,13 +174,24 @@ export default function Dashboard() {
       }
     }
 
-    // Attempt to fetch stats whenever initialization state changes
     fetchDashboardStats();
 
     return () => {
       isMounted = false;
     };
-  }, [user?.id, initialized]);
+  }, [
+    user?.id,
+    initialized,
+    employees,
+    departments,
+    jobs,
+    clients,
+    companies,
+    vendors,
+    offices,
+    warehouses,
+    branches,
+  ]);
 
   // Show loading state while waiting for initialization
   if (!initialized) {
@@ -215,7 +272,7 @@ export default function Dashboard() {
               }}
               renderSelected={(item) => (
                 <div className="flex items-center">
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Plus className="me-2 h-4 w-4" />
                   {item.label}
                 </div>
               )}
@@ -223,71 +280,220 @@ export default function Dashboard() {
           </div>
         }
       />
-      <div className="p-4">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Link href="/invoices">
-            <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+      <div className="space-y-8 p-4">
+        {/* Sales & Revenue Section */}
+        <div>
+          <h2 className="mb-4 text-lg font-semibold">{t("Dashboard.sales_and_revenue")}</h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Link href="/invoices">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium text-gray-500">
+                    {t("Invoices.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalInvoices}</div>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {stats.pendingInvoices} {t("Dashboard.pending")}
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/products">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium text-gray-500">
+                    {t("Products.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalProducts}</div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Card>
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-gray-500">
-                  {t("Dashboard.total_invoices")}
+                  {t("Revenue.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.totalInvoices}</div>
+                <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  {t("Invoices.title")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.pendingInvoices}</div>
                 <p className="mt-1 text-xs text-gray-500">
-                  {stats.pendingInvoices} {t("Dashboard.pending")}
+                  {((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}%{" "}
+                  {t("Dashboard.of_total")}
                 </p>
               </CardContent>
             </Card>
-          </Link>
-
-          <Link href="/products">
-            <Card className="cursor-pointer transition-shadow hover:shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-sm font-medium text-gray-500">
-                  {t("Dashboard.total_products")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.totalProducts}</div>
-              </CardContent>
-            </Card>
-          </Link>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-gray-500">
-                {t("Dashboard.total_revenue")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-gray-500">
-                {t("Dashboard.pending_invoices")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.pendingInvoices}</div>
-              <p className="mt-1 text-xs text-gray-500">
-                {((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}%{" "}
-                {t("Dashboard.of_total")}
-              </p>
-            </CardContent>
-          </Card>
+          </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* Contacts Section */}
+        <div>
+          <h2 className="mb-4 text-lg font-semibold">{t("Contacts.title")}</h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Link href="/clients">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-sm font-medium text-gray-500">
+                    <Users className="me-2 h-4 w-4" />
+                    {t("Clients.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalClients}</div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/companies">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-sm font-medium text-gray-500">
+                    <Building2 className="me-2 h-4 w-4" />
+                    {t("Companies.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalCompanies}</div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/vendors">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-sm font-medium text-gray-500">
+                    <Package className="me-2 h-4 w-4" />
+                    {t("Vendors.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalVendors}</div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+
+        {/* Locations Section */}
+        <div>
+          <h2 className="mb-4 text-lg font-semibold">{t("Locations.title")}</h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Link href="/offices">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-sm font-medium text-gray-500">
+                    <MapPin className="me-2 h-4 w-4" />
+                    {t("Offices.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalOffices}</div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/warehouses">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-sm font-medium text-gray-500">
+                    <MapPin className="me-2 h-4 w-4" />
+                    {t("Warehouses.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalWarehouses}</div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/branches">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-sm font-medium text-gray-500">
+                    <MapPin className="me-2 h-4 w-4" />
+                    {t("Branches.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalBranches}</div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+
+        {/* Human Resources Section */}
+        <div>
+          <h2 className="mb-4 text-lg font-semibold">{t("HumanResources.title")}</h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Link href="/employees">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-sm font-medium text-gray-500">
+                    <Users className="me-2 h-4 w-4" />
+                    {t("Employees.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalEmployees}</div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/departments">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-sm font-medium text-gray-500">
+                    <Building2 className="me-2 h-4 w-4" />
+                    {t("Departments.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalDepartments}</div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/jobs">
+              <Card className="cursor-pointer transition-shadow hover:shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center text-sm font-medium text-gray-500">
+                    <Briefcase className="me-2 h-4 w-4" />
+                    {t("Jobs.title")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalJobs}</div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+
+        {/* Recent Activity Section */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>{t("Dashboard.recent_invoices")}</CardTitle>
+              <CardTitle>{t("Invoices.title")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">{t("Dashboard.recent_invoices_list")}</p>
+              <p className="text-sm text-gray-500">{t("Invoices.title")}</p>
             </CardContent>
           </Card>
 
