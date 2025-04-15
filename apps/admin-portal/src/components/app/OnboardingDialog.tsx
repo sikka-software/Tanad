@@ -26,7 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useMainStore } from "@/hooks/main.store";
 import useUserStore from "@/hooks/use-user-store";
-import { checkExistingSlug } from "@/lib/operations";
+// import { checkExistingSlug } from "@/lib/operations";
 import { supabase } from "@/lib/supabase";
 import { Pukla } from "@/lib/types";
 
@@ -127,11 +127,11 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
         slug = Math.random().toString(36).substring(2, 8);
 
         // Check if the slug exists in the database
-        const existingSlug = await checkExistingSlug(slug);
+        // const existingSlug = await checkExistingSlug(slug);
 
-        if (!existingSlug) {
-          isUnique = true;
-        }
+        // if (!existingSlug) {
+        //   isUnique = true;
+        // }
       }
       form.setValue("slug", slug);
     } catch (error) {
@@ -150,14 +150,14 @@ export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
       // Check if slug exists
       const values = form.getValues();
       if (values.slug) {
-        const existingSlug = await checkExistingSlug(values.slug);
-        if (existingSlug) {
-          form.setError("slug", {
-            type: "manual",
-            message: t("MyPuklas.this_custom_slug_is_already_taken"),
-          });
-          return false;
-        }
+        // const existingSlug = await checkExistingSlug(values.slug);
+        // if (existingSlug) {
+        //   form.setError("slug", {
+        //     type: "manual",
+        //     message: t("MyPuklas.this_custom_slug_is_already_taken"),
+        //   });
+        //   return false;
+        // }
       }
 
       return true;

@@ -1,7 +1,7 @@
 # Technical Context
 
 ## Technology Stack
-- **Package Manager**: pnpm v9.0.0
+- **Package Manager**: pnpm v10.8.1
 - **Build Tool**: Turborepo
 - **Core Language**: TypeScript 5.8.2
 - **Node Version**: >=18

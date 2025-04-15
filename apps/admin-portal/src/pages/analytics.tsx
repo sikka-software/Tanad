@@ -319,7 +319,7 @@ export default function Analytics() {
                 <span className="text-2xl font-bold">
                   {t("Analytics.select_pukla_to_view_analytics")}
                 </span>
-                <Select onValueChange={(value) => router.push(`/analytics?id=${value}`)}>
+                <Select onValueChange={(value: any) => router.push(`/analytics?id=${value}`)}>
                   <SelectTrigger className="w-full max-w-[200px]">
                     <SelectValue placeholder={t("Analytics.select_pukla")} />
                   </SelectTrigger>
