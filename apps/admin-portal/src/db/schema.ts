@@ -554,13 +554,23 @@ export const jobListingJobs = pgTable(
   "job_listing_jobs",
   {
     id: uuid().primaryKey().defaultRandom(),
-    jobListingId: uuid("job_listing_id").notNull().references(() => jobListings.id, { onDelete: "cascade" }),
-    jobId: uuid("job_id").notNull().references(() => jobs.id, { onDelete: "cascade" }),
+    jobListingId: uuid("job_listing_id")
+      .notNull()
+      .references(() => jobListings.id, { onDelete: "cascade" }),
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
-    index("job_listing_jobs_job_listing_id_idx").using("btree", table.jobListingId.asc().nullsLast().op("uuid_ops")),
-    index("job_listing_jobs_job_id_idx").using("btree", table.jobId.asc().nullsLast().op("uuid_ops")),
+    index("job_listing_jobs_job_listing_id_idx").using(
+      "btree",
+      table.jobListingId.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("job_listing_jobs_job_id_idx").using(
+      "btree",
+      table.jobId.asc().nullsLast().op("uuid_ops"),
+    ),
   ],
 ).enableRLS();
 
@@ -588,7 +598,10 @@ export const offices = pgTable(
   },
   (table) => [
     index("offices_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("offices_company_id_idx").using("btree", table.companyId.asc().nullsLast().op("uuid_ops")),
+    index("offices_company_id_idx").using(
+      "btree",
+      table.companyId.asc().nullsLast().op("uuid_ops"),
+    ),
     index("offices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
     foreignKey({
       columns: [table.companyId],

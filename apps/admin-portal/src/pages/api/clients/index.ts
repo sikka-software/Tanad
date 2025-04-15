@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+
 import { desc } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
@@ -52,4 +53,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(405).json({ message: "Method not allowed" });
-} 
+}
