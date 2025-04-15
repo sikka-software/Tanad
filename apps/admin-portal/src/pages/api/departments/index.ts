@@ -27,6 +27,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const departmentsList = await db.query.departments.findMany({
         orderBy: desc(departments.createdAt),
+        with: {
+          locations: true,
+        },
       });
       return res.status(200).json(departmentsList.map(convertDrizzleDepartment));
     } catch (error) {

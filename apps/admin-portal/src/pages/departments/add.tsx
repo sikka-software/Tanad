@@ -59,10 +59,10 @@ export default function AddDepartmentPage() {
 
       // Then create the department locations
       if (data.locations && data.locations.length > 0) {
-        const locationInserts = data.locations.map(locationId => ({
+        const locationInserts = data.locations.map((locationId) => ({
           department_id: newDepartment.id,
           location_id: locationId,
-          location_type: 'office', // Default to office type
+          location_type: "office", // Default to office type
         }));
 
         const { error: locationError } = await supabase
@@ -117,7 +117,7 @@ export default function AddDepartmentPage() {
       />
 
       <div className="p-4">
-        <Card className="max-w-2xl mx-auto">
+        <Card className="mx-auto max-w-2xl">
           <CardHeader className="relative">
             {/* {process.env.NODE_ENV === "development" && (
               <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>

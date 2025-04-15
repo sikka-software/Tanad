@@ -7,6 +7,9 @@ import { z } from "zod";
 import ErrorComponent from "@/components/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import TableSkeleton from "@/components/ui/table-skeleton";
+import { useBranches } from "@/hooks/useBranches";
+import { useOffices } from "@/hooks/useOffices";
+import { useWarehouses } from "@/hooks/useWarehouses";
 import { useDepartmentsStore } from "@/stores/departments.store";
 import { Department } from "@/types/department.type";
 
@@ -25,9 +28,25 @@ interface DepartmentsTableProps {
 const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => {
   const t = useTranslations("Departments");
   const { updateDepartment } = useDepartmentsStore();
+  const { data: offices } = useOffices();
+  const { data: branches } = useBranches();
+  const { data: warehouses } = useWarehouses();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateDepartment(rowId, { [columnId]: value });
+  };
+
+  const getLocationName = (locationId: string) => {
+    const office = offices?.find((o) => o.id === locationId);
+    if (office) return office.name;
+
+    const branch = branches?.find((b) => b.id === locationId);
+    if (branch) return branch.name;
+
+    const warehouse = warehouses?.find((w) => w.id === locationId);
+    if (warehouse) return warehouse.name;
+
+    return locationId;
   };
 
   const columns: ExtendedColumnDef<Department>[] = [
@@ -41,6 +60,10 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
       accessorKey: "locations",
       header: t("form.locations.label"),
       validationSchema: locationSchema,
+      cell: ({ row }) => {
+        const locationIds = row.original.locations || [];
+        return locationIds.map(getLocationName).join(", ");
+      },
     },
     {
       accessorKey: "createdAt",
