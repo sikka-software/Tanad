@@ -9,6 +9,20 @@ import {
   Settings,
   Filter,
   FileInput,
+  Tag,
+  LayoutGrid,
+  LucideIcon,
+  Package,
+  BarChart,
+  CreditCard,
+  SaudiRiyal,
+  File,
+  SquareTerminal,
+  Settings2,
+  BookOpen,
+  Bot,
+  Pin,
+  MapPin,
 } from "lucide-react";
 
 export const commandList = [
@@ -74,6 +88,12 @@ export const commandList = [
         label: "HumanResources.title",
         shortcut: "⌘E",
         href: "/employees",
+      },
+      {
+        icon: Building2,
+        label: "Departments.title",
+        shortcut: "⌘D",
+        href: "/departments",
       },
       {
         icon: CircleDollarSign,

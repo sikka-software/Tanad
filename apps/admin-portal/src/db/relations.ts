@@ -16,6 +16,9 @@ import {
   branches,
   jobs,
   companies,
+  departments,
+  departmentLocations,
+  offices,
 } from "./schema";
 
 export const clientsRelations = relations(clients, ({ many, one }) => ({
@@ -141,5 +144,28 @@ export const jobsRelations = relations(jobs, ({ one }) => ({
   profile: one(profiles, {
     fields: [jobs.userId],
     references: [profiles.id],
+  }),
+}));
+
+export const departmentsRelations = relations(departments, ({ many, one }) => ({
+  employees: many(employees),
+  locations: many(departmentLocations),
+  profile: one(profiles, {
+    fields: [departments.userId],
+    references: [profiles.id],
+  }),
+}));
+
+export const departmentLocationsRelations = relations(departmentLocations, ({ one }) => ({
+  department: one(departments, {
+    fields: [departmentLocations.departmentId],
+    references: [departments.id],
+  }),
+}));
+
+export const employeesRelations = relations(employees, ({ one }) => ({
+  department: one(departments, {
+    fields: [employees.departmentId],
+    references: [departments.id],
   }),
 }));

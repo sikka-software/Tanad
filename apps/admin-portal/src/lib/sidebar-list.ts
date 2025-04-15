@@ -204,6 +204,13 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           isActive: pathname === "/employees",
         },
         {
+          title: "Departments",
+          translationKey: "Departments.title",
+          url: "/departments",
+          action: "/departments/add",
+          isActive: pathname.startsWith("/departments"),
+        },
+        {
           title: "Salaries",
           translationKey: "Salaries.title",
           url: "/salaries",

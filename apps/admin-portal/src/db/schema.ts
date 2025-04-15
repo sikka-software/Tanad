@@ -282,7 +282,7 @@ export const employees = pgTable("employees", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   phone: varchar("phone", { length: 50 }),
   position: varchar("position", { length: 255 }).notNull(),
-  department: varchar("department", { length: 255 }),
+  departmentId: uuid("department_id").references(() => departments.id),
   hireDate: date("hire_date").notNull(),
   salary: numeric("salary", { precision: 10, scale: 2 }),
   isActive: boolean("is_active").default(true).notNull(),
@@ -598,5 +598,53 @@ export const offices = pgTable(
   (table) => [
     index("offices_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("offices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+  ],
+).enableRLS();
+
+export const departments = pgTable(
+  "departments",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text().notNull(),
+    description: text(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("departments_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("departments_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+  ],
+).enableRLS();
+
+export const departmentLocations = pgTable(
+  "department_locations",
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    departmentId: uuid("department_id")
+      .notNull()
+      .references(() => departments.id, { onDelete: "cascade" }),
+    locationType: text("location_type").$type<"office" | "branch" | "warehouse">().notNull(),
+    locationId: uuid("location_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("department_locations_department_id_idx").using(
+      "btree",
+      table.departmentId.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("department_locations_location_id_idx").using(
+      "btree",
+      table.locationId.asc().nullsLast().op("uuid_ops"),
+    ),
+    check(
+      "department_locations_type_check",
+      sql`location_type = ANY (ARRAY['office'::text, 'branch'::text, 'warehouse'::text])`,
+    ),
   ],
 ).enableRLS();

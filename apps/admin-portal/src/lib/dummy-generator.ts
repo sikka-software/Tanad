@@ -21,9 +21,18 @@ export const generateDummyData = () => {
   const fakeCities = ["New York", "Los Angeles", "Chicago", "Houston", "Miami"];
   const fakeStates = ["NY", "CA", "IL", "TX", "FL"];
   const fakeZipCodes = ["10001", "90038", "60601", "77001", "33131"];
+  const fakeDescriptions = [
+    "Description 1",
+    "Description 2",
+    "Description 3",
+    "Description 4",
+    "Description 5",
+  ];
+  const fakeLocations = ["Office", "Branch", "Warehouse"];
 
   return {
     name: fakeNames[Math.floor(Math.random() * fakeNames.length)],
+    description: fakeDescriptions[Math.floor(Math.random() * fakeDescriptions.length)],
     email: fakeEmails[Math.floor(Math.random() * fakeEmails.length)],
     phone: fakeNumbers[Math.floor(Math.random() * fakeNumbers.length)],
     company: fakeCompanies[Math.floor(Math.random() * fakeCompanies.length)],
@@ -31,5 +40,6 @@ export const generateDummyData = () => {
     city: fakeCities[Math.floor(Math.random() * fakeCities.length)],
     state: fakeStates[Math.floor(Math.random() * fakeStates.length)],
     zipCode: fakeZipCodes[Math.floor(Math.random() * fakeZipCodes.length)],
+    locations: fakeLocations[Math.floor(Math.random() * fakeLocations.length)],
   };
 };
