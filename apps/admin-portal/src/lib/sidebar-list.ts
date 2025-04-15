@@ -1,22 +1,12 @@
 import {
-  Tag,
   Users,
   Settings,
-  LayoutGrid,
   LucideIcon,
   LayoutDashboard,
   Package,
   BarChart,
   CreditCard,
   Briefcase,
-  Building2,
-  SaudiRiyal,
-  File,
-  SquareTerminal,
-  Settings2,
-  BookOpen,
-  Bot,
-  Pin,
   MapPin,
 } from "lucide-react";
 

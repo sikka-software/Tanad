@@ -9,20 +9,6 @@ import {
   Settings,
   Filter,
   FileInput,
-  Tag,
-  LayoutGrid,
-  LucideIcon,
-  Package,
-  BarChart,
-  CreditCard,
-  SaudiRiyal,
-  File,
-  SquareTerminal,
-  Settings2,
-  BookOpen,
-  Bot,
-  Pin,
-  MapPin,
 } from "lucide-react";
 
 export const commandList = [
@@ -77,6 +63,12 @@ export const commandList = [
   {
     heading: "HumanResources.title",
     items: [
+      {
+        icon: Briefcase,
+        label: "Employees.title",
+        shortcut: "⌘E",
+        href: "/employees",
+      },
       {
         icon: Briefcase,
         label: "Jobs.title",

@@ -140,10 +140,12 @@ const NonCollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][numb
   const t = useTranslations();
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton className="text-sidebar-foreground/70">
-        {item.icon && <item.icon />}
-        <span>{t(item.translationKey)}</span>
-      </SidebarMenuButton>
+      <Link href={item.url}>
+        <SidebarMenuButton className="text-sidebar-foreground/70">
+          {item.icon && <item.icon />}
+          <span>{t(item.translationKey)}</span>
+        </SidebarMenuButton>
+      </Link>
       {item.action && (
         <SidebarMenuAction className="absolute !end-1 top-1/2 -translate-y-1/2">
           <Plus className="!size-3" />

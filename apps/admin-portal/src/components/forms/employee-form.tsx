@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { DatePicker } from "@/components/ui/date-picker";
@@ -18,6 +19,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { ComboboxAdd } from "@/components/ui/combobox-add";
+import { useDepartments } from "@/hooks/useDepartments";
+import { supabase } from "@/lib/supabase";
 
 import { FormDialog } from "../ui/form-dialog";
 import DepartmentForm, { DepartmentFormValues } from "./department-form";
@@ -35,7 +39,7 @@ const employeeFormSchema = z.object({
   email: z.string().email("Invalid email"),
   phone: z.string().optional(),
   position: z.string().min(1, "Position is required"),
-  department: z.string().optional(),
+  department: z.string().nullable(),
   hireDate: z.date({
     required_error: "Hire date is required",
   }),
@@ -52,6 +56,7 @@ export type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
 export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: EmployeeFormProps) {
   const t = useTranslations();
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
+  const { data: departments, isLoading: departmentsLoading } = useDepartments();
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeFormSchema),
@@ -61,7 +66,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
       email: "",
       phone: "",
       position: "",
-      department: "",
+      department: null,
       hireDate: undefined,
       salary: "",
       isActive: true,
@@ -69,7 +74,45 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
     },
   });
 
-  const handleDepartmentSubmit = async (data: DepartmentFormValues) => {};
+  // Format departments for ComboboxAdd
+  const departmentOptions =
+    departments?.map((department) => ({
+      label: department.name,
+      value: department.id,
+    })) || [];
+
+  const handleDepartmentSubmit = async (data: DepartmentFormValues) => {
+    try {
+      const { data: newDepartment, error } = await supabase
+        .from("departments")
+        .insert([
+          {
+            name: data.name.trim(),
+            description: data.description?.trim() || null,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Set the new department as the selected department
+      form.setValue("department", newDepartment.id);
+
+      // Close the dialog
+      setIsDepartmentDialogOpen(false);
+
+      // Show success message
+      toast.success(t("General.successful_operation"), {
+        description: t("Departments.success.created"),
+      });
+    } catch (error) {
+      console.error("Error creating department:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Departments.error.create"),
+      });
+    }
+  };
 
   return (
     <Form {...form}>
@@ -164,7 +207,19 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
               <FormItem>
                 <FormLabel>{t("Employees.form.department.label")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("Employees.form.department.placeholder")} {...field} />
+                  <ComboboxAdd
+                    data={departmentOptions}
+                    isLoading={departmentsLoading}
+                    defaultValue={field.value || ""}
+                    onChange={(value) => field.onChange(value || null)}
+                    texts={{
+                      placeholder: t("Employees.form.department.placeholder"),
+                      searchPlaceholder: t("Employees.form.department.search_placeholder"),
+                      noItems: t("Employees.form.department.no_departments"),
+                    }}
+                    addText={t("Departments.add_new")}
+                    onAddClick={() => setIsDepartmentDialogOpen(true)}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
