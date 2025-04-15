@@ -28,8 +28,6 @@ export function FormDialog({
   children,
   formId,
   onCancel,
-  cancelText = "Cancel",
-  submitText = "Save",
 }: FormDialogProps) {
   const t = useTranslations();
   const { locale } = useRouter();
@@ -42,7 +40,7 @@ export function FormDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="flex h-[80vh] max-h-[80vh] flex-col gap-0 overflow-hidden !p-0"
+        className="flex max-h-[80vh] flex-col gap-0 overflow-hidden !p-0"
         dir={locale === "ar" ? "rtl" : "ltr"}
       >
         <DialogHeader className="sticky top-0 z-10 border-b p-4">
@@ -50,10 +48,10 @@ export function FormDialog({
         </DialogHeader>
         <div className="flex-1 overflow-y-auto p-4">{children}</div>
         <DialogFooter className="sticky bottom-0 flex justify-end gap-2 border-t p-4">
-          <Button variant="outline" onClick={() => handleCancel}>
+          <Button variant="outline" onClick={handleCancel}>
             {t("General.cancel")}
           </Button>
-          <Button type="submit" form="company-form">
+          <Button type="submit" form={formId}>
             {t("General.save")}
           </Button>
         </DialogFooter>

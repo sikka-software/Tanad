@@ -308,8 +308,6 @@ export function ClientForm({
         onOpenChange={setIsCompanyDialogOpen}
         title={t("Companies.add_new")}
         formId="company-form"
-        cancelText={t("General.cancel")}
-        submitText={t("General.save")}
       >
         <CompanyForm id="company-form" onSubmit={handleCompanySubmit} />
       </FormDialog>
