@@ -39,7 +39,6 @@ interface DepartmentFormProps {
   id?: string;
   onSubmit: (data: DepartmentFormValues) => Promise<void>;
   loading?: boolean;
-  userId: string | null;
   defaultValues?: Partial<DepartmentFormValues>;
 }
 
@@ -47,7 +46,7 @@ export default function DepartmentForm({
   id,
   onSubmit,
   loading = false,
-  userId,
+
   defaultValues,
 }: DepartmentFormProps) {
   const t = useTranslations();

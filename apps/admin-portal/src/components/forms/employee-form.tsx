@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
@@ -17,6 +18,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+
+import { FormDialog } from "../ui/form-dialog";
+import DepartmentForm, { DepartmentFormValues } from "./department-form";
 
 interface EmployeeFormProps {
   id?: string;
@@ -47,6 +51,7 @@ export type EmployeeFormValues = z.infer<typeof employeeFormSchema>;
 
 export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: EmployeeFormProps) {
   const t = useTranslations();
+  const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeFormSchema),
@@ -63,6 +68,8 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
       notes: "",
     },
   });
+
+  const handleDepartmentSubmit = async (data: DepartmentFormValues) => {};
 
   return (
     <Form {...form}>
@@ -238,16 +245,16 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
           )}
         />
 
-        {/* <div className="flex justify-end gap-4 pt-4">
-          <Button type="button" variant="outline" onClick={() => router.push("/employees")}>
-            {t("General.cancel")}
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {loading
-              ? t("Employees.messages.creating_employee")
-              : t("Employees.messages.create_employee")}
-          </Button>
-        </div> */}
+        <FormDialog
+          open={isDepartmentDialogOpen}
+          onOpenChange={setIsDepartmentDialogOpen}
+          title={t("Departments.add_new")}
+          formId="department-form"
+          cancelText={t("General.cancel")}
+          submitText={t("General.save")}
+        >
+          <DepartmentForm id="department-form" onSubmit={handleDepartmentSubmit} />
+        </FormDialog>
       </form>
     </Form>
   );
