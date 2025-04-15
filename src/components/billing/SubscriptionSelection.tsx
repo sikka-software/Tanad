@@ -4,21 +4,29 @@ import { useEffect, useState } from "react";
 
 import { useLocale, useTranslations } from "next-intl";
 
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePricing } from "@/hooks/use-pricing";
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
+import { checkRequiredEnvVars } from "@/lib/check-env";
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Skeleton } from "../ui/skeleton";
+import { PaymentForm } from "./payment-form";
 
 // Map plan lookup keys to colors and badges
 const planColors: Record<
@@ -54,6 +62,24 @@ const planColors: Record<
     headerClass: "bg-amber-700 text-white",
     badgeClass: "bg-amber-600",
   },
+};
+
+// Map plan lookup keys to plan titles for direct use in component
+const planTitles: Record<string, string> = {
+  tanad_free: "Free Plan",
+  tanad_standard: "Standard Plan",
+  tanad_pro: "Pro Plan",
+  tanad_business: "Business Plan",
+  tanad_enterprise: "Enterprise Plan",
+};
+
+// Map lookup keys to plan descriptions
+const planDescriptions: Record<string, string> = {
+  tanad_free: "Basic features for individuals",
+  tanad_standard: "Advanced features for small teams",
+  tanad_pro: "Advanced features for growing businesses",
+  tanad_business: "Complete solution for established businesses",
+  tanad_enterprise: "Custom solution for large organizations",
 };
 
 // Helper function to format price in Arabic
@@ -105,9 +131,14 @@ export default function SubscriptionSelection() {
   } = useSubscription();
   const { loading: pricesLoading, getPlans } = usePricing(TANAD_PRODUCT_ID);
   const { user, fetchUserAndProfile } = useUserStore();
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
+  const [selectedPlanName, setSelectedPlanName] = useState<string>("");
+  const [selectedPlanPrice, setSelectedPlanPrice] = useState<string>("");
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [envVarsValid, setEnvVarsValid] = useState(true);
 
   const plans = getPlans();
   // Sort plans by price (ascending)
@@ -129,6 +160,18 @@ export default function SubscriptionSelection() {
     priceId: freePlan?.priceId || "",
     lookup_key: freePlan?.lookup_key || "",
   });
+
+  // Set a default selected plan if none is selected
+  useEffect(() => {
+    if (!selectedPlan && sortedPlans.length > 0 && !pricesLoading) {
+      // If no plan is selected yet, select the first non-free plan or the first plan
+      const defaultPlan =
+        sortedPlans.find((plan) => plan.lookup_key !== "tanad_free") || sortedPlans[0];
+      if (defaultPlan) {
+        setSelectedPlan(defaultPlan.priceId);
+      }
+    }
+  }, [selectedPlan, sortedPlans, pricesLoading]);
 
   useEffect(() => {
     if (pricesLoading) return;
@@ -154,66 +197,254 @@ export default function SubscriptionSelection() {
     }
   }, [pricesLoading, user?.price_id, user?.subscribed_to, freePlan, plans]);
 
+  // Function to update the selected plan with debounce protection
+  const updateSelectedPlan = (planId: string) => {
+    // If we're already in the process of selecting, ignore rapid changes
+    if (isSelecting) return;
+
+    // Set selection in progress flag
+    setIsSelecting(true);
+
+    // First clear the selection to force re-render
+    setSelectedPlan("");
+
+    // Then set the new selection after a short delay
+    setTimeout(() => {
+      setSelectedPlan(planId);
+      setIsSelecting(false);
+    }, 100);
+  };
+
+  // Update the handlePlanChange function to use the new debounced method
+  const handlePlanChange = (value: string) => {
+    if (selectedPlan === value) {
+      // If clicking the same plan again, use the debounced method
+      updateSelectedPlan(value);
+    } else {
+      setSelectedPlan(value);
+    }
+  };
+
   const handlePlanSelection = async () => {
-    if (!selectedPlan) return;
-    if (!user) {
-      toast.error(
-        t("please_sign_in_to_update_your_subscription", {
-          fallback: "Please sign in to update your subscription",
-        }),
-      );
+    if (!selectedPlan) {
+      toast.error(t("billing.select_plan_error"));
       return;
     }
 
-    if (currentPlan.priceId === selectedPlan && !subscriptionCancelAt) {
-      toast.error(
-        t("you_are_already_subscribed_to_this_plan", {
-          fallback: "You are already subscribed to this plan",
+    try {
+      setLoading(true);
+
+      console.log("Selected plan:", selectedPlan);
+      console.log("User:", user);
+      console.log("User stripe_customer_id:", user?.stripe_customer_id);
+
+      // Check if user and stripe_customer_id exist
+      if (!user || !user.stripe_customer_id) {
+        throw new Error(
+          t("billing.user_not_authenticated", {
+            fallback: "User is not authenticated or stripe customer ID is missing",
+          }),
+        );
+      }
+
+      // Find the selected plan from available plans
+      const planToSelect = sortedPlans.find((plan) => plan.priceId === selectedPlan);
+      if (!planToSelect) {
+        throw new Error(
+          t("billing.plan_not_found", {
+            fallback: "Selected plan not found",
+          }),
+        );
+      }
+
+      // Set plan details for display
+      setSelectedPlanName(
+        t(`billing.plans.${planToSelect.lookup_key?.replace("tanad_", "")}`, {
+          fallback: planToSelect.name,
         }),
       );
-      return;
-    }
+      setSelectedPlanPrice(planToSelect.price);
 
-    setIsPaymentDialogOpen(true);
+      // Validate Stripe keys first
+      if (!envVarsValid) {
+        throw new Error(
+          t("billing.invalid_stripe_config", {
+            fallback: "Stripe is not properly configured. Please contact support.",
+          }),
+        );
+      }
+
+      // Log the parameters for debugging
+      console.log("Creating payment intent with:", {
+        priceId: selectedPlan,
+        customerId: user.stripe_customer_id,
+      });
+
+      // Get a payment intent or setup intent client secret
+      const response = await fetch("/api/stripe/create-payment-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          priceId: selectedPlan,
+          customerId: user.stripe_customer_id,
+        }),
+      });
+
+      // Check for HTTP errors first
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Payment intent API error:", errorData);
+        throw new Error(errorData.message || errorData.error || `HTTP error ${response.status}`);
+      }
+
+      // Parse the response
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error("Error parsing response:", parseError);
+        throw new Error(
+          t("billing.invalid_response", {
+            fallback: "Invalid response from payment service",
+          }),
+        );
+      }
+
+      // Validate the response data
+      if (!data || typeof data !== "object") {
+        console.error("Invalid data format:", data);
+        throw new Error(
+          t("billing.invalid_data", {
+            fallback: "Invalid data returned from payment service",
+          }),
+        );
+      }
+
+      // Check for Stripe errors in the response
+      if (data.error) {
+        console.error("Stripe error in response:", data.error);
+        throw new Error(
+          data.message ||
+            data.error.message ||
+            t("billing.payment_setup_failed", {
+              fallback: "Failed to set up payment",
+            }),
+        );
+      }
+
+      if (!data.clientSecret) {
+        console.error("Missing client secret in response:", data);
+        throw new Error(
+          t("billing.missing_client_secret", {
+            fallback: "No client secret was returned from the payment service",
+          }),
+        );
+      }
+
+      // Set client secret and open payment dialog
+      setClientSecret(data.clientSecret);
+      setIsPaymentDialogOpen(true);
+    } catch (error) {
+      console.error("Error selecting plan:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t("billing.error_selecting_plan", { fallback: "Error selecting plan" }),
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubscriptionSuccess = async () => {
-    setIsLoading(true);
+    setLoading(true);
     try {
-      if (selectedPlan) {
-        // Attempt to create the subscription with Stripe
-        const result = await createSubscription(selectedPlan);
-
-        if (result.error) {
-          toast.error(result.error);
-        } else {
-          toast.success(
-            t("billing.subscription_updated_successfully", {
-              fallback: "Subscription updated successfully",
-            }),
-          );
-
-          await Promise.all([fetchUserAndProfile(), refetchSubscription()]);
-        }
+      if (!selectedPlan) {
+        throw new Error(
+          t("billing.no_plan_selected", {
+            fallback: "No plan is selected for subscription",
+          }),
+        );
       }
-    } catch (error) {
-      toast.error(
-        t("billing.subscription_update_failed", {
-          fallback: "Failed to update subscription",
+
+      if (!user?.stripe_customer_id) {
+        throw new Error(
+          t("billing.missing_customer_id", {
+            fallback: "Stripe customer ID is missing",
+          }),
+        );
+      }
+
+      console.log("Creating subscription with plan ID:", selectedPlan);
+
+      // Attempt to create the subscription with Stripe
+      const result = await createSubscription(selectedPlan);
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      toast.success(
+        t("billing.subscription_updated_successfully", {
+          fallback: "Subscription updated successfully",
         }),
       );
+
+      await Promise.all([fetchUserAndProfile(), refetchSubscription()]);
+    } catch (error) {
+      console.error("Subscription update failed:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t("billing.subscription_update_failed", {
+              fallback: "Failed to update subscription",
+            }),
+      );
     } finally {
-      setIsLoading(false);
+      setLoading(false);
       setIsPaymentDialogOpen(false);
     }
   };
 
-  const handlePlanChange = (value: string) => {
-    setSelectedPlan(value);
-  };
+  // Check environment variables on component mount
+  useEffect(() => {
+    try {
+      const isValid = checkRequiredEnvVars();
+      setEnvVarsValid(isValid);
+
+      if (!isValid) {
+        console.error("Stripe environment variables are not properly configured");
+      }
+    } catch (error) {
+      console.error("Error checking environment variables:", error);
+      setEnvVarsValid(false);
+    }
+  }, []);
+
+  if (!envVarsValid) {
+    return (
+      <Card className="border-amber-300 bg-amber-50 p-4 text-amber-900">
+        <div className="flex items-start gap-3">
+          <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-600" />
+          <div>
+            <h3 className="mb-1 text-lg font-semibold">Stripe Configuration Missing</h3>
+            <p className="mb-2">
+              The Stripe API keys are missing or invalid. Please add the required Stripe API keys to
+              your environment variables.
+            </p>
+            <p className="text-sm text-amber-700">
+              This is a developer-only message and should not appear in production.
+            </p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   if (pricesLoading) {
-    return <Skeleton className="h-[600px] w-full" />;
+    return <Skeleton className="h-[400px] w-full" />;
   }
 
   // Hide if user has an active subscription or promotion
@@ -221,181 +452,210 @@ export default function SubscriptionSelection() {
     return null;
   }
 
+  const getTranslatedFeatures = (plan: any, featureKeys: string[]) => {
+    return featureKeys.map((key) => {
+      if (key.startsWith("billing.features.")) {
+        return t(key, { fallback: key.replace("billing.features.", "") });
+      }
+      return key;
+    });
+  };
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         handlePlanSelection();
       }}
+      className="w-full"
     >
-      <Card className="border-none shadow-none">
-        <CardHeader className="pb-2 text-center">
-          <h2 className="text-3xl font-bold">
-            {t("billing.subscription_plans", { fallback: "Subscription Plans" })}
-          </h2>
-          <p className="text-muted-foreground">
-            {t("billing.choose_the_right_plan", {
-              fallback: "Choose the plan that best fits your business needs",
+      {subscriptionCancelAt && (
+        <div className="mb-6 rounded-md bg-amber-50 p-3 text-center text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+          <p className="text-sm font-medium">
+            {t("billing.subscription_cancels_on", {
+              date: new Date(Number(subscriptionCancelAt) * 1000).toLocaleDateString(
+                locale === "ar" ? "ar-SA" : "en-US",
+              ),
+              fallback: `Subscription cancels on ${new Date(Number(subscriptionCancelAt) * 1000).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")}`,
             })}
           </p>
-          {subscriptionCancelAt && (
-            <div className="mt-4 rounded-md bg-amber-50 p-2 text-amber-800 dark:bg-amber-950 dark:text-amber-200">
-              <p className="text-sm font-medium">
-                {t("billing.subscription_cancels_on", {
-                  date: new Date(Number(subscriptionCancelAt) * 1000).toLocaleDateString(
-                    locale === "ar" ? "ar-SA" : "en-US",
-                  ),
-                  fallback: `Subscription cancels on ${new Date(Number(subscriptionCancelAt) * 1000).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")}`,
+        </div>
+      )}
+
+      <div dir={locale === "ar" ? "rtl" : "ltr"}>
+        <RadioGroup
+          value={selectedPlan}
+          onValueChange={handlePlanChange}
+          className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
+          key={`plan-selection-${selectedPlan}`}
+        >
+          {displayPlans.map((plan) => {
+            const isCurrentPlan = currentPlan.priceId === plan.priceId;
+            const isDisabled =
+              plan.lookup_key === "tanad_free" && currentPlan.lookup_key === "tanad_free";
+            const isPopular = plan.lookup_key === "tanad_pro" || plan.lookup_key?.includes("_pro");
+            const isSelected = selectedPlan === plan.priceId;
+
+            // Get the plan title based on lookup key or translation
+            const planTitle = t(`billing.${plan.lookup_key}`, {
+              fallback: planTitles[plan.lookup_key] || plan.name,
+            });
+
+            // Get plan description from our mapping
+            const planDesc = t(`billing.${plan.lookup_key}_description`, {
+              fallback: planDescriptions[plan.lookup_key] || `${planTitle} subscription plan`,
+            });
+
+            // Format price for display based on locale
+            const displayPrice = formatPriceForLocale(plan.price, locale);
+            const priceValue = displayPrice.split(" ")[0];
+            const priceInterval = locale === "ar" ? "شهرياً" : "/month";
+
+            return (
+              <Card
+                key={plan.priceId}
+                className={cn(
+                  "hover:border-primary/70 relative cursor-pointer transition-all duration-200 hover:shadow-sm",
+                  isPopular ? "border-primary shadow-md" : "",
+                  isSelected ? "border-primary ring-primary/30 bg-primary/5 shadow-sm ring-2" : "",
+                  isCurrentPlan && !isSelected ? "bg-muted/50" : "",
+                  isDisabled ? "cursor-not-allowed opacity-60" : "",
+                )}
+                onClick={() => {
+                  if (!isDisabled) {
+                    if (selectedPlan === plan.priceId) {
+                      // Use debounced method for re-selecting the same plan
+                      updateSelectedPlan(plan.priceId);
+                    } else {
+                      setSelectedPlan(plan.priceId);
+                    }
+                  }
+                }}
+              >
+                <RadioGroupItem
+                  className="sr-only"
+                  value={plan.priceId}
+                  id={plan.priceId}
+                  disabled={isDisabled}
+                />
+
+                {isPopular && (
+                  <div className="absolute -top-3 right-0 left-0 flex justify-center">
+                    <Badge className="bg-primary hover:bg-primary/90">
+                      {t("billing.most_popular", { fallback: "Most Popular" })}
+                    </Badge>
+                  </div>
+                )}
+
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xl">{planTitle}</CardTitle>
+                  <CardDescription>{planDesc}</CardDescription>
+                </CardHeader>
+
+                <CardContent className="pb-3">
+                  <div className="mb-4">
+                    <span className="text-3xl font-bold">{priceValue}</span>
+                    <span className="text-muted-foreground ml-1">{priceInterval}</span>
+                  </div>
+
+                  <ul className="space-y-2 text-sm">
+                    {getTranslatedFeatures(plan, plan.features).map((feature, index) => (
+                      <li key={index} className="flex items-start">
+                        <Check
+                          className={`${locale === "ar" ? "ml-2" : "mr-2"} mt-0.5 h-4 w-4 shrink-0 text-green-500`}
+                        />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+
+                {isSelected && (
+                  <div className="absolute right-2 bottom-2">
+                    <Badge variant="outline" className="bg-primary text-primary-foreground">
+                      {t("billing.selected_plan_button", { fallback: "Selected" })}
+                    </Badge>
+                  </div>
+                )}
+              </Card>
+            );
+          })}
+        </RadioGroup>
+      </div>
+
+      <div className="mt-6 flex justify-center pt-6">
+        <Button
+          type="submit"
+          size="lg"
+          className="px-8"
+          disabled={
+            loading ||
+            !selectedPlan ||
+            (currentPlan.priceId === selectedPlan && !subscriptionCancelAt)
+          }
+        >
+          {loading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : currentPlan.priceId === selectedPlan && !subscriptionCancelAt ? (
+            t("billing.current_plan", { fallback: "Current Plan" })
+          ) : (
+            t("billing.update_plan", { fallback: "Update Plan" })
+          )}
+        </Button>
+      </div>
+
+      <Dialog
+        open={isPaymentDialogOpen}
+        onOpenChange={(open) => {
+          // If dialog is being closed, reset payment-related state
+          if (!open) {
+            setClientSecret(null);
+            if (loading) setLoading(false);
+          }
+          setIsPaymentDialogOpen(open);
+        }}
+      >
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedPlan &&
+                t(`billing.update_to_plan`, {
+                  plan: selectedPlanName,
+                  fallback: `Update to ${selectedPlanName} Plan`,
+                })}
+            </DialogTitle>
+            <DialogDescription>
+              {t("billing.payment_dialog_description", {
+                fallback: "Enter your payment details to complete the subscription change",
+              })}
+              {selectedPlan && (
+                <div className="mt-2 font-medium">
+                  {t("billing.selected_plan_price", {
+                    price: formatPriceForLocale(selectedPlanPrice, locale),
+                    fallback: `Price: ${formatPriceForLocale(selectedPlanPrice, locale)}`,
+                  })}
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          {/* Only render payment form if we have a valid client secret */}
+          {clientSecret ? (
+            <PaymentForm
+              onSuccess={handleSubscriptionSuccess}
+              planName={selectedPlanName}
+              planPrice={selectedPlanPrice}
+              clientSecret={clientSecret}
+            />
+          ) : (
+            <div className="p-4 text-center">
+              <Loader2 className="mx-auto mb-2 h-8 w-8 animate-spin" />
+              <p>
+                {t("billing.loading_payment_form", {
+                  fallback: "Loading payment form...",
                 })}
               </p>
             </div>
           )}
-        </CardHeader>
-        <CardContent dir={locale === "ar" ? "rtl" : "ltr"} className="pt-6">
-          <RadioGroup
-            value={selectedPlan}
-            onValueChange={handlePlanChange}
-            className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-          >
-            {displayPlans.map((plan) => {
-              const planColor = planColors[plan.lookup_key] || {
-                bgClass: "bg-gray-100 dark:bg-gray-800",
-                textClass: "text-gray-800 dark:text-gray-200",
-                headerClass: "bg-gray-800 text-white",
-              };
-              const isCurrentPlan = currentPlan.priceId === plan.priceId;
-              const isDisabled =
-                plan.lookup_key === "tanad_free" && currentPlan.lookup_key === "tanad_free";
-
-              // Extract amount and format plan name for display
-              const planName = t(`billing.${plan.lookup_key}`, { fallback: plan.name });
-              const displayPrice = formatPriceForLocale(plan.price, locale);
-
-              return (
-                <div key={plan.priceId} className="flex w-full">
-                  <RadioGroupItem
-                    className="sr-only"
-                    value={plan.priceId}
-                    id={plan.priceId}
-                    disabled={isDisabled}
-                  />
-                  <Label
-                    htmlFor={plan.priceId}
-                    className={cn(
-                      "relative flex h-full w-full cursor-pointer flex-col items-start overflow-hidden rounded-xl border-2 p-0 transition-all",
-                      selectedPlan === plan.priceId
-                        ? "border-primary ring-primary/20 ring-2"
-                        : "border-muted hover:border-muted-foreground/50",
-                      isCurrentPlan && "bg-primary/5",
-                      isDisabled && "cursor-not-allowed opacity-60",
-                    )}
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                  >
-                    {planColor.badge && (
-                      <div
-                        className={cn(
-                          "absolute top-0 z-10 overflow-hidden",
-                          locale === "ar" ? "left-0 rtl:left-0" : "right-0",
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "w-24 translate-x-[30%] translate-y-[-30%] rotate-45 px-2 py-1 text-center text-[10px] font-medium text-white",
-                            planColor.badgeClass || "bg-primary",
-                          )}
-                        >
-                          {t(`billing.badge.${planColor.badge.toLowerCase()}`, {
-                            fallback: planColor.badge,
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className={cn("w-full py-3 text-center", planColor.headerClass)}>
-                      <h3 className="text-xl font-bold">
-                        {t(`billing.${plan.lookup_key}`, { fallback: planName })}
-                      </h3>
-                    </div>
-
-                    <div className={cn("w-full py-3 text-center", planColor.bgClass)}>
-                      <p className={cn("text-2xl font-bold", planColor.textClass)}>
-                        {displayPrice}
-                      </p>
-                    </div>
-
-                    <div className="bg-background w-full flex-1 space-y-4 p-4">
-                      <div className="space-y-3 text-sm">
-                        {plan.features.map((feature, index) => (
-                          <div key={index} className="flex items-start gap-2">
-                            <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
-                            <span>{feature.startsWith("billing.") ? t(feature) : feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mt-auto w-full p-4 pt-0">
-                      <Button
-                        type="button"
-                        variant={selectedPlan === plan.priceId ? "default" : "outline"}
-                        className="w-full"
-                        onClick={() => !isDisabled && setSelectedPlan(plan.priceId)}
-                        disabled={isDisabled}
-                      >
-                        {isCurrentPlan
-                          ? t("billing.current_plan_button", { fallback: "Current Plan" })
-                          : t("billing.select_plan_button", { fallback: "Select Plan" })}
-                      </Button>
-                    </div>
-                  </Label>
-                </div>
-              );
-            })}
-          </RadioGroup>
-        </CardContent>
-        <CardFooter className="flex justify-center pt-6">
-          <Button
-            type="submit"
-            size="lg"
-            className="px-8"
-            disabled={
-              isLoading ||
-              !selectedPlan ||
-              (currentPlan.priceId === selectedPlan && !subscriptionCancelAt)
-            }
-          >
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : currentPlan.priceId === selectedPlan && !subscriptionCancelAt ? (
-              t("billing.current_plan", { fallback: "Current Plan" })
-            ) : (
-              t("billing.update_plan", { fallback: "Update Plan" })
-            )}
-          </Button>
-        </CardFooter>
-      </Card>
-
-      <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>
-              {t("billing.payment_details", { fallback: "Payment Details" })}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <p>
-              {t("billing.payment_dialog_description", {
-                fallback: "Complete your subscription by providing payment details.",
-              })}
-            </p>
-            <Button onClick={handleSubscriptionSuccess} className="mt-4" disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                t("billing.complete_subscription", { fallback: "Complete Subscription" })
-              )}
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
     </form>
