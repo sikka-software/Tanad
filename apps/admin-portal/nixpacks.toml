@@ -6,6 +6,7 @@ nixpkgsArchive = "5d053ff21df2edd995d98d9e5beb62d7302d9249"
 # Add the 'infisical' Nix package.
 # Note: Check the Nixpkgs search (search.nixos.org) if 'infisical' isn't the exact name; sometimes it might be 'infisical-cli'. 'infisical' is the common name currently.
 pkgs = ["infisical"]
+nixPkgs = ["nodejs", "npm"]
 
 # Phase 2: Install - Install language-specific dependencies
 [phases.install]
@@ -14,6 +15,8 @@ pkgs = ["infisical"]
 # and only if that succeeds (due to &&), it runs 'bun install'.
 cmds = [
   "pnpm dlx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN pnpm install",
+  "npm install -g pnpm",
+  "pnpm install",
 ]
 
 # You might also have build and start phases defined here
