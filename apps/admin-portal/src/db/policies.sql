@@ -15,6 +15,10 @@ ALTER TABLE salaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE warehouses ENABLE ROW LEVEL SECURITY;
 
+-- Enable RLS for job listings tables
+ALTER TABLE job_listings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE job_listing_jobs ENABLE ROW LEVEL SECURITY;
+
 -- Drop existing policies before recreating
 DROP POLICY IF EXISTS "Users can read their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can insert their own branches" ON branches;
@@ -87,6 +91,16 @@ DROP POLICY IF EXISTS "Users can read their own warehouses" ON warehouses;
 DROP POLICY IF EXISTS "Users can insert their own warehouses" ON warehouses;
 DROP POLICY IF EXISTS "Users can update their own warehouses" ON warehouses;
 DROP POLICY IF EXISTS "Users can delete their own warehouses" ON warehouses;
+
+DROP POLICY IF EXISTS "Users can view their own job listings and public ones" ON job_listings;
+DROP POLICY IF EXISTS "Users can create job listings" ON job_listings;
+DROP POLICY IF EXISTS "Users can update their own job listings" ON job_listings;
+DROP POLICY IF EXISTS "Users can delete their own job listings" ON job_listings;
+
+DROP POLICY IF EXISTS "Users can view job listing jobs for their listings" ON job_listing_jobs;
+DROP POLICY IF EXISTS "Users can add jobs to their listings" ON job_listing_jobs;
+DROP POLICY IF EXISTS "Users can update jobs in their listings" ON job_listing_jobs;
+DROP POLICY IF EXISTS "Users can remove jobs from their listings" ON job_listing_jobs;
 
 -- Templates policies
 alter table templates enable row level security;
@@ -229,4 +243,73 @@ CREATE POLICY "Users can delete their own vendors" ON vendors FOR DELETE USING (
 CREATE POLICY "Users can read their own warehouses" ON warehouses FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert their own warehouses" ON warehouses FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update their own warehouses" ON warehouses FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can delete their own warehouses" ON warehouses FOR DELETE USING (auth.uid() = user_id); 
+CREATE POLICY "Users can delete their own warehouses" ON warehouses FOR DELETE USING (auth.uid() = user_id);
+
+-- Job Listings Policies
+CREATE POLICY "Users can view their own job listings and public ones"
+ON job_listings
+FOR SELECT
+USING (
+  auth.uid() = user_id OR
+  is_active = true
+);
+
+CREATE POLICY "Users can create job listings"
+ON job_listings
+FOR INSERT
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own job listings"
+ON job_listings
+FOR UPDATE
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own job listings"
+ON job_listings
+FOR DELETE
+USING (auth.uid() = user_id);
+
+-- Job Listing Jobs Policies
+CREATE POLICY "Users can view job listing jobs for their listings"
+ON job_listing_jobs
+FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM job_listings
+    WHERE job_listings.id = job_listing_jobs.job_listing_id
+    AND job_listings.user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "Users can add jobs to their listings"
+ON job_listing_jobs
+FOR INSERT
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM job_listings
+    WHERE job_listings.id = job_listing_jobs.job_listing_id
+    AND job_listings.user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "Users can update jobs in their listings"
+ON job_listing_jobs
+FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM job_listings
+    WHERE job_listings.id = job_listing_jobs.job_listing_id
+    AND job_listings.user_id = auth.uid()
+  )
+);
+
+CREATE POLICY "Users can remove jobs from their listings"
+ON job_listing_jobs
+FOR DELETE
+USING (
+  EXISTS (
+    SELECT 1 FROM job_listings
+    WHERE job_listings.id = job_listing_jobs.job_listing_id
+    AND job_listings.user_id = auth.uid()
+  )
+); 

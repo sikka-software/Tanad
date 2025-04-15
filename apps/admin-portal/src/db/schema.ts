@@ -530,3 +530,36 @@ export const employeeRequests = pgTable(
     createdAtIdx: index("employee_requests_created_at_idx").on(table.createdAt),
   }),
 ).enableRLS();
+
+export const jobListings = pgTable(
+  "job_listings",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    isActive: boolean("is_active").default(true).notNull(),
+    slug: varchar("slug", { length: 255 }).notNull().unique(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("job_listings_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
+    index("job_listings_slug_idx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
+    index("job_listings_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+  ],
+).enableRLS();
+
+export const jobListingJobs = pgTable(
+  "job_listing_jobs",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    jobListingId: uuid("job_listing_id").notNull().references(() => jobListings.id, { onDelete: "cascade" }),
+    jobId: uuid("job_id").notNull().references(() => jobs.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("job_listing_jobs_job_listing_id_idx").using("btree", table.jobListingId.asc().nullsLast().op("uuid_ops")),
+    index("job_listing_jobs_job_id_idx").using("btree", table.jobId.asc().nullsLast().op("uuid_ops")),
+  ],
+).enableRLS();
