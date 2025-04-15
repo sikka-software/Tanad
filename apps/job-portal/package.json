@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "infisical run --env=dev -- next dev --turbopack --port 3038",
-    "build": "infisical run --env=prod -- next build",
+    "dev": "next dev --turbopack --port 3038",
+    "build": "next build",
     "start": "next start --port 3038",
     "lint": "next lint"
   },
