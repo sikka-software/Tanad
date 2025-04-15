@@ -26,7 +26,7 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
     if (columnId === "department") {
       // When editing department, we need to update the departmentId
       const departmentId = value as string;
-      await updateEmployee(rowId, { departmentId });
+      await updateEmployee(rowId, { department_id: departmentId });
     } else {
       await updateEmployee(rowId, { [columnId]: value });
     }
@@ -61,6 +61,7 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
     {
       accessorKey: "department",
       header: t("Employees.form.department.label"),
+      cellType: "select",
       validationSchema: departmentSchema,
     },
   ];
@@ -75,7 +76,15 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+  return (
+    <SheetTable
+      columns={columns}
+      // disabledColumns={["department"]}
+      data={data}
+      onEdit={handleEdit}
+      showHeader={true}
+    />
+  );
 };
 
 interface EmployeesTableProps {

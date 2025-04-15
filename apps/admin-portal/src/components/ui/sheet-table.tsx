@@ -33,6 +33,13 @@ import {
 import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
 import type { ZodType, ZodTypeDef } from "zod";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 // ** import ui components
 import {
   Table,
@@ -64,6 +71,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 > & {
   id?: string;
   accessorKey?: string;
+  cellType?: "text" | "select";
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
   style?: React.CSSProperties; // style for inline styles
@@ -725,6 +733,35 @@ function SheetTable<
               );
             }
 
+            // if cell type is select, show a select element
+            if (colDef.cellType === "select") {
+              return (
+                <Select>
+                  <TableCell
+                    key={cell.id}
+                    className={cn(
+                      "relative border p-0",
+                      {
+                        "bg-muted": isDisabled,
+                        "bg-destructive/25": errorMsg,
+                      },
+                      typeof colDef.className === "function"
+                        ? colDef.className(rowData)
+                        : colDef.className,
+                    )}
+                  >
+                    <SelectTrigger>
+                      <SelectValue>{cellContent}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                    </SelectContent>
+                  </TableCell>
+                </Select>
+              );
+            }
             return (
               <TableCell
                 key={cell.id}
