@@ -240,9 +240,9 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
         {
           title: "Job Listing",
           translationKey: "JobListing.title",
-          url: "/job-listing",
-          action: "/job-listing/add",
-          isActive: pathname === "/job-listing",
+          url: "/jobs/listings",
+          action: "/jobs/listings/add",
+          isActive: pathname === "/jobs/listings",
         },
         {
           title: "Jobs",

@@ -1,0 +1,90 @@
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { useTranslations } from "next-intl";
+import { Building2, MapPin, Calendar, DollarSign } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useJobs } from "@/hooks/useJobs";
+import { Job } from "@/types/job.type";
+import { JobListing } from "@/types/job-listing.type";
+
+export default function JobListingPublicPage() {
+  const t = useTranslations("Jobs");
+  const router = useRouter();
+  const { slug } = router.query;
+  const { data: jobs } = useJobs();
+  const [listing, setListing] = useState<JobListing | null>(null); // TODO: Replace with API call
+  const [listingJobs, setListingJobs] = useState<Job[]>([]);
+
+  useEffect(() => {
+    if (slug && jobs) {
+      // TODO: Fetch job listing by slug
+      // For now, we'll just show all jobs
+      setListingJobs(jobs);
+    }
+  }, [slug, jobs]);
+
+  const handleApply = (jobId: string) => {
+    router.push(`/jobs/${jobId}/apply`);
+  };
+
+  return (
+    <div className="container mx-auto py-8">
+      {listing && (
+        <div className="mb-8">
+          <h1 className="mb-2 text-3xl font-bold">{listing.title}</h1>
+          {listing.description && (
+            <p className="text-lg text-gray-600">{listing.description}</p>
+          )}
+        </div>
+      )}
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {listingJobs.map((job: Job) => (
+          <Card key={job.id} className="transition-shadow hover:shadow-lg">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">{job.title}</h3>
+                  <p className="text-sm text-gray-500">{job.type}</p>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                {job.department && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Building2 className="h-4 w-4" />
+                    <span>{job.department}</span>
+                  </div>
+                )}
+                {job.location && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{job.location}</span>
+                  </div>
+                )}
+                {job.salary && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <DollarSign className="h-4 w-4" />
+                    <span>{job.salary}</span>
+                  </div>
+                )}
+              </div>
+              {job.description && (
+                <p className="text-sm text-gray-600">{job.description}</p>
+              )}
+              <Button
+                className="w-full"
+                onClick={() => handleApply(job.id)}
+              >
+                {t("Apply Now")}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+} 
