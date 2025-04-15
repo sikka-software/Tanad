@@ -3,6 +3,8 @@ FROM ghcr.io/railwayapp/nixpacks:ubuntu-1742861060
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
 WORKDIR /app/
 
+# Install pnpm
+RUN npm install -g pnpm
 
 COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
 RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
