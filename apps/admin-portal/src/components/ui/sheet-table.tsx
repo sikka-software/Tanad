@@ -938,7 +938,7 @@ function SheetTable<
             </TableRow>
           </TableHeader>
         )}
-        {/* Optional second header */}{" "}
+        {/* Optional second header */}
         {showSecondHeader && secondHeaderTitle && (
           <TableRow>
             {/* Right icon cells empty headers */}
@@ -997,7 +997,7 @@ function SheetTable<
                 </TableRow>
               )}
               {/* For each top-level row in this group, find the actual row in table.
-                  Then recursively render it with renderRow() */}{" "}
+                  Then recursively render it with renderRow() */}
               {topRows.map((rowData) => {
                 const row = table.getRowModel().flatRows.find((r) => r.original === rowData);
                 if (!row) return null;

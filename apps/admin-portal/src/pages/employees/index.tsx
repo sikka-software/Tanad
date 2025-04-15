@@ -3,12 +3,10 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
-import { format } from "date-fns";
 import { Building2, Mail, Phone } from "lucide-react";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import EmployeesTable from "@/components/tables/employees-table";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
@@ -27,8 +25,8 @@ export default function EmployeesPage() {
 
         const searchLower = searchQuery.toLowerCase();
         return (
-          employee.firstName?.toLowerCase().includes(searchLower) ||
-          employee.lastName?.toLowerCase().includes(searchLower) ||
+          employee.first_name?.toLowerCase().includes(searchLower) ||
+          employee.last_name?.toLowerCase().includes(searchLower) ||
           employee.email?.toLowerCase().includes(searchLower) ||
           employee.position?.toLowerCase().includes(searchLower) ||
           employee.department?.toLowerCase()?.includes(searchLower)
@@ -38,14 +36,14 @@ export default function EmployeesPage() {
 
   const renderEmployee = (employee: Employee) => {
     if (!employee) return null;
-
+    console.log(employee);
     return (
       <Card key={employee.id} className="transition-shadow hover:shadow-lg">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
               <h3 className="text-lg font-semibold">
-                {employee.firstName} {employee.lastName}
+                {employee.first_name} {employee.last_name}
               </h3>
               <p className="text-sm text-gray-500">{employee.position}</p>
             </div>
