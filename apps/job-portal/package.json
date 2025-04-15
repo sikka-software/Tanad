@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack --port 3038",
-    "build": "next build",
+    "dev": "infisical run -- next dev --turbopack --port 3038",
+    "build": "infisical run -- next build",
     "start": "next start --port 3038",
     "lint": "next lint"
   },
@@ -15,6 +15,7 @@
     "@radix-ui/react-select": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.0",
     "@radix-ui/react-tabs": "^1.1.4",
+    "@supabase/supabase-js": "^2.49.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.488.0",
