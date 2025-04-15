@@ -43,12 +43,16 @@ export default function AddJobPage() {
         [...(Array.isArray(previousJobs) ? previousJobs : []), newJob],
       );
 
-      toast.success(t("Jobs.messages.job_created"));
+      toast.success(t("General.successful_operation"), {
+        description: t("Jobs.messages.job_created"),
+      });
       // Now we can navigate without the refresh parameter
       router.push("/jobs");
     } catch (error: any) {
       console.error("Error creating job:", error);
-      toast.error(error.message || t("Jobs.messages.error"));
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Jobs.messages.error"),
+      });
     } finally {
       setLoading(false);
     }

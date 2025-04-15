@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,22 +53,22 @@ const defaultTemplate = {
   company: {
     name: "",
     address: "",
-    contact: ""
+    contact: "",
   },
   client: {
     name: "",
     address: "",
-    contact: ""
+    contact: "",
   },
   items: [
     {
       description: "",
       quantity: 1,
-      price: 0
-    }
+      price: 0,
+    },
   ],
   notes: "",
-  terms: ""
+  terms: "",
 };
 
 interface Template {
@@ -97,6 +98,7 @@ export default function TemplatesPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const user = useUserStore((state) => state.user);
   const router = useRouter();
+  const t = useTranslations();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -173,7 +175,9 @@ export default function TemplatesPage() {
         throw new Error(data.details || data.error || "Failed to create template");
       }
 
-      toast.success("Template created successfully");
+      toast.success(t("General.successful_operation"), {
+        description: t("Templates.success.created"),
+      });
       setOpen(false);
       form.reset({
         name: "",
@@ -206,10 +210,14 @@ export default function TemplatesPage() {
         throw new Error("Failed to update template");
       }
 
-      toast.success("Template updated successfully");
+      toast.success(t("General.successful_operation"), {
+        description: t("Templates.success.updated"),
+      });
       fetchTemplates();
     } catch (error) {
-      toast.error("Failed to update template");
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : "Failed to update template",
+      });
     }
   };
 

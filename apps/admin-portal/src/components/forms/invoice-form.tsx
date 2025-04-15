@@ -223,7 +223,9 @@ export function InvoiceForm({
       setClients(data || []);
 
       // Show success message
-      toast.success(t("client_added"));
+      toast.success(t("General.successful_operation"), {
+        description: t("client_added"),
+      });
     } catch (error) {
       console.error("Error refreshing clients:", error);
     }

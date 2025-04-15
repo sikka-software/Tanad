@@ -69,14 +69,14 @@ export default function AddOfficePage() {
         [...(Array.isArray(previousOffices) ? previousOffices : []), newOffice],
       );
 
-      toast.success(t("Offices.success.title"), {
+      toast.success(t("General.successful_operation"), {
         description: t("Offices.success.created"),
       });
 
       router.push("/offices");
     } catch (error) {
-      toast.error(t("Offices.error.title"), {
-        description: error instanceof Error ? error.message : t("Offices.error.create"),
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Offices.error.creating"),
       });
     } finally {
       setLoading(false);

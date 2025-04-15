@@ -71,13 +71,13 @@ export default function AddClientPage() {
         [...(Array.isArray(previousClients) ? previousClients : []), newClient],
       );
 
-      toast.success(t("Clients.success.title"), {
+      toast.success(t("General.successful_operation"), {
         description: t("Clients.success.created"),
       });
 
       router.push("/clients");
     } catch (error) {
-      toast.error(t("Clients.error.title"), {
+      toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Clients.error.create"),
       });
     } finally {

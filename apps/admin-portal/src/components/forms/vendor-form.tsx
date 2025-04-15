@@ -9,15 +9,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { CompanyForm, type CompanyFormValues } from "@/components/forms/company-form";
-import { Button } from "@/components/ui/button";
 import { ComboboxAdd } from "@/components/ui/combobox-add";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -26,13 +18,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useCompanies } from "@/hooks/useCompanies";
 import { supabase } from "@/lib/supabase";
 import { fetchVendorById } from "@/services/vendorService";
-
-import { FormDialog } from "../ui/form-dialog";
 
 export const createVendorSchema = (t: (key: string) => string) =>
   z.object({
@@ -118,7 +109,7 @@ export function VendorForm({
         })
         .catch((error) => {
           console.error("Failed to fetch vendor:", error);
-          toast.error(t("error.title"), {
+          toast.error(t("General.error_operation"), {
             description: t("Vendors.messages.error_fetch"),
           });
         })
@@ -166,10 +157,14 @@ export function VendorForm({
       setIsCompanyDialogOpen(false);
 
       // Show success message
-      toast.success(t("Companies.success.created"));
+      toast.success(t("General.successful_operation"), {
+        description: t("Companies.success.created"),
+      });
     } catch (error) {
       console.error("Error creating company:", error);
-      toast.error(t("Companies.error.create"));
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Companies.error.create"),
+      });
     }
   };
 

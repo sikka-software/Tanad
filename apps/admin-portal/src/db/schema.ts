@@ -593,20 +593,10 @@ export const offices = pgTable(
     phone: text(),
     email: text(),
     isActive: boolean().default(true).notNull(),
-    companyId: uuid("company_id").notNull(),
     userId: uuid("user_id").notNull(),
   },
   (table) => [
     index("offices_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("offices_company_id_idx").using(
-      "btree",
-      table.companyId.asc().nullsLast().op("uuid_ops"),
-    ),
     index("offices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.companyId],
-      foreignColumns: [companies.id],
-      name: "offices_company_id_fkey",
-    }).onDelete("cascade"),
   ],
 ).enableRLS();

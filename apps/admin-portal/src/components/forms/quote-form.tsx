@@ -250,10 +250,12 @@ export function QuoteForm({
     try {
       const { data: newClient, error } = await supabase
         .from("clients")
-        .insert([{
-          ...data,
-          user_id: userId,
-        }])
+        .insert([
+          {
+            ...data,
+            user_id: userId,
+          },
+        ])
         .select("*")
         .single();
 
@@ -301,14 +303,17 @@ export function QuoteForm({
 
         if (error) throw error;
 
-        toast.success(
-          id ? t("Quotes.quote_updated_successfully") : t("Quotes.quote_created_successfully"),
-        );
+        toast.success(t("General.successful_operation"), {
+          description: id ? t("Quotes.success.updated") : t("Quotes.success.created"),
+        });
         router.push("/quotes");
       }
     } catch (error) {
       console.error(error);
-      toast.error(t("Quotes.error.something_went_wrong"));
+      toast.error(t("General.error_operation"), {
+        description:
+          error instanceof Error ? error.message : t("Quotes.error.something_went_wrong"),
+      });
     } finally {
       setIsLoading(false);
     }

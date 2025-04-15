@@ -177,12 +177,12 @@ export function BranchForm({
       if (branchId) {
         const { user_id, ...updateData } = branchData;
         result = await updateBranch(branchId, updateData);
-        toast.success(t("success.title"), {
+        toast.success(t("General.successful_operation"), {
           description: t("Branches.messages.success_updated"),
         });
       } else {
         result = await createBranch(branchData as unknown as BranchCreateData);
-        toast.success(t("success.title"), {
+        toast.success(t("General.successful_operation"), {
           description: t("Branches.messages.success_created"),
         });
       }
@@ -194,7 +194,7 @@ export function BranchForm({
       }
     } catch (error) {
       console.error("Failed to save branch:", error);
-      toast.error(t("error.title"), {
+      toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Branches.messages.error_save"),
       });
     } finally {

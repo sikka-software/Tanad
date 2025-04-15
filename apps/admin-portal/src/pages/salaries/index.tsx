@@ -1,7 +1,8 @@
+import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
 
 import { User, CalendarDays, CircleDollarSign, ReceiptText, NotebookText } from "lucide-react";
 import { toast } from "sonner";
@@ -33,7 +34,7 @@ const formatCurrency = (amount: number | null | undefined) => {
 };
 
 export default function SalariesPage() {
-  const t = useTranslations("Salaries");
+  const t = useTranslations();
   const router = useRouter();
   const { data: salaries, isLoading, error } = useSalaries();
   const deleteSalaryMutation = useDeleteSalary();
@@ -47,16 +48,16 @@ export default function SalariesPage() {
   );
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t("confirm_delete"))) {
+    if (window.confirm(t("General.confirm_delete"))) {
       deleteSalaryMutation.mutate(id, {
         onSuccess: () => {
-          toast.success(t("success.title"), {
-            description: t("messages.success_deleted"),
+          toast.success(t("General.successful_operation"), {
+            description: t("Salaries.messages.success_deleted"),
           });
         },
         onError: (err) => {
-          toast.error(t("error.title"), {
-            description: err instanceof Error ? err.message : t("messages.error_delete"),
+          toast.error(t("General.error_operation"), {
+            description: err instanceof Error ? err.message : t("Salaries.messages.error_delete"),
           });
         },
       });
@@ -74,7 +75,7 @@ export default function SalariesPage() {
             e.stopPropagation();
             router.push(`/salaries/${salary.id}/edit`);
           }}
-          aria-label={t("edit_salary")}
+          aria-label={t("Salaries.edit_salary")}
         >
           Edit
         </Button>
@@ -86,7 +87,7 @@ export default function SalariesPage() {
             handleDelete(salary.id);
           }}
           disabled={deleteSalaryMutation.isPending}
-          aria-label={t("delete_salary")}
+          aria-label={t("Salaries.delete_salary")}
         >
           {deleteSalaryMutation.isPending ? "..." : "Del"}
         </Button>
@@ -131,11 +132,11 @@ export default function SalariesPage() {
   return (
     <DataPageLayout>
       <PageSearchAndFilter
-        title={t("title")}
+        title={t("Salaries.title")}
         createHref="/salaries/add"
-        createLabel={t("create_salary")}
+        createLabel={t("Salaries.create_salary")}
         onSearch={setSearchQuery}
-        searchPlaceholder={t("search_salaries")}
+        searchPlaceholder={t("Salaries.search_salaries")}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
       />
@@ -152,7 +153,7 @@ export default function SalariesPage() {
               data={filteredSalaries || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("no_salaries_found")}
+              emptyMessage={t("Salaries.no_salaries_found")}
               renderItem={renderSalary}
               gridCols="3"
             />

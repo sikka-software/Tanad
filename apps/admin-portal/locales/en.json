@@ -27,6 +27,8 @@
     "soon": "Coming Soon",
     "active": "Active",
     "inactive": "Inactive",
+    "successful_operation": "Successful Operation",
+    "error_operation": "Error Operation",
     "languages": {
       "label": "Change Language",
       "ar": "العربية",
@@ -2352,6 +2354,16 @@
       "updated": "Office updated successfully",
       "deleted": "Office deleted successfully",
       "error": "An error occurred while processing your request"
+    },
+    "success": {
+      "created": "Office created successfully",
+      "updated": "Office updated successfully",
+      "deleted": "Office deleted successfully"
+    },
+    "error": {
+      "creating": "An error occurred while creating the office",
+      "updating": "An error occurred while updating the office",
+      "deleting": "An error occurred while deleting the office"
     }
   }
 }

@@ -76,14 +76,14 @@ export default function AddInvoicePage() {
 
       if (itemsError) throw itemsError;
 
-      toast.success(t("Invoices.success.title"), {
+      toast.success(t("General.successful_operation"), {
         description: t("Invoices.success.created"),
       });
 
       router.push("/invoices");
     } catch (error) {
       console.error(error);
-      toast.error(t("Invoices.error.title"), {
+      toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Invoices.error.create"),
       });
     } finally {

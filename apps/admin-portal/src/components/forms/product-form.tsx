@@ -79,7 +79,7 @@ export function ProductForm({
 
   const onSubmit = async (data: ProductFormValues) => {
     if (!userId) {
-      toast.error(t("Products.error.title"), {
+      toast.error(t("General.error_operation"), {
         description: t("Products.error.not_authenticated"),
       });
       return;
@@ -110,13 +110,13 @@ export function ProductForm({
 
       const result = await response.json();
 
-      toast.success(t("Products.success.title"), {
+      toast.success(t("General.successful_operation"), {
         description: t("Products.success.created"),
       });
 
       onSuccess(result.product);
     } catch (error) {
-      toast.error(t("Products.error.title"), {
+      toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Products.error.create"),
       });
     } finally {

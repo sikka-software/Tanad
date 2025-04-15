@@ -126,7 +126,7 @@ export function WarehouseForm({
         })
         .catch((error) => {
           console.error("Failed to fetch warehouse:", error);
-          toast.error(t("error.title"), {
+          toast.error(t("General.error_operation"), {
             description: t("Warehouses.messages.error_fetch"),
           });
         })
@@ -139,8 +139,8 @@ export function WarehouseForm({
   const onSubmit: SubmitHandler<WarehouseFormValues> = async (data) => {
     setInternalLoading(true);
     if (!userId) {
-      toast.error(t("error.title"), {
-        description: t("error.not_authenticated"),
+      toast.error(t("General.error_operation"), {
+        description: t("General.not_authenticated"),
       });
       setInternalLoading(false);
       return;
@@ -162,7 +162,7 @@ export function WarehouseForm({
       let result: Warehouse;
       if (warehouseId) {
         result = await updateWarehouse(warehouseId, warehouseData);
-        toast.success(t("success.title"), {
+        toast.success(t("General.successful_operation"), {
           description: t("Warehouses.messages.success_updated"),
         });
       } else {
@@ -171,7 +171,7 @@ export function WarehouseForm({
           userId: userId,
         };
         result = await createWarehouse(warehouseCreateData as unknown as WarehouseCreateData);
-        toast.success(t("success.title"), {
+        toast.success(t("General.successful_operation"), {
           description: t("Warehouses.messages.success_created"),
         });
       }
@@ -183,7 +183,7 @@ export function WarehouseForm({
       }
     } catch (error) {
       console.error("Failed to save warehouse:", error);
-      toast.error(t("error.title"), {
+      toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Warehouses.messages.error_save"),
       });
     } finally {

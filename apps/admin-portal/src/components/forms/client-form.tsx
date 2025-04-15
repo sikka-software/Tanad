@@ -129,10 +129,14 @@ export function ClientForm({
       setIsCompanyDialogOpen(false);
 
       // Show success message
-      toast.success(t("Companies.success.created"));
+      toast.success(t("General.successful_operation"), {
+        description: t("Companies.success.created"),
+      });
     } catch (error) {
       console.error("Error creating company:", error);
-      toast.error(t("Companies.error.create"));
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Companies.error.create"),
+      });
     }
   };
 

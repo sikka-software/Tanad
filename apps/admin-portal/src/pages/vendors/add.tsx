@@ -61,13 +61,13 @@ export default function AddVendorPage() {
       };
 
       await createVendorMutation.mutateAsync(vendorData);
-      toast.success(t("success.title"), {
+      toast.success(t("General.successful_operation"), {
         description: t("Vendors.messages.success_created"),
       });
       router.push("/vendors");
     } catch (error) {
       console.error("Failed to save vendor:", error);
-      toast.error(t("error.title"), {
+      toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Vendors.messages.error_save"),
       });
     }

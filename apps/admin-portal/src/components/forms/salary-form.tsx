@@ -163,7 +163,7 @@ export function SalaryForm({
         });
         if (!response.ok) throw new Error("Failed to update salary");
         result = await response.json();
-        toast.success(t("Salaries.success.title"), {
+        toast.success(t("General.successful_operation"), {
           description: t("Salaries.messages.success_updated"),
         });
       } else {
@@ -174,7 +174,7 @@ export function SalaryForm({
         });
         if (!response.ok) throw new Error("Failed to create salary");
         result = await response.json();
-        toast.success(t("Salaries.success.title"), {
+        toast.success(t("General.successful_operation"), {
           description: t("Salaries.messages.success_created"),
         });
       }

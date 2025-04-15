@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { useRouter } from "next/router";
+
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
+
 import { toast } from "sonner";
 
 import { JobListingForm, type JobListingFormValues } from "@/components/forms/job-listing-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { useJobListings } from "@/hooks/useJobListings";
 import useUserStore from "@/hooks/use-user-store";
+import { useJobListings } from "@/hooks/useJobListings";
 
 export default function AddJobListingPage() {
   const t = useTranslations();
@@ -30,11 +32,15 @@ export default function AddJobListingPage() {
         userId: user.id,
       });
 
-      toast.success(t("Jobs.messages.listing_created"));
+      toast.success(t("General.successful_operation"), {
+        description: t("Jobs.messages.listing_created"),
+      });
       router.push("/jobs/listings");
     } catch (error: any) {
       console.error("Error creating job listing:", error);
-      toast.error(error.message || t("Jobs.messages.error"));
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Jobs.messages.error"),
+      });
     } finally {
       setLoading(false);
     }
