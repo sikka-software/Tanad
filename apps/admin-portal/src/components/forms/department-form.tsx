@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import * as z from "zod";
 
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -20,11 +18,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import { Textarea } from "@/components/ui/textarea";
+import useUserStore from "@/hooks/use-user-store";
 import { useBranches } from "@/hooks/useBranches";
 import { useOffices } from "@/hooks/useOffices";
 import { useWarehouses } from "@/hooks/useWarehouses";
-import { cn } from "@/lib/utils";
-import { Department } from "@/types/department.type";
 
 export const createDepartmentSchema = (t: (key: string) => string) =>
   z.object({
@@ -46,14 +43,13 @@ export default function DepartmentForm({
   id,
   onSubmit,
   loading = false,
-
   defaultValues,
 }: DepartmentFormProps) {
   const t = useTranslations();
-  const router = useRouter();
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
+  const { user } = useUserStore();
   const locale = useLocale();
   const [locationOptions, setLocationOptions] = useState<MultiSelectOption[]>([]);
 
@@ -119,13 +115,9 @@ export default function DepartmentForm({
     );
   };
 
-  const handleCancel = () => {
-    router.back();
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
           name="name"
@@ -177,15 +169,6 @@ export default function DepartmentForm({
             </FormItem>
           )}
         />
-
-        <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={handleCancel}>
-            {t("General.cancel")}
-          </Button>
-          <Button type="submit" disabled={loading}>
-            {defaultValues ? t("General.save") : t("General.create")}
-          </Button>
-        </div>
       </form>
     </Form>
   );

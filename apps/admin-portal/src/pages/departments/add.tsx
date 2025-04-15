@@ -8,7 +8,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import DepartmentForm, { type DepartmentFormValues } from "@/components/forms/department-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
@@ -124,20 +125,10 @@ export default function AddDepartmentPage() {
       <div className="p-4">
         <Card className="mx-auto max-w-2xl">
           <CardHeader className="relative">
-            {/* {process.env.NODE_ENV === "development" && (
-              <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
-                Dummy Data
-              </Button>
-            )} */}
             <CardTitle>{t("Departments.department_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <DepartmentForm
-              id="department-form"
-              userId={userId}
-              onSubmit={handleSubmit}
-              loading={loading}
-            />
+            <DepartmentForm id="department-form" onSubmit={handleSubmit} loading={loading} />
           </CardContent>
         </Card>
       </div>
