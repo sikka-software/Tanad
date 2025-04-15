@@ -38,7 +38,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: apps/admin-portal
           file: apps/admin-portal/.nixpacks/Dockerfile
           push: true
           tags: ghcr.io/sikka-software/tanad:admin
