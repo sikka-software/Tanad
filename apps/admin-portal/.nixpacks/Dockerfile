@@ -3,6 +3,8 @@ FROM ghcr.io/railwayapp/nixpacks:ubuntu-1742861060
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
 WORKDIR /app/
 
+# Install pnpm
+RUN npm install -g pnpm
 
 COPY .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix
 RUN nix-env -if .nixpacks/nixpkgs-ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7.nix && nix-collect-garbage -d
@@ -18,8 +20,6 @@ ENV CI=$CI NIXPACKS_METADATA=$NIXPACKS_METADATA NODE_ENV=$NODE_ENV NPM_CONFIG_PR
 ENV NIXPACKS_PATH=/app/node_modules/.bin:$NIXPACKS_PATH
 COPY . /app/.
 RUN --mount=type=cache,id=2wDbdj5cMQQ-/root/npm,target=/root/.npm pnpm dlx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN pnpm install
-RUN --mount=type=cache,id=2wDbdj5cMQQ-/root/npm,target=/root/.npm npm install -g pnpm
-RUN --mount=type=cache,id=2wDbdj5cMQQ-/root/npm,target=/root/.npm pnpm install
 
 # build phase
 COPY . /app/.
