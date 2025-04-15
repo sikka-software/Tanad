@@ -3,16 +3,21 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
-import { departments } from "@/db/schema";
+import { departmentLocations, departments } from "@/db/schema";
 import { Department } from "@/types/department.type";
 
-function convertDrizzleDepartment(data: typeof departments.$inferSelect): Department {
+function convertDrizzleDepartment(
+  data: typeof departments.$inferSelect & {
+    locations?: (typeof departmentLocations.$inferSelect)[];
+  },
+): Department {
   return {
     id: data.id,
     name: data.name,
     description: data.description || "",
-    locations: data.locations || [],
-    created_at: data.createdAt?.toString() || "",
+    locations: data.locations?.map((l) => l.locationId) || [],
+    createdAt: data.createdAt?.toString() || "",
+    userId: data.userId,
   };
 }
 
@@ -23,6 +28,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const department = await db.query.departments.findFirst({
         where: eq(departments.id, id as string),
+        with: {
+          locations: true,
+        },
       });
 
       if (!department) {

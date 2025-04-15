@@ -4,6 +4,7 @@ export type Department = {
   description: string | null;
   createdAt: string;
   userId: string;
+  locations: string[];
 };
 
 export type DepartmentLocation = {
