@@ -61,8 +61,12 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
     {
       accessorKey: "department",
       header: t("Employees.form.department.label"),
-      cellType: "select",
       validationSchema: departmentSchema,
+      cellType: "select",
+      options: departments?.map((department) => ({
+        label: department.name,
+        value: department.id,
+      })),
     },
   ];
 

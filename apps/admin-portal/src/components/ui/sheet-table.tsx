@@ -72,6 +72,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   id?: string;
   accessorKey?: string;
   cellType?: "text" | "select";
+  options?: Array<{ label: string; value: string | number }>;
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
   style?: React.CSSProperties; // style for inline styles
@@ -734,32 +735,47 @@ function SheetTable<
             }
 
             // if cell type is select, show a select element
-            if (colDef.cellType === "select") {
+            if (colDef.cellType === "select" && colDef.options) {
               return (
-                <Select>
-                  <TableCell
-                    key={cell.id}
-                    className={cn(
-                      "relative border p-0",
-                      {
-                        "bg-muted": isDisabled,
-                        "bg-destructive/25": errorMsg,
-                      },
-                      typeof colDef.className === "function"
-                        ? colDef.className(rowData)
-                        : colDef.className,
-                    )}
-                  >
-                    <SelectTrigger>
+                <TableCell
+                  key={cell.id}
+                  className={cn(
+                    "relative border p-0",
+                    {
+                      "bg-muted": isDisabled,
+                      "bg-destructive/25": errorMsg,
+                    },
+                    typeof colDef.className === "function"
+                      ? colDef.className(rowData)
+                      : colDef.className,
+                  )}
+                >
+                  <Select>
+                    <SelectTrigger
+                      defaultStyles={false}
+                      className={cn(
+                        "focus:ring-none blur:outline-none relative border-none ring-0 outline-0 focus:ring-offset-0 focus:outline-none", // 'relative' for absolute icons if you prefer
+                        {
+                          "bg-muted": isDisabled,
+                          "bg-destructive/25": errorMsg,
+                        },
+                        typeof colDef.className === "function"
+                          ? colDef.className(rowData)
+                          : colDef.className,
+                      )}
+                      hideIcon={true}
+                    >
                       <SelectValue>{cellContent}</SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="1">1</SelectItem>
-                      <SelectItem value="2">2</SelectItem>
-                      <SelectItem value="3">3</SelectItem>
+                      {colDef.options.map((option) => (
+                        <SelectItem key={option.value} value={String(option.value)}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
-                  </TableCell>
-                </Select>
+                  </Select>
+                </TableCell>
               );
             }
             return (
