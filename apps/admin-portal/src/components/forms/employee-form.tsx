@@ -59,6 +59,7 @@ export type EmployeeFormValues = z.infer<ReturnType<typeof createEmployeeFormSch
 export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: EmployeeFormProps) {
   const t = useTranslations();
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
+  const [isDepartmentSaving, setIsDepartmentSaving] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
   const { user } = useUserStore();
   const locale = useLocale();
@@ -88,6 +89,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
     })) || [];
 
   const handleDepartmentSubmit = async (data: DepartmentFormValues) => {
+    setIsDepartmentSaving(true);
     try {
       // Check if user ID is available
       if (!user?.id) {
@@ -151,6 +153,8 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Departments.error.create"),
       });
+    } finally {
+      setIsDepartmentSaving(false);
     }
   };
 
@@ -351,7 +355,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
         formId="department-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
-        // loadingSave={}
+        loadingSave={isDepartmentSaving}
       >
         <DepartmentForm id="department-form" onSubmit={handleDepartmentSubmit} />
       </FormDialog>
