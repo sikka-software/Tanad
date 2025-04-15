@@ -22,7 +22,7 @@ export default function JobCard({
     <Card className="h-full flex flex-col hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
+          <h3 className="text-lg font-semibold text-foreground">{job.title}</h3>
           <Badge variant={job.type === "Full-time" ? "default" : "outline"}>
             {job.type}
           </Badge>

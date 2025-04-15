@@ -9,7 +9,7 @@ const Navbar = () => {
       <div className="flex h-16 items-center px-4">
         <div className="flex items-center space-x-4">
           <Link href="/" className="text-xl font-bold">
-            Job Portal
+            Company Logo
           </Link>
           <div className="hidden md:flex space-x-6">
             <Link
@@ -33,11 +33,12 @@ const Navbar = () => {
           </div>
         </div>
         <div className="ml-auto flex items-center space-x-4">
+          {/* Soon inshallah */}
           <Link
-            href="/post-job"
+            href=""
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
-            Post a Job
+            Login
           </Link>
           <ThemeSwitcher />
         </div>
