@@ -65,13 +65,13 @@ const useUserStore = create<UserState>()(
 
         // If already initialized and we have both user and profile, return early
         if (currentState.initialized && currentState.user && currentState.profile) {
-          console.log(
-            "[UserStore] Already fully initialized with user and profile, skipping fetch",
-          );
+          // console.log(
+          //   "[UserStore] Already fully initialized with user and profile, skipping fetch",
+          // );
           return;
         }
 
-        console.log("[UserStore] Starting fetch");
+        // console.log("[UserStore] Starting fetch");
         set({ loading: true });
 
         try {
@@ -84,10 +84,10 @@ const useUserStore = create<UserState>()(
             throw sessionError;
           }
 
-          console.log("[UserStore] Session check result:", {
-            hasSession: !!session,
-            userId: session?.user?.id,
-          });
+          // console.log("[UserStore] Session check result:", {
+          //   hasSession: !!session,
+          //   userId: session?.user?.id,
+          // });
 
           if (session?.user) {
             set({ user: session.user, isAuthenticated: true });
@@ -104,14 +104,14 @@ const useUserStore = create<UserState>()(
                 throw profileError;
               }
 
-              console.log("[UserStore] Profile fetched successfully:", profile?.id);
+              // console.log("[UserStore] Profile fetched successfully:", profile?.id);
               set({ profile, loading: false, initialized: true });
             } catch (error) {
               console.error("[UserStore] Error fetching profile:", error);
               set({ loading: false, initialized: true });
             }
           } else {
-            console.log("[UserStore] No session found, clearing state");
+            // console.log("[UserStore] No session found, clearing state");
             set({
               user: null,
               profile: null,
@@ -149,7 +149,7 @@ const useUserStore = create<UserState>()(
 
           if (error) throw error;
 
-          console.log("[UserStore] Profile refreshed:", profile?.id);
+          // console.log("[UserStore] Profile refreshed:", profile?.id);
           set({ profile, loading: false });
         } catch (error) {
           console.error("[UserStore] Error refreshing profile:", error);
@@ -160,7 +160,7 @@ const useUserStore = create<UserState>()(
       signOut: async () => {
         try {
           await supabase.auth.signOut();
-          console.log("[UserStore] Sign out successful");
+          // console.log("[UserStore] Sign out successful");
           set({
             user: null,
             profile: null,
@@ -203,7 +203,7 @@ const useUserStore = create<UserState>()(
 
 // Set up auth state change listener
 supabase.auth.onAuthStateChange(async (event, session) => {
-  console.log("[UserStore] Auth state changed:", { event, userId: session?.user?.id });
+  // console.log("[UserStore] Auth state changed:", { event, userId: session?.user?.id });
   const store = useUserStore.getState();
 
   if (event === "SIGNED_IN" && session?.user) {
@@ -222,7 +222,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 
         if (error) throw error;
 
-        console.log("[UserStore] Profile fetched on auth change:", profile?.id);
+        // console.log("[UserStore] Profile fetched on auth change:", profile?.id);
         store.setProfile(profile);
       } catch (error) {
         console.error("[UserStore] Error fetching profile on auth change:", error);

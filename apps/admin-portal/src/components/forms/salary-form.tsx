@@ -213,8 +213,8 @@ export function SalaryForm({
               <FormControl>
                 <Combobox
                   data={employees.map((emp) => ({
-                    label: `${emp.firstName} ${emp.lastName}`,
-                    value: `${emp.firstName} ${emp.lastName}`,
+                    label: `${emp.first_name} ${emp.last_name}`,
+                    value: `${emp.first_name} ${emp.last_name}`,
                   }))}
                   labelKey="label"
                   valueKey="value"
