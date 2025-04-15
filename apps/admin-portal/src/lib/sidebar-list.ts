@@ -16,6 +16,8 @@ import {
   Settings2,
   BookOpen,
   Bot,
+  Pin,
+  MapPin,
 } from "lucide-react";
 
 export type SidebarMenuGroupProps = {
@@ -119,9 +121,16 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       title: "Locations",
       translationKey: "Locations.title",
       url: "/locations",
-      icon: LayoutGrid,
+      icon: MapPin,
       isActive: pathname.startsWith("/warehouses") || pathname.startsWith("/branches"),
       items: [
+        {
+          title: "Offices",
+          translationKey: "Offices.title",
+          url: "/offices",
+          action: "/offices/add",
+          isActive: pathname.startsWith("/offices"),
+        },
         {
           title: "Warehouses",
           translationKey: "Warehouses.title",

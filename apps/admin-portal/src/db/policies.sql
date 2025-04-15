@@ -19,6 +19,9 @@ ALTER TABLE warehouses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_listings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_listing_jobs ENABLE ROW LEVEL SECURITY;
 
+-- Enable RLS for offices table
+ALTER TABLE offices ENABLE ROW LEVEL SECURITY;
+
 -- Drop existing policies before recreating
 DROP POLICY IF EXISTS "Users can read their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can insert their own branches" ON branches;
@@ -101,6 +104,11 @@ DROP POLICY IF EXISTS "Users can view job listing jobs for their listings" ON jo
 DROP POLICY IF EXISTS "Users can add jobs to their listings" ON job_listing_jobs;
 DROP POLICY IF EXISTS "Users can update jobs in their listings" ON job_listing_jobs;
 DROP POLICY IF EXISTS "Users can remove jobs from their listings" ON job_listing_jobs;
+
+DROP POLICY IF EXISTS "Users can read their own offices" ON offices;
+DROP POLICY IF EXISTS "Users can insert their own offices" ON offices;
+DROP POLICY IF EXISTS "Users can update their own offices" ON offices;
+DROP POLICY IF EXISTS "Users can delete their own offices" ON offices;
 
 -- Templates policies
 alter table templates enable row level security;
@@ -312,4 +320,10 @@ USING (
     WHERE job_listings.id = job_listing_jobs.job_listing_id
     AND job_listings.user_id = auth.uid()
   )
-); 
+);
+
+-- OFFICES POLICIES
+CREATE POLICY "Users can read their own offices" ON offices FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own offices" ON offices FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own offices" ON offices FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own offices" ON offices FOR DELETE USING (auth.uid() = user_id); 
