@@ -14,6 +14,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useMainStore } from "@/hooks/main.store";
 import { commandList } from "@/lib/command-list";
 
 type ShortcutCommand = {
@@ -24,8 +25,8 @@ type ShortcutCommand = {
 
 export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
 
+  const { openCommandMenu, setOpenCommandMenu } = useMainStore();
   const t = useTranslations();
   const tGeneral = useTranslations("General");
 
@@ -57,12 +58,12 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
       // Handle command menu toggle (⌘K) separately
       if (!shortcut.path) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpenCommandMenu(!openCommandMenu);
         return;
       }
 
       // Only handle other shortcuts when menu is open
-      if (open) {
+      if (openCommandMenu) {
         e.preventDefault();
         router.push(shortcut.path);
       }
@@ -70,10 +71,10 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, [router, shortcuts, open]);
+  }, [router, shortcuts, openCommandMenu, setOpenCommandMenu]);
 
   const runCommand = (command: () => void) => {
-    setOpen(false);
+    setOpenCommandMenu(false);
     command();
   };
 
@@ -83,8 +84,8 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="overflow-hidden p-0 max-w-xl">
+    <Dialog open={openCommandMenu} onOpenChange={setOpenCommandMenu}>
+      <DialogContent className="max-w-xl overflow-hidden p-0">
         <Command
           className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-item]_svg]:w-5] [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5"
           dir={dir}
