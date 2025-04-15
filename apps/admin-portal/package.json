@@ -11,6 +11,8 @@
   "scripts": {
     "dev": "next dev --turbopack --port 3037",
     "build": "next build",
+    "admin:dev": "infisical run --env=dev -- next dev --turbopack --port 3037",
+    "admin:build": "infisical run --env=prod -- next build",
     "start": "next start -p 3037",
     "lint": "next lint",
     "check-types": "tsc --noEmit",

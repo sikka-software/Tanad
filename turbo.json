@@ -16,6 +16,14 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "admin:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "admin:build": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

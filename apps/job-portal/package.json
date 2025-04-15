@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack --port 3038",
     "build": "next build",
+    "admin:dev": "infisical run --env=dev -- next dev --turbopack --port 3038",
+    "admin:build": "infisical run --env=prod -- next build",
     "start": "next start --port 3038",
     "lint": "next lint"
   },
