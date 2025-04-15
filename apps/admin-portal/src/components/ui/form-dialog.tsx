@@ -1,6 +1,8 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
+import { Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,6 +21,7 @@ interface FormDialogProps {
   onCancel?: () => void;
   cancelText?: string;
   submitText?: string;
+  loadingSave?: boolean;
 }
 
 export function FormDialog({
@@ -28,6 +31,7 @@ export function FormDialog({
   children,
   formId,
   onCancel,
+  loadingSave,
 }: FormDialogProps) {
   const t = useTranslations();
   const { locale } = useRouter();
@@ -51,8 +55,8 @@ export function FormDialog({
           <Button variant="outline" onClick={handleCancel}>
             {t("General.cancel")}
           </Button>
-          <Button type="submit" form={formId}>
-            {t("General.save")}
+          <Button type="submit" form={formId} className="min-w-24" disabled={loadingSave}>
+            {loadingSave ? <Loader2 className="size-4 animate-spin" /> : t("General.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -21,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import useUserStore from "@/hooks/use-user-store";
-import { useDepartments } from "@/hooks/useDepartments";
+import { useDepartments, DEPARTMENTS_QUERY_KEY } from "@/hooks/useDepartments";
 import { supabase } from "@/lib/supabase";
 
 import { FormDialog } from "../ui/form-dialog";
@@ -61,6 +62,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
   const { user } = useUserStore();
   const locale = useLocale();
+  const queryClient = useQueryClient();
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(createEmployeeFormSchema(t)),
@@ -119,7 +121,20 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
           .insert(locationInserts);
 
         if (locationError) throw locationError;
+
+        // Update the department object with locations
+        newDepartment.locations = data.locations;
       }
+
+      // Update the departments cache
+      const previousDepartments = queryClient.getQueryData(DEPARTMENTS_QUERY_KEY) || [];
+      queryClient.setQueryData(DEPARTMENTS_QUERY_KEY, [
+        ...(Array.isArray(previousDepartments) ? previousDepartments : []),
+        newDepartment,
+      ]);
+
+      // Also set the individual department query data
+      queryClient.setQueryData([...DEPARTMENTS_QUERY_KEY, newDepartment.id], newDepartment);
 
       // Set the new department as the selected department
       form.setValue("department", newDepartment.id);
@@ -336,6 +351,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
         formId="department-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
+        // loadingSave={}
       >
         <DepartmentForm id="department-form" onSubmit={handleDepartmentSubmit} />
       </FormDialog>

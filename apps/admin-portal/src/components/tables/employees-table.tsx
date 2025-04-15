@@ -25,12 +25,22 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
   };
 
   const columns: ExtendedColumnDef<Employee>[] = [
-    { accessorKey: "name", header: t("Employees.form.name.label"), validationSchema: nameSchema },
+    {
+      accessorKey: "first_name",
+      header: t("Employees.form.first_name.label"),
+      validationSchema: nameSchema,
+    },
+    {
+      accessorKey: "last_name",
+      header: t("Employees.form.last_name.label"),
+      validationSchema: nameSchema,
+    },
     {
       accessorKey: "email",
       header: t("Employees.form.email.label"),
       validationSchema: emailSchema,
     },
+
     {
       accessorKey: "phone",
       header: t("Employees.form.phone.label"),
