@@ -17,13 +17,13 @@ import { Input } from "@/components/ui/input";
 
 export const createOfficeSchema = (t: (key: string) => string) =>
   z.object({
-    name: z.string().min(1, t("Na me is required")),
+    name: z.string().min(1, t("Offices.form.name.required")),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
-    address: z.string().min(1, t("Address is required")),
-    city: z.string().min(1, t("City is required")),
-    state: z.string().min(1, t("State is required")),
-    zip_code: z.string().min(1, t("Zip code is required")),
+    address: z.string().min(1, t("Offices.form.address.required")),
+    city: z.string().min(1, t("Offices.form.city.required")),
+    state: z.string().min(1, t("Offices.form.state.required")),
+    zip_code: z.string().min(1, t("Offices.form.zip_code.required")),
   });
 
 export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
@@ -36,7 +36,7 @@ export interface OfficeFormProps {
 }
 
 export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
-  const t = useTranslations("Offices");
+  const t = useTranslations();
   const form = useForm<OfficeFormValues>({
     resolver: zodResolver(createOfficeSchema(t)),
     defaultValues: {
@@ -63,7 +63,7 @@ export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("name")}</FormLabel>
+              <FormLabel>{t("Offices.form.name.label")}</FormLabel>
               <FormControl>
                 <Input {...field} disabled={loading} />
               </FormControl>
@@ -77,7 +77,7 @@ export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("email")}</FormLabel>
+              <FormLabel>{t("Offices.form.email.label")}</FormLabel>
               <FormControl>
                 <Input {...field} type="email" disabled={loading} />
               </FormControl>
@@ -91,7 +91,7 @@ export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("phone")}</FormLabel>
+              <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
               <FormControl>
                 <Input {...field} type="tel" disabled={loading} />
               </FormControl>
@@ -105,7 +105,7 @@ export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
           name="address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("address")}</FormLabel>
+              <FormLabel>{t("Offices.form.address.label")}</FormLabel>
               <FormControl>
                 <Input {...field} disabled={loading} />
               </FormControl>
@@ -120,7 +120,7 @@ export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
             name="city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("city")}</FormLabel>
+                <FormLabel>{t("Offices.form.city.label")}</FormLabel>
                 <FormControl>
                   <Input {...field} disabled={loading} />
                 </FormControl>
@@ -134,7 +134,7 @@ export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("state")}</FormLabel>
+                <FormLabel>{t("Offices.form.state.label")}</FormLabel>
                 <FormControl>
                   <Input {...field} disabled={loading} />
                 </FormControl>
@@ -148,7 +148,7 @@ export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
             name="zip_code"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("zip_code")}</FormLabel>
+                <FormLabel>{t("Offices.form.zip_code.label")}</FormLabel>
                 <FormControl>
                   <Input {...field} disabled={loading} />
                 </FormControl>
