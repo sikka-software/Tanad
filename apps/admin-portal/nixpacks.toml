@@ -15,14 +15,14 @@ pkgs = ["infisical"]
 # This command first exports secrets from Infisical to a .env file,
 # and only if that succeeds (due to &&), it runs 'bun install'.
 cmds = [
-  "npx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN pnpm install",
+  "pnpm dlx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN pnpm install",
 ]
 
 # You might also have build and start phases defined here
 [phases.build]
 cmds = [
-  "npx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN pnpm run build",
+  "pnpm dlx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN pnpm run build",
 ]
 
 [start]
-cmd = "npx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN pnpm run start"
+cmd = "pnpm dlx @infisical/cli run --env=dev --domain=https://secrets.sikka.io --projectId=b1c8c504-ff56-43bb-9226-b1035bf94426 --token=$INFISICAL_TOKEN pnpm run start"
