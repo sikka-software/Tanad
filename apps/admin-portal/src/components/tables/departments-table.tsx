@@ -17,9 +17,10 @@ import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import TableSkeleton from "@/components/ui/table-skeleton";
 import { useBranches } from "@/hooks/useBranches";
 import { useOffices } from "@/hooks/useOffices";
+import { useUpdateDepartment } from "@/hooks/useDepartments";
 import { useWarehouses } from "@/hooks/useWarehouses";
-import { useDepartmentsStore } from "@/stores/departments.store";
 import { Department } from "@/types/department.type";
+import { ColumnDef, Row } from "@tanstack/react-table";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().min(1, "Required");
@@ -35,13 +36,13 @@ interface DepartmentsTableProps {
 
 const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => {
   const t = useTranslations("Departments");
-  const { updateDepartment } = useDepartmentsStore();
+  const { mutateAsync: updateDepartment } = useUpdateDepartment();
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateDepartment(rowId, { [columnId]: value });
+    await updateDepartment({ id: rowId, updates: { [columnId]: value } });
   };
 
   const getLocationName = (locationId: string) => {
@@ -55,6 +56,12 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
     if (warehouse) return warehouse.name;
 
     return locationId;
+  };
+
+  const handleRemoveLocation = async (row: Row<Department>, locationId: string) => {
+    const locationIds = row.original.locations || [];
+    const updatedLocations = locationIds.filter((id: string) => id !== locationId);
+    await updateDepartment({ id: row.original.id, updates: { locations: updatedLocations } });
   };
 
   const columns: ExtendedColumnDef<Department>[] = [
@@ -94,8 +101,7 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
                       className="h-4 w-4 p-0"
                       onClick={(e) => {
                         e.stopPropagation();
-                        const updatedLocations = locationIds.filter((id) => id !== locationId);
-                        updateDepartment(row.original.id, { locations: updatedLocations });
+                        handleRemoveLocation(row, locationId);
                       }}
                     >
                       <X className="h-3 w-3" />

@@ -70,6 +70,9 @@ export default function AddDepartmentPage() {
           .insert(locationInserts);
 
         if (locationError) throw locationError;
+
+        // Update the department object with locations before caching
+        newDepartment.locations = data.locations;
       }
 
       const previousDepartments = queryClient.getQueryData(["departments"]) || [];
@@ -77,6 +80,9 @@ export default function AddDepartmentPage() {
         ["departments"],
         [...(Array.isArray(previousDepartments) ? previousDepartments : []), newDepartment],
       );
+
+      // Also set the individual department query data
+      queryClient.setQueryData(["departments", newDepartment.id], newDepartment);
 
       toast.success(t("General.successful_operation"), {
         description: t("Departments.success.created"),
