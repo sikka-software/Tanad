@@ -5,7 +5,8 @@ export interface Employee {
   email: string;
   phone?: string;
   position: string;
-  department?: string;
+  department?: string | null;
+  departmentId?: string | null;
   hireDate: string;
   salary?: number;
   isActive: boolean;

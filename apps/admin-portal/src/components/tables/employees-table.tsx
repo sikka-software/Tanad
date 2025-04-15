@@ -7,6 +7,7 @@ import { z } from "zod";
 import ErrorComponent from "@/components/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import TableSkeleton from "@/components/ui/table-skeleton";
+import { useDepartments } from "@/hooks/useDepartments";
 import { useEmployeesStore } from "@/stores/employees.store";
 import { Employee } from "@/types/employee.type";
 
@@ -19,9 +20,16 @@ const departmentSchema = z.string().optional();
 const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
   const t = useTranslations();
   const { updateEmployee } = useEmployeesStore();
+  const { data: departments } = useDepartments();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateEmployee(rowId, { [columnId]: value });
+    if (columnId === "department") {
+      // When editing department, we need to update the departmentId
+      const departmentId = value as string;
+      await updateEmployee(rowId, { departmentId });
+    } else {
+      await updateEmployee(rowId, { [columnId]: value });
+    }
   };
 
   const columns: ExtendedColumnDef<Employee>[] = [
@@ -40,7 +48,6 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
       header: t("Employees.form.email.label"),
       validationSchema: emailSchema,
     },
-
     {
       accessorKey: "phone",
       header: t("Employees.form.phone.label"),

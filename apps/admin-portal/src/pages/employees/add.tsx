@@ -5,9 +5,9 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/components/forms/employee-form";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
@@ -31,7 +31,7 @@ export default function AddEmployeePage() {
           email: data.email.trim(),
           phone: data.phone?.trim() || null,
           position: data.position.trim(),
-          department: data.department?.trim() || null,
+          departmentId: data.department || null,
           hireDate: data.hireDate,
           salary: data.salary ? parseFloat(data.salary) : null,
           isActive: data.isActive,
@@ -47,16 +47,21 @@ export default function AddEmployeePage() {
       // Get the new employee data
       const newEmployee = await response.json();
 
-      // Update the employees cache to include the new employee
       const previousEmployees = queryClient.getQueryData(["employees"]) || [];
       queryClient.setQueryData(
         ["employees"],
         [...(Array.isArray(previousEmployees) ? previousEmployees : []), newEmployee],
       );
 
+      toast.success(t("General.successful_operation"), {
+        description: t("Employees.success.created"),
+      });
       router.push("/employees");
     } catch (error) {
       console.error(error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Employees.error.create"),
+      });
       throw error;
     } finally {
       setLoading(false);

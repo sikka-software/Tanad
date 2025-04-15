@@ -2225,6 +2225,12 @@
       "updated": "Employee updated successfully",
       "deleted": "Employee deleted successfully",
       "error": "An error occurred while processing your request"
+    },
+    "success": {
+      "created": "Employee created successfully"
+    },
+    "error": {
+      "create": "Failed to create employee"
     }
   },
   "Contacts": {

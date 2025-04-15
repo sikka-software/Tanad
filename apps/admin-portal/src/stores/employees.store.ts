@@ -21,9 +21,21 @@ export const useEmployeesStore = create<EmployeesStore>((set, get) => ({
   fetchEmployees: async () => {
     set({ isLoading: true, error: null });
     try {
-      const { data, error } = await supabase.from("employees").select("*");
+      const { data, error } = await supabase.from("employees").select(`
+          *,
+          department:departments (
+            name
+          )
+        `);
       if (error) throw error;
-      set({ employees: data as Employee[], isLoading: false });
+
+      // Transform the data to match our Employee type
+      const transformedData = data.map((employee: any) => ({
+        ...employee,
+        department: employee.department?.name || null,
+      }));
+
+      set({ employees: transformedData as Employee[], isLoading: false });
     } catch (error) {
       set({ error: error as Error, isLoading: false });
     }
@@ -31,10 +43,7 @@ export const useEmployeesStore = create<EmployeesStore>((set, get) => ({
 
   updateEmployee: async (id: string, updates: Partial<Employee>) => {
     try {
-      const { error } = await supabase
-        .from("employees")
-        .update(updates)
-        .eq("id", id);
+      const { error } = await supabase.from("employees").update(updates).eq("id", id);
       if (error) throw error;
       await get().fetchEmployees();
     } catch (error) {
@@ -61,4 +70,4 @@ export const useEmployeesStore = create<EmployeesStore>((set, get) => ({
       set({ error: error as Error });
     }
   },
-})); 
+}));
