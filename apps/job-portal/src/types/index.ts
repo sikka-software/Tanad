@@ -1,10 +1,13 @@
 export interface JobListing {
-  id: string
-  title: string
-  description: string | null
-  isActive: boolean
-  slug: string
-  createdAt: string
-  updatedAt: string
-  userId: string
-} 
+  id: string;
+  title: string;
+  description: string;
+  department: string;
+  location: string;
+  type: string;
+  postedDate: string;
+  salary: string;
+  responsibilities: string[];
+  requirements: string[];
+  benefits: string[];
+}

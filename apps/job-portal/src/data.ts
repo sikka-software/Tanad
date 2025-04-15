@@ -1,5 +1,5 @@
 export type JobListing = {
-  id: number;
+  id: string;
   title: string;
   description: string;
   department: string;
@@ -14,7 +14,7 @@ export type JobListing = {
 
 export const jobListings: JobListing[] = [
   {
-    id: 1,
+    id: "1",
     title: "Senior Frontend Developer",
     department: "Engineering",
     type: "Full-time",
@@ -48,7 +48,7 @@ export const jobListings: JobListing[] = [
     ],
   },
   {
-    id: 2,
+    id: "2",
     title: "Product Manager",
     department: "Product",
     type: "Full-time",
@@ -81,7 +81,7 @@ export const jobListings: JobListing[] = [
     ],
   },
   {
-    id: 3,
+    id: "3",
     title: "UX/UI Designer",
     department: "Design",
     type: "Full-time",
@@ -115,7 +115,7 @@ export const jobListings: JobListing[] = [
     ],
   },
   {
-    id: 4,
+    id: "4",
     title: "DevOps Engineer",
     department: "Engineering",
     type: "Full-time",
@@ -149,7 +149,7 @@ export const jobListings: JobListing[] = [
     ],
   },
   {
-    id: 5,
+    id: "5",
     title: "Marketing Specialist",
     department: "Marketing",
     type: "Full-time",
@@ -183,7 +183,7 @@ export const jobListings: JobListing[] = [
     ],
   },
   {
-    id: 6,
+    id: "6",
     title: "Customer Success Manager",
     department: "Customer Success",
     type: "Full-time",
@@ -216,7 +216,7 @@ export const jobListings: JobListing[] = [
     ],
   },
   {
-    id: 7,
+    id: "7",
     title: "Data Scientist",
     department: "Data",
     type: "Full-time",
@@ -249,7 +249,7 @@ export const jobListings: JobListing[] = [
     ],
   },
   {
-    id: 8,
+    id: "8",
     title: "Sales Development Representative",
     department: "Sales",
     type: "Full-time",
@@ -282,7 +282,7 @@ export const jobListings: JobListing[] = [
     ],
   },
   {
-    id: 9,
+    id: "9",
     title: "Backend Engineer",
     department: "Engineering",
     type: "Full-time",

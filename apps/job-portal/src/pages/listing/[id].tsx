@@ -1,70 +1,70 @@
-import { GetServerSideProps } from 'next'
-import { supabase } from '../../lib/supabase'
-import { JobListing } from '../../types'
+import Image from "next/image";
+import { Geist, Geist_Mono } from "next/font/google";
+import JobListings from "@/components/job-listings";
+import { useRouter } from 'next/router';
+import { useJobListing } from '../../hooks/use-job-listing';
 
-interface JobListingPageProps {
-  job: JobListing | null
-}
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
-export default function JobListingPage({ job }: JobListingPageProps) {
-  if (!job) {
-    return <div>Job listing not found</div>
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export default function Home() {
+  const router = useRouter();
+  const { id } = router.query;
+  const { data: job, isLoading, error } = useJobListing(id as string);
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-gray-50">
+        <div className="container mx-auto py-8 px-4">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Loading...
+            </h1>
+          </header>
+        </div>
+      </main>
+    );
+  }
+
+  if (error || !job) {
+    return (
+      <main className="min-h-screen bg-gray-50">
+        <div className="container mx-auto py-8 px-4">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Job Listing Not Found
+            </h1>
+            <p className="text-gray-600 max-w-2xl">
+              The job listing you're looking for doesn't exist or has been removed.
+            </p>
+          </header>
+        </div>
+      </main>
+    );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">{job.title}</h1>
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Company</h2>
-          <p>{job.company}</p>
-        </div>
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Location</h2>
-          <p>{job.location}</p>
-        </div>
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Description</h2>
-          <p className="whitespace-pre-wrap">{job.description}</p>
-        </div>
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Requirements</h2>
-          <ul className="list-disc pl-5">
-            {job.requirements.map((req: string, index: number) => (
-              <li key={index}>{req}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold mb-2">Salary</h2>
-          <p>{job.salary}</p>
-        </div>
+    <main className="min-h-screen bg-gray-50">
+      <div className="container mx-auto py-8 px-4">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Career Opportunities
+          </h1>
+          <p className="text-gray-600 max-w-2xl">
+            Join our team and help us build the future. We're looking for
+            talented individuals who are passionate about making a difference.
+          </p>
+        </header>
+
+        <JobListings />
       </div>
-    </div>
-  )
+    </main>
+  );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params as { id: string }
-
-  const { data: job, error } = await supabase
-    .from('job_listings')
-    .select('*')
-    .eq('id', id)
-    .single()
-
-  if (error) {
-    console.error('Error fetching job listing:', error)
-    return {
-      props: {
-        job: null
-      }
-    }
-  }
-
-  return {
-    props: {
-      job
-    }
-  }
-} 

@@ -297,6 +297,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.49.4
         version: 2.49.4
+      '@tanstack/react-query':
+        specifier: ^5.74.3
+        version: 5.74.3(react@19.1.0)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
