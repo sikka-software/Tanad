@@ -2402,6 +2402,14 @@
       "locations": "Locations",
       "createdAt": "Created At",
       "updatedAt": "Updated At"
+    },
+    "success": {
+      "created": "Department created successfully",
+      "updated": "Department updated successfully"
+    },
+    "error": {
+      "creating": "An error occurred while creating the department",
+      "updating": "An error occurred while updating the department"
     }
   }
 }

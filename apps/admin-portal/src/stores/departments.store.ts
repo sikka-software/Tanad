@@ -10,7 +10,7 @@ interface DepartmentsState {
   updateDepartment: (id: string, updates: Partial<Department>) => Promise<void>;
 }
 
-export const useDepartmentsStore = create<DepartmentsState>((set) => ({
+export const useDepartmentsStore = create<DepartmentsState>((set, get) => ({
   departments: [],
   isLoading: false,
   error: null,
@@ -45,11 +45,15 @@ export const useDepartmentsStore = create<DepartmentsState>((set) => ({
 
       const updatedDepartment = await response.json();
 
+      // Update the local state immediately
       set((state) => ({
         departments: state.departments.map((department) =>
           department.id === id ? updatedDepartment : department,
         ),
       }));
+
+      // Refetch to ensure we have the latest data
+      await get().fetchDepartments();
     } catch (error) {
       set({ error: (error as Error).message });
     }

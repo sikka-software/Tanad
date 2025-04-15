@@ -2405,7 +2405,9 @@
       "locations": {
         "label": "المواقع",
         "placeholder": "أدخل المواقع",
-        "required": "المواقع مطلوبة"
+        "required": "المواقع مطلوبة",
+        "noLocations": "لا يوجد مواقع",
+        "multipleLocations": "{count, plural, =0 {بدون موقع} =1 {موقع واحد} other {# مواقع}}"
       },
       "validation": {
         "name_required": "الاسم مطلوب",
@@ -2419,6 +2421,14 @@
       "locations": "المواقع",
       "createdAt": "تاريخ الإنشاء",
       "updatedAt": "تاريخ التحديث"
+    },
+    "success": {
+      "created": "تم إنشاء القسم بنجاح",
+      "updated": "تم تحديث القسم بنجاح"
+    },
+    "error": {
+      "creating": "حدث خطأ أثناء إنشاء القسم",
+      "updating": "حدث خطأ أثناء تحديث القسم"
     }
   }
 }

@@ -72,7 +72,7 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
         const locationIds = row.original.locations || [];
 
         if (locationIds.length === 0) {
-          return "No locations";
+          return t("form.locations.noLocations");
         } else if (locationIds.length === 1) {
           return getLocationName(locationIds[0]);
         } else {
@@ -80,7 +80,8 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 px-2 py-1">
-                  {locationIds.length} locations
+                  {/* {locationIds.length}{" "} */}
+                  {t("form.locations.multipleLocations", { count: locationIds.length })}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
