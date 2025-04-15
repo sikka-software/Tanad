@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
 import JobListings from "@/components/job-listings";
-import { useRouter } from 'next/router';
-import { useJobListing } from '../../hooks/use-job-listing';
+import { useRouter } from "next/router";
+import { useJobListing } from "../../hooks/use-job-listing";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,10 +21,10 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Loading...
             </h1>
           </header>
@@ -35,14 +35,15 @@ export default function Home() {
 
   if (error || !job) {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-background">
         <div className="container mx-auto py-8 px-4">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Job Listing Not Found
             </h1>
-            <p className="text-gray-600 max-w-2xl">
-              The job listing you're looking for doesn't exist or has been removed.
+            <p className="text-muted-foreground max-w-2xl">
+              The job listing you're looking for doesn't exist or has been
+              removed.
             </p>
           </header>
         </div>
@@ -51,13 +52,13 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Career Opportunities
           </h1>
-          <p className="text-gray-600 max-w-2xl">
+          <p className="text-muted-foreground max-w-2xl">
             Join our team and help us build the future. We're looking for
             talented individuals who are passionate about making a difference.
           </p>

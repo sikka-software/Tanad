@@ -12,14 +12,14 @@ import {
 import JobCard from "@/components/job-card";
 import JobDetailsModal from "@/components/job-details-dialog";
 import { JobListing } from "@/types";
-import { useRouter } from 'next/router'
-import { useJobListing } from '../hooks/use-job-listing'
-import { useJobs } from '../hooks/use-jobs'
+import { useRouter } from "next/router";
+import { useJobListing } from "../hooks/use-job-listing";
+import { useJobs } from "../hooks/use-jobs";
 
 export default function JobListings() {
-  const router = useRouter()
-  const { id } = router.query
-  const { data: jobs = [], isLoading: isLoadingJobs } = useJobs()
+  const router = useRouter();
+  const { id } = router.query;
+  const { data: jobs = [], isLoading: isLoadingJobs } = useJobs();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
@@ -27,30 +27,32 @@ export default function JobListings() {
   const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
 
   // Get unique departments and locations for filters
-  const departments = [...new Set(jobs.map((job) => job.department || 'N/A'))];
-  const locations = [...new Set(jobs.map((job) => job.location || 'N/A'))];
+  const departments = [...new Set(jobs.map((job) => job.department || "N/A"))];
+  const locations = [...new Set(jobs.map((job) => job.location || "N/A"))];
 
   // Filter jobs based on search and filters
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
       job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (job.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+      (job.description || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment =
-      selectedDepartment === "all" || (job.department || 'N/A') === selectedDepartment;
+      selectedDepartment === "all" ||
+      (job.department || "N/A") === selectedDepartment;
     const matchesLocation =
-      selectedLocation === "all" || (job.location || 'N/A') === selectedLocation;
+      selectedLocation === "all" ||
+      (job.location || "N/A") === selectedLocation;
 
     return matchesSearch && matchesDepartment && matchesLocation;
   });
 
   // If we're on a detail page, show just that job
   if (id) {
-    const { data: job, isLoading, error } = useJobListing(id as string)
+    const { data: job, isLoading, error } = useJobListing(id as string);
 
     if (isLoading) {
       return (
         <div>
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="bg-background rounded-lg shadow-sm p-6 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Input
@@ -99,13 +101,13 @@ export default function JobListings() {
             </div>
           </div>
         </div>
-      )
+      );
     }
 
     if (error || !job) {
       return (
         <div>
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="bg-background rounded-lg shadow-sm p-6 mb-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Input
@@ -154,27 +156,27 @@ export default function JobListings() {
             </div>
           </div>
         </div>
-      )
+      );
     }
 
     // Convert the database job to match the JobListing type
     const jobListing: JobListing = {
       id: job.id,
       title: job.title,
-      description: job.description || 'N/A',
-      department: 'N/A',
-      location: 'N/A',
-      type: 'N/A',
+      description: job.description || "N/A",
+      department: "N/A",
+      location: "N/A",
+      type: "N/A",
       postedDate: new Date().toISOString(),
-      salary: 'N/A',
-      responsibilities: ['N/A'],
-      requirements: ['N/A'],
-      benefits: ['N/A']
-    }
+      salary: "N/A",
+      responsibilities: ["N/A"],
+      requirements: ["N/A"],
+      benefits: ["N/A"],
+    };
 
     return (
       <div>
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="bg-background border border-border rounded-lg shadow-sm p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Input
@@ -231,13 +233,13 @@ export default function JobListings() {
           />
         )}
       </div>
-    )
+    );
   }
 
   if (isLoadingJobs) {
     return (
       <div>
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="bg-background rounded-lg shadow-sm p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Input
@@ -286,12 +288,12 @@ export default function JobListings() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div>
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+      <div className="bg-background rounded-lg shadow-sm p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Input
