@@ -42,20 +42,35 @@ export default function AddDepartmentPage() {
         throw new Error(t("Departments.error.not_authenticated"));
       }
 
-      const { data: newDepartment, error } = await supabase
+      // First create the department
+      const { data: newDepartment, error: departmentError } = await supabase
         .from("departments")
         .insert([
           {
             name: data.name.trim(),
             description: data.description?.trim() || null,
-            locations: data.locations?.map((location: string) => location) || [],
             user_id: userId,
           },
         ])
         .select()
         .single();
 
-      if (error) throw error;
+      if (departmentError) throw departmentError;
+
+      // Then create the department locations
+      if (data.locations && data.locations.length > 0) {
+        const locationInserts = data.locations.map(locationId => ({
+          department_id: newDepartment.id,
+          location_id: locationId,
+          location_type: 'office', // Default to office type
+        }));
+
+        const { error: locationError } = await supabase
+          .from("department_locations")
+          .insert(locationInserts);
+
+        if (locationError) throw locationError;
+      }
 
       const previousDepartments = queryClient.getQueryData(["departments"]) || [];
       queryClient.setQueryData(
