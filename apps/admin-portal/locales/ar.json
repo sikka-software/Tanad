@@ -2312,6 +2312,7 @@
     "office_details": "تفاصيل المكتب",
     "back_to_list": "العودة إلى القائمة",
     "no_offices": "لم يتم العثور على مكاتب",
+    "search_offices": "بحث عن المكاتب",
     "table": {
       "name": "الاسم",
       "address": "العنوان",
@@ -2375,6 +2376,40 @@
       "creating": "حدث خطأ أثناء إنشاء المكتب",
       "updating": "حدث خطأ أثناء تحديث المكتب",
       "deleting": "حدث خطأ أثناء حذف المكتب"
+    }
+  },
+  "Departments": {
+    "title": "الأقسام",
+    "add_new": "إضافة قسم جديد",
+    "search_departments": "بحث عن الأقسام",
+    "department_details": "تفاصيل القسم",
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم القسم",
+        "required": "الاسم مطلوب"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل وصف القسم"
+      },
+      "locations": {
+        "label": "المواقع",
+        "placeholder": "أدخل المواقع",
+        "required": "المواقع مطلوبة"
+      },
+      "validation": {
+        "name_required": "الاسم مطلوب",
+        "description_required": "الوصف مطلوب",
+        "locations_required": "يجب اختيار موقع واحد على الأقل"
+      }
+    },
+    "table": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "locations": "المواقع",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "تاريخ التحديث"
     }
   }
 }

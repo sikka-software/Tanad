@@ -2365,5 +2365,34 @@
       "updating": "An error occurred while updating the office",
       "deleting": "An error occurred while deleting the office"
     }
+  },
+  "Departments": {
+    "title": "Departments",
+    "add_new": "Add New Department",
+    "search_departments": "Search departments",
+    "department_details": "Department Details",
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter name",
+        "required": "Name is required"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter description"
+      },
+      "validation": {
+        "name_required": "Name is required",
+        "description_required": "Description is required",
+        "locations_required": "At least one location is required"
+      }
+    },
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "locations": "Locations",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At"
+    }
   }
 }

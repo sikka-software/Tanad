@@ -100,7 +100,7 @@ export default function DepartmentForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Departments.form.name")}</FormLabel>
+              <FormLabel>{t("Departments.form.name.label")}</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -114,7 +114,7 @@ export default function DepartmentForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Departments.form.description")}</FormLabel>
+              <FormLabel>{t("Departments.form.description.label")}</FormLabel>
               <FormControl>
                 <Textarea {...field} />
               </FormControl>
@@ -128,13 +128,13 @@ export default function DepartmentForm({
           name="locations"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Departments.form.locations")}</FormLabel>
+              <FormLabel>{t("Departments.form.locations.label")}</FormLabel>
               <FormControl>
                 <MultiSelect
                   options={locationOptions}
                   onValueChange={field.onChange}
                   defaultValue={field.value?.map((location) => location) || []}
-                  placeholder={t("Departments.form.select_locations")}
+                  placeholder={t("Departments.form.locations.placeholder")}
                   variant="inverted"
                   animation={2}
                   maxCount={3}
@@ -147,10 +147,10 @@ export default function DepartmentForm({
 
         <div className="flex justify-end gap-4">
           <Button type="button" variant="outline" onClick={handleCancel}>
-            {t("common.cancel")}
+            {t("General.cancel")}
           </Button>
           <Button type="submit" disabled={loading}>
-            {defaultValues ? t("common.save") : t("common.create")}
+            {defaultValues ? t("General.save") : t("General.create")}
           </Button>
         </div>
       </form>
