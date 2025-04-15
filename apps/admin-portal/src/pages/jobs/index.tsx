@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
@@ -5,16 +7,26 @@ import { format } from "date-fns";
 import { Building2, MapPin, Calendar, DollarSign } from "lucide-react";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import JobsTable from "@/components/tables/jobs-table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
-import PageTitle from "@/components/ui/page-title";
+import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { useJobs } from "@/hooks/useJobs";
 import { Job } from "@/types/job.type";
 
 export default function JobsPage() {
   const t = useTranslations("Jobs");
   const { data: jobs, isLoading, error } = useJobs();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+
+  const filteredJobs = jobs?.filter(
+    (job) =>
+      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (job.department?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+      (job.location?.toLowerCase() || "").includes(searchQuery.toLowerCase()),
+  );
 
   const renderJob = (job: Job) => (
     <Card key={job.id} className="transition-shadow hover:shadow-lg">
@@ -67,22 +79,34 @@ export default function JobsPage() {
 
   return (
     <DataPageLayout>
-      <PageTitle
+      <PageSearchAndFilter
         title={t("title")}
-        createButtonLink="/jobs/add"
-        createButtonText={t("create_job")}
-        createButtonDisabled={isLoading}
+        createHref="/jobs/add"
+        createLabel={t("create_job")}
+        onSearch={setSearchQuery}
+        searchPlaceholder={t("search_jobs")}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
-      <div className="p-4">
-        <DataModelList
-          data={jobs}
-          isLoading={isLoading}
-          error={error instanceof Error ? error : null}
-          errorMessage={error instanceof Error ? t(error.message) : undefined}
-          emptyMessage={t("no_jobs_found")}
-          renderItem={renderJob}
-          gridCols="3"
-        />
+      <div>
+        {viewMode === "table" ? (
+          <JobsTable
+            data={filteredJobs || []}
+            isLoading={isLoading}
+            error={error instanceof Error ? error : null}
+          />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredJobs || []}
+              isLoading={isLoading}
+              error={error instanceof Error ? error : null}
+              emptyMessage={t("no_jobs_found")}
+              renderItem={renderJob}
+              gridCols="3"
+            />
+          </div>
+        )}
       </div>
     </DataPageLayout>
   );
