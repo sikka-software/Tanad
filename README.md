@@ -19,6 +19,6 @@ Proprietary - © Sikka Software
 
 - Email: hello@sikka.io
 - Website: https://sikka.io
-- Twitter: [@pukla_app](https://twitter.com/pukla_app)
-- Instagram: [@pukla_app](https://instagram.com/pukla_app)
+- Twitter: [@tanad_app](https://twitter.com/tanad_app)
+- Instagram: [@tanad_app](https://instagram.com/tanad_app)
 - WhatsApp: [+966531045453](https://wa.me/966531045453)
