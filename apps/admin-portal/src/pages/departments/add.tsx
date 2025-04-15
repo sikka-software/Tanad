@@ -102,13 +102,13 @@ export default function AddDepartmentPage() {
       />
 
       <div className="p-4">
-        <Card className="max-w-2xl">
+        <Card className="max-w-2xl mx-auto">
           <CardHeader className="relative">
-            {process.env.NODE_ENV === "development" && (
+            {/* {process.env.NODE_ENV === "development" && (
               <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
                 Dummy Data
               </Button>
-            )}
+            )} */}
             <CardTitle>{t("Departments.department_details")}</CardTitle>
           </CardHeader>
           <CardContent>

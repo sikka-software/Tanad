@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useBranches } from "@/hooks/useBranches";
 import { useOffices } from "@/hooks/useOffices";
 import { useWarehouses } from "@/hooks/useWarehouses";
+import { cn } from "@/lib/utils";
 import { Department } from "@/types/department.type";
 
 export const createDepartmentSchema = (t: (key: string) => string) =>
@@ -53,6 +55,7 @@ export default function DepartmentForm({
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
+  const locale = useLocale();
   const [locationOptions, setLocationOptions] = useState<MultiSelectOption[]>([]);
 
   const form = useForm<DepartmentFormValues>({
@@ -71,22 +74,51 @@ export default function DepartmentForm({
         type: "office" as const,
         label: office.name,
         value: office.name,
+        metadata: { type: "office" },
       })) || []),
       ...(branches?.map((branch) => ({
         id: branch.id,
         type: "branch" as const,
         label: branch.name,
         value: branch.name,
+        metadata: { type: "branch" },
       })) || []),
       ...(warehouses?.map((warehouse) => ({
         id: warehouse.id,
         type: "warehouse" as const,
         label: warehouse.name,
         value: warehouse.name,
+        metadata: { type: "warehouse" },
       })) || []),
     ];
     setLocationOptions(options);
   }, [offices, branches, warehouses]);
+
+  const renderLocationOption = (option: MultiSelectOption) => {
+    const type = option.metadata?.type;
+    const typeLabel = type ? t(`Locations.types.${type}`) : "";
+    let typeIcon;
+    switch (type) {
+      case "office":
+        typeIcon = <BuildingIcon className="!text-muted-foreground !size-3" />;
+        break;
+      case "branch":
+        typeIcon = <StoreIcon className="!text-muted-foreground !size-3" />;
+        break;
+      case "warehouse":
+        typeIcon = <WarehouseIcon className="!text-muted-foreground !size-3" />;
+        break;
+    }
+    return (
+      <div className="flex flex-col">
+        <span className="text-muted-foreground flex items-center gap-2 text-xs capitalize">
+          {typeIcon}
+          {typeLabel}
+        </span>
+        <span>{option.label}</span>
+      </div>
+    );
+  };
 
   const handleCancel = () => {
     router.back();
@@ -131,6 +163,7 @@ export default function DepartmentForm({
               <FormLabel>{t("Departments.form.locations.label")}</FormLabel>
               <FormControl>
                 <MultiSelect
+                  dir={locale === "ar" ? "rtl" : "ltr"}
                   options={locationOptions}
                   onValueChange={field.onChange}
                   defaultValue={field.value?.map((location) => location) || []}
@@ -138,6 +171,7 @@ export default function DepartmentForm({
                   variant="inverted"
                   animation={2}
                   maxCount={3}
+                  renderOption={renderLocationOption}
                 />
               </FormControl>
               <FormMessage />

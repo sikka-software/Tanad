@@ -29,6 +29,10 @@
     "inactive": "Inactive",
     "successful_operation": "Successful Operation",
     "error_operation": "Error Operation",
+    "select_all": "Select All",
+    "clear": "Clear",
+    "close": "Close",
+    "no_results_found": "No results found",
     "languages": {
       "label": "Change Language",
       "ar": "العربية",
@@ -2116,7 +2120,12 @@
     }
   },
   "Locations": {
-    "title": "Locations"
+    "title": "Locations",
+    "types": {
+      "office": "Office",
+      "branch": "Branch",
+      "warehouse": "Warehouse"
+    }
   },
   "Recruitment": {
     "title": "Recruitment"

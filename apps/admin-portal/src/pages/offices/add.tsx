@@ -112,7 +112,7 @@ export default function AddOfficePage() {
       />
 
       <div className="p-4">
-        <Card className="max-w-2xl">
+        <Card className="mx-auto max-w-2xl">
           <CardHeader className="relative">
             {process.env.NODE_ENV === "development" && (
               <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
