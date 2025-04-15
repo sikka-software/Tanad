@@ -1,6 +1,4 @@
 import { useState } from "react";
-
-import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -8,23 +6,24 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
+import { useJobListings } from "@/hooks/useJobListings";
 import { JobListing } from "@/types/job-listing.type";
 
 export default function JobListingsPage() {
   const t = useTranslations("Jobs");
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [listings, setListings] = useState<JobListing[]>([]); // TODO: Replace with API call
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const { jobListings, isLoading } = useJobListings();
 
-  const filteredListings = listings.filter(
-    (listing) =>
+  const filteredListings = (jobListings || []).filter(
+    (listing: JobListing) =>
       listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (listing.description?.toLowerCase() || "").includes(searchQuery.toLowerCase()),
   );
 
   const handleCreateListing = () => {
-    router.push("/jobs/listings/create");
+    router.push("/jobs/listings/add");
   };
 
   const renderListing = (listing: JobListing) => (
@@ -51,6 +50,10 @@ export default function JobListingsPage() {
     </Card>
   );
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <DataPageLayout>
       <PageSearchAndFilter
@@ -68,7 +71,7 @@ export default function JobListingsPage() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {
     props: {
       messages: (await import(`../../../../locales/${locale}.json`)).default,
