@@ -50,7 +50,7 @@ const GeneralSettings = ({
 }: GeneralSettingsProps) => {
   const t = useTranslations();
   const lang = useLocale();
-  
+
   // Add state to track the selected timezone
   const [selectedTimezone, setSelectedTimezone] = useState<string>("UTC");
 
@@ -84,7 +84,7 @@ const GeneralSettings = ({
       // Get timezone value, ensuring it's not undefined
       const timezone = profile.user_settings?.timezone || "UTC";
       console.log("Setting timezone to:", timezone);
-      
+
       // Set the selected timezone state
       setSelectedTimezone(timezone);
 
@@ -92,14 +92,19 @@ const GeneralSettings = ({
         name: profile.full_name || "",
         email: user?.email || profile.email || "",
         language: lang,
-        timezone,
+        timezone: timezone, // Ensure timezone is explicitly set and not lost
       };
 
       console.log("Setting form values:", formValues);
-      form.reset(formValues);
 
-      // Verify the form state after reset
+      // Use a timeout to ensure the form reset happens after React has processed state updates
       setTimeout(() => {
+        form.reset(formValues);
+
+        // Force set the timezone field value explicitly
+        form.setValue("timezone", timezone);
+
+        // Verify the form state after reset
         console.log("Form values after reset:", form.getValues());
       }, 0);
     }
@@ -241,48 +246,50 @@ const GeneralSettings = ({
                   control={form.control}
                   name="timezone"
                   render={({ field }) => {
-                    // Debug logging
-                    console.log("Current timezone value:", field.value);
-                    console.log("Selected timezone state:", selectedTimezone);
-                    
-                    // Map timezone codes to display names
-                    const timezoneLabels = {
-                      "UTC": "UTC",
-                      "EST": "Eastern Time (EST)",
-                      "CST": "Central Time (CST)",
-                      "PST": "Pacific Time (PST)"
-                    };
-                    
+                    // Add logging to debug the field value during render
+                    console.log("Rendering timezone field with value:", field.value);
+
                     return (
                       <FormItem>
                         <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
                         {isLoadingProfile ? (
                           <Skeleton className="h-10 w-full" />
                         ) : (
-                          <>
-                            <Select
-                              defaultValue={field.value}
-                              onValueChange={(value) => {
-                                setSelectedTimezone(value);
-                                field.onChange(value);
-                              }}
-                              disabled={isSaving}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue>
-                                    {timezoneLabels[field.value as keyof typeof timezoneLabels] || field.value}
-                                  </SelectValue>
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="UTC">UTC</SelectItem>
-                                <SelectItem value="EST">Eastern Time (EST)</SelectItem>
-                                <SelectItem value="CST">Central Time (CST)</SelectItem>
-                                <SelectItem value="PST">Pacific Time (PST)</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </>
+                          <Select
+                            disabled={isSaving}
+                            onValueChange={(val) => {
+                              console.log("Timezone changed to:", val);
+                              field.onChange(val);
+                            }}
+                            value={field.value || selectedTimezone} // Fall back to selectedTimezone if field.value is empty
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue>
+                                  {field.value === "UTC" && "UTC"}
+                                  {field.value === "EST" && "Eastern Time (EST)"}
+                                  {field.value === "CST" && "Central Time (CST)"}
+                                  {field.value === "PST" && "Pacific Time (PST)"}
+                                  {!field.value && selectedTimezone === "UTC" && "UTC"}
+                                  {!field.value &&
+                                    selectedTimezone === "EST" &&
+                                    "Eastern Time (EST)"}
+                                  {!field.value &&
+                                    selectedTimezone === "CST" &&
+                                    "Central Time (CST)"}
+                                  {!field.value &&
+                                    selectedTimezone === "PST" &&
+                                    "Pacific Time (PST)"}
+                                </SelectValue>
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="UTC">UTC</SelectItem>
+                              <SelectItem value="EST">Eastern Time (EST)</SelectItem>
+                              <SelectItem value="CST">Central Time (CST)</SelectItem>
+                              <SelectItem value="PST">Pacific Time (PST)</SelectItem>
+                            </SelectContent>
+                          </Select>
                         )}
                         <FormMessage />
                       </FormItem>
