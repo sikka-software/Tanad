@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 
 import GeneralSettings from "@/components/settings/general-settings";
+import NotificationSettings from "@/components/settings/notification-settings";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -91,7 +92,7 @@ const SortableItem = ({ item }: SortableItemProps) => {
   );
 };
 
-export default function SettingsPage() {
+const SettingsPage = () => {
   const pathname = usePathname();
   const t = useTranslations();
   const lang = useLocale();
@@ -100,6 +101,7 @@ export default function SettingsPage() {
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const generalSettingsFormRef = React.useRef<HTMLFormElement>(null);
+  const notificationSettingsFormRef = React.useRef<HTMLFormElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -130,18 +132,16 @@ export default function SettingsPage() {
   const handleSave = () => {
     if (activeTab === "general" && generalSettingsFormRef.current) {
       generalSettingsFormRef.current.requestSubmit();
-    } else {
-      // Handle other tab saves
-      setIsDirty(false);
-      console.log("Settings saved", menuList);
+    } else if (activeTab === "notifications" && notificationSettingsFormRef.current) {
+      notificationSettingsFormRef.current.requestSubmit();
     }
   };
 
-  const handleGeneralSettingsSave = () => {
+  const handleSaveStart = () => {
     setIsSaving(true);
   };
 
-  const handleGeneralSettingsSaveComplete = () => {
+  const handleSaveComplete = () => {
     setIsSaving(false);
     setIsDirty(false);
   };
@@ -247,10 +247,10 @@ export default function SettingsPage() {
               <TabsContent value="general" className="m-0">
                 <GeneralSettings
                   onDirtyChange={setIsDirty}
-                  onSave={handleGeneralSettingsSave}
-                  onSaveComplete={handleGeneralSettingsSaveComplete}
+                  onSave={handleSaveStart}
+                  onSaveComplete={handleSaveComplete}
                   isSaving={isSaving}
-                  formRef={generalSettingsFormRef as React.RefObject<HTMLFormElement>}
+                  formRef={generalSettingsFormRef}
                 />
               </TabsContent>
 
@@ -438,97 +438,13 @@ export default function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="notifications" className="m-0">
-                <Card className="shadow-none">
-                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
-                    <CardTitle>{t("Settings.notifications.title")}</CardTitle>
-                    <CardDescription>{t("Settings.notifications.description")}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">
-                        {t("Settings.notifications.email.title")}
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="email-updates" className="flex-1">
-                            {t("Settings.notifications.email.updates")}
-                          </Label>
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="email-updates"
-                            defaultChecked
-                            onCheckedChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="email-marketing" className="flex-1">
-                            {t("Settings.notifications.email.marketing")}
-                          </Label>
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="email-marketing"
-                            defaultChecked
-                            onCheckedChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="email-security" className="flex-1">
-                            {t("Settings.notifications.email.security")}
-                          </Label>
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="email-security"
-                            defaultChecked
-                            onCheckedChange={handleInputChange}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">
-                        {t("Settings.notifications.in_app.title")}
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="app-mentions" className="flex-1">
-                            {t("Settings.notifications.in_app.mentions")}
-                          </Label>
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="app-mentions"
-                            defaultChecked
-                            onCheckedChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="app-comments" className="flex-1">
-                            {t("Settings.notifications.in_app.comments")}
-                          </Label>
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="app-comments"
-                            defaultChecked
-                            onCheckedChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="app-tasks" className="flex-1">
-                            {t("Settings.notifications.in_app.tasks")}
-                          </Label>
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="app-tasks"
-                            defaultChecked
-                            onCheckedChange={handleInputChange}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <NotificationSettings
+                  onDirtyChange={setIsDirty}
+                  onSave={handleSaveStart}
+                  onSaveComplete={handleSaveComplete}
+                  isSaving={isSaving}
+                  formRef={notificationSettingsFormRef}
+                />
               </TabsContent>
 
               <TabsContent value="billing" className="m-0">
@@ -636,7 +552,9 @@ export default function SettingsPage() {
       </div>
     </div>
   );
-}
+};
+
+export default SettingsPage;
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

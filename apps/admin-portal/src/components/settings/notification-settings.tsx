@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -13,11 +13,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "../ui/form";
 import { Separator } from "../ui/separator";
 import { Switch } from "../ui/switch";
@@ -38,7 +36,7 @@ interface NotificationSettingsProps {
   onSave: () => void;
   onSaveComplete: () => void;
   isSaving: boolean;
-  formRef: React.RefObject<HTMLFormElement>;
+  formRef: React.RefObject<HTMLFormElement | null>;
 }
 
 const NotificationSettings = ({
@@ -49,6 +47,7 @@ const NotificationSettings = ({
   formRef,
 }: NotificationSettingsProps) => {
   const t = useTranslations();
+  const lang = useLocale();
   const { profile } = useUserStore();
   const profileMutation = useProfileMutation();
 
@@ -98,141 +97,154 @@ const NotificationSettings = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("Settings.notifications")}</CardTitle>
-        <CardDescription>{t("Settings.notifications_description")}</CardDescription>
+    <Card className="shadow-none">
+      <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
+        <CardTitle>{t("Settings.notifications.title")}</CardTitle>
+        <CardDescription>{t("Settings.notifications.description")}</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
         <Form {...form}>
           <form
             ref={formRef}
             onSubmit={form.handleSubmit(onSubmit)}
             onKeyDown={handleKeyDown}
-            className="space-y-6"
           >
             <div className="space-y-4">
-              <h3 className="text-sm font-medium">{t("Settings.email_notifications")}</h3>
-              <FormField
-                control={form.control}
-                name="email_updates"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">{t("Settings.email_updates")}</FormLabel>
-                      <FormDescription>{t("Settings.email_updates_description")}</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isSaving}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email_marketing"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">{t("Settings.email_marketing")}</FormLabel>
-                      <FormDescription>{t("Settings.email_marketing_description")}</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isSaving}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email_security"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">{t("Settings.email_security")}</FormLabel>
-                      <FormDescription>{t("Settings.email_security_description")}</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isSaving}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              <h3 className="text-sm font-medium">
+                {t("Settings.notifications.email.title")}
+              </h3>
+              <div className="space-y-3">
+                <FormField
+                  control={form.control}
+                  name="email_updates"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between">
+                      <FormLabel htmlFor="email-updates" className="flex-1">
+                        {t("Settings.notifications.email.updates")}
+                      </FormLabel>
+                      <FormControl>
+                        <Switch
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="email-updates"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email_marketing"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between">
+                      <FormLabel htmlFor="email-marketing" className="flex-1">
+                        {t("Settings.notifications.email.marketing")}
+                      </FormLabel>
+                      <FormControl>
+                        <Switch
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="email-marketing"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email_security"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between">
+                      <FormLabel htmlFor="email-security" className="flex-1">
+                        {t("Settings.notifications.email.security")}
+                      </FormLabel>
+                      <FormControl>
+                        <Switch
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="email-security"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             <Separator />
 
             <div className="space-y-4">
-              <h3 className="text-sm font-medium">{t("Settings.app_notifications")}</h3>
-              <FormField
-                control={form.control}
-                name="app_mentions"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">{t("Settings.app_mentions")}</FormLabel>
-                      <FormDescription>{t("Settings.app_mentions_description")}</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isSaving}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="app_comments"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">{t("Settings.app_comments")}</FormLabel>
-                      <FormDescription>{t("Settings.app_comments_description")}</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isSaving}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="app_tasks"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">{t("Settings.app_tasks")}</FormLabel>
-                      <FormDescription>{t("Settings.app_tasks_description")}</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isSaving}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+              <h3 className="text-sm font-medium">
+                {t("Settings.notifications.in_app.title")}
+              </h3>
+              <div className="space-y-3">
+                <FormField
+                  control={form.control}
+                  name="app_mentions"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between">
+                      <FormLabel htmlFor="app-mentions" className="flex-1">
+                        {t("Settings.notifications.in_app.mentions")}
+                      </FormLabel>
+                      <FormControl>
+                        <Switch
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="app-mentions"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="app_comments"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between">
+                      <FormLabel htmlFor="app-comments" className="flex-1">
+                        {t("Settings.notifications.in_app.comments")}
+                      </FormLabel>
+                      <FormControl>
+                        <Switch
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="app-comments"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="app_tasks"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center justify-between">
+                      <FormLabel htmlFor="app-tasks" className="flex-1">
+                        {t("Settings.notifications.in_app.tasks")}
+                      </FormLabel>
+                      <FormControl>
+                        <Switch
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="app-tasks"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
           </form>
         </Form>

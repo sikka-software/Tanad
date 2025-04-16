@@ -34,7 +34,7 @@ interface GeneralSettingsProps {
   onSave: () => void;
   onSaveComplete: () => void;
   isSaving: boolean;
-  formRef: React.RefObject<HTMLFormElement>;
+  formRef: React.RefObject<HTMLFormElement | null>;
 }
 
 const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, formRef }: GeneralSettingsProps) => {
