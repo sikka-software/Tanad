@@ -1756,6 +1756,7 @@
     "branch_details": "تفاصيل الفرع",
     "create_branch": "إنشاء فرع",
     "no_branches_found": "لا توجد فروع",
+    "search_branches": "بحث عن فروع...",
     "manager": "المدير",
     "edit": "تعديل الفرع",
     "status": {

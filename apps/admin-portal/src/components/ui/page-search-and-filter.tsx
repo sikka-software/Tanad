@@ -2,7 +2,15 @@ import * as React from "react";
 
 import Link from "next/link";
 
-import { Search, Filter, ChevronDown, SlidersHorizontal, Plus, LayoutGrid, Table2 } from "lucide-react";
+import {
+  Search,
+  Filter,
+  ChevronDown,
+  SlidersHorizontal,
+  Plus,
+  LayoutGrid,
+  Table2,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -33,7 +41,7 @@ const PageSearchAndFilter = ({
   return (
     <div
       className={cn(
-        "bg-background  sticky top-0 flex !min-h-14 items-center justify-between gap-4 border-b px-2",
+        "bg-background sticky top-0 flex !min-h-12 items-center justify-between gap-4 border-b px-2",
         className,
       )}
       {...props}
@@ -46,10 +54,10 @@ const PageSearchAndFilter = ({
           <Input
             type="text"
             placeholder={searchPlaceholder}
-            className="bg-muted/50 h-9 w-full ps-9 focus-visible:ring-1"
+            className="bg-muted/50 h-8 w-full ps-9 focus-visible:ring-1"
             onChange={(e) => onSearch?.(e.target.value)}
           />
-          <Search className="text-muted-foreground absolute top-1/2 start-3 h-4 w-4 -translate-y-1/2" />
+          <Search className="text-muted-foreground absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2" />
         </div>
       </div>
 
@@ -58,8 +66,8 @@ const PageSearchAndFilter = ({
         {onViewModeChange && (
           <Button
             variant="outline"
-            size="sm"
-            className="h-9"
+            size="icon"
+            className="size-8"
             onClick={() => onViewModeChange(viewMode === "table" ? "cards" : "table")}
           >
             {viewMode === "table" ? (
@@ -73,18 +81,18 @@ const PageSearchAndFilter = ({
           </Button>
         )}
 
-        <Button variant="outline" size="sm" className="h-9">
+        {/* <Button variant="outline" size="sm" className="h-9">
           <Filter className="me-2 h-4 w-4" />
           <span className="hidden sm:inline">Filters</span>
           <ChevronDown className="ms-1 h-4 w-4" />
-        </Button>
+        </Button> */}
 
-        <Button variant="outline" size="sm" className="h-9 px-2 sm:px-3">
+        <Button variant="outline" size="icon" className="size-8 px-2 sm:px-3">
           <SlidersHorizontal className="h-4 w-4" />
           <span className="sr-only">Settings</span>
         </Button>
 
-        <Button size="sm" className="h-9">
+        <Button size="sm" className="h-8">
           <Link href={createHref} className="flex items-center">
             <Plus className="me-1 h-4 w-4" />
             <span>{createLabel}</span>

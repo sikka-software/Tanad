@@ -2061,6 +2061,7 @@
     "branch_details": "Branch Details",
     "create_branch": "Create Branch",
     "no_branches_found": "No branches found",
+    "search_branches": "Search branches...",
     "manager": "Manager",
     "edit": "Edit Branch",
     "status": {

@@ -31,25 +31,23 @@ const PageTitle = ({
   };
 }) => {
   return (
-    <div className="bg-background sticky top-0 flex !min-h-14 items-center justify-between border-b p-2">
-      <h1 className="text-xl font-bold">{title}</h1>
+    <div className="bg-background sticky top-0 flex !min-h-12 items-center justify-between border-b bg-background p-2 py-0">
+      <h2 className="ms-2 text-xl font-bold">{title}</h2>
       {formButtons && (
-        <>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={onCancel}>
-              {texts?.cancel}
-            </Button>
-            <Button type="submit" size="sm" form={formId} className="min-w-24" disabled={loading}>
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : texts?.submit_form}
-            </Button>
-          </div>
-        </>
+        <div className="flex gap-2 p-0">
+          <Button variant="outline" size="sm" className="h-8" onClick={onCancel}>
+            {texts?.cancel}
+          </Button>
+          <Button type="submit" size="sm" form={formId} className="h-8 min-w-24" disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : texts?.submit_form}
+          </Button>
+        </div>
       )}
       {customButton
         ? customButton
         : createButtonLink && (
             <Link href={createButtonLink}>
-              <Button disabled={createButtonDisabled} size="sm">
+              <Button disabled={createButtonDisabled} size="sm" className="h-8">
                 <Plus className="h-4 w-4" />
                 {createButtonText}
               </Button>
