@@ -8,24 +8,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Flag } from "lucide-react";
 import * as z from "zod";
 
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Separator } from "@/ui/separator";
+import { Skeleton } from "@/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
+
 import useUserStore from "@/hooks/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
-
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Separator } from "../ui/separator";
-import { Skeleton } from "../ui/skeleton";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -331,7 +323,7 @@ const GeneralSettings = ({
                             <TooltipContent className="max-w-[250px]">
                               <div className="flex flex-row">
                                 <div className="flex flex-col">
-                                  <span className="text-sm font-bold flex flex-row items-center">
+                                  <span className="flex flex-row items-center text-sm font-bold">
                                     <Flag className="me-2 !size-3" />
                                     {t("Flags.timezone_soon.title")}
                                   </span>

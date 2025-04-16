@@ -6,12 +6,14 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
-import ErrorComponent from "@/components/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import TableSkeleton from "@/components/ui/table-skeleton";
-import { useInvoicesStore } from "@/stores/invoices.store";
+import { Button } from "@/ui/button";
+import ErrorComponent from "@/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import TableSkeleton from "@/ui/table-skeleton";
+
 import { Invoice } from "@/types/invoice.type";
+
+import { useInvoicesStore } from "@/stores/invoices.store";
 
 const invoiceNumberSchema = z.string().min(1, "Required");
 const issueDateSchema = z.date();

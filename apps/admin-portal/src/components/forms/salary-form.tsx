@@ -9,21 +9,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Combobox } from "@/components/ui/combobox";
-import { DatePicker } from "@/components/ui/date-picker";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Combobox } from "@/ui/combobox";
+import { DatePicker } from "@/ui/date-picker";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/input";
+import { Textarea } from "@/ui/textarea";
+
+import type { Salary } from "@/types/salary.type";
+
 import useUserStore from "@/hooks/use-user-store";
 import { useEmployees } from "@/hooks/useEmployees";
-import type { Salary } from "@/types/salary.type";
 
 const createSalarySchema = (t: (key: string) => string) =>
   z.object({

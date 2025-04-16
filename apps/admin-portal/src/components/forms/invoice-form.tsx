@@ -10,40 +10,20 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { ClientForm } from "@/components/forms/client-form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ComboboxAdd } from "@/components/ui/combobox-add";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/lib/supabase";
+import { Button } from "@/ui/button";
+import { ComboboxAdd } from "@/ui/combobox-add";
+import { DatePicker } from "@/ui/date-picker";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormDialog } from "@/ui/form-dialog";
+import { Input } from "@/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
+import { Textarea } from "@/ui/textarea";
 
-import { FormDialog } from "../ui/form-dialog";
+import { ClientForm } from "@/forms/client-form";
+
+import { supabase } from "@/lib/supabase";
 
 const invoiceSchema = z.object({
   client_id: z.string().min(1, "Client is required"),

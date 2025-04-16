@@ -4,11 +4,13 @@ import { useTranslations } from "next-intl";
 
 import { z } from "zod";
 
-import ErrorComponent from "@/components/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import TableSkeleton from "@/components/ui/table-skeleton";
-import { useVendorsStore } from "@/stores/vendors.store";
+import ErrorComponent from "@/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import TableSkeleton from "@/ui/table-skeleton";
+
 import { Vendor } from "@/types/vendor.type";
+
+import { useVendorsStore } from "@/stores/vendors.store";
 
 const nameSchema = z.string().min(1, "Required");
 const companySchema = z.string().optional();

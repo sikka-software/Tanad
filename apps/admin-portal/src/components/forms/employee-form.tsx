@@ -8,25 +8,20 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { ComboboxAdd } from "@/components/ui/combobox-add";
-import { DatePicker } from "@/components/ui/date-picker";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import useUserStore from "@/hooks/use-user-store";
-import { useDepartments, DEPARTMENTS_QUERY_KEY } from "@/hooks/useDepartments";
+import { ComboboxAdd } from "@/ui/combobox-add";
+import { DatePicker } from "@/ui/date-picker";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormDialog } from "@/ui/form-dialog";
+import { Input } from "@/ui/input";
+import { Switch } from "@/ui/switch";
+import { Textarea } from "@/ui/textarea";
+
+import DepartmentForm, { DepartmentFormValues } from "@/components/forms/department-form";
+
 import { supabase } from "@/lib/supabase";
 
-import { FormDialog } from "../ui/form-dialog";
-import DepartmentForm, { DepartmentFormValues } from "./department-form";
+import useUserStore from "@/hooks/use-user-store";
+import { useDepartments, DEPARTMENTS_QUERY_KEY } from "@/hooks/useDepartments";
 
 interface EmployeeFormProps {
   id?: string;

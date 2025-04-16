@@ -6,18 +6,13 @@ import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useJobs } from "@/hooks/useJobs";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/input";
+import { Textarea } from "@/ui/textarea";
+
 import { Job } from "@/types/job.type";
+
+import { useJobs } from "@/hooks/useJobs";
 
 interface JobListingFormProps {
   id?: string;

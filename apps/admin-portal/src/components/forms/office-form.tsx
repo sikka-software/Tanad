@@ -5,15 +5,8 @@ import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/input";
 
 export const createOfficeSchema = (t: (key: string) => string) =>
   z.object({

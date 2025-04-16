@@ -11,41 +11,22 @@ import { PlusCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
-import { ComboboxAdd } from "@/components/ui/combobox-add";
-import { DatePicker } from "@/components/ui/date-picker";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/ui/button";
+import { ComboboxAdd } from "@/ui/combobox-add";
+import { DatePicker } from "@/ui/date-picker";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormDialog } from "@/ui/form-dialog";
+import { Input } from "@/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
+import { Textarea } from "@/ui/textarea";
+
+import { ClientForm, type ClientFormValues } from "@/forms/client-form";
+
 import { supabase } from "@/lib/supabase";
+
 import { Client } from "@/types/client.type";
 import { Product } from "@/types/product.type";
-
-import { FormDialog } from "../ui/form-dialog";
-import { ClientForm, type ClientFormValues } from "./client-form";
 
 export interface QuoteItem {
   product_id?: string;

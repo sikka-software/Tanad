@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { MoreHorizontal } from "lucide-react";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   DropdownMenuItem,
   DropdownMenu,
@@ -13,12 +13,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import ErrorComponent from "@/components/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import TableSkeleton from "@/components/ui/table-skeleton";
-import { useClientsStore } from "@/stores/clients.store";
+} from "@/ui/dropdown-menu";
+import ErrorComponent from "@/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import TableSkeleton from "@/ui/table-skeleton";
+
 import { Client } from "@/types/client.type";
+
+import { useClientsStore } from "@/stores/clients.store";
 
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");

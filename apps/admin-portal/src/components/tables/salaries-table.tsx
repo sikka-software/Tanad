@@ -4,11 +4,13 @@ import { useTranslations } from "next-intl";
 
 import { z } from "zod";
 
-import ErrorComponent from "@/components/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import TableSkeleton from "@/components/ui/table-skeleton";
-import { useSalariesStore } from "@/stores/salaries.store";
+import ErrorComponent from "@/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import TableSkeleton from "@/ui/table-skeleton";
+
 import { Salary } from "@/types/salary.type";
+
+import { useSalariesStore } from "@/stores/salaries.store";
 
 const employeeNameSchema = z.string().min(1, "Required");
 const grossAmountSchema = z.number().min(0, "Must be positive");

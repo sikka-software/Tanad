@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -8,19 +6,12 @@ import { useRouter } from "next/router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import { DatePicker } from "@/components/ui/date-picker";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DatePicker } from "@/ui/date-picker";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Switch } from "@/ui/switch";
+import { Textarea } from "@/ui/textarea";
 
 interface JobFormProps {
   id?: string;
@@ -256,4 +247,4 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
       </form>
     </Form>
   );
-} 
+}

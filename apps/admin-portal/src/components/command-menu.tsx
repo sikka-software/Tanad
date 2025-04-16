@@ -12,10 +12,12 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@/components/ui/command";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useMainStore } from "@/hooks/main.store";
+} from "@/ui/command";
+import { Dialog, DialogContent } from "@/ui/dialog";
+
 import { commandList } from "@/lib/command-list";
+
+import { useMainStore } from "@/hooks/main.store";
 
 type ShortcutCommand = {
   key: string;

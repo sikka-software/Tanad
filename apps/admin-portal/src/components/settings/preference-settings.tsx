@@ -6,21 +6,14 @@ import { useLocale, useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
+import { Card, CardTitle, CardHeader, CardDescription, CardContent } from "@/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Separator } from "@/ui/separator";
+import { Skeleton } from "@/ui/skeleton";
+
 import useUserStore from "@/hooks/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
-
-import { Card, CardTitle, CardHeader, CardDescription, CardContent } from "../ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Separator } from "../ui/separator";
-import { Skeleton } from "../ui/skeleton";
 
 const formSchema = z.object({
   currency: z.string(),
@@ -318,8 +311,12 @@ const PreferenceSettings = ({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="12h">{t("Settings.preferences.datetime.12h")}</SelectItem>
-                            <SelectItem value="24h">{t("Settings.preferences.datetime.24h")}</SelectItem>
+                            <SelectItem value="12h">
+                              {t("Settings.preferences.datetime.12h")}
+                            </SelectItem>
+                            <SelectItem value="24h">
+                              {t("Settings.preferences.datetime.24h")}
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       )}

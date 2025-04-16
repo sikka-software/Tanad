@@ -4,11 +4,14 @@ import { useTranslations } from "next-intl";
 
 import { z } from "zod";
 
-import ErrorComponent from "@/components/ui/error-component";
+import ErrorComponent from "@/ui/error-component";
+import TableSkeleton from "@/ui/table-skeleton";
+
 import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import TableSkeleton from "@/components/ui/table-skeleton";
-import { useWarehousesStore } from "@/stores/warehouses.store";
+
 import { Warehouse } from "@/types/warehouse.type";
+
+import { useWarehousesStore } from "@/stores/warehouses.store";
 
 const nameSchema = z.string().min(1, "Required");
 const codeSchema = z.string().min(1, "Required");

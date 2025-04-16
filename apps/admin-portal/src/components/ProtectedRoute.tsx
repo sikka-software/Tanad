@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useRouter } from "next/router";
 
-// Hooks
 import useUserStore from "@/hooks/use-user-store";
 
 interface ProtectedRouteProps {

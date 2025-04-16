@@ -6,11 +6,13 @@ import { type CellContext } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { z } from "zod";
 
-import ErrorComponent from "@/components/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import TableSkeleton from "@/components/ui/table-skeleton";
-import { useQuotesStore } from "@/stores/quotes.store";
+import ErrorComponent from "@/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import TableSkeleton from "@/ui/table-skeleton";
+
 import { Quote } from "@/types/quote.type";
+
+import { useQuotesStore } from "@/stores/quotes.store";
 
 const quoteNumberSchema = z.string().min(1, "Required");
 const statusSchema = z.enum(["draft", "sent", "accepted", "rejected", "expired"]);

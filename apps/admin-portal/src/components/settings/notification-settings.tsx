@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import { useLocale, useTranslations } from "next-intl";
@@ -6,19 +6,14 @@ import { useLocale, useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import { useProfileMutation } from "@/hooks/use-profile-mutation";
-import useUserStore from "@/hooks/use-user-store";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/ui/form";
+import { Separator } from "@/ui/separator";
+import { Skeleton } from "@/ui/skeleton";
+import { Switch } from "@/ui/switch";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "../ui/form";
-import { Separator } from "../ui/separator";
-import { Switch } from "../ui/switch";
+import useUserStore from "@/hooks/use-user-store";
+import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 
 const formSchema = z.object({
   email_updates: z.boolean(),
@@ -48,42 +43,82 @@ const NotificationSettings = ({
 }: NotificationSettingsProps) => {
   const t = useTranslations();
   const lang = useLocale();
-  const { profile } = useUserStore();
-  const profileMutation = useProfileMutation();
+
+  // Get user from the existing store to get profileId
+  const { user } = useUserStore();
+  const profileId = user?.id || "";
+
+  // Use the profile hook to fetch data
+  const { data: profile, isLoading: isLoadingProfile } = useProfile(profileId);
+
+  // Initialize the update mutation
+  const updateProfileMutation = useUpdateProfile();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email_updates: profile?.user_settings?.notifications?.email_updates ?? false,
-      email_marketing: profile?.user_settings?.notifications?.email_marketing ?? false,
-      email_security: profile?.user_settings?.notifications?.email_security ?? false,
-      app_mentions: profile?.user_settings?.notifications?.app_mentions ?? false,
-      app_comments: profile?.user_settings?.notifications?.app_comments ?? false,
-      app_tasks: profile?.user_settings?.notifications?.app_tasks ?? false,
+      email_updates: false,
+      email_marketing: false,
+      email_security: false,
+      app_mentions: false,
+      app_comments: false,
+      app_tasks: false,
     },
   });
 
+  // Reset form when profile data is loaded
+  useEffect(() => {
+    if (profile) {
+      console.log("Profile loaded for notifications:", profile);
+      console.log("User settings:", profile.user_settings);
+
+      // Get notification values from user_settings, with fallbacks
+      const formValues = {
+        email_updates: profile.user_settings?.notifications?.email_updates ?? false,
+        email_marketing: profile.user_settings?.notifications?.email_marketing ?? false,
+        email_security: profile.user_settings?.notifications?.email_security ?? false,
+        app_mentions: profile.user_settings?.notifications?.app_mentions ?? false,
+        app_comments: profile.user_settings?.notifications?.app_comments ?? false,
+        app_tasks: profile.user_settings?.notifications?.app_tasks ?? false,
+      };
+
+      console.log("Setting notification form values:", formValues);
+
+      // Use a timeout to ensure the form reset happens after React has processed state updates
+      setTimeout(() => {
+        form.reset(formValues);
+      }, 0);
+    }
+  }, [profile, form]);
+
   // Watch for form changes to update isDirty state
   const isDirty = form.formState.isDirty;
-  React.useEffect(() => {
+  useEffect(() => {
     onDirtyChange(isDirty);
   }, [isDirty, onDirtyChange]);
 
   const onSubmit = async (data: FormValues) => {
     onSave();
     try {
-      await profileMutation.mutateAsync({
-        name: profile?.full_name || "",
-        email: profile?.email || "",
-        timezone: profile?.user_settings?.timezone || "UTC",
-        user_settings: {
-          ...profile?.user_settings,
-          notifications: data,
+      // Log the current data
+      console.log("Submitting notification form data:", data);
+      console.log("Current profile:", profile);
+
+      await updateProfileMutation.mutateAsync({
+        profileId,
+        data: {
+          user_settings: {
+            ...(profile?.user_settings || {}),
+            notifications: data,
+          },
         },
       });
+
+      // Reset the form with the current data to clear dirty state
       form.reset(data);
       onSaveComplete();
     } catch (error) {
+      console.error("Error submitting notification form:", error);
       onSaveComplete();
     }
   };
@@ -104,15 +139,9 @@ const NotificationSettings = ({
       </CardHeader>
       <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
         <Form {...form}>
-          <form
-            ref={formRef}
-            onSubmit={form.handleSubmit(onSubmit)}
-            onKeyDown={handleKeyDown}
-          >
+          <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} onKeyDown={handleKeyDown}>
             <div className="space-y-4">
-              <h3 className="text-sm font-medium">
-                {t("Settings.notifications.email.title")}
-              </h3>
+              <h3 className="text-sm font-medium">{t("Settings.notifications.email.title")}</h3>
               <div className="space-y-3">
                 <FormField
                   control={form.control}
@@ -123,13 +152,17 @@ const NotificationSettings = ({
                         {t("Settings.notifications.email.updates")}
                       </FormLabel>
                       <FormControl>
-                        <Switch
-                          dir={lang === "ar" ? "rtl" : "ltr"}
-                          id="email-updates"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={isSaving}
-                        />
+                        {isLoadingProfile ? (
+                          <Skeleton className="h-6 w-10" />
+                        ) : (
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="email-updates"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isSaving}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}
@@ -143,13 +176,17 @@ const NotificationSettings = ({
                         {t("Settings.notifications.email.marketing")}
                       </FormLabel>
                       <FormControl>
-                        <Switch
-                          dir={lang === "ar" ? "rtl" : "ltr"}
-                          id="email-marketing"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={isSaving}
-                        />
+                        {isLoadingProfile ? (
+                          <Skeleton className="h-6 w-10" />
+                        ) : (
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="email-marketing"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isSaving}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}
@@ -163,13 +200,17 @@ const NotificationSettings = ({
                         {t("Settings.notifications.email.security")}
                       </FormLabel>
                       <FormControl>
-                        <Switch
-                          dir={lang === "ar" ? "rtl" : "ltr"}
-                          id="email-security"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={isSaving}
-                        />
+                        {isLoadingProfile ? (
+                          <Skeleton className="h-6 w-10" />
+                        ) : (
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="email-security"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isSaving}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}
@@ -180,9 +221,7 @@ const NotificationSettings = ({
             <Separator />
 
             <div className="space-y-4">
-              <h3 className="text-sm font-medium">
-                {t("Settings.notifications.in_app.title")}
-              </h3>
+              <h3 className="text-sm font-medium">{t("Settings.notifications.in_app.title")}</h3>
               <div className="space-y-3">
                 <FormField
                   control={form.control}
@@ -193,13 +232,17 @@ const NotificationSettings = ({
                         {t("Settings.notifications.in_app.mentions")}
                       </FormLabel>
                       <FormControl>
-                        <Switch
-                          dir={lang === "ar" ? "rtl" : "ltr"}
-                          id="app-mentions"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={isSaving}
-                        />
+                        {isLoadingProfile ? (
+                          <Skeleton className="h-6 w-10" />
+                        ) : (
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="app-mentions"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isSaving}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}
@@ -213,13 +256,17 @@ const NotificationSettings = ({
                         {t("Settings.notifications.in_app.comments")}
                       </FormLabel>
                       <FormControl>
-                        <Switch
-                          dir={lang === "ar" ? "rtl" : "ltr"}
-                          id="app-comments"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={isSaving}
-                        />
+                        {isLoadingProfile ? (
+                          <Skeleton className="h-6 w-10" />
+                        ) : (
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="app-comments"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isSaving}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}
@@ -233,13 +280,17 @@ const NotificationSettings = ({
                         {t("Settings.notifications.in_app.tasks")}
                       </FormLabel>
                       <FormControl>
-                        <Switch
-                          dir={lang === "ar" ? "rtl" : "ltr"}
-                          id="app-tasks"
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={isSaving}
-                        />
+                        {isLoadingProfile ? (
+                          <Skeleton className="h-6 w-10" />
+                        ) : (
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="app-tasks"
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isSaving}
+                          />
+                        )}
                       </FormControl>
                     </FormItem>
                   )}

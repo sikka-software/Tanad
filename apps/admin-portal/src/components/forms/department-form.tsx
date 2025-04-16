@@ -7,17 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import * as z from "zod";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
-import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/input";
+import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
+import { Textarea } from "@/ui/textarea";
+
 import useUserStore from "@/hooks/use-user-store";
 import { useBranches } from "@/hooks/useBranches";
 import { useOffices } from "@/hooks/useOffices";

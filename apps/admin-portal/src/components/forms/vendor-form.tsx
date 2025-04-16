@@ -8,22 +8,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { CompanyForm, type CompanyFormValues } from "@/components/forms/company-form";
-import { ComboboxAdd } from "@/components/ui/combobox-add";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { FormDialog } from "@/components/ui/form-dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useCompanies } from "@/hooks/useCompanies";
+import { ComboboxAdd } from "@/ui/combobox-add";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormDialog } from "@/ui/form-dialog";
+import { Input } from "@/ui/input";
+import { Textarea } from "@/ui/textarea";
+
+import { CompanyForm, type CompanyFormValues } from "@/forms/company-form";
+
 import { supabase } from "@/lib/supabase";
+
 import { fetchVendorById } from "@/services/vendorService";
+
+import { useCompanies } from "@/hooks/useCompanies";
 
 export const createVendorSchema = (t: (key: string) => string) =>
   z.object({

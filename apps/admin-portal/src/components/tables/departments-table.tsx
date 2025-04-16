@@ -6,21 +6,23 @@ import { Row } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import ErrorComponent from "@/components/ui/error-component";
-import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
-import TableSkeleton from "@/components/ui/table-skeleton";
+} from "@/ui/dropdown-menu";
+import ErrorComponent from "@/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import TableSkeleton from "@/ui/table-skeleton";
+
+import { Department } from "@/types/department.type";
+
 import { useBranches } from "@/hooks/useBranches";
 import { useUpdateDepartment } from "@/hooks/useDepartments";
 import { useOffices } from "@/hooks/useOffices";
 import { useWarehouses } from "@/hooks/useWarehouses";
-import { Department } from "@/types/department.type";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().min(1, "Required");
