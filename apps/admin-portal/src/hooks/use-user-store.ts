@@ -15,6 +15,7 @@ export interface Profile {
   user_settings: {
     currency: string;
     calendar_type: string;
+    timezone: string;
   };
   username: string | null;
   subscribed_to: string | null;

@@ -214,7 +214,7 @@ export default function SettingsPage() {
             </TabsList>
             <ScrollArea className="h-[calc(100vh-180px)]">
               <TabsContent value="general" className="m-0">
-                <GeneralSettings />
+                <GeneralSettings onDirtyChange={setIsDirty} />
               </TabsContent>
 
               <TabsContent value="appearance" className="m-0">
