@@ -1,5 +1,631 @@
-const Settings = () => {
-  return <div>Settings</div>;
+"use client";
+
+import { useState } from "react";
+
+import { GetStaticProps } from "next";
+import { useLocale, useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  ChevronsUpDown,
+  CreditCard,
+  GripVertical,
+  Mail,
+  Moon,
+  Save,
+  SettingsIcon,
+  Sun,
+  User,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import PageTitle from "@/components/ui/page-title";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
+
+interface SortableItemProps {
+  item: SidebarMenuGroupProps["items"][number];
+}
+
+const SortableItem = ({ item }: SortableItemProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.title,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="hover:bg-accent flex cursor-grab items-center gap-3 rounded-md border p-3 active:cursor-grabbing"
+    >
+      <GripVertical className="text-muted-foreground h-4 w-4" />
+      {item.icon && <item.icon className="h-4 w-4" />}
+      <span className="flex-1">{item.title}</span>
+      {item.isActive && (
+        <span className="text-primary bg-primary/10 rounded-full px-2 py-1 text-xs font-medium">
+          Active
+        </span>
+      )}
+    </div>
+  );
 };
 
-export default Settings;
+export default function SettingsPage() {
+  const pathname = usePathname();
+  const t = useTranslations();
+  const lang = useLocale();
+  const [menuList, setMenuList] = useState(getMenuList(pathname));
+  const [activeTab, setActiveTab] = useState("general");
+  const [isDirty, setIsDirty] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent, groupName: string) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = menuList[groupName].findIndex((item) => item.title === active.id);
+      const newIndex = menuList[groupName].findIndex((item) => item.title === over.id);
+
+      setMenuList((prev) => ({
+        ...prev,
+        [groupName]: arrayMove(prev[groupName], oldIndex, newIndex),
+      }));
+      setIsDirty(true);
+    }
+  };
+
+  const handleInputChange = () => {
+    setIsDirty(true);
+  };
+
+  const handleSave = () => {
+    // Save logic here
+    setIsDirty(false);
+    console.log("Settings saved", menuList);
+  };
+
+  return (
+    <div>
+      <PageTitle
+        title="Settings"
+        customButton={
+          <div className="container mx-auto flex max-w-7xl justify-end">
+            <Button onClick={handleSave} disabled={!isDirty} className="h-8 gap-2" size="sm">
+              <Save className="h-4 w-4" />
+              Save Changes
+            </Button>
+          </div>
+        }
+      />
+      <div className="flex flex-col gap-6 p-4 md:flex-row">
+        {/* Sidebar */}
+        <div className="w-full shrink-0 md:w-64">
+          <Card>
+            <CardHeader className="p-4">
+              <CardTitle className="text-lg">Settings</CardTitle>
+              <CardDescription>Manage your account settings</CardDescription>
+            </CardHeader>
+            <Separator />
+            <CardContent className="p-0">
+              <div className="flex w-full flex-col">
+                <Button
+                  variant={activeTab === "general" ? "secondary" : "ghost"}
+                  className="h-auto justify-start rounded-none px-4 py-3"
+                  onClick={() => setActiveTab("general")}
+                >
+                  <User className="mr-2 h-4 w-4" />
+                  General
+                </Button>
+                <Button
+                  variant={activeTab === "appearance" ? "secondary" : "ghost"}
+                  className="h-auto justify-start rounded-none px-4 py-3"
+                  onClick={() => setActiveTab("appearance")}
+                >
+                  <Sun className="mr-2 h-4 w-4" />
+                  Appearance
+                </Button>
+                <Button
+                  variant={activeTab === "navigation" ? "secondary" : "ghost"}
+                  className="h-auto justify-start rounded-none px-4 py-3"
+                  onClick={() => setActiveTab("navigation")}
+                >
+                  <SettingsIcon className="mr-2 h-4 w-4" />
+                  Navigation
+                </Button>
+                <Button
+                  variant={activeTab === "preferences" ? "secondary" : "ghost"}
+                  className="h-auto justify-start rounded-none px-4 py-3"
+                  onClick={() => setActiveTab("preferences")}
+                >
+                  <ChevronsUpDown className="mr-2 h-4 w-4" />
+                  Preferences
+                </Button>
+                <Button
+                  variant={activeTab === "notifications" ? "secondary" : "ghost"}
+                  className="h-auto justify-start rounded-none px-4 py-3"
+                  onClick={() => setActiveTab("notifications")}
+                >
+                  <Mail className="mr-2 h-4 w-4" />
+                  Notifications
+                </Button>
+                <Button
+                  variant={activeTab === "billing" ? "secondary" : "ghost"}
+                  className="h-auto justify-start rounded-none px-4 py-3"
+                  onClick={() => setActiveTab("billing")}
+                >
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Billing
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="hidden">
+              <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="appearance">Appearance</TabsTrigger>
+              <TabsTrigger value="navigation">Navigation</TabsTrigger>
+              <TabsTrigger value="preferences">Preferences</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="billing">Billing</TabsTrigger>
+            </TabsList>
+            <ScrollArea className="h-[calc(100vh-180px)]">
+              <TabsContent value="general" className="m-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>General Settings</CardTitle>
+                    <CardDescription>Manage your account details and preferences</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Profile Information</h3>
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Name</Label>
+                          <Input id="name" defaultValue="John Doe" onChange={handleInputChange} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            defaultValue="john@example.com"
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Regional Settings</h3>
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label htmlFor="language">Language</Label>
+                          <Select defaultValue="en" onValueChange={handleInputChange}>
+                            <SelectTrigger id="language">
+                              <SelectValue placeholder="Select language" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="en">English</SelectItem>
+                              <SelectItem value="fr">French</SelectItem>
+                              <SelectItem value="de">German</SelectItem>
+                              <SelectItem value="es">Spanish</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="timezone">Timezone</Label>
+                          <Select defaultValue="utc" onValueChange={handleInputChange}>
+                            <SelectTrigger id="timezone">
+                              <SelectValue placeholder="Select timezone" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="utc">UTC</SelectItem>
+                              <SelectItem value="est">Eastern Time (ET)</SelectItem>
+                              <SelectItem value="cst">Central Time (CT)</SelectItem>
+                              <SelectItem value="pst">Pacific Time (PT)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="appearance" className="m-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Appearance</CardTitle>
+                    <CardDescription>Customize how the application looks</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Theme</h3>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Sun className="h-4 w-4" />
+                          <Label htmlFor="theme-mode">Dark Mode</Label>
+                          <Moon className="h-4 w-4" />
+                        </div>
+                        <Switch
+                          id="theme-mode"
+                          onCheckedChange={handleInputChange}
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                        />
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Density</h3>
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="density">Interface Density</Label>
+                          <Select defaultValue="comfortable" onValueChange={handleInputChange}>
+                            <SelectTrigger id="density">
+                              <SelectValue placeholder="Select density" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="comfortable">Comfortable</SelectItem>
+                              <SelectItem value="compact">Compact</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="navigation" className="m-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Navigation</CardTitle>
+                    <CardDescription>Customize your navigation menu</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {Object.entries(menuList).map(([groupName, items]) => (
+                      <div key={groupName} className="space-y-4">
+                        <h3 className="text-sm font-medium">{groupName}</h3>
+                        <DndContext
+                          sensors={sensors}
+                          collisionDetection={closestCenter}
+                          onDragEnd={(event) => handleDragEnd(event, groupName)}
+                        >
+                          <SortableContext
+                            items={items.map((item) => item.title)}
+                            strategy={verticalListSortingStrategy}
+                          >
+                            <div className="space-y-2">
+                              {items.map((item) => (
+                                <SortableItem key={item.title} item={item} />
+                              ))}
+                            </div>
+                          </SortableContext>
+                        </DndContext>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="preferences" className="m-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Preferences</CardTitle>
+                    <CardDescription>Set your default preferences</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Default Settings</h3>
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label htmlFor="currency">Default Currency</Label>
+                          <Select defaultValue="usd" onValueChange={handleInputChange}>
+                            <SelectTrigger id="currency">
+                              <SelectValue placeholder="Select currency" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="usd">USD ($)</SelectItem>
+                              <SelectItem value="eur">EUR (€)</SelectItem>
+                              <SelectItem value="gbp">GBP (£)</SelectItem>
+                              <SelectItem value="jpy">JPY (¥)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="calendar">Default Calendar</Label>
+                          <Select defaultValue="month" onValueChange={handleInputChange}>
+                            <SelectTrigger id="calendar">
+                              <SelectValue placeholder="Select calendar view" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="day">Day</SelectItem>
+                              <SelectItem value="week">Week</SelectItem>
+                              <SelectItem value="month">Month</SelectItem>
+                              <SelectItem value="year">Year</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Date & Time Format</h3>
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label htmlFor="date-format">Date Format</Label>
+                          <Select defaultValue="mdy" onValueChange={handleInputChange}>
+                            <SelectTrigger id="date-format">
+                              <SelectValue placeholder="Select date format" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
+                              <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
+                              <SelectItem value="ymd">YYYY/MM/DD</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="time-format">Time Format</Label>
+                          <Select defaultValue="12h" onValueChange={handleInputChange}>
+                            <SelectTrigger id="time-format">
+                              <SelectValue placeholder="Select time format" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="12h">12-hour (AM/PM)</SelectItem>
+                              <SelectItem value="24h">24-hour</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="notifications" className="m-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Notifications</CardTitle>
+                    <CardDescription>Manage your notification preferences</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Email Notifications</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="email-updates" className="flex-1">
+                            Product updates
+                          </Label>
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="email-updates"
+                            defaultChecked
+                            onCheckedChange={handleInputChange}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="email-marketing" className="flex-1">
+                            Marketing emails
+                          </Label>
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="email-marketing"
+                            defaultChecked
+                            onCheckedChange={handleInputChange}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="email-security" className="flex-1">
+                            Security alerts
+                          </Label>
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="email-security"
+                            defaultChecked
+                            onCheckedChange={handleInputChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">In-App Notifications</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="app-mentions" className="flex-1">
+                            Mentions
+                          </Label>
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="app-mentions"
+                            defaultChecked
+                            onCheckedChange={handleInputChange}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="app-comments" className="flex-1">
+                            Comments
+                          </Label>
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="app-comments"
+                            defaultChecked
+                            onCheckedChange={handleInputChange}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="app-tasks" className="flex-1">
+                            Task assignments
+                          </Label>
+                          <Switch
+                            dir={lang === "ar" ? "rtl" : "ltr"}
+                            id="app-tasks"
+                            defaultChecked
+                            onCheckedChange={handleInputChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="billing" className="m-0">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Billing</CardTitle>
+                    <CardDescription>
+                      Manage your billing information and subscription
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Current Plan</h3>
+                      <div className="bg-accent/50 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium">Pro Plan</h4>
+                            <p className="text-muted-foreground text-sm">
+                              $29/month, billed monthly
+                            </p>
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Change Plan
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Payment Method</h3>
+                      <div className="bg-background flex items-center justify-between rounded-lg border p-3">
+                        <div className="flex items-center gap-3">
+                          <CreditCard className="h-5 w-5" />
+                          <div>
+                            <p className="text-sm font-medium">Visa ending in 4242</p>
+                            <p className="text-muted-foreground text-xs">Expires 12/2025</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm">
+                          Edit
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Billing Information</h3>
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                          <Label htmlFor="billing-name">Name</Label>
+                          <Input
+                            id="billing-name"
+                            defaultValue="John Doe"
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="billing-email">Email</Label>
+                          <Input
+                            id="billing-email"
+                            type="email"
+                            defaultValue="billing@example.com"
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="billing-address">Address</Label>
+                          <Input
+                            id="billing-address"
+                            defaultValue="123 Main St"
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="billing-city">City</Label>
+                          <Input
+                            id="billing-city"
+                            defaultValue="San Francisco"
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </ScrollArea>
+          </Tabs>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`../../locales/${locale}.json`)).default,
+    },
+  };
+};

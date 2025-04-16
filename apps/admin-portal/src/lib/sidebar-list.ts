@@ -294,20 +294,20 @@ function getSettingsMenus(pathname: string): SidebarMenuGroupProps["items"] {
       isActive: pathname === "/billing",
     },
     {
-      title: "Account",
-      translationKey: "Account.title",
+      title: "Settings",
+      translationKey: "Settings.title",
       icon: Settings,
-      url: "/account",
-      isActive: pathname === "/account",
+      url: "/settings",
+      isActive: pathname === "/settings",
     },
   ];
 }
 
-export function getMenuList(pathname: string) {
+export function getMenuList(pathname?: string): Record<string, SidebarMenuGroupProps["items"]> {
   return {
-    Administration: getAdministrationMenus(pathname),
-    Accounting: getAccountingMenus(pathname),
-    HumanResources: getHrMenus(pathname),
-    Settings: getSettingsMenus(pathname),
+    Administration: getAdministrationMenus(pathname || ""),
+    Accounting: getAccountingMenus(pathname || ""),
+    HumanResources: getHrMenus(pathname || ""),
+    Settings: getSettingsMenus(pathname || ""),
   };
 }
