@@ -34,9 +34,10 @@ import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 
 interface SortableItemProps {
   item: SidebarMenuGroupProps["items"][number];
+  title: string;
 }
 
-const SortableItem = ({ item }: SortableItemProps) => {
+const SortableItem = ({ item, title }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.title,
   });
@@ -57,7 +58,7 @@ const SortableItem = ({ item }: SortableItemProps) => {
     >
       <GripVertical className="text-muted-foreground h-4 w-4" />
       <span className="h-4 w-4 flex-shrink-0" />
-      <span className="flex-1">{item.title}</span>
+      <span className="flex-1">{title}</span>
       {item.isActive && (
         <span className="text-primary bg-primary/10 rounded-full px-2 py-1 text-xs font-medium">
           Active
@@ -217,7 +218,7 @@ const SidebarSettings = ({
         <form ref={formRef} onSubmit={handleSubmit}>
           {Object.entries(menuList).map(([groupName, items]) => (
             <div key={groupName} className="space-y-4">
-              <h3 className="text-sm font-medium">{groupName}</h3>
+              <h3 className="text-sm font-medium">{t(`${groupName}.title`)}</h3>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -229,7 +230,11 @@ const SidebarSettings = ({
                 >
                   <div className="space-y-2">
                     {items.map((item) => (
-                      <SortableItem key={item.title} item={item} />
+                      <SortableItem
+                        key={t(item.title)}
+                        item={item}
+                        title={t(`${item.title}.title`)}
+                      />
                     ))}
                   </div>
                 </SortableContext>
