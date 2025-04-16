@@ -1310,6 +1310,33 @@
     "creating_product": "جاري الإنشاء...",
     "no_products": "لا توجد منتجات",
     "add_first_product": "أضف أول منتج",
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "required": "الاسم مطلوب",
+        "placeholder": "أدخل اسم المنتج"
+      },
+      "description": {
+        "label": "الوصف",
+        "required": "الوصف مطلوب",
+        "placeholder": "أدخل وصف المنتج"
+      },
+      "price": {
+        "label": "السعر",
+        "required": "السعر مطلوب",
+        "placeholder": "أدخل سعر المنتج"
+      },
+      "sku": {
+        "label": "رمز المنتج",
+        "required": "رمز المنتج مطلوب",
+        "placeholder": "أدخل رمز المنتج (اختياري)"
+      },
+      "stock_quantity": {
+        "label": "الكمية المتوفرة",
+        "required": "الكمية المتوفرة مطلوبة",
+        "placeholder": "أدخل الكمية المتوفرة"
+      }
+    },
     "success": {
       "title": "تم بنجاح",
       "created": "تم إنشاء المنتج بنجاح"

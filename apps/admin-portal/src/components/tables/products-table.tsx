@@ -1,5 +1,7 @@
 import React from "react";
 
+import { useTranslations } from "next-intl";
+
 import { z } from "zod";
 
 import ErrorComponent from "@/components/ui/error-component";
@@ -22,19 +24,24 @@ interface ProductsTableProps {
 
 const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
   const { updateProduct } = useProductsStore();
+  const t = useTranslations();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateProduct(rowId, { [columnId]: value });
   };
 
   const columns: ExtendedColumnDef<Product>[] = [
-    { accessorKey: "name", header: "Name", validationSchema: nameSchema },
-    { accessorKey: "description", header: "Description", validationSchema: descriptionSchema },
-    { accessorKey: "price", header: "Price", validationSchema: priceSchema },
-    { accessorKey: "sku", header: "SKU", validationSchema: skuSchema },
+    { accessorKey: "name", header: t("Products.form.name.label"), validationSchema: nameSchema },
+    {
+      accessorKey: "description",
+      header: t("Products.form.description.label"),
+      validationSchema: descriptionSchema,
+    },
+    { accessorKey: "price", header: t("Products.form.price.label"), validationSchema: priceSchema },
+    { accessorKey: "sku", header: t("Products.form.sku.label"), validationSchema: skuSchema },
     {
       accessorKey: "stock_quantity",
-      header: "Stock Quantity",
+      header: t("Products.form.stock_quantity.label"),
       validationSchema: stockQuantitySchema,
     },
   ];

@@ -46,7 +46,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-8"
+                  className="h-8 ps-1.5"
                   onClick={() => setOpenCommandMenu(true)}
                 >
                   <kbd className="bg-muted pointer-events-none hidden h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">

@@ -20,27 +20,28 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-const productSchema = z.object({
-  name: z.string().min(1, "Product name is required"),
-  description: z.string().optional(),
-  price: z
-    .string()
-    .min(1, "Price is required")
-    .refine(
-      (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
-      "Price must be a positive number",
-    ),
-  sku: z.string().optional(),
-  stock_quantity: z
-    .string()
-    .min(1, "Stock quantity is required")
-    .refine(
-      (val) => !isNaN(parseInt(val)) && parseInt(val) >= 0,
-      "Stock quantity must be a positive number",
-    ),
-});
+export const createProductSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("Products.form.name.required")),
+    description: z.string().optional(),
+    price: z
+      .string()
+      .min(1, t("Products.form.price.required"))
+      .refine(
+        (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
+        t("Products.form.price.invalid"),
+      ),
+    sku: z.string().optional(),
+    stock_quantity: z
+      .string()
+      .min(1, t("Products.form.stock_quantity.required"))
+      .refine(
+        (val) => !isNaN(parseInt(val)) && parseInt(val) >= 0,
+        t("Products.form.stock_quantity.invalid"),
+      ),
+  });
 
-export type ProductFormValues = z.infer<typeof productSchema>;
+export type ProductFormValues = z.input<ReturnType<typeof createProductSchema>>;
 
 interface ProductFormProps {
   id?: string;
@@ -67,7 +68,7 @@ export function ProductForm({
   const loading = externalLoading || internalLoading;
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(createProductSchema(t)),
     defaultValues: {
       name: "",
       description: "",
@@ -134,10 +135,10 @@ export function ProductForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Products.product_name")} *</FormLabel>
+              <FormLabel>{t("Products.form.name.label")} *</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={t("Products.enter_product_name")}
+                  placeholder={t("Products.form.name.placeholder")}
                   {...field}
                   disabled={loading}
                 />
@@ -152,10 +153,10 @@ export function ProductForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Products.description")}</FormLabel>
+              <FormLabel>{t("Products.form.description.label")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder={t("Products.enter_description")}
+                  placeholder={t("Products.form.description.placeholder")}
                   rows={4}
                   {...field}
                   disabled={loading}
@@ -172,7 +173,7 @@ export function ProductForm({
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Products.price")} *</FormLabel>
+                <FormLabel>{t("Products.form.price.label")} *</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -193,7 +194,7 @@ export function ProductForm({
             name="stock_quantity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Products.stock_quantity")} *</FormLabel>
+                <FormLabel>{t("Products.form.stock_quantity.label")} *</FormLabel>
                 <FormControl>
                   <Input type="number" min="0" placeholder="0" {...field} disabled={loading} />
                 </FormControl>
@@ -208,9 +209,13 @@ export function ProductForm({
           name="sku"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Products.sku")}</FormLabel>
+              <FormLabel>{t("Products.form.sku.label")}</FormLabel>
               <FormControl>
-                <Input placeholder={t("Products.enter_sku")} {...field} disabled={loading} />
+                <Input
+                  placeholder={t("Products.form.sku.placeholder")}
+                  {...field}
+                  disabled={loading}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

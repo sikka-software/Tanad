@@ -1259,7 +1259,7 @@
   "Products": {
     "title": "Products",
     "add_new": "Add New Product",
-    "search_products": "Search products",
+    "search_products": "Search Products",
     "product_details": "Product Details",
     "product_name": "Product Name",
     "product_name_required": "Product name is required",
@@ -1274,35 +1274,37 @@
     "enter_sku": "Enter SKU (optional)",
     "no_description": "No description",
     "sku_label": "SKU: {value}",
-    "stock_label": "In Stock: {value}",
+    "stock_label": "Available: {value}",
     "create_product": "Create Product",
     "creating_product": "Creating...",
     "no_products": "No products",
     "add_first_product": "Add your first product",
-    "success": {
-      "title": "Success",
-      "created": "Product created successfully"
-    },
-    "error": {
-      "title": "Error",
-      "create": "Failed to create product",
-      "fetch": "Failed to fetch products"
-    },
-    "products": {
-      "title": "Products",
-      "add_product": "Add Product",
-      "no_products": "No products added",
-      "product": "Product",
-      "quantity": "Quantity",
-      "unit_price": "Unit Price",
-      "subtotal": "Subtotal",
-      "select_product": "Select product",
-      "search_products": "Search products",
-      "no_products_found": "No products found",
-      "add_new_product": "Add new product",
-      "product_description": "Product description",
-      "name": "Name",
-      "save_product": "Save Product"
+    "form": {
+      "name": {
+        "label": "Name",
+        "required": "Name is required",
+        "placeholder": "Enter product name"
+      },
+      "description": {
+        "label": "Description",
+        "required": "Description is required",
+        "placeholder": "Enter product description"
+      },
+      "price": {
+        "label": "Price",
+        "required": "Price is required",
+        "placeholder": "Enter product price"
+      },
+      "sku": {
+        "label": "SKU",
+        "required": "SKU is required",
+        "placeholder": "Enter SKU (optional)"
+      },
+      "stock_quantity": {
+        "label": "Stock Quantity",
+        "required": "Stock quantity is required",
+        "placeholder": "Enter stock quantity"
+      }
     }
   },
   "Invoices": {

@@ -9,6 +9,8 @@ import {
   Settings,
   Filter,
   FileInput,
+  Warehouse,
+  Store,
 } from "lucide-react";
 
 export const commandList = [
@@ -57,6 +59,29 @@ export const commandList = [
         label: "Products.title",
         shortcut: "⌘P",
         href: "/products",
+      },
+    ],
+  },
+  {
+    heading: "Locations.title",
+    items: [
+      {
+        icon: Building2,
+        label: "Offices.title",
+        shortcut: "⌘O",
+        href: "/offices",
+      },
+      {
+        icon: Warehouse,
+        label: "Warehouses.title",
+        shortcut: "⌘W",
+        href: "/warehouses",
+      },
+      {
+        icon: Store,
+        label: "Branches.title",
+        shortcut: "⌘B",
+        href: "/branches",
       },
     ],
   },
