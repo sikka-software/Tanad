@@ -6,7 +6,7 @@ on:
 
 env:
   NODE_VERSION: "21.x"
-  ADMIN_PORTAL_DEPLOY_WEBHOOK: https://a02.sikka.io/api/deploy/k88s4os80gg8skw8gk0sookc&force=true
+  ADMIN_PORTAL_DEPLOY_WEBHOOK: https://a01.sikka.io/api/v1/deploy?uuid=oogggwg80w48ssw8ccg4o0wo&force=true
 jobs:
   admin-portal:
     name: "Admin Portal"
@@ -55,4 +55,5 @@ jobs:
 
       - name: Trigger Dokploy Deployment
         run: |
-          curl ${{ env.ADMIN_PORTAL_DEPLOY_WEBHOOK }}
+          curl '${{ env.ADMIN_PORTAL_DEPLOY_WEBHOOK }}' \
+          --header 'Authorization: Bearer ${{ secrets.A01_COOLIFY_TOKEN }}'
