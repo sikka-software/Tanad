@@ -4,65 +4,20 @@ import { useEffect, useState } from "react";
 
 import { useLocale, useTranslations } from "next-intl";
 
-import { Check, Loader2, ShieldAlert } from "lucide-react";
-import { toast } from "sonner";
+import { Check, Loader2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePricing } from "@/hooks/use-pricing";
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
-import { checkRequiredEnvVars } from "@/lib/check-env";
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-import { PaymentForm } from "./payment-form";
-
-// Map plan lookup keys to colors and badges
-const planColors: Record<
-  string,
-  { bgClass: string; textClass: string; badge?: string; headerClass: string; badgeClass?: string }
-> = {
-  tanad_free: {
-    bgClass: "bg-gray-900 dark:bg-gray-900",
-    textClass: "text-white",
-    headerClass: "bg-gray-800 text-white",
-  },
-  tanad_standard: {
-    bgClass: "bg-purple-900 dark:bg-purple-900",
-    textClass: "text-white",
-    headerClass: "bg-purple-800 text-white",
-  },
-  tanad_pro: {
-    bgClass: "bg-purple-900 dark:bg-purple-900",
-    textClass: "text-white",
-    badge: "Popular",
-    headerClass: "bg-purple-800 text-white",
-    badgeClass: "bg-purple-700",
-  },
-  tanad_business: {
-    bgClass: "bg-green-900 dark:bg-green-900",
-    textClass: "text-white",
-    headerClass: "bg-green-800 text-white",
-  },
-  tanad_enterprise: {
-    bgClass: "bg-amber-800 dark:bg-amber-800",
-    textClass: "text-white",
-    badge: "Premium",
-    headerClass: "bg-amber-700 text-white",
-    badgeClass: "bg-amber-600",
-  },
-};
+import { PaymentDialog } from "./PaymentDialog";
 
 // Map plan lookup keys to plan titles for direct use in component
 const planTitles: Record<string, string> = {
@@ -119,7 +74,15 @@ function formatPriceForLocale(price: string, locale: string): string {
   return price;
 }
 
-export default function SubscriptionSelection() {
+interface SubscriptionSelectionProps {
+  subscription?: any;
+  disabled?: boolean;
+}
+
+export default function SubscriptionSelection({
+  subscription = {},
+  disabled = false,
+}: SubscriptionSelectionProps) {
   const t = useTranslations();
   const locale = useLocale();
   const {
@@ -132,14 +95,11 @@ export default function SubscriptionSelection() {
   const { loading: pricesLoading, getPlans } = usePricing(TANAD_PRODUCT_ID);
   const { user, fetchUserAndProfile } = useUserStore();
   const [loading, setLoading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string>("");
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
-  const [selectedPlanName, setSelectedPlanName] = useState<string>("");
-  const [selectedPlanPrice, setSelectedPlanPrice] = useState<string>("");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
-  const [envVarsValid, setEnvVarsValid] = useState(true);
-
+  const [isLoading, setIsLoading] = useState(false);
   const plans = getPlans();
   // Sort plans by price (ascending)
   const sortedPlans = [...plans].sort((a, b) => {
@@ -225,223 +185,19 @@ export default function SubscriptionSelection() {
     }
   };
 
-  const handlePlanSelection = async () => {
-    if (!selectedPlan) {
-      toast.error(t("billing.select_plan_error"));
-      return;
-    }
+  const handleSelectPlan = async (priceId: string) => {
+    setIsLoading(true);
+    setSelectedPlan(priceId);
 
-    try {
-      setLoading(true);
-
-      console.log("Selected plan:", selectedPlan);
-      console.log("User:", user);
-      console.log("User stripe_customer_id:", user?.stripe_customer_id);
-
-      // Check if user and stripe_customer_id exist
-      if (!user || !user.stripe_customer_id) {
-        throw new Error(
-          t("billing.user_not_authenticated", {
-            fallback: "User is not authenticated or stripe customer ID is missing",
-          }),
-        );
-      }
-
-      // Find the selected plan from available plans
-      const planToSelect = sortedPlans.find((plan) => plan.priceId === selectedPlan);
-      if (!planToSelect) {
-        throw new Error(
-          t("billing.plan_not_found", {
-            fallback: "Selected plan not found",
-          }),
-        );
-      }
-
-      // Set plan details for display
-      setSelectedPlanName(
-        t(`billing.plans.${planToSelect.lookup_key?.replace("tanad_", "")}`, {
-          fallback: planToSelect.name,
-        }),
-      );
-      setSelectedPlanPrice(planToSelect.price);
-
-      // Validate Stripe keys first
-      if (!envVarsValid) {
-        throw new Error(
-          t("billing.invalid_stripe_config", {
-            fallback: "Stripe is not properly configured. Please contact support.",
-          }),
-        );
-      }
-
-      // Log the parameters for debugging
-      console.log("Creating payment intent with:", {
-        priceId: selectedPlan,
-        customerId: user.stripe_customer_id,
-      });
-
-      // Get a payment intent or setup intent client secret
-      const response = await fetch("/api/stripe/create-payment-intent", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          priceId: selectedPlan,
-          customerId: user.stripe_customer_id,
-        }),
-      });
-
-      // Check for HTTP errors first
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Payment intent API error:", errorData);
-        throw new Error(errorData.message || errorData.error || `HTTP error ${response.status}`);
-      }
-
-      // Parse the response
-      let data;
-      try {
-        data = await response.json();
-      } catch (parseError) {
-        console.error("Error parsing response:", parseError);
-        throw new Error(
-          t("billing.invalid_response", {
-            fallback: "Invalid response from payment service",
-          }),
-        );
-      }
-
-      // Validate the response data
-      if (!data || typeof data !== "object") {
-        console.error("Invalid data format:", data);
-        throw new Error(
-          t("billing.invalid_data", {
-            fallback: "Invalid data returned from payment service",
-          }),
-        );
-      }
-
-      // Check for Stripe errors in the response
-      if (data.error) {
-        console.error("Stripe error in response:", data.error);
-        throw new Error(
-          data.message ||
-            data.error.message ||
-            t("billing.payment_setup_failed", {
-              fallback: "Failed to set up payment",
-            }),
-        );
-      }
-
-      if (!data.clientSecret) {
-        console.error("Missing client secret in response:", data);
-        throw new Error(
-          t("billing.missing_client_secret", {
-            fallback: "No client secret was returned from the payment service",
-          }),
-        );
-      }
-
-      // Set client secret and open payment dialog
-      setClientSecret(data.clientSecret);
-      setIsPaymentDialogOpen(true);
-    } catch (error) {
-      console.error("Error selecting plan:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : t("billing.error_selecting_plan", { fallback: "Error selecting plan" }),
-      );
-    } finally {
-      setLoading(false);
-    }
+    setIsPaymentDialogOpen(true);
   };
 
   const handleSubscriptionSuccess = async () => {
-    setLoading(true);
-    try {
-      if (!selectedPlan) {
-        throw new Error(
-          t("billing.no_plan_selected", {
-            fallback: "No plan is selected for subscription",
-          }),
-        );
-      }
-
-      if (!user?.stripe_customer_id) {
-        throw new Error(
-          t("billing.missing_customer_id", {
-            fallback: "Stripe customer ID is missing",
-          }),
-        );
-      }
-
-      console.log("Creating subscription with plan ID:", selectedPlan);
-
-      // Attempt to create the subscription with Stripe
-      const result = await createSubscription(selectedPlan);
-
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      toast.success(
-        t("billing.subscription_updated_successfully", {
-          fallback: "Subscription updated successfully",
-        }),
-      );
-
-      await Promise.all([fetchUserAndProfile(), refetchSubscription()]);
-    } catch (error) {
-      console.error("Subscription update failed:", error);
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : t("billing.subscription_update_failed", {
-              fallback: "Failed to update subscription",
-            }),
-      );
-    } finally {
-      setLoading(false);
-      setIsPaymentDialogOpen(false);
-    }
+    setIsPaymentDialogOpen(false);
+    setIsLoading(false);
+    setSelectedPlan("");
+    await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
   };
-
-  // Check environment variables on component mount
-  useEffect(() => {
-    try {
-      const isValid = checkRequiredEnvVars();
-      setEnvVarsValid(isValid);
-
-      if (!isValid) {
-        console.error("Stripe environment variables are not properly configured");
-      }
-    } catch (error) {
-      console.error("Error checking environment variables:", error);
-      setEnvVarsValid(false);
-    }
-  }, []);
-
-  if (!envVarsValid) {
-    return (
-      <Card className="border-amber-300 bg-amber-50 p-4 text-amber-900">
-        <div className="flex items-start gap-3">
-          <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-600" />
-          <div>
-            <h3 className="mb-1 text-lg font-semibold">Stripe Configuration Missing</h3>
-            <p className="mb-2">
-              The Stripe API keys are missing or invalid. Please add the required Stripe API keys to
-              your environment variables.
-            </p>
-            <p className="text-sm text-amber-700">
-              This is a developer-only message and should not appear in production.
-            </p>
-          </div>
-        </div>
-      </Card>
-    );
-  }
 
   if (pricesLoading) {
     return <Skeleton className="h-[400px] w-full" />;
@@ -451,6 +207,13 @@ export default function SubscriptionSelection() {
   if (subscriptionStatus && (subscriptionStatus as string) === "active" && !subscriptionCancelAt) {
     return null;
   }
+
+  const handlePaymentSuccess = async () => {
+    setIsPaymentDialogOpen(false);
+    setIsLoading(false);
+    setSelectedPlan(null);
+    await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
+  };
 
   const getTranslatedFeatures = (plan: any, featureKeys: string[]) => {
     return featureKeys.map((key) => {
@@ -465,7 +228,7 @@ export default function SubscriptionSelection() {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        handlePlanSelection();
+        handleSelectPlan(selectedPlan || "");
       }}
       className="w-full"
     >
@@ -484,7 +247,7 @@ export default function SubscriptionSelection() {
 
       <div dir={locale === "ar" ? "rtl" : "ltr"}>
         <RadioGroup
-          value={selectedPlan}
+          value={selectedPlan || ""}
           onValueChange={handlePlanChange}
           className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
           key={`plan-selection-${selectedPlan}`}
@@ -603,61 +366,14 @@ export default function SubscriptionSelection() {
           )}
         </Button>
       </div>
-
-      <Dialog
-        open={isPaymentDialogOpen}
-        onOpenChange={(open) => {
-          // If dialog is being closed, reset payment-related state
-          if (!open) {
-            setClientSecret(null);
-            if (loading) setLoading(false);
-          }
-          setIsPaymentDialogOpen(open);
-        }}
-      >
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>
-              {selectedPlan &&
-                t(`billing.update_to_plan`, {
-                  plan: selectedPlanName,
-                  fallback: `Update to ${selectedPlanName} Plan`,
-                })}
-            </DialogTitle>
-            <DialogDescription>
-              {t("billing.payment_dialog_description", {
-                fallback: "Enter your payment details to complete the subscription change",
-              })}
-              {selectedPlan && (
-                <div className="mt-2 font-medium">
-                  {t("billing.selected_plan_price", {
-                    price: formatPriceForLocale(selectedPlanPrice, locale),
-                    fallback: `Price: ${formatPriceForLocale(selectedPlanPrice, locale)}`,
-                  })}
-                </div>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          {/* Only render payment form if we have a valid client secret */}
-          {clientSecret ? (
-            <PaymentForm
-              onSuccess={handleSubscriptionSuccess}
-              planName={selectedPlanName}
-              planPrice={selectedPlanPrice}
-              clientSecret={clientSecret}
-            />
-          ) : (
-            <div className="p-4 text-center">
-              <Loader2 className="mx-auto mb-2 h-8 w-8 animate-spin" />
-              <p>
-                {t("billing.loading_payment_form", {
-                  fallback: "Loading payment form...",
-                })}
-              </p>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {isPaymentDialogOpen && (
+        <PaymentDialog
+          open={isPaymentDialogOpen}
+          onOpenChange={setIsPaymentDialogOpen}
+          selectedPlan={selectedPlan || ""}
+          onSuccess={handlePaymentSuccess}
+        />
+      )}
     </form>
   );
 }
