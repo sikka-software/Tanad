@@ -10,34 +10,19 @@ import { BranchForm } from "@/components/forms/branch-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { branchKeys } from "@/hooks/useBranches";
+
 import { supabase } from "@/lib/supabase";
+
+import useUserStore from "@/hooks/use-user-store";
+import { branchKeys } from "@/hooks/useBranches";
 
 export default function AddBranchPage() {
   const router = useRouter();
   const t = useTranslations();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
 
-  // Fetch user ID on mount
-  useEffect(() => {
-    const getUserId = async () => {
-      setLoadingUser(true);
-      const { data, error } = await supabase.auth.getUser();
-      if (data.user) {
-        setUserId(data.user.id);
-      } else {
-        // Redirect to login if not authenticated
-        console.error("User not authenticated:", error);
-        router.push("/auth/login");
-      }
-      setLoadingUser(false);
-    };
-
-    getUserId();
-  }, [router]);
+  const { user } = useUserStore();
 
   const handleSuccess = (branch: any) => {
     setLoading(false);
@@ -51,6 +36,10 @@ export default function AddBranchPage() {
     // Navigate to branches list
     router.push("/branches");
   };
+
+  if (!user) {
+    router.push("/auth");
+  }
 
   return (
     <div>
@@ -74,7 +63,7 @@ export default function AddBranchPage() {
           <CardContent>
             <BranchForm
               id="branch-form"
-              userId={userId}
+              userId={user?.id}
               onSuccess={handleSuccess}
               loading={loading}
               setLoading={setLoading}

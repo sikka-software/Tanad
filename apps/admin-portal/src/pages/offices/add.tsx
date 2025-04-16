@@ -1,45 +1,34 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { OfficeForm, type OfficeFormValues } from "@/components/forms/office-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
+
+import useUserStore from "@/hooks/use-user-store";
 
 export default function AddOfficePage() {
   const router = useRouter();
   const t = useTranslations();
-  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const getUserId = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        setUserId(data.user.id);
-      } else {
-        router.push("/auth/login");
-      }
-    };
-
-    getUserId();
-  }, [router]);
+  const { user } = useUserStore();
 
   const handleSubmit = async (data: OfficeFormValues) => {
     setLoading(true);
     try {
       // Check if user ID is available
-      if (!userId) {
+      if (!user?.id) {
         throw new Error(t("Offices.error.not_authenticated"));
       }
 
@@ -54,7 +43,7 @@ export default function AddOfficePage() {
             city: data.city.trim(),
             state: data.state.trim(),
             zip_code: data.zip_code.trim(),
-            user_id: userId,
+            user_id: user?.id,
           },
         ])
         .select()
@@ -124,7 +113,7 @@ export default function AddOfficePage() {
           <CardContent>
             <OfficeForm
               id="office-form"
-              userId={userId}
+              userId={user?.id}
               onSubmit={handleSubmit}
               loading={loading}
             />

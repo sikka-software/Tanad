@@ -39,7 +39,7 @@ export type ProductFormValues = z.input<ReturnType<typeof createProductSchema>>;
 interface ProductFormProps {
   id?: string;
   onSuccess: (product: any) => void;
-  userId: string | null;
+  userId: string | undefined;
   formRef?: RefObject<HTMLFormElement>;
   hideFormButtons?: boolean;
   loading?: boolean;

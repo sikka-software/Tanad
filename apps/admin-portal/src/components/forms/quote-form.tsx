@@ -51,7 +51,7 @@ export interface QuoteFormProps {
   id?: string;
   formRef?: RefObject<HTMLFormElement>;
   loading?: boolean;
-  userId?: string | null;
+  userId?: string | undefined;
   onSubmit?: (data: QuoteFormValues) => void;
   hideFormButtons?: boolean;
 }
@@ -144,7 +144,7 @@ export function QuoteForm({
 
   useEffect(() => {
     // Get the current user ID and fetch clients
-    const getUserIdAndClients = async () => {
+    const getClients = async () => {
       setClientsLoading(true);
 
       // Fetch clients with all fields and company details
@@ -170,7 +170,7 @@ export function QuoteForm({
       }
     };
 
-    getUserIdAndClients();
+    getClients();
   }, [t]);
 
   useEffect(() => {
@@ -728,7 +728,7 @@ export function QuoteForm({
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
-        <ClientForm id="client-form" onSubmit={handleClientAdded} userId={userId || null} />
+        <ClientForm id="client-form" onSubmit={handleClientAdded} userId={userId} />
       </FormDialog>
     </>
   );

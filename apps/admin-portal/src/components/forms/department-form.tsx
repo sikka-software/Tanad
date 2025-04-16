@@ -20,7 +20,7 @@ import { useWarehouses } from "@/hooks/useWarehouses";
 export const createDepartmentSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Departments.form.validation.name_required")),
-    description: z.string().min(1, t("Departments.form.validation.description_required")),
+    description: z.string().optional(),
     locations: z.array(z.string()).min(1, t("Departments.form.validation.locations_required")),
   });
 

@@ -39,7 +39,7 @@ interface WarehouseFormProps {
   warehouseId?: string;
   onSuccess?: (warehouse: Warehouse) => void;
   loading?: boolean;
-  userId: string | null;
+  userId: string | undefined;
   setLoading?: (loading: boolean) => void;
 }
 

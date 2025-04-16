@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useTranslations } from "next-intl";
@@ -8,32 +8,12 @@ import { SalaryForm } from "@/components/forms/salary-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { supabase } from "@/lib/supabase";
 
 export default function EditSalaryPage() {
   const router = useRouter();
   const t = useTranslations();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
 
   const { id: salaryId } = router.query; // Get salaryId from URL query
-
-  // Fetch user ID
-  useEffect(() => {
-    const getUserId = async () => {
-      setLoadingUser(true);
-      const { data, error } = await supabase.auth.getUser();
-      if (data.user) {
-        setUserId(data.user.id);
-      } else {
-        console.error("User not authenticated:", error);
-        router.push("/auth/login");
-      }
-      setLoadingUser(false);
-    };
-
-    getUserId();
-  }, [router]);
 
   // Check if salaryId is valid
   useEffect(() => {

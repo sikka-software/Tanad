@@ -80,6 +80,7 @@ export function InvoiceForm({
   loading: externalLoading,
   onSuccess,
   onSubmit,
+  
 }: InvoiceFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(externalLoading || false);
@@ -87,7 +88,7 @@ export function InvoiceForm({
   const [products, setProducts] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | undefined>();
   const [clientsLoading, setClientsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
   const t = useTranslations("Invoices");
@@ -95,7 +96,7 @@ export function InvoiceForm({
 
   useEffect(() => {
     // Get the current user ID and fetch clients
-    const getUserIdAndClients = async () => {
+    const getClients = async () => {
       setClientsLoading(true);
 
       // Get user ID
@@ -122,7 +123,7 @@ export function InvoiceForm({
       }
     };
 
-    getUserIdAndClients();
+    getClients();
   }, [t]);
 
   useEffect(() => {

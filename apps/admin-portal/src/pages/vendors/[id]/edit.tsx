@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useTranslations } from "next-intl";
@@ -8,31 +8,16 @@ import { VendorForm } from "@/components/forms/vendor-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { supabase } from "@/lib/supabase";
+
+import useUserStore from "@/hooks/use-user-store";
 
 export default function EditVendorPage() {
   const router = useRouter();
   const t = useTranslations("Vendors");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
 
   const { id: vendorId } = router.query;
 
-  useEffect(() => {
-    const getUserId = async () => {
-      setLoadingUser(true);
-      const { data, error } = await supabase.auth.getUser();
-      if (data.user) {
-        setUserId(data.user.id);
-      } else {
-        console.error("User not authenticated:", error);
-        router.push("/auth/login");
-      }
-      setLoadingUser(false);
-    };
-
-    getUserId();
-  }, [router]);
+  const { user } = useUserStore();
 
   useEffect(() => {
     if (router.isReady && !vendorId) {
@@ -43,6 +28,10 @@ export default function EditVendorPage() {
   const handleSuccess = () => {
     // VendorForm handles navigation by default
   };
+
+  if (!user) {
+    router.push("/auth");
+  }
 
   return (
     <div>
@@ -62,7 +51,7 @@ export default function EditVendorPage() {
             <CardTitle>{t("vendor_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <VendorForm userId={userId} vendorId={vendorId as string} />
+            <VendorForm userId={user?.id} vendorId={vendorId as string} />
           </CardContent>
         </Card>
       </div>

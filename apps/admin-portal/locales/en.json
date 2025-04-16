@@ -2485,7 +2485,6 @@
       },
       "validation": {
         "name_required": "Name is required",
-        "description_required": "Description is required",
         "locations_required": "At least one location is required"
       }
     },

@@ -42,7 +42,7 @@ interface ClientFormProps {
   id?: string;
   onSubmit: (data: ClientFormValues) => Promise<void>;
   loading?: boolean;
-  userId: string | null;
+  userId: string | undefined;
   defaultValues?: Partial<ClientFormValues>;
 }
 

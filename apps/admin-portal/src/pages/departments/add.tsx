@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -7,38 +7,28 @@ import { useRouter } from "next/router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import DepartmentForm, { type DepartmentFormValues } from "@/components/forms/department-form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import PageTitle from "@/ui/page-title";
+
+import DepartmentForm, { type DepartmentFormValues } from "@/forms/department-form";
+
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
+
+import useUserStore from "@/hooks/use-user-store";
 
 export default function AddDepartmentPage() {
   const router = useRouter();
   const t = useTranslations();
-  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const getUserId = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        setUserId(data.user.id);
-      } else {
-        router.push("/auth/login");
-      }
-    };
-
-    getUserId();
-  }, [router]);
+  const { user } = useUserStore();
 
   const handleSubmit = async (data: DepartmentFormValues) => {
     setLoading(true);
     try {
       // Check if user ID is available
-      if (!userId) {
+      if (!user?.id) {
         throw new Error(t("Departments.error.not_authenticated"));
       }
 
@@ -49,7 +39,7 @@ export default function AddDepartmentPage() {
           {
             name: data.name.trim(),
             description: data.description?.trim() || null,
-            user_id: userId,
+            user_id: user.id,
           },
         ])
         .select()

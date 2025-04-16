@@ -1,38 +1,26 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { QuoteForm, type QuoteFormValues } from "@/components/forms/quote-form";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+
 import { supabase } from "@/lib/supabase";
+
+import useUserStore from "@/hooks/use-user-store";
 
 export default function AddQuotePage() {
   const router = useRouter();
   const t = useTranslations();
-  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const getUserId = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        setUserId(data.user.id);
-      } else {
-        router.push("/auth/login");
-      }
-    };
-
-    getUserId();
-  }, [router]);
+  const { user } = useUserStore();
 
   const handleSubmit = async (data: QuoteFormValues) => {
     setLoading(true);
@@ -60,7 +48,7 @@ export default function AddQuotePage() {
             subtotal: subtotal,
             tax_rate: data.tax_rate,
             notes: data.notes?.trim() || null,
-            user_id: userId,
+            user_id: user?.id,
           },
         ])
         .select()
@@ -117,7 +105,7 @@ export default function AddQuotePage() {
           <CardContent>
             <QuoteForm
               id="quote-form"
-              userId={userId}
+              userId={user?.id}
               onSubmit={handleSubmit}
               loading={loading}
               hideFormButtons

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -7,33 +7,23 @@ import { useRouter } from "next/router";
 import { toast } from "sonner";
 
 import { InvoiceForm, type InvoiceFormValues } from "@/components/forms/invoice-form";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+
 import { supabase } from "@/lib/supabase";
+
+import useUserStore from "@/hooks/use-user-store";
 
 export default function AddInvoicePage() {
   const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const getUserId = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-      }
-    };
-    getUserId();
-  }, []);
+  const { user } = useUserStore();
 
   const handleSubmit = async (data: InvoiceFormValues) => {
     setLoading(true);
     try {
-      if (!userId) {
+      if (!user?.id) {
         throw new Error("You must be logged in to create an invoice");
       }
 
@@ -55,7 +45,7 @@ export default function AddInvoicePage() {
             subtotal: subtotal,
             tax_rate: data.tax_rate,
             notes: data.notes?.trim() || null,
-            user_id: userId,
+            user_id: user?.id,
           },
         ])
         .select()

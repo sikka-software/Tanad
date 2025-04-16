@@ -23,7 +23,7 @@ export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
 
 export interface OfficeFormProps {
   id?: string;
-  userId: string | null;
+  userId: string | undefined;
   onSubmit: (data: OfficeFormValues) => void;
   loading?: boolean;
 }

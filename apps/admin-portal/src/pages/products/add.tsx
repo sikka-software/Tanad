@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -7,10 +7,10 @@ import { useRouter } from "next/router";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { ProductForm } from "@/components/forms/product-form";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { supabase } from "@/lib/supabase";
+
+import useUserStore from "@/hooks/use-user-store";
 
 // Define the Product type
 interface Product {
@@ -27,21 +27,8 @@ export default function AddProductPage() {
   const router = useRouter();
   const t = useTranslations();
   const queryClient = useQueryClient();
-  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const getUserId = async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        setUserId(data.user.id);
-      } else {
-        router.push("/auth/login");
-      }
-    };
-
-    getUserId();
-  }, [router]);
+  const { user } = useUserStore();
 
   const handleSuccess = (newProduct: Product) => {
     // Update the products cache to include the new product
@@ -78,7 +65,7 @@ export default function AddProductPage() {
             <ProductForm
               id="product-form"
               onSuccess={handleSuccess}
-              userId={userId}
+              userId={user?.id}
               loading={loading}
               setLoading={setLoading}
               hideFormButtons

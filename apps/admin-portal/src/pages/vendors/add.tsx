@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -10,36 +8,21 @@ import { VendorForm, type VendorFormValues } from "@/components/forms/vendor-for
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import { useCreateVendor } from "@/hooks/useVendors";
+
 import { generateDummyData } from "@/lib/dummy-generator";
-import { supabase } from "@/lib/supabase";
+
+import useUserStore from "@/hooks/use-user-store";
+import { useCreateVendor } from "@/hooks/useVendors";
 
 export default function AddVendorPage() {
   const router = useRouter();
   const t = useTranslations();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
   const createVendorMutation = useCreateVendor();
 
-  // Fetch user ID on mount
-  useEffect(() => {
-    const getUserId = async () => {
-      setLoadingUser(true);
-      const { data, error } = await supabase.auth.getUser();
-      if (data.user) {
-        setUserId(data.user.id);
-      } else {
-        console.error("User not authenticated:", error);
-        router.push("/auth/login");
-      }
-      setLoadingUser(false);
-    };
-
-    getUserId();
-  }, [router]);
+  const { user } = useUserStore();
 
   const onSubmit = async (data: VendorFormValues) => {
-    if (!userId) {
+    if (!user?.id) {
       toast.error(t("error.title"), {
         description: t("error.not_authenticated"),
       });
@@ -57,7 +40,7 @@ export default function AddVendorPage() {
         state: data.state.trim(),
         zipCode: data.zipCode.trim(),
         notes: data.notes?.trim() || null,
-        userId: userId,
+        userId: user?.id,
       };
 
       await createVendorMutation.mutateAsync(vendorData);
@@ -114,7 +97,7 @@ export default function AddVendorPage() {
           <CardContent>
             <VendorForm
               formId="vendor-form"
-              userId={userId}
+              userId={user?.id}
               loading={createVendorMutation.isPending}
               onSubmit={onSubmit}
             />

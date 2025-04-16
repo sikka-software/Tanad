@@ -41,7 +41,7 @@ interface VendorFormProps {
   formId?: string;
   vendorId?: string;
   loading?: boolean;
-  userId: string | null;
+  userId: string | undefined;
   onSubmit?: (data: VendorFormValues) => void;
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -7,36 +7,18 @@ import { useRouter } from "next/router";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { SalaryForm } from "@/components/forms/salary-form";
-// Import SalaryForm
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+
+import useUserStore from "@/hooks/use-user-store";
 import { salaryKeys } from "@/hooks/useSalaries";
-import { supabase } from "@/lib/supabase";
 
 export default function AddSalaryPage() {
   const router = useRouter();
   const t = useTranslations();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-
-  useEffect(() => {
-    const getUserId = async () => {
-      setLoadingUser(true);
-      const { data, error } = await supabase.auth.getUser();
-      if (data.user) {
-        setUserId(data.user.id);
-      } else {
-        console.error("User not authenticated:", error);
-        router.push("/auth/login");
-      }
-      setLoadingUser(false);
-    };
-
-    getUserId();
-  }, [router]);
+  const { user } = useUserStore();
 
   const handleSuccess = (salary: any) => {
     setLoading(false);
@@ -76,7 +58,7 @@ export default function AddSalaryPage() {
               onSuccess={handleSuccess}
               loading={loading}
               setLoading={setLoading}
-              userId={userId}
+              userId={user?.id}
             />
           </CardContent>
         </Card>

@@ -42,7 +42,7 @@ interface BranchFormProps {
   branchId?: string;
   onSuccess?: (branch: Branch) => void;
   loading?: boolean;
-  userId: string | null;
+  userId: string | undefined;
   setLoading?: (loading: boolean) => void;
 }
 
