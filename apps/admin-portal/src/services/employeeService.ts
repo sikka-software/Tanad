@@ -41,33 +41,48 @@ export async function fetchEmployeeById(id: string): Promise<Employee> {
 }
 
 export async function updateEmployee(id: string, updates: Partial<Employee>): Promise<Employee> {
+  // Make a copy of updates to avoid modifying the original object
+  const updatesToApply = { ...updates };
+  
   // If we're updating department_id, we need special handling to also update department field
-  if (updates.department_id !== undefined) {
+  if (updatesToApply.department_id !== undefined) {
     const { data: departmentData, error: departmentError } = await supabase
       .from("departments")
       .select("name")
-      .eq("id", updates.department_id)
+      .eq("id", updatesToApply.department_id)
       .single();
       
     if (departmentError) throw departmentError;
     
     // Update the department name in the updates object
-    updates.department = departmentData?.name || null;
+    updatesToApply.department = departmentData?.name || null;
   }
   
-  const { data, error } = await supabase
+  // First perform the update
+  const { error: updateError } = await supabase
     .from("employees")
-    .update(updates)
-    .eq("id", id)
+    .update(updatesToApply)
+    .eq("id", id);
+  
+  if (updateError) throw updateError;
+  
+  // Then fetch the updated record separately to avoid PGRST116 error
+  const { data, error: fetchError } = await supabase
+    .from("employees")
     .select(`
       *,
       department:departments (
         name
       )
     `)
-    .single();
+    .eq("id", id)
+    .maybeSingle(); // Use maybeSingle() instead of single() to avoid errors
   
-  if (error) throw error;
+  if (fetchError) throw fetchError;
+  
+  if (!data) {
+    throw new Error(`Employee with id ${id} not found after update`);
+  }
   
   return {
     ...data,

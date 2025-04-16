@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -22,24 +22,94 @@ const statusSchema = z.enum(["active", "inactive", "on_leave"]);
 
 const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
   const t = useTranslations();
-  const { mutate: updateEmployee } = useUpdateEmployee();
+  const { mutate: updateEmployee, isPending } = useUpdateEmployee();
   const { data: departments } = useDepartments();
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "department") {
-      // When editing department, we need to update the departmentId
-      const departmentId = value as string;
-      updateEmployee({ 
-        id: rowId, 
-        updates: { department_id: departmentId }
+  
+  // Keep track of the combined state (original data + pending updates)
+  const [currentData, setCurrentData] = useState<Employee[]>([]);
+  const [pendingUpdates, setPendingUpdates] = useState<Record<string, Partial<Employee>>>({});
+  
+  // Update the current data when original data changes
+  useEffect(() => {
+    if (data) {
+      // Apply any pending updates over the incoming data
+      const updatedData = data.map(employee => {
+        const updates = pendingUpdates[employee.id];
+        if (updates) {
+          return { ...employee, ...updates };
+        }
+        return employee;
       });
-    } else {
-      updateEmployee({ 
-        id: rowId, 
-        updates: { [columnId]: value }
-      });
+      setCurrentData(updatedData);
     }
-  };
+  }, [data, pendingUpdates]);
+
+  // Create a memoized handleEdit function
+  const handleEdit = useCallback((rowId: string, columnId: string, value: unknown) => {
+    let updates: Partial<Employee> = {};
+    
+    if (columnId === "department") {
+      // For department changes, handle department_id and department name
+      const departmentId = value as string;
+      updates.department_id = departmentId;
+      
+      // Find the department name for immediate UI display
+      const department = departments?.find(d => d.id === departmentId);
+      if (department) {
+        updates.department = department.name;
+      }
+    } else if (columnId === "status") {
+      updates.status = value as "active" | "inactive" | "on_leave";
+    } else {
+      // For other fields, directly update
+      updates = { [columnId]: value };
+    }
+    
+    // Track this update in our pending updates
+    setPendingUpdates(prev => ({
+      ...prev,
+      [rowId]: { ...(prev[rowId] || {}), ...updates }
+    }));
+    
+    // Immediately apply to our current data view
+    setCurrentData(current => 
+      current.map(employee => 
+        employee.id === rowId 
+          ? { ...employee, ...updates } 
+          : employee
+      )
+    );
+    
+    // Send to the server
+    updateEmployee(
+      { id: rowId, updates },
+      {
+        onSuccess: () => {
+          // On success, clear this item from pending updates
+          setPendingUpdates(prev => {
+            const { [rowId]: _, ...rest } = prev;
+            return rest;
+          });
+        },
+        onError: () => {
+          // On error, revert this specific update
+          setPendingUpdates(prev => {
+            const { [rowId]: _, ...rest } = prev;
+            return rest;
+          });
+          
+          // Also revert our current data view for this row
+          setCurrentData(current => 
+            current.map(employee => 
+              employee.id === rowId
+                ? data.find(e => e.id === rowId) || employee // Revert to original
+                : employee
+            )
+          );
+        }
+      }
+    );
+  }, [data, departments, updateEmployee]);
 
   const columns: ExtendedColumnDef<Employee>[] = [
     {
@@ -103,7 +173,7 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
   return (
     <SheetTable
       columns={columns}
-      data={data}
+      data={currentData.length > 0 ? currentData : data}
       onEdit={handleEdit}
       showHeader={true}
     />

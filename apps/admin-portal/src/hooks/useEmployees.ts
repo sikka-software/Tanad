@@ -15,6 +15,7 @@ export const useEmployees = () => {
   return useQuery({
     queryKey: EMPLOYEES_QUERY_KEY,
     queryFn: fetchEmployeesService,
+    staleTime: 10000, // Consider data fresh for 10 seconds
   });
 };
 
@@ -42,6 +43,31 @@ export const useUpdateEmployee = () => {
       // Snapshot the previous values
       const previousEmployees = queryClient.getQueryData(EMPLOYEES_QUERY_KEY);
       const previousEmployee = queryClient.getQueryData([...EMPLOYEES_QUERY_KEY, id]);
+      
+      // Prepare updates to apply optimistically
+      const optimisticUpdates = { ...updates };
+      
+      // Handle department_id changes to also update the department name for UI
+      if (updates.department_id !== undefined) {
+        try {
+          // Get the current departments from the cache
+          const departments: any = queryClient.getQueryData(["departments"]);
+          
+          if (departments && Array.isArray(departments)) {
+            // Find the department with the matching ID
+            const department = departments.find(
+              (d: any) => d.id === updates.department_id
+            );
+            
+            if (department) {
+              // Set the department name for the optimistic update
+              optimisticUpdates.department = department.name;
+            }
+          }
+        } catch (error) {
+          console.error('Error getting department name for optimistic update:', error);
+        }
+      }
 
       // Optimistically update the cache
       queryClient.setQueryData(EMPLOYEES_QUERY_KEY, (old: Employee[] | undefined) => {
@@ -49,20 +75,7 @@ export const useUpdateEmployee = () => {
         
         return old.map((employee) => {
           if (employee.id === id) {
-            // Handle department_id and department name updates
-            if (updates.department_id !== undefined) {
-              // For optimistic updates, we'll use the current department name
-              // The actual name will be updated when the mutation completes
-              const currentEmployees = old as Employee[];
-              const updatedEmployee = currentEmployees.find(e => e.id === id);
-              if (updatedEmployee) {
-                return { 
-                  ...employee, 
-                  ...updates,
-                };
-              }
-            }
-            return { ...employee, ...updates };
+            return { ...employee, ...optimisticUpdates };
           }
           return employee;
         });
@@ -71,11 +84,24 @@ export const useUpdateEmployee = () => {
       if (previousEmployee) {
         queryClient.setQueryData([...EMPLOYEES_QUERY_KEY, id], (old: Employee | undefined) => {
           if (!old) return old;
-          return { ...old, ...updates };
+          return { ...old, ...optimisticUpdates };
         });
       }
 
       return { previousEmployees, previousEmployee };
+    },
+    onSuccess: (updatedEmployee, { id }) => {
+      // Manually update the cache with the new data instead of invalidating
+      queryClient.setQueryData(EMPLOYEES_QUERY_KEY, (old: Employee[] | undefined) => {
+        if (!old) return [updatedEmployee];
+        
+        return old.map(employee => 
+          employee.id === id ? updatedEmployee : employee
+        );
+      });
+      
+      // Also update the individual employee query data if it exists
+      queryClient.setQueryData([...EMPLOYEES_QUERY_KEY, id], updatedEmployee);
     },
     onError: (err, { id }, context) => {
       // Roll back to the previous values if mutation fails
@@ -86,11 +112,7 @@ export const useUpdateEmployee = () => {
         queryClient.setQueryData([...EMPLOYEES_QUERY_KEY, id], context.previousEmployee);
       }
     },
-    onSettled: (_, __, { id }) => {
-      // Always refetch to ensure cache consistency
-      queryClient.invalidateQueries({ queryKey: EMPLOYEES_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: [...EMPLOYEES_QUERY_KEY, id] });
-    },
+    // Don't invalidate queries on settle - we're manually updating the cache
   });
 };
 
