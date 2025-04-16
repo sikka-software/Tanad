@@ -24,6 +24,16 @@ export interface Profile {
       app_comments: boolean;
       app_tasks: boolean;
     };
+    navigation?: Record<
+      string,
+      Array<{
+        title: string;
+        translationKey?: string;
+        url?: string;
+        isActive?: boolean;
+        action?: string;
+      }>
+    >;
   };
   username: string | null;
   subscribed_to: string | null;

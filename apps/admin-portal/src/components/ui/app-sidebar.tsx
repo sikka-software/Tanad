@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/sidebar";
 import useUserStore from "@/hooks/use-user-store";
 import { CACHE_KEY } from "@/lib/constants";
-import { getMenuList } from "@/lib/sidebar-list";
+import { getMenuList, applyCustomMenuOrder } from "@/lib/sidebar-list";
 import { supabase } from "@/lib/supabase";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
@@ -66,7 +66,7 @@ export function AppSidebar() {
   const lang = useLocale();
   const [open, setOpen] = useState(false);
   const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
-  const { user } = useUserStore();
+  const { user, profile } = useUserStore();
   const router = useRouter();
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
@@ -75,6 +75,13 @@ export function AppSidebar() {
     groups: new Set(),
     menus: new Set(),
   });
+
+  // Log profile when component renders
+  useEffect(() => {
+    console.log("[AppSidebar] Profile on render:", profile);
+    console.log("[AppSidebar] User settings:", profile?.user_settings);
+    console.log("[AppSidebar] Has navigation settings:", profile?.user_settings && 'navigation' in profile.user_settings);
+  }, [profile]);
 
   // Store and clear expanded states when sidebar collapses
   useEffect(() => {
@@ -118,7 +125,31 @@ export function AppSidebar() {
     [state, isMobile, setSidebarOpen],
   );
 
-  const menuGroups = getMenuList(router.pathname);
+  // Get default menu list
+  const defaultMenuGroups = getMenuList(router.pathname);
+  
+  // Apply custom order from user settings if available
+  const menuGroups = useMemo(() => {
+    if (profile?.user_settings && 'navigation' in profile.user_settings) {
+      try {
+        console.log("[AppSidebar] User has navigation settings:", profile.user_settings.navigation);
+        console.log("[AppSidebar] Default menu order:", defaultMenuGroups);
+        
+        const result = applyCustomMenuOrder(
+          defaultMenuGroups,
+          profile.user_settings.navigation as Record<string, Array<{title: string}>>
+        );
+        
+        console.log("[AppSidebar] Menu after applying custom order:", result);
+        return result;
+      } catch (error) {
+        console.error("[AppSidebar] Error applying custom menu order:", error);
+      }
+    } else {
+      console.log("[AppSidebar] No navigation settings found in profile");
+    }
+    return defaultMenuGroups;
+  }, [defaultMenuGroups, profile?.user_settings]);
 
   const filterMenuItems = (items: any, query: string) => {
     if (!query) return items;

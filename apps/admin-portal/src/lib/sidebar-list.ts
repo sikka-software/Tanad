@@ -311,3 +311,46 @@ export function getMenuList(pathname?: string): Record<string, SidebarMenuGroupP
     Settings: getSettingsMenus(pathname || ""),
   };
 }
+
+/**
+ * Apply custom order from user preferences to the default menu list
+ * @param defaultMenuList - The default menu list from getMenuList
+ * @param savedNavigation - The saved navigation order from user settings
+ * @returns A new menu list with items reordered according to saved preferences
+ */
+export function applyCustomMenuOrder(
+  defaultMenuList: Record<string, SidebarMenuGroupProps["items"]>,
+  savedNavigation: Record<string, Array<{ title: string }>>,
+): Record<string, SidebarMenuGroupProps["items"]> {
+  const resultMenu = { ...defaultMenuList };
+
+  // For each group in the saved navigation
+  Object.keys(savedNavigation).forEach((groupName) => {
+    if (defaultMenuList[groupName] && savedNavigation[groupName]) {
+      // Create an array to hold the reordered items
+      const orderedItems: SidebarMenuGroupProps["items"] = [];
+
+      // First add items that exist in both saved navigation and default menu
+      savedNavigation[groupName].forEach((savedItem: { title: string }) => {
+        const originalItem = defaultMenuList[groupName].find(
+          (item) => item.title === savedItem.title,
+        );
+        if (originalItem) {
+          orderedItems.push(originalItem);
+        }
+      });
+
+      // Then add any items that exist in the default menu but not in saved navigation
+      defaultMenuList[groupName].forEach((defaultItem) => {
+        if (!orderedItems.some((item) => item.title === defaultItem.title)) {
+          orderedItems.push(defaultItem);
+        }
+      });
+
+      // Replace the default menu with the ordered one
+      resultMenu[groupName] = orderedItems;
+    }
+  });
+
+  return resultMenu;
+}

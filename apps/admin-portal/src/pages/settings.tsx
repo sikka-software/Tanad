@@ -33,6 +33,7 @@ import {
   SettingsIcon,
   User,
   Loader2,
+  Sidebar,
 } from "lucide-react";
 
 import GeneralSettings from "@/components/settings/general-settings";
@@ -172,7 +173,7 @@ const SettingsPage = () => {
                   className="h-auto justify-start rounded-none px-4 py-3"
                   onClick={() => handleTabChange("navigation")}
                 >
-                  <SettingsIcon className="mr-2 h-4 w-4" />
+                  <Sidebar className="mr-2 h-4 w-4" />
                   {t("Settings.tabs.navigation")}
                 </Button>
                 <Button

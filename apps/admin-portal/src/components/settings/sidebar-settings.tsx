@@ -27,7 +27,7 @@ import { GripVertical } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
+import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
 import useUserStore from "@/hooks/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
@@ -114,47 +114,29 @@ const SidebarSettings = ({
 
   // Load menu configuration from profile if available
   useEffect(() => {
-    if (profile?.user_settings?.navigation) {
+    // Add debugging on each render to see the profile structure
+    console.log("Current profile in SidebarSettings:", profile);
+    console.log("Current user settings:", profile?.user_settings);
+    console.log(
+      "Does navigation exist?",
+      profile?.user_settings && "navigation" in profile.user_settings,
+    );
+
+    if (profile?.user_settings && "navigation" in profile.user_settings) {
       try {
-        // When loading from the database, we only want to update the order
-        // but keep the original menu items with their icon components
-        const savedOrder = profile.user_settings.navigation as Record<
-          string,
-          SidebarMenuGroupProps["items"]
-        >;
+        // Use the applyCustomMenuOrder function to get a correctly ordered menu
         const currentMenu = getMenuList(pathname);
+        console.log("Profile navigation settings:", profile.user_settings.navigation);
+        console.log("Current default menu:", currentMenu);
 
-        // Create a new menu list that preserves the original menu items and their properties
-        // but updates the order based on what's saved in the profile
-        const updatedMenuList: Record<string, SidebarMenuGroupProps["items"]> = { ...currentMenu };
+        const savedNavigation = profile.user_settings.navigation as Record<
+          string,
+          Array<{ title: string }>
+        >;
+        const orderedMenu = applyCustomMenuOrder(currentMenu, savedNavigation);
+        console.log("Ordered menu after applying saved order:", orderedMenu);
 
-        // For each menu group
-        Object.keys(currentMenu).forEach((groupName) => {
-          if (savedOrder[groupName]) {
-            // Reorder the current menu items based on the saved order
-            const orderedItems: SidebarMenuGroupProps["items"] = [];
-            // First add items that exist in both the saved order and current menu
-            savedOrder[groupName].forEach((savedItem: any) => {
-              const originalItem = currentMenu[groupName].find(
-                (item) => item.title === savedItem.title,
-              );
-              if (originalItem) {
-                orderedItems.push(originalItem);
-              }
-            });
-
-            // Then add any items that exist in the current menu but not in the saved order
-            currentMenu[groupName].forEach((currentItem) => {
-              if (!orderedItems.some((item) => item.title === currentItem.title)) {
-                orderedItems.push(currentItem);
-              }
-            });
-
-            updatedMenuList[groupName] = orderedItems;
-          }
-        });
-
-        setMenuList(updatedMenuList);
+        setMenuList(orderedMenu);
       } catch (error) {
         console.error("Error loading menu configuration:", error);
       }
@@ -200,17 +182,23 @@ const SidebarSettings = ({
         }));
       });
 
+      console.log("Saving navigation settings:", simplifiedMenuList);
+
+      // Get current user settings to ensure we're not overwriting anything
+      const currentUserSettings = profile?.user_settings || {};
+
       // Save menu configuration to profile
-      await updateProfileMutation.mutateAsync({
+      const result = await updateProfileMutation.mutateAsync({
         profileId,
         data: {
           user_settings: {
-            ...(profile?.user_settings || {}),
+            ...currentUserSettings,
             navigation: simplifiedMenuList,
           },
         },
       });
 
+      console.log("Navigation settings saved successfully. Updated profile:", result);
       setIsDirty(false);
       if (onSaveComplete) onSaveComplete();
     } catch (error) {
