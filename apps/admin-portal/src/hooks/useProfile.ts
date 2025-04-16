@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -24,7 +26,7 @@ const fetchProfile = async (profileId: string): Promise<ProfileData> => {
   if (!profileId) {
     throw new Error("Profile ID is required");
   }
-  
+
   const response = await fetch(`/api/profile/info?profileId=${profileId}`);
 
   if (!response.ok) {
@@ -47,7 +49,7 @@ const updateProfile = async ({
   if (!profileId) {
     throw new Error("Profile ID is required");
   }
-  
+
   const response = await fetch(`/api/profile/update?profileId=${profileId}`, {
     method: "PATCH",
     headers: {
@@ -84,7 +86,7 @@ export function useProfile(profileId: string) {
       }
       // Otherwise retry up to 3 times
       return failureCount < 3;
-    }
+    },
   });
 }
 
@@ -92,13 +94,14 @@ export function useProfile(profileId: string) {
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
   const userStore = useUserStore();
+  const t = useTranslations();
 
   return useMutation({
     mutationFn: updateProfile,
     onSuccess: (data) => {
       // Invalidate the profile query to refetch
       queryClient.invalidateQueries({ queryKey: ["profile", data.id] });
-      
+
       // Also update the profile in the user store to keep both in sync
       // This helps with components that still use the user store
       if (userStore.profile) {
@@ -117,17 +120,17 @@ export function useUpdateProfile() {
             calendar_type: userStore.profile.user_settings.calendar_type,
             timezone: data.user_settings?.timezone || userStore.profile.user_settings.timezone,
             notifications: userStore.profile.user_settings.notifications,
-          }
+          },
         };
-        
+
         userStore.setProfile(updatedProfile);
       }
-      
-      toast.success("Profile updated successfully");
+
+      toast.success(t("Settings.saved_successfully"));
     },
     onError: (error) => {
       console.error("Error updating profile:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to update profile");
+      toast.error(t("Settings.error_saving"));
     },
   });
 }
@@ -136,12 +139,12 @@ export function useUpdateProfile() {
 export function useUserAndProfile(profileId: string) {
   const { data: profile, isLoading, error } = useProfile(profileId);
   const userStore = useUserStore();
-  
+
   return {
     profile: profile || userStore.profile,
     user: userStore.user,
     isLoading,
-    error
+    error,
   };
 }
 

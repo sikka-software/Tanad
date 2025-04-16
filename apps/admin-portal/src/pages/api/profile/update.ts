@@ -80,7 +80,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       return res.status(500).json({ error: "Failed to update profile" });
     }
 
-    console.log("Profile updated successfully:", updatedProfile.id);
     return res.status(200).json({ profile: updatedProfile });
   } catch (error) {
     console.error("Error updating profile:", error);

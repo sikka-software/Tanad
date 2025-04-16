@@ -6,8 +6,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 import useUserStore from "@/hooks/use-user-store";
+import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import {
@@ -22,6 +22,7 @@ import {
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Separator } from "../ui/separator";
+import { Skeleton } from "../ui/skeleton";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -49,14 +50,14 @@ const GeneralSettings = ({
 }: GeneralSettingsProps) => {
   const t = useTranslations();
   const lang = useLocale();
-  
+
   // Get user from the existing store to get profileId
   const { user } = useUserStore();
   const profileId = user?.id || "";
-  
+
   // Use the profile hook to fetch data
   const { data: profile, isLoading: isLoadingProfile } = useProfile(profileId);
-  
+
   // Initialize the update mutation
   const updateProfileMutation = useUpdateProfile();
 
@@ -64,12 +65,12 @@ const GeneralSettings = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: profile?.full_name || "",
-      email: user?.email || profile?.email || "", 
+      email: user?.email || profile?.email || "",
       language: lang,
       timezone: profile?.user_settings?.timezone || "UTC",
     },
   });
-  
+
   // Reset form when profile data is loaded
   React.useEffect(() => {
     if (profile) {
@@ -102,13 +103,13 @@ const GeneralSettings = ({
           },
         },
       });
-      
+
       // If email has changed, you might need to update it through auth system
       if (data.email !== user?.email) {
         // Handle email update through auth provider if needed
         console.log("Email changed, might need additional auth updates");
       }
-      
+
       // Reset the form with the current data to clear dirty state
       form.reset(data);
       onSaveComplete();
@@ -124,11 +125,6 @@ const GeneralSettings = ({
       form.handleSubmit(onSubmit)();
     }
   };
-
-  // Show loading state if no profile yet
-  if (isLoadingProfile || !profileId) {
-    return <div className="p-6 text-center">Loading profile information...</div>;
-  }
 
   return (
     <Card className="shadow-none">
@@ -154,7 +150,11 @@ const GeneralSettings = ({
                     <FormItem>
                       <FormLabel>{t("Settings.general.profile.name")}</FormLabel>
                       <FormControl>
-                        <Input {...field} disabled={isSaving} />
+                        {isLoadingProfile ? (
+                          <Skeleton className="h-10 w-full" />
+                        ) : (
+                          <Input {...field} disabled={isSaving} />
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -167,7 +167,11 @@ const GeneralSettings = ({
                     <FormItem>
                       <FormLabel>{t("Settings.general.profile.email")}</FormLabel>
                       <FormControl>
-                        <Input type="email" {...field} disabled={isSaving} />
+                        {isLoadingProfile ? (
+                          <Skeleton className="h-10 w-full" />
+                        ) : (
+                          <Input type="email" {...field} disabled={isSaving} />
+                        )}
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -187,21 +191,25 @@ const GeneralSettings = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("Settings.general.regional.language")}</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={isSaving}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("General.select")} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="en">{t("General.languages.en")}</SelectItem>
-                          <SelectItem value="ar">{t("General.languages.ar")}</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {isLoadingProfile ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={isSaving}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("General.select")} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="en">{t("General.languages.en")}</SelectItem>
+                            <SelectItem value="ar">{t("General.languages.ar")}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -212,23 +220,27 @@ const GeneralSettings = ({
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={isSaving}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={t("General.select")} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="UTC">UTC</SelectItem>
-                          <SelectItem value="EST">Eastern Time (ET)</SelectItem>
-                          <SelectItem value="CST">Central Time (CT)</SelectItem>
-                          <SelectItem value="PST">Pacific Time (PT)</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {isLoadingProfile ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={isSaving}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("General.select")} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="UTC">UTC</SelectItem>
+                            <SelectItem value="EST">Eastern Time (ET)</SelectItem>
+                            <SelectItem value="CST">Central Time (CT)</SelectItem>
+                            <SelectItem value="PST">Pacific Time (PT)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
