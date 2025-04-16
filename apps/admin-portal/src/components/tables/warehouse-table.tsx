@@ -21,7 +21,7 @@ const stateSchema = z.string().min(1, "Required");
 const zipCodeSchema = z.string().min(1, "Required");
 const capacitySchema = z.number().optional();
 const notesSchema = z.string().optional();
-const isActiveSchema = z.boolean();
+const is_activeSchema = z.boolean();
 
 interface WarehouseTableProps {
   data: Warehouse[];
@@ -48,7 +48,7 @@ const WarehouseTable = ({ data, isLoading, error }: WarehouseTableProps) => {
     {
       accessorKey: "is_active",
       header: t("form.is_active.label"),
-      validationSchema: isActiveSchema,
+      validationSchema: is_activeSchema,
     },
     { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
   ];

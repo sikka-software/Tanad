@@ -16,7 +16,7 @@ function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehous
     state: data.state,
     zip_code: data.zipCode,
     capacity: data.capacity ? Number(data.capacity) : null,
-    is_active: data.isActive,
+    is_active: data.is_active,
     notes: data.notes,
     created_at: data.createdAt?.toString() || "",
   };
@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const dbWarehouse = {
         ...req.body,
         zipCode: req.body.zip_code,
-        isActive: req.body.is_active,
+        is_active: req.body.is_active,
         capacity: req.body.capacity?.toString(),
       };
 

@@ -46,7 +46,7 @@ export default function AddCompanyPage() {
           industry: data.industry?.trim() || null,
           size: data.size?.trim() || null,
           notes: data.notes?.trim() || null,
-          isActive: data.isActive,
+          is_active: data.is_active,
           userId: user.id,
         }),
       });

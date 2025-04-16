@@ -17,7 +17,7 @@ function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {
     phone: data.phone,
     email: data.email,
     manager: data.manager,
-    is_active: data.isActive,
+    is_active: data.is_active,
     notes: data.notes,
     created_at: data.createdAt?.toString() || "",
   };

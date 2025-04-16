@@ -52,13 +52,13 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
-  const [isOpen, setIsOpen] = React.useState(item.isActive);
+  const [isOpen, setIsOpen] = React.useState(item.is_active);
 
   return (
     <Collapsible
       key={item.title}
       asChild
-      defaultOpen={item.isActive}
+      defaultOpen={item.is_active}
       open={isOpen}
       onOpenChange={setIsOpen}
     >
@@ -87,7 +87,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                 <SidebarMenuSubButton
                   asChild
                   className={cn(
-                    subItem.isActive &&
+                    subItem.is_active &&
                       "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
                   )}
                 >

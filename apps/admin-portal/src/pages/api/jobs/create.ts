@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       department,
       type,
       salary,
-      isActive,
+      is_active,
       startDate,
       endDate,
       userId,
@@ -61,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       department,
       type,
       salary: salary ? `${salary}` : null,
-      isActive,
+      is_active,
       startDate,
       endDate,
       userId: effectiveUserId
@@ -78,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         department,
         type,
         salary: salary ? sql`${salary}::numeric` : null,
-        isActive,
+        is_active,
         startDate,
         endDate,
         userId: effectiveUserId, // This should work with Supabase RLS

@@ -34,8 +34,8 @@ export default function JobListingsPage() {
             <h3 className="text-lg font-semibold">{listing.title}</h3>
             <p className="text-sm text-gray-500">{listing.jobs?.length || 0} jobs</p>
           </div>
-          <Badge variant={listing.isActive ? "default" : "secondary"}>
-            {listing.isActive ? "Active" : "Inactive"}
+          <Badge variant={listing.is_active ? "default" : "secondary"}>
+            {listing.is_active ? "Active" : "Inactive"}
           </Badge>
         </div>
       </CardHeader>

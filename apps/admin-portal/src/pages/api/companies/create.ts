@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       industry,
       size,
       notes,
-      isActive,
+      is_active,
       userId,
     } = req.body;
 
@@ -44,7 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         industry,
         size,
         notes,
-        isActive,
+        is_active,
         userId,
       })
       .returning();

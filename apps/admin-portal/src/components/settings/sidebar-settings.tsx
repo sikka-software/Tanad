@@ -92,7 +92,7 @@ const SortableItem = ({ item, title, enabled, onToggle }: SortableItemProps) => 
       <GripVertical className="text-muted-foreground h-4 w-4" />
       <span className="h-4 w-4 flex-shrink-0" />
       <span className="flex-1">{title}</span>
-      {item.isActive && (
+      {item.is_active && (
         <span className="text-primary bg-primary/10 mr-2 rounded-full px-2 py-1 text-xs font-medium">
           Active
         </span>
@@ -299,7 +299,7 @@ const SidebarSettings = ({
           title: item.title,
           translationKey: item.translationKey,
           url: item.url,
-          isActive: item.isActive,
+          is_active: item.is_active,
           action: item.action,
         }));
       });

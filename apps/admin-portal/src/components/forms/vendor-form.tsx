@@ -138,7 +138,7 @@ export function VendorForm({
             industry: data.industry?.trim() || null,
             size: data.size?.trim() || null,
             notes: data.notes?.trim() || null,
-            is_active: data.isActive,
+            is_active: data.is_active,
             user_id: userId,
           },
         ])

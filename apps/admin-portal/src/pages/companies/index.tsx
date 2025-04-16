@@ -37,8 +37,8 @@ export default function CompaniesPage() {
             <h3 className="text-lg font-semibold">{company.name}</h3>
             {company.industry && <p className="text-sm text-gray-500">{company.industry}</p>}
           </div>
-          <Badge variant={company.isActive ? "default" : "secondary"}>
-            {company.isActive ? "Active" : "Inactive"}
+          <Badge variant={company.is_active ? "default" : "secondary"}>
+            {company.is_active ? "Active" : "Inactive"}
           </Badge>
         </div>
       </CardHeader>

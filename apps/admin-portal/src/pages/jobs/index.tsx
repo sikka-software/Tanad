@@ -36,8 +36,8 @@ export default function JobsPage() {
             <h3 className="text-lg font-semibold">{job.title}</h3>
             <p className="text-sm text-gray-500">{job.type}</p>
           </div>
-          <Badge variant={job.isActive ? "default" : "secondary"}>
-            {job.isActive ? "Active" : "Inactive"}
+          <Badge variant={job.is_active ? "default" : "secondary"}>
+            {job.is_active ? "Active" : "Inactive"}
           </Badge>
         </div>
       </CardHeader>

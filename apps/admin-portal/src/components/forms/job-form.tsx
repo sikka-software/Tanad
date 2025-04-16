@@ -33,7 +33,7 @@ const jobFormSchema = z.object({
     .refine((val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), "Invalid salary"),
   startDate: z.date().optional(),
   endDate: z.date().optional(),
-  isActive: z.boolean(),
+  is_active: z.boolean(),
 });
 
 export type JobFormValues = z.infer<typeof jobFormSchema>;
@@ -54,7 +54,7 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
       salary: "",
       startDate: undefined,
       endDate: undefined,
-      isActive: true,
+      is_active: true,
     },
   });
 
@@ -232,7 +232,7 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
 
         <FormField
           control={form.control}
-          name="isActive"
+          name="is_active"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">

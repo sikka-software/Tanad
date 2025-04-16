@@ -35,7 +35,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/invoices", labelKey: "Invoices.title" },
-      { path: "/invoices/add", labelKey: "Invoices.add_new", isActive: true },
+      { path: "/invoices/add", labelKey: "Invoices.add_new", is_active: true },
     ],
   },
   {
@@ -43,7 +43,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/invoices", labelKey: "Invoices.title" },
-      { path: "", labelKey: "Invoices.edit", isActive: true },
+      { path: "", labelKey: "Invoices.edit", is_active: true },
     ],
   },
   {
@@ -51,7 +51,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/quotes", labelKey: "Quotes.title" },
-      { path: "/quotes/add", labelKey: "Quotes.add_new", isActive: true },
+      { path: "/quotes/add", labelKey: "Quotes.add_new", is_active: true },
     ],
   },
   {
@@ -59,7 +59,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/clients", labelKey: "Clients.title" },
-      { path: "/clients/add", labelKey: "Clients.add_new", isActive: true },
+      { path: "/clients/add", labelKey: "Clients.add_new", is_active: true },
     ],
   },
   {
@@ -67,7 +67,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/clients", labelKey: "Clients.title" },
-      { path: "", labelKey: "Clients.edit", isActive: true },
+      { path: "", labelKey: "Clients.edit", is_active: true },
     ],
   },
   {
@@ -75,7 +75,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/products", labelKey: "Products.title" },
-      { path: "/products/add", labelKey: "Products.add_new", isActive: true },
+      { path: "/products/add", labelKey: "Products.add_new", is_active: true },
     ],
   },
   {
@@ -83,7 +83,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/products", labelKey: "Products.title" },
-      { path: "", labelKey: "Products.edit", isActive: true },
+      { path: "", labelKey: "Products.edit", is_active: true },
     ],
   },
   {
@@ -91,7 +91,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/employees", labelKey: "Employees.title" },
-      { path: "/employees/add", labelKey: "Employees.add_new", isActive: true },
+      { path: "/employees/add", labelKey: "Employees.add_new", is_active: true },
     ],
   },
   {
@@ -99,7 +99,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/employees", labelKey: "Employees.title" },
-      { path: "", labelKey: "Employees.edit", isActive: true },
+      { path: "", labelKey: "Employees.edit", is_active: true },
     ],
   },
   {
@@ -107,7 +107,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/jobs", labelKey: "Jobs.title" },
-      { path: "/jobs/add", labelKey: "Jobs.add_new", isActive: true },
+      { path: "/jobs/add", labelKey: "Jobs.add_new", is_active: true },
     ],
   },
   {
@@ -115,7 +115,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/jobs", labelKey: "Jobs.title" },
-      { path: "", labelKey: "Jobs.edit", isActive: true },
+      { path: "", labelKey: "Jobs.edit", is_active: true },
     ],
   },
   {
@@ -123,7 +123,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/warehouses", labelKey: "Warehouses.title" },
-      { path: "/warehouses/add", labelKey: "Warehouses.add_new", isActive: true },
+      { path: "/warehouses/add", labelKey: "Warehouses.add_new", is_active: true },
     ],
   },
   {
@@ -131,7 +131,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/warehouses", labelKey: "Warehouses.title" },
-      { path: "", labelKey: "Warehouses.edit", isActive: true },
+      { path: "", labelKey: "Warehouses.edit", is_active: true },
     ],
   },
   {
@@ -139,7 +139,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/branches", labelKey: "Branches.title" },
-      { path: "/branches/add", labelKey: "Branches.add_new", isActive: true },
+      { path: "/branches/add", labelKey: "Branches.add_new", is_active: true },
     ],
   },
   {
@@ -147,7 +147,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/branches", labelKey: "Branches.title" },
-      { path: "", labelKey: "Branches.edit", isActive: true },
+      { path: "", labelKey: "Branches.edit", is_active: true },
     ],
   },
   {
@@ -155,7 +155,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/companies", labelKey: "Companies.title" },
-      { path: "/companies/add", labelKey: "Companies.add_new", isActive: true },
+      { path: "/companies/add", labelKey: "Companies.add_new", is_active: true },
     ],
   },
   {
@@ -163,7 +163,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/companies", labelKey: "Companies.title" },
-      { path: "", labelKey: "Companies.edit", isActive: true },
+      { path: "", labelKey: "Companies.edit", is_active: true },
     ],
   },
   {
@@ -171,7 +171,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/vendors", labelKey: "Vendors.title" },
-      { path: "/vendors/add", labelKey: "Vendors.add_new", isActive: true },
+      { path: "/vendors/add", labelKey: "Vendors.add_new", is_active: true },
     ],
   },
   {
@@ -179,7 +179,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/vendors", labelKey: "Vendors.title" },
-      { path: "", labelKey: "Vendors.edit", isActive: true },
+      { path: "", labelKey: "Vendors.edit", is_active: true },
     ],
   },
   {
@@ -187,7 +187,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/salaries", labelKey: "Salaries.title" },
-      { path: "/salaries/add", labelKey: "Salaries.add_new", isActive: true },
+      { path: "/salaries/add", labelKey: "Salaries.add_new", is_active: true },
     ],
   },
   {
@@ -195,7 +195,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/salaries", labelKey: "Salaries.title" },
-      { path: "", labelKey: "Salaries.edit", isActive: true },
+      { path: "", labelKey: "Salaries.edit", is_active: true },
     ],
   },
   {
@@ -203,7 +203,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/departments", labelKey: "Departments.title" },
-      { path: "/departments/add", labelKey: "Departments.add_new", isActive: true },
+      { path: "/departments/add", labelKey: "Departments.add_new", is_active: true },
     ],
   },
   {
@@ -211,7 +211,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/departments", labelKey: "Departments.title" },
-      { path: "", labelKey: "Departments.edit", isActive: true },
+      { path: "", labelKey: "Departments.edit", is_active: true },
     ],
   },
   {
@@ -219,7 +219,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/offices", labelKey: "Offices.title" },
-      { path: "/offices/add", labelKey: "Offices.add_new", isActive: true },
+      { path: "/offices/add", labelKey: "Offices.add_new", is_active: true },
     ],
   },
   {
@@ -227,7 +227,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/offices", labelKey: "Offices.title" },
-      { path: "", labelKey: "Offices.edit", isActive: true },
+      { path: "", labelKey: "Offices.edit", is_active: true },
     ],
   },
 ];

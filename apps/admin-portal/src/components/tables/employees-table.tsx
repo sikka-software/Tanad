@@ -48,8 +48,6 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
   const handleEdit = useCallback((rowId: string, columnId: string, value: unknown) => {
     let updates: Partial<Employee> = {};
     
-    console.log('handleEdit called with:', { rowId, columnId, value });
-    
     if (columnId === "department") {
       // For department changes, handle department_id and department name
       const departmentId = value as string;
@@ -61,21 +59,11 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
         updates.department = department.name;
       }
     } else if (columnId === "status") {
-      // Log status update specifically
-      console.log('Status update:', { 
-        columnId, 
-        value, 
-        valueType: typeof value,
-        update: { status: value } 
-      });
-      
       updates.status = value as "active" | "inactive" | "on_leave";
     } else {
       // For other fields, directly update
       updates = { [columnId]: value };
     }
-    
-    console.log('Updates object:', updates);
     
     // Track this update in our pending updates
     setPendingUpdates(prev => ({

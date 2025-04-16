@@ -17,12 +17,12 @@ export type SidebarMenuGroupProps = {
     translationKey: string;
     url: string;
     icon?: LucideIcon;
-    isActive?: boolean;
+    is_active?: boolean;
     action?: string;
     items?: {
       title: string;
       translationKey: string;
-      isActive?: boolean;
+      is_active?: boolean;
       url: string;
       action?: string;
     }[];
@@ -61,14 +61,14 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       translationKey: "Dashboard.title",
       url: "/dashboard",
       icon: LayoutDashboard,
-      isActive: pathname.startsWith("/dashboard"),
+      is_active: pathname.startsWith("/dashboard"),
     },
     {
       title: "Analytics",
       translationKey: "Analytics.title",
       url: "/analytics",
       icon: BarChart,
-      isActive: pathname.startsWith("/analytics"),
+      is_active: pathname.startsWith("/analytics"),
     },
 
     {
@@ -76,32 +76,32 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       translationKey: "Contacts.title",
       url: "/contacts",
       icon: Users,
-      isActive: pathname.startsWith("/contacts"),
+      is_active: pathname.startsWith("/contacts"),
       items: [
         {
           title: "All Contacts",
           translationKey: "Contacts.all",
-          isActive: pathname === "/contacts",
+          is_active: pathname === "/contacts",
           url: "/contacts",
         },
         {
           title: "Companies",
           translationKey: "Companies.title",
-          isActive: pathname === "/companies",
+          is_active: pathname === "/companies",
           action: "/companies/add",
           url: "/companies",
         },
         {
           title: "Clients",
           translationKey: "Clients.title",
-          isActive: pathname.startsWith("/clients"),
+          is_active: pathname.startsWith("/clients"),
           action: "/clients/add",
           url: "/clients",
         },
         {
           title: "Vendors",
           translationKey: "Vendors.title",
-          isActive: pathname.startsWith("/vendors"),
+          is_active: pathname.startsWith("/vendors"),
           action: "/vendors/add",
           url: "/vendors",
         },
@@ -112,28 +112,28 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       translationKey: "Locations.title",
       url: "/locations",
       icon: MapPin,
-      isActive: pathname.startsWith("/warehouses") || pathname.startsWith("/branches"),
+      is_active: pathname.startsWith("/warehouses") || pathname.startsWith("/branches"),
       items: [
         {
           title: "Offices",
           translationKey: "Offices.title",
           url: "/offices",
           action: "/offices/add",
-          isActive: pathname.startsWith("/offices"),
+          is_active: pathname.startsWith("/offices"),
         },
         {
           title: "Warehouses",
           translationKey: "Warehouses.title",
           url: "/warehouses",
           action: "/warehouses/add",
-          isActive: pathname.startsWith("/warehouses"),
+          is_active: pathname.startsWith("/warehouses"),
         },
         {
           title: "Branches",
           translationKey: "Branches.title",
           url: "/branches",
           action: "/branches/add",
-          isActive: pathname.startsWith("/branches"),
+          is_active: pathname.startsWith("/branches"),
         },
       ],
     },
@@ -148,26 +148,26 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
       translationKey: "Sales.title",
       url: "",
       icon: Package,
-      isActive: pathname.startsWith("/products"),
+      is_active: pathname.startsWith("/products"),
       items: [
         {
           title: "Products",
           translationKey: "Products.title",
-          isActive: pathname.startsWith("/products"),
+          is_active: pathname.startsWith("/products"),
           url: "/products",
           action: "/products/add",
         },
         {
           title: "Invoices",
           translationKey: "Invoices.title",
-          isActive: pathname.startsWith("/invoices"),
+          is_active: pathname.startsWith("/invoices"),
           url: "/invoices",
           action: "/invoices/add",
         },
         {
           title: "Quotes",
           translationKey: "Quotes.title",
-          isActive: pathname.startsWith("/quotes"),
+          is_active: pathname.startsWith("/quotes"),
           url: "/quotes",
           action: "/quotes/add",
         },
@@ -184,55 +184,55 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
       translationKey: "Employees.title",
       url: "",
       icon: Users,
-      isActive: pathname.startsWith("/employees"),
+      is_active: pathname.startsWith("/employees"),
       items: [
         {
           title: "All Employees",
           translationKey: "Employees.allEmployees",
           url: "/employees",
           action: "/employees/add",
-          isActive: pathname === "/employees",
+          is_active: pathname === "/employees",
         },
         {
           title: "Departments",
           translationKey: "Departments.title",
           url: "/departments",
           action: "/departments/add",
-          isActive: pathname.startsWith("/departments"),
+          is_active: pathname.startsWith("/departments"),
         },
         {
           title: "Salaries",
           translationKey: "Salaries.title",
           url: "/salaries",
           action: "/salaries/add",
-          isActive: pathname === "/salaries",
+          is_active: pathname === "/salaries",
         },
         // {
         //   title: "Leave",
         //   translationKey: "Leave.title",
         //   url: "/leave",
         //   action: "/leave/add",
-        //   isActive: pathname === "/leave",
+        //   is_active: pathname === "/leave",
         // },
         // {
         //   title: "Holidays",
         //   translationKey: "Holidays.title",
         //   url: "/holidays",
         //   action: "/holidays/add",
-        //   isActive: pathname === "/holidays",
+        //   is_active: pathname === "/holidays",
         // },
         // {
         //   title: "Reports",
         //   translationKey: "Reports.title",
         //   url: "/reports",
-        //   isActive: pathname === "/reports",
+        //   is_active: pathname === "/reports",
         // },
         {
           title: "Requests",
           translationKey: "Requests.title",
           url: "/employees/requests",
           action: "/employees/requests/add",
-          isActive: pathname.startsWith("/employees/requests"),
+          is_active: pathname.startsWith("/employees/requests"),
         },
       ],
     },
@@ -241,28 +241,28 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
       translationKey: "Recruitment.title",
       url: "",
       icon: Briefcase,
-      isActive: pathname.startsWith("/recruitment"),
+      is_active: pathname.startsWith("/recruitment"),
       items: [
         {
           title: "Job Listing",
           translationKey: "JobListings.title",
           url: "/jobs/listings",
           action: "/jobs/listings/add",
-          isActive: pathname === "/jobs/listings",
+          is_active: pathname === "/jobs/listings",
         },
         {
           title: "Jobs",
           translationKey: "Jobs.title",
           url: "/jobs",
           action: "/jobs/add",
-          isActive: pathname === "/jobs",
+          is_active: pathname === "/jobs",
         },
         {
           title: "Applicants",
           translationKey: "Applicants.title",
           url: "/applicants",
           action: "/applicants/add",
-          isActive: pathname === "/applicants",
+          is_active: pathname === "/applicants",
         },
       ],
     },
@@ -284,21 +284,21 @@ function getSettingsMenus(pathname: string): SidebarMenuGroupProps["items"] {
       translationKey: "Users.title",
       icon: Users,
       url: "/users",
-      isActive: pathname === "/users",
+      is_active: pathname === "/users",
     },
     {
       title: "Billing",
       translationKey: "Billing.title",
       icon: CreditCard,
       url: "/billing",
-      isActive: pathname === "/billing",
+      is_active: pathname === "/billing",
     },
     {
       title: "Settings",
       translationKey: "Settings.title",
       icon: Settings,
       url: "/settings",
-      isActive: pathname === "/settings",
+      is_active: pathname === "/settings",
     },
   ];
 }

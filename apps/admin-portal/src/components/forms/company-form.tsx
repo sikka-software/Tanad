@@ -27,7 +27,7 @@ export const createCompanySchema = (t: (key: string) => string) =>
     industry: z.string().optional(),
     size: z.string().optional(),
     notes: z.string().optional(),
-    isActive: z.boolean().default(true),
+    is_active: z.boolean().default(true),
   });
 
 export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
@@ -57,7 +57,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
       industry: "",
       size: "",
       notes: "",
-      isActive: true,
+      is_active: true,
       ...defaultValues,
     },
   });
@@ -262,7 +262,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
         />
         <FormField
           control={form.control}
-          name="isActive"
+          name="is_active"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">

@@ -18,7 +18,7 @@ const departmentSchema = z.string().min(1, "Required");
 const locationSchema = z.string().min(1, "Required");
 const salarySchema = z.number().min(0, "Salary must be positive");
 const descriptionSchema = z.string().optional();
-const isActiveSchema = z.boolean();
+const is_activeSchema = z.boolean();
 
 interface JobsTableProps {
   data: Job[];
@@ -50,9 +50,9 @@ const JobsTable = ({ data, isLoading, error }: JobsTableProps) => {
       validationSchema: descriptionSchema,
     },
     {
-      accessorKey: "isActive",
+      accessorKey: "is_active",
       header: t("form.is_active.label"),
-      validationSchema: isActiveSchema,
+      validationSchema: is_activeSchema,
     },
   ];
 

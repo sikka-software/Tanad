@@ -22,7 +22,7 @@ const citySchema = z.string().optional();
 const stateSchema = z.string().optional();
 const zipCodeSchema = z.string().optional();
 const sizeSchema = z.number().min(0, "Must be >= 0").optional();
-const isActiveSchema = z.boolean();
+const is_activeSchema = z.boolean();
 const notesSchema = z.string().optional();
 
 interface CompaniesTableProps {
@@ -51,9 +51,9 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
     { accessorKey: "zipCode", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
     { accessorKey: "size", header: t("form.size.label"), validationSchema: sizeSchema },
     {
-      accessorKey: "isActive",
+      accessorKey: "is_active",
       header: t("form.is_active.label"),
-      validationSchema: isActiveSchema,
+      validationSchema: is_activeSchema,
       // type: "boolean",
     },
     { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },

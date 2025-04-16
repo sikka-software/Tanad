@@ -30,7 +30,7 @@ export interface Profile {
         title: string;
         translationKey?: string;
         url?: string;
-        isActive?: boolean;
+        is_active?: boolean;
         action?: string;
       }>
     >;

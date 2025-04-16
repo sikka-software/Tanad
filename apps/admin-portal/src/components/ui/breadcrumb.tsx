@@ -53,7 +53,7 @@ export function Breadcrumb() {
         breadcrumbs.push({
           path: "/dashboard",
           label: t("Dashboard.title"),
-          isActive: false,
+          is_active: false,
         });
       }
 
@@ -63,7 +63,7 @@ export function Breadcrumb() {
         label: routeMap[pathname].translationKey
           ? getTranslatedKey(routeMap[pathname].translationKey!)
           : routeMap[pathname].label,
-        isActive: true,
+        is_active: true,
       });
 
       return breadcrumbs;
@@ -74,7 +74,7 @@ export function Breadcrumb() {
       {
         path: "/dashboard",
         label: t("Dashboard.title"),
-        isActive: pathname === "/",
+        is_active: pathname === "/",
       },
     ];
   };
@@ -96,7 +96,7 @@ export function Breadcrumb() {
             <ChevronRight className="text-muted-foreground/60 mx-1 h-4 w-4 rtl:rotate-180" />
           )}
 
-          {crumb.isActive ? (
+          {crumb.is_active ? (
             <span className="text-foreground truncate font-medium">{crumb.label}</span>
           ) : (
             <Link href={crumb.path} className="hover:text-foreground truncate transition-colors">

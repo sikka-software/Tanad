@@ -31,7 +31,7 @@ export default function AddJobPage() {
         department: data.department?.trim() || undefined,
         type: data.type.trim(),
         salary: data.salary ? parseFloat(data.salary) : undefined,
-        isActive: data.isActive,
+        is_active: data.is_active,
         startDate: data.startDate?.toISOString() || undefined,
         endDate: data.endDate?.toISOString() || undefined,
       });

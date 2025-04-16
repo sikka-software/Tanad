@@ -7,7 +7,7 @@ export interface Job {
   department?: string;
   type: string;
   salary?: number;
-  isActive: boolean;
+  is_active: boolean;
   startDate?: string;
   endDate?: string;
   createdAt: string;

@@ -4,7 +4,7 @@ export interface JobListing {
   id: string;
   title: string;
   description: string | null;
-  isActive: boolean;
+  is_active: boolean;
   slug: string;
   createdAt: string;
   updatedAt: string;

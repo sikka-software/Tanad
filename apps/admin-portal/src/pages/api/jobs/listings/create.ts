@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .values({
         title: title.trim(),
         description: description?.trim() || null,
-        isActive: true,
+        is_active: true,
         slug: title.trim().toLowerCase().replace(/\s+/g, "-"),
         userId: userId,
       })
