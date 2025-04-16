@@ -8,7 +8,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { Info } from "lucide-react";
 
 import CurrentPlan from "@/components/billing/CurrentPlan";
-import CurrentPlanSimple from "@/components/billing/CurrentPlanSimple";
 import SubscriptionSelection from "@/components/billing/SubscriptionSelection";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
@@ -91,22 +90,22 @@ export default function Billing() {
 
         {/* Current Plan Card */}
         <div className="mb-10">
-          <CurrentPlanSimple />
+          <CurrentPlan />
         </div>
 
         {/* Available Plans */}
-        <div className="mb-6">
-          <h2 className="mb-2 text-2xl font-bold">{t("billing.available_plans")}</h2>
-          <p className="text-muted-foreground">
-            {t("billing.choose_plan_description", {
-              fallback: "Choose the plan that works best for you and your team",
-            })}
-          </p>
-        </div>
 
         {/* Subscription Selection Section - with Tabs */}
         {showSubscriptionSelection && (
           <div className="w-full" id="plans">
+            <div className="mb-6">
+              <h2 className="mb-2 text-2xl font-bold">{t("billing.available_plans")}</h2>
+              <p className="text-muted-foreground">
+                {t("billing.choose_plan_description", {
+                  fallback: "Choose the plan that works best for you and your team",
+                })}
+              </p>
+            </div>
             <Tabs
               defaultValue="monthly"
               value={billingPeriod}
@@ -158,19 +157,7 @@ export default function Billing() {
         {/* Hidden buttons for subscription management */}
         <div className="hidden">
           <div id="cancelSubscriptionBtn">
-            <CurrentPlan
-              id={subscription.id}
-              name={subscription.name}
-              price={subscription.price}
-              billingCycle={subscription.billingCycle}
-              nextBillingDate={subscription.nextBillingDate}
-              cancelAt={subscription.cancelAt?.toString()}
-              status={subscription.status}
-              isExpired={subscription.isExpired}
-              isLoading={subscription.loading}
-              refetch={subscription.refetch}
-              onSubscriptionUpdate={subscription.refetch}
-            />
+            <CurrentPlan />
           </div>
         </div>
       </main>
