@@ -42,12 +42,28 @@ export const useEmployeesStore = create<EmployeesStore>((set, get) => ({
   },
 
   updateEmployee: async (id: string, updates: Partial<Employee>) => {
+    set({ isLoading: true, error: null });
     try {
+      // If we're updating department_id, we need special handling
+      if (updates.department_id !== undefined) {
+        // First get the department name for the new department_id
+        const { data: departmentData, error: departmentError } = await supabase
+          .from("departments")
+          .select("name")
+          .eq("id", updates.department_id)
+          .single();
+          
+        if (departmentError) throw departmentError;
+        
+        // Update the department name in the updates object
+        updates.department = departmentData?.name || null;
+      }
+      
       const { error } = await supabase.from("employees").update(updates).eq("id", id);
       if (error) throw error;
       await get().fetchEmployees();
     } catch (error) {
-      set({ error: error as Error });
+      set({ error: error as Error, isLoading: false });
     }
   },
 

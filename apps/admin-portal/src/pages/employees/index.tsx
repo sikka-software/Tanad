@@ -17,26 +17,27 @@ export default function EmployeesPage() {
   const t = useTranslations("Employees");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const { data: employees, isLoading, error } = useEmployees();
+  
+  // Use TanStack Query hook for employees
+  const { data: employees = [], isLoading, error } = useEmployees();
 
-  const filteredEmployees = Array.isArray(employees)
-    ? employees.filter((employee: Employee) => {
-        if (!employee) return false;
+  // Filter employees based on search query
+  const filteredEmployees = employees.filter((employee: Employee) => {
+    if (!employee) return false;
 
-        const searchLower = searchQuery.toLowerCase();
-        return (
-          employee.first_name?.toLowerCase().includes(searchLower) ||
-          employee.last_name?.toLowerCase().includes(searchLower) ||
-          employee.email?.toLowerCase().includes(searchLower) ||
-          employee.position?.toLowerCase().includes(searchLower) ||
-          employee.department?.toLowerCase()?.includes(searchLower)
-        );
-      })
-    : [];
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      employee.first_name?.toLowerCase().includes(searchLower) ||
+      employee.last_name?.toLowerCase().includes(searchLower) ||
+      employee.email?.toLowerCase().includes(searchLower) ||
+      employee.position?.toLowerCase().includes(searchLower) ||
+      employee.department?.toLowerCase()?.includes(searchLower)
+    );
+  });
 
   const renderEmployee = (employee: Employee) => {
     if (!employee) return null;
-    console.log(employee);
+    
     return (
       <Card key={employee.id} className="transition-shadow hover:shadow-lg">
         <CardHeader>

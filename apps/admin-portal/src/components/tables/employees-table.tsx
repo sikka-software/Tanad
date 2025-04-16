@@ -11,7 +11,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 import { Employee } from "@/types/employee.type";
 
 import { useDepartments } from "@/hooks/useDepartments";
-import { useEmployeesStore } from "@/stores/employees.store";
+import { useUpdateEmployee } from "@/hooks/useEmployees";
 
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");
@@ -22,16 +22,22 @@ const statusSchema = z.enum(["active", "inactive", "on_leave"]);
 
 const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
   const t = useTranslations();
-  const { updateEmployee } = useEmployeesStore();
+  const { mutate: updateEmployee } = useUpdateEmployee();
   const { data: departments } = useDepartments();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "department") {
       // When editing department, we need to update the departmentId
       const departmentId = value as string;
-      await updateEmployee(rowId, { department_id: departmentId });
+      updateEmployee({ 
+        id: rowId, 
+        updates: { department_id: departmentId }
+      });
     } else {
-      await updateEmployee(rowId, { [columnId]: value });
+      updateEmployee({ 
+        id: rowId, 
+        updates: { [columnId]: value }
+      });
     }
   };
 
@@ -97,7 +103,6 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
   return (
     <SheetTable
       columns={columns}
-      // disabledColumns={["department"]}
       data={data}
       onEdit={handleEdit}
       showHeader={true}
