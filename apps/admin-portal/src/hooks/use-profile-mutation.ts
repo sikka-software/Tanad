@@ -1,8 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
-import { db } from "@/db";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { eq } from "drizzle-orm";
+import { toast } from "sonner";
+
+import { db } from "@/db/drizzle";
 import { profiles } from "@/db/schema";
 import { supabase } from "@/lib/supabase";
 
@@ -19,6 +21,12 @@ export const useProfileMutation = () => {
 
       if (updateError) throw updateError;
 
+      // Get current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("No user found");
+
       // Update profile in Drizzle
       await db
         .update(profiles)
@@ -28,7 +36,7 @@ export const useProfileMutation = () => {
             timezone: data.timezone,
           },
         })
-        .where(profiles.id.eq(supabase.auth.getUser().then((user) => user.data.user?.id)));
+        .where(eq(profiles.id, user.id));
 
       return data;
     },
@@ -41,4 +49,4 @@ export const useProfileMutation = () => {
       toast.error(t("Settings.error_saving"));
     },
   });
-}; 
+};

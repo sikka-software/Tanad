@@ -2,7 +2,6 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 import * as z from "zod";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
@@ -19,7 +18,7 @@ import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Separator } from "../ui/separator";
 import useUserStore from "@/hooks/use-user-store";
-import { supabase } from "@/lib/supabase";
+import { useProfileMutation } from "@/hooks/use-profile-mutation";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -41,7 +40,8 @@ interface GeneralSettingsProps {
 const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, formRef }: GeneralSettingsProps) => {
   const t = useTranslations();
   const lang = useLocale();
-  const { profile, refreshProfile } = useUserStore();
+  const { profile } = useUserStore();
+  const profileMutation = useProfileMutation();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -60,37 +60,17 @@ const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, form
   }, [isDirty, onDirtyChange]);
 
   const onSubmit = async (data: FormValues) => {
+    onSave();
     try {
-      onSave(); // Notify parent that save is starting
-
-      // Update user's email and display name
-      const { error: updateError } = await supabase.auth.updateUser({
+      await profileMutation.mutateAsync({
+        name: data.name,
         email: data.email,
+        timezone: data.timezone,
       });
-
-      if (updateError) throw updateError;
-
-      const { error: updateProfileError } = await supabase
-        .from("profiles")
-        .update({
-          full_name: data.name,
-          user_settings: {
-            ...profile?.user_settings,
-            timezone: data.timezone,
-          },
-        })
-        .eq("id", profile?.id);
-
-      if (updateProfileError) throw updateProfileError;
-
-      await refreshProfile();
-      toast.success(t("Settings.saved_successfully"));
-      form.reset(data); // Reset form state after successful save
-      onSaveComplete(); // Notify parent that save is complete
+      form.reset(data);
+      onSaveComplete();
     } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error(t("Settings.error_saving"));
-      onSaveComplete(); // Notify parent that save is complete even on error
+      onSaveComplete();
     }
   };
 
