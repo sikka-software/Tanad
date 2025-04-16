@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import React from "react";
 
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
@@ -33,6 +34,7 @@ import {
   SettingsIcon,
   Sun,
   User,
+  Loader2,
 } from "lucide-react";
 
 import GeneralSettings from "@/components/settings/general-settings";
@@ -96,6 +98,8 @@ export default function SettingsPage() {
   const [menuList, setMenuList] = useState(getMenuList(pathname));
   const [activeTab, setActiveTab] = useState("general");
   const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const generalSettingsFormRef = React.useRef<HTMLFormElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -124,9 +128,22 @@ export default function SettingsPage() {
   };
 
   const handleSave = () => {
-    // Save logic here
+    if (activeTab === "general" && generalSettingsFormRef.current) {
+      generalSettingsFormRef.current.requestSubmit();
+    } else {
+      // Handle other tab saves
+      setIsDirty(false);
+      console.log("Settings saved", menuList);
+    }
+  };
+
+  const handleGeneralSettingsSave = () => {
+    setIsSaving(true);
+  };
+
+  const handleGeneralSettingsSaveComplete = () => {
+    setIsSaving(false);
     setIsDirty(false);
-    console.log("Settings saved", menuList);
   };
 
   return (
@@ -135,9 +152,23 @@ export default function SettingsPage() {
         title={t("Settings.title")}
         customButton={
           <div className="container mx-auto flex max-w-7xl justify-end">
-            <Button onClick={handleSave} disabled={!isDirty} className="h-8 gap-2" size="sm">
-              <Save className="h-4 w-4" />
-              {t("General.save")}
+            <Button
+              onClick={handleSave}
+              disabled={!isDirty || isSaving}
+              className="h-8 gap-2"
+              size="sm"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {t("General.saving")}
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4" />
+                  {t("General.save")}
+                </>
+              )}
             </Button>
           </div>
         }
@@ -214,7 +245,13 @@ export default function SettingsPage() {
             </TabsList>
             <ScrollArea className="h-[calc(100vh-180px)]">
               <TabsContent value="general" className="m-0">
-                <GeneralSettings onDirtyChange={setIsDirty} />
+                <GeneralSettings
+                  onDirtyChange={setIsDirty}
+                  onSave={handleGeneralSettingsSave}
+                  onSaveComplete={handleGeneralSettingsSaveComplete}
+                  isSaving={isSaving}
+                  formRef={generalSettingsFormRef as React.RefObject<HTMLFormElement>}
+                />
               </TabsContent>
 
               <TabsContent value="appearance" className="m-0">

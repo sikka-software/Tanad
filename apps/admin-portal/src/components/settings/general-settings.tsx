@@ -32,9 +32,13 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface GeneralSettingsProps {
   onDirtyChange: (isDirty: boolean) => void;
+  onSave: () => void;
+  onSaveComplete: () => void;
+  isSaving: boolean;
+  formRef: React.RefObject<HTMLFormElement>;
 }
 
-const GeneralSettings = ({ onDirtyChange }: GeneralSettingsProps) => {
+const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, formRef }: GeneralSettingsProps) => {
   const t = useTranslations();
   const lang = useLocale();
   const { profile, refreshProfile } = useUserStore();
@@ -57,10 +61,14 @@ const GeneralSettings = ({ onDirtyChange }: GeneralSettingsProps) => {
 
   const onSubmit = async (data: FormValues) => {
     try {
+      onSave(); // Notify parent that save is starting
+
       // Update user's email and display name
       const { error: updateError } = await supabase.auth.updateUser({
         email: data.email,
       });
+
+      if (updateError) throw updateError;
 
       const { error: updateProfileError } = await supabase
         .from("profiles")
@@ -73,15 +81,16 @@ const GeneralSettings = ({ onDirtyChange }: GeneralSettingsProps) => {
         })
         .eq("id", profile?.id);
 
-      if (updateError) throw updateError;
       if (updateProfileError) throw updateProfileError;
 
       await refreshProfile();
       toast.success(t("Settings.saved_successfully"));
       form.reset(data); // Reset form state after successful save
+      onSaveComplete(); // Notify parent that save is complete
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error(t("Settings.error_saving"));
+      onSaveComplete(); // Notify parent that save is complete even on error
     }
   };
 
@@ -93,7 +102,7 @@ const GeneralSettings = ({ onDirtyChange }: GeneralSettingsProps) => {
       </CardHeader>
       <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-sm font-medium">{t("Settings.general.profile.title")}</h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -104,7 +113,7 @@ const GeneralSettings = ({ onDirtyChange }: GeneralSettingsProps) => {
                     <FormItem>
                       <FormLabel>{t("Settings.general.profile.name")}</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} disabled={isSaving} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -117,7 +126,7 @@ const GeneralSettings = ({ onDirtyChange }: GeneralSettingsProps) => {
                     <FormItem>
                       <FormLabel>{t("Settings.general.profile.email")}</FormLabel>
                       <FormControl>
-                        <Input type="email" {...field} />
+                        <Input type="email" {...field} disabled={isSaving} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -137,7 +146,11 @@ const GeneralSettings = ({ onDirtyChange }: GeneralSettingsProps) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("Settings.general.regional.language")}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                        disabled={isSaving}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder={t("General.select")} />
@@ -158,7 +171,11 @@ const GeneralSettings = ({ onDirtyChange }: GeneralSettingsProps) => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                        disabled={isSaving}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder={t("General.select")} />
