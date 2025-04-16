@@ -1,8 +1,13 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+
 import { useLocale, useTranslations } from "next-intl";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
+import { useProfileMutation } from "@/hooks/use-profile-mutation";
+import useUserStore from "@/hooks/use-user-store";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import {
@@ -17,8 +22,6 @@ import {
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Separator } from "../ui/separator";
-import useUserStore from "@/hooks/use-user-store";
-import { useProfileMutation } from "@/hooks/use-profile-mutation";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -37,12 +40,19 @@ interface GeneralSettingsProps {
   formRef: React.RefObject<HTMLFormElement | null>;
 }
 
-const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, formRef }: GeneralSettingsProps) => {
+const GeneralSettings = ({
+  onDirtyChange,
+  onSave,
+  onSaveComplete,
+  isSaving,
+  formRef,
+}: GeneralSettingsProps) => {
   const t = useTranslations();
   const lang = useLocale();
   const { profile } = useUserStore();
   const profileMutation = useProfileMutation();
 
+  console.log("profile is ", profile);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -90,9 +100,9 @@ const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, form
       </CardHeader>
       <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
         <Form {...form}>
-          <form 
-            ref={formRef} 
-            onSubmit={form.handleSubmit(onSubmit)} 
+          <form
+            ref={formRef}
+            onSubmit={form.handleSubmit(onSubmit)}
             onKeyDown={handleKeyDown}
             className="space-y-6"
           >
@@ -139,8 +149,8 @@ const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, form
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("Settings.general.regional.language")}</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
+                      <Select
+                        onValueChange={field.onChange}
                         defaultValue={field.value}
                         disabled={isSaving}
                       >
@@ -164,8 +174,8 @@ const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, form
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
+                      <Select
+                        onValueChange={field.onChange}
                         defaultValue={field.value}
                         disabled={isSaving}
                       >

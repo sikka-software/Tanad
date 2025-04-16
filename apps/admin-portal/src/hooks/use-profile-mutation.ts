@@ -35,6 +35,8 @@ export const useProfileMutation = () => {
 
       if (updateError) throw updateError;
 
+      const user = await supabase.auth.getUser();
+      console.log("user is ", user);
       // Update profile in Supabase
       const { error: updateProfileError } = await supabase
         .from("profiles")
@@ -45,7 +47,7 @@ export const useProfileMutation = () => {
             timezone: data.timezone,
           },
         })
-        .eq("id", (await supabase.auth.getUser()).data.user?.id);
+        .eq("id", user.data.user?.id);
 
       if (updateProfileError) throw updateProfileError;
 
