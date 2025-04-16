@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useLocale, useTranslations } from "next-intl";
@@ -50,6 +50,9 @@ const GeneralSettings = ({
 }: GeneralSettingsProps) => {
   const t = useTranslations();
   const lang = useLocale();
+  
+  // Add state to track the selected timezone
+  const [selectedTimezone, setSelectedTimezone] = useState<string>("UTC");
 
   // Get user from the existing store to get profileId
   const { user } = useUserStore();
@@ -81,6 +84,9 @@ const GeneralSettings = ({
       // Get timezone value, ensuring it's not undefined
       const timezone = profile.user_settings?.timezone || "UTC";
       console.log("Setting timezone to:", timezone);
+      
+      // Set the selected timezone state
+      setSelectedTimezone(timezone);
 
       const formValues = {
         name: profile.full_name || "",
@@ -235,28 +241,48 @@ const GeneralSettings = ({
                   control={form.control}
                   name="timezone"
                   render={({ field }) => {
-                    console.log("Timezone field:", field.value);
-                    console.log("Timezone field object:", JSON.stringify(field, null, 2));
-                    console.log("Complete form values:", form.getValues());
+                    // Debug logging
+                    console.log("Current timezone value:", field.value);
+                    console.log("Selected timezone state:", selectedTimezone);
+                    
+                    // Map timezone codes to display names
+                    const timezoneLabels = {
+                      "UTC": "UTC",
+                      "EST": "Eastern Time (EST)",
+                      "CST": "Central Time (CST)",
+                      "PST": "Pacific Time (PST)"
+                    };
+                    
                     return (
                       <FormItem>
                         <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
                         {isLoadingProfile ? (
                           <Skeleton className="h-10 w-full" />
                         ) : (
-                          <Select {...field} disabled={isSaving} key={`timezone-${field.value}`}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder={t("General.select")} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="UTC">UTC</SelectItem>
-                              <SelectItem value="EST">Eastern Time (EST)</SelectItem>
-                              <SelectItem value="CST">Central Time (CST)</SelectItem>
-                              <SelectItem value="PST">Pacific Time (PST)</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <>
+                            <Select
+                              defaultValue={field.value}
+                              onValueChange={(value) => {
+                                setSelectedTimezone(value);
+                                field.onChange(value);
+                              }}
+                              disabled={isSaving}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue>
+                                    {timezoneLabels[field.value as keyof typeof timezoneLabels] || field.value}
+                                  </SelectValue>
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="UTC">UTC</SelectItem>
+                                <SelectItem value="EST">Eastern Time (EST)</SelectItem>
+                                <SelectItem value="CST">Central Time (CST)</SelectItem>
+                                <SelectItem value="PST">Pacific Time (PST)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </>
                         )}
                         <FormMessage />
                       </FormItem>
