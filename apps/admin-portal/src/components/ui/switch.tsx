@@ -1,94 +1,97 @@
+"use client";
+
 import * as React from "react";
 
 import * as SwitchPrimitives from "@radix-ui/react-switch";
+import { motion } from "motion/react";
 
 import { cn } from "@/lib/utils";
 
-const Switch = React.forwardRef<
-  React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> & { loading?: boolean }
->(({ className, loading, ...props }, ref) => (
-  <SwitchPrimitives.Root
-    className={cn(
-      "peer focus-visible:ring-ring focus-visible:ring-offset-background data-[state=checked]:bg-primary data-[state=unchecked]:bg-input inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-      className,
-    )}
-    {...props}
-    ref={ref}
-  >
-    {!loading && (
-      <SwitchPrimitives.Thumb
-        className={cn(
-          "bg-background pointer-events-none block h-5 w-5 rounded-full shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0 rtl:data-[state=checked]:translate-x-0 rtl:data-[state=unchecked]:-translate-x-5",
-        )}
-      />
-    )}
-  </SwitchPrimitives.Root>
-));
-const SquareSwitch = React.forwardRef<
-  React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => (
-  <SwitchPrimitives.Root
-    className={cn(
-      "peer focus-visible:ring-ring focus-visible:ring-offset-background data-[state=checked]:bg-primary data-[state=unchecked]:bg-input inline-flex h-[31px] w-[52px] shrink-0 cursor-pointer items-center rounded border-2 border-transparent transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
-      className,
-    )}
-    {...props}
-    ref={ref}
-  >
-    <SwitchPrimitives.Thumb
-      className={cn(
-        "bg-background pointer-events-none block h-[27px] w-[28px] rounded shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0 rtl:data-[state=checked]:translate-x-0 rtl:data-[state=unchecked]:-translate-x-5",
-      )}
-    />
-  </SwitchPrimitives.Root>
-));
-Switch.displayName = SwitchPrimitives.Root.displayName;
-SquareSwitch.displayName = SwitchPrimitives.Root.displayName;
-const LTRSquareSwitch = (props: {
-  id: string;
-  is_enabled: boolean;
-  enabled_text: string;
-  disabled_text: string;
-  handleToggleEnabled: (checked: boolean) => void;
-}) => (
-  <div className="relative inline-grid h-9 grid-cols-[1fr_1fr] items-center text-sm font-medium">
-    <Switch
-      id={props.id}
-      checked={props.is_enabled}
-      onCheckedChange={props.handleToggleEnabled}
-      className="peer data-[state=unchecked]:bg-input/50 absolute inset-0 h-[inherit] w-auto rounded [&_span]:z-10 [&_span]:h-full [&_span]:w-1/2 [&_span]:rounded [&_span]:transition-transform [&_span]:duration-300 [&_span]:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] data-[state=checked]:[&_span]:translate-x-full rtl:data-[state=checked]:[&_span]:-translate-x-full"
-    />
-    <span className="min-w-78flex pointer-events-none relative ms-0.5 items-center justify-center px-2 text-center transition-transform duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] peer-data-[state=checked]:invisible peer-data-[state=unchecked]:translate-x-full rtl:peer-data-[state=unchecked]:-translate-x-full">
-      <span className="text-[10px] font-medium uppercase">{props.disabled_text}</span>
-    </span>
-    <span className="min-w-78flex peer-data-[state=checked]:text-background pointer-events-none relative me-0.5 items-center justify-center px-2 text-center transition-transform duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] peer-data-[state=checked]:-translate-x-full peer-data-[state=unchecked]:invisible rtl:peer-data-[state=checked]:translate-x-full">
-      <span className="text-[10px] font-medium uppercase">{props.enabled_text}</span>
-    </span>
-  </div>
-);
+type SwitchProps = React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> & {
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  thumbIcon?: React.ReactNode;
+};
 
-const RTLSquareSwitch = (props: {
-  id: string;
-  is_enabled: boolean;
-  handleToggleEnabled: (checked: boolean) => void;
-  enabled_text: string;
-  disabled_text: string;
-}) => (
-  <div className="relative inline-grid h-9 grid-cols-[1fr_1fr] items-center text-sm font-medium">
-    <Switch
-      id={props.id}
-      checked={props.is_enabled}
-      onCheckedChange={props.handleToggleEnabled}
-      className="peer data-[state=unchecked]:bg-input/50 absolute inset-0 h-[inherit] w-auto rounded [&_span]:z-10 [&_span]:h-full [&_span]:w-1/2 [&_span]:rounded [&_span]:transition-transform [&_span]:duration-300 [&_span]:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] data-[state=unchecked]:[&_span]:translate-x-[100%] rtl:data-[state=unchecked]:[&_span]:-translate-x-[100%]"
-    />
-    <span className="peer-data-[state=checked]:text-background pointer-events-none relative ms-0.5 flex min-w-78 items-center justify-center px-2 text-center transition-transform duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] peer-data-[state=checked]:translate-x-full peer-data-[state=unchecked]:invisible rtl:peer-data-[state=checked]:-translate-x-full">
-      <span className="text-[10px] font-medium uppercase">{props.enabled_text}</span>
-    </span>
-    <span className="peer-data-[state=checked]:text-background pointer-events-none relative me-0.5 flex min-w-78 items-center justify-center px-2 text-center transition-transform duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] peer-data-[state=checked]:invisible peer-data-[state=unchecked]:-translate-x-full rtl:peer-data-[state=unchecked]:translate-x-full">
-      <span className="text-[10px] font-medium uppercase">{props.disabled_text}</span>
-    </span>
-  </div>
+const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, SwitchProps>(
+  ({ className, leftIcon, rightIcon, thumbIcon, onCheckedChange, ...props }, ref) => {
+    const [isChecked, setIsChecked] = React.useState(
+      props?.checked ?? props?.defaultChecked ?? false,
+    );
+    const [isTapped, setIsTapped] = React.useState(false);
+
+    React.useEffect(() => {
+      if (props?.checked !== undefined) setIsChecked(props.checked);
+    }, [props?.checked]);
+
+    const handleChange = React.useCallback(
+      (checked: boolean) => {
+        setIsChecked(checked);
+        onCheckedChange?.(checked);
+      },
+      [onCheckedChange],
+    );
+
+    return (
+      <SwitchPrimitives.Root {...props} onCheckedChange={handleChange} asChild>
+        <motion.button
+          ref={ref}
+          className={cn(
+            "focus-visible:ring-ring focus-visible:ring-offset-background data-[state=checked]:bg-primary data-[state=unchecked]:bg-input relative flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full p-[3px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:justify-end data-[state=unchecked]:justify-start",
+            className,
+          )}
+          whileTap="tap"
+          initial={false}
+          onTapStart={() => setIsTapped(true)}
+          onTapCancel={() => setIsTapped(false)}
+          onTap={() => setIsTapped(false)}
+        >
+          {leftIcon && (
+            <motion.div
+              animate={isChecked ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }}
+              transition={{ type: "spring", bounce: 0 }}
+              className="absolute top-1/2 left-1 -translate-y-1/2 text-neutral-400 dark:text-neutral-500 [&_svg]:size-3"
+            >
+              {typeof leftIcon !== "string" ? leftIcon : null}
+            </motion.div>
+          )}
+
+          {rightIcon && (
+            <motion.div
+              animate={isChecked ? { scale: 0, opacity: 0 } : { scale: 1, opacity: 1 }}
+              transition={{ type: "spring", bounce: 0 }}
+              className="absolute top-1/2 right-1 -translate-y-1/2 text-neutral-500 dark:text-neutral-400 [&_svg]:size-3"
+            >
+              {typeof rightIcon !== "string" ? rightIcon : null}
+            </motion.div>
+          )}
+
+          <SwitchPrimitives.Thumb asChild>
+            <motion.div
+              whileTap="tab"
+              className={cn(
+                "bg-background relative z-[1] flex items-center justify-center rounded-full text-neutral-500 shadow-lg ring-0 dark:text-neutral-400 [&_svg]:size-3",
+              )}
+              layout
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              style={{
+                width: 18,
+                height: 18,
+              }}
+              animate={
+                isTapped
+                  ? { width: 21, transition: { duration: 0.1 } }
+                  : { width: 18, transition: { duration: 0.1 } }
+              }
+            >
+              {thumbIcon && typeof thumbIcon !== "string" ? thumbIcon : null}
+            </motion.div>
+          </SwitchPrimitives.Thumb>
+        </motion.button>
+      </SwitchPrimitives.Root>
+    );
+  },
 );
-export { Switch, SquareSwitch, LTRSquareSwitch, RTLSquareSwitch };
+Switch.displayName = SwitchPrimitives.Root.displayName;
+
+export { Switch, type SwitchProps };
