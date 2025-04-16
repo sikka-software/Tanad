@@ -266,20 +266,20 @@ const GeneralSettings = ({
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue>
-                                  {field.value === "UTC" && "UTC"}
-                                  {field.value === "EST" && "Eastern Time (EST)"}
-                                  {field.value === "CST" && "Central Time (CST)"}
-                                  {field.value === "PST" && "Pacific Time (PST)"}
-                                  {!field.value && selectedTimezone === "UTC" && "UTC"}
-                                  {!field.value &&
-                                    selectedTimezone === "EST" &&
-                                    "Eastern Time (EST)"}
-                                  {!field.value &&
-                                    selectedTimezone === "CST" &&
-                                    "Central Time (CST)"}
-                                  {!field.value &&
-                                    selectedTimezone === "PST" &&
-                                    "Pacific Time (PST)"}
+                                  {(() => {
+                                    const timezoneValue = field.value || selectedTimezone;
+                                    const timezoneLabels = {
+                                      UTC: "UTC",
+                                      EST: "Eastern Time (EST)",
+                                      CST: "Central Time (CST)",
+                                      PST: "Pacific Time (PST)",
+                                    };
+                                    return (
+                                      timezoneLabels[
+                                        timezoneValue as keyof typeof timezoneLabels
+                                      ] || timezoneValue
+                                    );
+                                  })()}
                                 </SelectValue>
                               </SelectTrigger>
                             </FormControl>
