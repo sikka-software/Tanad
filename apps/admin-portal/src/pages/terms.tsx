@@ -1,8 +1,8 @@
 import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 
-import TOSAr from "@/components/legal/tos-ar.mdx";
-import TOSEn from "@/components/legal/tos-en.mdx";
+// import TOSAr from "@/components/legal/tos-ar.mdx";
+// import TOSEn from "@/components/legal/tos-en.mdx";
 
 export default function TermsPage() {
   const t = useTranslations();
@@ -16,7 +16,7 @@ export default function TermsPage() {
           <span>{t("General.last-updated")}:</span>
           <span>{"01/12/2023"}</span>
         </div>
-        {lang === "ar" ? <TOSAr /> : <TOSEn />}
+        {/* {lang === "ar" ? <TOSAr /> : <TOSEn />} */}
       </div>
     </div>
   );

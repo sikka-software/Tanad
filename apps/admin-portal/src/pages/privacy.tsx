@@ -1,8 +1,8 @@
 import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 
-import PrivacyPolicyAr from "@/components/legal/privacy-policy-ar.mdx";
-import PrivacyPolicyEn from "@/components/legal/privacy-policy-en.mdx";
+// import PrivacyPolicyAr from "@/components/legal/privacy-policy-ar.mdx";
+// import PrivacyPolicyEn from "@/components/legal/privacy-policy-en.mdx";
 
 export default function PrivacyPage() {
   const t = useTranslations();
@@ -16,7 +16,7 @@ export default function PrivacyPage() {
           <span>{t("General.last-updated")}:</span>
           <span>{"01/12/2023"}</span>
         </div>
-        {lang === "ar" ? <PrivacyPolicyAr /> : <PrivacyPolicyEn />}
+        {/* {lang === "ar" ? <PrivacyPolicyAr /> : <PrivacyPolicyEn />} */}
       </div>
     </div>
   );
