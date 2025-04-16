@@ -1,11 +1,8 @@
 import { useTranslations } from "next-intl";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { eq } from "drizzle-orm";
 import { toast } from "sonner";
 
-import { db } from "@/db/drizzle";
-import { profiles } from "@/db/schema";
 import { supabase } from "@/lib/supabase";
 
 export const useProfileMutation = () => {
@@ -21,22 +18,18 @@ export const useProfileMutation = () => {
 
       if (updateError) throw updateError;
 
-      // Get current user
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("No user found");
-
-      // Update profile in Drizzle
-      await db
-        .update(profiles)
-        .set({
+      // Update profile in Supabase
+      const { error: updateProfileError } = await supabase
+        .from("profiles")
+        .update({
           full_name: data.name,
           user_settings: {
             timezone: data.timezone,
           },
         })
-        .where(eq(profiles.id, user.id));
+        .eq("id", (await supabase.auth.getUser()).data.user?.id);
+
+      if (updateProfileError) throw updateProfileError;
 
       return data;
     },
