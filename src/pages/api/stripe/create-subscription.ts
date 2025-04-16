@@ -50,7 +50,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let customerIdToUse = customerId;
     let userProfile = null;
 
-    if (userId) {
+    if (
+      userId &&
+      (!customerIdToUse || customerIdToUse === "null" || customerIdToUse === "undefined")
+    ) {
+      console.log(`No valid customer ID provided, looking up by user ID: ${userId}`);
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("stripe_customer_id, email, full_name, language, subscribed_to")
@@ -58,6 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .single();
 
       if (profileError) {
+        console.error("Error finding user profile:", profileError);
         return res.status(404).json({
           error: "User not found",
           message: "Could not find user profile",
@@ -65,11 +70,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       userProfile = profile;
+      console.log("Found user profile:", userProfile);
 
       if (profile?.stripe_customer_id) {
+        console.log(`Found existing stripe customer ID: ${profile.stripe_customer_id}`);
         customerIdToUse = profile.stripe_customer_id;
       } else {
         // Create a new customer if one doesn't exist
+        console.log("No stripe customer ID found, creating new customer");
         const customer = await stripe.customers.create({
           email: profile?.email || undefined,
           name: profile?.full_name || undefined,
@@ -78,13 +86,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         });
         customerIdToUse = customer.id;
+        console.log(`Created new stripe customer: ${customerIdToUse}`);
 
         // Update user with stripe customer id
-        await supabase
+        const { error: updateError } = await supabase
           .from("profiles")
           .update({ stripe_customer_id: customerIdToUse })
           .eq("id", userId);
+
+        if (updateError) {
+          console.error("Error updating profile with customer ID:", updateError);
+        } else {
+          console.log(`Updated user profile with stripe customer ID: ${customerIdToUse}`);
+        }
       }
+    }
+
+    if (!customerIdToUse) {
+      return res.status(400).json({
+        error: "Customer ID required",
+        message: "Failed to obtain valid customer ID for subscription",
+      });
     }
 
     // Get the lookup key for this price ID

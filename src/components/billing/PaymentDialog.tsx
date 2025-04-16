@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { AlertTriangle, CreditCard, Loader2, ShieldAlert, XCircle } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -114,6 +115,29 @@ export function PaymentDialog({
         price: priceData.price || "0.00 SAR/month",
       });
 
+      // Check if we need to obtain a customer ID - if none exists
+      if (!user.stripe_customer_id && user.id) {
+        console.log("No customer ID, will use user ID for fallback:", user.id);
+        toast.info("Setting up your payment method...");
+      }
+
+      // Make sure we have a customer ID
+      if (!user?.stripe_customer_id) {
+        // Try to wait for it if it might be loading
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        if (!user?.stripe_customer_id && !user?.id) {
+          setLoading(false);
+          toast.error("User information not available. Please refresh and try again.");
+          return;
+        }
+      }
+
+      // Logging the user data we have available
+      console.log("User data for setup intent:", {
+        id: user.id,
+        customerId: user.stripe_customer_id,
+      });
+
       // Create a setup intent for the customer
       const setupResponse = await fetch("/api/stripe/create-setup-intent", {
         method: "POST",
@@ -122,6 +146,7 @@ export function PaymentDialog({
         },
         body: JSON.stringify({
           customerId: user.stripe_customer_id,
+          userId: user.id,
         }),
       });
 
@@ -150,11 +175,53 @@ export function PaymentDialog({
     setLoading(false);
     setError(null);
 
+    console.log("Payment successful, closing dialog");
+
+    // Allow some time for the backend to process the subscription
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     // Close dialog
     onOpenChange(false);
 
-    // Call the parent's success handler
-    onSuccess();
+    // Additional delay before calling parent's success handler
+    // This helps ensure the subscription data is ready when components refresh
+    setTimeout(() => {
+      console.log("Executing onSuccess callback");
+      onSuccess();
+
+      // Force re-render of other components
+      try {
+        // Additional direct refresh of subscription data
+        refetchSubscription()
+          .then(() => {
+            console.log("Subscription data refreshed directly");
+          })
+          .catch((err) => {
+            console.error("Error in direct subscription refresh:", err);
+          });
+      } catch (error) {
+        console.error("Error in delayed refresh:", error);
+      }
+
+      // Show success message
+      toast.success(
+        t("billing.payment.success", {
+          fallback: "Payment successful! Your subscription has been updated.",
+        }),
+      );
+
+      // Add a fallback full page refresh with delay if needed
+      // Only do this if absolutely necessary - as a last resort
+      const shouldForceRefresh = true; // Set to true for testing, can be made conditional later
+
+      if (shouldForceRefresh) {
+        console.log("Scheduling fallback page refresh in 3 seconds");
+        setTimeout(() => {
+          console.log("Performing fallback page refresh");
+          window.location.href = window.location.pathname + "?refresh=" + Date.now() + "#billing";
+        }, 3000);
+      }
+    }, 1500);
   };
 
   // Check if Stripe key is available
@@ -166,8 +233,8 @@ export function PaymentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
-            {t("billing.payment_dialog.title", { fallback: "Payment Details" })}
+          <DialogTitle className={locale === "ar" ? "text-right" : "text-left"}>
+            {t("billing.payment.dialog_title", { fallback: "Payment Details" })}
           </DialogTitle>
         </DialogHeader>
 
@@ -286,6 +353,7 @@ function PaymentFormContent({
     type: "card" | "authentication" | "network" | "general";
   } | null>(null);
   const [saveCard, setSaveCard] = useState(true);
+  const { user } = useUserStore();
 
   const isRtl = locale === "ar";
 
@@ -366,6 +434,12 @@ function PaymentFormContent({
       return;
     }
 
+    // Check if we have user data
+    if (!user || (!user.stripe_customer_id && !user.id)) {
+      toast.error("User information is not available. Please refresh and try again.");
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
 
@@ -412,6 +486,13 @@ function PaymentFormContent({
       // Log success of setup intent before proceeding
       console.log("Setup successful, payment method ID:", paymentMethodId);
 
+      // Log available IDs for debugging
+      console.log("Creating subscription with:", {
+        userId: user?.id,
+        customerId: user?.stripe_customer_id,
+        paymentMethodId,
+      });
+
       try {
         const response = await fetch("/api/stripe/create-subscription", {
           method: "POST",
@@ -421,6 +502,8 @@ function PaymentFormContent({
           body: JSON.stringify({
             priceId,
             paymentMethodId,
+            customerId: user?.stripe_customer_id,
+            userId: user?.id,
           }),
         });
 
@@ -461,7 +544,48 @@ function PaymentFormContent({
         }
 
         // Dispatch a custom event for subscription updates
+        console.log("Dispatching subscription_updated event");
         window.dispatchEvent(new CustomEvent("subscription_updated"));
+
+        // Also dispatch as named constant from CurrentPlan
+        if (typeof window !== "undefined") {
+          try {
+            console.log("Broadcasting subscription update to CurrentPlan");
+            // Try importing the constant
+            import("@/components/billing/CurrentPlan")
+              .then((module) => {
+                if (module.SUBSCRIPTION_UPDATED_EVENT) {
+                  const eventName = module.SUBSCRIPTION_UPDATED_EVENT;
+                  console.log(`Dispatching ${eventName} event`);
+                  window.dispatchEvent(new CustomEvent(eventName));
+                }
+              })
+              .catch((err) => {
+                console.warn("Could not import from CurrentPlan:", err);
+              });
+          } catch (err) {
+            console.warn("Error dispatching additional event:", err);
+          }
+        }
+
+        // Show success message
+        toast.success(
+          t("billing.payment.success", {
+            fallback: "Payment successful! Your subscription has been updated.",
+          }),
+        );
+
+        // Add a fallback full page refresh with delay if needed
+        // Only do this if absolutely necessary - as a last resort
+        const shouldForceRefresh = true; // Set to true for testing, can be made conditional later
+
+        if (shouldForceRefresh) {
+          console.log("Scheduling fallback page refresh in 3 seconds");
+          setTimeout(() => {
+            console.log("Performing fallback page refresh");
+            window.location.href = window.location.pathname + "?refresh=" + Date.now() + "#billing";
+          }, 3000);
+        }
 
         // Call success handler
         console.log("Payment process completed successfully");

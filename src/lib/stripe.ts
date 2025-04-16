@@ -1,3 +1,4 @@
+import { loadStripe } from "@stripe/stripe-js";
 import Stripe from "stripe";
 
 import { getStripeInstance } from "./stripe-admin";
@@ -188,3 +189,29 @@ export async function updateProductFeatures(
     return false;
   }
 }
+
+const STRIPE_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+
+let stripePromise: Promise<any> | null = null;
+
+export const getStripe = () => {
+  if (!STRIPE_PUBLISHABLE_KEY) {
+    console.error("Stripe publishable key is missing!");
+    return null;
+  }
+
+  if (!stripePromise) {
+    try {
+      stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+      if (!stripePromise) {
+        console.error("Failed to initialize Stripe");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error initializing Stripe:", error);
+      return null;
+    }
+  }
+
+  return stripePromise;
+};

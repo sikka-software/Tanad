@@ -212,7 +212,40 @@ export default function SubscriptionSelection({
     setIsPaymentDialogOpen(false);
     setIsLoading(false);
     setSelectedPlan(null);
-    await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
+
+    // Clear any caches to ensure fresh data
+    console.log("Payment successful, refreshing subscription data");
+
+    try {
+      // Refresh data with multiple retries
+      const maxRetries = 3;
+      let retryCount = 0;
+      let success = false;
+
+      while (retryCount < maxRetries && !success) {
+        try {
+          // Wait a moment for backend to process the subscription
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          // Refresh the data
+          await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
+          console.log("Subscription data refreshed successfully");
+          success = true;
+        } catch (error) {
+          console.error(`Retry ${retryCount + 1}/${maxRetries} failed:`, error);
+          retryCount++;
+        }
+      }
+
+      // Dispatch custom events to notify other components
+      console.log("Broadcasting subscription update events");
+      window.dispatchEvent(new CustomEvent("subscription_updated"));
+
+      // Force UI refresh
+      window.location.hash = "billing";
+    } catch (error) {
+      console.error("Error refreshing subscription data:", error);
+    }
   };
 
   const getTranslatedFeatures = (plan: any, featureKeys: string[]) => {

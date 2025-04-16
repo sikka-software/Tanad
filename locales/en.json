@@ -1003,7 +1003,7 @@
       "privacy": "Privacy Policy",
       "terms_agreement_end": ".",
       "processing": "Processing...",
-
+      "dialog_title": "Payment Details",
       "complete_payment": "Complete Payment",
       "error": "An error occurred while processing your payment. Please try again.",
       "incomplete_card": "Please complete your card information.",
