@@ -1,442 +1,547 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 
-import { AlertTriangle, Calendar, CalendarOff } from "lucide-react";
+import { AlertCircle, Download, RefreshCcw } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { usePricing } from "@/hooks/use-pricing";
+import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
+import { TANAD_PRODUCT_ID } from "@/lib/constants";
 
-import { Button } from "../ui/button";
-import ConfirmCancelSubscription from "./ConfirmCancelSubscription";
-import { ConfirmReactivateSubscription } from "./ConfirmReactivateSubscription";
+// Create a pub/sub event for subscription updates
+export const SUBSCRIPTION_UPDATED_EVENT = "subscription_updated";
 
-interface CurrentPlanProps {
-  id?: string | null;
-  name?: string | null;
-  price?: number | string | null;
-  billingCycle?: string | null;
-  nextBillingDate?: string | null;
-  cancelAt?: string | null;
-  status?:
-    | "active"
-    | "canceled"
-    | "incomplete"
-    | "incomplete_expired"
-    | "past_due"
-    | "trialing"
-    | "unpaid"
-    | "paused"
-    | null;
-  isExpired?: boolean;
-  isLoading?: boolean;
-  refetch?: () => Promise<void>;
-  onSubscriptionUpdate?: () => Promise<void>;
-  disabled?: boolean;
+// Map plan lookup keys to plan titles
+const planTitles: Record<string, string> = {
+  tanad_free: "Free Plan",
+  tanad_standard: "Standard Plan",
+  tanad_pro: "Pro Plan",
+  tanad_business: "Business Plan",
+  tanad_enterprise: "Enterprise Plan",
+};
+
+interface BillingHistoryItem {
+  id: string;
+  number: string;
+  date: string;
+  amount: string;
+  status: string;
+  planName: string;
+  pdfUrl?: string;
+  subscriptionId?: string;
 }
 
-// Helper function to format price for Arabic locale
-function formatPriceForLocale(price: string | number | null | undefined, locale: string): string {
-  if (!price) return "-";
-
-  // Convert price to string if it's a number
-  const priceStr = typeof price === "number" ? price.toString() : price;
-
-  if (locale !== "ar") {
-    // For non-Arabic locales, just ensure it's formatted nicely
-    const numericMatch = priceStr.match(/(\d+(\.\d+)?)/);
-    if (numericMatch) {
-      const number = parseFloat(numericMatch[0]);
-      const formatted = number.toLocaleString("en-US");
-      return priceStr.replace(numericMatch[0], formatted);
-    }
-    return priceStr;
-  }
-
-  // For Arabic, use full Arabic formatting
-  const parts = priceStr.toString().split(" ");
-  if (parts.length >= 2) {
-    let amount = parts[0];
-    const currency = parts[1];
-
-    // Try to parse the amount as a number for proper formatting
-    try {
-      const numAmount = parseFloat(amount);
-      amount = new Intl.NumberFormat("ar-SA", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      }).format(numAmount);
-    } catch (e) {
-      // If parsing fails, keep original amount
-    }
-
-    // Replace SAR with ر.س for Arabic
-    const arabicCurrency = currency === "SAR" ? "ر.س" : currency;
-
-    // Format with appropriate spacing for Arabic
-    let result = `${amount} ${arabicCurrency}`;
-
-    // Add interval information if present
-    if (parts.length > 2 && parts[2].startsWith("/")) {
-      const interval = parts[2].substring(1); // remove the slash
-      const arabicInterval =
-        interval === "month" ? "شهرياً" : interval === "year" ? "سنوياً" : interval;
-      result += ` ${arabicInterval}`;
-    } else if (parts.length === 2) {
-      // Add monthly by default if no interval specified
-      result += " شهرياً";
-    }
-
-    return result;
-  }
-
-  // For simple numeric values, format to Arabic numerals
-  if (/^\d+(\.\d+)?$/.test(priceStr)) {
-    const num = parseFloat(priceStr);
-    return new Intl.NumberFormat("ar-SA").format(num);
-  }
-
-  return priceStr;
-}
-
-export default function CurrentPlan({
-  id,
-  name,
-  price,
-  billingCycle,
-  nextBillingDate,
-  cancelAt,
-  status,
-  isExpired,
-  isLoading = false,
-  refetch,
-  onSubscriptionUpdate,
-  disabled = false,
-}: CurrentPlanProps) {
+export default function CurrentPlan() {
   const t = useTranslations();
-  const [isCanceling, setIsCanceling] = useState(false);
-  const [isReactivating, setIsReactivating] = useState(false);
   const locale = useLocale();
-  const { user } = useUserStore();
-  const [isReactivateDialogOpen, setIsReactivateDialogOpen] = useState(false);
+  const subscription = useSubscription();
+  const { user, fetchUserAndProfile } = useUserStore();
+  const { getPlans } = usePricing(TANAD_PRODUCT_ID);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [billingHistory, setBillingHistory] = useState<BillingHistoryItem[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [lastRefreshTime, setLastRefreshTime] = useState<number>(Date.now());
 
-  // Helper function to get current plan details based on subscription state
-  const getCurrentPlanDetails = () => {
-    if (isExpired || status === "canceled" || status === "incomplete_expired") {
-      return {
-        name: "billing.free_plan",
-        price: "0",
-        billingCycle: "month",
-        nextBillingDate: "-",
-      };
-    }
-    return {
-      name,
-      price,
-      billingCycle,
-      nextBillingDate,
-    };
-  };
+  // Memoize the refresh function to prevent unnecessary re-renders
+  const refreshData = useCallback(async () => {
+    if (!user) return;
 
-  const currentPlan = getCurrentPlanDetails();
-  const handleCancelSubscription = async () => {
-    if (!id) return;
-
+    // Refresh both subscription data and user data
     try {
-      setIsCanceling(true);
-      const response = await fetch("/api/stripe/cancel-subscription", {
+      console.log("Manually refreshing subscription and user data");
+      await fetchUserAndProfile();
+      await subscription.refetch();
+      setLastRefreshTime(Date.now()); // Update refresh timestamp
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
+  }, [user, fetchUserAndProfile, subscription]);
+
+  // Listen for subscription update events
+  useEffect(() => {
+    const handleSubscriptionUpdate = () => {
+      console.log("Subscription update event detected, refreshing data");
+      refreshData();
+    };
+
+    // Add event listener
+    window.addEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdate);
+
+    // Clean up
+    return () => {
+      window.removeEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdate);
+    };
+  }, [refreshData]);
+
+  // Fetch billing history when dialog opens or when subscription changes
+  useEffect(() => {
+    if (isHistoryDialogOpen && user) {
+      fetchBillingHistory();
+    }
+  }, [isHistoryDialogOpen, user, lastRefreshTime]);
+
+  // Also refresh data when subscription ID changes
+  useEffect(() => {
+    if (subscription.id) {
+      // This ensures we refresh billing history after a new subscription
+      fetchBillingHistory();
+    }
+  }, [subscription.id]);
+
+  const fetchBillingHistory = async () => {
+    if (!user) return;
+
+    setIsLoadingHistory(true);
+    setBillingHistory([]); // Clear previous data when loading
+    try {
+      console.log("Fetching billing history for user", user.id);
+      const response = await fetch("/api/stripe/billing-history", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscriptionId: id }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          limit: 100, // Fetch more invoices to ensure we get everything
+          includeDrafts: false, // Skip draft invoices by default
+        }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to cancel subscription");
+        const error = await response.json();
+        throw new Error(error.message || "Failed to fetch billing history");
       }
 
-      toast.success(t("billing.cancel_subscription.cancel_success"));
-
-      // Refresh the subscription data
-      if (refetch) {
-        await refetch();
-      }
-
-      // Call onSubscriptionUpdate if provided
-      if (onSubscriptionUpdate) {
-        await onSubscriptionUpdate();
-      }
+      const data = await response.json();
+      console.log("Billing history fetched:", data.invoices?.length || 0, "invoices");
+      setBillingHistory(data.invoices || []);
     } catch (error) {
-      console.error("Error canceling subscription:", error);
-      toast.error(error instanceof Error ? error.message : t("billing.cancel_error"));
+      console.error("Error fetching billing history:", error);
+      toast.error("Failed to load billing history");
     } finally {
-      setIsCanceling(false);
+      setIsLoadingHistory(false);
     }
   };
 
-  const handleReactivateSubscription = () => {
-    setIsReactivateDialogOpen(true);
-  };
-
-  const getStatusBadge = () => {
-    if (isExpired) {
-      return (
-        <Badge variant="destructive" className="gap-1 text-nowrap">
-          <AlertTriangle className="h-3 w-3" />
-          {t("billing.subscription_expired")}
-        </Badge>
-      );
-    }
-    if (cancelAt) {
-      // Convert Unix timestamp to Date object
-      const cancelDate = new Date(Number(cancelAt) * 1000);
-
-      // Format the date with proper options
-      let formattedDate;
-      try {
-        formattedDate = cancelDate.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
-          year: "numeric" as const,
-          month: "long" as const,
-          day: "numeric" as const,
-        });
-      } catch (error) {
-        // Fallback formatting if locale isn't supported
-        console.error("Date formatting error:", error);
-        formattedDate =
-          locale === "ar"
-            ? `${cancelDate.getDate()}/${cancelDate.getMonth() + 1}/${cancelDate.getFullYear()}`
-            : cancelDate.toLocaleDateString("en-US", {
-                year: "numeric" as const,
-                month: "long" as const,
-                day: "numeric" as const,
-              });
-      }
-      return (
-        <Badge variant="secondary" className="gap-1 text-nowrap">
-          <CalendarOff className="h-3 w-3" />
-          {t("billing.subscription_cancels_on")} {formattedDate}
-        </Badge>
-      );
-    }
-
-    switch (status) {
-      case "active":
-        return (
-          <Badge variant="secondary" className="gap-1">
-            <Calendar className="h-3 w-3" />
-            {t("billing.subscription_status.active")}
-          </Badge>
-        );
-      case "trialing":
-        return <Badge variant="secondary">{t("billing.subscription_trialing")}</Badge>;
-      case "past_due":
-        return (
-          <Badge variant="destructive" className="gap-1">
-            <AlertTriangle className="h-3 w-3" />
-            {t("billing.subscription_past_due")}
-          </Badge>
-        );
-      case "canceled":
-        return <Badge variant="destructive">{t("billing.subscription_canceled")}</Badge>;
-      case "incomplete":
-        return <Badge variant="secondary">{t("billing.subscription_incomplete")}</Badge>;
-      case "incomplete_expired":
-        return <Badge variant="destructive">{t("billing.subscription_incomplete_expired")}</Badge>;
-      case "unpaid":
-        return <Badge variant="destructive">{t("billing.subscription_unpaid")}</Badge>;
-      default:
-        return null;
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <Card className="h-full w-full">
-        <CardHeader>
-          <Skeleton className="h-6 w-48" />
-          <Skeleton className="mt-2 h-4 w-72" />
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-2/3" />
-          <Skeleton className="h-8 w-1/2" />
-          <Skeleton className="h-10 w-full" />
-        </CardContent>
-      </Card>
-    );
+  if (subscription.loading) {
+    return <Skeleton className="h-24 w-full rounded-lg" />;
   }
 
-  // Get display name of plan from translation
-  const displayPlanName = currentPlan.name
-    ? t(`billing.${currentPlan.name}`, { fallback: currentPlan.name })
-    : "-";
+  // Format the next billing date if available
+  const formatNextBillingDate = () => {
+    if (!subscription.nextBillingDate || subscription.nextBillingDate === "-") return null;
 
-  // Format price for display based on locale
-  const displayPrice = formatPriceForLocale(currentPlan.price, locale);
+    try {
+      let date;
+      if (subscription.nextBillingDate.includes("/")) {
+        // Parse DD/MM/YYYY format
+        const parts = subscription.nextBillingDate.split("/");
+        date = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      } else if (typeof subscription.nextBillingDate === "number") {
+        // Handle Unix timestamp (seconds)
+        date = new Date(subscription.nextBillingDate * 1000);
+      } else {
+        // Try to parse as regular date
+        date = new Date(subscription.nextBillingDate);
+      }
 
-  // Get header background class based on plan name
-  const getPlanHeaderClass = () => {
-    const planKey =
-      typeof currentPlan.name === "string"
-        ? currentPlan.name.replace("billing.", "").replace("plans.", "")
-        : "free_plan";
+      if (isNaN(date.getTime())) return subscription.nextBillingDate;
 
-    switch (planKey) {
-      case "tanad_pro":
-      case "pro":
-        return "bg-purple-800 text-white";
-      case "tanad_standard":
-      case "standard":
-        return "bg-purple-800 text-white";
-      case "tanad_business":
-      case "business":
-        return "bg-green-800 text-white";
-      case "tanad_enterprise":
-      case "enterprise":
-        return "bg-amber-700 text-white";
-      case "tanad_free":
-      case "free":
-      case "free_plan":
-      default:
-        return "bg-gray-800 text-white";
+      // Format the date based on locale
+      const options: Intl.DateTimeFormatOptions = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+
+      try {
+        return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", options);
+      } catch (e) {
+        // Fallback for browsers that don't support the locale
+        return date.toLocaleDateString("en-US", options);
+      }
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return subscription.nextBillingDate;
     }
   };
 
-  // Get background color for the price display section
-  const getPlanPriceClass = () => {
-    const planKey =
-      typeof currentPlan.name === "string"
-        ? currentPlan.name.replace("billing.", "").replace("plans.", "")
-        : "free_plan";
-
-    switch (planKey) {
-      case "tanad_pro":
-      case "pro":
-        return "bg-purple-900 text-white";
-      case "tanad_standard":
-      case "standard":
-        return "bg-purple-900 text-white";
-      case "tanad_business":
-      case "business":
-        return "bg-green-900 text-white";
-      case "tanad_enterprise":
-      case "enterprise":
-        return "bg-amber-800 text-white";
-      case "tanad_free":
-      case "free":
-      case "free_plan":
-      default:
-        return "bg-gray-900 text-white";
+  // Get the plan lookup key from user data or available plans
+  const getPlanLookupKey = () => {
+    // Check if we have a lookup key directly in the user profile
+    if (user?.subscribed_to) {
+      return user.subscribed_to;
     }
+
+    // If not, try to find the plan by price ID
+    if (user?.price_id) {
+      const plans = getPlans();
+      const userPlan = plans.find((plan) => plan.priceId === user.price_id);
+      if (userPlan?.lookup_key) {
+        return userPlan.lookup_key;
+      }
+    }
+
+    // Default to free plan if nothing found
+    return "tanad_free";
+  };
+
+  // Format the plan name using translations and lookup key
+  const getDisplayPlanName = () => {
+    const lookupKey = getPlanLookupKey();
+
+    // Use translation if available, otherwise fall back to default titles
+    return t(`billing.${lookupKey}`, {
+      fallback: planTitles[lookupKey] || formatPlanName(subscription.name),
+    });
+  };
+
+  // Format the plan name to match the design (as a fallback)
+  const formatPlanName = (name: string | null) => {
+    if (!name) return "-";
+
+    // For the simplified design, just get the basic plan name without "Plan"
+    let simpleName = name;
+
+    // Remove tanad_ prefix if present
+    if (name.includes("tanad_")) {
+      simpleName = name.replace("tanad_", "");
+    }
+
+    // Convert to title case but keep it simple (e.g., "Pro" instead of "Pro Plan")
+    return simpleName.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
+
+  const nextBillingDate = formatNextBillingDate();
+  const planName = getDisplayPlanName();
+
+  // Status badge for invoices - enhance to show more payment states
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "paid":
+        return (
+          <Badge variant="outline" className="border-green-500 bg-green-50 text-green-700">
+            {t("billing.invoice_status_paid", { fallback: "Paid" })}
+          </Badge>
+        );
+      case "open":
+        return (
+          <Badge variant="outline" className="border-blue-500 bg-blue-50 text-blue-700">
+            {t("billing.invoice_status_open", { fallback: "Open" })}
+          </Badge>
+        );
+      case "void":
+        return (
+          <Badge variant="outline" className="border-gray-500 bg-gray-50 text-gray-700">
+            {t("billing.invoice_status_void", { fallback: "Void" })}
+          </Badge>
+        );
+      case "uncollectible":
+        return (
+          <Badge variant="outline" className="border-red-500 bg-red-50 text-red-700">
+            {t("billing.invoice_status_uncollectible", { fallback: "Uncollectible" })}
+          </Badge>
+        );
+      case "draft":
+        return (
+          <Badge variant="outline" className="border-amber-500 bg-amber-50 text-amber-700">
+            {t("billing.invoice_status_draft", { fallback: "Draft" })}
+          </Badge>
+        );
+      case "pending":
+        return (
+          <Badge variant="outline" className="border-purple-500 bg-purple-50 text-purple-700">
+            {t("billing.invoice_status_pending", { fallback: "Pending" })}
+          </Badge>
+        );
+      case "overdue":
+        return (
+          <Badge variant="outline" className="border-red-500 bg-red-50 text-red-700">
+            {t("billing.invoice_status_overdue", { fallback: "Overdue" })}
+          </Badge>
+        );
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
+
+  // Format the plan name for billing history items
+  const formatBillingHistoryPlanName = (planName: string) => {
+    // Try to extract a lookup key if it follows our naming convention
+    let lookupKey = "";
+    if (planName.toLowerCase().includes("tanad_")) {
+      // Extract what could be a lookup key
+      const match = planName.toLowerCase().match(/tanad_[a-z]+/);
+      if (match) lookupKey = match[0];
+    }
+
+    if (lookupKey && lookupKey in planTitles) {
+      // Use translation if available for this lookup key
+      return t(`billing.${lookupKey}`, {
+        fallback: planTitles[lookupKey],
+      });
+    }
+
+    // Fall back to the basic formatting if no lookup key matched
+    return formatPlanName(planName);
   };
 
   return (
-    <Card className="h-full w-full overflow-hidden border-2">
-      <CardHeader className={`pt-3 pb-3 text-center ${getPlanHeaderClass()}`}>
-        <CardTitle>{t("billing.current_plan.title")}</CardTitle>
-      </CardHeader>
+    <>
+      <div className="bg-background rounded-lg border p-6">
+        <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+          <div>
+            <h2 className="text-xl font-bold">{t("billing.current_plan.title")}</h2>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="text-lg font-medium">{planName}</span>
+              {subscription.status === "active" && !subscription.cancelAt && (
+                <Badge variant="outline" className="border-green-500 bg-green-50 text-green-700">
+                  {t("billing.subscription_status.active")}
+                </Badge>
+              )}
+              {subscription.status === "trialing" && (
+                <Badge variant="outline" className="border-blue-500 bg-blue-50 text-blue-700">
+                  {t("billing.subscription_status.trialing")}
+                </Badge>
+              )}
+              {subscription.cancelAt && (
+                <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
+                  {t("billing.canceling")}
+                </Badge>
+              )}
+            </div>
 
-      <div className={`w-full p-4 text-center ${getPlanPriceClass()}`}>
-        <h3 className="text-2xl font-bold">{displayPlanName}</h3>
-        <p className="mt-2 text-2xl font-bold">{displayPrice}</p>
-        {getStatusBadge() && <div className="mt-3 flex justify-center">{getStatusBadge()}</div>}
-      </div>
+            {/* Price and billing cycle */}
+            <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-4">
+              {subscription.price && subscription.price !== "0 SAR" && (
+                <p className="text-foreground font-medium">
+                  {subscription.price}
+                  {subscription.billingCycle && subscription.billingCycle !== "-" && (
+                    <span className="text-muted-foreground">
+                      {" "}
+                      {locale === "ar"
+                        ? subscription.billingCycle === "month"
+                          ? "شهرياً"
+                          : "سنوياً"
+                        : subscription.billingCycle === "month"
+                          ? "/month"
+                          : "/year"}
+                    </span>
+                  )}
+                </p>
+              )}
 
-      <CardContent className="bg-background space-y-4 p-4">
-        {/* Next billing date */}
-        {currentPlan.nextBillingDate && currentPlan.nextBillingDate !== "-" && (
-          <div className="space-y-1">
-            <p className="text-muted-foreground text-sm">{t("billing.next_billing_date")}</p>
-            <p className="font-medium">
-              {(() => {
-                // Check if the date string is already in Arabic format (containing Arabic numerals)
-                const containsArabicNumerals = /[\u0660-\u0669]/.test(currentPlan.nextBillingDate);
+              {/* Billing cycle badge */}
+              {subscription.billingCycle && subscription.billingCycle !== "-" && (
+                <Badge variant="outline" className="text-xs">
+                  {t(`billing.${subscription.billingCycle}_billing`, {
+                    fallback:
+                      subscription.billingCycle === "month" ? "Monthly billing" : "Annual billing",
+                  })}
+                </Badge>
+              )}
+            </div>
 
-                if (containsArabicNumerals) {
-                  // If it's already in Arabic format, return it as is
-                  return currentPlan.nextBillingDate;
-                }
-
-                // Parse DD/MM/YYYY format
-                const dateMatch = currentPlan.nextBillingDate.match(/(\d{2})\/(\d{2})\/(\d{4})/);
-                if (dateMatch) {
-                  const [_, day, month, year] = dateMatch;
-                  const date = new Date(Number(year), Number(month) - 1, Number(day));
-
-                  return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
+            {/* Format cancellation date if available */}
+            {subscription.cancelAt && (
+              <p className="mt-2 flex items-center text-sm text-orange-600">
+                <span className="mr-2 inline-block h-2 w-2 rounded-full bg-orange-500"></span>
+                {t("billing.subscription_cancels_on", {
+                  date: new Date(Number(subscription.cancelAt) * 1000).toLocaleDateString(
+                    locale === "ar" ? "ar-SA" : "en-US",
+                    { year: "numeric", month: "long", day: "numeric" },
+                  ),
+                  fallback: `Your subscription will cancel on ${new Date(
+                    Number(subscription.cancelAt) * 1000,
+                  ).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
-                  });
-                }
+                  })}`,
+                })}
+              </p>
+            )}
 
-                // If not DD/MM/YYYY format, try regular date parsing
-                try {
-                  return new Date(currentPlan.nextBillingDate).toLocaleDateString(
-                    locale === "ar" ? "ar-SA" : "en-US",
-                    {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    },
-                  );
-                } catch (error) {
-                  // If all parsing fails, return the original string
-                  return currentPlan.nextBillingDate;
-                }
-              })()}
-            </p>
+            {/* Next billing date */}
+            {nextBillingDate && !subscription.cancelAt && (
+              <p className="text-muted-foreground mt-2 flex items-center">
+                <span className="mr-2 inline-block h-2 w-2 rounded-full bg-green-500"></span>
+                {locale === "ar"
+                  ? t("billing.next_billing_date_is", {
+                      date: nextBillingDate,
+                      fallback: `تاريخ الفاتورة القادمة هو ${nextBillingDate}`,
+                    })
+                  : t("billing.next_billing_date_is", {
+                      date: nextBillingDate,
+                      fallback: `Your subscription will automatically renew on ${nextBillingDate}`,
+                    })}
+              </p>
+            )}
           </div>
-        )}
-
-        {/* Actions */}
-        <div className="pt-4">
-          {cancelAt ? (
+          <div>
             <Button
-              onClick={handleReactivateSubscription}
-              className="w-full"
-              variant="default"
-              disabled={isReactivating}
+              variant="outline"
+              className="bg-background hover:bg-accent"
+              onClick={() => setIsHistoryDialogOpen(true)}
             >
-              {isReactivating ? t("billing.reactivating") : t("billing.reactivate_subscription")}
+              {t("billing.history", { fallback: "Billing History" })}
             </Button>
-          ) : (
-            status === "active" &&
-            currentPlan.name !== "billing.free_plan" && (
-              <ConfirmCancelSubscription
-                isCanceling={isCanceling}
-                setIsCanceling={setIsCanceling}
-                handleCancelSubscription={handleCancelSubscription}
-              />
-            )
-          )}
-
-          {/* If on a free plan or canceled/expired subscription, show a button to upgrade */}
-          {(status === "canceled" ||
-            status === "incomplete_expired" ||
-            currentPlan.name === "billing.free_plan") && (
-            <Link href="#plans" className="block w-full">
-              <Button className="w-full" variant="default">
-                {t("billing.upgrade_plan")}
-              </Button>
-            </Link>
-          )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.preventDefault();
+                refreshData();
+                toast.success(t("billing.data_refreshed", { fallback: "Billing data refreshed" }));
+              }}
+              className="ml-2 h-9 w-9"
+              title={t("billing.current_plan.refresh", { fallback: "Refresh" })}
+            >
+              <RefreshCcw className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-      </CardContent>
+      </div>
 
-      <ConfirmReactivateSubscription
-        open={isReactivateDialogOpen}
-        onOpenChange={setIsReactivateDialogOpen}
-        onReactivate={async () => {
-          setIsReactivating(true);
-          await onSubscriptionUpdate?.();
-          setIsReactivating(false);
+      {/* Billing History Dialog */}
+      <Dialog
+        open={isHistoryDialogOpen}
+        onOpenChange={(open) => {
+          setIsHistoryDialogOpen(open);
+          // Re-fetch data when the dialog is opened
+          if (open && user) {
+            fetchBillingHistory();
+          }
         }}
-        subscriptionId={id || null}
-      />
-    </Card>
+      >
+        <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle>
+                {t("billing.history_dialog_title", { fallback: "Billing History" })}
+              </DialogTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.preventDefault();
+                  fetchBillingHistory();
+                }}
+                disabled={isLoadingHistory}
+                className="h-8 w-8"
+                aria-label={t("billing.current_plan.refresh", { fallback: "Refresh" })}
+              >
+                <RefreshCcw className={`h-4 w-4 ${isLoadingHistory ? "animate-spin" : ""}`} />
+              </Button>
+            </div>
+          </DialogHeader>
+
+          <div className="mt-4">
+            {isLoadingHistory ? (
+              <div className="py-8">
+                <Skeleton className="mb-2 h-12 w-full" />
+                <Skeleton className="mb-2 h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+            ) : billingHistory.length > 0 ? (
+              <>
+                <p className="text-muted-foreground mb-4 text-sm">
+                  {t("billing.history_description", {
+                    fallback: "Your billing history and past invoices",
+                  })}
+                </p>
+                <div className="max-h-[50vh] overflow-auto">
+                  <Table>
+                    <TableHeader className="bg-background sticky top-0">
+                      <TableRow>
+                        <TableHead>{t("billing.invoice_date", { fallback: "Date" })}</TableHead>
+                        <TableHead>
+                          {t("billing.invoice_number", { fallback: "Invoice" })}
+                        </TableHead>
+                        <TableHead>{t("billing.invoice_amount", { fallback: "Amount" })}</TableHead>
+                        <TableHead>{t("billing.invoice_status", { fallback: "Status" })}</TableHead>
+                        <TableHead>{t("billing.invoice_plan", { fallback: "Plan" })}</TableHead>
+                        <TableHead className="text-right">
+                          {t("billing.actions", { fallback: "Actions" })}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {billingHistory.map((invoice) => (
+                        <TableRow key={invoice.id}>
+                          <TableCell>{formatDate(invoice.date)}</TableCell>
+                          <TableCell>{invoice.number}</TableCell>
+                          <TableCell>{invoice.amount}</TableCell>
+                          <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                          <TableCell>{formatBillingHistoryPlanName(invoice.planName)}</TableCell>
+                          <TableCell className="text-right">
+                            {invoice.pdfUrl && (
+                              <a
+                                href={invoice.pdfUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:text-primary/80 inline-flex items-center"
+                                aria-label={t("billing.download_invoice", {
+                                  fallback: "Download Invoice",
+                                })}
+                              >
+                                <Download className="mr-1 h-4 w-4" />
+                                <span className="sr-only">
+                                  {t("billing.download_invoice", { fallback: "Download Invoice" })}
+                                </span>
+                              </a>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
+            ) : (
+              <div className="text-muted-foreground flex flex-col items-center py-8 text-center">
+                <AlertCircle className="text-muted-foreground/70 mb-2 h-12 w-12" />
+                <p className="mb-1">
+                  {t("billing.no_history", { fallback: "No billing history found" })}
+                </p>
+                <p className="text-sm">
+                  {t("billing.no_history_description", {
+                    fallback: "Your invoices will appear here once you've been billed",
+                  })}
+                </p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
