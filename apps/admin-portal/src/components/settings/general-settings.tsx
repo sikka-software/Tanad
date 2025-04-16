@@ -74,6 +74,14 @@ const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, form
     }
   };
 
+  // Handle enter key press
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      form.handleSubmit(onSubmit)();
+    }
+  };
+
   return (
     <Card className="shadow-none">
       <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
@@ -82,7 +90,12 @@ const GeneralSettings = ({ onDirtyChange, onSave, onSaveComplete, isSaving, form
       </CardHeader>
       <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
         <Form {...form}>
-          <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form 
+            ref={formRef} 
+            onSubmit={form.handleSubmit(onSubmit)} 
+            onKeyDown={handleKeyDown}
+            className="space-y-6"
+          >
             <div className="space-y-4">
               <h3 className="text-sm font-medium">{t("Settings.general.profile.title")}</h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

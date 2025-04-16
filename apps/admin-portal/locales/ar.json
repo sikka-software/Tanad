@@ -959,6 +959,8 @@
   "Settings": {
     "title": "الإعدادات",
     "description": "إدارة إعدادات حسابك",
+    "saved_successfully": "تم حفظ الإعدادات بنجاح",
+    "error_saving": "فشل تحديث الإعدادات",
     "tabs": {
       "general": "عام",
       "appearance": "المظهر",

@@ -988,6 +988,8 @@
   "Settings": {
     "title": "Settings",
     "description": "Manage your account settings",
+    "saved_successfully": "Settings saved successfully",
+    "error_saving": "Failed to save settings",
     "tabs": {
       "general": "General",
       "appearance": "Appearance",
