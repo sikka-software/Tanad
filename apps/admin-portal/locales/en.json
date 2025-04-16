@@ -987,36 +987,97 @@
   },
   "Settings": {
     "title": "Settings",
-    "appearance": "Appearance",
-    "appearanceDescription": "Customize how Pukla looks for you.",
-    "hideAvatar": "Show Avatar",
-    "hideAvatarDescription": "Show or hide your avatar in the interface.",
-    "hideWatermark": "Show Pukla Watermark",
-    "hideWatermarkDescription": "Show or hide the Pukla watermark (Premium feature).",
-    "saving": "Saving...",
-    "saveChanges": "Save changes",
-    "appearanceUpdated": "Appearance Updated",
-    "appearanceUpdatedDescription": "Your appearance settings have been updated successfully.",
-    "error": "Error",
-    "errorSavingSettings": "There was an error saving your settings. Please try again.",
-    "hideTitle": "Hide Title",
-    "hideTitleDescription": "Hide your Pukla title from your page",
-    "hideBio": "Hide Bio",
-    "hideBioDescription": "Hide your bio from your page",
-    "avatarShape": "Avatar Shape",
-    "avatarShapeDescription": "Choose the shape of your profile avatar",
-    "selectAvatarShape": "Select shape",
-    "avatarShapes": {
-      "circle": "Circle",
-      "square": "Square",
-      "horizontal_rectangle": "Horizontal Rectangle",
-      "vertical_rectangle": "Vertical Rectangle"
+    "description": "Manage your account settings",
+    "tabs": {
+      "general": "General",
+      "appearance": "Appearance",
+      "navigation": "Navigation",
+      "preferences": "Preferences",
+      "notifications": "Notifications",
+      "billing": "Billing"
     },
-    "socials_position_title": "Social Links Position",
-    "socials_position_description": "Choose where to display your social media links",
-    "socials_position": {
-      "top": "Top of Page",
-      "bottom": "Bottom of Page"
+    "general": {
+      "title": "General Settings",
+      "description": "Manage your account details and preferences",
+      "profile": {
+        "title": "Profile Information",
+        "name": "Name",
+        "email": "Email"
+      },
+      "regional": {
+        "title": "Regional Settings",
+        "language": "Language",
+        "timezone": "Timezone"
+      }
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize how the application looks",
+      "theme": {
+        "title": "Theme",
+        "dark_mode": "Dark Mode"
+      },
+      "density": {
+        "title": "Density",
+        "interface_density": "Interface Density",
+        "comfortable": "Comfortable",
+        "compact": "Compact"
+      }
+    },
+    "navigation": {
+      "title": "Navigation",
+      "description": "Customize your navigation menu"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Set your default preferences",
+      "default": {
+        "title": "Default Settings",
+        "currency": "Default Currency",
+        "calendar": "Default Calendar"
+      },
+      "datetime": {
+        "title": "Date & Time Format",
+        "date_format": "Date Format",
+        "time_format": "Time Format",
+        "12h": "12-hour (AM/PM)",
+        "24h": "24-hour"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Manage your notification preferences",
+      "email": {
+        "title": "Email Notifications",
+        "updates": "Product updates",
+        "marketing": "Marketing emails",
+        "security": "Security alerts"
+      },
+      "in_app": {
+        "title": "In-App Notifications",
+        "mentions": "Mentions",
+        "comments": "Comments",
+        "tasks": "Task assignments"
+      }
+    },
+    "billing": {
+      "title": "Billing",
+      "description": "Manage your billing information and subscription",
+      "current_plan": {
+        "title": "Current Plan",
+        "change_plan": "Change Plan"
+      },
+      "payment_method": {
+        "title": "Payment Method",
+        "edit": "Edit"
+      },
+      "billing_info": {
+        "title": "Billing Information",
+        "name": "Name",
+        "email": "Email",
+        "address": "Address",
+        "city": "City"
+      }
     }
   },
   "Feedback": {

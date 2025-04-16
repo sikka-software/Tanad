@@ -958,36 +958,97 @@
   },
   "Settings": {
     "title": "الإعدادات",
-    "appearance": "المظهر",
-    "appearanceDescription": "خصص كيف يبدو بكلة بالنسبة لك.",
-    "hideAvatar": "إظهار الصورة الشخصية",
-    "hideAvatarDescription": "إظهار أو إخفاء صورتك الشخصية في الواجهة.",
-    "hideWatermark": "إخفاء علامة بكلة المائية",
-    "hideWatermarkDescription": "إظهار أو إخفاء علامة بكلة المائية (ميزة مميزة).",
-    "saving": "جاري الحفظ...",
-    "saveChanges": "حفظ التغييرات",
-    "appearanceUpdated": "تم تحديث المظهر",
-    "appearanceUpdatedDescription": "تم تحديث إعدادات المظهر الخاصة بك بنجاح.",
-    "error": "خطأ",
-    "errorSavingSettings": "حدث خطأ أثناء حفظ الإعدادات. يرجى المحاولة مرة أخرى.",
-    "hideTitle": "إخفاء العنوان",
-    "hideTitleDescription": "إخفاء عنوان بكلة من صفحتك",
-    "hideBio": "إخفاء النبذة",
-    "hideBioDescription": "إخفاء النبذة من صفحتك",
-    "avatarShape": "شكل الصورة الشخصية",
-    "avatarShapeDescription": "اختر شكل صورتك الشخصية",
-    "selectAvatarShape": "اختر الشكل",
-    "avatarShapes": {
-      "circle": "دائري",
-      "square": "مربع",
-      "horizontal_rectangle": "مستطيل أفقي",
-      "vertical_rectangle": "مستطيل عمودي"
+    "description": "إدارة إعدادات حسابك",
+    "tabs": {
+      "general": "عام",
+      "appearance": "المظهر",
+      "navigation": "التنقل",
+      "preferences": "التفضيلات",
+      "notifications": "الإشعارات",
+      "billing": "الدفع"
     },
-    "socials_position_title": "موقع روابط التواصل الاجتماعي",
-    "socials_position_description": "اختر مكان عرض روابط التواصل الاجتماعي",
-    "socials_position": {
-      "top": "أعلى الصفحة",
-      "bottom": "أسفل الصفحة"
+    "general": {
+      "title": "الإعدادات العامة",
+      "description": "إدارة تفاصيل حسابك وتفضيلاتك",
+      "profile": {
+        "title": "معلومات الملف الشخصي",
+        "name": "الاسم",
+        "email": "البريد الإلكتروني"
+      },
+      "regional": {
+        "title": "الإعدادات الإقليمية",
+        "language": "اللغة",
+        "timezone": "المنطقة الزمنية"
+      }
+    },
+    "appearance": {
+      "title": "المظهر",
+      "description": "تخصيص مظهر التطبيق",
+      "theme": {
+        "title": "المظهر",
+        "dark_mode": "الوضع الداكن"
+      },
+      "density": {
+        "title": "الكثافة",
+        "interface_density": "كثافة الواجهة",
+        "comfortable": "مريح",
+        "compact": "مضغوط"
+      }
+    },
+    "navigation": {
+      "title": "التنقل",
+      "description": "تخصيص قائمة التنقل"
+    },
+    "preferences": {
+      "title": "التفضيلات",
+      "description": "تعيين التفضيلات الافتراضية",
+      "default": {
+        "title": "الإعدادات الافتراضية",
+        "currency": "العملة الافتراضية",
+        "calendar": "التقويم الافتراضي"
+      },
+      "datetime": {
+        "title": "تنسيق التاريخ والوقت",
+        "date_format": "تنسيق التاريخ",
+        "time_format": "تنسيق الوقت",
+        "12h": "12 ساعة (ص/م)",
+        "24h": "24 ساعة"
+      }
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "description": "إدارة تفضيلات الإشعارات",
+      "email": {
+        "title": "إشعارات البريد الإلكتروني",
+        "updates": "تحديثات المنتج",
+        "marketing": "رسائل التسويق",
+        "security": "تنبيهات الأمان"
+      },
+      "in_app": {
+        "title": "الإشعارات داخل التطبيق",
+        "mentions": "الإشارات",
+        "comments": "التعليقات",
+        "tasks": "مهام التعيين"
+      }
+    },
+    "billing": {
+      "title": "الدفع",
+      "description": "إدارة معلومات الدفع والاشتراك",
+      "current_plan": {
+        "title": "الخطة الحالية",
+        "change_plan": "تغيير الخطة"
+      },
+      "payment_method": {
+        "title": "طريقة الدفع",
+        "edit": "تعديل"
+      },
+      "billing_info": {
+        "title": "معلومات الدفع",
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "address": "العنوان",
+        "city": "المدينة"
+      }
     }
   },
   "Feedback": {

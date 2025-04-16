@@ -131,26 +131,21 @@ export default function SettingsPage() {
   return (
     <div>
       <PageTitle
-        title="Settings"
+        title={t("Settings.title")}
         customButton={
           <div className="container mx-auto flex max-w-7xl justify-end">
             <Button onClick={handleSave} disabled={!isDirty} className="h-8 gap-2" size="sm">
               <Save className="h-4 w-4" />
-              Save Changes
+              {t("General.save")}
             </Button>
           </div>
         }
       />
-      <div className="flex flex-col gap-6 p-4 md:flex-row">
+      <div className="flex flex-col gap-4 p-4 md:flex-row">
         {/* Sidebar */}
         <div className="w-full shrink-0 md:w-64">
-          <Card>
-            <CardHeader className="p-4">
-              <CardTitle className="text-lg">Settings</CardTitle>
-              <CardDescription>Manage your account settings</CardDescription>
-            </CardHeader>
-            <Separator />
-            <CardContent className="p-0">
+          <Card className="shadow-none">
+            <CardContent className="p-0" dir={lang === "ar" ? "rtl" : "ltr"}>
               <div className="flex w-full flex-col">
                 <Button
                   variant={activeTab === "general" ? "secondary" : "ghost"}
@@ -158,7 +153,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("general")}
                 >
                   <User className="mr-2 h-4 w-4" />
-                  General
+                  {t("Settings.tabs.general")}
                 </Button>
                 <Button
                   variant={activeTab === "appearance" ? "secondary" : "ghost"}
@@ -166,7 +161,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("appearance")}
                 >
                   <Sun className="mr-2 h-4 w-4" />
-                  Appearance
+                  {t("Settings.tabs.appearance")}
                 </Button>
                 <Button
                   variant={activeTab === "navigation" ? "secondary" : "ghost"}
@@ -174,7 +169,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("navigation")}
                 >
                   <SettingsIcon className="mr-2 h-4 w-4" />
-                  Navigation
+                  {t("Settings.tabs.navigation")}
                 </Button>
                 <Button
                   variant={activeTab === "preferences" ? "secondary" : "ghost"}
@@ -182,7 +177,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("preferences")}
                 >
                   <ChevronsUpDown className="mr-2 h-4 w-4" />
-                  Preferences
+                  {t("Settings.tabs.preferences")}
                 </Button>
                 <Button
                   variant={activeTab === "notifications" ? "secondary" : "ghost"}
@@ -190,7 +185,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("notifications")}
                 >
                   <Mail className="mr-2 h-4 w-4" />
-                  Notifications
+                  {t("Settings.tabs.notifications")}
                 </Button>
                 <Button
                   variant={activeTab === "billing" ? "secondary" : "ghost"}
@@ -198,7 +193,7 @@ export default function SettingsPage() {
                   onClick={() => setActiveTab("billing")}
                 >
                   <CreditCard className="mr-2 h-4 w-4" />
-                  Billing
+                  {t("Settings.tabs.billing")}
                 </Button>
               </div>
             </CardContent>
@@ -209,30 +204,30 @@ export default function SettingsPage() {
         <div className="flex-1">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="hidden">
-              <TabsTrigger value="general">General</TabsTrigger>
-              <TabsTrigger value="appearance">Appearance</TabsTrigger>
-              <TabsTrigger value="navigation">Navigation</TabsTrigger>
-              <TabsTrigger value="preferences">Preferences</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="billing">Billing</TabsTrigger>
+              <TabsTrigger value="general">{t("Settings.tabs.general")}</TabsTrigger>
+              <TabsTrigger value="appearance">{t("Settings.tabs.appearance")}</TabsTrigger>
+              <TabsTrigger value="navigation">{t("Settings.tabs.navigation")}</TabsTrigger>
+              <TabsTrigger value="preferences">{t("Settings.tabs.preferences")}</TabsTrigger>
+              <TabsTrigger value="notifications">{t("Settings.tabs.notifications")}</TabsTrigger>
+              <TabsTrigger value="billing">{t("Settings.tabs.billing")}</TabsTrigger>
             </TabsList>
             <ScrollArea className="h-[calc(100vh-180px)]">
               <TabsContent value="general" className="m-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>General Settings</CardTitle>
-                    <CardDescription>Manage your account details and preferences</CardDescription>
+                <Card className="shadow-none">
+                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
+                    <CardTitle>{t("Settings.general.title")}</CardTitle>
+                    <CardDescription>{t("Settings.general.description")}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Profile Information</h3>
+                      <h3 className="text-sm font-medium">{t("Settings.general.profile.title")}</h3>
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="name">Name</Label>
+                          <Label htmlFor="name">{t("Settings.general.profile.name")}</Label>
                           <Input id="name" defaultValue="John Doe" onChange={handleInputChange} />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
+                          <Label htmlFor="email">{t("Settings.general.profile.email")}</Label>
                           <Input
                             id="email"
                             type="email"
@@ -246,27 +241,31 @@ export default function SettingsPage() {
                     <Separator />
 
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Regional Settings</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.general.regional.title")}
+                      </h3>
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="language">Language</Label>
+                          <Label htmlFor="language">
+                            {t("Settings.general.regional.language")}
+                          </Label>
                           <Select defaultValue="en" onValueChange={handleInputChange}>
                             <SelectTrigger id="language">
-                              <SelectValue placeholder="Select language" />
+                              <SelectValue placeholder={t("General.select")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="en">English</SelectItem>
-                              <SelectItem value="fr">French</SelectItem>
-                              <SelectItem value="de">German</SelectItem>
-                              <SelectItem value="es">Spanish</SelectItem>
+                              <SelectItem value="en">{t("General.languages.en")}</SelectItem>
+                              <SelectItem value="ar">{t("General.languages.ar")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="timezone">Timezone</Label>
+                          <Label htmlFor="timezone">
+                            {t("Settings.general.regional.timezone")}
+                          </Label>
                           <Select defaultValue="utc" onValueChange={handleInputChange}>
                             <SelectTrigger id="timezone">
-                              <SelectValue placeholder="Select timezone" />
+                              <SelectValue placeholder={t("General.select")} />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="utc">UTC</SelectItem>
@@ -283,18 +282,22 @@ export default function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="appearance" className="m-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Appearance</CardTitle>
-                    <CardDescription>Customize how the application looks</CardDescription>
+                <Card className="shadow-none">
+                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
+                    <CardTitle>{t("Settings.appearance.title")}</CardTitle>
+                    <CardDescription>{t("Settings.appearance.description")}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Theme</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.appearance.theme.title")}
+                      </h3>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <Sun className="h-4 w-4" />
-                          <Label htmlFor="theme-mode">Dark Mode</Label>
+                          <Label htmlFor="theme-mode">
+                            {t("Settings.appearance.theme.dark_mode")}
+                          </Label>
                           <Moon className="h-4 w-4" />
                         </div>
                         <Switch
@@ -308,17 +311,25 @@ export default function SettingsPage() {
                     <Separator />
 
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Density</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.appearance.density.title")}
+                      </h3>
                       <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="density">Interface Density</Label>
+                          <Label htmlFor="density">
+                            {t("Settings.appearance.density.interface_density")}
+                          </Label>
                           <Select defaultValue="comfortable" onValueChange={handleInputChange}>
                             <SelectTrigger id="density">
-                              <SelectValue placeholder="Select density" />
+                              <SelectValue placeholder={t("General.select")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="comfortable">Comfortable</SelectItem>
-                              <SelectItem value="compact">Compact</SelectItem>
+                              <SelectItem value="comfortable">
+                                {t("Settings.appearance.density.comfortable")}
+                              </SelectItem>
+                              <SelectItem value="compact">
+                                {t("Settings.appearance.density.compact")}
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -329,12 +340,12 @@ export default function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="navigation" className="m-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Navigation</CardTitle>
-                    <CardDescription>Customize your navigation menu</CardDescription>
+                <Card className="shadow-none">
+                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
+                    <CardTitle>{t("Settings.navigation.title")}</CardTitle>
+                    <CardDescription>{t("Settings.navigation.description")}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
                     {Object.entries(menuList).map(([groupName, items]) => (
                       <div key={groupName} className="space-y-4">
                         <h3 className="text-sm font-medium">{groupName}</h3>
@@ -361,20 +372,24 @@ export default function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="preferences" className="m-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Preferences</CardTitle>
-                    <CardDescription>Set your default preferences</CardDescription>
+                <Card className="shadow-none">
+                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
+                    <CardTitle>{t("Settings.preferences.title")}</CardTitle>
+                    <CardDescription>{t("Settings.preferences.description")}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Default Settings</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.preferences.default.title")}
+                      </h3>
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="currency">Default Currency</Label>
+                          <Label htmlFor="currency">
+                            {t("Settings.preferences.default.currency")}
+                          </Label>
                           <Select defaultValue="usd" onValueChange={handleInputChange}>
                             <SelectTrigger id="currency">
-                              <SelectValue placeholder="Select currency" />
+                              <SelectValue placeholder={t("General.select")} />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="usd">USD ($)</SelectItem>
@@ -385,10 +400,12 @@ export default function SettingsPage() {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="calendar">Default Calendar</Label>
+                          <Label htmlFor="calendar">
+                            {t("Settings.preferences.default.calendar")}
+                          </Label>
                           <Select defaultValue="month" onValueChange={handleInputChange}>
                             <SelectTrigger id="calendar">
-                              <SelectValue placeholder="Select calendar view" />
+                              <SelectValue placeholder={t("General.select")} />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="day">Day</SelectItem>
@@ -404,13 +421,17 @@ export default function SettingsPage() {
                     <Separator />
 
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Date & Time Format</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.preferences.datetime.title")}
+                      </h3>
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="date-format">Date Format</Label>
+                          <Label htmlFor="date-format">
+                            {t("Settings.preferences.datetime.date_format")}
+                          </Label>
                           <Select defaultValue="mdy" onValueChange={handleInputChange}>
                             <SelectTrigger id="date-format">
-                              <SelectValue placeholder="Select date format" />
+                              <SelectValue placeholder={t("General.select")} />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
@@ -420,14 +441,20 @@ export default function SettingsPage() {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="time-format">Time Format</Label>
+                          <Label htmlFor="time-format">
+                            {t("Settings.preferences.datetime.time_format")}
+                          </Label>
                           <Select defaultValue="12h" onValueChange={handleInputChange}>
                             <SelectTrigger id="time-format">
-                              <SelectValue placeholder="Select time format" />
+                              <SelectValue placeholder={t("General.select")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="12h">12-hour (AM/PM)</SelectItem>
-                              <SelectItem value="24h">24-hour</SelectItem>
+                              <SelectItem value="12h">
+                                {t("Settings.preferences.datetime.12h")}
+                              </SelectItem>
+                              <SelectItem value="24h">
+                                {t("Settings.preferences.datetime.24h")}
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -438,18 +465,20 @@ export default function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="notifications" className="m-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Notifications</CardTitle>
-                    <CardDescription>Manage your notification preferences</CardDescription>
+                <Card className="shadow-none">
+                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
+                    <CardTitle>{t("Settings.notifications.title")}</CardTitle>
+                    <CardDescription>{t("Settings.notifications.description")}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Email Notifications</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.notifications.email.title")}
+                      </h3>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <Label htmlFor="email-updates" className="flex-1">
-                            Product updates
+                            {t("Settings.notifications.email.updates")}
                           </Label>
                           <Switch
                             dir={lang === "ar" ? "rtl" : "ltr"}
@@ -460,7 +489,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="email-marketing" className="flex-1">
-                            Marketing emails
+                            {t("Settings.notifications.email.marketing")}
                           </Label>
                           <Switch
                             dir={lang === "ar" ? "rtl" : "ltr"}
@@ -471,7 +500,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="email-security" className="flex-1">
-                            Security alerts
+                            {t("Settings.notifications.email.security")}
                           </Label>
                           <Switch
                             dir={lang === "ar" ? "rtl" : "ltr"}
@@ -486,11 +515,13 @@ export default function SettingsPage() {
                     <Separator />
 
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">In-App Notifications</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.notifications.in_app.title")}
+                      </h3>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <Label htmlFor="app-mentions" className="flex-1">
-                            Mentions
+                            {t("Settings.notifications.in_app.mentions")}
                           </Label>
                           <Switch
                             dir={lang === "ar" ? "rtl" : "ltr"}
@@ -501,7 +532,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="app-comments" className="flex-1">
-                            Comments
+                            {t("Settings.notifications.in_app.comments")}
                           </Label>
                           <Switch
                             dir={lang === "ar" ? "rtl" : "ltr"}
@@ -512,7 +543,7 @@ export default function SettingsPage() {
                         </div>
                         <div className="flex items-center justify-between">
                           <Label htmlFor="app-tasks" className="flex-1">
-                            Task assignments
+                            {t("Settings.notifications.in_app.tasks")}
                           </Label>
                           <Switch
                             dir={lang === "ar" ? "rtl" : "ltr"}
@@ -528,16 +559,16 @@ export default function SettingsPage() {
               </TabsContent>
 
               <TabsContent value="billing" className="m-0">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Billing</CardTitle>
-                    <CardDescription>
-                      Manage your billing information and subscription
-                    </CardDescription>
+                <Card className="shadow-none">
+                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
+                    <CardTitle>{t("Settings.billing.title")}</CardTitle>
+                    <CardDescription>{t("Settings.billing.description")}</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Current Plan</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.billing.current_plan.title")}
+                      </h3>
                       <div className="bg-accent/50 rounded-lg p-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -547,7 +578,7 @@ export default function SettingsPage() {
                             </p>
                           </div>
                           <Button variant="outline" size="sm">
-                            Change Plan
+                            {t("Settings.billing.current_plan.change_plan")}
                           </Button>
                         </div>
                       </div>
@@ -556,7 +587,9 @@ export default function SettingsPage() {
                     <Separator />
 
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Payment Method</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.billing.payment_method.title")}
+                      </h3>
                       <div className="bg-background flex items-center justify-between rounded-lg border p-3">
                         <div className="flex items-center gap-3">
                           <CreditCard className="h-5 w-5" />
@@ -566,7 +599,7 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <Button variant="ghost" size="sm">
-                          Edit
+                          {t("Settings.billing.payment_method.edit")}
                         </Button>
                       </div>
                     </div>
@@ -574,10 +607,14 @@ export default function SettingsPage() {
                     <Separator />
 
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Billing Information</h3>
+                      <h3 className="text-sm font-medium">
+                        {t("Settings.billing.billing_info.title")}
+                      </h3>
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                          <Label htmlFor="billing-name">Name</Label>
+                          <Label htmlFor="billing-name">
+                            {t("Settings.billing.billing_info.name")}
+                          </Label>
                           <Input
                             id="billing-name"
                             defaultValue="John Doe"
@@ -585,7 +622,9 @@ export default function SettingsPage() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="billing-email">Email</Label>
+                          <Label htmlFor="billing-email">
+                            {t("Settings.billing.billing_info.email")}
+                          </Label>
                           <Input
                             id="billing-email"
                             type="email"
@@ -594,7 +633,9 @@ export default function SettingsPage() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="billing-address">Address</Label>
+                          <Label htmlFor="billing-address">
+                            {t("Settings.billing.billing_info.address")}
+                          </Label>
                           <Input
                             id="billing-address"
                             defaultValue="123 Main St"
@@ -602,7 +643,9 @@ export default function SettingsPage() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="billing-city">City</Label>
+                          <Label htmlFor="billing-city">
+                            {t("Settings.billing.billing_info.city")}
+                          </Label>
                           <Input
                             id="billing-city"
                             defaultValue="San Francisco"
