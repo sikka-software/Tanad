@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useLocale, useTranslations } from "next-intl";
@@ -8,8 +8,6 @@ import * as z from "zod";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/ui/form";
-import { Separator } from "@/ui/separator";
-import { Skeleton } from "@/ui/skeleton";
 import { Switch } from "@/ui/switch";
 
 import useUserStore from "@/hooks/use-user-store";
@@ -47,9 +45,15 @@ const NotificationSettings = ({
   // Get user from the existing store to get profileId
   const { user } = useUserStore();
   const profileId = user?.id || "";
-
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   // Use the profile hook to fetch data
-  const { data: profile, isLoading: isLoadingProfile } = useProfile(profileId);
+  const { data: profile } = useProfile(profileId);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoadingProfile(false);
+    }, 1000);
+  }, []);
 
   // Initialize the update mutation
   const updateProfileMutation = useUpdateProfile();
@@ -139,30 +143,32 @@ const NotificationSettings = ({
       </CardHeader>
       <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
         <Form {...form}>
-          <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} onKeyDown={handleKeyDown}>
+          <form
+            className="space-y-4"
+            ref={formRef}
+            onSubmit={form.handleSubmit(onSubmit)}
+            onKeyDown={handleKeyDown}
+          >
             <div className="space-y-4">
               <h3 className="text-sm font-medium">{t("Settings.notifications.email.title")}</h3>
-              <div className="space-y-3">
+              <div className="flex flex-col gap-4 rounded-lg border p-4">
                 <FormField
                   control={form.control}
                   name="email_updates"
                   render={({ field }) => (
-                    <FormItem className="flex items-center justify-between">
-                      <FormLabel htmlFor="email-updates" className="flex-1">
+                    <FormItem className="m-0 flex items-center justify-between">
+                      <FormLabel htmlFor="email-updates" className="m-0 flex-1">
                         {t("Settings.notifications.email.updates")}
                       </FormLabel>
-                      <FormControl>
-                        {isLoadingProfile ? (
-                          <Skeleton className="h-6 w-10" />
-                        ) : (
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="email-updates"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={isSaving}
-                          />
-                        )}
+                      <FormControl className="m-0">
+                        <Switch
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="email-updates"
+                          loading={isLoadingProfile}
+                          checked={isLoadingProfile ? false : field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -171,22 +177,19 @@ const NotificationSettings = ({
                   control={form.control}
                   name="email_marketing"
                   render={({ field }) => (
-                    <FormItem className="flex items-center justify-between">
-                      <FormLabel htmlFor="email-marketing" className="flex-1">
+                    <FormItem className="m-0 flex items-center justify-between">
+                      <FormLabel htmlFor="email-marketing" className="m-0 flex-1">
                         {t("Settings.notifications.email.marketing")}
                       </FormLabel>
-                      <FormControl>
-                        {isLoadingProfile ? (
-                          <Skeleton className="h-6 w-10" />
-                        ) : (
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="email-marketing"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={isSaving}
-                          />
-                        )}
+                      <FormControl className="m-0">
+                        <Switch
+                          loading={isLoadingProfile}
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="email-marketing"
+                          checked={isLoadingProfile ? false : field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -195,22 +198,20 @@ const NotificationSettings = ({
                   control={form.control}
                   name="email_security"
                   render={({ field }) => (
-                    <FormItem className="flex items-center justify-between">
-                      <FormLabel htmlFor="email-security" className="flex-1">
+                    <FormItem className="m-0 flex items-center justify-between">
+                      <FormLabel htmlFor="email-security" className="m-0 flex-1">
                         {t("Settings.notifications.email.security")}
                       </FormLabel>
-                      <FormControl>
-                        {isLoadingProfile ? (
-                          <Skeleton className="h-6 w-10" />
-                        ) : (
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="email-security"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={isSaving}
-                          />
-                        )}
+                      <FormControl className="m-0">
+                        <Switch
+                          loading={isLoadingProfile}
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="email-security"
+                          className="m-0"
+                          checked={isLoadingProfile ? false : field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -218,31 +219,27 @@ const NotificationSettings = ({
               </div>
             </div>
 
-            <Separator />
-
             <div className="space-y-4">
               <h3 className="text-sm font-medium">{t("Settings.notifications.in_app.title")}</h3>
-              <div className="space-y-3">
+
+              <div className="flex flex-col gap-4 rounded-lg border p-4">
                 <FormField
                   control={form.control}
                   name="app_mentions"
                   render={({ field }) => (
-                    <FormItem className="flex items-center justify-between">
-                      <FormLabel htmlFor="app-mentions" className="flex-1">
+                    <FormItem className="m-0 flex items-center justify-between">
+                      <FormLabel htmlFor="app-mentions" className="m-0 flex-1">
                         {t("Settings.notifications.in_app.mentions")}
                       </FormLabel>
-                      <FormControl>
-                        {isLoadingProfile ? (
-                          <Skeleton className="h-6 w-10" />
-                        ) : (
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="app-mentions"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={isSaving}
-                          />
-                        )}
+                      <FormControl className="m-0">
+                        <Switch
+                          loading={isLoadingProfile}
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="app-mentions"
+                          checked={isLoadingProfile ? false : field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -251,22 +248,19 @@ const NotificationSettings = ({
                   control={form.control}
                   name="app_comments"
                   render={({ field }) => (
-                    <FormItem className="flex items-center justify-between">
-                      <FormLabel htmlFor="app-comments" className="flex-1">
+                    <FormItem className="m-0 flex items-center justify-between">
+                      <FormLabel htmlFor="app-comments" className="m-0 flex-1">
                         {t("Settings.notifications.in_app.comments")}
                       </FormLabel>
-                      <FormControl>
-                        {isLoadingProfile ? (
-                          <Skeleton className="h-6 w-10" />
-                        ) : (
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="app-comments"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={isSaving}
-                          />
-                        )}
+                      <FormControl className="m-0">
+                        <Switch
+                          loading={isLoadingProfile}
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="app-comments"
+                          checked={isLoadingProfile ? false : field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
                       </FormControl>
                     </FormItem>
                   )}
@@ -275,22 +269,19 @@ const NotificationSettings = ({
                   control={form.control}
                   name="app_tasks"
                   render={({ field }) => (
-                    <FormItem className="flex items-center justify-between">
-                      <FormLabel htmlFor="app-tasks" className="flex-1">
+                    <FormItem className="m-0 flex items-center justify-between">
+                      <FormLabel htmlFor="app-tasks" className="m-0 flex-1">
                         {t("Settings.notifications.in_app.tasks")}
                       </FormLabel>
-                      <FormControl>
-                        {isLoadingProfile ? (
-                          <Skeleton className="h-6 w-10" />
-                        ) : (
-                          <Switch
-                            dir={lang === "ar" ? "rtl" : "ltr"}
-                            id="app-tasks"
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={isSaving}
-                          />
-                        )}
+                      <FormControl className="m-0">
+                        <Switch
+                          loading={isLoadingProfile}
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          id="app-tasks"
+                          checked={isLoadingProfile ? false : field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isSaving}
+                        />
                       </FormControl>
                     </FormItem>
                   )}

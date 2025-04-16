@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useLocale, useTranslations } from "next-intl";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DollarSign, Euro, PoundSterling, SaudiRiyal, JapaneseYen, Flag } from "lucide-react";
 import * as z from "zod";
 
 import { Card, CardTitle, CardHeader, CardDescription, CardContent } from "@/ui/card";
@@ -11,9 +12,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Separator } from "@/ui/separator";
 import { Skeleton } from "@/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import useUserStore from "@/hooks/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
+
+import BetaFlag from "../ui/beta-flag";
 
 const formSchema = z.object({
   currency: z.string(),
@@ -199,10 +203,36 @@ const PreferenceSettings = ({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="usd">USD ($)</SelectItem>
-                            <SelectItem value="eur">EUR (€)</SelectItem>
-                            <SelectItem value="gbp">GBP (£)</SelectItem>
-                            <SelectItem value="jpy">JPY (¥)</SelectItem>
+                            <SelectItem value="sar">
+                              <div className="flex flex-row items-center gap-2">
+                                <span>SAR</span>
+                                <SaudiRiyal className="size-3" />
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="usd">
+                              <div className="flex flex-row items-center gap-2">
+                                <span>USD</span>
+                                <DollarSign className="size-3" />
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="eur">
+                              <div className="flex flex-row items-center gap-2">
+                                <span>EUR</span>
+                                <Euro className="size-3" />
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="gbp">
+                              <div className="flex flex-row items-center gap-2">
+                                <span>GBP</span>
+                                <PoundSterling className="size-3" />
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="jpy">
+                              <div className="flex flex-row items-center gap-2">
+                                <span>JPY</span>
+                                <JapaneseYen className="size-3" />
+                              </div>
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       )}
@@ -219,27 +249,33 @@ const PreferenceSettings = ({
                       {isLoadingProfile ? (
                         <Skeleton className="h-10 w-full" />
                       ) : (
-                        <Select
-                          disabled={isSaving}
-                          onValueChange={(val) => {
-                            console.log("Calendar changed to:", val);
-                            field.onChange(val);
-                            setSelectedCalendar(val);
-                          }}
-                          value={field.value || selectedCalendar}
+                        <BetaFlag
+                          title={t("Flags.calendar_soon.title")}
+                          description={t("Flags.calendar_soon.description")}
                         >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t("General.select")} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="day">Day</SelectItem>
-                            <SelectItem value="week">Week</SelectItem>
-                            <SelectItem value="month">Month</SelectItem>
-                            <SelectItem value="year">Year</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          <Select
+                            disabled
+                            // disabled={isSaving}
+                            onValueChange={(val) => {
+                              console.log("Calendar changed to:", val);
+                              field.onChange(val);
+                              setSelectedCalendar(val);
+                            }}
+                            value={field.value || selectedCalendar}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t("General.select")} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="day">
+                                {t("General.calendars.gregorian")}
+                              </SelectItem>
+                              <SelectItem value="week">{t("General.calendars.hijri")}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </BetaFlag>
                       )}
                       <FormMessage />
                     </FormItem>

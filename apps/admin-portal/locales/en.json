@@ -34,6 +34,10 @@
     "close": "Close",
     "no_results_found": "No results found",
     "quick_access": "Quick Access",
+    "calendars": {
+      "gregorian": "Gregorian",
+      "hijri": "Hijri"
+    },
     "languages": {
       "label": "Change Language",
       "ar": "العربية",
@@ -118,7 +122,11 @@
   "Flags": {
     "timezone_soon": {
       "title": "Coming Soon",
-      "description": "We are working on connecting all timestamps to your timezone"
+      "description": "We are working on connecting all timestamps to other timezones"
+    },
+    "calendar_soon": {
+      "title": "Coming Soon",
+      "description": "We are working on connecting all timestamps to other calendars"
     }
   },
   "SEO": {

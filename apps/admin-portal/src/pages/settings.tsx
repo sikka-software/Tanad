@@ -46,16 +46,17 @@ import PageTitle from "@/components/ui/page-title";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
 // Valid tab names for type safety
 const validTabs = ["general", "navigation", "preferences", "notifications", "billing"] as const;
-type TabName = typeof validTabs[number];
+type TabName = (typeof validTabs)[number];
 
 // Function to get tab from URL hash
 const getTabFromHash = (): TabName => {
   if (typeof window === "undefined") return "general";
-  
+
   const hash = window.location.hash.replace("#", "");
   return validTabs.includes(hash as TabName) ? (hash as TabName) : "general";
 };
@@ -247,14 +248,6 @@ const SettingsPage = () => {
                   <Mail className="mr-2 h-4 w-4" />
                   {t("Settings.tabs.notifications")}
                 </Button>
-                <Button
-                  variant={activeTab === "billing" ? "secondary" : "ghost"}
-                  className="h-auto justify-start rounded-none px-4 py-3"
-                  onClick={() => handleTabChange("billing")}
-                >
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  {t("Settings.tabs.billing")}
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -262,13 +255,16 @@ const SettingsPage = () => {
 
         {/* Main Content */}
         <div className="flex-1">
-          <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as TabName)} className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => handleTabChange(value as TabName)}
+            className="w-full"
+          >
             <TabsList className="hidden">
               <TabsTrigger value="general">{t("Settings.tabs.general")}</TabsTrigger>
               <TabsTrigger value="navigation">{t("Settings.tabs.navigation")}</TabsTrigger>
               <TabsTrigger value="preferences">{t("Settings.tabs.preferences")}</TabsTrigger>
               <TabsTrigger value="notifications">{t("Settings.tabs.notifications")}</TabsTrigger>
-              <TabsTrigger value="billing">{t("Settings.tabs.billing")}</TabsTrigger>
             </TabsList>
             <ScrollArea className="h-[calc(100vh-180px)]">
               <TabsContent value="general" className="m-0">
@@ -331,106 +327,6 @@ const SettingsPage = () => {
                   isSaving={isSaving}
                   formRef={notificationSettingsFormRef}
                 />
-              </TabsContent>
-
-              <TabsContent value="billing" className="m-0">
-                <Card className="shadow-none">
-                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
-                    <CardTitle>{t("Settings.billing.title")}</CardTitle>
-                    <CardDescription>{t("Settings.billing.description")}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">
-                        {t("Settings.billing.current_plan.title")}
-                      </h3>
-                      <div className="bg-accent/50 rounded-lg p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-medium">Pro Plan</h4>
-                            <p className="text-muted-foreground text-sm">
-                              $29/month, billed monthly
-                            </p>
-                          </div>
-                          <Button variant="outline" size="sm">
-                            {t("Settings.billing.current_plan.change_plan")}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">
-                        {t("Settings.billing.payment_method.title")}
-                      </h3>
-                      <div className="bg-background flex items-center justify-between rounded-lg border p-3">
-                        <div className="flex items-center gap-3">
-                          <CreditCard className="h-5 w-5" />
-                          <div>
-                            <p className="text-sm font-medium">Visa ending in 4242</p>
-                            <p className="text-muted-foreground text-xs">Expires 12/2025</p>
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="sm">
-                          {t("Settings.billing.payment_method.edit")}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">
-                        {t("Settings.billing.billing_info.title")}
-                      </h3>
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                          <Label htmlFor="billing-name">
-                            {t("Settings.billing.billing_info.name")}
-                          </Label>
-                          <Input
-                            id="billing-name"
-                            defaultValue="John Doe"
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="billing-email">
-                            {t("Settings.billing.billing_info.email")}
-                          </Label>
-                          <Input
-                            id="billing-email"
-                            type="email"
-                            defaultValue="billing@example.com"
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="billing-address">
-                            {t("Settings.billing.billing_info.address")}
-                          </Label>
-                          <Input
-                            id="billing-address"
-                            defaultValue="123 Main St"
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="billing-city">
-                            {t("Settings.billing.billing_info.city")}
-                          </Label>
-                          <Input
-                            id="billing-city"
-                            defaultValue="San Francisco"
-                            onChange={handleInputChange}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </TabsContent>
             </ScrollArea>
           </Tabs>

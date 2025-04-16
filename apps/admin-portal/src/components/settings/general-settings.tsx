@@ -19,6 +19,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 import useUserStore from "@/hooks/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 
+import BetaFlag from "../ui/beta-flag";
+
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
@@ -281,57 +283,47 @@ const GeneralSettings = ({
                         {isLoadingProfile ? (
                           <Skeleton className="h-10 w-full" />
                         ) : (
-                          <Tooltip>
-                            <TooltipTrigger className="w-full">
-                              <Select
-                                disabled={isSaving}
-                                onValueChange={(val) => {
-                                  console.log("Timezone changed to:", val);
-                                  field.onChange(val);
-                                  setSelectedTimezone(val);
-                                }}
-                                value={field.value || selectedTimezone} // Fall back to selectedTimezone if field.value is empty
-                              >
-                                <FormControl>
-                                  <SelectTrigger disabled>
-                                    <SelectValue>
-                                      {(() => {
-                                        const timezoneValue = field.value || selectedTimezone;
-                                        const timezoneLabels = {
-                                          UTC: "UTC",
-                                          EST: "Eastern Time (EST)",
-                                          CST: "Central Time (CST)",
-                                          PST: "Pacific Time (PST)",
-                                        };
-                                        return (
-                                          timezoneLabels[
-                                            timezoneValue as keyof typeof timezoneLabels
-                                          ] || timezoneValue
-                                        );
-                                      })()}
-                                    </SelectValue>
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="UTC">UTC</SelectItem>
-                                  <SelectItem value="EST">Eastern Time (EST)</SelectItem>
-                                  <SelectItem value="CST">Central Time (CST)</SelectItem>
-                                  <SelectItem value="PST">Pacific Time (PST)</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-[250px]">
-                              <div className="flex flex-row">
-                                <div className="flex flex-col">
-                                  <span className="flex flex-row items-center text-sm font-bold">
-                                    <Flag className="me-2 !size-3" />
-                                    {t("Flags.timezone_soon.title")}
-                                  </span>
-                                  <p className="text-xs">{t("Flags.timezone_soon.description")}</p>
-                                </div>
-                              </div>
-                            </TooltipContent>
-                          </Tooltip>
+                          <BetaFlag
+                            title={t("Flags.timezone_soon.title")}
+                            description={t("Flags.timezone_soon.description")}
+                          >
+                            <Select
+                              disabled={isSaving}
+                              onValueChange={(val) => {
+                                console.log("Timezone changed to:", val);
+                                field.onChange(val);
+                                setSelectedTimezone(val);
+                              }}
+                              value={field.value || selectedTimezone} // Fall back to selectedTimezone if field.value is empty
+                            >
+                              <FormControl>
+                                <SelectTrigger disabled>
+                                  <SelectValue>
+                                    {(() => {
+                                      const timezoneValue = field.value || selectedTimezone;
+                                      const timezoneLabels = {
+                                        UTC: "UTC",
+                                        EST: "Eastern Time (EST)",
+                                        CST: "Central Time (CST)",
+                                        PST: "Pacific Time (PST)",
+                                      };
+                                      return (
+                                        timezoneLabels[
+                                          timezoneValue as keyof typeof timezoneLabels
+                                        ] || timezoneValue
+                                      );
+                                    })()}
+                                  </SelectValue>
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="UTC">UTC</SelectItem>
+                                <SelectItem value="EST">Eastern Time (EST)</SelectItem>
+                                <SelectItem value="CST">Central Time (CST)</SelectItem>
+                                <SelectItem value="PST">Pacific Time (PST)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </BetaFlag>
                         )}
                         <FormMessage />
                       </FormItem>
