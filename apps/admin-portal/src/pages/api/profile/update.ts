@@ -54,6 +54,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       }
     });
 
+    // Special handling for nested user_settings object
+    if (updateData.user_settings && typeof updateData.user_settings === "object") {
+      // Merge existing user_settings with the new ones rather than replacing
+      sanitizedData.user_settings = {
+        ...(existingProfile.user_settings || {}),
+        ...updateData.user_settings,
+      };
+    }
+
     if (Object.keys(sanitizedData).length === 0) {
       return res.status(400).json({ error: "No valid fields to update" });
     }
@@ -63,7 +72,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       .update(profiles)
       .set({
         ...sanitizedData,
-        // Auto-update the updatedAt timestamp if it exists in the schema
       })
       .where(eq(profiles.id, profileId))
       .returning();
@@ -72,6 +80,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       return res.status(500).json({ error: "Failed to update profile" });
     }
 
+    console.log("Profile updated successfully:", updatedProfile.id);
     return res.status(200).json({ profile: updatedProfile });
   } catch (error) {
     console.error("Error updating profile:", error);

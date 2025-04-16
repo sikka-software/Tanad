@@ -50,8 +50,12 @@ const GeneralSettings = ({
   const t = useTranslations();
   const lang = useLocale();
   
-  // Get user and profile data from the existing store
-  const { user, profile } = useUserStore();
+  // Get user from the existing store to get profileId
+  const { user } = useUserStore();
+  const profileId = user?.id || "";
+  
+  // Use the profile hook to fetch data
+  const { data: profile, isLoading: isLoadingProfile } = useProfile(profileId);
   
   // Initialize the update mutation
   const updateProfileMutation = useUpdateProfile();
@@ -60,11 +64,23 @@ const GeneralSettings = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: profile?.full_name || "",
-      email: user?.email || profile?.email || "", // Prioritize user email over profile email
+      email: user?.email || profile?.email || "", 
       language: lang,
       timezone: profile?.user_settings?.timezone || "UTC",
     },
   });
+  
+  // Reset form when profile data is loaded
+  React.useEffect(() => {
+    if (profile) {
+      form.reset({
+        name: profile.full_name || "",
+        email: user?.email || profile.email || "",
+        language: lang,
+        timezone: profile.user_settings?.timezone || "UTC",
+      });
+    }
+  }, [profile, user, lang, form]);
 
   // Watch for form changes to update isDirty state
   const isDirty = form.formState.isDirty;
@@ -76,7 +92,7 @@ const GeneralSettings = ({
     onSave();
     try {
       await updateProfileMutation.mutateAsync({
-        profileId: profile?.id || "", // Use profile ID from user store
+        profileId,
         data: {
           full_name: data.name,
           // Email is managed separately through auth system if needed
@@ -93,6 +109,7 @@ const GeneralSettings = ({
         console.log("Email changed, might need additional auth updates");
       }
       
+      // Reset the form with the current data to clear dirty state
       form.reset(data);
       onSaveComplete();
     } catch (error) {
@@ -109,7 +126,7 @@ const GeneralSettings = ({
   };
 
   // Show loading state if no profile yet
-  if (!profile) {
+  if (isLoadingProfile || !profileId) {
     return <div className="p-6 text-center">Loading profile information...</div>;
   }
 

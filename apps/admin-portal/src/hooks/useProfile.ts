@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import useUserStore from "@/hooks/use-user-store";
+import type { Profile as UserStoreProfile } from "@/hooks/use-user-store";
+
 // Types for our profile data
 type ProfileData = {
   id: string;
@@ -18,6 +21,10 @@ type ProfileUpdateData = Partial<Omit<ProfileData, "id">>;
 
 // Function to fetch profile data
 const fetchProfile = async (profileId: string): Promise<ProfileData> => {
+  if (!profileId) {
+    throw new Error("Profile ID is required");
+  }
+  
   const response = await fetch(`/api/profile/info?profileId=${profileId}`);
 
   if (!response.ok) {
@@ -37,6 +44,10 @@ const updateProfile = async ({
   profileId: string;
   data: ProfileUpdateData;
 }): Promise<ProfileData> => {
+  if (!profileId) {
+    throw new Error("Profile ID is required");
+  }
+  
   const response = await fetch(`/api/profile/update?profileId=${profileId}`, {
     method: "PATCH",
     headers: {
@@ -58,20 +69,60 @@ const updateProfile = async ({
 export function useProfile(profileId: string) {
   return useQuery({
     queryKey: ["profile", profileId],
-    queryFn: () => fetchProfile(profileId),
+    queryFn: () => {
+      if (!profileId) {
+        throw new Error("Cannot fetch profile: No profile ID provided");
+      }
+      return fetchProfile(profileId);
+    },
     enabled: !!profileId,
+    staleTime: 60 * 1000, // Consider data fresh for 1 minute
+    retry: (failureCount, error) => {
+      // Don't retry if the error is due to missing profileId
+      if (error instanceof Error && error.message.includes("No profile ID provided")) {
+        return false;
+      }
+      // Otherwise retry up to 3 times
+      return failureCount < 3;
+    }
   });
 }
 
 // Hook to update profile data
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
+  const userStore = useUserStore();
 
   return useMutation({
     mutationFn: updateProfile,
     onSuccess: (data) => {
       // Invalidate the profile query to refetch
       queryClient.invalidateQueries({ queryKey: ["profile", data.id] });
+      
+      // Also update the profile in the user store to keep both in sync
+      // This helps with components that still use the user store
+      if (userStore.profile) {
+        // Create a compatible user store profile object by preserving original values
+        // and overriding with new data
+        const updatedProfile: UserStoreProfile = {
+          ...userStore.profile,
+          full_name: data.full_name || userStore.profile.full_name,
+          avatar_url: data.avatar_url || userStore.profile.avatar_url,
+          address: data.address || userStore.profile.address,
+          email: data.email || userStore.profile.email,
+          username: data.username || userStore.profile.username,
+          // Careful handling of user_settings to preserve the required fields
+          user_settings: {
+            currency: userStore.profile.user_settings.currency,
+            calendar_type: userStore.profile.user_settings.calendar_type,
+            timezone: data.user_settings?.timezone || userStore.profile.user_settings.timezone,
+            notifications: userStore.profile.user_settings.notifications,
+          }
+        };
+        
+        userStore.setProfile(updatedProfile);
+      }
+      
       toast.success("Profile updated successfully");
     },
     onError: (error) => {
@@ -83,14 +134,12 @@ export function useUpdateProfile() {
 
 // For integrating with the existing user store when needed
 export function useUserAndProfile(profileId: string) {
-  // This could integrate with the existing user store or other auth mechanisms
   const { data: profile, isLoading, error } = useProfile(profileId);
+  const userStore = useUserStore();
   
-  // Here you would typically fetch/access the user data as well
-  // For now, we're just returning the profile data
   return {
-    profile,
-    user: null, // This would be replaced with actual user data
+    profile: profile || userStore.profile,
+    user: userStore.user,
     isLoading,
     error
   };
