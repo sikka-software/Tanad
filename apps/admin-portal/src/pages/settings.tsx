@@ -29,31 +29,22 @@ import {
   CreditCard,
   GripVertical,
   Mail,
-  Moon,
   Save,
   SettingsIcon,
-  Sun,
   User,
   Loader2,
 } from "lucide-react";
 
 import GeneralSettings from "@/components/settings/general-settings";
 import NotificationSettings from "@/components/settings/notification-settings";
+import PreferenceSettings from "@/components/settings/preference-settings";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import PageTitle from "@/components/ui/page-title";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
@@ -188,14 +179,6 @@ const SettingsPage = () => {
                   {t("Settings.tabs.general")}
                 </Button>
                 <Button
-                  variant={activeTab === "appearance" ? "secondary" : "ghost"}
-                  className="h-auto justify-start rounded-none px-4 py-3"
-                  onClick={() => setActiveTab("appearance")}
-                >
-                  <Sun className="mr-2 h-4 w-4" />
-                  {t("Settings.tabs.appearance")}
-                </Button>
-                <Button
                   variant={activeTab === "navigation" ? "secondary" : "ghost"}
                   className="h-auto justify-start rounded-none px-4 py-3"
                   onClick={() => setActiveTab("navigation")}
@@ -237,7 +220,6 @@ const SettingsPage = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="hidden">
               <TabsTrigger value="general">{t("Settings.tabs.general")}</TabsTrigger>
-              <TabsTrigger value="appearance">{t("Settings.tabs.appearance")}</TabsTrigger>
               <TabsTrigger value="navigation">{t("Settings.tabs.navigation")}</TabsTrigger>
               <TabsTrigger value="preferences">{t("Settings.tabs.preferences")}</TabsTrigger>
               <TabsTrigger value="notifications">{t("Settings.tabs.notifications")}</TabsTrigger>
@@ -252,64 +234,6 @@ const SettingsPage = () => {
                   isSaving={isSaving}
                   formRef={generalSettingsFormRef}
                 />
-              </TabsContent>
-
-              <TabsContent value="appearance" className="m-0">
-                <Card className="shadow-none">
-                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
-                    <CardTitle>{t("Settings.appearance.title")}</CardTitle>
-                    <CardDescription>{t("Settings.appearance.description")}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">
-                        {t("Settings.appearance.theme.title")}
-                      </h3>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Sun className="h-4 w-4" />
-                          <Label htmlFor="theme-mode">
-                            {t("Settings.appearance.theme.dark_mode")}
-                          </Label>
-                          <Moon className="h-4 w-4" />
-                        </div>
-                        <Switch
-                          id="theme-mode"
-                          onCheckedChange={handleInputChange}
-                          dir={lang === "ar" ? "rtl" : "ltr"}
-                        />
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">
-                        {t("Settings.appearance.density.title")}
-                      </h3>
-                      <div className="grid grid-cols-1 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="density">
-                            {t("Settings.appearance.density.interface_density")}
-                          </Label>
-                          <Select defaultValue="comfortable" onValueChange={handleInputChange}>
-                            <SelectTrigger id="density">
-                              <SelectValue placeholder={t("General.select")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="comfortable">
-                                {t("Settings.appearance.density.comfortable")}
-                              </SelectItem>
-                              <SelectItem value="compact">
-                                {t("Settings.appearance.density.compact")}
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </TabsContent>
 
               <TabsContent value="navigation" className="m-0">
@@ -345,96 +269,7 @@ const SettingsPage = () => {
               </TabsContent>
 
               <TabsContent value="preferences" className="m-0">
-                <Card className="shadow-none">
-                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
-                    <CardTitle>{t("Settings.preferences.title")}</CardTitle>
-                    <CardDescription>{t("Settings.preferences.description")}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">
-                        {t("Settings.preferences.default.title")}
-                      </h3>
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                          <Label htmlFor="currency">
-                            {t("Settings.preferences.default.currency")}
-                          </Label>
-                          <Select defaultValue="usd" onValueChange={handleInputChange}>
-                            <SelectTrigger id="currency">
-                              <SelectValue placeholder={t("General.select")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="usd">USD ($)</SelectItem>
-                              <SelectItem value="eur">EUR (€)</SelectItem>
-                              <SelectItem value="gbp">GBP (£)</SelectItem>
-                              <SelectItem value="jpy">JPY (¥)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="calendar">
-                            {t("Settings.preferences.default.calendar")}
-                          </Label>
-                          <Select defaultValue="month" onValueChange={handleInputChange}>
-                            <SelectTrigger id="calendar">
-                              <SelectValue placeholder={t("General.select")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="day">Day</SelectItem>
-                              <SelectItem value="week">Week</SelectItem>
-                              <SelectItem value="month">Month</SelectItem>
-                              <SelectItem value="year">Year</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-medium">
-                        {t("Settings.preferences.datetime.title")}
-                      </h3>
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                          <Label htmlFor="date-format">
-                            {t("Settings.preferences.datetime.date_format")}
-                          </Label>
-                          <Select defaultValue="mdy" onValueChange={handleInputChange}>
-                            <SelectTrigger id="date-format">
-                              <SelectValue placeholder={t("General.select")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
-                              <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
-                              <SelectItem value="ymd">YYYY/MM/DD</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="time-format">
-                            {t("Settings.preferences.datetime.time_format")}
-                          </Label>
-                          <Select defaultValue="12h" onValueChange={handleInputChange}>
-                            <SelectTrigger id="time-format">
-                              <SelectValue placeholder={t("General.select")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="12h">
-                                {t("Settings.preferences.datetime.12h")}
-                              </SelectItem>
-                              <SelectItem value="24h">
-                                {t("Settings.preferences.datetime.24h")}
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <PreferenceSettings />
               </TabsContent>
 
               <TabsContent value="notifications" className="m-0">

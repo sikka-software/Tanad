@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -50,9 +51,11 @@ const GeneralSettings = ({
 }: GeneralSettingsProps) => {
   const t = useTranslations();
   const lang = useLocale();
+  const router = useRouter();
 
-  // Add state to track the selected timezone
+  // Add state to track the selected timezone and language
   const [selectedTimezone, setSelectedTimezone] = useState<string>("UTC");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(lang);
 
   // Get user from the existing store to get profileId
   const { user } = useUserStore();
@@ -88,10 +91,15 @@ const GeneralSettings = ({
       // Set the selected timezone state
       setSelectedTimezone(timezone);
 
+      // Get stored language preference or use current locale
+      const language = profile.user_settings?.language || lang;
+      // Set selected language state
+      setSelectedLanguage(language);
+
       const formValues = {
         name: profile.full_name || "",
         email: user?.email || profile.email || "",
-        language: lang,
+        language: language,
         timezone: timezone, // Ensure timezone is explicitly set and not lost
       };
 
@@ -101,8 +109,9 @@ const GeneralSettings = ({
       setTimeout(() => {
         form.reset(formValues);
 
-        // Force set the timezone field value explicitly
+        // Force set the field values explicitly
         form.setValue("timezone", timezone);
+        form.setValue("language", language);
 
         // Verify the form state after reset
         console.log("Form values after reset:", form.getValues());
@@ -131,6 +140,7 @@ const GeneralSettings = ({
           user_settings: {
             ...(profile?.user_settings || {}),
             timezone: data.timezone,
+            language: data.language,
           },
         },
       });
@@ -143,6 +153,16 @@ const GeneralSettings = ({
 
       // Reset the form with the current data to clear dirty state
       form.reset(data);
+
+      // Check if language has changed and then switch the language
+      if (data.language !== lang) {
+        console.log("Switching language to:", data.language);
+        // Use the same approach as in the language-switcher component
+        router.replace(router.pathname, router.asPath, {
+          locale: data.language,
+        });
+      }
+
       onSaveComplete();
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -226,10 +246,22 @@ const GeneralSettings = ({
                       {isLoadingProfile ? (
                         <Skeleton className="h-10 w-full" />
                       ) : (
-                        <Select {...field} disabled={isSaving} key={`language-${field.value}`}>
+                        <Select
+                          disabled={isSaving}
+                          onValueChange={(val) => {
+                            console.log("Language changed to:", val);
+                            field.onChange(val);
+                            setSelectedLanguage(val);
+                          }}
+                          value={field.value || selectedLanguage}
+                        >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder={t("General.select")} />
+                              <SelectValue placeholder={t("General.select")}>
+                                {field.value === "en"
+                                  ? t("General.languages.en")
+                                  : t("General.languages.ar")}
+                              </SelectValue>
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -260,11 +292,12 @@ const GeneralSettings = ({
                             onValueChange={(val) => {
                               console.log("Timezone changed to:", val);
                               field.onChange(val);
+                              setSelectedTimezone(val);
                             }}
                             value={field.value || selectedTimezone} // Fall back to selectedTimezone if field.value is empty
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger disabled>
                                 <SelectValue>
                                   {(() => {
                                     const timezoneValue = field.value || selectedTimezone;
