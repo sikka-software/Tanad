@@ -34,6 +34,7 @@ export interface Profile {
         action?: string;
       }>
     >;
+    hidden_menu_items?: Record<string, string[]>;
   };
   username: string | null;
   subscribed_to: string | null;

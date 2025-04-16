@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/sidebar";
 import useUserStore from "@/hooks/use-user-store";
 import { CACHE_KEY } from "@/lib/constants";
-import { getMenuList, applyCustomMenuOrder } from "@/lib/sidebar-list";
+import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 import { supabase } from "@/lib/supabase";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
@@ -141,6 +141,25 @@ export function AppSidebar() {
         );
         
         console.log("[AppSidebar] Menu after applying custom order:", result);
+        
+        // Apply hidden menu items filter
+        if (profile.user_settings.hidden_menu_items) {
+          console.log("[AppSidebar] Applying hidden menu items filter:", profile.user_settings.hidden_menu_items);
+          
+          const hiddenItems = profile.user_settings.hidden_menu_items as Record<string, string[]>;
+          const filteredResult: Record<string, SidebarMenuGroupProps["items"]> = {};
+          
+          Object.entries(result).forEach(([groupName, items]) => {
+            // Filter out hidden items from this group
+            filteredResult[groupName] = items.filter(item => 
+              !hiddenItems[groupName]?.includes(item.title)
+            );
+          });
+          
+          console.log("[AppSidebar] Menu after filtering hidden items:", filteredResult);
+          return filteredResult;
+        }
+        
         return result;
       } catch (error) {
         console.error("[AppSidebar] Error applying custom menu order:", error);

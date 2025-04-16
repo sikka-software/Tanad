@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import React from "react";
 
 import { useLocale, useTranslations } from "next-intl";
@@ -26,6 +26,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 
 import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
@@ -35,9 +36,11 @@ import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 interface SortableItemProps {
   item: SidebarMenuGroupProps["items"][number];
   title: string;
+  enabled: boolean;
+  onToggle: (enabled: boolean) => void;
 }
 
-const SortableItem = ({ item, title }: SortableItemProps) => {
+const SortableItem = ({ item, title, enabled, onToggle }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.title,
   });
@@ -48,22 +51,45 @@ const SortableItem = ({ item, title }: SortableItemProps) => {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const handleSwitchChange = (checked: boolean) => {
+    console.log(`Switch toggled for ${item.title}: ${checked}`);
+    onToggle(checked);
+  };
+
+  // Completely separate component for the switch to avoid any drag interference
+  const SwitchWrapper = () => (
+    <div className="flex items-center relative z-10" onClick={(e) => e.stopPropagation()}>
+      <Switch 
+        checked={enabled} 
+        onCheckedChange={handleSwitchChange}
+        aria-label={`Toggle ${title} visibility`}
+        className="data-[state=checked]:bg-primary"
+      />
+    </div>
+  );
+  
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="hover:bg-accent flex cursor-grab items-center gap-3 rounded-md border p-3 active:cursor-grabbing"
-    >
-      <GripVertical className="text-muted-foreground h-4 w-4" />
-      <span className="h-4 w-4 flex-shrink-0" />
-      <span className="flex-1">{title}</span>
-      {item.isActive && (
-        <span className="text-primary bg-primary/10 rounded-full px-2 py-1 text-xs font-medium">
-          Active
-        </span>
-      )}
+    <div className="flex items-center gap-3 rounded-md border p-3">
+      {/* Draggable part */}
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className="hover:bg-accent flex cursor-grab items-center gap-3 flex-1 rounded-md active:cursor-grabbing"
+      >
+        <GripVertical className="text-muted-foreground h-4 w-4" />
+        <span className="h-4 w-4 flex-shrink-0" />
+        <span className="flex-1">{title}</span>
+        {item.isActive && (
+          <span className="text-primary bg-primary/10 rounded-full px-2 py-1 text-xs font-medium mr-2">
+            Active
+          </span>
+        )}
+      </div>
+      
+      {/* Non-draggable switch */}
+      <SwitchWrapper />
     </div>
   );
 };
@@ -106,6 +132,15 @@ const SidebarSettings = ({
     }),
   );
 
+  // Add state to track enabled/disabled items
+  const [enabledItems, setEnabledItems] = useState<Record<string, Record<string, boolean>>>({});
+
+  // Create a memoized version of enabledItems to use in the dependency array
+  const enabledItemsRef = useRef(enabledItems);
+  useEffect(() => {
+    enabledItemsRef.current = enabledItems;
+  }, [enabledItems]);
+
   // Update parent component when isDirty changes
   useEffect(() => {
     if (onDirtyChange) {
@@ -115,29 +150,74 @@ const SidebarSettings = ({
 
   // Load menu configuration from profile if available
   useEffect(() => {
+    console.log("Profile or pathname changed, updating menu configuration");
+    
     // Add debugging on each render to see the profile structure
     console.log("Current profile in SidebarSettings:", profile);
-    console.log("Current user settings:", profile?.user_settings);
-    console.log(
-      "Does navigation exist?",
-      profile?.user_settings && "navigation" in profile.user_settings,
-    );
-
+    
+    if (!profile) {
+      console.log("No profile available yet, skipping menu configuration");
+      return;
+    }
+    
+    // Only initialize once when profile is loaded
+    // or when hidden_menu_items changes
+    const currentMenu = getMenuList(pathname);
+    
+    // Initialize the enabledItems state regardless of profile data
+    // This ensures we always have a valid state to work with
+    const initialEnabledState: Record<string, Record<string, boolean>> = {};
+    
+    // First initialize all items as enabled
+    Object.entries(currentMenu).forEach(([groupName, items]) => {
+      initialEnabledState[groupName] = {};
+      items.forEach(item => {
+        initialEnabledState[groupName][item.title] = true;
+      });
+    });
+    
+    // Then if we have hidden items data, apply it
+    if (profile?.user_settings?.hidden_menu_items) {
+      const hiddenItems = profile.user_settings.hidden_menu_items as Record<string, string[]>;
+      
+      Object.entries(hiddenItems).forEach(([groupName, hiddenItemsList]) => {
+        if (initialEnabledState[groupName]) {
+          hiddenItemsList.forEach(itemTitle => {
+            if (initialEnabledState[groupName][itemTitle] !== undefined) {
+              initialEnabledState[groupName][itemTitle] = false;
+            }
+          });
+        }
+      });
+    }
+    
+    // Compare new state with current state to avoid unnecessary updates
+    const currentEnabledItemsString = JSON.stringify(enabledItems);
+    const newEnabledItemsString = JSON.stringify(initialEnabledState);
+    
+    if (currentEnabledItemsString !== newEnabledItemsString) {
+      console.log("Updating enabledItems state");
+      setEnabledItems(initialEnabledState);
+    }
+    
+    // Load the ordered menu as before
     if (profile?.user_settings && "navigation" in profile.user_settings) {
       try {
         // Use the applyCustomMenuOrder function to get a correctly ordered menu
-        const currentMenu = getMenuList(pathname);
-        console.log("Profile navigation settings:", profile.user_settings.navigation);
-        console.log("Current default menu:", currentMenu);
-
         const savedNavigation = profile.user_settings.navigation as Record<
           string,
           Array<{ title: string }>
         >;
         const orderedMenu = applyCustomMenuOrder(currentMenu, savedNavigation);
-        console.log("Ordered menu after applying saved order:", orderedMenu);
-
-        setMenuList(orderedMenu);
+        
+        // Compare ordered menu with current menu to avoid unnecessary updates
+        const currentMenuString = JSON.stringify(menuList);
+        const newMenuString = JSON.stringify(orderedMenu);
+        
+        if (currentMenuString !== newMenuString) {
+          console.log("Updating menuList state");
+          setMenuList(orderedMenu);
+        }
       } catch (error) {
         console.error("Error loading menu configuration:", error);
       }
@@ -163,6 +243,34 @@ const SidebarSettings = ({
     setIsDirty(true);
   };
 
+  // Handler for toggling item visibility
+  const handleToggleItem = useCallback((groupName: string, itemTitle: string, enabled: boolean) => {
+    console.log(`Toggle item: ${groupName} / ${itemTitle} to ${enabled}`);
+    
+    // Check if the value is actually changing before updating state
+    if (enabledItemsRef.current[groupName]?.[itemTitle] === enabled) {
+      console.log("Value didn't change, skipping update");
+      return;
+    }
+    
+    // Create deep copy to ensure state update
+    const newEnabledItems = {...enabledItemsRef.current};
+    
+    // Initialize group if it doesn't exist
+    if (!newEnabledItems[groupName]) {
+      newEnabledItems[groupName] = {};
+    }
+    
+    // Update the specific item's enabled state
+    newEnabledItems[groupName][itemTitle] = enabled;
+    
+    console.log("New enabled items state:", newEnabledItems);
+    setEnabledItems(newEnabledItems);
+    
+    // Mark form as dirty to enable the save button
+    setIsDirty(true);
+  }, [setIsDirty]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     if (e) e.preventDefault();
 
@@ -183,7 +291,24 @@ const SidebarSettings = ({
         }));
       });
 
+      // Create a record of hidden menu items
+      const hiddenMenuItems: Record<string, string[]> = {};
+      
+      Object.entries(enabledItems).forEach(([groupName, items]) => {
+        hiddenMenuItems[groupName] = [];
+        Object.entries(items).forEach(([itemTitle, enabled]) => {
+          if (!enabled) {
+            hiddenMenuItems[groupName].push(itemTitle);
+          }
+        });
+        // Remove empty arrays
+        if (hiddenMenuItems[groupName].length === 0) {
+          delete hiddenMenuItems[groupName];
+        }
+      });
+      
       console.log("Saving navigation settings:", simplifiedMenuList);
+      console.log("Saving hidden menu items:", hiddenMenuItems);
 
       // Get current user settings to ensure we're not overwriting anything
       const currentUserSettings = profile?.user_settings || {};
@@ -195,6 +320,7 @@ const SidebarSettings = ({
           user_settings: {
             ...currentUserSettings,
             navigation: simplifiedMenuList,
+            hidden_menu_items: hiddenMenuItems
           },
         },
       });
@@ -229,13 +355,21 @@ const SidebarSettings = ({
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-2">
-                    {items.map((item) => (
-                      <SortableItem
-                        key={t(item.title)}
-                        item={item}
-                        title={t(`${item.title}.title`)}
-                      />
-                    ))}
+                    {items.map((item) => {
+                      // Get the enabled state for this item, defaulting to true if not defined
+                      const isEnabled = enabledItems[groupName]?.[item.title] ?? true;
+                      console.log(`Rendering item ${groupName}/${item.title} with enabled=${isEnabled}`);
+                      
+                      return (
+                        <SortableItem
+                          key={item.title}
+                          item={item}
+                          title={t(`${item.title}.title`)}
+                          enabled={isEnabled}
+                          onToggle={(enabled) => handleToggleItem(groupName, item.title, enabled)}
+                        />
+                      );
+                    })}
                   </div>
                 </SortableContext>
               </DndContext>
