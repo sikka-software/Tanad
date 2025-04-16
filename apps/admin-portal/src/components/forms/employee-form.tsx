@@ -32,8 +32,8 @@ interface EmployeeFormProps {
 
 const createEmployeeFormSchema = (t: (key: string) => string) =>
   z.object({
-    firstName: z.string().min(1, t("Employees.form.first_name.required")),
-    lastName: z.string().min(1, t("Employees.form.last_name.required")),
+    first_name: z.string().min(1, t("Employees.form.first_name.required")),
+    last_name: z.string().min(1, t("Employees.form.last_name.required")),
     email: z.string().email(t("Employees.form.email.invalid")),
     phone: z.string().optional(),
     position: z.string().min(1, t("Employees.form.position.required")),
@@ -66,8 +66,8 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(createEmployeeFormSchema(t)),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      first_name: "",
+      last_name: "",
       email: "",
       phone: "",
       position: "",
@@ -163,7 +163,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
-              name="firstName"
+              name="first_name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("Employees.form.first_name.label")} *</FormLabel>
@@ -177,7 +177,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
 
             <FormField
               control={form.control}
-              name="lastName"
+              name="last_name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("Employees.form.last_name.label")} *</FormLabel>

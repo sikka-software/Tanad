@@ -26,8 +26,8 @@ export default function AddEmployeePage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          firstName: data.firstName.trim(),
-          lastName: data.lastName.trim(),
+          first_name: data.first_name.trim(),
+          last_name: data.last_name.trim(),
           email: data.email.trim(),
           phone: data.phone?.trim() || null,
           position: data.position.trim(),

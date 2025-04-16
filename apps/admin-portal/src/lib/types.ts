@@ -5,8 +5,8 @@ export type ThemeType = "light" | "dark";
 export type LangType = "ar" | "en";
 
 export interface Profile {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   phone: string;
   address: string;
   city: string;

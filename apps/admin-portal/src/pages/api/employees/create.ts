@@ -12,8 +12,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const {
-      firstName,
-      lastName,
+      first_name,
+      last_name,
       email,
       phone,
       position,
@@ -28,8 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const [employee] = await db
       .insert(employees)
       .values({
-        firstName,
-        lastName,
+        first_name,
+        last_name,
         email,
         phone,
         position,

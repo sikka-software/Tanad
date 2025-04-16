@@ -241,8 +241,8 @@ export const products = pgTable(
 
 export const employees = pgTable("employees", {
   id: uuid().primaryKey().defaultRandom(),
-  firstName: varchar("first_name", { length: 255 }).notNull(),
-  lastName: varchar("last_name", { length: 255 }).notNull(),
+  first_name: varchar("first_name", { length: 255 }).notNull(),
+  last_name: varchar("last_name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   phone: varchar("phone", { length: 50 }),
   position: varchar("position", { length: 255 }).notNull(),
