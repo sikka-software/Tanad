@@ -64,7 +64,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
     >
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
-          <SidebarMenuButton tooltip={item.title}>
+          <SidebarMenuButton tooltip={t(item.translationKey)}>
             {item.icon && <item.icon />}
             <span>{t(item.translationKey)}</span>
 
@@ -141,7 +141,7 @@ const NonCollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][numb
   return (
     <SidebarMenuItem>
       <Link href={item.url}>
-        <SidebarMenuButton className="text-sidebar-foreground/70">
+        <SidebarMenuButton tooltip={t(item.translationKey)} className="text-sidebar-foreground/70">
           {item.icon && <item.icon />}
           <span>{t(item.translationKey)}</span>
         </SidebarMenuButton>
