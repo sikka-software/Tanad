@@ -204,7 +204,7 @@ export function useSubscription() {
   /**
    * Create a new subscription for the user
    */
-  const createSubscription = async (priceId: string): Promise<CreateSubscriptionResponse> => {
+  const createSubscription = async (planId: string): Promise<CreateSubscriptionResponse> => {
     try {
       if (!user || !user.stripe_customer_id) {
         throw new Error("User not authenticated or missing stripe customer ID");
@@ -216,7 +216,7 @@ export function useSubscription() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          priceId,
+          planId,
           customerId: user.stripe_customer_id,
           userId: user.id,
         }),
@@ -337,19 +337,25 @@ export function useSubscription() {
     }
   };
 
-  // Fetch subscription when dependency changes
+  // Add refetch to useEffect dependencies to ensure it runs when needed
   useEffect(() => {
-    if (!userLoading && !plansLoading) {
+    if (!userLoading && user) {
+      console.log("User data updated, fetching subscription data");
       fetchSubscription();
     }
-  }, [user?.stripe_customer_id, user?.id, user?.subscribed_to, plansLoading, userLoading]);
+  }, [userLoading, user, plansLoading]); // When user or plans data changes
+
+  const refetch = async () => {
+    console.log("Manually refetching subscription data");
+    return fetchSubscription();
+  };
 
   // The subscription data and utility functions to expose
   return {
     ...subscriptionData,
-    loading: loading || plansLoading || userLoading,
+    loading,
     error,
-    refetch: fetchSubscription,
+    refetch,
     createSubscription,
     updateSubscription,
     cancelSubscription,
