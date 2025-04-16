@@ -10,7 +10,24 @@ export const useProfileMutation = () => {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: async (data: { name: string; email: string; timezone: string }) => {
+    mutationFn: async (data: {
+      name: string;
+      email: string;
+      timezone: string;
+      user_settings?: {
+        currency?: string;
+        calendar_type?: string;
+        timezone?: string;
+        notifications?: {
+          email_updates?: boolean;
+          email_marketing?: boolean;
+          email_security?: boolean;
+          app_mentions?: boolean;
+          app_comments?: boolean;
+          app_tasks?: boolean;
+        };
+      };
+    }) => {
       // Update auth email
       const { error: updateError } = await supabase.auth.updateUser({
         email: data.email,
@@ -24,6 +41,7 @@ export const useProfileMutation = () => {
         .update({
           full_name: data.name,
           user_settings: {
+            ...data.user_settings,
             timezone: data.timezone,
           },
         })

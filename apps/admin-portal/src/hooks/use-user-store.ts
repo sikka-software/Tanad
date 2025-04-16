@@ -16,6 +16,14 @@ export interface Profile {
     currency: string;
     calendar_type: string;
     timezone: string;
+    notifications?: {
+      email_updates: boolean;
+      email_marketing: boolean;
+      email_security: boolean;
+      app_mentions: boolean;
+      app_comments: boolean;
+      app_tasks: boolean;
+    };
   };
   username: string | null;
   subscribed_to: string | null;
