@@ -932,7 +932,8 @@
     "contact_sales_description": "Contact our sales team for a tailored plan that meets your specific requirements",
     "contact_sales": "Contact Sales",
     "current_plan": {
-      "title": "Current Plan"
+      "title": "Current Plan",
+      "refresh": "Refresh"
     },
     "most_popular": "Most Popular",
     "subscription_updated_successfully": "Subscription updated successfully",
@@ -1002,13 +1003,15 @@
       "privacy": "Privacy Policy",
       "terms_agreement_end": ".",
       "processing": "Processing...",
+
       "complete_payment": "Complete Payment",
       "error": "An error occurred while processing your payment. Please try again.",
       "incomplete_card": "Please complete your card information.",
       "enter_details": "Enter your payment details to complete the subscription change",
-      "test_card": "For testing, use card number: 4242 4242 4242 4242, any future date, any CVC"
+      "test_card": "For testing, use card number: 4242 4242 4242 4242, any future date, any CVC",
+      "method_unavailable": "This payment method is not available yet. Please use a credit card."
     },
-
+    "data_refreshed": "Data refreshed successfully",
     "features": {
       "basic_access": "Basic access",
       "limited_projects": "Up to 3 projects",
@@ -1060,7 +1063,12 @@
       "custom_automation": "Custom automation",
       "biometric_auth": "Biometric authentication",
       "multiple_payment_gateways": "Multiple payment gateways"
-    }
+    },
+    "month_billing": "Monthly Billing",
+    "year_billing": "Yearly Billing (Save {discount})",
+    "history_dialog_title": "Billing History",
+    "no_history_description": "Your invoices will appear here once you've been billed",
+    "no_history": "No billing history found"
   },
   "AvailablePlans": {
     "title": "Available Plans",
@@ -1070,8 +1078,8 @@
     "yearly_billing": "Yearly Billing (Save {discount})",
     "yearly_plans_coming_soon": "Yearly billing options coming soon",
     "need_custom_solution": "Need a custom solution?",
-    "contact_sales_description": "Contact our sales team for a tailored plan that meets your specific requirements",
-    "contact_sales": "Contact Sales"
+    "contact_sales_description": "Contact Tanad for a tailored plan that meets your specific requirements",
+    "contact_sales": "Contact Tanad"
   },
   "Account": {
     "title": "Account",

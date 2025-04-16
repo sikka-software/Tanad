@@ -898,10 +898,11 @@
     "yearly_billing": "الدفع السنوي (خصم {discount})",
     "yearly_plans_coming_soon": "خيارات الدفع السنوي قريباً",
     "need_custom_solution": "هل تحتاج إلى حل مخصص؟",
-    "contact_sales_description": "تواصل مع فريق المبيعات للحصول على خطة مخصصة تلبي متطلباتك الخاصة",
-    "contact_sales": "التواصل مع المبيعات",
+    "contact_sales_description": "تواصل مع فريق خدمات تند لتخصيص خطتك",
+    "contact_sales": "التواصل مع تند",
     "current_plan": {
-      "title": "الباقة الحالية"
+      "title": "الباقة الحالية",
+      "refresh": "تحديث"
     },
     "most_popular": "الأكثر طلباً",
     "subscription_updated_successfully": "تم تحديث الاشتراك بنجاح",
@@ -940,7 +941,9 @@
       "confirm": "نعم، إلغاء",
       "cancel_success": "تم إلغاء اشتراكك وسينتهي في نهاية فترة الفوترة الحالية"
     },
-
+    "history_dialog_title": "سجل الفواتير",
+    "no_history_description": "ستظهر الفواتير هنا بمجرد أن تكون قد تم الفوترة",
+    "no_history": "لم يتم العثور على سجل فواتير",
     "tanad_free": "الباقة المجانية",
     "tanad_standard": "الباقة القياسية",
     "tanad_pro": "الباقة الاحترافية",
@@ -962,22 +965,25 @@
       "card_holder_name": "اسم حامل البطاقة",
       "card_holder_placeholder": "محمد أحمد",
       "email": "البريد الإلكتروني",
-      "email_placeholder": "mohammed@example.com",
+      "email_placeholder": "example@domain.com",
       "card_information": "معلومات البطاقة",
       "save_card": "حفظ البطاقة للمدفوعات المستقبلية",
       "terms_agreement_start": "بالمتابعة، فإنك توافق على ",
       "terms": "شروط الخدمة",
       "terms_agreement_middle": " وتقر بـ ",
       "privacy": "سياسة الخصوصية",
-      "terms_agreement_end": " الخاصة بنا.",
-      "processing": "جارٍ المعالجة...",
+      "terms_agreement_end": ".",
+      "processing": "جاري المعالجة...",
       "complete_payment": "إتمام الدفع",
-      "error": "حدث خطأ أثناء معالجة الدفع. يرجى المحاولة مرة أخرى.",
+      "error": "حدث خطأ أثناء معالجة الدفع الخاص بك. يرجى المحاولة مرة أخرى.",
       "incomplete_card": "يرجى إكمال معلومات بطاقتك.",
-      "enter_details": "أدخل تفاصيل الدفع لإكمال تغيير الاشتراك",
-      "test_card": "للاختبار، استخدم رقم البطاقة: ٤٢٤٢ ٤٢٤٢ ٤٢٤٢ ٤٢٤٢، أي تاريخ مستقبلي، أي رمز CVC"
+      "enter_details": "أدخل تفاصيل الدفع الخاصة بك لإكمال تغيير الاشتراك",
+      "test_card": "للاختبار، استخدم رقم البطاقة: ٤٢٤٢ ٤٢٤٢ ٤٢٤٢ ٤٢٤٢، أي تاريخ مستقبلي، أي رمز CVC",
+      "method_unavailable": "طريقة الدفع هذه غير متوفرة حالياً. الرجاء استخدام بطاقة ائتمان."
     },
-
+    "month_billing": "الدفع الشهري",
+    "year_billing": "الدفع السنوي (يوفر {discount})",
+    "data_refreshed": "تم تحديث البيانات بنجاح",
     "features": {
       "basic_access": "وصول أساسي",
       "limited_projects": "حتى 3 مشاريع",
@@ -999,7 +1005,7 @@
       "payroll_processing": "معالجة الرواتب",
       "vendor_management": "إدارة الموردين",
       "product_catalog": "كتالوج المنتجات",
-
+      "advanced_reports": "تقارير متقدمة",
       "dedicated_support": "دعم مخصص",
       "advanced_reporting": "تقارير متقدمة",
       "white_label": "العلامة البيضاء",
