@@ -38,6 +38,7 @@ import {
 import GeneralSettings from "@/components/settings/general-settings";
 import NotificationSettings from "@/components/settings/notification-settings";
 import PreferenceSettings from "@/components/settings/preference-settings";
+import SidebarSettings from "@/components/settings/sidebar-settings";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -68,41 +69,6 @@ const setHashForTab = (tab: TabName) => {
   }
 };
 
-interface SortableItemProps {
-  item: SidebarMenuGroupProps["items"][number];
-}
-
-const SortableItem = ({ item }: SortableItemProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: item.title,
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="hover:bg-accent flex cursor-grab items-center gap-3 rounded-md border p-3 active:cursor-grabbing"
-    >
-      <GripVertical className="text-muted-foreground h-4 w-4" />
-      {item.icon && <item.icon className="h-4 w-4" />}
-      <span className="flex-1">{item.title}</span>
-      {item.isActive && (
-        <span className="text-primary bg-primary/10 rounded-full px-2 py-1 text-xs font-medium">
-          Active
-        </span>
-      )}
-    </div>
-  );
-};
-
 const SettingsPage = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -115,6 +81,7 @@ const SettingsPage = () => {
   const generalSettingsFormRef = React.useRef<HTMLFormElement>(null);
   const notificationSettingsFormRef = React.useRef<HTMLFormElement>(null);
   const preferenceSettingsFormRef = React.useRef<HTMLFormElement>(null);
+  const sidebarSettingsFormRef = React.useRef<HTMLFormElement>(null);
 
   // Initialize from URL hash and set up hash change listener
   useEffect(() => {
@@ -132,32 +99,6 @@ const SettingsPage = () => {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
-
-  const handleDragEnd = (event: DragEndEvent, groupName: string) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = menuList[groupName].findIndex((item) => item.title === active.id);
-      const newIndex = menuList[groupName].findIndex((item) => item.title === over.id);
-
-      setMenuList((prev) => ({
-        ...prev,
-        [groupName]: arrayMove(prev[groupName], oldIndex, newIndex),
-      }));
-      setIsDirty(true);
-    }
-  };
-
-  const handleInputChange = () => {
-    setIsDirty(true);
-  };
-
   const handleSave = () => {
     if (activeTab === "general" && generalSettingsFormRef.current) {
       generalSettingsFormRef.current.requestSubmit();
@@ -165,6 +106,8 @@ const SettingsPage = () => {
       notificationSettingsFormRef.current.requestSubmit();
     } else if (activeTab === "preferences" && preferenceSettingsFormRef.current) {
       preferenceSettingsFormRef.current.requestSubmit();
+    } else if (activeTab === "navigation" && sidebarSettingsFormRef.current) {
+      sidebarSettingsFormRef.current.requestSubmit();
     }
   };
 
@@ -278,35 +221,13 @@ const SettingsPage = () => {
               </TabsContent>
 
               <TabsContent value="navigation" className="m-0">
-                <Card className="shadow-none">
-                  <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
-                    <CardTitle>{t("Settings.navigation.title")}</CardTitle>
-                    <CardDescription>{t("Settings.navigation.description")}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
-                    {Object.entries(menuList).map(([groupName, items]) => (
-                      <div key={groupName} className="space-y-4">
-                        <h3 className="text-sm font-medium">{groupName}</h3>
-                        <DndContext
-                          sensors={sensors}
-                          collisionDetection={closestCenter}
-                          onDragEnd={(event) => handleDragEnd(event, groupName)}
-                        >
-                          <SortableContext
-                            items={items.map((item) => item.title)}
-                            strategy={verticalListSortingStrategy}
-                          >
-                            <div className="space-y-2">
-                              {items.map((item) => (
-                                <SortableItem key={item.title} item={item} />
-                              ))}
-                            </div>
-                          </SortableContext>
-                        </DndContext>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
+                <SidebarSettings 
+                  onDirtyChange={setIsDirty}
+                  onSave={handleSaveStart}
+                  onSaveComplete={handleSaveComplete}
+                  isSaving={isSaving}
+                  formRef={sidebarSettingsFormRef}
+                />
               </TabsContent>
 
               <TabsContent value="preferences" className="m-0">
