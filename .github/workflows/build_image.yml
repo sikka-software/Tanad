@@ -6,7 +6,7 @@ on:
 
 env:
   NODE_VERSION: "21.x"
-  ADMIN_PORTAL_DEPLOY_WEBHOOK: https://a01.sikka.io/api/deploy/k88s4os80gg8skw8gk0sookc&force=true
+  ADMIN_PORTAL_DEPLOY_WEBHOOK: https://a02.sikka.io/api/deploy/k88s4os80gg8skw8gk0sookc&force=true
 jobs:
   admin-portal:
     name: "Admin Portal"
@@ -38,8 +38,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: apps/admin-portal
-          file: apps/admin-portal/.nixpacks/Dockerfile
+          context: .
+          file: Dockerfile.admin
           push: true
           tags: ghcr.io/sikka-software/tanad:admin
           cache-from: type=gha
