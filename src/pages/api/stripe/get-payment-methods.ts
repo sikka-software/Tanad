@@ -2,10 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import { getStripeInstance } from "@/lib/stripe-admin";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not set in environment variables");
-}
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
