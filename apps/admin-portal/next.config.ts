@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-import createMDX from "@next/mdx";
-
 const { version } = require("./package.json");
 
 const nextConfig: NextConfig = {
@@ -39,6 +37,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-const withMDX = createMDX({});
-
-export default withMDX(nextConfig);
+module.exports = nextConfig;

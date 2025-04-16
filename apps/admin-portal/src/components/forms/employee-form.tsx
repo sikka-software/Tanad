@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useLocale, useTranslations } from "next-intl";
@@ -16,7 +16,7 @@ import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
-import DepartmentForm, { DepartmentFormValues } from "@/components/forms/department-form";
+import DepartmentForm, { DepartmentFormValues } from "@/forms/department-form";
 
 import { supabase } from "@/lib/supabase";
 
