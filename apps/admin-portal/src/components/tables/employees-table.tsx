@@ -18,6 +18,7 @@ const emailSchema = z.string().email("Invalid email");
 const phoneSchema = z.string().optional();
 const positionSchema = z.string().min(1, "Required");
 const departmentSchema = z.string().optional();
+const statusSchema = z.enum(["active", "inactive", "on_leave"]);
 
 const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
   const t = useTranslations();
@@ -69,6 +70,17 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
         label: department.name,
         value: department.id,
       })),
+    },
+    {
+      accessorKey: "status",
+      header: t("Employees.form.status.label"),
+      validationSchema: statusSchema,
+      cellType: "select",
+      options: [
+        { label: t("Employees.form.status.active"), value: "active" },
+        { label: t("Employees.form.status.inactive"), value: "inactive" },
+        { label: t("Employees.form.status.on_leave"), value: "on_leave" },
+      ],
     },
   ];
 

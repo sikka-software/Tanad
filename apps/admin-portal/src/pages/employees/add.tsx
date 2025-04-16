@@ -34,7 +34,7 @@ export default function AddEmployeePage() {
           departmentId: data.department || null,
           hireDate: data.hireDate,
           salary: data.salary ? parseFloat(data.salary) : null,
-          isActive: data.isActive,
+          status: data.status,
           notes: data.notes?.trim() || null,
         }),
       });

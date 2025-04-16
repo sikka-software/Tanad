@@ -285,7 +285,7 @@ export const employees = pgTable("employees", {
   departmentId: uuid("department_id").references(() => departments.id),
   hireDate: date("hire_date").notNull(),
   salary: numeric("salary", { precision: 10, scale: 2 }),
-  isActive: boolean("is_active").default(true).notNull(),
+  status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
   notes: text("notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

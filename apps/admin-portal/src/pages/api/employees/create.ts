@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       departmentId,
       hireDate,
       salary,
-      isActive,
+      status,
       notes,
     } = req.body;
 
@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         departmentId,
         hireDate,
         salary: salary ? sql`${salary}::numeric` : null,
-        isActive,
+        status,
         notes,
       })
       .returning();

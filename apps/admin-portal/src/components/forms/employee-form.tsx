@@ -13,7 +13,7 @@ import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
-import { Switch } from "@/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
 import DepartmentForm, { DepartmentFormValues } from "@/forms/department-form";
@@ -39,13 +39,16 @@ const createEmployeeFormSchema = (t: (key: string) => string) =>
     position: z.string().min(1, t("Employees.form.position.required")),
     department: z.string().nullable(),
     hireDate: z.date({
-      required_error: "Hire date is required",
+      required_error: t("Employees.form.hire_date.required"),
     }),
     salary: z
       .string()
       .optional()
-      .refine((val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), "Invalid salary"),
-    isActive: z.boolean(),
+      .refine(
+        (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
+        t("Employees.form.salary.invalid"),
+      ),
+    status: z.enum(["active", "inactive", "on_leave"]),
     notes: z.string().optional(),
   });
 
@@ -71,7 +74,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
       department: null,
       hireDate: undefined,
       salary: "",
-      isActive: true,
+      status: "active",
       notes: "",
     },
   });
@@ -310,15 +313,23 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
 
           <FormField
             control={form.control}
-            name="isActive"
+            name="status"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel className="text-base">{t("Employees.form.is_active.label")}</FormLabel>
-                </div>
-                <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl>
+              <FormItem>
+                <FormLabel>{t("Employees.form.status.label")}</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("Employees.form.status.placeholder")} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="active">{t("Employees.form.status.active")}</SelectItem>
+                    <SelectItem value="inactive">{t("Employees.form.status.inactive")}</SelectItem>
+                    <SelectItem value="on_leave">{t("Employees.form.status.on_leave")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
               </FormItem>
             )}
           />
