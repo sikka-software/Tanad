@@ -28,6 +28,7 @@ import { GripVertical } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
+
 import useUserStore from "@/hooks/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 
@@ -86,17 +87,17 @@ const SidebarSettings = ({
   const pathname = usePathname();
   const [isDirty, setIsDirty] = useState(false);
   const [menuList, setMenuList] = useState(getMenuList(pathname));
-  
+
   // Get user from the existing store to get profileId
   const { user } = useUserStore();
   const profileId = user?.id || "";
-  
+
   // Use the profile hook to fetch data
   const { data: profile } = useProfile(profileId);
-  
+
   // Initialize the update mutation
   const updateProfileMutation = useUpdateProfile();
-  
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -110,44 +111,49 @@ const SidebarSettings = ({
       onDirtyChange(isDirty);
     }
   }, [isDirty, onDirtyChange]);
-  
+
   // Load menu configuration from profile if available
   useEffect(() => {
     if (profile?.user_settings?.navigation) {
       try {
         // When loading from the database, we only want to update the order
         // but keep the original menu items with their icon components
-        const savedOrder = profile.user_settings.navigation as Record<string, SidebarMenuGroupProps["items"]>;
+        const savedOrder = profile.user_settings.navigation as Record<
+          string,
+          SidebarMenuGroupProps["items"]
+        >;
         const currentMenu = getMenuList(pathname);
-        
+
         // Create a new menu list that preserves the original menu items and their properties
         // but updates the order based on what's saved in the profile
         const updatedMenuList: Record<string, SidebarMenuGroupProps["items"]> = { ...currentMenu };
-        
+
         // For each menu group
-        Object.keys(currentMenu).forEach(groupName => {
+        Object.keys(currentMenu).forEach((groupName) => {
           if (savedOrder[groupName]) {
             // Reorder the current menu items based on the saved order
             const orderedItems: SidebarMenuGroupProps["items"] = [];
             // First add items that exist in both the saved order and current menu
             savedOrder[groupName].forEach((savedItem: any) => {
-              const originalItem = currentMenu[groupName].find(item => item.title === savedItem.title);
+              const originalItem = currentMenu[groupName].find(
+                (item) => item.title === savedItem.title,
+              );
               if (originalItem) {
                 orderedItems.push(originalItem);
               }
             });
-            
+
             // Then add any items that exist in the current menu but not in the saved order
-            currentMenu[groupName].forEach(currentItem => {
-              if (!orderedItems.some(item => item.title === currentItem.title)) {
+            currentMenu[groupName].forEach((currentItem) => {
+              if (!orderedItems.some((item) => item.title === currentItem.title)) {
                 orderedItems.push(currentItem);
               }
             });
-            
+
             updatedMenuList[groupName] = orderedItems;
           }
         });
-        
+
         setMenuList(updatedMenuList);
       } catch (error) {
         console.error("Error loading menu configuration:", error);
@@ -173,19 +179,19 @@ const SidebarSettings = ({
   const handleInputChange = () => {
     setIsDirty(true);
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     if (e) e.preventDefault();
-    
+
     if (onSave) onSave();
-    
+
     try {
       // When saving to the database, we need to simplify the menu structure
       // to avoid issues with circular references and complex objects like icon components
       const simplifiedMenuList: Record<string, any[]> = {};
-      
+
       Object.entries(menuList).forEach(([groupName, items]) => {
-        simplifiedMenuList[groupName] = items.map(item => ({
+        simplifiedMenuList[groupName] = items.map((item) => ({
           title: item.title,
           translationKey: item.translationKey,
           url: item.url,
@@ -193,7 +199,7 @@ const SidebarSettings = ({
           action: item.action,
         }));
       });
-      
+
       // Save menu configuration to profile
       await updateProfileMutation.mutateAsync({
         profileId,
@@ -204,7 +210,7 @@ const SidebarSettings = ({
           },
         },
       });
-      
+
       setIsDirty(false);
       if (onSaveComplete) onSaveComplete();
     } catch (error) {
@@ -212,7 +218,7 @@ const SidebarSettings = ({
       if (onSaveComplete) onSaveComplete();
     }
   };
-  
+
   return (
     <Card className="shadow-none">
       <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>

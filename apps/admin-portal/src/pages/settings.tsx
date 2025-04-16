@@ -221,7 +221,7 @@ const SettingsPage = () => {
               </TabsContent>
 
               <TabsContent value="navigation" className="m-0">
-                <SidebarSettings 
+                <SidebarSettings
                   onDirtyChange={setIsDirty}
                   onSave={handleSaveStart}
                   onSaveComplete={handleSaveComplete}
