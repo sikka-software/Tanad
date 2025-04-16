@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import {
   DndContext,
@@ -48,6 +48,25 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
+// Valid tab names for type safety
+const validTabs = ["general", "navigation", "preferences", "notifications", "billing"] as const;
+type TabName = typeof validTabs[number];
+
+// Function to get tab from URL hash
+const getTabFromHash = (): TabName => {
+  if (typeof window === "undefined") return "general";
+  
+  const hash = window.location.hash.replace("#", "");
+  return validTabs.includes(hash as TabName) ? (hash as TabName) : "general";
+};
+
+// Function to set URL hash
+const setHashForTab = (tab: TabName) => {
+  if (typeof window !== "undefined") {
+    window.location.hash = tab;
+  }
+};
+
 interface SortableItemProps {
   item: SidebarMenuGroupProps["items"][number];
 }
@@ -85,15 +104,32 @@ const SortableItem = ({ item }: SortableItemProps) => {
 
 const SettingsPage = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const t = useTranslations();
   const lang = useLocale();
   const [menuList, setMenuList] = useState(getMenuList(pathname));
-  const [activeTab, setActiveTab] = useState("general");
+  const [activeTab, setActiveTab] = useState<TabName>("general");
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const generalSettingsFormRef = React.useRef<HTMLFormElement>(null);
   const notificationSettingsFormRef = React.useRef<HTMLFormElement>(null);
   const preferenceSettingsFormRef = React.useRef<HTMLFormElement>(null);
+
+  // Initialize from URL hash and set up hash change listener
+  useEffect(() => {
+    // Set initial tab from hash
+    const tabFromHash = getTabFromHash();
+    setActiveTab(tabFromHash);
+
+    // Listen for hash changes
+    const handleHashChange = () => {
+      const newTab = getTabFromHash();
+      setActiveTab(newTab);
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -140,6 +176,12 @@ const SettingsPage = () => {
     setIsDirty(false);
   };
 
+  // Handle tab change with hash update
+  const handleTabChange = (tab: TabName) => {
+    setActiveTab(tab);
+    setHashForTab(tab);
+  };
+
   return (
     <div>
       <PageTitle
@@ -176,7 +218,7 @@ const SettingsPage = () => {
                 <Button
                   variant={activeTab === "general" ? "secondary" : "ghost"}
                   className="h-auto justify-start rounded-none px-4 py-3"
-                  onClick={() => setActiveTab("general")}
+                  onClick={() => handleTabChange("general")}
                 >
                   <User className="mr-2 h-4 w-4" />
                   {t("Settings.tabs.general")}
@@ -184,7 +226,7 @@ const SettingsPage = () => {
                 <Button
                   variant={activeTab === "navigation" ? "secondary" : "ghost"}
                   className="h-auto justify-start rounded-none px-4 py-3"
-                  onClick={() => setActiveTab("navigation")}
+                  onClick={() => handleTabChange("navigation")}
                 >
                   <SettingsIcon className="mr-2 h-4 w-4" />
                   {t("Settings.tabs.navigation")}
@@ -192,7 +234,7 @@ const SettingsPage = () => {
                 <Button
                   variant={activeTab === "preferences" ? "secondary" : "ghost"}
                   className="h-auto justify-start rounded-none px-4 py-3"
-                  onClick={() => setActiveTab("preferences")}
+                  onClick={() => handleTabChange("preferences")}
                 >
                   <ChevronsUpDown className="mr-2 h-4 w-4" />
                   {t("Settings.tabs.preferences")}
@@ -200,7 +242,7 @@ const SettingsPage = () => {
                 <Button
                   variant={activeTab === "notifications" ? "secondary" : "ghost"}
                   className="h-auto justify-start rounded-none px-4 py-3"
-                  onClick={() => setActiveTab("notifications")}
+                  onClick={() => handleTabChange("notifications")}
                 >
                   <Mail className="mr-2 h-4 w-4" />
                   {t("Settings.tabs.notifications")}
@@ -208,7 +250,7 @@ const SettingsPage = () => {
                 <Button
                   variant={activeTab === "billing" ? "secondary" : "ghost"}
                   className="h-auto justify-start rounded-none px-4 py-3"
-                  onClick={() => setActiveTab("billing")}
+                  onClick={() => handleTabChange("billing")}
                 >
                   <CreditCard className="mr-2 h-4 w-4" />
                   {t("Settings.tabs.billing")}
@@ -220,7 +262,7 @@ const SettingsPage = () => {
 
         {/* Main Content */}
         <div className="flex-1">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as TabName)} className="w-full">
             <TabsList className="hidden">
               <TabsTrigger value="general">{t("Settings.tabs.general")}</TabsTrigger>
               <TabsTrigger value="navigation">{t("Settings.tabs.navigation")}</TabsTrigger>
