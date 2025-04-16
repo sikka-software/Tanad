@@ -1,21 +1,170 @@
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+
 import { useLocale, useTranslations } from "next-intl";
 
-import { Card, CardTitle, CardHeader, CardDescription, CardContent } from "../ui/card";
-import { Label } from "../ui/label";
-import { SelectContent } from "../ui/select";
-import { SelectValue } from "../ui/select";
-import { SelectTrigger } from "../ui/select";
-import { Select } from "../ui/select";
-import { SelectItem } from "../ui/select";
-import { Separator } from "../ui/separator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
-const PreferenceSettings = () => {
+import useUserStore from "@/hooks/use-user-store";
+import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
+
+import { Card, CardTitle, CardHeader, CardDescription, CardContent } from "../ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Separator } from "../ui/separator";
+import { Skeleton } from "../ui/skeleton";
+
+const formSchema = z.object({
+  currency: z.string(),
+  calendar: z.string(),
+  dateFormat: z.string(),
+  timeFormat: z.string(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+interface PreferenceSettingsProps {
+  onDirtyChange?: (isDirty: boolean) => void;
+  onSave?: () => void;
+  onSaveComplete?: () => void;
+  isSaving?: boolean;
+  formRef?: React.RefObject<HTMLFormElement | null>;
+}
+
+const PreferenceSettings = ({
+  onDirtyChange,
+  onSave,
+  onSaveComplete,
+  isSaving,
+  formRef,
+}: PreferenceSettingsProps = {}) => {
   const lang = useLocale();
   const t = useTranslations();
 
-  const handleInputChange = (value: string) => {
-    console.log("Input changed:", value);
+  // Add state to track the selected values
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("usd");
+  const [selectedCalendar, setSelectedCalendar] = useState<string>("month");
+  const [selectedDateFormat, setSelectedDateFormat] = useState<string>("mdy");
+  const [selectedTimeFormat, setSelectedTimeFormat] = useState<string>("12h");
+
+  // Get user from the existing store to get profileId
+  const { user } = useUserStore();
+  const profileId = user?.id || "";
+
+  // Use the profile hook to fetch data
+  const { data: profile, isLoading: isLoadingProfile } = useProfile(profileId);
+
+  // Initialize the update mutation
+  const updateProfileMutation = useUpdateProfile();
+
+  // Create form with default values
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      currency: "usd",
+      calendar: "month",
+      dateFormat: "mdy",
+      timeFormat: "12h",
+    },
+  });
+
+  // Reset form when profile data is loaded
+  useEffect(() => {
+    if (profile) {
+      console.log("Profile loaded for preferences:", profile);
+      console.log("User settings:", profile.user_settings);
+
+      // Get preference values from user_settings, with fallbacks
+      const currency = profile.user_settings?.currency || "usd";
+      const calendar = profile.user_settings?.calendar || "month";
+      const dateFormat = profile.user_settings?.date_format || "mdy";
+      const timeFormat = profile.user_settings?.time_format || "12h";
+
+      // Set the selected state values
+      setSelectedCurrency(currency);
+      setSelectedCalendar(calendar);
+      setSelectedDateFormat(dateFormat);
+      setSelectedTimeFormat(timeFormat);
+
+      const formValues = {
+        currency,
+        calendar,
+        dateFormat,
+        timeFormat,
+      };
+
+      console.log("Setting preference form values:", formValues);
+
+      // Use a timeout to ensure the form reset happens after React has processed state updates
+      setTimeout(() => {
+        form.reset(formValues);
+
+        // Force set the field values explicitly
+        form.setValue("currency", currency);
+        form.setValue("calendar", calendar);
+        form.setValue("dateFormat", dateFormat);
+        form.setValue("timeFormat", timeFormat);
+
+        // Verify the form state after reset
+        console.log("Preference form values after reset:", form.getValues());
+      }, 0);
+    }
+  }, [profile, form]);
+
+  // Watch for form changes to update isDirty state
+  const isDirty = form.formState.isDirty;
+  useEffect(() => {
+    if (onDirtyChange) {
+      onDirtyChange(isDirty);
+    }
+  }, [isDirty, onDirtyChange]);
+
+  const onSubmit = async (data: FormValues) => {
+    if (onSave) onSave();
+    try {
+      // Log the current data
+      console.log("Submitting preference form data:", data);
+      console.log("Current profile:", profile);
+
+      await updateProfileMutation.mutateAsync({
+        profileId,
+        data: {
+          user_settings: {
+            ...(profile?.user_settings || {}),
+            currency: data.currency,
+            calendar: data.calendar,
+            date_format: data.dateFormat,
+            time_format: data.timeFormat,
+          },
+        },
+      });
+
+      // Reset the form with the current data to clear dirty state
+      form.reset(data);
+
+      if (onSaveComplete) onSaveComplete();
+    } catch (error) {
+      console.error("Error submitting preference form:", error);
+      if (onSaveComplete) onSaveComplete();
+    }
   };
+
+  // Handle enter key press
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      form.handleSubmit(onSubmit)();
+    }
+  };
+
   return (
     <Card className="shadow-none">
       <CardHeader dir={lang === "ar" ? "rtl" : "ltr"}>
@@ -23,72 +172,165 @@ const PreferenceSettings = () => {
         <CardDescription>{t("Settings.preferences.description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6" dir={lang === "ar" ? "rtl" : "ltr"}>
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium">{t("Settings.preferences.default.title")}</h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="currency">{t("Settings.preferences.default.currency")}</Label>
-              <Select defaultValue="usd" onValueChange={handleInputChange}>
-                <SelectTrigger id="currency">
-                  <SelectValue placeholder={t("General.select")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="usd">USD ($)</SelectItem>
-                  <SelectItem value="eur">EUR (€)</SelectItem>
-                  <SelectItem value="gbp">GBP (£)</SelectItem>
-                  <SelectItem value="jpy">JPY (¥)</SelectItem>
-                </SelectContent>
-              </Select>
+        <Form {...form}>
+          <form
+            ref={formRef}
+            onSubmit={form.handleSubmit(onSubmit)}
+            onKeyDown={handleKeyDown}
+            className="space-y-6"
+          >
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">{t("Settings.preferences.default.title")}</h3>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="currency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("Settings.preferences.default.currency")}</FormLabel>
+                      {isLoadingProfile ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          disabled={isSaving}
+                          onValueChange={(val) => {
+                            console.log("Currency changed to:", val);
+                            field.onChange(val);
+                            setSelectedCurrency(val);
+                          }}
+                          value={field.value || selectedCurrency}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("General.select")} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="usd">USD ($)</SelectItem>
+                            <SelectItem value="eur">EUR (€)</SelectItem>
+                            <SelectItem value="gbp">GBP (£)</SelectItem>
+                            <SelectItem value="jpy">JPY (¥)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="calendar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("Settings.preferences.default.calendar")}</FormLabel>
+                      {isLoadingProfile ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          disabled={isSaving}
+                          onValueChange={(val) => {
+                            console.log("Calendar changed to:", val);
+                            field.onChange(val);
+                            setSelectedCalendar(val);
+                          }}
+                          value={field.value || selectedCalendar}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("General.select")} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="day">Day</SelectItem>
+                            <SelectItem value="week">Week</SelectItem>
+                            <SelectItem value="month">Month</SelectItem>
+                            <SelectItem value="year">Year</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="calendar">{t("Settings.preferences.default.calendar")}</Label>
-              <Select defaultValue="month" onValueChange={handleInputChange}>
-                <SelectTrigger id="calendar">
-                  <SelectValue placeholder={t("General.select")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="day">Day</SelectItem>
-                  <SelectItem value="week">Week</SelectItem>
-                  <SelectItem value="month">Month</SelectItem>
-                  <SelectItem value="year">Year</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
 
-        <Separator />
+            <Separator />
 
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium">{t("Settings.preferences.datetime.title")}</h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="date-format">{t("Settings.preferences.datetime.date_format")}</Label>
-              <Select defaultValue="mdy" onValueChange={handleInputChange}>
-                <SelectTrigger id="date-format">
-                  <SelectValue placeholder={t("General.select")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
-                  <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
-                  <SelectItem value="ymd">YYYY/MM/DD</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">{t("Settings.preferences.datetime.title")}</h3>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="dateFormat"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("Settings.preferences.datetime.date_format")}</FormLabel>
+                      {isLoadingProfile ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          disabled={isSaving}
+                          onValueChange={(val) => {
+                            console.log("Date format changed to:", val);
+                            field.onChange(val);
+                            setSelectedDateFormat(val);
+                          }}
+                          value={field.value || selectedDateFormat}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("General.select")} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
+                            <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
+                            <SelectItem value="ymd">YYYY/MM/DD</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="timeFormat"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("Settings.preferences.datetime.time_format")}</FormLabel>
+                      {isLoadingProfile ? (
+                        <Skeleton className="h-10 w-full" />
+                      ) : (
+                        <Select
+                          disabled={isSaving}
+                          onValueChange={(val) => {
+                            console.log("Time format changed to:", val);
+                            field.onChange(val);
+                            setSelectedTimeFormat(val);
+                          }}
+                          value={field.value || selectedTimeFormat}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder={t("General.select")} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="12h">{t("Settings.preferences.datetime.12h")}</SelectItem>
+                            <SelectItem value="24h">{t("Settings.preferences.datetime.24h")}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="time-format">{t("Settings.preferences.datetime.time_format")}</Label>
-              <Select defaultValue="12h" onValueChange={handleInputChange}>
-                <SelectTrigger id="time-format">
-                  <SelectValue placeholder={t("General.select")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="12h">{t("Settings.preferences.datetime.12h")}</SelectItem>
-                  <SelectItem value="24h">{t("Settings.preferences.datetime.24h")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );

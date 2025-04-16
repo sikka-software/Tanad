@@ -93,6 +93,7 @@ const SettingsPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const generalSettingsFormRef = React.useRef<HTMLFormElement>(null);
   const notificationSettingsFormRef = React.useRef<HTMLFormElement>(null);
+  const preferenceSettingsFormRef = React.useRef<HTMLFormElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -125,6 +126,8 @@ const SettingsPage = () => {
       generalSettingsFormRef.current.requestSubmit();
     } else if (activeTab === "notifications" && notificationSettingsFormRef.current) {
       notificationSettingsFormRef.current.requestSubmit();
+    } else if (activeTab === "preferences" && preferenceSettingsFormRef.current) {
+      preferenceSettingsFormRef.current.requestSubmit();
     }
   };
 
@@ -269,7 +272,13 @@ const SettingsPage = () => {
               </TabsContent>
 
               <TabsContent value="preferences" className="m-0">
-                <PreferenceSettings />
+                <PreferenceSettings
+                  onDirtyChange={setIsDirty}
+                  onSave={handleSaveStart}
+                  onSaveComplete={handleSaveComplete}
+                  isSaving={isSaving}
+                  formRef={preferenceSettingsFormRef}
+                />
               </TabsContent>
 
               <TabsContent value="notifications" className="m-0">

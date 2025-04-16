@@ -115,6 +115,12 @@
     "report_issue_thank_you": "Thank you for your report",
     "report_issue_description_thank_you": "Our team has been notified and will investigate this issue promptly."
   },
+  "Flags": {
+    "timezone_soon": {
+      "title": "Coming Soon",
+      "description": "We are working on connecting all timestamps to your timezone"
+    }
+  },
   "SEO": {
     "landing": {
       "title": "One link for all your links!",

@@ -116,7 +116,12 @@
     "report_issue_thank_you": "شكراً لك على إبلاغك",
     "report_issue_description_thank_you": "تم إبلاغ فريقنا وسيتم التحقق من هذا الخطأ في الميعاد القريب."
   },
-
+  "Flags": {
+    "timezone_soon": {
+      "title": "قريباً",
+      "description": "شغالين على ربط جميع الأوقات بالمنظقة الزمنية الخاصة بك"
+    }
+  },
   "SEO": {
     "landing": {
       "title": "رابط واحد عن كل الروابط!",
