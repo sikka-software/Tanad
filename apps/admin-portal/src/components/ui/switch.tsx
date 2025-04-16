@@ -11,10 +11,11 @@ type SwitchProps = React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root> 
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   thumbIcon?: React.ReactNode;
+  loading?: boolean;
 };
 
 const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, SwitchProps>(
-  ({ className, leftIcon, rightIcon, thumbIcon, onCheckedChange, ...props }, ref) => {
+  ({ className, leftIcon, rightIcon, thumbIcon, onCheckedChange, loading, ...props }, ref) => {
     const [isChecked, setIsChecked] = React.useState(
       props?.checked ?? props?.defaultChecked ?? false,
     );
@@ -66,27 +67,29 @@ const Switch = React.forwardRef<React.ElementRef<typeof SwitchPrimitives.Root>, 
             </motion.div>
           )}
 
-          <SwitchPrimitives.Thumb asChild>
-            <motion.div
-              whileTap="tab"
-              className={cn(
-                "bg-background relative z-[1] flex items-center justify-center rounded-full text-neutral-500 shadow-lg ring-0 dark:text-neutral-400 [&_svg]:size-3",
-              )}
-              layout
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              style={{
-                width: 18,
-                height: 18,
-              }}
-              animate={
-                isTapped
-                  ? { width: 21, transition: { duration: 0.1 } }
-                  : { width: 18, transition: { duration: 0.1 } }
-              }
-            >
-              {thumbIcon && typeof thumbIcon !== "string" ? thumbIcon : null}
-            </motion.div>
-          </SwitchPrimitives.Thumb>
+          {!loading && (
+            <SwitchPrimitives.Thumb asChild>
+              <motion.div
+                whileTap="tab"
+                className={cn(
+                  "bg-background relative z-[1] flex items-center justify-center rounded-full text-neutral-500 shadow-lg ring-0 dark:text-neutral-400 [&_svg]:size-3",
+                )}
+                layout
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                style={{
+                  width: 18,
+                  height: 18,
+                }}
+                animate={
+                  isTapped
+                    ? { width: 21, transition: { duration: 0.1 } }
+                    : { width: 18, transition: { duration: 0.1 } }
+                }
+              >
+                {thumbIcon && typeof thumbIcon !== "string" ? thumbIcon : null}
+              </motion.div>
+            </SwitchPrimitives.Thumb>
+          )}
         </motion.button>
       </SwitchPrimitives.Root>
     );
