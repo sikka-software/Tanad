@@ -25,7 +25,7 @@ export async function fetchEmployees(): Promise<Employee[]> {
     department_id: employee.departmentId,
     hire_date: employee.hireDate,
     salary: employee.salary,
-    status: employee.is_active ? 'active' : 'inactive',
+    status: employee.status,
     notes: employee.notes,
     created_at: employee.createdAt,
     updated_at: employee.updatedAt
@@ -58,7 +58,7 @@ export async function fetchEmployeeById(id: string): Promise<Employee> {
     department_id: data.departmentId,
     hire_date: data.hireDate,
     salary: data.salary,
-    status: data.is_active ? 'active' : 'inactive',
+    status: data.status,
     notes: data.notes,
     created_at: data.createdAt,
     updated_at: data.updatedAt
@@ -81,10 +81,9 @@ export async function updateEmployee(id: string, updates: Partial<Employee>): Pr
     else if (key === 'department') {
       // Skip this field as it's handled by the join
     }
-    // Special case for status field which maps to is_active in DB
+    // For status, directly map it since it's the same field name
     else if (key === 'status') {
-      // If status is 'active', set is_active to true, otherwise false
-      updatesToApply['is_active'] = value === 'active';
+      updatesToApply['status'] = value;
     }
     // All other fields: convert from snake_case to camelCase
     else if (key.includes('_')) {
@@ -166,8 +165,7 @@ export async function updateEmployee(id: string, updates: Partial<Employee>): Pr
     department_id: data.departmentId,
     hire_date: data.hireDate,
     salary: data.salary,
-    // Map is_active back to status enum
-    status: data.is_active ? 'active' : 'inactive',
+    status: data.status,
     notes: data.notes,
     created_at: data.createdAt,
     updated_at: data.updatedAt
@@ -190,10 +188,9 @@ export async function addEmployee(employee: Omit<Employee, "id" | "created_at" |
     else if (key === 'department') {
       // Skip this field as it's handled by the join
     }
-    // Special case for status field which maps to is_active in DB
+    // For status, directly map it since it's the same field name
     else if (key === 'status') {
-      // If status is 'active', set is_active to true, otherwise false
-      employeeData['is_active'] = value === 'active';
+      employeeData['status'] = value;
     }
     // All other fields: convert from snake_case to camelCase
     else if (key.includes('_')) {
@@ -232,7 +229,7 @@ export async function addEmployee(employee: Omit<Employee, "id" | "created_at" |
     department_id: data.departmentId,
     hire_date: data.hireDate,
     salary: data.salary,
-    status: data.is_active ? 'active' : 'inactive',
+    status: data.status,
     notes: data.notes,
     created_at: data.createdAt,
     updated_at: data.updatedAt
