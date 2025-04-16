@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import { useProfileMutation } from "@/hooks/use-profile-mutation";
+import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 import useUserStore from "@/hooks/use-user-store";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
@@ -49,15 +49,18 @@ const GeneralSettings = ({
 }: GeneralSettingsProps) => {
   const t = useTranslations();
   const lang = useLocale();
-  const { profile } = useUserStore();
-  const profileMutation = useProfileMutation();
+  
+  // Get user and profile data from the existing store
+  const { user, profile } = useUserStore();
+  
+  // Initialize the update mutation
+  const updateProfileMutation = useUpdateProfile();
 
-  console.log("profile is ", profile);
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: profile?.full_name || "",
-      email: profile?.email || "",
+      email: user?.email || profile?.email || "", // Prioritize user email over profile email
       language: lang,
       timezone: profile?.user_settings?.timezone || "UTC",
     },
@@ -72,11 +75,24 @@ const GeneralSettings = ({
   const onSubmit = async (data: FormValues) => {
     onSave();
     try {
-      await profileMutation.mutateAsync({
-        name: data.name,
-        email: data.email,
-        timezone: data.timezone,
+      await updateProfileMutation.mutateAsync({
+        profileId: profile?.id || "", // Use profile ID from user store
+        data: {
+          full_name: data.name,
+          // Email is managed separately through auth system if needed
+          user_settings: {
+            ...(profile?.user_settings || {}),
+            timezone: data.timezone,
+          },
+        },
       });
+      
+      // If email has changed, you might need to update it through auth system
+      if (data.email !== user?.email) {
+        // Handle email update through auth provider if needed
+        console.log("Email changed, might need additional auth updates");
+      }
+      
       form.reset(data);
       onSaveComplete();
     } catch (error) {
@@ -91,6 +107,11 @@ const GeneralSettings = ({
       form.handleSubmit(onSubmit)();
     }
   };
+
+  // Show loading state if no profile yet
+  if (!profile) {
+    return <div className="p-6 text-center">Loading profile information...</div>;
+  }
 
   return (
     <Card className="shadow-none">
