@@ -77,14 +77,25 @@ const GeneralSettings = ({
     if (profile) {
       console.log("Profile loaded:", profile);
       console.log("User settings:", profile.user_settings);
-      console.log("Timezone:", profile.user_settings?.timezone);
 
-      form.reset({
+      // Get timezone value, ensuring it's not undefined
+      const timezone = profile.user_settings?.timezone || "UTC";
+      console.log("Setting timezone to:", timezone);
+
+      const formValues = {
         name: profile.full_name || "",
         email: user?.email || profile.email || "",
         language: lang,
-        timezone: profile.user_settings?.timezone || "UTC",
-      });
+        timezone,
+      };
+
+      console.log("Setting form values:", formValues);
+      form.reset(formValues);
+
+      // Verify the form state after reset
+      setTimeout(() => {
+        console.log("Form values after reset:", form.getValues());
+      }, 0);
     }
   }, [profile, user, lang, form]);
 
@@ -204,11 +215,7 @@ const GeneralSettings = ({
                       {isLoadingProfile ? (
                         <Skeleton className="h-10 w-full" />
                       ) : (
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          disabled={isSaving}
-                        >
+                        <Select {...field} disabled={isSaving} key={`language-${field.value}`}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder={t("General.select")} />
@@ -229,18 +236,15 @@ const GeneralSettings = ({
                   name="timezone"
                   render={({ field }) => {
                     console.log("Timezone field:", field.value);
+                    console.log("Timezone field object:", JSON.stringify(field, null, 2));
+                    console.log("Complete form values:", form.getValues());
                     return (
                       <FormItem>
                         <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
                         {isLoadingProfile ? (
                           <Skeleton className="h-10 w-full" />
                         ) : (
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                            defaultValue={field.value}
-                            disabled={isSaving}
-                          >
+                          <Select {...field} disabled={isSaving} key={`timezone-${field.value}`}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder={t("General.select")} />
