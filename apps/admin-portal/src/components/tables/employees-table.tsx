@@ -49,15 +49,21 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
     (rowId: string, columnId: string, value: unknown) => {
       let updates: Partial<Employee> = {};
 
-      if (columnId === "department") {
+      if (columnId === "department_id") {
         // For department changes, handle department_id and department name
         const department_id = value as string;
-        updates.department_id = department_id;
-
-        // Find the department name for immediate UI display
         const department = departments?.find((d) => d.id === department_id);
+
         if (department) {
-          updates.department = department.name;
+          updates = {
+            department_id: department_id,
+            department: department.name, // Set both department_id and department name
+          };
+        } else {
+          updates = {
+            department_id: null,
+            department: null,
+          };
         }
       } else if (columnId === "status") {
         updates.status = value as "active" | "inactive" | "on_leave" | "terminated";
@@ -137,7 +143,7 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
       validationSchema: positionSchema,
     },
     {
-      accessorKey: "department",
+      accessorKey: "department_id",
       header: t("Employees.form.department.label"),
       validationSchema: departmentSchema,
       cellType: "select",
@@ -145,6 +151,10 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
         label: department.name,
         value: department.id,
       })),
+      cell: ({ row }) => {
+        const department = departments?.find((d) => d.id === row.original.department_id);
+        return department?.name || "";
+      },
     },
     {
       accessorKey: "status",

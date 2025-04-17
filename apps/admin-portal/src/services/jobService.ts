@@ -1,5 +1,6 @@
-import useUserStore from "@/hooks/use-user-store";
 import { Job } from "@/types/job.type";
+
+import useUserStore from "@/hooks/use-user-store";
 
 export async function fetchJobs(): Promise<Job[]> {
   const response = await fetch("/api/jobs");
@@ -37,7 +38,6 @@ export async function createJob(
     const jobWithuser_id = {
       ...jobData,
       user_id: finaluser_id, // Keep camelCase for TypeScript
-      user_id: finaluser_id, // Add snake_case for RLS policy
     };
 
     console.log("Creating job with payload:", JSON.stringify(jobWithuser_id, null, 2));

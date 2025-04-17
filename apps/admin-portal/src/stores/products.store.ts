@@ -9,7 +9,6 @@ export type Product = {
   price: number;
   sku?: string;
   stock_quantity?: number;
-  user_id: string;
   created_at: string;
   updated_at: string;
   user_id: string;
@@ -20,7 +19,9 @@ type ProductsStore = {
   isLoading: boolean;
   error: string | null;
   fetchProducts: () => Promise<void>;
-  createProduct: (product: Omit<Product, "id" | "user_id" | "created_at" | "updated_at">) => Promise<void>;
+  createProduct: (
+    product: Omit<Product, "id" | "user_id" | "created_at" | "updated_at">,
+  ) => Promise<void>;
   updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
 };
@@ -49,11 +50,7 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
   createProduct: async (product) => {
     try {
       set({ isLoading: true, error: null });
-      const { data, error } = await supabase
-        .from("products")
-        .insert([product])
-        .select()
-        .single();
+      const { data, error } = await supabase.from("products").insert([product]).select().single();
 
       if (error) throw error;
 
@@ -102,4 +99,4 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       set({ error: (error as Error).message, isLoading: false });
     }
   },
-})); 
+}));
