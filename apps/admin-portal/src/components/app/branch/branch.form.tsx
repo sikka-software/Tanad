@@ -1,98 +1,43 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
+import * as z from "zod";
 
-import { Button } from "@/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
-import { createBranch, fetchBranchById, updateBranch } from "@/services/branchService";
+export const createBranchSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("Branches.form.name.required")),
+    code: z.string().min(1, t("Branches.form.code.required")),
+    address: z.string().min(1, t("Branches.form.address.required")),
+    city: z.string().min(1, t("Branches.form.city.required")),
+    state: z.string().min(1, t("Branches.form.state.required")),
+    zip_code: z.string().min(1, t("Branches.form.zip_code.required")),
+    phone: z.string().optional().or(z.literal("")),
+    email: z.string().email().optional().or(z.literal("")),
+    manager: z.string().optional().or(z.literal("")),
+    is_active: z.boolean().default(true),
+    notes: z.string().optional().or(z.literal("")),
+  });
 
-import type { Branch, BranchCreateData } from "@/types/branch.type";
+export type BranchFormValues = z.input<ReturnType<typeof createBranchSchema>>;
 
-// Define the schema
-const branchFormSchema = z.object({
-  name: z.string().min(1),
-  code: z.string().min(1),
-  address: z.string().min(1),
-  city: z.string().min(1),
-  state: z.string().min(1),
-  zip_code: z.string().min(1),
-  phone: z.string().optional(),
-  email: z.string().email().optional(),
-  manager: z.string().optional(),
-  is_active: z.boolean().default(true),
-  notes: z.string().optional(),
-});
-
-// Define the form values type
-type BranchFormValues = z.input<typeof branchFormSchema>;
-
-interface BranchFormProps {
+export interface BranchFormProps {
   id?: string;
-  branch_id?: string;
-  onSuccess?: (branch: Branch) => void;
-  loading?: boolean;
   user_id: string | undefined;
-  setLoading?: (loading: boolean) => void;
+  onSubmit: (data: BranchFormValues) => void;
+  loading?: boolean;
+  initialData?: BranchFormValues;
 }
 
-export function BranchForm({
-  id,
-  branch_id,
-  onSuccess,
-  loading: externalLoading = false,
-  user_id,
-  setLoading,
-}: BranchFormProps) {
-  const router = useRouter();
+export function BranchForm({ user_id, id, onSubmit, loading, initialData }: BranchFormProps) {
   const t = useTranslations();
-  const [internalLoading, setInternalLoading] = useState(false);
-  const loading = externalLoading || internalLoading;
-
-  // Create schema with translations
-  const getBranchSchema = () => {
-    return branchFormSchema
-      .refine(() => true, {
-        message: t("Branches.form.name.required"),
-        path: ["name"],
-      })
-      .refine(() => true, {
-        message: t("Branches.form.code.required"),
-        path: ["code"],
-      })
-      .refine(() => true, {
-        message: t("Branches.form.address.required"),
-        path: ["address"],
-      })
-      .refine(() => true, {
-        message: t("Branches.form.city.required"),
-        path: ["city"],
-      })
-      .refine(() => true, {
-        message: t("Branches.form.state.required"),
-        path: ["state"],
-      })
-      .refine(() => true, {
-        message: t("Branches.form.zip_code.required"),
-        path: ["zip_code"],
-      })
-      .refine(() => true, {
-        message: t("Branches.form.email.invalid"),
-        path: ["email"],
-      });
-  };
-
   const form = useForm<BranchFormValues>({
-    resolver: zodResolver(getBranchSchema()),
-    defaultValues: {
+    resolver: zodResolver(createBranchSchema(t)),
+    defaultValues: initialData || {
       name: "",
       code: "",
       address: "",
@@ -107,98 +52,14 @@ export function BranchForm({
     },
   });
 
-  useEffect(() => {
-    if (branch_id) {
-      setInternalLoading(true);
-      fetchBranchById(branch_id)
-        .then((branch) => {
-          form.reset({
-            name: branch.name,
-            code: branch.code,
-            address: branch.address,
-            city: branch.city,
-            state: branch.state,
-            zip_code: branch.zip_code,
-            phone: branch.phone || "",
-            email: branch.email || "",
-            manager: branch.manager || "",
-            is_active: branch.is_active,
-            notes: branch.notes || "",
-          });
-        })
-        .catch((error) => {
-          console.error("Failed to fetch branch:", error);
-          toast.error(t("error.title"), {
-            description: t("Branches.messages.error_fetch"),
-          });
-        })
-        .finally(() => {
-          setInternalLoading(false);
-        });
-    }
-  }, [branch_id, form, t]);
-
-  const onSubmit: SubmitHandler<BranchFormValues> = async (data) => {
-    setInternalLoading(true);
-    setLoading?.(true);
-    if (!user_id) {
-      toast.error(t("error.title"), {
-        description: t("error.not_authenticated"),
-      });
-      setInternalLoading(false);
-      setLoading?.(false);
-      return;
-    }
-
-    try {
-      const branchData = {
-        name: data.name.trim(),
-        code: data.code.trim(),
-        address: data.address.trim(),
-        city: data.city.trim(),
-        state: data.state.trim(),
-        zip_code: data.zip_code.trim(),
-        phone: data.phone?.trim() || null,
-        email: data.email?.trim() || null,
-        manager: data.manager?.trim() || null,
-        is_active: data.is_active,
-        notes: data.notes?.trim() || null,
-        user_id: user_id,
-      };
-
-      let result: Branch;
-      if (branch_id) {
-        const { user_id, ...updateData } = branchData;
-        result = await updateBranch(branch_id, updateData);
-        toast.success(t("General.successful_operation"), {
-          description: t("Branches.messages.success_updated"),
-        });
-      } else {
-        result = await createBranch(branchData as unknown as BranchCreateData);
-        toast.success(t("General.successful_operation"), {
-          description: t("Branches.messages.success_created"),
-        });
-      }
-
-      if (onSuccess) {
-        onSuccess(result);
-      } else {
-        router.push("/branches");
-      }
-    } catch (error) {
-      console.error("Failed to save branch:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Branches.messages.error_save"),
-      });
-    } finally {
-      setInternalLoading(false);
-      setLoading?.(false);
-    }
-  };
+  // Expose form methods for external use (like dummy data)
+  if (typeof window !== "undefined") {
+    (window as any).branchForm = form;
+  }
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id || "branch-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -402,10 +263,6 @@ export function BranchForm({
             </FormItem>
           )}
         />
-
-        <Button type="submit" disabled={loading} className="w-full">
-          {branch_id ? t("Branches.form.update_button") : t("Branches.form.create_button")}
-        </Button>
       </form>
     </Form>
   );
