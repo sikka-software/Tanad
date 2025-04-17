@@ -15,7 +15,7 @@
  * - Real-time validation with Zod schemas
  * - Keyboard shortcuts (Ctrl+Z, Ctrl+V, etc.)
  */
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -51,6 +51,7 @@ import {
   TableRow,
   TableFooter,
 } from "@/components/ui/table";
+
 // ** import lib
 import { cn } from "@/lib/utils";
 
@@ -135,6 +136,16 @@ export interface SheetTableProps<T extends object> extends FooterProps {
    * Callback for when a cell is focused.
    */
   onCellFocus?: (rowId: string) => void;
+
+  /**
+   * Whether row selection is enabled.
+   */
+  enableRowSelection?: boolean;
+
+  /**
+   * Callback for when row selection changes.
+   */
+  onRowSelectionChange?: (selectedRows: T[]) => void;
 
   /**
    * Columns that are disabled for editing.
@@ -327,7 +338,8 @@ function SheetTable<
     showHeader = true,
     showSecondHeader = false,
     secondHeaderTitle = "",
-
+    enableRowSelection = false,
+    onRowSelectionChange,
     // Footer props
     totalRowValues,
     totalRowLabel = "",
@@ -358,6 +370,11 @@ function SheetTable<
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   /**
+   * Row selection state
+   */
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+
+  /**
    * Track errors/original content keyed by (groupKey, rowId) for editing.
    */
   const [cellErrors, setCellErrors] = useState<
@@ -385,11 +402,15 @@ function SheetTable<
     // Add expansions
     getExpandedRowModel: getExpandedRowModel(),
     enableExpanding: true,
+    // Add row selection
+    enableRowSelection,
+    onRowSelectionChange: setRowSelection,
     // External expanded state
     state: {
       // If user also provided tableOptions.state, merge them
       ...(tableOptions.state ?? {}),
       expanded,
+      rowSelection,
       ...(enableColumnSizing
         ? {
             columnSizing,
@@ -414,6 +435,14 @@ function SheetTable<
    * Initialize the table using TanStack Table.
    */
   const table = useReactTable<T>(mergedOptions);
+
+  // Update parent component when row selection changes
+  useEffect(() => {
+    if (onRowSelectionChange) {
+      const selectedRows = table.getSelectedRowModel().flatRows.map((row) => row.original);
+      onRowSelectionChange(selectedRows);
+    }
+  }, [rowSelection, table, onRowSelectionChange]);
 
   /**
    * Find a TanStack row by matching rowData.id.
@@ -630,11 +659,27 @@ function SheetTable<
           className={cn(
             "border-none", // it's will remove border for icons cells
             disabled ? "bg-muted" : "",
+            enableRowSelection && row.getIsSelected() ? "bg-muted/50" : "",
           )}
           // On mouse enter/leave, set hovered row
           onMouseEnter={() => setHoveredRowId(rowId)}
           onMouseLeave={() => setHoveredRowId((prev) => (prev === rowId ? null : prev))}
+          data-state={row.getIsSelected() && "selected"}
         >
+          {/* Selection checkbox */}
+          {enableRowSelection && (
+            <TableCell className="w-[30px] border-y p-0 px-2">
+              <div className="flex h-full items-center justify-center">
+                <input
+                  type="checkbox"
+                  checked={row.getIsSelected()}
+                  onChange={row.getToggleSelectedHandler()}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+              </div>
+            </TableCell>
+          )}
+
           {/* Left icon cells */}
           {addPos === "left" && handleAddRowFunction && (
             <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle}>
@@ -888,8 +933,8 @@ function SheetTable<
         {/* If there's a totalRowTitle, show it in a single row */}
         {totalRowTitle && (
           <TableRow className="border-none">
-            {/* Right icon - empty cells  */}
-            {addPos === "left" && (
+            {/* If there's a totalRowTitle, show it in a single row */}
+            {enableRowSelection && (
               <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
             )}
 
@@ -961,6 +1006,21 @@ function SheetTable<
         {showHeader && (
           <TableHeader>
             <TableRow className="border-none">
+              {/* Selection checkbox header */}
+              {enableRowSelection && (
+                <TableHead className="w-[30px] border-none p-0">
+                  <div className="flex h-full items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={table.getIsAllRowsSelected()}
+                      onChange={table.getToggleAllRowsSelectedHandler()}
+                      className="h-4 w-4 rounded border-gray-300"
+                      title={t("selectAll")}
+                    />
+                  </div>
+                </TableHead>
+              )}
+
               {/* Right icon cells empty headers */}
               {addPos === "left" && (
                 <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
@@ -990,7 +1050,6 @@ function SheetTable<
               )}
 
               {/* Left icon cells empty headers */}
-
               {addPos === "right" && (
                 <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
               )}

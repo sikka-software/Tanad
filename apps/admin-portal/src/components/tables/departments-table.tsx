@@ -34,9 +34,15 @@ interface DepartmentsTableProps {
   data: Department[];
   isLoading?: boolean;
   error?: Error | null;
+  onSelectedRowsChange?: (selectedRows: Department[]) => void;
 }
 
-const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => {
+const DepartmentsTable = ({
+  data,
+  isLoading,
+  error,
+  onSelectedRowsChange,
+}: DepartmentsTableProps) => {
   const t = useTranslations("Departments");
   const { mutateAsync: updateDepartment } = useUpdateDepartment();
   const { data: offices } = useOffices();
@@ -45,6 +51,12 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateDepartment({ id: rowId, updates: { [columnId]: value } });
+  };
+
+  const handleRowSelectionChange = (selectedRows: Department[]) => {
+    if (onSelectedRowsChange) {
+      onSelectedRowsChange(selectedRows);
+    }
   };
 
   const getLocationName = (locationId: string) => {
@@ -67,16 +79,23 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
   };
 
   const columns: ExtendedColumnDef<Department>[] = [
-    { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
+    {
+      accessorKey: "name",
+      header: t("form.name.label"),
+      validationSchema: nameSchema,
+      className: "min-w-[200px]",
+    },
     {
       accessorKey: "description",
       header: t("form.description.label"),
       validationSchema: descriptionSchema,
+      className: "min-w-[250px]",
     },
     {
       accessorKey: "locations",
       header: t("form.locations.label"),
       validationSchema: locationSchema,
+      className: "min-w-[200px]",
       cell: ({ row }) => {
         const locationIds = row.original.locations || [];
 
@@ -89,7 +108,6 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 px-2 py-1">
-                  {/* {locationIds.length}{" "} */}
                   {t("form.locations.multipleLocations", { count: locationIds.length })}
                 </Button>
               </DropdownMenuTrigger>
@@ -120,11 +138,13 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
       accessorKey: "createdAt",
       header: t("form.createdAt.label"),
       validationSchema: createdAtSchema,
+      className: "min-w-[180px]",
     },
     {
       accessorKey: "updatedAt",
       header: t("form.updatedAt.label"),
       validationSchema: updatedAtSchema,
+      className: "min-w-[180px]",
     },
   ];
 
@@ -138,7 +158,16 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+  return (
+    <SheetTable
+      columns={columns}
+      data={data}
+      onEdit={handleEdit}
+      showHeader={true}
+      enableRowSelection={true}
+      onRowSelectionChange={handleRowSelectionChange}
+    />
+  );
 };
 
 export default DepartmentsTable;
