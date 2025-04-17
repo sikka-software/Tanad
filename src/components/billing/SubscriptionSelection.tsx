@@ -95,7 +95,6 @@ export default function SubscriptionSelection({
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const plans = getPlans();
@@ -105,7 +104,6 @@ export default function SubscriptionSelection({
     const priceB = parseFloat(b.price.split(" ")[0]) || 0;
     return priceA - priceB;
   });
-
   // In Arabic, we reverse the order of plans to display from right to left
   const displayPlans = locale === "ar" ? [...sortedPlans].reverse() : sortedPlans;
 
@@ -403,6 +401,7 @@ export default function SubscriptionSelection({
           onOpenChange={setIsPaymentDialogOpen}
           selectedPlan={selectedPlan || ""}
           onSuccess={handlePaymentSuccess}
+          customerId={user?.stripe_customer_id || ""}
         />
       )}
     </form>

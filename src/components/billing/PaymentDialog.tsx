@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
+import { supabase } from "@/lib/supabase";
 
 // Load Stripe with publishable key
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
@@ -115,11 +116,13 @@ export function PaymentDialog({
   onOpenChange,
   selectedPlan,
   onSuccess,
+  customerId,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedPlan: string;
   onSuccess: () => void;
+  customerId: string;
 }) {
   const t = useTranslations();
   const { resolvedTheme } = useTheme();
@@ -152,6 +155,14 @@ export function PaymentDialog({
     setError(null);
 
     try {
+      // Debug user data
+      console.log("User data before setup:", {
+        id: user?.id,
+        customerId: user?.stripe_customer_id,
+        isAuthenticated: !!user,
+        hasProfile: !!user?.profile,
+      });
+
       // Fetch price details first
       const priceResponse = await fetch(`/api/stripe/get-price?priceId=${selectedPlan}`);
       if (!priceResponse.ok) {
@@ -164,9 +175,17 @@ export function PaymentDialog({
       });
 
       // Check if we need to obtain a customer ID - if none exists
-      if (!user.stripe_customer_id && user.id) {
-        console.log("No customer ID, will use user ID for fallback:", user.id);
-        toast.info("Setting up your payment method...");
+      if (!user.stripe_customer_id && user.id && !customerId) {
+        // Look up customer ID from database
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("stripe_customer_id")
+          .eq("id", user.id)
+          .single();
+
+        if (profile?.stripe_customer_id) {
+          customerId = profile.stripe_customer_id;
+        }
       }
 
       // Make sure we have a customer ID
@@ -180,12 +199,6 @@ export function PaymentDialog({
         }
       }
 
-      // Logging the user data we have available
-      console.log("User data for setup intent:", {
-        id: user.id,
-        customerId: user.stripe_customer_id,
-      });
-
       // Create a setup intent for the customer
       const setupResponse = await fetch("/api/stripe/create-setup-intent", {
         method: "POST",
@@ -193,13 +206,13 @@ export function PaymentDialog({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          customerId: user.stripe_customer_id,
-          userId: user.id,
+          customerId: customerId || user.stripe_customer_id,
         }),
       });
 
       if (!setupResponse.ok) {
         const errorData = await setupResponse.json();
+        console.error("Setup response error:", errorData);
         throw new Error(errorData.message || errorData.error || "Failed to set up payment");
       }
 
@@ -211,7 +224,15 @@ export function PaymentDialog({
       setClientSecret(setupData.clientSecret);
     } catch (err: any) {
       console.error("Payment setup error:", err);
-      setError(err.message || "Failed to set up payment");
+      if (err.message === "Could not find user profile") {
+        setError(
+          "User profile not found. Please make sure you are logged in with a complete profile.",
+        );
+        // Try to refresh the user data
+        fetchUserAndProfile().catch((e) => console.error("Failed to refresh user data:", e));
+      } else {
+        setError(err.message || "Failed to set up payment");
+      }
     } finally {
       setLoading(false);
     }
