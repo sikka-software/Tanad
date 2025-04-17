@@ -1015,7 +1015,7 @@ function SheetTable<
                       checked={table.getIsAllRowsSelected()}
                       onChange={table.getToggleAllRowsSelectedHandler()}
                       className="h-4 w-4 rounded border-gray-300"
-                      title={t("selectAll")}
+                      title={t("General.select_all")}
                     />
                   </div>
                 </TableHead>

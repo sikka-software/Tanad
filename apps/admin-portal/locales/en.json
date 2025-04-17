@@ -29,11 +29,17 @@
     "inactive": "Inactive",
     "successful_operation": "Successful Operation",
     "error_operation": "Error Operation",
-    "select_all": "Select All",
     "clear": "Clear",
     "close": "Close",
     "no_results_found": "No results found",
     "quick_access": "Quick Access",
+    "select_all": "Select All",
+    "deselect_all": "Deselect All",
+    "items_selected": "Items Selected",
+    "delete_selected": "Delete Selected",
+    "delete_all": "Delete All",
+    "edit_selected": "Edit Selected",
+    "view_selected": "View Selected",
     "calendars": {
       "gregorian": "Gregorian",
       "hijri": "Hijri"
@@ -2486,6 +2492,14 @@
       "validation": {
         "name_required": "Name is required",
         "locations_required": "At least one location is required"
+      },
+      "updatedAt": {
+        "label": "Updated At",
+        "placeholder": "Enter updated at"
+      },
+      "createdAt": {
+        "label": "Created At",
+        "placeholder": "Enter created at"
       }
     },
     "table": {

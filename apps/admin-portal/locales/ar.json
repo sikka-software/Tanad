@@ -11,11 +11,17 @@
     "inactive": "غير نشط",
     "successful_operation": "تمت العملية بنجاح",
     "error_operation": "حدث خطأ أثناء العملية",
-    "select_all": "اختر الكل",
     "clear": "مسح",
     "close": "اغلاق",
     "no_results_found": "لا توجد نتائج",
     "quick_access": "الوصول السريع",
+    "items_selected": "عناصر مختارة",
+    "delete_selected": "حذف المختارة",
+    "delete_all": "حذف الكل",
+    "edit_selected": "تعديل المختارة",
+    "view_selected": "عرض المختارة",
+    "select_all": "اختر الكل",
+    "deselect_all": "إلغاء الاختيار",
     "calendars": {
       "gregorian": "التقويم الميلادي",
       "hijri": "التقويم الهجري"
@@ -2616,6 +2622,14 @@
         "name_required": "الاسم مطلوب",
         "description_required": "الوصف مطلوب",
         "locations_required": "يجب اختيار موقع واحد على الأقل"
+      },
+      "updatedAt": {
+        "label": "تاريخ التحديث",
+        "placeholder": "أدخل تاريخ التحديث"
+      },
+      "createdAt": {
+        "label": "تاريخ الإنشاء",
+        "placeholder": "أدخل تاريخ الإنشاء"
       }
     },
     "table": {

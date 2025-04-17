@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -23,6 +23,7 @@ import { useBranches } from "@/hooks/useBranches";
 import { useUpdateDepartment } from "@/hooks/useDepartments";
 import { useOffices } from "@/hooks/useOffices";
 import { useWarehouses } from "@/hooks/useWarehouses";
+import { useDepartmentsStore } from "@/stores/departments.store";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().min(1, "Required");
@@ -48,16 +49,31 @@ const DepartmentsTable = ({
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
+  const { selectedRows, setSelectedRows } = useDepartmentsStore();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateDepartment({ id: rowId, updates: { [columnId]: value } });
   };
 
-  const handleRowSelectionChange = (selectedRows: Department[]) => {
-    if (onSelectedRowsChange) {
-      onSelectedRowsChange(selectedRows);
-    }
-  };
+  const handleRowSelectionChange = useCallback(
+    (rows: Department[]) => {
+      const newSelectedIds = rows.map((row) => row.id!);
+      // Only update if the selection has actually changed
+      const currentSelection = new Set(selectedRows);
+      const newSelection = new Set(newSelectedIds);
+
+      if (
+        newSelection.size !== currentSelection.size ||
+        !Array.from(newSelection).every((id) => currentSelection.has(id))
+      ) {
+        setSelectedRows(newSelectedIds);
+        if (onSelectedRowsChange) {
+          onSelectedRowsChange(rows);
+        }
+      }
+    },
+    [selectedRows, setSelectedRows, onSelectedRowsChange],
+  );
 
   const getLocationName = (locationId: string) => {
     const office = offices?.find((o) => o.id === locationId);
@@ -158,6 +174,9 @@ const DepartmentsTable = ({
     return <ErrorComponent errorMessage={error.message} />;
   }
 
+  // Create a selection state object for the table
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+
   return (
     <SheetTable
       columns={columns}
@@ -166,6 +185,12 @@ const DepartmentsTable = ({
       showHeader={true}
       enableRowSelection={true}
       onRowSelectionChange={handleRowSelectionChange}
+      tableOptions={{
+        state: {
+          rowSelection,
+        },
+        enableRowSelection: true,
+      }}
     />
   );
 };
