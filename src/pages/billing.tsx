@@ -148,7 +148,17 @@ export default function Billing() {
           <div>
             <h3 className="font-medium">{t("billing.need_custom_solution")}</h3>
             <p className="text-muted-foreground">{t("billing.contact_sales_description")}</p>
-            <Button variant="link" className="h-auto px-0">
+            <Button
+              variant="link"
+              className="h-auto px-0"
+              onClick={() => {
+                const subject = encodeURIComponent("Enterprise Plan Inquiry");
+                const body = encodeURIComponent(
+                  `Hello,\n\nI'm interested in learning more about enterprise solutions.`,
+                );
+                window.location.href = `mailto:tanad@sikka.io?subject=${subject}&body=${body}&from=${user.email}`;
+              }}
+            >
               {t("billing.contact_sales")}
             </Button>
           </div>
