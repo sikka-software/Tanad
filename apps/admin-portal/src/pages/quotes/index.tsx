@@ -1,18 +1,16 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-
-import { Trash2, X } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
 
 import QuoteCard from "@/components/app/quote/quote.card";
 import QuotesTable from "@/components/app/quote/quote.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Button } from "@/components/ui/button";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
 import { Quote } from "@/types/quote.type";
 
@@ -40,11 +38,7 @@ export default function QuotesPage() {
       )
     : [];
 
-  const selectedQuotes = selectedRows
-    .map((id) => quotes?.find((quote) => quote.id === id))
-    .filter((quote): quote is Quote => quote !== undefined);
-
-  const handleSelectedRowsChange = (rows: Quote[]) => {
+  const handleRowSelectionChange = (rows: Quote[]) => {
     const newSelectedIds = rows.map((row) => row.id!);
     if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
       setSelectedRows(newSelectedIds);
@@ -78,35 +72,12 @@ export default function QuotesPage() {
   return (
     <DataPageLayout>
       {selectedRows.length > 0 ? (
-        <div className="bg-background sticky top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-b px-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">
-              {selectedRows.length} {t("General.items_selected")}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearSelection}
-              className="flex items-center gap-2"
-              disabled={isDeleting}
-            >
-              <X className="h-4 w-4" />
-              {t("General.clear")}
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteSelected}
-              className="flex items-center gap-2"
-              disabled={isDeleting}
-            >
-              <Trash2 className="h-4 w-4" />
-              {t("General.delete")}
-            </Button>
-          </div>
-        </div>
+        <SelectionMode
+          selectedRows={selectedRows}
+          clearSelection={clearSelection}
+          isDeleting={isDeleting}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        />
       ) : (
         <PageSearchAndFilter
           title={t("Quotes.title")}
@@ -125,7 +96,7 @@ export default function QuotesPage() {
             data={filteredQuotes}
             isLoading={isLoading}
             error={error as Error | null}
-            onSelectedRowsChange={handleSelectedRowsChange}
+            onSelectedRowsChange={handleRowSelectionChange}
           />
         ) : (
           <div className="p-4">

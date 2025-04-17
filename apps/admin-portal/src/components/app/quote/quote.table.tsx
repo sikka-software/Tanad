@@ -1,10 +1,7 @@
-import React from "react";
-
-import { useTranslations } from "next-intl";
-
 import { type CellContext } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { toast } from "sonner";
+import { useTranslations } from "next-intl";
+import React from "react";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -29,48 +26,11 @@ interface QuotesTableProps {
 }
 
 const QuotesTable = ({ data, isLoading, error, onSelectedRowsChange }: QuotesTableProps) => {
-  const { updateQuote, setSelectedRows, selectedRows } = useQuotesStore();
-  const bulkDeleteQuotes = useBulkDeleteQuotes();
   const t = useTranslations();
+  const { updateQuote, setSelectedRows, selectedRows } = useQuotesStore();
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    // Don't allow editing of computed or relation fields
-    if (columnId === "client_id") return;
-
-    await updateQuote(rowId, { [columnId]: value });
-  };
-
-  const handleSelectedRowsChange = (rows: Quote[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    // Only update if the selection has actually changed
-    const currentSelection = new Set(selectedRows);
-    const newSelection = new Set(newSelectedIds);
-
-    if (
-      newSelection.size !== currentSelection.size ||
-      !Array.from(newSelection).every((id) => currentSelection.has(id))
-    ) {
-      setSelectedRows(newSelectedIds);
-      if (onSelectedRowsChange) {
-        onSelectedRowsChange(rows);
-      }
-    }
-  };
-
-  const handleBulkDelete = async () => {
-    if (selectedRows.length === 0) {
-      toast.error(t("Quotes.error.no_selection"));
-      return;
-    }
-
-    try {
-      await bulkDeleteQuotes.mutateAsync(selectedRows);
-      toast.success(t("Quotes.success.bulk_delete"));
-      setSelectedRows([]);
-    } catch (error) {
-      toast.error(t("Quotes.error.bulk_delete"));
-    }
-  };
+  // Create a selection state object for the table
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Quote>[] = [
     {
@@ -125,6 +85,28 @@ const QuotesTable = ({ data, isLoading, error, onSelectedRowsChange }: QuotesTab
     },
   ];
 
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "client_id") return;
+    await updateQuote(rowId, { [columnId]: value });
+  };
+
+  const handleRowSelectionChange = (rows: Quote[]) => {
+    const newSelectedIds = rows.map((row) => row.id!);
+    // Only update if the selection has actually changed
+    const currentSelection = new Set(selectedRows);
+    const newSelection = new Set(newSelectedIds);
+
+    if (
+      newSelection.size !== currentSelection.size ||
+      !Array.from(newSelection).every((id) => currentSelection.has(id))
+    ) {
+      setSelectedRows(newSelectedIds);
+      if (onSelectedRowsChange) {
+        onSelectedRowsChange(rows);
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
@@ -135,8 +117,19 @@ const QuotesTable = ({ data, isLoading, error, onSelectedRowsChange }: QuotesTab
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  // Create a selection state object for the table
-  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+  const quoteTableOptions = {
+    state: {
+      rowSelection,
+    },
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
+    getRowId: (row: Quote) => row.id!,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
+  };
 
   return (
     <SheetTable
@@ -145,20 +138,8 @@ const QuotesTable = ({ data, isLoading, error, onSelectedRowsChange }: QuotesTab
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
-      onRowSelectionChange={handleSelectedRowsChange}
-      tableOptions={{
-        state: {
-          rowSelection,
-        },
-        enableRowSelection: true,
-        enableMultiRowSelection: true,
-        getRowId: (row) => row.id!,
-        onRowSelectionChange: (updater) => {
-          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-          const selectedRows = data.filter((row) => newSelection[row.id!]);
-          handleSelectedRowsChange(selectedRows);
-        },
-      }}
+      onRowSelectionChange={handleRowSelectionChange}
+      tableOptions={quoteTableOptions}
     />
   );
 };

@@ -5,8 +5,6 @@ module.exports = {
   printWidth: 100,
   importOrderSeparation: true,
   importOrder: [
-    "^react(?!-dom$)",
-    "^next(?!-dom$)",
     "<THIRD_PARTY_MODULES>",
     "^@sikka/(.*)$",
     "^@root/(.*)$",

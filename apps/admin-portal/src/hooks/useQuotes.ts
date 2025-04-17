@@ -7,16 +7,8 @@ import {
   fetchQuotes,
   updateQuote,
 } from "@/services/quoteService";
-import type { Quote } from "@/types/quote.type";
 
-// Query keys for quotes
-export const quoteKeys = {
-  all: ["quotes"] as const,
-  lists: () => [...quoteKeys.all, "list"] as const,
-  list: (filters: any) => [...quoteKeys.lists(), { filters }] as const,
-  details: () => [...quoteKeys.all, "detail"] as const,
-  detail: (id: string) => [...quoteKeys.details(), id] as const,
-};
+import { Quote, QuoteCreateData } from "@/types/quote.type";
 
 // Hook to fetch all quotes
 export function useQuotes() {
@@ -29,7 +21,7 @@ export function useQuotes() {
 // Hook to fetch a single quote by ID
 export function useQuote(id: string) {
   return useQuery({
-    queryKey: quoteKeys.detail(id),
+    queryKey: ["quotes", id],
     queryFn: () => fetchQuoteById(id),
     enabled: !!id, // Only run query if id is truthy
   });
@@ -40,12 +32,9 @@ export function useCreateQuote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newQuote: Omit<Quote, "id" | "created_at">) => {
-      return createQuote(newQuote);
-    },
+    mutationFn: (newQuote: Omit<Quote, "id" | "created_at">) => createQuote(newQuote),
     onSuccess: () => {
-      // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ["quotes"] });
     },
   });
 }
@@ -55,11 +44,10 @@ export function useUpdateQuote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Quote> }) => {
-      return updateQuote(id, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
+    mutationFn: ({ id, data }: { id: string; data: Partial<Quote> }) => updateQuote(id, data),
+    onSuccess: (data) => {
+      // queryClient.invalidateQueries({ queryKey: ["quotes", data.id] });
+      queryClient.invalidateQueries({ queryKey: ["quotes"] });
     },
   });
 }
@@ -70,8 +58,9 @@ export function useDeleteQuote() {
 
   return useMutation({
     mutationFn: deleteQuote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["quotes"] });
+      // queryClient.removeQueries({ queryKey: ["quotes", variables] });
     },
   });
 }

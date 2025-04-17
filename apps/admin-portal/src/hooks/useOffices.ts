@@ -7,6 +7,7 @@ import {
   fetchOffices,
   updateOffice,
 } from "@/services/officeService";
+
 import { Office, OfficeCreateData } from "@/types/office.type";
 
 // Hooks
@@ -59,10 +60,34 @@ export function useDeleteOffice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteOffice(id),
+    mutationFn: deleteOffice,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["offices"] });
       queryClient.removeQueries({ queryKey: ["offices", variables] });
+    },
+  });
+}
+
+export function useBulkDeleteOffices() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      const response = await fetch("/api/offices/bulk-delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete offices");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["offices"] });
     },
   });
 }

@@ -1,20 +1,25 @@
 import { create } from "zustand";
 
 import { supabase } from "@/lib/supabase";
+
 import { Office } from "@/types/office.type";
 
 interface OfficesStore {
   offices: Office[];
   isLoading: boolean;
   error: string | null;
+  selectedRows: string[];
   fetchOffices: () => Promise<void>;
   updateOffice: (id: string, updates: Partial<Office>) => Promise<void>;
+  setSelectedRows: (ids: string[]) => void;
+  clearSelection: () => void;
 }
 
 export const useOfficesStore = create<OfficesStore>((set) => ({
   offices: [],
   isLoading: false,
   error: null,
+  selectedRows: [],
 
   fetchOffices: async () => {
     set({ isLoading: true, error: null });
@@ -41,5 +46,19 @@ export const useOfficesStore = create<OfficesStore>((set) => ({
     } catch (error) {
       set({ error: (error as Error).message });
     }
+  },
+
+  setSelectedRows: (ids: string[]) => {
+    set((state) => {
+      // Only update if the selection has actually changed
+      if (JSON.stringify(state.selectedRows) === JSON.stringify(ids)) {
+        return state;
+      }
+      return { ...state, selectedRows: ids };
+    });
+  },
+
+  clearSelection: () => {
+    set({ selectedRows: [] });
   },
 }));
