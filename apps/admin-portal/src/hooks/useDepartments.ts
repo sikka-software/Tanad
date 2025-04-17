@@ -91,7 +91,8 @@ export const useDeleteDepartments = () => {
         throw new Error(error.error || "Failed to delete departments");
       }
 
-      return response.json();
+      const result = await response.json();
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["departments"] });

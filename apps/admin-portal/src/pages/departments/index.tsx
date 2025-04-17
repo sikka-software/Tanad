@@ -61,16 +61,15 @@ export default function DepartmentsPage() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    deleteDepartments(selectedRows, {
-      onSuccess: () => {
-        clearSelection();
-        setIsDeleteDialogOpen(false);
-      },
-      onError: () => {
-        setIsDeleteDialogOpen(false);
-      },
-    });
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteDepartments(selectedRows);
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    } catch (error) {
+      console.error("Failed to delete departments:", error);
+      setIsDeleteDialogOpen(false);
+    }
   };
 
   const renderDepartment = (department: Department) => (
