@@ -18,7 +18,7 @@ import { useJobListings, useBulkDeleteJobListings } from "@/hooks/useJobListings
 import useJobListingsStore from "@/stores/job-listings.store";
 
 export default function JobListingsPage() {
-  const t = useTranslations("Jobs");
+  const t = useTranslations();
   const router = useRouter();
   const user = useUserStore((state) => state.user);
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,10 +45,10 @@ export default function JobListingsPage() {
     try {
       await deleteJobListings(selectedRows);
       clearSelection();
-      toast.success(t("messages.items_deleted"));
+      toast.success(t("JobListings.messages.items_deleted"));
     } catch (err: unknown) {
       console.error("Error deleting job listings:", err);
-      toast.error(t("messages.delete_error"), {
+      toast.error(t("JobListings.messages.delete_error"), {
         description: String(err),
       });
     } finally {
@@ -67,11 +67,11 @@ export default function JobListingsPage() {
         />
       ) : (
         <PageSearchAndFilter
-          title={t("title")}
+          title={t("JobListings.title")}
           createHref="/jobs/listings/add"
-          createLabel={t("create_listing")}
+          createLabel={t("JobListings.create_listing")}
           onSearch={setSearchQuery}
-          searchPlaceholder={t("search_listings")}
+          searchPlaceholder={t("JobListings.search_listings")}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
@@ -91,7 +91,7 @@ export default function JobListingsPage() {
               data={filteredListings}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("no_listings_found")}
+              emptyMessage={t("JobListings.no_listings_found")}
               renderItem={(listing: JobListing) => (
                 <JobListingCard key={listing.id} jobListing={listing} />
               )}
@@ -106,8 +106,8 @@ export default function JobListingsPage() {
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
         isDeleting={isDeleting}
         handleConfirmDelete={handleConfirmDelete}
-        title={t("confirm_delete")}
-        description={t("delete_description", { count: selectedRows.length })}
+        title={t("JobListings.confirm_delete")}
+        description={t("JobListings.delete_description", { count: selectedRows.length })}
       />
     </DataPageLayout>
   );

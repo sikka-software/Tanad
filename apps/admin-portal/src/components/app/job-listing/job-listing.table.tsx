@@ -1,10 +1,11 @@
 import { useTranslations } from "next-intl";
 
+import ErrorComponent from "@/components/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
 import TableSkeleton from "@/components/ui/table-skeleton";
-import ErrorComponent from "@/components/ui/error-component";
 
 import { JobListing } from "@/types/job-listing.type";
+
 import useJobListingsStore from "@/stores/job-listings.store";
 
 interface JobListingsTableProps {
@@ -20,7 +21,7 @@ export default function JobListingsTable({
   error,
   onSelectedRowsChange,
 }: JobListingsTableProps) {
-  const t = useTranslations("Jobs");
+  const t = useTranslations();
   const selectedRows = useJobListingsStore((state) => state.selectedRows);
 
   const rowSelection = selectedRows.reduce(
@@ -34,20 +35,23 @@ export default function JobListingsTable({
   const columns: ExtendedColumnDef<JobListing>[] = [
     {
       accessorKey: "title",
-      header: t("form.title.label"),
+      header: t("JobListings.form.title.label"),
     },
     {
       accessorKey: "description",
-      header: t("form.description.label"),
+      header: t("JobListings.form.description.label"),
     },
     {
       accessorKey: "is_active",
-      header: t("form.status.label"),
-      cell: ({ row }) => (row.getValue("is_active") ? t("status.active") : t("status.inactive")),
+      header: t("JobListings.form.status.label"),
+      cell: ({ row }) =>
+        row.getValue("is_active")
+          ? t("JobListings.status.active")
+          : t("JobListings.status.inactive"),
     },
     {
       accessorKey: "created_at",
-      header: t("form.created_at.label"),
+      header: t("JobListings.form.created_at.label"),
       cell: ({ row }) => {
         const date = new Date(row.getValue("created_at"));
         return date.toLocaleDateString();

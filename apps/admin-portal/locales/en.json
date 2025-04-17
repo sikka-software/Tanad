@@ -1892,7 +1892,48 @@
     }
   },
   "JobListings": {
-    "title": "Job Listings"
+    "title": "Job Listings",
+    "create_listing": "Create Listing",
+    "add_new_listing": "Add New Listing",
+    "search_listings": "Search listings...",
+    "listing_details": "Listing Details",
+    "messages": {
+      "auth_required": "You must be logged in to create a job listing",
+      "listing_created": "Job listing created successfully",
+      "error": "An error occurred while creating the job listing",
+      "items_deleted": "Job listings deleted successfully",
+      "delete_error": "An error occurred while deleting job listings"
+    },
+    "status": {
+      "title": "Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "form": {
+      "title": {
+        "label": "Listing Title",
+        "placeholder": "Enter listing title"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter listing description"
+      },
+      "jobs": {
+        "label": "Jobs",
+        "placeholder": "Select jobs"
+      },
+      "is_active": {
+        "label": "Is this listing active?",
+        "placeholder": "Enter whether the listing is active or not"
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Select status"
+      },
+      "created_at": {
+        "label": "Created Date"
+      }
+    }
   },
   "Expenses": {
     "title": "Expenses"

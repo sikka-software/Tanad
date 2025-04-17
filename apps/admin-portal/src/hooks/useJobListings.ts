@@ -1,14 +1,32 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { fetchJobListings, bulkDeleteJobListings } from "@/services/jobListingService";
+import {
+  fetchJobListings,
+  bulkDeleteJobListings,
+  createJobListing,
+} from "@/services/jobListingService";
 
 import { JobListing } from "@/types/job-listing.type";
 
 export function useJobListings() {
-  return useQuery<JobListing[]>({
+  const queryClient = useQueryClient();
+
+  const query = useQuery<JobListing[]>({
     queryKey: ["jobListings"],
     queryFn: fetchJobListings,
   });
+
+  const createMutation = useMutation({
+    mutationFn: (data: Pick<JobListing, 'title' | 'user_id'> & { description?: string | undefined; jobs?: string[] }) => createJobListing(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["jobListings"] });
+    },
+  });
+
+  return {
+    ...query,
+    createJobListing: createMutation,
+  };
 }
 
 export function useBulkDeleteJobListings() {

@@ -1,8 +1,6 @@
-import { useState } from "react";
-
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
+import { useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -24,7 +22,7 @@ export default function AddJobListingPage() {
 
   const handleSubmit = async (data: JobListingFormValues) => {
     if (!user?.id) {
-      toast.error(t("Jobs.messages.auth_required"));
+      toast.error(t("JobListings.messages.auth_required"));
       return;
     }
 
@@ -36,13 +34,13 @@ export default function AddJobListingPage() {
       });
 
       toast.success(t("General.successful_operation"), {
-        description: t("Jobs.messages.listing_created"),
+        description: t("JobListings.messages.listing_created"),
       });
       router.push("/jobs/listings");
     } catch (error: any) {
       console.error("Error creating job listing:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Jobs.messages.error"),
+        description: error instanceof Error ? error.message : t("JobListings.messages.error"),
       });
     } finally {
       setLoading(false);
@@ -52,13 +50,13 @@ export default function AddJobListingPage() {
   return (
     <div>
       <PageTitle
-        title={t("Jobs.add_new_listing")}
+        title={t("JobListings.add_new_listing")}
         formButtons
         formId="job-listing-form"
         loading={loading}
         onCancel={() => router.push("/jobs/listings")}
         texts={{
-          submit_form: t("Jobs.add_new_listing"),
+          submit_form: t("JobListings.add_new_listing"),
           cancel: t("General.cancel"),
         }}
       />
@@ -66,7 +64,7 @@ export default function AddJobListingPage() {
       <div className="p-4">
         <Card>
           <CardHeader>
-            <CardTitle>{t("Jobs.listing_details")}</CardTitle>
+            <CardTitle>{t("JobListings.listing_details")}</CardTitle>
           </CardHeader>
           <CardContent>
             <JobListingForm id="job-listing-form" onSubmit={handleSubmit} loading={loading} />

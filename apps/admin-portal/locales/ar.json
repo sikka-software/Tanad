@@ -2281,7 +2281,48 @@
     }
   },
   "JobListings": {
-    "title": "صفحات التوظيف"
+    "title": "صفحات التوظيف",
+    "create_listing": "إنشاء صفحة توظيف",
+    "add_new_listing": "إضافة صفحة توظيف جديدة",
+    "search_listings": "البحث في صفحات التوظيف...",
+    "listing_details": "تفاصيل صفحة التوظيف",
+    "messages": {
+      "auth_required": "يجب تسجيل الدخول لإنشاء إعلان وظيفي",
+      "listing_created": "تم إنشاء إعلان الوظيفة بنجاح",
+      "error": "حدث خطأ أثناء إنشاء إعلان الوظيفة",
+      "items_deleted": "تم حذف إعلانات الوظائف بنجاح",
+      "delete_error": "حدث خطأ أثناء حذف إعلانات الوظائف"
+    },
+    "status": {
+      "title": "الحالة",
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "form": {
+      "title": {
+        "label": "عنوان الإعلان",
+        "placeholder": "أدخل عنوان الإعلان"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل وصف الإعلان"
+      },
+      "jobs": {
+        "label": "الوظائف",
+        "placeholder": "اختر الوظائف"
+      },
+      "is_active": {
+        "label": "هل هذا الإعلان نشط؟",
+        "placeholder": "أدخل إذا كان الإعلان نشطًا أم لا"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة"
+      },
+      "created_at": {
+        "label": "تاريخ الإنشاء"
+      }
+    }
   },
   "Expenses": {
     "title": "المصروفات"

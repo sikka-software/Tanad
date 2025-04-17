@@ -1,4 +1,5 @@
 import { JobListing } from "@/types/job-listing.type";
+
 import useUserStore from "@/hooks/use-user-store";
 
 export async function fetchJobListings(): Promise<JobListing[]> {
@@ -47,6 +48,36 @@ export async function bulkDeleteJobListings(ids: string[]): Promise<void> {
     }
   } catch (error) {
     console.error("Error deleting job listings:", error);
+    throw error;
+  }
+}
+
+export async function createJobListing(data: Pick<JobListing, 'title' | 'user_id'> & { description?: string | undefined; jobs?: string[] }): Promise<JobListing> {
+  try {
+    const user = useUserStore.getState().user;
+    if (!user?.id) {
+      throw new Error("User ID is required");
+    }
+
+    const response = await fetch("/api/jobs/listings/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-user-id": user.id,
+      },
+      body: JSON.stringify({
+        ...data,
+        description: data.description ?? null
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to create job listing");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error creating job listing:", error);
     throw error;
   }
 }

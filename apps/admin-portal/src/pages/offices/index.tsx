@@ -24,7 +24,6 @@ export default function OfficesPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { data: offices, isLoading, error } = useOffices();
 
-  // Get selection state and actions from the store
   const { selectedRows, setSelectedRows, clearSelection } = useOfficesStore();
   const { mutate: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
 
@@ -39,11 +38,6 @@ export default function OfficesPage() {
     if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
       setSelectedRows(newSelectedIds);
     }
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedRows.length === 0) return;
-    setIsDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = async () => {
