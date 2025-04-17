@@ -32,7 +32,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const { setUser: setUserStore } = useUserStore((state) => state);
+  const {
+    user: storeUser,
+    setUser: setUserStore,
+    fetchUserAndProfile,
+  } = useUserStore((state) => state);
+
+  // Sync context with store
+  useEffect(() => {
+    if (storeUser) {
+      setUser(storeUser as UserType);
+    } else {
+      setUser(null);
+    }
+    setLoading(false);
+  }, [storeUser]);
 
   const refreshUser = async () => {
     try {
@@ -44,7 +58,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
       if (session) {
         // Get user profile data
-
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("*")
@@ -54,7 +67,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (profileError) throw profileError;
 
         // Combine auth and profile data
-        setUserStore({
+        const updatedUser = {
           ...session.user,
           stripe_customer_id: profile?.stripe_customer_id,
           full_name: profile?.full_name,
@@ -66,7 +79,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           phone: profile?.phone,
           email: profile?.email,
           avatar_url: profile?.avatar_url,
-        });
+        };
+
+        setUserStore(updatedUser);
+        setUser(updatedUser as UserType);
       } else {
         setUser(null);
       }
@@ -76,31 +92,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        // Get user profile data
-        supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single()
-          .then(({ data: profile }) => {
-            // Combine auth and profile data
-            setUserStore({
-              ...session.user,
-              stripe_customer_id: profile?.stripe_customer_id,
-              full_name: profile?.full_name,
-              subscribed_to: profile?.subscribed_to,
-              price_id: profile?.price_id,
-              profile: profile?.profile,
-              user_settings: profile?.user_settings,
-              address: profile?.address,
-              phone: profile?.phone,
-              email: profile?.email,
-              avatar_url: profile?.avatar_url,
-            });
-          });
-      }
+    // Initialize user data
+    fetchUserAndProfile().then(() => {
       setLoading(false);
     });
 
@@ -108,34 +101,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        // Get user profile data
-        supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single()
-          .then(({ data: profile }) => {
-            // Get links count
-
-            // Combine auth and profile data
-            setUserStore({
-              ...session.user,
-              stripe_customer_id: profile?.stripe_customer_id,
-              full_name: profile?.full_name,
-              subscribed_to: profile?.subscribed_to,
-              price_id: profile?.price_id,
-              profile: profile?.profile,
-              user_settings: profile?.user_settings,
-              address: profile?.address,
-              phone: profile?.phone,
-              email: profile?.email,
-              avatar_url: profile?.avatar_url,
-            });
-          });
+        refreshUser();
       } else {
         setUser(null);
       }
-      setLoading(false);
     });
 
     return () => {

@@ -29,7 +29,6 @@ const useUserStore = create<{
         data: { session },
       } = await supabase.auth.getSession();
       const user = session?.user || null;
-      set({ user: user as any });
 
       // Fetch the profile info if user exists
       if (user) {
@@ -40,9 +39,26 @@ const useUserStore = create<{
           .single();
 
         if (error) console.error("Error fetching profile:", error);
-        set({ profile });
+
+        // Set both the profile object and the user with profile data merged
+        set({
+          profile,
+          user: {
+            ...user,
+            stripe_customer_id: profile?.stripe_customer_id,
+            full_name: profile?.full_name,
+            subscribed_to: profile?.subscribed_to,
+            price_id: profile?.price_id,
+            profile: profile?.profile,
+            user_settings: profile?.user_settings,
+            address: profile?.address,
+            phone: profile?.phone,
+            email: profile?.email,
+            avatar_url: profile?.avatar_url,
+          } as PuklaUser,
+        });
       } else {
-        set({ profile: null });
+        set({ user: null, profile: null });
       }
     } finally {
       set({ loading: false, initialized: true });
