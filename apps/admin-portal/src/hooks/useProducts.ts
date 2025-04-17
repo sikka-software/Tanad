@@ -101,7 +101,7 @@ export function useBulkDeleteProducts() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to delete products");
+        throw error;
       }
 
       return response.json();

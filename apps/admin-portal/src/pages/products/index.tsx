@@ -52,24 +52,22 @@ export default function ProductsPage() {
       },
       onError: (error: any) => {
         console.log("error is ", error);
-        if (error?.response?.data?.error === "cant_delete_products_referenced") {
-          const referencedIds = error.response.data.details.referencedProductIds;
+        if (error?.error === "cant_delete_products_referenced") {
+          const referencedIds = error.details.referencedProductIds;
           const referencedProducts =
             products
               ?.filter((p) => referencedIds.includes(p.id))
               .map((p) => p.name)
               .join(", ") || "";
 
-          toast.error(error.error, {
-            description:
-              error.details?.message ||
-              t("Products.error.delete_referenced_description", {
-                products: referencedProducts || t("General.unknown"),
-              }),
+          toast.error(t("Products.error.delete_referenced"), {
+            description: t("Products.error.delete_referenced_description", {
+              products: referencedProducts || t("General.unknown"),
+            }),
           });
         } else {
-          toast.error(error.error, {
-            description: error.error || error.message || t("Products.error.delete"),
+          toast.error(t("Products.error.delete"), {
+            description: t(`Products.error.${error.message}`),
           });
         }
         setIsDeleteDialogOpen(false);
