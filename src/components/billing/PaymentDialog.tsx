@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
@@ -106,6 +107,85 @@ function PaymentError({
             </Button>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// New component for displaying saved payment methods
+function SavedPaymentMethods({
+  paymentMethods,
+  selectedPaymentMethod,
+  setSelectedPaymentMethod,
+  loading,
+  locale,
+}: {
+  paymentMethods: any[];
+  selectedPaymentMethod: string | null;
+  setSelectedPaymentMethod: (id: string | null) => void;
+  loading: boolean;
+  locale: string;
+}) {
+  const t = useTranslations();
+  const isRtl = locale === "ar";
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!paymentMethods.length) {
+    return (
+      <div className="text-muted-foreground py-2 text-sm">
+        {t("billing.payment.no_saved_cards", { fallback: "No saved payment methods found." })}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4" dir={isRtl ? "rtl" : "ltr"}>
+      <div className="text-sm font-medium">
+        {t("billing.payment.saved_cards", { fallback: "Saved Cards" })}
+      </div>
+      <RadioGroup
+        value={selectedPaymentMethod || ""}
+        onValueChange={(value: string) => setSelectedPaymentMethod(value === "" ? null : value)}
+        className="space-y-2"
+      >
+        {paymentMethods.map((method) => (
+          <div
+            key={method.id}
+            className="hover:bg-accent flex items-center space-x-2 rounded-md border p-3"
+            dir={isRtl ? "rtl" : "ltr"}
+          >
+            <RadioGroupItem value={method.id} id={method.id} className={isRtl ? "ml-2" : "mr-2"} />
+            <div className="flex flex-1 items-center justify-between">
+              <div className="flex flex-col">
+                <span className="font-medium">
+                  {method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1)}
+                </span>
+                <span className="text-muted-foreground text-sm">
+                  •••• •••• •••• {method.card.last4} |{" "}
+                  {t("billing.payment.expires", { fallback: "Expires" })} {method.card.exp_month}/
+                  {method.card.exp_year}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </RadioGroup>
+      <div className="flex justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setSelectedPaymentMethod(null)}
+          className="text-muted-foreground"
+        >
+          {t("billing.payment.use_new_card", { fallback: "Use a new card instead" })}
+        </Button>
       </div>
     </div>
   );
@@ -412,8 +492,54 @@ function PaymentFormContent({
   const [saveCard, setSaveCard] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "wallet">("card");
   const { user } = useUserStore();
+  const [savedPaymentMethods, setSavedPaymentMethods] = useState<any[]>([]);
+  const [loadingSavedMethods, setLoadingSavedMethods] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [showNewCardForm, setShowNewCardForm] = useState(false);
 
   const isRtl = locale === "ar";
+
+  // Fetch saved payment methods when component mounts
+  useEffect(() => {
+    const fetchSavedPaymentMethods = async () => {
+      if (!user?.stripe_customer_id) return;
+
+      setLoadingSavedMethods(true);
+      try {
+        const response = await fetch("/api/stripe/get-payment-methods", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customerId: user.stripe_customer_id,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch payment methods");
+        }
+
+        const data = await response.json();
+        setSavedPaymentMethods(data.paymentMethods || []);
+
+        // If there are saved methods, select the first one by default
+        if (data.paymentMethods && data.paymentMethods.length > 0) {
+          setSelectedPaymentMethod(data.paymentMethods[0].id);
+          setShowNewCardForm(false);
+        } else {
+          setShowNewCardForm(true);
+        }
+      } catch (error) {
+        console.error("Error fetching payment methods:", error);
+        setShowNewCardForm(true);
+      } finally {
+        setLoadingSavedMethods(false);
+      }
+    };
+
+    fetchSavedPaymentMethods();
+  }, [user?.stripe_customer_id]);
 
   // Format price for Arabic display
   const formatPriceForDisplay = (price: string): string => {
@@ -488,7 +614,7 @@ function PaymentFormContent({
     e.preventDefault();
     e.stopPropagation();
 
-    if (!stripe || !elements || !priceId) {
+    if (!stripe || !priceId) {
       return;
     }
 
@@ -502,11 +628,68 @@ function PaymentFormContent({
     setError(null);
 
     try {
+      // If we have a selected saved payment method, use it
+      if (selectedPaymentMethod && paymentMethod === "card") {
+        console.log("Using saved payment method:", selectedPaymentMethod);
+
+        // Create subscription with the selected payment method
+        const response = await fetch("/api/stripe/create-subscription", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            priceId,
+            paymentMethodId: selectedPaymentMethod,
+            customerId: user?.stripe_customer_id,
+            userId: user?.id,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || errorData.error || "Subscription creation failed");
+        }
+
+        const data = await response.json();
+        console.log("Subscription created successfully with saved card:", data);
+
+        // Dispatch events and call success handler
+        window.dispatchEvent(new CustomEvent("subscription_updated"));
+
+        // Also dispatch as named constant from CurrentPlan if available
+        if (typeof window !== "undefined") {
+          try {
+            import("@/components/billing/CurrentPlan")
+              .then((module) => {
+                if (module.SUBSCRIPTION_UPDATED_EVENT) {
+                  window.dispatchEvent(new CustomEvent(module.SUBSCRIPTION_UPDATED_EVENT));
+                }
+              })
+              .catch((err) => console.warn("Could not import from CurrentPlan:", err));
+          } catch (err) {
+            console.warn("Error dispatching additional event:", err);
+          }
+        }
+
+        setIsProcessing(false);
+        onSuccess();
+        return;
+      }
+
+      // If using a new card, proceed with the original flow
+      if (!elements) {
+        throw new Error("Stripe Elements not available");
+      }
+
       // Submit payment details without confirming payment
       const { error: submitError } = await elements.submit();
       if (submitError) {
         throw new Error(submitError.message);
       }
+
+      // Continue with the existing payment flow for new cards
+      // ... rest of the existing payment processing code remains the same ...
 
       // Then confirm the setup
       const { setupIntent, error } = await stripe.confirmSetup({
@@ -565,13 +748,13 @@ function PaymentFormContent({
           }),
         });
 
+        let data;
         if (!response.ok) {
           const errorData = await response.json();
-          console.error("Subscription creation failed:", errorData);
           throw new Error(errorData.message || errorData.error || "Subscription creation failed");
         }
 
-        const data = await response.json();
+        data = await response.json();
         console.log("Subscription created successfully:", data);
 
         // Handle additional payment confirmation if needed
@@ -700,37 +883,69 @@ function PaymentFormContent({
           </TabsList>
 
           <TabsContent value="card" className="pt-4">
-            <div className="rounded-lg border p-4" dir={isRtl ? "rtl" : "ltr"}>
-              <PaymentElement
-                options={{
-                  layout: {
-                    type: "tabs",
-                    defaultCollapsed: false,
-                  },
-                  defaultValues: {
-                    billingDetails: {
-                      address: {
-                        country: "SA",
+            {/* Display saved payment methods if available */}
+            {savedPaymentMethods.length > 0 && !showNewCardForm && (
+              <div className="mb-6 rounded-lg border p-4">
+                <SavedPaymentMethods
+                  paymentMethods={savedPaymentMethods}
+                  selectedPaymentMethod={selectedPaymentMethod}
+                  setSelectedPaymentMethod={setSelectedPaymentMethod}
+                  loading={loadingSavedMethods}
+                  locale={locale}
+                />
+              </div>
+            )}
+
+            {/* Show the new card form if there are no saved methods or user chose to use a new card */}
+            {(showNewCardForm || savedPaymentMethods.length === 0) && (
+              <>
+                <div className="rounded-lg border p-4" dir={isRtl ? "rtl" : "ltr"}>
+                  <PaymentElement
+                    options={{
+                      layout: {
+                        type: "tabs",
+                        defaultCollapsed: false,
                       },
-                    },
-                  },
-                }}
-              />
-            </div>
-            <div className="flex flex-col space-y-6" dir={isRtl ? "rtl" : "ltr"}>
-              <Checkbox
-                id="save-card"
-                checked={saveCard}
-                onCheckedChange={(checked) => setSaveCard(checked as boolean)}
-              />
-              <label
-                htmlFor="save-card"
-                className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                dir={isRtl ? "rtl" : "ltr"}
-              >
-                {t("billing.payment.save_card", { fallback: "Save card for future payments" })}
-              </label>
-            </div>
+                      defaultValues: {
+                        billingDetails: {
+                          address: {
+                            country: "SA",
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+                <div className="flex items-center space-x-2" dir={isRtl ? "rtl" : "ltr"}>
+                  <Checkbox
+                    id="save-card"
+                    checked={saveCard}
+                    onCheckedChange={(checked) => setSaveCard(checked as boolean)}
+                  />
+                  <label
+                    htmlFor="save-card"
+                    className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {t("billing.payment.save_card", { fallback: "Save card for future payments" })}
+                  </label>
+                </div>
+                {savedPaymentMethods.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowNewCardForm(false);
+                      if (savedPaymentMethods.length > 0 && !selectedPaymentMethod) {
+                        setSelectedPaymentMethod(savedPaymentMethods[0].id);
+                      }
+                    }}
+                    className="text-muted-foreground mt-2"
+                  >
+                    {t("billing.payment.use_saved_card", { fallback: "Use a saved card instead" })}
+                  </Button>
+                )}
+              </>
+            )}
           </TabsContent>
 
           <TabsContent value="wallet" className="space-y-4 pt-4" dir={isRtl ? "rtl" : "ltr"}>

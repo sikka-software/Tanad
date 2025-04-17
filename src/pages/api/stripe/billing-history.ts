@@ -53,9 +53,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       customer: customerIdToUse,
       limit: Number(limit),
       expand: ["data.subscription", "data.lines.data.price.product", "data.payment_intent"],
+      status: includeDrafts ? undefined : "paid", // Only fetch paid invoices by default, or all if includeDrafts is true
     });
 
     console.log(`Found ${invoices.data.length} invoices for customer ${customerIdToUse}`);
+
+    // If we didn't find any paid invoices, also try to get any other non-draft invoices
+    if (invoices.data.length === 0 && !includeDrafts) {
+      const pendingInvoices = await stripe.invoices.list({
+        customer: customerIdToUse,
+        limit: Number(limit),
+        expand: ["data.subscription", "data.lines.data.price.product", "data.payment_intent"],
+        status: "open", // Try to find open invoices too
+      });
+
+      console.log(
+        `Found ${pendingInvoices.data.length} open invoices for customer ${customerIdToUse}`,
+      );
+
+      // Combine the arrays
+      invoices.data = [...invoices.data, ...pendingInvoices.data];
+    }
 
     // Filter out draft invoices if needed and sort by creation date (newest first)
     const filteredInvoices = invoices.data
