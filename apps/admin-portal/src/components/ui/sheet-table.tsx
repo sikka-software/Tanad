@@ -403,14 +403,13 @@ function SheetTable<
     getExpandedRowModel: getExpandedRowModel(),
     enableExpanding: true,
     // Add row selection
-    enableRowSelection,
-    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
     // External expanded state
     state: {
       // If user also provided tableOptions.state, merge them
       ...(tableOptions.state ?? {}),
       expanded,
-      rowSelection,
       ...(enableColumnSizing
         ? {
             columnSizing,
@@ -442,7 +441,7 @@ function SheetTable<
       const selectedRows = table.getSelectedRowModel().flatRows.map((row) => row.original);
       onRowSelectionChange(selectedRows);
     }
-  }, [rowSelection, table, onRowSelectionChange]);
+  }, [table.getState().rowSelection, onRowSelectionChange, table]);
 
   /**
    * Find a TanStack row by matching rowData.id.
@@ -659,7 +658,7 @@ function SheetTable<
           className={cn(
             "border-none", // it's will remove border for icons cells
             disabled ? "bg-muted" : "",
-            enableRowSelection && row.getIsSelected() ? "bg-muted/50" : "",
+            row.getIsSelected() ? "bg-muted/50" : "",
           )}
           // On mouse enter/leave, set hovered row
           onMouseEnter={() => setHoveredRowId(rowId)}
@@ -1012,8 +1011,8 @@ function SheetTable<
                   <div className="flex h-full items-center justify-center">
                     <input
                       type="checkbox"
-                      checked={table.getIsAllRowsSelected()}
-                      onChange={table.getToggleAllRowsSelectedHandler()}
+                      checked={table.getIsAllPageRowsSelected()}
+                      onChange={table.getToggleAllPageRowsSelectedHandler()}
                       className="h-4 w-4 rounded border-gray-300"
                       title={t("General.select_all")}
                     />

@@ -181,15 +181,22 @@ const DepartmentsTable = ({
     <SheetTable
       columns={columns}
       data={data}
-      onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      onEdit={handleEdit}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={{
         state: {
           rowSelection,
         },
         enableRowSelection: true,
+        enableMultiRowSelection: true,
+        getRowId: (row) => row.id!,
+        onRowSelectionChange: (updater) => {
+          const newSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
+          const selectedRows = data.filter(row => newSelection[row.id!]);
+          handleRowSelectionChange(selectedRows);
+        },
       }}
     />
   );
