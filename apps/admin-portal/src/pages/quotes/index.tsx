@@ -16,7 +16,7 @@ import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
 import { Quote } from "@/types/quote.type";
 
-import { useQuotes } from "@/hooks/useQuotes";
+import { useQuotes, useBulkDeleteQuotes } from "@/hooks/useQuotes";
 import { useQuotesStore } from "@/stores/quotes.store";
 
 export default function QuotesPage() {
@@ -27,7 +27,8 @@ export default function QuotesPage() {
   const { data: quotes, isLoading, error } = useQuotes();
 
   // Get selection state and actions from the store
-  const { selectedRows, clearSelection } = useQuotesStore();
+  const { selectedRows, setSelectedRows, clearSelection } = useQuotesStore();
+  const { mutate: deleteQuotes, isPending: isDeleting } = useBulkDeleteQuotes();
 
   const filteredQuotes = Array.isArray(quotes)
     ? quotes.filter(
@@ -42,6 +43,37 @@ export default function QuotesPage() {
   const selectedQuotes = selectedRows
     .map((id) => quotes?.find((quote) => quote.id === id))
     .filter((quote): quote is Quote => quote !== undefined);
+
+  const handleSelectedRowsChange = (rows: Quote[]) => {
+    const newSelectedIds = rows.map((row) => row.id!);
+    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+      setSelectedRows(newSelectedIds);
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedRows.length === 0) return;
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteQuotes(selectedRows, {
+        onSuccess: () => {
+          clearSelection();
+          setIsDeleteDialogOpen(false);
+        },
+        onError: (error: any) => {
+          console.error("Failed to delete quotes:", error);
+          toast.error(t("Quotes.error.bulk_delete"));
+          setIsDeleteDialogOpen(false);
+        },
+      });
+    } catch (error) {
+      console.error("Failed to delete quotes:", error);
+      setIsDeleteDialogOpen(false);
+    }
+  };
 
   return (
     <DataPageLayout>
@@ -58,6 +90,7 @@ export default function QuotesPage() {
               size="sm"
               onClick={clearSelection}
               className="flex items-center gap-2"
+              disabled={isDeleting}
             >
               <X className="h-4 w-4" />
               {t("General.clear")}
@@ -65,8 +98,9 @@ export default function QuotesPage() {
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => setIsDeleteDialogOpen(true)}
+              onClick={handleDeleteSelected}
               className="flex items-center gap-2"
+              disabled={isDeleting}
             >
               <Trash2 className="h-4 w-4" />
               {t("General.delete")}
@@ -87,7 +121,12 @@ export default function QuotesPage() {
 
       <div>
         {viewMode === "table" ? (
-          <QuotesTable data={filteredQuotes} isLoading={isLoading} error={error as Error | null} />
+          <QuotesTable
+            data={filteredQuotes}
+            isLoading={isLoading}
+            error={error as Error | null}
+            onSelectedRowsChange={handleSelectedRowsChange}
+          />
         ) : (
           <div className="p-4">
             <DataModelList
@@ -106,11 +145,8 @@ export default function QuotesPage() {
       <ConfirmDelete
         isDeleteDialogOpen={isDeleteDialogOpen}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={false}
-        handleConfirmDelete={() => {
-          // The bulk delete will be handled by the QuotesTable component
-          setIsDeleteDialogOpen(false);
-        }}
+        isDeleting={isDeleting}
+        handleConfirmDelete={handleConfirmDelete}
         title={t("Quotes.confirm_delete_title")}
         description={t("Quotes.confirm_delete", { count: selectedRows.length })}
       />

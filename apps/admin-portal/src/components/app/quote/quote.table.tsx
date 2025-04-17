@@ -25,9 +25,10 @@ interface QuotesTableProps {
   data: Quote[];
   isLoading?: boolean;
   error?: Error | null;
+  onSelectedRowsChange?: (rows: Quote[]) => void;
 }
 
-const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
+const QuotesTable = ({ data, isLoading, error, onSelectedRowsChange }: QuotesTableProps) => {
   const { updateQuote, setSelectedRows, selectedRows } = useQuotesStore();
   const bulkDeleteQuotes = useBulkDeleteQuotes();
   const t = useTranslations();
@@ -50,6 +51,9 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
       !Array.from(newSelection).every((id) => currentSelection.has(id))
     ) {
       setSelectedRows(newSelectedIds);
+      if (onSelectedRowsChange) {
+        onSelectedRowsChange(rows);
+      }
     }
   };
 

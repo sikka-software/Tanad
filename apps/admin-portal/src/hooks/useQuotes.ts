@@ -95,6 +95,11 @@ export const useBulkDeleteQuotes = () => {
         throw new Error(error.message || "Failed to delete quotes");
       }
 
+      // For 204 No Content responses, we don't need to parse JSON
+      if (response.status === 204) {
+        return;
+      }
+
       return response.json();
     },
     onSuccess: () => {
