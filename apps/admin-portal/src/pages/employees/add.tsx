@@ -11,11 +11,14 @@ import { EmployeeForm, type EmployeeFormValues } from "@/components/forms/employ
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
+import useUserStore from "@/hooks/use-user-store";
+
 export default function AddEmployeePage() {
   const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
+  const { user } = useUserStore();
 
   const handleSubmit = async (data: EmployeeFormValues) => {
     setLoading(true);
@@ -24,6 +27,7 @@ export default function AddEmployeePage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${user?.id}`,
         },
         body: JSON.stringify({
           first_name: data.first_name.trim(),
