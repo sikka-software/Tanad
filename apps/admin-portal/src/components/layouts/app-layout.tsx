@@ -1,7 +1,6 @@
+import Cookies from "js-cookie";
 import { useLocale, useTranslations } from "next-intl";
 import { ThemeProvider } from "next-themes";
-
-import Cookies from "js-cookie";
 import { Toaster } from "sonner";
 
 import ProtectedRoute from "@/components/app/ProtectedRoute";
@@ -31,7 +30,6 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           <AppSidebar />
           <CommandMenu dir={lang === "ar" ? "rtl" : "ltr"} />
           <Toaster
-            toastOptions={{ className: "rtl:!start-8 rtl:xs:!start-0" }}
             richColors
             position={lang === "ar" ? "bottom-left" : "bottom-right"}
             dir={lang === "ar" ? "rtl" : "ltr"}
