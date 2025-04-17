@@ -1025,8 +1025,8 @@ When implementing cell editing in tables using the `SheetTable` component, follo
    const columns = [
      {
        accessorKey: "field_name",
-       header: t("columns.field_name"),
-       cell: ({ row }) => row.getValue("field_name"),
+       header: t("ModelName.form.field_name.label"),
+       cell: ({ row }: { row: TableRow }) => row.getValue("field_name"),
        validationSchema: fieldSchema,
      },
      // ... other columns

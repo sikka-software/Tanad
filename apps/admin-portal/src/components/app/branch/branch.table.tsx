@@ -39,7 +39,7 @@ export default function BranchesTable({
   error,
   onSelectedRowsChange,
 }: BranchesTableProps) {
-  const t = useTranslations("Branches");
+  const t = useTranslations();
   const { selectedRows, setSelectedRows, updateBranch } = useBranchesStore();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
@@ -71,61 +71,61 @@ export default function BranchesTable({
       },
       {
         accessorKey: "name",
-        header: t("columns.name"),
+        header: t("Branches.form.name.label"),
         cell: ({ row }: { row: TableRow }) => row.getValue("name"),
         validationSchema: nameSchema,
       },
       {
         accessorKey: "code",
-        header: t("columns.code"),
+        header: t("Branches.form.code.label"),
         cell: ({ row }: { row: TableRow }) => row.getValue("code"),
         validationSchema: codeSchema,
       },
       {
         accessorKey: "address",
-        header: t("columns.address"),
+        header: t("Branches.form.address.label"),
         cell: ({ row }: { row: TableRow }) => row.getValue("address"),
         validationSchema: addressSchema,
       },
       {
         accessorKey: "city",
-        header: t("columns.city"),
+        header: t("Branches.form.city.label"),
         cell: ({ row }: { row: TableRow }) => row.getValue("city"),
         validationSchema: citySchema,
       },
       {
         accessorKey: "state",
-        header: t("columns.state"),
+        header: t("Branches.form.state.label"),
         cell: ({ row }: { row: TableRow }) => row.getValue("state"),
         validationSchema: stateSchema,
       },
       {
         accessorKey: "zip_code",
-        header: t("columns.zip_code"),
+        header: t("Branches.form.zip_code.label"),
         cell: ({ row }: { row: TableRow }) => row.getValue("zip_code"),
         validationSchema: zipCodeSchema,
       },
       {
         accessorKey: "phone",
-        header: t("columns.phone"),
+        header: t("Branches.form.phone.label"),
         cell: ({ row }: { row: TableRow }) => row.getValue("phone"),
         validationSchema: phoneSchema,
       },
       {
         accessorKey: "email",
-        header: t("columns.email"),
+        header: t("Branches.form.email.label"),
         cell: ({ row }: { row: TableRow }) => row.getValue("email"),
         validationSchema: emailSchema,
       },
       {
         accessorKey: "manager",
-        header: t("columns.manager"),
+        header: t("Branches.form.manager.label"),
         cell: ({ row }: { row: TableRow }) => row.getValue("manager"),
         validationSchema: managerSchema,
       },
       {
         accessorKey: "is_active",
-        header: t("columns.is_active"),
+        header: t("Branches.form.is_active.label"),
         cell: ({ row }: { row: TableRow }) =>
           row.getValue("is_active") ? t("active") : t("inactive"),
         validationSchema: isActiveSchema,
