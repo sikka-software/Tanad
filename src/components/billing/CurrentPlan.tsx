@@ -102,6 +102,7 @@ export default function CurrentPlan() {
     }
   }, [subscription.id]);
 
+  // Fetch billing history
   const fetchBillingHistory = async () => {
     if (!user) return;
 
@@ -180,52 +181,6 @@ export default function CurrentPlan() {
     }
   };
 
-  // Get the plan lookup key from user data or available plans
-  const getPlanLookupKey = () => {
-    // Check if we have a lookup key directly in the user profile
-    if (user?.subscribed_to) {
-      return user.subscribed_to;
-    }
-
-    // If not, try to find the plan by price ID
-    if (user?.price_id) {
-      const plans = getPlans();
-      const userPlan = plans.find((plan) => plan.priceId === user.price_id);
-      if (userPlan?.lookup_key) {
-        return userPlan.lookup_key;
-      }
-    }
-
-    // Default to free plan if nothing found
-    return "tanad_free";
-  };
-
-  // Format the plan name using translations and lookup key
-  const getDisplayPlanName = () => {
-    const lookupKey = getPlanLookupKey();
-
-    // Use translation if available, otherwise fall back to default titles
-    return t(`billing.${lookupKey}`, {
-      fallback: planTitles[lookupKey] || formatPlanName(subscription.name),
-    });
-  };
-
-  // Format the plan name to match the design (as a fallback)
-  const formatPlanName = (name: string | null) => {
-    if (!name) return "-";
-
-    // For the simplified design, just get the basic plan name without "Plan"
-    let simpleName = name;
-
-    // Remove tanad_ prefix if present
-    if (name.includes("tanad_")) {
-      simpleName = name.replace("tanad_", "");
-    }
-
-    // Convert to title case but keep it simple (e.g., "Pro" instead of "Pro Plan")
-    return simpleName.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-  };
-
   // Format date for display
   const formatDate = (dateString: string) => {
     try {
@@ -241,7 +196,6 @@ export default function CurrentPlan() {
   };
 
   const nextBillingDate = formatNextBillingDate();
-  const planName = getDisplayPlanName();
 
   // Status badge for invoices - enhance to show more payment states
   const getStatusBadge = (status: string) => {
@@ -311,7 +265,7 @@ export default function CurrentPlan() {
     }
 
     // Fall back to the basic formatting if no lookup key matched
-    return formatPlanName(planName);
+    return planName;
   };
 
   return (
@@ -321,7 +275,13 @@ export default function CurrentPlan() {
           <div>
             <h2 className="text-xl font-bold">{t("billing.current_plan.title")}</h2>
             <div className="mt-1 flex items-center gap-2">
-              <span className="text-lg font-medium">{planName}</span>
+              <span className="text-lg font-medium">
+                {subscription.planLookupKey
+                  ? t(`billing.${subscription.planLookupKey}`, {
+                      fallback: subscription.planLookupKey,
+                    })
+                  : t("billing.tanad_free", { fallback: "Free Plan" })}
+              </span>
               {subscription.status === "active" && !subscription.cancelAt && (
                 <Badge variant="outline" className="border-green-500 bg-green-50 text-green-700">
                   {t("billing.subscription_status.active")}
