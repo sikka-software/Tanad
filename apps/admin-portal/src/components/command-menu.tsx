@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
 import {
@@ -30,6 +30,7 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
 
   const { openCommandMenu, setOpenCommandMenu } = useMainStore();
   const t = useTranslations();
+  const locale = useLocale();
   const tGeneral = useTranslations("General");
 
   // Define all shortcuts and their corresponding paths
@@ -87,7 +88,7 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
 
   return (
     <Dialog open={openCommandMenu} onOpenChange={setOpenCommandMenu}>
-      <DialogContent className="max-w-xl overflow-hidden p-0">
+      <DialogContent className="max-w-xl overflow-hidden p-0" dir={locale === "ar" ? "rtl" : "ltr"}>
         <Command
           className="[&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-item]_svg]:w-5] [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5"
           dir={dir}

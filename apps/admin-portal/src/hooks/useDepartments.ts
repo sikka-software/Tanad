@@ -78,10 +78,20 @@ export const useDeleteDepartments = () => {
 
   return useMutation({
     mutationFn: async (departmentIds: string[]) => {
-      // Delete departments sequentially
-      for (const id of departmentIds) {
-        await deleteDepartment(id);
+      const response = await fetch("/api/departments/bulk-delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ departmentIds }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to delete departments");
       }
+
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["departments"] });

@@ -3,10 +3,20 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
-import { Trash2, X } from "lucide-react";
+import { Loader2, Trash2, X } from "lucide-react";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import DepartmentsTable from "@/components/tables/departments-table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
@@ -23,7 +33,8 @@ export default function DepartmentsPage() {
   const { data: departments, isLoading, error } = useDepartments();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
   // Get selection state and actions from the store
   const { selectedRows, setSelectedRows, clearSelection } = useDepartmentsStore();
   const { mutate: deleteDepartments, isPending: isDeleting } = useDeleteDepartments();
@@ -47,19 +58,19 @@ export default function DepartmentsPage() {
 
   const handleDeleteSelected = () => {
     if (selectedRows.length === 0) return;
-    
-    if (confirm(t("Departments.confirm_delete", { count: selectedRows.length }))) {
-      console.log("Deleting departments with IDs:", selectedRows);
-      deleteDepartments(selectedRows, {
-        onSuccess: () => {
-          console.log("Departments deleted successfully");
-          clearSelection();
-        },
-        onError: (error) => {
-          console.error("Failed to delete departments:", error);
-        },
-      });
-    }
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteDepartments(selectedRows, {
+      onSuccess: () => {
+        clearSelection();
+        setIsDeleteDialogOpen(false);
+      },
+      onError: () => {
+        setIsDeleteDialogOpen(false);
+      },
+    });
   };
 
   const renderDepartment = (department: Department) => (
@@ -142,6 +153,41 @@ export default function DepartmentsPage() {
           </div>
         )}
       </div>
+
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!isDeleting) {
+            setIsDeleteDialogOpen(open);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("Departments.confirm_delete_title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("Departments.confirm_delete", { count: selectedRows.length })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>{t("General.cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t("General.deleting")}
+                </>
+              ) : (
+                t("General.delete")
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DataPageLayout>
   );
 }

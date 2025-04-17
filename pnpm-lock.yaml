@@ -210,9 +210,6 @@ importers:
       trim-canvas:
         specifier: ^0.1.2
         version: 0.1.2
-      tw-animate-css:
-        specifier: ^1.2.5
-        version: 1.2.5
       ua-parser-js:
         specifier: ^2.0.3
         version: 2.0.3
@@ -274,6 +271,9 @@ importers:
       tsx:
         specifier: ^4.19.3
         version: 4.19.3
+      tw-animate-css:
+        specifier: ^1.2.5
+        version: 1.2.5
       typescript:
         specifier: ^5
         version: 5.8.2
