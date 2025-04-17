@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
+import { Row } from "@tanstack/react-table";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -12,6 +13,7 @@ import { Employee } from "@/types/employee.type";
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useUpdateEmployee } from "@/hooks/useEmployees";
+import { useEmployeesStore } from "@/stores/employees.store";
 
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");
@@ -20,29 +22,49 @@ const positionSchema = z.string().min(1, "Required");
 const departmentSchema = z.string().optional();
 const statusSchema = z.enum(["active", "inactive", "on_leave"]);
 
-const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
-  const t = useTranslations();
-  const { mutate: updateEmployee, isPending } = useUpdateEmployee();
-  const { data: departments } = useDepartments();
+interface EmployeesTableProps {
+  data: Employee[];
+  isLoading?: boolean;
+  error?: Error | null;
+  onSelectedRowsChange?: (selectedRows: Employee[]) => void;
+}
 
-  // Keep track of the combined state (original data + pending updates)
-  const [currentData, setCurrentData] = useState<Employee[]>([]);
+const EmployeesTable = ({
+  data,
+  isLoading,
+  error,
+  onSelectedRowsChange,
+}: EmployeesTableProps) => {
+  const t = useTranslations("Employees");
+  const { data: departments } = useDepartments();
+  const { mutateAsync: updateEmployee } = useUpdateEmployee();
+  const { selectedRows, setSelectedRows } = useEmployeesStore();
+  const [currentData, setCurrentData] = useState<Employee[]>(data);
   const [pendingUpdates, setPendingUpdates] = useState<Record<string, Partial<Employee>>>({});
 
-  // Update the current data when original data changes
   useEffect(() => {
-    if (data) {
-      // Apply any pending updates over the incoming data
-      const updatedData = data.map((employee) => {
-        const updates = pendingUpdates[employee.id];
-        if (updates) {
-          return { ...employee, ...updates };
+    setCurrentData(data);
+  }, [data]);
+
+  const handleRowSelectionChange = useCallback(
+    (rows: Employee[]) => {
+      const newSelectedIds = rows.map((row) => row.id!);
+      // Only update if the selection has actually changed
+      const currentSelection = new Set(selectedRows);
+      const newSelection = new Set(newSelectedIds);
+
+      if (
+        newSelection.size !== currentSelection.size ||
+        !Array.from(newSelection).every((id) => currentSelection.has(id))
+      ) {
+        setSelectedRows(newSelectedIds);
+        if (onSelectedRowsChange) {
+          onSelectedRowsChange(rows);
         }
-        return employee;
-      });
-      setCurrentData(updatedData);
-    }
-  }, [data, pendingUpdates]);
+      }
+    },
+    [selectedRows, setSelectedRows, onSelectedRowsChange],
+  );
 
   // Create a memoized handleEdit function
   const handleEdit = useCallback(
@@ -119,32 +141,32 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
   const columns: ExtendedColumnDef<Employee>[] = [
     {
       accessorKey: "first_name",
-      header: t("Employees.form.first_name.label"),
+      header: t("form.first_name.label"),
       validationSchema: nameSchema,
     },
     {
       accessorKey: "last_name",
-      header: t("Employees.form.last_name.label"),
+      header: t("form.last_name.label"),
       validationSchema: nameSchema,
     },
     {
       accessorKey: "email",
-      header: t("Employees.form.email.label"),
+      header: t("form.email.label"),
       validationSchema: emailSchema,
     },
     {
       accessorKey: "phone",
-      header: t("Employees.form.phone.label"),
+      header: t("form.phone.label"),
       validationSchema: phoneSchema,
     },
     {
       accessorKey: "position",
-      header: t("Employees.form.position.label"),
+      header: t("form.position.label"),
       validationSchema: positionSchema,
     },
     {
       accessorKey: "department_id",
-      header: t("Employees.form.department.label"),
+      header: t("form.department.label"),
       validationSchema: departmentSchema,
       cellType: "select",
       options: departments?.map((department) => ({
@@ -158,13 +180,13 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
     },
     {
       accessorKey: "status",
-      header: t("Employees.form.status.label"),
+      header: t("form.status.label"),
       validationSchema: statusSchema,
       cellType: "select",
       options: [
-        { label: t("Employees.form.status.active"), value: "active" },
-        { label: t("Employees.form.status.inactive"), value: "inactive" },
-        { label: t("Employees.form.status.on_leave"), value: "on_leave" },
+        { label: t("form.status.active"), value: "active" },
+        { label: t("form.status.inactive"), value: "inactive" },
+        { label: t("form.status.on_leave"), value: "on_leave" },
       ],
     },
   ];
@@ -179,20 +201,32 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
+  // Create a selection state object for the table
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+
   return (
     <SheetTable
       columns={columns}
       data={currentData.length > 0 ? currentData : data}
       onEdit={handleEdit}
       showHeader={true}
+      enableRowSelection={true}
+      onRowSelectionChange={handleRowSelectionChange}
+      tableOptions={{
+        state: {
+          rowSelection,
+        },
+        enableRowSelection: true,
+        enableMultiRowSelection: true,
+        getRowId: (row) => row.id!,
+        onRowSelectionChange: (updater) => {
+          const newSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
+          const selectedRows = data.filter(row => newSelection[row.id!]);
+          handleRowSelectionChange(selectedRows);
+        },
+      }}
     />
   );
 };
-
-interface EmployeesTableProps {
-  data: Employee[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
 
 export default EmployeesTable;

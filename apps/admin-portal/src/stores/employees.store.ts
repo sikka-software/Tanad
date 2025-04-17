@@ -1,89 +1,73 @@
 import { create } from "zustand";
 
-import { supabase } from "@/lib/supabase";
 import { Employee } from "@/types/employee.type";
 
-interface EmployeesStore {
+interface EmployeesState {
   employees: Employee[];
   isLoading: boolean;
-  error: Error | null;
+  error: string | null;
+  selectedRows: string[];
   fetchEmployees: () => Promise<void>;
   updateEmployee: (id: string, updates: Partial<Employee>) => Promise<void>;
-  addEmployee: (employee: Omit<Employee, "id" | "created_at" | "updated_at">) => Promise<void>;
-  deleteEmployee: (id: string) => Promise<void>;
+  setSelectedRows: (rows: string[]) => void;
+  clearSelection: () => void;
 }
 
-export const useEmployeesStore = create<EmployeesStore>((set, get) => ({
+export const useEmployeesStore = create<EmployeesState>((set, get) => ({
   employees: [],
   isLoading: false,
   error: null,
+  selectedRows: [],
 
   fetchEmployees: async () => {
     set({ isLoading: true, error: null });
     try {
-      const { data, error } = await supabase.from("employees").select(`
-          *,
-          department:departments (
-            name
-          )
-        `);
-      if (error) throw error;
-
-      // Transform the data to match our Employee type
-      const transformedData = data.map((employee: any) => ({
-        ...employee,
-        department: employee.department?.name || null,
-      }));
-
-      set({ employees: transformedData as Employee[], isLoading: false });
+      const response = await fetch("/api/employees");
+      if (!response.ok) {
+        throw new Error("Failed to fetch employees");
+      }
+      const data = await response.json();
+      set({ employees: data, isLoading: false });
     } catch (error) {
-      set({ error: error as Error, isLoading: false });
+      set({ error: (error as Error).message, isLoading: false });
     }
   },
 
   updateEmployee: async (id: string, updates: Partial<Employee>) => {
-    set({ isLoading: true, error: null });
     try {
-      // If we're updating department_id, we need special handling
-      if (updates.department_id !== undefined) {
-        // First get the department name for the new department_id
-        const { data: departmentData, error: departmentError } = await supabase
-          .from("departments")
-          .select("name")
-          .eq("id", updates.department_id)
-          .single();
-          
-        if (departmentError) throw departmentError;
-        
-        // Update the department name in the updates object
-        updates.department = departmentData?.name || null;
+      const response = await fetch(`/api/employees/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update employee with id ${id}`);
       }
-      
-      const { error } = await supabase.from("employees").update(updates).eq("id", id);
-      if (error) throw error;
+
+      const updatedEmployee = await response.json();
+
+      // Update the local state immediately
+      set((state) => ({
+        employees: state.employees.map((employee) =>
+          employee.id === id ? updatedEmployee : employee,
+        ),
+      }));
+
+      // Refetch to ensure we have the latest data
       await get().fetchEmployees();
     } catch (error) {
-      set({ error: error as Error, isLoading: false });
+      set({ error: (error as Error).message });
     }
   },
 
-  addEmployee: async (employee) => {
-    try {
-      const { error } = await supabase.from("employees").insert([employee]);
-      if (error) throw error;
-      await get().fetchEmployees();
-    } catch (error) {
-      set({ error: error as Error });
-    }
+  setSelectedRows: (rows: string[]) => {
+    set({ selectedRows: rows });
   },
 
-  deleteEmployee: async (id: string) => {
-    try {
-      const { error } = await supabase.from("employees").delete().eq("id", id);
-      if (error) throw error;
-      await get().fetchEmployees();
-    } catch (error) {
-      set({ error: error as Error });
-    }
+  clearSelection: () => {
+    set({ selectedRows: [] });
   },
 }));
