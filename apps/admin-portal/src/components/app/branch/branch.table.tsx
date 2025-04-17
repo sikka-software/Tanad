@@ -1,25 +1,25 @@
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import React, { useCallback } from "react";
 import { z } from "zod";
 
-import ErrorComponent from "@/components/ui/error-component";
-import SheetTable from "@/components/ui/sheet-table";
-import TableSkeleton from "@/components/ui/table-skeleton";
+import ErrorComponent from "@/ui/error-component";
+import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
+import TableSkeleton from "@/ui/table-skeleton";
 
 import { Branch } from "@/types/branch.type";
 
 import { useBranchesStore } from "@/stores/branches.store";
 
-// Validation schemas for each field
+// Validation schemas
 const nameSchema = z.string().min(1, "Required");
 const codeSchema = z.string().min(1, "Required");
 const addressSchema = z.string().min(1, "Required");
 const citySchema = z.string().min(1, "Required");
 const stateSchema = z.string().min(1, "Required");
 const zipCodeSchema = z.string().min(1, "Required");
-const phoneSchema = z.string().optional();
-const emailSchema = z.string().email().optional();
-const managerSchema = z.string().optional();
+const phoneSchema = z.string().nullable();
+const emailSchema = z.string().email().nullable();
+const managerSchema = z.string().nullable();
 const isActiveSchema = z.boolean();
 
 interface BranchesTableProps {
@@ -29,117 +29,53 @@ interface BranchesTableProps {
   onSelectedRowsChange?: (rows: Branch[]) => void;
 }
 
-interface TableRow {
-  getValue: (key: string) => any;
-}
-
-export default function BranchesTable({
-  data,
-  isLoading,
-  error,
-  onSelectedRowsChange,
-}: BranchesTableProps) {
+const BranchesTable = ({ data, isLoading, error, onSelectedRowsChange }: BranchesTableProps) => {
   const t = useTranslations();
-  const { selectedRows, setSelectedRows, updateBranch } = useBranchesStore();
+  const { updateBranch, selectedRows, setSelectedRows } = useBranchesStore();
+
+  // Create a selection state object for the table
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+
+  const columns: ExtendedColumnDef<Branch>[] = [
+    { accessorKey: "name", header: t("Branches.form.name.label"), validationSchema: nameSchema },
+    { accessorKey: "code", header: t("Branches.form.code.label"), validationSchema: codeSchema },
+    { accessorKey: "address", header: t("Branches.form.address.label"), validationSchema: addressSchema },
+    { accessorKey: "city", header: t("Branches.form.city.label"), validationSchema: citySchema },
+    { accessorKey: "state", header: t("Branches.form.state.label"), validationSchema: stateSchema },
+    { accessorKey: "zip_code", header: t("Branches.form.zip_code.label"), validationSchema: zipCodeSchema },
+    { accessorKey: "phone", header: t("Branches.form.phone.label"), validationSchema: phoneSchema },
+    { accessorKey: "email", header: t("Branches.form.email.label"), validationSchema: emailSchema },
+    { accessorKey: "manager", header: t("Branches.form.manager.label"), validationSchema: managerSchema },
+    { 
+      accessorKey: "is_active", 
+      header: t("Branches.form.is_active.label"), 
+      cell: ({ row }) => row.getValue("is_active") ? t("active") : t("inactive"),
+      validationSchema: isActiveSchema 
+    },
+  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    try {
-      await updateBranch(rowId, { [columnId]: value });
-    } catch (error) {
-      console.error("Failed to update branch:", error);
-    }
+    if (columnId === "branch_id") return;
+    await updateBranch(rowId, { [columnId]: value });
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        id: "select",
-        header: ({ table }: { table: any }) => (
-          <input
-            type="checkbox"
-            checked={table.getIsAllRowsSelected()}
-            onChange={table.getToggleAllRowsSelectedHandler()}
-          />
-        ),
-        cell: ({ row }: { row: any }) => (
-          <input
-            type="checkbox"
-            checked={row.getIsSelected()}
-            onChange={row.getToggleSelectedHandler()}
-          />
-        ),
-      },
-      {
-        accessorKey: "name",
-        header: t("Branches.form.name.label"),
-        cell: ({ row }: { row: TableRow }) => row.getValue("name"),
-        validationSchema: nameSchema,
-      },
-      {
-        accessorKey: "code",
-        header: t("Branches.form.code.label"),
-        cell: ({ row }: { row: TableRow }) => row.getValue("code"),
-        validationSchema: codeSchema,
-      },
-      {
-        accessorKey: "address",
-        header: t("Branches.form.address.label"),
-        cell: ({ row }: { row: TableRow }) => row.getValue("address"),
-        validationSchema: addressSchema,
-      },
-      {
-        accessorKey: "city",
-        header: t("Branches.form.city.label"),
-        cell: ({ row }: { row: TableRow }) => row.getValue("city"),
-        validationSchema: citySchema,
-      },
-      {
-        accessorKey: "state",
-        header: t("Branches.form.state.label"),
-        cell: ({ row }: { row: TableRow }) => row.getValue("state"),
-        validationSchema: stateSchema,
-      },
-      {
-        accessorKey: "zip_code",
-        header: t("Branches.form.zip_code.label"),
-        cell: ({ row }: { row: TableRow }) => row.getValue("zip_code"),
-        validationSchema: zipCodeSchema,
-      },
-      {
-        accessorKey: "phone",
-        header: t("Branches.form.phone.label"),
-        cell: ({ row }: { row: TableRow }) => row.getValue("phone"),
-        validationSchema: phoneSchema,
-      },
-      {
-        accessorKey: "email",
-        header: t("Branches.form.email.label"),
-        cell: ({ row }: { row: TableRow }) => row.getValue("email"),
-        validationSchema: emailSchema,
-      },
-      {
-        accessorKey: "manager",
-        header: t("Branches.form.manager.label"),
-        cell: ({ row }: { row: TableRow }) => row.getValue("manager"),
-        validationSchema: managerSchema,
-      },
-      {
-        accessorKey: "is_active",
-        header: t("Branches.form.is_active.label"),
-        cell: ({ row }: { row: TableRow }) =>
-          row.getValue("is_active") ? t("active") : t("inactive"),
-        validationSchema: isActiveSchema,
-      },
-    ],
-    [t],
+  const handleRowSelectionChange = useCallback(
+    (rows: Branch[]) => {
+      const newSelectedIds = rows.map((row) => row.id);
+      // Only update if the selection has actually changed
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(newSelectedIds);
+        if (onSelectedRowsChange) {
+          onSelectedRowsChange(rows);
+        }
+      }
+    },
+    [selectedRows, setSelectedRows, onSelectedRowsChange],
   );
 
   if (isLoading) {
     return (
-      <TableSkeleton
-        columns={columns.filter((col) => col.accessorKey).map((col) => col.accessorKey as string)}
-        rows={5}
-      />
+      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
     );
   }
 
@@ -147,38 +83,31 @@ export default function BranchesTable({
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  const rowSelection = selectedRows.reduce(
-    (acc, id) => {
-      acc[id] = true;
-      return acc;
+  const branchTableOptions = {
+    state: {
+      rowSelection,
     },
-    {} as Record<string, boolean>,
-  );
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
+    getRowId: (row: Branch) => row.id,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id]);
+      handleRowSelectionChange(selectedRows);
+    },
+  };
 
   return (
     <SheetTable
-      data={data}
       columns={columns}
+      data={data}
       onEdit={handleEdit}
-      tableOptions={{
-        state: {
-          rowSelection,
-        },
-        enableRowSelection: true,
-        enableMultiRowSelection: true,
-        getRowId: (row: Branch) => row.id,
-        onRowSelectionChange: (updater) => {
-          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-          const selectedRows = data.filter((row) => newSelection[row.id]);
-          setSelectedRows(selectedRows.map((row) => row.id));
-          onSelectedRowsChange?.(selectedRows);
-        },
-      }}
-      onRowSelectionChange={(selectedRows: Branch[]) => {
-        setSelectedRows(selectedRows.map((row) => row.id));
-        onSelectedRowsChange?.(selectedRows);
-      }}
       showHeader={true}
+      enableRowSelection={true}
+      onRowSelectionChange={handleRowSelectionChange}
+      tableOptions={branchTableOptions}
     />
   );
-}
+};
+
+export default BranchesTable;

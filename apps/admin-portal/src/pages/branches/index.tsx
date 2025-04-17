@@ -1,58 +1,69 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
 
 import BranchCard from "@/components/app/branch/branch.card";
 import BranchesTable from "@/components/app/branch/branch.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import SelectionMode from "@/components/ui/selection-mode";
-import ConfirmDelete from "@/components/ui/confirm-delete";
 
 import { Branch } from "@/types/branch.type";
 
-import { useBranches } from "@/hooks/useBranches";
+import { useBranches, useBulkDeleteBranches } from "@/hooks/useBranches";
 import { useBranchesStore } from "@/stores/branches.store";
-import { useBulkDeleteBranches } from "@/hooks/useBranches";
 
 export default function BranchesPage() {
-  const t = useTranslations("Branches");
-  const { data: branches, isLoading, error } = useBranches();
+  const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { data: branches, isLoading, error } = useBranches();
 
+  // Get selection state and actions from the store
   const { selectedRows, setSelectedRows, clearSelection } = useBranchesStore();
   const { mutate: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
 
   const filteredBranches = branches?.filter(
-    (branch) =>
+    (branch: Branch) =>
       branch.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      branch.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (branch.email?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-      (branch.manager?.toLowerCase() || "").includes(searchQuery.toLowerCase()),
+      branch.email?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleRowSelectionChange = (rows: Branch[]) => {
-    setSelectedRows(rows.map((row) => row.id));
+    const newSelectedIds = rows.map((row) => row.id);
+    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+      setSelectedRows(newSelectedIds);
+    }
   };
 
   const handleDeleteSelected = () => {
+    if (selectedRows.length === 0) return;
     setIsDeleteDialogOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    deleteBranches(selectedRows, {
-      onSuccess: () => {
-        clearSelection();
-        setIsDeleteDialogOpen(false);
-      },
-    });
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteBranches(selectedRows, {
+        onSuccess: () => {
+          clearSelection();
+          setIsDeleteDialogOpen(false);
+        },
+        onError: (error: any) => {
+          console.error("Failed to delete branches:", error);
+          toast.error(t("Branches.error.bulk_delete"));
+          setIsDeleteDialogOpen(false);
+        },
+      });
+    } catch (error) {
+      console.error("Failed to delete branches:", error);
+      setIsDeleteDialogOpen(false);
+    }
   };
-
-  const renderBranch = (branch: Branch) => <BranchCard branch={branch} />;
 
   return (
     <DataPageLayout>
@@ -65,11 +76,11 @@ export default function BranchesPage() {
         />
       ) : (
         <PageSearchAndFilter
-          title={t("title")}
+          title={t("Branches.title")}
           createHref="/branches/add"
-          createLabel={t("add_new")}
+          createLabel={t("Branches.add_new")}
           onSearch={setSearchQuery}
-          searchPlaceholder={t("search_branches")}
+          searchPlaceholder={t("Branches.search_branches")}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
@@ -89,8 +100,8 @@ export default function BranchesPage() {
               data={filteredBranches || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("no_branches_found")}
-              renderItem={renderBranch}
+              emptyMessage={t("Branches.no_branches_found")}
+              renderItem={(branch: Branch) => <BranchCard branch={branch} />}
               gridCols="3"
             />
           </div>
@@ -102,8 +113,8 @@ export default function BranchesPage() {
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
         isDeleting={isDeleting}
         handleConfirmDelete={handleConfirmDelete}
-        title={t("confirm_delete")}
-        description={t("delete_description", { count: selectedRows.length })}
+        title={t("Branches.confirm_delete_title")}
+        description={t("Branches.confirm_delete", { count: selectedRows.length })}
       />
     </DataPageLayout>
   );
