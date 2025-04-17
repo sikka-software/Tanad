@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import Stripe from "stripe";
 
+import { getPlanIdForPriceId } from "@/lib/stripe";
 import { getStripeInstance } from "@/lib/stripe-admin";
 import { supabase } from "@/lib/supabase";
 
@@ -57,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log(`No valid customer ID provided, looking up by user ID: ${userId}`);
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("stripe_customer_id, email  , subscribed_to")
+        .select("stripe_customer_id, email, full_name, subscribed_to")
         .eq("id", userId)
         .single();
 
@@ -109,7 +110,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Get the lookup key for this price ID
-    let lookupKey = await getPlanIdForPriceId(stripe, priceId);
+    let lookupKey = await getPlanIdForPriceId(priceId);
     console.log("Creating subscription for plan:", lookupKey);
 
     // For free plan, just update the user's subscription status without creating a Stripe subscription
@@ -305,48 +306,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       error: "Failed to create subscription",
       message: error.message || "An unexpected error occurred",
     });
-  }
-}
-
-/**
- * Helper function to get the plan lookup key from a price ID
- */
-async function getPlanIdForPriceId(stripe: Stripe, priceId: string) {
-  try {
-    // If the priceId is already a lookup key, return it
-    if (priceId.startsWith("tanad_")) {
-      return priceId;
-    }
-
-    console.log("Price ID:", priceId);
-    console.log("Stripe:", stripe);
-
-    // Otherwise, retrieve the price and get the lookup key from it
-    const price = await stripe.prices.retrieve(priceId, {
-      expand: ["product"],
-    });
-
-    // First try to get lookup_key from price
-    if (price.lookup_key) {
-      return price.lookup_key;
-    }
-
-    // If not found, try getting it from product
-    if (price.product && typeof price.product !== "string") {
-      const product = price.product as Stripe.Product;
-      if (product.metadata?.lookup_key) {
-        return product.metadata.lookup_key;
-      }
-      // Use product name or ID as a fallback identifier
-      return `tanad_${product.name?.toLowerCase().replace(/\s+/g, "_") || product.id}`;
-    }
-
-    console.log("No lookup key found");
-    console.log("Price:", price);
-
-    return "tanad_free";
-  } catch (error) {
-    console.error("Error getting plan ID for price:", error);
-    return "tanad_free";
   }
 }

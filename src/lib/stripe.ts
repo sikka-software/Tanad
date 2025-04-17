@@ -215,3 +215,40 @@ export const getStripe = () => {
 
   return stripePromise;
 };
+
+/**
+ * Helper function to get the plan lookup key from a price ID
+ */
+export async function getPlanIdForPriceId(priceId: string) {
+  try {
+    // If the priceId is already a lookup key, return it
+    if (priceId.startsWith("tanad_")) {
+      return priceId;
+    }
+
+    // Otherwise, retrieve the price and get the lookup key from it
+    const price = await stripe.prices.retrieve(priceId, {
+      expand: ["product"],
+    });
+
+    // First try to get lookup_key from price
+    if (price.lookup_key) {
+      return price.lookup_key;
+    }
+
+    // If not found, try getting it from product
+    if (price.product && typeof price.product !== "string") {
+      const product = price.product as Stripe.Product;
+      if (product.metadata?.lookup_key) {
+        return product.metadata.lookup_key;
+      }
+      // Use product name or ID as a fallback identifier
+      return `tanad_${product.name?.toLowerCase().replace(/\s+/g, "_") || product.id}`;
+    }
+
+    return "tanad_free";
+  } catch (error) {
+    console.error("Error getting plan ID for price:", error);
+    return "tanad_free";
+  }
+}
