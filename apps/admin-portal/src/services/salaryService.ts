@@ -26,20 +26,18 @@ export async function fetchSalaryById(id: string): Promise<Salary> {
   }
 }
 
-export async function createSalary(salary: SalaryCreateData): Promise<Salary> {
+export async function createSalary(data: SalaryCreateData): Promise<Salary> {
   try {
     const response = await fetch("/api/salaries", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(salary),
+      body: JSON.stringify(data),
     });
-
     if (!response.ok) {
       throw new Error("Failed to create salary");
     }
-
     return response.json();
   } catch (error) {
     console.error("Error creating salary:", error);
@@ -47,24 +45,22 @@ export async function createSalary(salary: SalaryCreateData): Promise<Salary> {
   }
 }
 
-export async function updateSalary(id: string, updates: Partial<Salary>): Promise<Salary> {
+export async function updateSalary(id: string, data: Partial<Salary>): Promise<Salary> {
   try {
     const response = await fetch(`/api/salaries/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updates),
+      body: JSON.stringify(data),
     });
-
     if (!response.ok) {
-      throw new Error(`Failed to update salary with id ${id}`);
+      throw new Error("Failed to update salary");
     }
-
     return response.json();
   } catch (error) {
-    console.error(`Error updating salary ${id}:`, error);
-    throw new Error(`Failed to update salary with id ${id}`);
+    console.error("Error updating salary:", error);
+    throw new Error("Failed to update salary");
   }
 }
 
@@ -73,13 +69,12 @@ export async function deleteSalary(id: string): Promise<void> {
     const response = await fetch(`/api/salaries/${id}`, {
       method: "DELETE",
     });
-
     if (!response.ok) {
-      throw new Error(`Failed to delete salary with id ${id}`);
+      throw new Error("Failed to delete salary");
     }
   } catch (error) {
-    console.error(`Error deleting salary ${id}:`, error);
-    throw new Error(`Failed to delete salary with id ${id}`);
+    console.error("Error deleting salary:", error);
+    throw new Error("Failed to delete salary");
   }
 }
 
@@ -92,7 +87,6 @@ export async function bulkDeleteSalaries(ids: string[]): Promise<void> {
       },
       body: JSON.stringify({ ids }),
     });
-
     if (!response.ok) {
       throw new Error("Failed to delete salaries");
     }

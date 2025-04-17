@@ -6,7 +6,9 @@ import {
   fetchSalaryById,
   fetchSalaries,
   updateSalary,
+  bulkDeleteSalaries,
 } from "@/services/salaryService";
+
 import type { Salary, SalaryCreateData } from "@/types/salary.type";
 
 // Query keys for salaries
@@ -72,6 +74,18 @@ export function useDeleteSalary() {
 
   return useMutation({
     mutationFn: deleteSalary,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["salaries"] });
+    },
+  });
+}
+
+// Hook for bulk deleting salaries
+export function useBulkDeleteSalaries() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: bulkDeleteSalaries,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["salaries"] });
     },

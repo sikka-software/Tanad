@@ -6,7 +6,6 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Quote } from "@/types/quote.type";
 import { Salary } from "@/types/salary.type";
 
 import { useSalariesStore } from "@/stores/salaries.store";

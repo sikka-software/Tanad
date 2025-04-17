@@ -13,7 +13,7 @@ import SelectionMode from "@/components/ui/selection-mode";
 
 import type { Salary } from "@/types/salary.type";
 
-import { useSalaries } from "@/hooks/useSalaries";
+import { useSalaries, useBulkDeleteSalaries } from "@/hooks/useSalaries";
 import { useSalariesStore } from "@/stores/salaries.store";
 
 export default function SalariesPage() {
@@ -22,7 +22,8 @@ export default function SalariesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { selectedRows, clearSelection, bulkDeleteSalaries } = useSalariesStore();
+  const { selectedRows, clearSelection } = useSalariesStore();
+  const { mutate: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
 
   const filteredSalaries = salaries?.filter(
     (salary) =>
@@ -32,16 +33,23 @@ export default function SalariesPage() {
 
   const handleConfirmDelete = async () => {
     try {
-      await bulkDeleteSalaries(selectedRows);
-      clearSelection();
-      setIsDeleteDialogOpen(false);
-      toast.success(t("Salaries.success.title"), {
-        description: t("Salaries.messages.success_deleted"),
+      await deleteSalaries(selectedRows, {
+        onSuccess: () => {
+          clearSelection();
+          setIsDeleteDialogOpen(false);
+          toast.success(t("Salaries.success.title"), {
+            description: t("Salaries.messages.success_deleted"),
+          });
+        },
+        onError: () => {
+          toast.error(t("Salaries.error.title"), {
+            description: t("Salaries.messages.error_delete"),
+          });
+        },
       });
     } catch (error) {
-      toast.error(t("Salaries.error.title"), {
-        description: t("Salaries.messages.error_delete"),
-      });
+      console.error("Failed to delete salaries:", error);
+      setIsDeleteDialogOpen(false);
     }
   };
 
@@ -51,7 +59,7 @@ export default function SalariesPage() {
         <SelectionMode
           selectedRows={selectedRows}
           clearSelection={clearSelection}
-          isDeleting={false}
+          isDeleting={isDeleting}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
         />
       ) : (
@@ -89,7 +97,7 @@ export default function SalariesPage() {
       <ConfirmDelete
         isDeleteDialogOpen={isDeleteDialogOpen}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={false}
+        isDeleting={isDeleting}
         handleConfirmDelete={handleConfirmDelete}
         title={t("Salaries.delete_salary")}
         description={t("Salaries.confirm_delete")}
