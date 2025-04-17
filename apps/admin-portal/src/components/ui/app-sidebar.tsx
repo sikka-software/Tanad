@@ -78,16 +78,6 @@ export function AppSidebar() {
     menus: new Set(),
   });
 
-  // Log profile when component renders
-  useEffect(() => {
-    console.log("[AppSidebar] Profile on render:", profile);
-    console.log("[AppSidebar] User settings:", profile?.user_settings);
-    console.log(
-      "[AppSidebar] Has navigation settings:",
-      profile?.user_settings && "navigation" in profile.user_settings,
-    );
-  }, [profile]);
-
   // Store and clear expanded states when sidebar collapses
   useEffect(() => {
     if (state === "collapsed" && !isMobile) {
@@ -137,23 +127,13 @@ export function AppSidebar() {
   const menuGroups = useMemo(() => {
     if (profile?.user_settings && "navigation" in profile.user_settings) {
       try {
-        console.log("[AppSidebar] User has navigation settings:", profile.user_settings.navigation);
-        console.log("[AppSidebar] Default menu order:", defaultMenuGroups);
-
         const result = applyCustomMenuOrder(
           defaultMenuGroups,
           profile.user_settings.navigation as Record<string, Array<{ title: string }>>,
         );
 
-        console.log("[AppSidebar] Menu after applying custom order:", result);
-
         // Apply hidden menu items filter
         if (profile.user_settings.hidden_menu_items) {
-          console.log(
-            "[AppSidebar] Applying hidden menu items filter:",
-            profile.user_settings.hidden_menu_items,
-          );
-
           const hiddenItems = profile.user_settings.hidden_menu_items as Record<string, string[]>;
           const filteredResult: Record<string, SidebarMenuGroupProps["items"]> = {};
 
@@ -164,16 +144,15 @@ export function AppSidebar() {
             );
           });
 
-          console.log("[AppSidebar] Menu after filtering hidden items:", filteredResult);
           return filteredResult;
         }
 
         return result;
       } catch (error) {
-        console.error("[AppSidebar] Error applying custom menu order:", error);
+        console.error("[app-sidebar] Error applying custom menu order:", error);
       }
     } else {
-      console.log("[AppSidebar] No navigation settings found in profile");
+      console.log("[app-sidebar] No navigation settings found in profile");
     }
     return defaultMenuGroups;
   }, [defaultMenuGroups, profile?.user_settings]);
