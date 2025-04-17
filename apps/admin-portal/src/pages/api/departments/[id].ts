@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { supabase } from "@/lib/supabase";
 
 import { eq } from "drizzle-orm";
 
@@ -101,14 +102,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === "DELETE") {
+    if (!id || typeof id !== "string") {
+      return res.status(400).json({ error: "Invalid department ID" });
+    }
+
     try {
-      await db.delete(departments).where(eq(departments.id, id as string));
-      return res.status(204).end();
+      // Delete department locations first
+      await db
+        .delete(departmentLocations)
+        .where(eq(departmentLocations.department_id, id));
+
+      // Delete the department
+      const [deletedDepartment] = await db
+        .delete(departments)
+        .where(eq(departments.id, id))
+        .returning();
+
+      if (!deletedDepartment) {
+        return res.status(404).json({ error: "Department not found" });
+      }
+
+      return res.status(200).json({ message: "Department deleted successfully" });
     } catch (error) {
-      console.error("Error deleting department:", error);
-      return res.status(500).json({ message: "Error deleting department" });
+      console.error("Error in delete:", error);
+      return res.status(500).json({ error: "Internal server error" });
     }
   }
 
-  return res.status(405).json({ message: "Method not allowed" });
+  return res.status(405).json({ error: "Method not allowed" });
 }

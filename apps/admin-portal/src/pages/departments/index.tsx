@@ -15,6 +15,7 @@ import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { Department } from "@/types/department.type";
 
 import { useDepartments } from "@/hooks/useDepartments";
+import { useDeleteDepartments } from "@/hooks/useDepartments";
 import { useDepartmentsStore } from "@/stores/departments.store";
 
 export default function DepartmentsPage() {
@@ -25,6 +26,7 @@ export default function DepartmentsPage() {
   
   // Get selection state and actions from the store
   const { selectedRows, setSelectedRows, clearSelection } = useDepartmentsStore();
+  const { mutate: deleteDepartments, isPending: isDeleting } = useDeleteDepartments();
 
   const filteredDepartments = departments?.filter(
     (department) =>
@@ -44,8 +46,20 @@ export default function DepartmentsPage() {
   };
 
   const handleDeleteSelected = () => {
-    // TODO: Implement delete functionality
-    console.log("Deleting departments:", selectedDepartments);
+    if (selectedRows.length === 0) return;
+    
+    if (confirm(t("Departments.confirm_delete", { count: selectedRows.length }))) {
+      console.log("Deleting departments with IDs:", selectedRows);
+      deleteDepartments(selectedRows, {
+        onSuccess: () => {
+          console.log("Departments deleted successfully");
+          clearSelection();
+        },
+        onError: (error) => {
+          console.error("Failed to delete departments:", error);
+        },
+      });
+    }
   };
 
   const renderDepartment = (department: Department) => (
