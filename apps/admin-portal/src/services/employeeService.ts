@@ -75,13 +75,44 @@ export async function updateEmployee(id: string, updates: Partial<Employee>): Pr
     throw new Error("No authenticated user");
   }
 
+  // Convert from snake_case to camelCase for the database
+  const employeeData: Record<string, any> = {};
+
+  // Map from snake_case interface to camelCase database fields
+  Object.entries(updates).forEach(([key, value]) => {
+    // Special case for department_id
+    if (key === "department_id") {
+      employeeData["departmentId"] = value;
+    }
+    // Skip department field as it's a virtual field
+    else if (key === "department") {
+      // Skip this field as it's handled by the join
+    } else if (key === "status") {
+      employeeData["status"] = value;
+    }
+    // Fields that should remain with snake_case in the database
+    else if (["first_name", "last_name", "phone"].includes(key)) {
+      employeeData[key] = value;
+    }
+    // All other fields: convert from snake_case to camelCase
+    else if (key.includes("_")) {
+      // Convert snake_case to camelCase
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      employeeData[camelKey] = value;
+    }
+    // For fields already in camelCase, keep as is
+    else {
+      employeeData[key] = value;
+    }
+  });
+
   const response = await fetch(`/api/employees/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      ...updates,
+      ...employeeData,
       userId: user.id,
     }),
   });
