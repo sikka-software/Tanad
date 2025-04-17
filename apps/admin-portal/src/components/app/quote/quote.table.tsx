@@ -40,7 +40,17 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
   };
 
   const handleSelectedRowsChange = (rows: Quote[]) => {
-    setSelectedRows(rows.map((row) => row.id!));
+    const newSelectedIds = rows.map((row) => row.id!);
+    // Only update if the selection has actually changed
+    const currentSelection = new Set(selectedRows);
+    const newSelection = new Set(newSelectedIds);
+
+    if (
+      newSelection.size !== currentSelection.size ||
+      !Array.from(newSelection).every((id) => currentSelection.has(id))
+    ) {
+      setSelectedRows(newSelectedIds);
+    }
   };
 
   const handleBulkDelete = async () => {
@@ -121,6 +131,9 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
+  // Create a selection state object for the table
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+
   return (
     <SheetTable
       columns={columns}
@@ -129,6 +142,19 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
       showHeader={true}
       enableRowSelection={true}
       onRowSelectionChange={handleSelectedRowsChange}
+      tableOptions={{
+        state: {
+          rowSelection,
+        },
+        enableRowSelection: true,
+        enableMultiRowSelection: true,
+        getRowId: (row) => row.id!,
+        onRowSelectionChange: (updater) => {
+          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+          const selectedRows = data.filter((row) => newSelection[row.id!]);
+          handleSelectedRowsChange(selectedRows);
+        },
+      }}
     />
   );
 };
