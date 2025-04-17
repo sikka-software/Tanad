@@ -4,6 +4,7 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
 import { Trash2, X } from "lucide-react";
+import { toast } from "sonner";
 
 import ProductCard from "@/components/app/product/product.card";
 import ProductsTable from "@/components/app/product/product.table";
@@ -15,7 +16,7 @@ import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
 import { Product } from "@/types/product.type";
 
-import { useProducts, useDeleteProducts } from "@/hooks/useProducts";
+import { useProducts, useBulkDeleteProducts } from "@/hooks/useProducts";
 import { useProductsStore } from "@/stores/products.store";
 
 export default function ProductsPage() {
@@ -27,7 +28,7 @@ export default function ProductsPage() {
 
   // Get selection state and actions from the store
   const { selectedRows, setSelectedRows, clearSelection } = useProductsStore();
-  const { mutate: deleteProducts, isPending: isDeleting } = useDeleteProducts();
+  const { mutate: deleteProducts, isPending: isDeleting } = useBulkDeleteProducts();
 
   const filteredProducts = Array.isArray(products)
     ? products.filter(
@@ -42,27 +43,34 @@ export default function ProductsPage() {
     .map((id) => products?.find((prod) => prod.id === id))
     .filter((prod): prod is Product => prod !== undefined);
 
-  const handleSelectedRowsChange = (rows: Product[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
-
-  const handleDeleteSelected = () => {
+  const handleBulkDelete = () => {
     if (selectedRows.length === 0) return;
-    setIsDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteProducts(selectedRows);
-      clearSelection();
-      setIsDeleteDialogOpen(false);
-    } catch (error) {
-      console.error("Failed to delete products:", error);
-      setIsDeleteDialogOpen(false);
-    }
+    deleteProducts(selectedRows, {
+      onSuccess: () => {
+        clearSelection();
+        setIsDeleteDialogOpen(false);
+      },
+      onError: (error: any) => {
+        if (error?.response?.data?.error === "Cannot delete products that are used in quotes") {
+          const referencedIds = error.response.data.details.referencedProductIds;
+          const referencedProducts = products
+            ?.filter((p) => referencedIds.includes(p.id))
+            .map((p) => p.name)
+            .join(", ") || "";
+          
+          toast.error(t("Products.error.delete_referenced"), {
+            description: t("Products.error.delete_referenced_description", {
+              products: referencedProducts || t("General.unknown"),
+            }),
+          });
+        } else {
+          toast.error(t("General.error_operation"), {
+            description: error.message || t("Products.error.delete"),
+          });
+        }
+        setIsDeleteDialogOpen(false);
+      },
+    });
   };
 
   return (
@@ -80,6 +88,7 @@ export default function ProductsPage() {
               size="sm"
               onClick={clearSelection}
               className="flex items-center gap-2"
+              disabled={isDeleting}
             >
               <X className="h-4 w-4" />
               {t("General.clear")}
@@ -87,8 +96,9 @@ export default function ProductsPage() {
             <Button
               variant="destructive"
               size="sm"
-              onClick={handleDeleteSelected}
+              onClick={() => setIsDeleteDialogOpen(true)}
               className="flex items-center gap-2"
+              disabled={isDeleting}
             >
               <Trash2 className="h-4 w-4" />
               {t("General.delete")}
@@ -113,7 +123,7 @@ export default function ProductsPage() {
             data={filteredProducts}
             isLoading={isLoading}
             error={error as Error | null}
-            onSelectedRowsChange={handleSelectedRowsChange}
+            onSelectedRowsChange={(rows) => setSelectedRows(rows.map((r) => r.id))}
           />
         ) : (
           <div className="p-4">
@@ -134,7 +144,7 @@ export default function ProductsPage() {
         isDeleteDialogOpen={isDeleteDialogOpen}
         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
         isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
+        handleConfirmDelete={handleBulkDelete}
         title={t("Products.confirm_delete_title")}
         description={t("Products.confirm_delete", { count: selectedRows.length })}
       />

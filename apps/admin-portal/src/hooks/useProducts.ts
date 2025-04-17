@@ -85,28 +85,27 @@ export function useDeleteProduct() {
 }
 
 // Hook to delete multiple products
-export function useDeleteProducts() {
+export function useBulkDeleteProducts() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (productIds: string[]) => {
+    mutationFn: async (ids: string[]) => {
       const response = await fetch("/api/products/bulk-delete", {
-        method: "DELETE",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ productIds }),
+        body: JSON.stringify({ ids }),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to delete products");
+        throw new Error("Failed to delete products");
       }
 
-      const result = await response.json();
-      return result;
+      return response.json();
     },
     onSuccess: () => {
+      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });

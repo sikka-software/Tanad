@@ -1,32 +1,44 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { inArray } from "drizzle-orm";
+
 import { db } from "@/db/drizzle";
-import { products } from "@/db/schema";
+import { products as productsTable, quoteItems } from "@/db/schema";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "DELETE") {
-    return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
   }
 
   try {
-    const { productIds } = req.body;
-    console.log("Received product IDs for deletion:", productIds);
+    const { ids } = req.body;
 
-    if (!Array.isArray(productIds) || productIds.length === 0) {
-      return res.status(400).json({ error: "Invalid product IDs" });
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: "Invalid or empty product IDs array" });
     }
 
-    // Delete products
-    const deletedProducts = await db
-      .delete(products)
-      .where(inArray(products.id, productIds))
-      .returning();
+    // Check if any of the products are referenced in quote items
+    const referencedProducts = await db
+      .select({ id: quoteItems.product_id })
+      .from(quoteItems)
+      .where(inArray(quoteItems.product_id, ids))
+      .groupBy(quoteItems.product_id);
 
-    console.log("Products deletion result:", deletedProducts);
+    if (referencedProducts.length > 0) {
+      const referencedIds = referencedProducts.map((p) => p.id).filter(Boolean);
+      return res.status(400).json({
+        error: "Cannot delete products that are used in quotes",
+        details: {
+          referencedProductIds: referencedIds,
+          message: "Please remove these products from quotes before deleting them",
+        },
+      });
+    }
+
+    await db.delete(productsTable).where(inArray(productsTable.id, ids));
 
     return res.status(200).json({ message: "Products deleted successfully" });
   } catch (error) {
-    console.error("Error in bulk delete:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("Error deleting products:", error);
+    return res.status(500).json({ message: "Error deleting products" });
   }
 } 

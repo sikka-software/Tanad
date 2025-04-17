@@ -25,6 +25,7 @@ type ProductsStore = {
   ) => Promise<void>;
   updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
+  bulkDeleteProducts: (ids: string[]) => Promise<void>;
   setSelectedRows: (rows: string[]) => void;
   clearSelection: () => void;
 };
@@ -98,6 +99,23 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
       set((state) => ({
         products: state.products.filter((p) => p.id !== id),
         isLoading: false,
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
+
+  bulkDeleteProducts: async (ids: string[]) => {
+    try {
+      set({ isLoading: true, error: null });
+      const { error } = await supabase.from("products").delete().in("id", ids);
+
+      if (error) throw error;
+
+      set((state) => ({
+        products: state.products.filter((p) => !ids.includes(p.id)),
+        isLoading: false,
+        selectedRows: state.selectedRows.filter((id) => !ids.includes(id)),
       }));
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
