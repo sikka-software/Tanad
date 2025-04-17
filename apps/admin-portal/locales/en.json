@@ -1756,6 +1756,7 @@
     "search_salaries": "Search salaries...",
     "confirm_delete": "Are you sure you want to delete this salary?",
     "no_salaries_found": "No salaries found",
+    "salary_details": "Salary Details",
     "success": {
       "title": "Success",
       "deleted": "Salary deleted successfully"

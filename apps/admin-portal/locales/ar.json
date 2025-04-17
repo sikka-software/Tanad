@@ -2145,6 +2145,7 @@
     "search_salaries": "البحث في الرواتب...",
     "confirm_delete": "هل أنت متأكد من حذف هذا الراتب؟",
     "no_salaries_found": "لم يتم العثور على رواتب",
+    "salary_details": "تفاصيل الراتب",
     "success": {
       "title": "تم بنجاح",
       "deleted": "تم حذف الراتب بنجاح"

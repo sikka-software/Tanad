@@ -147,27 +147,33 @@ export function SalaryForm({
         throw new Error(t("error.not_authenticated"));
       }
 
-      const { data: newEmployee, error } = await supabase
-        .from("employees")
-        .insert([
-          {
-            first_name: data.first_name.trim(),
-            last_name: data.last_name.trim(),
-            email: data.email.trim(),
-            phone: data.phone?.trim() || null,
-            position: data.position.trim(),
-            department: data.department || null,
-            hire_date: data.hireDate.toISOString(),
-            salary: data.salary || null,
-            status: data.status,
-            notes: data.notes?.trim() || null,
-            user_id: user.id,
-          },
-        ])
-        .select()
-        .single();
+      const response = await fetch("/api/employees/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.id}`,
+        },
+        body: JSON.stringify({
+          first_name: data.first_name.trim(),
+          last_name: data.last_name.trim(),
+          email: data.email.trim(),
+          phone: data.phone?.trim() || null,
+          position: data.position.trim(),
+          department_id: data.department || null,
+          hireDate: data.hireDate,
+          salary: data.salary ? parseFloat(data.salary) : null,
+          status: data.status,
+          notes: data.notes?.trim() || null,
+        }),
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || t("Employees.messages.error"));
+      }
+
+      // Get the new employee data
+      const newEmployee = await response.json();
 
       // Set the new employee as the selected employee
       const fullName = `${newEmployee.first_name} ${newEmployee.last_name}`;
