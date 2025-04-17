@@ -1700,8 +1700,7 @@
       "item_price_required": "السعر مطلوب",
       "item_price_positive": "السعر يجب أن يكون رقماً موجباً",
       "item_description_or_product": "يجب اختيار منتج أو إدخال وصف لكل عنصر"
-    },
-    "cancel": "إلغاء"
+    }
   },
   "Holidays": {
     "title": "العطلات الرسمية"
@@ -2227,7 +2226,7 @@
     "back_to_list": "العودة إلى القائمة",
     "no_jobs_found": "لم يتم العثور على وظائف",
     "failed_to_fetch_jobs": "فشل في جلب الوظائف",
-    "cancel": "إلغاء",
+    "search_jobs": "البحث في الوظائف...",
     "messages": {
       "creating_job": "جاري إنشاء الوظيفة...",
       "create_job": "إنشاء الوظيفة",
@@ -2272,10 +2271,12 @@
         "placeholder": "أدخل الراتب"
       },
       "start_date": {
-        "label": "تاريخ البدء"
+        "label": "تاريخ البدء",
+        "placeholder": "أدخل تاريخ البدء"
       },
       "end_date": {
-        "label": "تاريخ الانتهاء"
+        "label": "تاريخ الانتهاء",
+        "placeholder": "أدخل تاريخ الانتهاء"
       },
       "is_active": {
         "label": "هل هذه الوظيفة نشطة؟"
