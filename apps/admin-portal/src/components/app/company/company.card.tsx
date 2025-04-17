@@ -1,6 +1,5 @@
-import { useTranslations } from "next-intl";
-
 import { Mail, Phone, Globe, MapPin, Building2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -8,7 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Company } from "@/types/company.type";
 
 const CompanyCard = ({ company }: { company: Company }) => {
-  const t = useTranslations("Companies");
+  const t = useTranslations();
   return (
     <Card key={company.id} className="transition-shadow hover:shadow-lg">
       <CardHeader>
@@ -18,7 +17,7 @@ const CompanyCard = ({ company }: { company: Company }) => {
             {company.industry && <p className="text-sm text-gray-500">{company.industry}</p>}
           </div>
           <Badge variant={company.is_active ? "default" : "secondary"}>
-            {company.is_active ? "Active" : "Inactive"}
+            {company.is_active ? t("Companies.active") : t("Companies.inactive")}
           </Badge>
         </div>
       </CardHeader>

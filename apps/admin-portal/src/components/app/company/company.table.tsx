@@ -1,7 +1,5 @@
-import React from "react";
-
 import { useTranslations } from "next-intl";
-
+import React from "react";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
