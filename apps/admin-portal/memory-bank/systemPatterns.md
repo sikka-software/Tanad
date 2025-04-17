@@ -953,3 +953,118 @@ When implementing new API routes using this pattern:
 ### Example Routes Using This Pattern
 - `/api/offices`
 - `/api/quotes`
+
+## Table Row Selection Pattern
+
+When implementing row selection in tables using the `SheetTable` component, follow these patterns:
+
+1. **State Management**:
+   - Use a store (e.g., Zustand) to manage selected row IDs
+   - Store should have `selectedRows: string[]` and `setSelectedRows: (ids: string[]) => void`
+
+2. **Table Configuration**:
+   ```typescript
+   tableOptions={{
+     state: {
+       rowSelection,
+     },
+     enableRowSelection: true,
+     enableMultiRowSelection: true,
+     getRowId: (row) => row.id,
+     onRowSelectionChange: (updater) => {
+       const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+       const selectedRows = data.filter((row) => newSelection[row.id]);
+       setSelectedRows(selectedRows.map((row) => row.id));
+       onSelectedRowsChange?.(selectedRows);
+     },
+   }}
+   ```
+
+3. **Row Selection Column**:
+   - Must be the first column with `id: "select"`
+   - Include both header and cell checkboxes
+   - Header checkbox controls all rows
+   - Cell checkboxes control individual rows
+
+4. **Selection State Conversion**:
+   - Convert selected row IDs to a record format for the table:
+   ```typescript
+   const rowSelection = selectedRows.reduce((acc, id) => {
+     acc[id] = true;
+     return acc;
+   }, {} as Record<string, boolean>);
+   ```
+
+5. **Parent Component Integration**:
+   - Pass `onSelectedRowsChange` callback to handle selection changes
+   - Use the callback to update parent state or trigger actions
+
+This pattern ensures consistent row selection behavior across all tables in the application.
+
+## Table Cell Editing Pattern
+
+When implementing cell editing in tables using the `SheetTable` component, follow these patterns:
+
+1. **Validation Schemas**:
+   ```typescript
+   // Required fields
+   const requiredSchema = z.string().min(1, "Required");
+   
+   // Optional fields
+   const optionalSchema = z.string().optional();
+   
+   // Email fields
+   const emailSchema = z.string().email().optional();
+   
+   // Boolean fields
+   const booleanSchema = z.boolean();
+   ```
+
+2. **Column Configuration**:
+   ```typescript
+   const columns = [
+     {
+       accessorKey: "field_name",
+       header: t("columns.field_name"),
+       cell: ({ row }) => row.getValue("field_name"),
+       validationSchema: fieldSchema,
+     },
+     // ... other columns
+   ];
+   ```
+
+3. **Edit Handler**:
+   ```typescript
+   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+     try {
+       await updateItem(rowId, { [columnId]: value });
+     } catch (error) {
+       console.error("Failed to update item:", error);
+     }
+   };
+   ```
+
+4. **Table Component Props**:
+   ```typescript
+   <SheetTable
+     data={data}
+     columns={columns}
+     onEdit={handleEdit}
+     // ... other props
+   />
+   ```
+
+5. **Store Integration**:
+   - Store must have an update function (e.g., `updateItem`)
+   - Update function should handle optimistic updates
+   - Error handling should be implemented
+
+6. **Implementation Checklist**:
+   - [ ] Add validation schemas for all fields
+   - [ ] Configure columns with validation schemas
+   - [ ] Implement edit handler
+   - [ ] Add onEdit prop to SheetTable
+   - [ ] Ensure store has update function
+   - [ ] Handle errors appropriately
+
+This pattern ensures consistent cell editing behavior across all tables in the application.

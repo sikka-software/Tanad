@@ -6,6 +6,7 @@ import {
   fetchBranchById,
   fetchBranches,
   updateBranch,
+  bulkDeleteBranches,
 } from '@/services/branchService';
 
 // Query keys for branches
@@ -80,6 +81,19 @@ export function useDeleteBranch() {
       // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
       queryClient.removeQueries({ queryKey: branchKeys.detail(variables) });
+    },
+  });
+}
+
+// Hook for bulk deleting branches
+export function useBulkDeleteBranches() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: bulkDeleteBranches,
+    onSuccess: () => {
+      // Invalidate the list query
+      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
     },
   });
 } 
