@@ -1,4 +1,44 @@
+import { eq, inArray } from "drizzle-orm";
+
 import { Quote, QuoteItem, QuoteCreateData, QuoteItemCreateData } from "@/types/quote.type";
+
+import { db } from "@/db/drizzle";
+import { quotes } from "@/db/schema";
+
+// Helper function to convert database quote to Quote type
+function convertDbQuoteToQuote(dbQuote: any): Quote {
+  return {
+    id: dbQuote.id,
+    created_at: dbQuote.created_at,
+    quote_number: dbQuote.quoteNumber,
+    issue_date: dbQuote.issueDate,
+    expiry_date: dbQuote.expiryDate,
+    status: dbQuote.status,
+    subtotal: Number(dbQuote.subtotal),
+    tax_rate: dbQuote.taxRate ? Number(dbQuote.taxRate) : 0,
+    tax_amount: dbQuote.taxAmount ? Number(dbQuote.taxAmount) : 0,
+    total: dbQuote.total ? Number(dbQuote.total) : 0,
+    notes: dbQuote.notes,
+    client_id: dbQuote.client_id,
+  };
+}
+
+// Helper function to convert Quote type to database quote
+function convertQuoteToDbQuote(quote: QuoteCreateData): any {
+  return {
+    quoteNumber: quote.quote_number,
+    issueDate: quote.issue_date,
+    expiryDate: quote.expiry_date,
+    status: quote.status,
+    subtotal: quote.subtotal.toString(),
+    taxRate: quote.tax_rate.toString(),
+    taxAmount: quote.tax_amount.toString(),
+    total: quote.total.toString(),
+    notes: quote.notes,
+    client_id: quote.client_id,
+    user_id: quote.user_id,
+  };
+}
 
 export async function fetchQuotes(): Promise<Quote[]> {
   const response = await fetch("/api/quotes");
@@ -16,13 +56,13 @@ export async function fetchQuoteById(id: string): Promise<Quote> {
   return response.json();
 }
 
-export async function createQuote(quote: Omit<Quote, "id" | "created_at">): Promise<Quote> {
+export async function createQuote(newQuote: QuoteCreateData): Promise<Quote> {
   const response = await fetch("/api/quotes", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(quote),
+    body: JSON.stringify(newQuote),
   });
   if (!response.ok) {
     throw new Error("Failed to create quote");
@@ -30,16 +70,13 @@ export async function createQuote(quote: Omit<Quote, "id" | "created_at">): Prom
   return response.json();
 }
 
-export async function updateQuote(
-  id: string,
-  quote: Partial<Omit<Quote, "id" | "created_at">>,
-): Promise<Quote> {
+export async function updateQuote(id: string, updates: Partial<Quote>): Promise<Quote> {
   const response = await fetch(`/api/quotes/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(quote),
+    body: JSON.stringify(updates),
   });
   if (!response.ok) {
     throw new Error("Failed to update quote");
@@ -53,6 +90,19 @@ export async function deleteQuote(id: string): Promise<void> {
   });
   if (!response.ok) {
     throw new Error("Failed to delete quote");
+  }
+}
+
+export async function bulkDeleteQuotes(ids: string[]): Promise<void> {
+  const response = await fetch("/api/quotes/bulk-delete", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete quotes");
   }
 }
 

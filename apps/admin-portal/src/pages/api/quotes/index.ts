@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
 import { quotes } from "@/db/schema";
@@ -43,34 +43,58 @@ function convertDrizzleQuote(data: any): any {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    switch (req.method) {
-      case "GET":
+  switch (req.method) {
+    case "GET":
+      try {
         const result = await db.query.quotes.findMany({
           with: {
             client: true,
           },
-          orderBy: [desc(quotes.created_at)],
         });
-
         const data = result.map(convertDrizzleQuote);
         return res.status(200).json(data);
+      } catch (error) {
+        console.error("Error fetching quotes:", error);
+        return res.status(500).json({ message: "Error fetching quotes" });
+      }
 
-      case "POST":
-        const [newQuote] = await db.insert(quotes).values(req.body).returning();
+    case "POST":
+      try {
+        const {
+          quote_number,
+          issue_date,
+          expiry_date,
+          status,
+          subtotal,
+          tax_rate,
+          notes,
+          client_id,
+          user_id,
+        } = req.body;
+        const [newQuote] = await db
+          .insert(quotes)
+          .values({
+            quoteNumber: quote_number,
+            issueDate: issue_date,
+            expiryDate: expiry_date,
+            status,
+            subtotal: subtotal.toString(),
+            taxRate: tax_rate.toString(),
+            notes,
+            client_id,
+            user_id,
+          })
+          .returning();
         if (!newQuote) {
           return res.status(400).json({ message: "Failed to create quote" });
         }
-        return res.status(201).json(newQuote);
+        return res.status(201).json(convertDrizzleQuote(newQuote));
+      } catch (error) {
+        console.error("Error creating quote:", error);
+        return res.status(500).json({ message: "Error creating quote" });
+      }
 
-      default:
-        return res.status(405).json({ message: "Method not allowed" });
-    }
-  } catch (error) {
-    console.error("Error handling quotes:", error);
-    return res.status(500).json({
-      message: "Internal server error",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
+    default:
+      return res.status(405).json({ message: "Method not allowed" });
   }
 }

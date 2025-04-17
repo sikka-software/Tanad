@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 
 import { type CellContext } from "@tanstack/react-table";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -12,6 +13,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { Quote } from "@/types/quote.type";
 
+import { useBulkDeleteQuotes } from "@/hooks/useQuotes";
 import { useQuotesStore } from "@/stores/quotes.store";
 
 const quoteNumberSchema = z.string().min(1, "Required");
@@ -26,7 +28,8 @@ interface QuotesTableProps {
 }
 
 const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
-  const { updateQuote } = useQuotesStore();
+  const { updateQuote, setSelectedRows, selectedRows } = useQuotesStore();
+  const bulkDeleteQuotes = useBulkDeleteQuotes();
   const t = useTranslations();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
@@ -34,6 +37,25 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
     if (columnId === "client_id") return;
 
     await updateQuote(rowId, { [columnId]: value });
+  };
+
+  const handleSelectedRowsChange = (rows: Quote[]) => {
+    setSelectedRows(rows.map((row) => row.id!));
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedRows.length === 0) {
+      toast.error(t("Quotes.error.no_selection"));
+      return;
+    }
+
+    try {
+      await bulkDeleteQuotes.mutateAsync(selectedRows);
+      toast.success(t("Quotes.success.bulk_delete"));
+      setSelectedRows([]);
+    } catch (error) {
+      toast.error(t("Quotes.error.bulk_delete"));
+    }
   };
 
   const columns: ExtendedColumnDef<Quote>[] = [
@@ -99,7 +121,16 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+  return (
+    <SheetTable
+      columns={columns}
+      data={data}
+      onEdit={handleEdit}
+      showHeader={true}
+      enableRowSelection={true}
+      onRowSelectionChange={handleSelectedRowsChange}
+    />
+  );
 };
 
 export default QuotesTable;
