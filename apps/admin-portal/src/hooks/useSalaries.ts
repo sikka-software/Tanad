@@ -9,16 +9,7 @@ import {
   bulkDeleteSalaries,
 } from "@/services/salaryService";
 
-import type { Salary, SalaryCreateData } from "@/types/salary.type";
-
-// Query keys for salaries
-export const salaryKeys = {
-  all: ["salaries"] as const,
-  lists: () => [...salaryKeys.all, "list"] as const,
-  list: (filters: any) => [...salaryKeys.lists(), { filters }] as const,
-  details: () => [...salaryKeys.all, "detail"] as const,
-  detail: (id: string) => [...salaryKeys.details(), id] as const,
-};
+import type { Salary } from "@/types/salary.type";
 
 // Hook to fetch all salaries
 export function useSalaries() {
@@ -31,7 +22,7 @@ export function useSalaries() {
 // Hook to fetch a single salary by ID
 export function useSalary(id: string) {
   return useQuery({
-    queryKey: salaryKeys.detail(id),
+    queryKey: ["salaries", id],
     queryFn: () => fetchSalaryById(id),
     enabled: !!id,
   });
@@ -62,8 +53,8 @@ export function useUpdateSalary() {
       salary: Partial<Omit<Salary, "id" | "created_at">>;
     }) => updateSalary(id, salary),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: salaryKeys.detail(data.id) });
-      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ["salaries", data.id] });
+      queryClient.invalidateQueries({ queryKey: ["salaries"] });
     },
   });
 }

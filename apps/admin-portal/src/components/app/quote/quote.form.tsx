@@ -1,13 +1,11 @@
-import { useEffect, useMemo, useState, RefObject } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
-
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { PlusCircle, Trash2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState, RefObject } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -64,6 +62,8 @@ export function QuoteForm({
   onSubmit,
   hideFormButtons,
 }: QuoteFormProps) {
+  const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
@@ -72,8 +72,6 @@ export function QuoteForm({
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
   const [clientsLoading, setClientsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
-  const t = useTranslations();
-  const locale = useLocale();
 
   const quoteSchema = z.object({
     client_id: z.string().min(1, t("Quotes.validation.client_required")),
@@ -492,7 +490,7 @@ export function QuoteForm({
               name="client_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Quotes.clients.client")} *</FormLabel>
+                  <FormLabel>{t("Quotes.form.client.label")} *</FormLabel>
                   <FormControl>
                     <ComboboxAdd
                       data={clientOptions}
@@ -509,7 +507,7 @@ export function QuoteForm({
                         );
                       }}
                       texts={{
-                        placeholder: t("Clients.select_client"),
+                        placeholder: t("Quotes.form.client.placeholder"),
                         searchPlaceholder: t("Quotes.clients.search_clients"),
                         noItems: t("Quotes.clients.no_clients"),
                       }}
@@ -527,9 +525,9 @@ export function QuoteForm({
               name="quote_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Quotes.quote_number")} *</FormLabel>
+                  <FormLabel>{t("Quotes.form.quote_number.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("Quotes.enter_quote_number")} {...field} />
+                    <Input placeholder={t("Quotes.form.quote_number.placeholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -571,11 +569,11 @@ export function QuoteForm({
               name="issue_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Quotes.issue_date")} *</FormLabel>
+                  <FormLabel>{t("Quotes.form.issue_date.label")} *</FormLabel>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
-                    placeholder={t("Quotes.select_issue_date")}
+                    placeholder={t("Quotes.form.issue_date.placeholder")}
                   />
                   <FormMessage />
                 </FormItem>
@@ -587,11 +585,11 @@ export function QuoteForm({
               name="expiry_date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Quotes.expiry_date")} *</FormLabel>
+                  <FormLabel>{t("Quotes.form.expiry_date.label")} *</FormLabel>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
                     onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
-                    placeholder={t("Quotes.select_expiry_date")}
+                    placeholder={t("Quotes.form.expiry_date.placeholder")}
                   />
                   <FormMessage />
                 </FormItem>
@@ -604,7 +602,7 @@ export function QuoteForm({
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Quotes.status.title")} *</FormLabel>
+                <FormLabel>{t("Quotes.form.status.title")} *</FormLabel>
                 <Select
                   defaultValue={field.value}
                   onValueChange={field.onChange}
@@ -612,15 +610,15 @@ export function QuoteForm({
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder={t("Quotes.status.select_status")} />
+                      <SelectValue placeholder={t("Quotes.form.status.placeholder")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="draft">{t("Quotes.status.draft")}</SelectItem>
-                    <SelectItem value="sent">{t("Quotes.status.sent")}</SelectItem>
-                    <SelectItem value="accepted">{t("Quotes.status.accepted")}</SelectItem>
-                    <SelectItem value="rejected">{t("Quotes.status.rejected")}</SelectItem>
-                    <SelectItem value="expired">{t("Quotes.status.expired")}</SelectItem>
+                    <SelectItem value="draft">{t("Quotes.form.status.draft")}</SelectItem>
+                    <SelectItem value="sent">{t("Quotes.form.status.sent")}</SelectItem>
+                    <SelectItem value="accepted">{t("Quotes.form.status.accepted")}</SelectItem>
+                    <SelectItem value="rejected">{t("Quotes.form.status.rejected")}</SelectItem>
+                    <SelectItem value="expired">{t("Quotes.form.status.expired")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -697,15 +695,15 @@ export function QuoteForm({
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex items-center justify-between md:col-start-2">
-              <span className="text-sm font-medium">{t("Quotes.common.subtotal")}</span>
+              <span className="text-sm font-medium">{t("Quotes.subtotal")}</span>
               <span className="text-sm">${subtotal.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between md:col-start-2">
-              <span className="text-sm font-medium">{t("Quotes.common.tax")}</span>
+              <span className="text-sm font-medium">{t("Quotes.tax")}</span>
               <span className="text-sm">${tax.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between md:col-start-2">
-              <span className="text-sm font-medium">{t("Quotes.common.total")}</span>
+              <span className="text-sm font-medium">{t("Quotes.total")}</span>
               <span className="text-sm font-bold">${total.toFixed(2)}</span>
             </div>
           </div>

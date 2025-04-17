@@ -1603,6 +1603,8 @@
     "back_to_list": "العودة إلى عروض الأسعار",
     "quote_details": "تفاصيل عرض السعر",
     "submitting": "جاري الإرسال...",
+    "search_quotes": "البحث عن عروض الأسعار",
+    "no_quotes_found": "لا يوجد عروض أسعار",
     "client": "العميل",
     "select_client": "اختر عميل",
     "search_clients": "البحث عن عملاء",
@@ -1617,6 +1619,7 @@
     "select_status": "اختر الحالة",
     "select_issue_date": "اختر تاريخ الإصدار",
     "select_expiry_date": "اختر تاريخ انتهاء الصلاحية",
+    "tax": "الضريبة",
     "status": {
       "title": "الحالة",
       "draft": "مسودة",
@@ -1627,6 +1630,34 @@
     },
     "notes": "ملاحظات",
     "enter_notes": "أدخل الملاحظات",
+    "form": {
+      "quote_number": {
+        "label": "رقم عرض السعر",
+        "placeholder": "أدخل رقم عرض السعر"
+      },
+      "client": {
+        "label": "العميل",
+        "placeholder": "اختر عميل"
+      },
+      "expiry_date": {
+        "label": "تاريخ انتهاء الصلاحية",
+        "placeholder": "اختر تاريخ انتهاء الصلاحية"
+      },
+      "status": {
+        "title": "الحالة",
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "draft": "مسودة",
+        "sent": "تم الإرسال",
+        "accepted": "مقبول",
+        "rejected": "مرفوض",
+        "expired": "منتهي الصلاحية"
+      },
+      "issue_date": {
+        "label": "تاريخ الإصدار",
+        "placeholder": "اختر تاريخ الإصدار"
+      }
+    },
     "products": {
       "title": "المنتجات",
       "product": "المنتج",

@@ -11,18 +11,21 @@ When implementing any CRUD module, we must first respect and align with the data
 #### Schema Alignment Guidelines
 
 1. **Field Mapping**
+
    - All fields defined in the schema must be represented in the model's TypeScript interface
    - Field types must match the schema types (e.g., `text()`, `boolean()`, `uuid()`)
    - Required fields in schema must be required in the interface
    - Optional fields in schema must be nullable in the interface
 
 2. **Validation Rules**
+
    - Use Zod schemas that match the database constraints
    - Required fields should have `min(1)` validation
    - Unique constraints should be enforced in both frontend and backend
    - Default values should be respected
 
 3. **Implementation Checklist**
+
    - [ ] Review schema definition in `schema.ts`
    - [ ] Create/update TypeScript interface matching schema
    - [ ] Implement Zod validation schemas
@@ -31,6 +34,7 @@ When implementing any CRUD module, we must first respect and align with the data
    - [ ] Handle nullable fields appropriately
 
 4. **Example Schema Alignment**
+
    ```typescript
    // Schema Definition
    export const offices = pgTable("offices", {
@@ -75,6 +79,7 @@ When implementing any CRUD module, we must first respect and align with the data
    ```
 
 5. **Common Pitfalls to Avoid**
+
    - Don't add fields not in the schema
    - Don't make required fields optional
    - Don't ignore default values
@@ -93,21 +98,25 @@ When implementing any CRUD module, we must first respect and align with the data
 ### Sub-Patterns
 
 1. **SheetTable Pattern**
+
    - Handles the table view component
    - Manages row selection and inline editing
    - Provides data display and manipulation UI
 
 2. **Data Page Pattern**
+
    - Implements the main data management page
    - Handles view modes (table/cards)
    - Manages search, filtering, and bulk actions
 
 3. **Data Hooks Pattern**
+
    - Provides React Query hooks for data operations
    - Manages data fetching and caching
    - Handles optimistic updates
 
 4. **API Service Pattern**
+
    - Implements the service layer for API calls
    - Handles data transformation
    - Manages error handling
@@ -130,6 +139,7 @@ flowchart TD
 ### Usage Guidelines
 
 When implementing a new CRUD module:
+
 1. Follow the Data Page Pattern for the main page
 2. Implement the SheetTable Pattern for table view
 3. Create hooks following the Data Hooks Pattern
@@ -137,6 +147,7 @@ When implementing a new CRUD module:
 5. Set up routes using the API Route Pattern
 
 ### Example Modules Using This Pattern
+
 - Offices Module
 - Quotes Module
 
@@ -259,12 +270,15 @@ Key Features:
 ## Selection State Management
 
 ### Problem: Infinite Update Loops in Zustand Stores
+
 When implementing selection state in Zustand stores, direct use of `set` can cause infinite update loops when combined with React's state management. This occurs because:
+
 1. The store update triggers a component re-render
 2. The re-render causes another store update
 3. This cycle continues indefinitely
 
 ### Solution: Stable Selection Pattern
+
 Always use this pattern for selection state in Zustand stores:
 
 ```typescript
@@ -276,7 +290,7 @@ interface Store {
 
 const useStore = create<Store>((set) => ({
   selectedRows: [],
-  
+
   setSelectedRows: (ids: string[]) => {
     set((state) => {
       // Only update if the selection has actually changed
@@ -286,7 +300,7 @@ const useStore = create<Store>((set) => ({
       return { ...state, selectedRows: ids };
     });
   },
-  
+
   clearSelection: () => {
     set((state) => {
       // Only update if there are actually selected rows
@@ -300,13 +314,16 @@ const useStore = create<Store>((set) => ({
 ```
 
 Key points:
+
 1. Use state updater function instead of direct set
 2. Compare current and new state before updating
 3. Return current state if no change is needed
 4. Apply this pattern to ALL selection state implementations
 
 ### Implementation Checklist
+
 When implementing selection state:
+
 - [ ] Use state updater function pattern
 - [ ] Add comparison check before updates
 - [ ] Handle empty state cases
@@ -314,7 +331,9 @@ When implementing selection state:
 - [ ] Verify no infinite loops occur
 
 ### Affected Components
+
 This pattern must be used in:
+
 - Quotes store
 - Offices store
 - Departments store
@@ -397,11 +416,13 @@ The SheetTable Pattern is a standardized approach for implementing editable, sel
 ### Key Characteristics
 
 1. **Component Structure**
+
    - Uses `SheetTable` component from `@/ui/sheet-table`
    - Implements `ExtendedColumnDef` for column definitions
    - Includes loading and error states with `TableSkeleton` and `ErrorComponent`
 
 2. **Common Props Interface**
+
    ```typescript
    interface TableProps {
      data: T[];
@@ -412,6 +433,7 @@ The SheetTable Pattern is a standardized approach for implementing editable, sel
    ```
 
 3. **Standard Features**
+
    - Row selection with multi-select support
    - Inline cell editing
    - Column validation using Zod schemas
@@ -420,6 +442,7 @@ The SheetTable Pattern is a standardized approach for implementing editable, sel
    - Translation support
 
 4. **Implementation Pattern**
+
    - Uses store for state management (e.g., `useOfficesStore`, `useQuotesStore`)
    - Implements `handleEdit` for cell updates
    - Implements `handleRowSelectionChange` for selection management
@@ -445,6 +468,7 @@ The SheetTable Pattern is a standardized approach for implementing editable, sel
 ### Usage Guidelines
 
 When implementing a new table using this pattern:
+
 1. Create a new table component following the same structure
 2. Define appropriate Zod schemas for validation
 3. Implement the standard props interface
@@ -454,6 +478,7 @@ When implementing a new table using this pattern:
 7. Implement edit and selection handlers
 
 ### Example Components Using This Pattern
+
 - `office.table.tsx`
 - `quote.table.tsx`
 
@@ -464,6 +489,7 @@ The Data Page Pattern is a standardized approach for implementing data managemen
 ### Key Characteristics
 
 1. **Component Structure**
+
    ```typescript
    export default function DataPage() {
      const t = useTranslations();
@@ -471,13 +497,14 @@ The Data Page Pattern is a standardized approach for implementing data managemen
      const [viewMode, setViewMode] = useState<"table" | "cards">("table");
      const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
      const { data, isLoading, error } = useDataHook();
-     
+
      const { selectedRows, setSelectedRows, clearSelection } = useStore();
      const { mutate: deleteItems, isPending: isDeleting } = useBulkDeleteHook();
    }
    ```
 
 2. **Common Features**
+
    - Search functionality
    - View mode toggle (table/cards)
    - Bulk selection and actions
@@ -487,6 +514,7 @@ The Data Page Pattern is a standardized approach for implementing data managemen
    - Translation support
 
 3. **Layout Structure**
+
    ```typescript
    <DataPageLayout>
      {selectedRows.length > 0 ? (
@@ -542,6 +570,7 @@ The Data Page Pattern is a standardized approach for implementing data managemen
    ```
 
 4. **Standard Functions**
+
    - `handleRowSelectionChange`: Manages row selection state
    - `handleDeleteSelected`: Handles bulk delete initiation
    - `handleConfirmDelete`: Handles actual deletion with error handling
@@ -558,6 +587,7 @@ The Data Page Pattern is a standardized approach for implementing data managemen
 ### Usage Guidelines
 
 When implementing a new data page using this pattern:
+
 1. Create a new page component following the same structure
 2. Implement the standard state variables
 3. Set up the required hooks and store
@@ -567,6 +597,7 @@ When implementing a new data page using this pattern:
 7. Implement data filtering logic
 
 ### Example Pages Using This Pattern
+
 - `quotes/index.tsx`
 - `offices/index.tsx`
 
@@ -577,6 +608,7 @@ The Data Hooks Pattern is a standardized approach for implementing React Query h
 ### Key Characteristics
 
 1. **Standard Hook Structure**
+
    ```typescript
    // Query Hooks
    export function useItems() {
@@ -650,6 +682,7 @@ The Data Hooks Pattern is a standardized approach for implementing React Query h
    ```
 
 2. **Common Features**
+
    - Standard CRUD operations
    - Bulk delete functionality
    - Optimistic updates
@@ -658,12 +691,14 @@ The Data Hooks Pattern is a standardized approach for implementing React Query h
    - Type safety
 
 3. **Hook Types**
+
    - Query hooks for fetching data
    - Mutation hooks for modifying data
    - Single item and list operations
    - Bulk operations
 
 4. **Cache Management**
+
    - Proper query key structure
    - Strategic cache invalidation
    - Optimistic updates
@@ -678,6 +713,7 @@ The Data Hooks Pattern is a standardized approach for implementing React Query h
 ### Usage Guidelines
 
 When implementing new data hooks using this pattern:
+
 1. Create a new hooks file following the same structure
 2. Implement all standard CRUD operations
 3. Add bulk operations if needed
@@ -687,6 +723,7 @@ When implementing new data hooks using this pattern:
 7. Follow the standard hook naming convention
 
 ### Example Hooks Using This Pattern
+
 - `useOffices.ts`
 - `useQuotes.ts`
 
@@ -697,6 +734,7 @@ The API Service Pattern is a standardized approach for implementing API service 
 ### Key Characteristics
 
 1. **Standard Service Structure**
+
    ```typescript
    // Fetch Operations
    export async function fetchItems(): Promise<Item[]> {
@@ -795,6 +833,7 @@ The API Service Pattern is a standardized approach for implementing API service 
    ```
 
 2. **Common Features**
+
    - Standard CRUD operations
    - Bulk operations
    - Error handling with try-catch
@@ -804,6 +843,7 @@ The API Service Pattern is a standardized approach for implementing API service 
    - Standard headers
 
 3. **Error Handling**
+
    - Try-catch blocks for all operations
    - Consistent error message format
    - Error logging
@@ -811,6 +851,7 @@ The API Service Pattern is a standardized approach for implementing API service 
    - Type-safe error handling
 
 4. **API Structure**
+
    - Standard endpoint patterns
    - Consistent HTTP methods
    - Proper request/response handling
@@ -827,6 +868,7 @@ The API Service Pattern is a standardized approach for implementing API service 
 ### Usage Guidelines
 
 When implementing a new API service using this pattern:
+
 1. Create a new service file following the same structure
 2. Implement all standard CRUD operations
 3. Add bulk operations if needed
@@ -836,6 +878,7 @@ When implementing a new API service using this pattern:
 7. Use consistent error messages
 
 ### Example Services Using This Pattern
+
 - `officeService.ts`
 - `quoteService.ts`
 
@@ -846,16 +889,18 @@ The API Route Pattern is a standardized approach for implementing Next.js API ro
 ### CRITICAL IMPLEMENTATION NOTES
 
 1. **API Route Structure**
+
    - MUST use `NextApiRequest` and `NextApiResponse` from 'next'
    - NEVER use `NextRequest` or `NextResponse` from 'next/server'
    - MUST export a default async handler function
    - MUST use `res.status().json()` pattern for responses
 
 2. **Standard Route Files**
+
    ```typescript
    // index.ts - List and Create
    import { NextApiRequest, NextApiResponse } from "next";
-   
+
    export default async function handler(req: NextApiRequest, res: NextApiResponse) {
      if (req.method === "GET") {
        try {
@@ -881,6 +926,7 @@ The API Route Pattern is a standardized approach for implementing Next.js API ro
    ```
 
 3. **Common Features**
+
    - RESTful API structure
    - Standard HTTP methods
    - Error handling
@@ -890,6 +936,7 @@ The API Route Pattern is a standardized approach for implementing Next.js API ro
    - Response formatting
 
 4. **Error Handling**
+
    - Try-catch blocks
    - Standard error responses
    - Proper status codes
@@ -906,6 +953,7 @@ The API Route Pattern is a standardized approach for implementing Next.js API ro
 ### Usage Guidelines
 
 When implementing new API routes using this pattern:
+
 1. Create a new route directory following the same structure
 2. Implement all standard route files
 3. Add proper error handling
@@ -915,6 +963,7 @@ When implementing new API routes using this pattern:
 7. Use proper response formats
 
 ### Example Routes Using This Pattern
+
 - `/api/offices`
 - `/api/quotes`
 
@@ -923,10 +972,12 @@ When implementing new API routes using this pattern:
 When implementing row selection in tables using the `SheetTable` component, follow these patterns:
 
 1. **State Management**:
+
    - Use a store (e.g., Zustand) to manage selected row IDs
    - Store should have `selectedRows: string[]` and `setSelectedRows: (ids: string[]) => void`
 
 2. **Table Configuration**:
+
    ```typescript
    tableOptions={{
      state: {
@@ -945,18 +996,24 @@ When implementing row selection in tables using the `SheetTable` component, foll
    ```
 
 3. **Row Selection Column**:
+
    - Must be the first column with `id: "select"`
    - Include both header and cell checkboxes
    - Header checkbox controls all rows
    - Cell checkboxes control individual rows
 
 4. **Selection State Conversion**:
+
    - Convert selected row IDs to a record format for the table:
+
    ```typescript
-   const rowSelection = selectedRows.reduce((acc, id) => {
-     acc[id] = true;
-     return acc;
-   }, {} as Record<string, boolean>);
+   const rowSelection = selectedRows.reduce(
+     (acc, id) => {
+       acc[id] = true;
+       return acc;
+     },
+     {} as Record<string, boolean>,
+   );
    ```
 
 5. **Parent Component Integration**:
@@ -970,21 +1027,23 @@ This pattern ensures consistent row selection behavior across all tables in the 
 When implementing cell editing in tables using the `SheetTable` component, follow these patterns:
 
 1. **Validation Schemas**:
+
    ```typescript
    // Required fields
    const requiredSchema = z.string().min(1, "Required");
-   
+
    // Optional fields
    const optionalSchema = z.string().optional();
-   
+
    // Email fields
    const emailSchema = z.string().email().optional();
-   
+
    // Boolean fields
    const booleanSchema = z.boolean();
    ```
 
 2. **Column Configuration**:
+
    ```typescript
    const columns = [
      {
@@ -998,6 +1057,7 @@ When implementing cell editing in tables using the `SheetTable` component, follo
    ```
 
 3. **Edit Handler**:
+
    ```typescript
    const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
      try {
@@ -1009,6 +1069,7 @@ When implementing cell editing in tables using the `SheetTable` component, follo
    ```
 
 4. **Table Component Props**:
+
    ```typescript
    <SheetTable
      data={data}
@@ -1019,6 +1080,7 @@ When implementing cell editing in tables using the `SheetTable` component, follo
    ```
 
 5. **Store Integration**:
+
    - Store must have an update function (e.g., `updateItem`)
    - Update function should handle optimistic updates
    - Error handling should be implemented
@@ -1036,14 +1098,17 @@ This pattern ensures consistent cell editing behavior across all tables in the a
 ## Store Naming Conventions
 
 ### Collection Store Pattern
+
 When implementing stores for collections of data (e.g., warehouses, offices, employees):
 
 1. **File Naming**
+
    - Use plural form for the store file name
    - Example: `warehouses.store.ts`, not `warehouse.store.ts`
    - This matches the RESTful API convention of using plurals for collections
 
 2. **Store Hook Naming**
+
    ```typescript
    // Correct
    const useWarehousesStore = create<WarehousesStore>((set) => ({
@@ -1057,15 +1122,16 @@ When implementing stores for collections of data (e.g., warehouses, offices, emp
    ```
 
 3. **Import Pattern**
+
    ```typescript
    // Correct
-   import useWarehousesStore from "@/stores/warehouses.store";
-
    // Incorrect
    import { useWarehouseStore } from "@/stores/warehouse.store";
+   import useWarehousesStore from "@/stores/warehouses.store";
    ```
 
 4. **Interface Naming**
+
    ```typescript
    // Correct
    interface WarehousesStore {
@@ -1081,12 +1147,14 @@ When implementing stores for collections of data (e.g., warehouses, offices, emp
    ```
 
 ### Implementation Guidelines
+
 1. Always use plural form for collection stores
 2. Match the store name with the database table name (which are also plural)
 3. Use consistent export/import patterns
 4. Follow the Selection State Management pattern for all collection stores
 
 ### Common Pitfalls to Avoid
+
 1. Don't mix singular and plural naming
 2. Don't create multiple stores for the same collection
 3. Don't use inconsistent import patterns
@@ -1106,13 +1174,16 @@ flowchart TD
 ```
 
 #### When to Use getServerSideProps
+
 Use `getServerSideProps` when:
+
 - Working with dynamic data that changes frequently
 - Routes with dynamic parameters where paths can't be predetermined
 - CRUD operations where new items can be added/removed
 - User-specific or authenticated pages
 
 Example implementation:
+
 ```typescript
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
@@ -1124,13 +1195,16 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 ```
 
 #### When to Use getStaticProps + getStaticPaths
+
 Use `getStaticProps` with `getStaticPaths` when:
+
 - Data is static or changes infrequently
 - All possible paths are known at build time
 - Pages can be pre-rendered for performance
 - Content is the same for all users
 
 Example implementation:
+
 ```typescript
 export const getStaticPaths: GetStaticPaths = async () => {
   const paths = // fetch all possible paths
@@ -1151,14 +1225,18 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
 ```
 
 ### Implementation Checklist
+
 When creating a new page with dynamic routes:
+
 1. Assess data characteristics:
+
    - [ ] Is the data dynamic or static?
    - [ ] Can all paths be known at build time?
    - [ ] How frequently does the data change?
    - [ ] Is the content user-specific?
 
 2. Choose appropriate data fetching strategy:
+
    - [ ] Use `getServerSideProps` for dynamic/user-specific data
    - [ ] Use `getStaticProps` + `getStaticPaths` for static/pre-renderable data
 
@@ -1168,12 +1246,14 @@ When creating a new page with dynamic routes:
    - User dashboard → Always use `getServerSideProps`
 
 ### Example Components Using This Pattern
+
 - `/companies/[id]/edit.tsx` - Uses `getServerSideProps`
 - `/blog/[slug].tsx` - Uses `getStaticProps` + `getStaticPaths`
 
 ## Core Components
 
 ### 1. Store Pattern
+
 ```typescript
 interface ModuleState {
   items: Item[];
@@ -1211,6 +1291,7 @@ export const useModuleStore = create<ModuleState>((set) => ({
 ```
 
 ### 2. Table Component Pattern
+
 ```typescript
 interface TableProps {
   data: Item[];
@@ -1242,6 +1323,7 @@ const columns: ExtendedColumnDef<Item>[] = [
 ```
 
 ### 3. Service Layer Pattern
+
 ```typescript
 export async function fetchItems(): Promise<Item[]> {
   const response = await fetch("/api/items");
@@ -1260,14 +1342,12 @@ export async function bulkDeleteItems(ids: string[]): Promise<void> {
 ```
 
 ### 4. API Routes Pattern
+
 ```typescript
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "DELETE") {
     try {
-      const result = await db
-        .delete(items)
-        .where(eq(items.id, id))
-        .returning();
+      const result = await db.delete(items).where(eq(items.id, id)).returning();
 
       if (!result.length) {
         return res.status(404).json({ message: "Item not found" });
@@ -1283,6 +1363,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 ## Implementation Steps
 
 1. **Schema and Types**
+
    ```typescript
    // schema.ts
    export const items = pgTable("items", {
@@ -1300,18 +1381,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
    ```
 
 2. **Store Setup**
+
    - Initialize store with state and actions
    - Implement selection state management
    - Add error and loading states
    - Add CRUD operations
 
 3. **Component Creation**
+
    - Create table component with selection
    - Implement form component for create/edit
    - Add card component for alternative view
    - Setup validation schemas
 
 4. **API Layer**
+
    - Create service functions for CRUD
    - Implement API routes
    - Add bulk operations
@@ -1326,19 +1410,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 ## Best Practices
 
 ### 1. Selection State
+
 ```typescript
 const handleRowSelectionChange = (selectedRows: Item[]) => {
   setSelectedRows(selectedRows.map((row) => row.id));
   onSelectedRowsChange?.(selectedRows);
 };
 
-const rowSelection = selectedRows.reduce((acc, id) => {
-  acc[id] = true;
-  return acc;
-}, {} as Record<string, boolean>);
+const rowSelection = selectedRows.reduce(
+  (acc, id) => {
+    acc[id] = true;
+    return acc;
+  },
+  {} as Record<string, boolean>,
+);
 ```
 
 ### 2. Error Handling
+
 ```typescript
 try {
   const result = await db.query.items.findFirst({
@@ -1357,12 +1446,13 @@ try {
 ```
 
 ### 3. Loading States
+
 ```typescript
 if (isLoading) {
   return (
-    <TableSkeleton 
-      columns={columns.map((column) => column.accessorKey as string)} 
-      rows={5} 
+    <TableSkeleton
+      columns={columns.map((column) => column.accessorKey as string)}
+      rows={5}
     />
   );
 }
@@ -1373,6 +1463,7 @@ if (error) {
 ```
 
 ### 4. Form Validation
+
 ```typescript
 const schema = z.object({
   name: z.string().min(1, "Required"),
@@ -1393,16 +1484,19 @@ const form = useForm({
 ## Common Pitfalls
 
 1. **Selection State**
+
    - Always check for changes before updating
    - Clear selection after actions
    - Use consistent selection patterns
 
 2. **API Handling**
+
    - Handle all error cases
    - Use consistent error formats
    - Validate input data
 
 3. **Type Safety**
+
    - Use proper TypeScript types
    - Avoid any types
    - Keep interfaces consistent
@@ -1461,11 +1555,13 @@ export default function ItemsPage() {
 ## Testing Considerations
 
 1. **Unit Tests**
+
    - Test store actions
    - Validate form behavior
    - Check selection logic
 
 2. **Integration Tests**
+
    - Test API endpoints
    - Verify bulk operations
    - Check error handling
@@ -1478,11 +1574,13 @@ export default function ItemsPage() {
 ## Maintenance
 
 1. **Code Organization**
+
    - Keep related files together
    - Use consistent naming
    - Document complex logic
 
 2. **Performance Monitoring**
+
    - Track state updates
    - Monitor API response times
    - Check rendering performance
@@ -1491,3 +1589,89 @@ export default function ItemsPage() {
    - Log API errors
    - Monitor client errors
    - Track validation failures
+
+## Data Mutation Pattern
+
+### React Query Mutations
+
+The application uses React Query for data fetching and mutations. All data mutations (create, update, delete) should follow this pattern:
+
+1. **API Endpoint Structure**:
+
+   - Single item operations: `/api/{resource}/{id}` (GET, PUT, DELETE)
+   - Bulk operations: `/api/{resource}/bulk-{operation}` (POST)
+   - Return `204` for successful deletions
+   - Return `200` with data for updates/creates
+
+2. **Service Layer Pattern**:
+
+```typescript
+// Service function pattern
+export async function bulkDeleteResource(ids: string[]): Promise<void> {
+  try {
+    const response = await fetch("/api/resource/bulk-delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) throw new Error("Failed to delete resources");
+  } catch (error) {
+    console.error("Error deleting resources:", error);
+    throw error;
+  }
+}
+```
+
+3. **React Query Hook Pattern**:
+
+```typescript
+// Hook pattern for mutations
+export function useBulkDeleteResource() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkDeleteResource,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["resources"] });
+    },
+  });
+}
+```
+
+4. **Component Usage Pattern**:
+
+```typescript
+const { mutate: deleteResources, isPending: isDeleting } = useBulkDeleteResource();
+
+const handleDelete = async () => {
+  await deleteResources(ids, {
+    onSuccess: () => {
+      // Clear selection, close dialog, show success toast
+    },
+    onError: () => {
+      // Show error toast
+    },
+  });
+};
+```
+
+### Key Implementation Rules:
+
+1. Always use React Query mutations for data modifications
+2. Always invalidate relevant queries after successful mutations
+3. Handle loading states using mutation's `isPending`
+4. Implement proper error handling at all layers
+5. Use bulk operations for multiple items
+6. Clear selections and show feedback after operations
+7. Never rely on manual cache updates or page refreshes
+
+### Common Pitfalls to Avoid:
+
+1. ❌ Using Zustand store for data mutations
+2. ❌ Manual cache updates without query invalidation
+3. ❌ Missing loading states during mutations
+4. ❌ Requiring page refreshes for UI updates
+5. ❌ Individual API calls for bulk operations
+
+## Other System Patterns
+
+[Additional patterns will be documented here]

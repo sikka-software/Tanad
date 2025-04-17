@@ -6,9 +6,10 @@ import {
   fetchQuoteById,
   fetchQuotes,
   updateQuote,
+  bulkDeleteQuotes,
 } from "@/services/quoteService";
 
-import { Quote, QuoteCreateData } from "@/types/quote.type";
+import { Quote } from "@/types/quote.type";
 
 // Hook to fetch all quotes
 export function useQuotes() {
@@ -70,27 +71,7 @@ export const useBulkDeleteQuotes = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/quotes/bulk-delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete quotes");
-      }
-
-      // For 204 No Content responses, we don't need to parse JSON
-      if (response.status === 204) {
-        return;
-      }
-
-      return response.json();
-    },
+    mutationFn: bulkDeleteQuotes,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quotes"] });
     },
