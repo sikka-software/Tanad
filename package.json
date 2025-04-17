@@ -3,12 +3,13 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "build:admin": "infisical run --env=dev -- pnpm admin:build --filter @tanad/admin",
     "dev": "turbo run dev",
-    "admin:dev": "turbo run admin:dev",
-    "admin:build": "turbo run admin:build",
+    "dev:admin": "infisical run --env=dev -- pnpm admin:dev --filter @tanad/admin",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "check-types": "turbo run check-types",
+    "admin": "infisical run --env=dev -- pnpm --filter @tanad/admin exec next dev --turbopack --port 3037"
   },
   "devDependencies": {
     "prettier": "^3.5.3",

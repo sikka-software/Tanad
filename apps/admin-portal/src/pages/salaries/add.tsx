@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
 import useUserStore from "@/hooks/use-user-store";
-import { salaryKeys } from "@/hooks/useSalaries";
 
 export default function AddSalaryPage() {
   const router = useRouter();
@@ -21,11 +20,11 @@ export default function AddSalaryPage() {
   const handleSuccess = (salary: any) => {
     setLoading(false);
     // Update the salaries cache to include the new salary
-    const previousSalaries = queryClient.getQueryData(salaryKeys.lists()) || [];
-    queryClient.setQueryData(salaryKeys.lists(), [
-      ...(Array.isArray(previousSalaries) ? previousSalaries : []),
-      salary,
-    ]);
+    const previousSalaries = queryClient.getQueryData(["salaries"]) || [];
+    queryClient.setQueryData(
+      ["salaries"],
+      [...(Array.isArray(previousSalaries) ? previousSalaries : []), salary],
+    );
 
     // Navigate to salaries list
     router.push("/salaries");
