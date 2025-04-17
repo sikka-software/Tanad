@@ -18,6 +18,54 @@ import useUserStore from "@/hooks/use-user-store";
 // Load Stripe with publishable key
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 
+// PayPal Icon Component
+function PayPalIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} fill="none">
+      <path
+        d="M19.763 7.376c-.216 1.45-1.314 4.5-3.8 4.5h-1.8c-.262 0-.5.15-.608.39l-1.6 5.2c-.08.24-.314.45-.575.45H9.36a.348.348 0 0 1-.338-.45l.48-1.6v-.01l.87-2.78c.08-.26-.1-.55-.375-.55H8.42c-.266 0-.406-.28-.339-.57l.39-1.65h1.37c.262 0 .501-.15.606-.39l1.575-5.2c.08-.24.315-.39.576-.39h5.041c.266 0 .406.24.339.52-.078.27-.214.72-.214.72z"
+        fill="#253B80"
+      />
+      <path
+        d="M6.1 7.4l-2 7.2c-.078.3.084.55.345.55h1.4c.264 0 .504-.19.607-.48l2-6.8c.078-.3-.084-.56-.345-.56H6.77a.72.72 0 0 0-.671.09z"
+        fill="#179BD7"
+      />
+      <path
+        d="M17.012 3.1c-.216 1.45-1.313 4.5-3.8 4.5h-1.8c-.263 0-.5.15-.607.39l-1.6 5.2c-.08.24-.313.45-.575.45H6.61a.348.348 0 0 1-.338-.45l.87-2.79c.08-.26-.1-.55-.375-.55H5.67c-.266 0-.407-.28-.338-.57l.39-1.65h1.37c.262 0 .5-.15.606-.39l1.575-5.2c.08-.24.314-.39.576-.39h5.041c.265 0 .406.24.338.52-.078.27-.214.72-.214.72z"
+        fill="#253B80"
+      />
+      <path
+        d="M3.35 3.13l-2 7.2c-.08.3.083.55.345.55h1.4c.262 0 .503-.19.606-.48l2-6.8c.08-.3-.083-.56-.345-.56h-1.34a.727.727 0 0 0-.67.09h.005z"
+        fill="#179BD7"
+      />
+    </svg>
+  );
+}
+
+// Google Pay Icon Component
+function GooglePayIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} fill="none">
+      <path
+        d="M21.5 12c0-.17-.02-.33-.04-.5h-9.68v1.9h5.53c-.12.65-.48 1.2-.99 1.58v1.31h1.61c.94-.86 1.56-2.13 1.56-3.67l.01-.62z"
+        fill="#4285F4"
+      />
+      <path
+        d="M11.78 21.5c1.34 0 2.47-.44 3.29-1.2l-1.61-1.24c-.45.3-1.02.48-1.68.48-1.28 0-2.38-.87-2.77-2.04H7.36v1.28c.82 1.63 2.46 2.72 4.42 2.72z"
+        fill="#34A853"
+      />
+      <path
+        d="M9.01 17.5c-.1-.3-.16-.62-.16-.96 0-.34.06-.66.15-.96V14.3H7.35c-.32.63-.5 1.34-.5 2.08 0 .74.18 1.45.5 2.08l1.66-1.27v.31z"
+        fill="#FBBC05"
+      />
+      <path
+        d="M11.78 13.54c.72 0 1.37.25 1.88.73l1.42-1.42c-.86-.8-1.98-1.29-3.3-1.29-1.96 0-3.6 1.09-4.42 2.72l1.65 1.28c.39-1.17 1.5-2.02 2.77-2.02z"
+        fill="#EA4335"
+      />
+    </svg>
+  );
+}
+
 function PaymentError({
   message,
   type = "general",
@@ -209,18 +257,6 @@ export function PaymentDialog({
           fallback: "Payment successful! Your subscription has been updated.",
         }),
       );
-
-      // Add a fallback full page refresh with delay if needed
-      // Only do this if absolutely necessary - as a last resort
-      const shouldForceRefresh = true; // Set to true for testing, can be made conditional later
-
-      if (shouldForceRefresh) {
-        console.log("Scheduling fallback page refresh in 3 seconds");
-        setTimeout(() => {
-          console.log("Performing fallback page refresh");
-          window.location.href = window.location.pathname + "?refresh=" + Date.now() + "#billing";
-        }, 3000);
-      }
     }, 1500);
   };
 
@@ -568,26 +604,6 @@ function PaymentFormContent({
             console.warn("Error dispatching additional event:", err);
           }
         }
-
-        // Show success message
-        toast.success(
-          t("billing.payment.success", {
-            fallback: "Payment successful! Your subscription has been updated.",
-          }),
-        );
-
-        // Add a fallback full page refresh with delay if needed
-        // Only do this if absolutely necessary - as a last resort
-        const shouldForceRefresh = true; // Set to true for testing, can be made conditional later
-
-        if (shouldForceRefresh) {
-          console.log("Scheduling fallback page refresh in 3 seconds");
-          setTimeout(() => {
-            console.log("Performing fallback page refresh");
-            window.location.href = window.location.pathname + "?refresh=" + Date.now() + "#billing";
-          }, 3000);
-        }
-
         // Call success handler
         console.log("Payment process completed successfully");
         setIsProcessing(false);
@@ -680,10 +696,7 @@ function PaymentFormContent({
                 }}
               />
             </div>
-
-            <div
-              className={`mt-4 flex items-center ${isRtl ? "flex-row-reverse" : ""} space-x-2 ${isRtl ? "space-x-reverse" : ""}`}
-            >
+            <div className="flex flex-col space-y-6" dir={isRtl ? "rtl" : "ltr"}>
               <Checkbox
                 id="save-card"
                 checked={saveCard}
@@ -692,6 +705,7 @@ function PaymentFormContent({
               <label
                 htmlFor="save-card"
                 className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                dir={isRtl ? "rtl" : "ltr"}
               >
                 {t("billing.payment.save_card", { fallback: "Save card for future payments" })}
               </label>
@@ -707,6 +721,7 @@ function PaymentFormContent({
                 toast.info("PayPal integration coming soon");
               }}
             >
+              <PayPalIcon className="h-5 w-5" />
               <span className="text-center font-medium">
                 {t("billing.payment.pay_with_paypal", { fallback: "Pay with PayPal" })}
               </span>
@@ -720,6 +735,7 @@ function PaymentFormContent({
                 toast.info("Google Pay integration coming soon");
               }}
             >
+              <GooglePayIcon className="h-5 w-5" />
               <span className="text-center font-medium">
                 {t("billing.payment.google_pay", { fallback: "Google Pay" })}
               </span>
