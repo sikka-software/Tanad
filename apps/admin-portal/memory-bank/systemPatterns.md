@@ -1,5 +1,59 @@
 # System Patterns
 
+## CRUD Module Pattern
+
+The CRUD Module Pattern is a comprehensive approach for implementing full-stack CRUD (Create, Read, Update, Delete) functionality across the application. This pattern encompasses several sub-patterns that work together to provide a complete data management solution.
+
+### Sub-Patterns
+
+1. **SheetTable Pattern**
+   - Handles the table view component
+   - Manages row selection and inline editing
+   - Provides data display and manipulation UI
+
+2. **Data Page Pattern**
+   - Implements the main data management page
+   - Handles view modes (table/cards)
+   - Manages search, filtering, and bulk actions
+
+3. **Data Hooks Pattern**
+   - Provides React Query hooks for data operations
+   - Manages data fetching and caching
+   - Handles optimistic updates
+
+4. **API Service Pattern**
+   - Implements the service layer for API calls
+   - Handles data transformation
+   - Manages error handling
+
+5. **API Route Pattern**
+   - Implements the Next.js API routes
+   - Provides RESTful endpoints
+   - Handles request/response formatting
+
+### Implementation Flow
+
+```mermaid
+flowchart TD
+    A[Data Page Pattern] --> B[SheetTable Pattern]
+    A --> C[Data Hooks Pattern]
+    C --> D[API Service Pattern]
+    D --> E[API Route Pattern]
+```
+
+### Usage Guidelines
+
+When implementing a new CRUD module:
+1. Follow the Data Page Pattern for the main page
+2. Implement the SheetTable Pattern for table view
+3. Create hooks following the Data Hooks Pattern
+4. Implement services using the API Service Pattern
+5. Set up routes using the API Route Pattern
+
+### Example Modules Using This Pattern
+- Offices Module
+- Quotes Module
+
 ## Data Management Patterns
 
 ### 1. Table Component Pattern (`employee.table.tsx`)
@@ -249,3 +303,567 @@ This pattern must be used in:
    - Follow consistent patterns
    - Document code
    - Use proper naming conventions
+
+## SheetTable Pattern
+
+The SheetTable Pattern is a standardized approach for implementing editable, selectable data tables across the application. This pattern is used in components like `office.table.tsx` and `quote.table.tsx`.
+
+### Key Characteristics
+
+1. **Component Structure**
+   - Uses `SheetTable` component from `@/ui/sheet-table`
+   - Implements `ExtendedColumnDef` for column definitions
+   - Includes loading and error states with `TableSkeleton` and `ErrorComponent`
+
+2. **Common Props Interface**
+   ```typescript
+   interface TableProps {
+     data: T[];
+     isLoading?: boolean;
+     error?: Error | null;
+     onSelectedRowsChange?: (rows: T[]) => void;
+   }
+   ```
+
+3. **Standard Features**
+   - Row selection with multi-select support
+   - Inline cell editing
+   - Column validation using Zod schemas
+   - Loading states with skeleton UI
+   - Error handling
+   - Translation support
+
+4. **Implementation Pattern**
+   - Uses store for state management (e.g., `useOfficesStore`, `useQuotesStore`)
+   - Implements `handleEdit` for cell updates
+   - Implements `handleRowSelectionChange` for selection management
+   - Configures table options with consistent settings
+
+5. **Table Options Configuration**
+   ```typescript
+   const tableOptions = {
+     state: {
+       rowSelection,
+     },
+     enableRowSelection: true,
+     enableMultiRowSelection: true,
+     getRowId: (row: T) => row.id!,
+     onRowSelectionChange: (updater: any) => {
+       const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+       const selectedRows = data.filter((row) => newSelection[row.id!]);
+       handleRowSelectionChange(selectedRows);
+     },
+   };
+   ```
+
+### Usage Guidelines
+
+When implementing a new table using this pattern:
+1. Create a new table component following the same structure
+2. Define appropriate Zod schemas for validation
+3. Implement the standard props interface
+4. Configure columns with validation schemas
+5. Set up the table options with consistent settings
+6. Handle loading and error states
+7. Implement edit and selection handlers
+
+### Example Components Using This Pattern
+- `office.table.tsx`
+- `quote.table.tsx`
+
+## Data Page Pattern
+
+The Data Page Pattern is a standardized approach for implementing data management pages across the application. This pattern is used in pages like `quotes/index.tsx` and `offices/index.tsx`.
+
+### Key Characteristics
+
+1. **Component Structure**
+   ```typescript
+   export default function DataPage() {
+     const t = useTranslations();
+     const [searchQuery, setSearchQuery] = useState("");
+     const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+     const { data, isLoading, error } = useDataHook();
+     
+     const { selectedRows, setSelectedRows, clearSelection } = useStore();
+     const { mutate: deleteItems, isPending: isDeleting } = useBulkDeleteHook();
+   }
+   ```
+
+2. **Common Features**
+   - Search functionality
+   - View mode toggle (table/cards)
+   - Bulk selection and actions
+   - Delete confirmation dialog
+   - Data filtering
+   - Loading and error states
+   - Translation support
+
+3. **Layout Structure**
+   ```typescript
+   <DataPageLayout>
+     {selectedRows.length > 0 ? (
+       <SelectionMode
+         selectedRows={selectedRows}
+         clearSelection={clearSelection}
+         isDeleting={isDeleting}
+         setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+       />
+     ) : (
+       <PageSearchAndFilter
+         title={t("Title")}
+         createHref="/path/add"
+         createLabel={t("Add New")}
+         onSearch={setSearchQuery}
+         searchPlaceholder={t("Search")}
+         viewMode={viewMode}
+         onViewModeChange={setViewMode}
+       />
+     )}
+
+     <div>
+       {viewMode === "table" ? (
+         <DataTable
+           data={filteredData}
+           isLoading={isLoading}
+           error={error}
+           onSelectedRowsChange={handleRowSelectionChange}
+         />
+       ) : (
+         <div className="p-4">
+           <DataModelList
+             data={filteredData}
+             isLoading={isLoading}
+             error={error}
+             emptyMessage={t("No Items")}
+             renderItem={(item) => <ItemCard item={item} />}
+             gridCols="3"
+           />
+         </div>
+       )}
+     </div>
+
+     <ConfirmDelete
+       isDeleteDialogOpen={isDeleteDialogOpen}
+       setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+       isDeleting={isDeleting}
+       handleConfirmDelete={handleConfirmDelete}
+       title={t("Confirm Delete")}
+       description={t("Delete Description", { count: selectedRows.length })}
+     />
+   </DataPageLayout>
+   ```
+
+4. **Standard Functions**
+   - `handleRowSelectionChange`: Manages row selection state
+   - `handleDeleteSelected`: Handles bulk delete initiation
+   - `handleConfirmDelete`: Handles actual deletion with error handling
+   - Data filtering logic
+
+5. **Required Dependencies**
+   - `DataPageLayout` component
+   - `PageSearchAndFilter` component
+   - `SelectionMode` component
+   - `ConfirmDelete` component
+   - `DataModelList` component
+   - Appropriate store and hooks
+
+### Usage Guidelines
+
+When implementing a new data page using this pattern:
+1. Create a new page component following the same structure
+2. Implement the standard state variables
+3. Set up the required hooks and store
+4. Implement the standard functions
+5. Use the standard layout structure
+6. Add appropriate translations
+7. Implement data filtering logic
+
+### Example Pages Using This Pattern
+- `quotes/index.tsx`
+- `offices/index.tsx`
+
+## Data Hooks Pattern
+
+The Data Hooks Pattern is a standardized approach for implementing React Query hooks for data management across the application. This pattern is used in hooks like `useOffices.ts` and `useQuotes.ts`.
+
+### Key Characteristics
+
+1. **Standard Hook Structure**
+   ```typescript
+   // Query Hooks
+   export function useItems() {
+     return useQuery({
+       queryKey: ["items"],
+       queryFn: fetchItems,
+     });
+   }
+
+   export function useItem(id: string) {
+     return useQuery({
+       queryKey: ["items", id],
+       queryFn: () => fetchItemById(id),
+       enabled: !!id,
+     });
+   }
+
+   // Mutation Hooks
+   export function useCreateItem() {
+     const queryClient = useQueryClient();
+     return useMutation({
+       mutationFn: (newItem: Omit<Item, "id" | "created_at">) => createItem(newItem),
+       onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: ["items"] });
+       },
+     });
+   }
+
+   export function useUpdateItem() {
+     const queryClient = useQueryClient();
+     return useMutation({
+       mutationFn: ({ id, data }: { id: string; data: Partial<Item> }) => updateItem(id, data),
+       onSuccess: (data) => {
+         queryClient.invalidateQueries({ queryKey: ["items", data.id] });
+         queryClient.invalidateQueries({ queryKey: ["items"] });
+       },
+     });
+   }
+
+   export function useDeleteItem() {
+     const queryClient = useQueryClient();
+     return useMutation({
+       mutationFn: deleteItem,
+       onSuccess: (_, variables) => {
+         queryClient.invalidateQueries({ queryKey: ["items"] });
+         queryClient.removeQueries({ queryKey: ["items", variables] });
+       },
+     });
+   }
+
+   export function useBulkDeleteItems() {
+     const queryClient = useQueryClient();
+     return useMutation({
+       mutationFn: async (ids: string[]) => {
+         const response = await fetch("/api/items/bulk-delete", {
+           method: "POST",
+           headers: { "Content-Type": "application/json" },
+           body: JSON.stringify({ ids }),
+         });
+
+         if (!response.ok) {
+           const error = await response.json();
+           throw new Error(error.message || "Failed to delete items");
+         }
+       },
+       onSuccess: () => {
+         queryClient.invalidateQueries({ queryKey: ["items"] });
+       },
+     });
+   }
+   ```
+
+2. **Common Features**
+   - Standard CRUD operations
+   - Bulk delete functionality
+   - Optimistic updates
+   - Cache invalidation
+   - Error handling
+   - Type safety
+
+3. **Hook Types**
+   - Query hooks for fetching data
+   - Mutation hooks for modifying data
+   - Single item and list operations
+   - Bulk operations
+
+4. **Cache Management**
+   - Proper query key structure
+   - Strategic cache invalidation
+   - Optimistic updates
+   - Query removal for deleted items
+
+5. **Error Handling**
+   - Standard error format
+   - API error parsing
+   - Error propagation
+   - Type-safe error handling
+
+### Usage Guidelines
+
+When implementing new data hooks using this pattern:
+1. Create a new hooks file following the same structure
+2. Implement all standard CRUD operations
+3. Add bulk operations if needed
+4. Set up proper cache invalidation
+5. Implement error handling
+6. Add type safety
+7. Follow the standard hook naming convention
+
+### Example Hooks Using This Pattern
+- `useOffices.ts`
+- `useQuotes.ts`
+
+## API Service Pattern
+
+The API Service Pattern is a standardized approach for implementing API service layers across the application. This pattern is used in services like `officeService.ts` and `quoteService.ts`.
+
+### Key Characteristics
+
+1. **Standard Service Structure**
+   ```typescript
+   // Fetch Operations
+   export async function fetchItems(): Promise<Item[]> {
+     try {
+       const response = await fetch("/api/items");
+       if (!response.ok) {
+         throw new Error("Failed to fetch items");
+       }
+       return response.json();
+     } catch (error) {
+       console.error("Error fetching items:", error);
+       throw new Error("Failed to fetch items");
+     }
+   }
+
+   export async function fetchItemById(id: string): Promise<Item> {
+     try {
+       const response = await fetch(`/api/items/${id}`);
+       if (!response.ok) {
+         throw new Error(`Item with id ${id} not found`);
+       }
+       return response.json();
+     } catch (error) {
+       console.error(`Error fetching item ${id}:`, error);
+       throw new Error(`Failed to fetch item with id ${id}`);
+     }
+   }
+
+   // Create Operation
+   export async function createItem(item: ItemCreateData): Promise<Item> {
+     try {
+       const response = await fetch("/api/items", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify(item),
+       });
+       if (!response.ok) {
+         throw new Error("Failed to create item");
+       }
+       return response.json();
+     } catch (error) {
+       console.error("Error creating item:", error);
+       throw new Error("Failed to create item");
+     }
+   }
+
+   // Update Operation
+   export async function updateItem(id: string, updates: Partial<Item>): Promise<Item> {
+     try {
+       const response = await fetch(`/api/items/${id}`, {
+         method: "PUT",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify(updates),
+       });
+       if (!response.ok) {
+         throw new Error(`Failed to update item with id ${id}`);
+       }
+       return response.json();
+     } catch (error) {
+       console.error(`Error updating item ${id}:`, error);
+       throw new Error(`Failed to update item with id ${id}`);
+     }
+   }
+
+   // Delete Operation
+   export async function deleteItem(id: string): Promise<void> {
+     try {
+       const response = await fetch(`/api/items/${id}`, {
+         method: "DELETE",
+       });
+       if (!response.ok) {
+         throw new Error(`Failed to delete item with id ${id}`);
+       }
+     } catch (error) {
+       console.error(`Error deleting item ${id}:`, error);
+       throw new Error(`Failed to delete item with id ${id}`);
+     }
+   }
+
+   // Bulk Delete Operation
+   export async function bulkDeleteItems(ids: string[]): Promise<void> {
+     try {
+       const response = await fetch("/api/items/bulk-delete", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ ids }),
+       });
+       if (!response.ok) {
+         throw new Error("Failed to delete items");
+       }
+     } catch (error) {
+       console.error("Error deleting items:", error);
+       throw new Error("Failed to delete items");
+     }
+   }
+   ```
+
+2. **Common Features**
+   - Standard CRUD operations
+   - Bulk operations
+   - Error handling with try-catch
+   - Consistent error messages
+   - Type safety
+   - Proper HTTP method usage
+   - Standard headers
+
+3. **Error Handling**
+   - Try-catch blocks for all operations
+   - Consistent error message format
+   - Error logging
+   - Proper error propagation
+   - Type-safe error handling
+
+4. **API Structure**
+   - Standard endpoint patterns
+   - Consistent HTTP methods
+   - Proper request/response handling
+   - JSON data handling
+   - Proper headers
+
+5. **Type Safety**
+   - Proper TypeScript types
+   - Input validation
+   - Return type definitions
+   - Partial types for updates
+   - Create data types
+
+### Usage Guidelines
+
+When implementing a new API service using this pattern:
+1. Create a new service file following the same structure
+2. Implement all standard CRUD operations
+3. Add bulk operations if needed
+4. Implement proper error handling
+5. Add type safety
+6. Follow the standard API structure
+7. Use consistent error messages
+
+### Example Services Using This Pattern
+- `officeService.ts`
+- `quoteService.ts`
+
+## API Route Pattern
+
+The API Route Pattern is a standardized approach for implementing Next.js API routes across the application. This pattern is used in routes like `/api/offices` and `/api/quotes`.
+
+### Key Characteristics
+
+1. **Route Structure**
+   ```
+   /api/[resource]/
+   ├── index.ts        # List and Create operations
+   ├── [id].ts         # Get, Update, Delete operations
+   └── bulk-delete.ts  # Bulk delete operation
+   ```
+
+2. **Standard Route Files**
+   ```typescript
+   // index.ts - List and Create
+   export async function GET() {
+     try {
+       const items = await fetchItems();
+       return NextResponse.json(items);
+     } catch (error) {
+       return NextResponse.json({ error: "Failed to fetch items" }, { status: 500 });
+     }
+   }
+
+   export async function POST(request: Request) {
+     try {
+       const data = await request.json();
+       const item = await createItem(data);
+       return NextResponse.json(item, { status: 201 });
+     } catch (error) {
+       return NextResponse.json({ error: "Failed to create item" }, { status: 500 });
+     }
+   }
+
+   // [id].ts - Get, Update, Delete
+   export async function GET(request: Request, { params }: { params: { id: string } }) {
+     try {
+       const item = await fetchItemById(params.id);
+       return NextResponse.json(item);
+     } catch (error) {
+       return NextResponse.json({ error: "Item not found" }, { status: 404 });
+     }
+   }
+
+   export async function PUT(request: Request, { params }: { params: { id: string } }) {
+     try {
+       const data = await request.json();
+       const item = await updateItem(params.id, data);
+       return NextResponse.json(item);
+     } catch (error) {
+       return NextResponse.json({ error: "Failed to update item" }, { status: 500 });
+     }
+   }
+
+   export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+     try {
+       await deleteItem(params.id);
+       return new NextResponse(null, { status: 204 });
+     } catch (error) {
+       return NextResponse.json({ error: "Failed to delete item" }, { status: 500 });
+     }
+   }
+
+   // bulk-delete.ts
+   export async function POST(request: Request) {
+     try {
+       const { ids } = await request.json();
+       await bulkDeleteItems(ids);
+       return new NextResponse(null, { status: 204 });
+     } catch (error) {
+       return NextResponse.json({ error: "Failed to delete items" }, { status: 500 });
+     }
+   }
+   ```
+
+3. **Common Features**
+   - RESTful API structure
+   - Standard HTTP methods
+   - Error handling
+   - Proper status codes
+   - Type safety
+   - Request validation
+   - Response formatting
+
+4. **Error Handling**
+   - Try-catch blocks
+   - Standard error responses
+   - Proper status codes
+   - Error logging
+   - Consistent error format
+
+5. **Response Format**
+   - JSON responses
+   - Proper status codes
+   - Consistent structure
+   - Type-safe responses
+   - Empty responses for DELETE
+
+### Usage Guidelines
+
+When implementing new API routes using this pattern:
+1. Create a new route directory following the same structure
+2. Implement all standard route files
+3. Add proper error handling
+4. Use consistent status codes
+5. Implement request validation
+6. Follow RESTful conventions
+7. Use proper response formats
+
+### Example Routes Using This Pattern
+- `/api/offices`
+- `/api/quotes`
