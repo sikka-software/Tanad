@@ -27,17 +27,50 @@ interface CompaniesTableProps {
   data: Company[];
   isLoading?: boolean;
   error?: Error | null;
+  onSelectedRowsChange?: (rows: Company[]) => void;
 }
 
-const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
+const CompaniesTable = ({ data, isLoading, error, onSelectedRowsChange }: CompaniesTableProps) => {
   const t = useTranslations("Companies");
-  const { updateCompany } = useCompaniesStore();
+  const { updateCompany, selectedRows, setSelectedRows } = useCompaniesStore();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateCompany(rowId, { [columnId]: value });
   };
 
+  const handleRowSelectionChange = (selectedRows: Company[]) => {
+    setSelectedRows(selectedRows.map((row) => row.id));
+    onSelectedRowsChange?.(selectedRows);
+  };
+
+  const rowSelection = selectedRows.reduce(
+    (acc, id) => {
+      acc[id] = true;
+      return acc;
+    },
+    {} as Record<string, boolean>,
+  );
+
   const columns: ExtendedColumnDef<Company>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllRowsSelected()}
+          onChange={table.getToggleAllRowsSelectedHandler()}
+          className="h-4 w-4 rounded border-gray-300"
+        />
+      ),
+      cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={row.getIsSelected()}
+          onChange={row.getToggleSelectedHandler()}
+          className="h-4 w-4 rounded border-gray-300"
+        />
+      ),
+    },
     { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
     { accessorKey: "industry", header: t("form.industry.label"), validationSchema: industrySchema },
     { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
@@ -52,7 +85,6 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
       accessorKey: "is_active",
       header: t("form.is_active.label"),
       validationSchema: is_activeSchema,
-      // type: "boolean",
     },
     { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
   ];
@@ -67,7 +99,27 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+  return (
+    <SheetTable
+      columns={columns}
+      data={data}
+      onEdit={handleEdit}
+      showHeader={true}
+      tableOptions={{
+        state: {
+          rowSelection,
+        },
+        enableRowSelection: true,
+        enableMultiRowSelection: true,
+        getRowId: (row) => row.id,
+        onRowSelectionChange: (updater) => {
+          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+          const selectedRows = data.filter((row) => newSelection[row.id]);
+          handleRowSelectionChange(selectedRows);
+        },
+      }}
+    />
+  );
 };
 
 export default CompaniesTable;

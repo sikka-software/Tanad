@@ -3,10 +3,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createCompany,
   deleteCompany,
+  bulkDeleteCompanies,
   fetchCompanyById,
   fetchCompanies,
   updateCompany,
 } from "@/services/companyService";
+
 import type { Company } from "@/types/company.type";
 
 // Query keys for companies
@@ -26,60 +28,57 @@ export function useCompanies() {
   });
 }
 
-// Hook to fetch a single company by ID
+// Hook to fetch a single company
 export function useCompany(id: string) {
   return useQuery({
-    queryKey: companyKeys.detail(id),
+    queryKey: ["companies", id],
     queryFn: () => fetchCompanyById(id),
-    enabled: !!id, // Only run query if id is truthy
+    enabled: !!id,
   });
 }
 
-// Hook for creating a new company
+// Hook to create a company
 export function useCreateCompany() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (newCompany: Omit<Company, "id" | "created_at">) => {
-      return createCompany(newCompany);
-    },
+    mutationFn: createCompany,
     onSuccess: () => {
-      // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
 }
 
-// Hook for updating an existing company
+// Hook to update a company
 export function useUpdateCompany() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: ({
-      id,
-      company,
-    }: {
-      id: string;
-      company: Partial<Omit<Company, "id" | "created_at">>;
-    }) => updateCompany(id, company),
-    onSuccess: (data: Company) => {
-      // Invalidate both the specific detail and the list queries
-      queryClient.invalidateQueries({ queryKey: companyKeys.detail(data.id) });
-      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
+    mutationFn: ({ id, data }: { id: string; data: Partial<Company> }) => updateCompany(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["companies", data.id] });
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
 }
 
-// Hook for deleting a company
+// Hook to delete a company
 export function useDeleteCompany() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (id: string) => deleteCompany(id),
+    mutationFn: deleteCompany,
     onSuccess: (_, variables) => {
-      // Invalidate the list and remove the specific detail query from cache
-      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
-      queryClient.removeQueries({ queryKey: companyKeys.detail(variables) });
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.removeQueries({ queryKey: ["companies", variables] });
     },
   });
-} 
+}
+
+// Hook to bulk delete companies
+export function useBulkDeleteCompanies() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkDeleteCompanies,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+    },
+  });
+}

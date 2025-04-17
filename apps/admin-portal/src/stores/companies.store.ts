@@ -1,18 +1,21 @@
 import { create } from "zustand";
 
 import { Company } from "@/types/company.type";
-import { db } from "@/db/drizzle";
 
 interface CompaniesState {
   companies: Company[];
+  selectedRows: string[];
   isLoading: boolean;
   error: string | null;
   fetchCompanies: () => Promise<void>;
   updateCompany: (id: string, updates: Partial<Company>) => Promise<void>;
+  setSelectedRows: (ids: string[]) => void;
+  clearSelection: () => void;
 }
 
 export const useCompaniesStore = create<CompaniesState>((set) => ({
   companies: [],
+  selectedRows: [],
   isLoading: false,
   error: null,
 
@@ -42,11 +45,31 @@ export const useCompaniesStore = create<CompaniesState>((set) => ({
 
       set((state) => ({
         companies: state.companies.map((company) =>
-          company.id === id ? { ...company, ...updates } : company
+          company.id === id ? { ...company, ...updates } : company,
         ),
       }));
     } catch (error) {
       set({ error: (error as Error).message });
     }
   },
-})); 
+
+  setSelectedRows: (ids: string[]) => {
+    set((state) => {
+      // Only update if the selection has actually changed
+      if (JSON.stringify(state.selectedRows) === JSON.stringify(ids)) {
+        return state;
+      }
+      return { ...state, selectedRows: ids };
+    });
+  },
+
+  clearSelection: () => {
+    set((state) => {
+      // Only update if there are actually selected rows
+      if (state.selectedRows.length === 0) {
+        return state;
+      }
+      return { ...state, selectedRows: [] };
+    });
+  },
+}));
