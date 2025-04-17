@@ -9,7 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import { WarehouseForm } from "@/forms/warehouse-form";
+import { WarehouseForm } from "@/components/app/warehouse/warehouse.form";
 
 import useUserStore from "@/hooks/use-user-store";
 import { warehouseKeys } from "@/hooks/useWarehouses";

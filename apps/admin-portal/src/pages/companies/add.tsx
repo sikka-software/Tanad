@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 
-import { CompanyForm, type CompanyFormValues } from "@/components/forms/company-form";
+import { CompanyForm, type CompanyFormValues } from "@/components/app/company/company.form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";

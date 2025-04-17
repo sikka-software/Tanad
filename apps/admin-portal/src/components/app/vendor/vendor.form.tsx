@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { useTranslations } from "next-intl";
@@ -14,69 +14,69 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { CompanyForm, type CompanyFormValues } from "@/forms/company-form";
+import { CompanyForm, type CompanyFormValues } from "@/components/app/company/company.form";
 
 import { supabase } from "@/lib/supabase";
 
+import { fetchVendorById } from "@/services/vendorService";
+
 import { useCompanies } from "@/hooks/useCompanies";
 
-export const createClientSchema = (t: (key: string) => string) =>
+export const createVendorSchema = (t: (key: string) => string) =>
   z.object({
-    name: z.string().min(1, t("Clients.form.validation.name_required")),
-    email: z
-      .string()
-      .min(1, t("Clients.form.validation.email_required"))
-      .email(t("Clients.form.validation.email_invalid")),
-    phone: z.string().min(1, t("Clients.form.validation.phone_required")),
-    company: z.string().nullable(),
-    address: z.string().min(1, t("Clients.form.validation.address_required")),
-    city: z.string().min(1, t("Clients.form.validation.city_required")),
-    state: z.string().min(1, t("Clients.form.validation.state_required")),
-    zip_code: z.string().min(1, t("Clients.form.validation.zip_code_required")),
-    notes: z.string().optional(),
+    name: z.string().min(1, t("Vendors.form.name.required")),
+    email: z.string().email(t("Vendors.form.email.invalid")),
+    phone: z.string().min(1, t("Vendors.form.phone.required")),
+    company: z.string().optional(),
+    address: z.string().min(1, t("Vendors.form.address.required")),
+    city: z.string().min(1, t("Vendors.form.city.required")),
+    state: z.string().min(1, t("Vendors.form.state.required")),
+    zipCode: z.string().min(5, t("Vendors.form.zip_code.required")),
+    notes: z.string().nullable(),
   });
 
-export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
+export type VendorFormValues = z.input<ReturnType<typeof createVendorSchema>>;
 
-interface ClientFormProps {
-  id?: string;
-  onSubmit: (data: ClientFormValues) => Promise<void>;
+interface VendorFormProps {
+  formId?: string;
+  vendor_id?: string;
   loading?: boolean;
   user_id: string | undefined;
-  defaultValues?: Partial<ClientFormValues>;
+  onSubmit?: (data: VendorFormValues) => void;
 }
 
-export function ClientForm({
-  id,
-  onSubmit,
-  loading = false,
+export function VendorForm({
+  formId,
+  vendor_id,
+  loading: externalLoading = false,
   user_id,
-  defaultValues,
-}: ClientFormProps) {
+  onSubmit,
+}: VendorFormProps) {
   const t = useTranslations();
   const { locale } = useRouter();
-  const { data: companies, isLoading: companiesLoading } = useCompanies();
+  const [internalLoading, setInternalLoading] = useState(false);
+  const loading = externalLoading || internalLoading;
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
+  const { data: companies, isLoading: companiesLoading } = useCompanies();
 
-  const form = useForm<ClientFormValues>({
-    resolver: zodResolver(createClientSchema(t)),
+  const form = useForm<VendorFormValues>({
+    resolver: zodResolver(createVendorSchema(t)),
     defaultValues: {
       name: "",
       email: "",
       phone: "",
-      company: null,
+      company: "",
       address: "",
       city: "",
       state: "",
-      zip_code: "",
+      zipCode: "",
       notes: "",
-      ...defaultValues,
     },
   });
 
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
-    (window as any).clientForm = form;
+    (window as any).vendorForm = form;
   }
 
   // Format companies for ComboboxAdd
@@ -85,6 +85,36 @@ export function ClientForm({
       label: company.name,
       value: company.id,
     })) || [];
+
+  // Fetch vendor data if vendor_id is provided (edit mode)
+  useEffect(() => {
+    if (vendor_id) {
+      setInternalLoading(true);
+      fetchVendorById(vendor_id)
+        .then((vendor) => {
+          form.reset({
+            name: vendor.name,
+            email: vendor.email,
+            phone: vendor.phone,
+            company: vendor.company || "",
+            address: vendor.address,
+            city: vendor.city,
+            state: vendor.state,
+            zipCode: vendor.zipCode,
+            notes: vendor.notes || "",
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to fetch vendor:", error);
+          toast.error(t("General.error_operation"), {
+            description: t("Vendors.messages.error_fetch"),
+          });
+        })
+        .finally(() => {
+          setInternalLoading(false);
+        });
+    }
+  }, [vendor_id, form, t]);
 
   const handleCompanySubmit = async (data: CompanyFormValues) => {
     try {
@@ -117,7 +147,7 @@ export function ClientForm({
 
       if (error) throw error;
 
-      // Set the new company as the selected company
+      // Set the new company name as the selected company
       form.setValue("company", newCompany.name);
 
       // Close the dialog
@@ -135,20 +165,26 @@ export function ClientForm({
     }
   };
 
+  const handleSubmit = (data: VendorFormValues) => {
+    if (onSubmit) {
+      onSubmit(data);
+    }
+  };
+
   return (
     <>
       <Form {...form}>
-        <form id={id || "client-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+        <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Clients.form.name.label")} *</FormLabel>
+                  <FormLabel>{t("Vendors.form.name.label")} *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Clients.form.name.placeholder")}
+                      placeholder={t("Vendors.form.name.placeholder")}
                       {...field}
                       disabled={loading}
                     />
@@ -163,18 +199,18 @@ export function ClientForm({
               name="company"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Clients.form.company.label")}</FormLabel>
+                  <FormLabel>{t("Vendors.form.company.label")} *</FormLabel>
                   <FormControl>
                     <ComboboxAdd
                       direction={locale === "ar" ? "rtl" : "ltr"}
-                      data={companyOptions}
+                      data={companyOptions.map((opt) => ({ ...opt, value: opt.label }))}
                       isLoading={companiesLoading}
-                      defaultValue={field.value || ""}
-                      onChange={(value) => field.onChange(value || null)}
+                      defaultValue={field.value}
+                      onChange={field.onChange}
                       texts={{
-                        placeholder: t("Clients.form.company.placeholder"),
-                        searchPlaceholder: t("Clients.form.company.search_placeholder"),
-                        noItems: t("Clients.form.company.no_companies"),
+                        placeholder: t("Vendors.form.company.placeholder"),
+                        searchPlaceholder: t("Vendors.form.company.search_placeholder"),
+                        noItems: t("Vendors.form.company.no_companies"),
                       }}
                       addText={t("Companies.add_new")}
                       onAddClick={() => setIsCompanyDialogOpen(true)}
@@ -186,18 +222,19 @@ export function ClientForm({
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Clients.form.email.label")} *</FormLabel>
+                  <FormLabel>{t("Vendors.form.email.label")} *</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder={t("Clients.form.email.placeholder")}
+                      placeholder={t("Vendors.form.email.placeholder")}
                       {...field}
+                      disabled={loading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -210,12 +247,13 @@ export function ClientForm({
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Clients.form.phone.label")} *</FormLabel>
+                  <FormLabel>{t("Vendors.form.phone.label")} *</FormLabel>
                   <FormControl>
                     <Input
                       type="tel"
-                      placeholder={t("Clients.form.phone.placeholder")}
+                      placeholder={t("Vendors.form.phone.placeholder")}
                       {...field}
+                      disabled={loading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -229,24 +267,32 @@ export function ClientForm({
             name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Clients.form.address.label")} *</FormLabel>
+                <FormLabel>{t("Vendors.form.address.label")} *</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("Clients.form.address.placeholder")} {...field} />
+                  <Input
+                    placeholder={t("Vendors.form.address.placeholder")}
+                    {...field}
+                    disabled={loading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <FormField
               control={form.control}
               name="city"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Clients.form.city.label")} *</FormLabel>
+                  <FormLabel>{t("Vendors.form.city.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("Clients.form.city.placeholder")} {...field} />
+                    <Input
+                      placeholder={t("Vendors.form.city.placeholder")}
+                      {...field}
+                      disabled={loading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -258,9 +304,13 @@ export function ClientForm({
               name="state"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Clients.form.state.label")} *</FormLabel>
+                  <FormLabel>{t("Vendors.form.state.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("Clients.form.state.placeholder")} {...field} />
+                    <Input
+                      placeholder={t("Vendors.form.state.placeholder")}
+                      {...field}
+                      disabled={loading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -269,12 +319,16 @@ export function ClientForm({
 
             <FormField
               control={form.control}
-              name="zip_code"
+              name="zipCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Clients.form.zip_code.label")} *</FormLabel>
+                  <FormLabel>{t("Vendors.form.zip_code.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("Clients.form.zip_code.placeholder")} {...field} />
+                    <Input
+                      placeholder={t("Vendors.form.zip_code.placeholder")}
+                      {...field}
+                      disabled={loading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -287,9 +341,14 @@ export function ClientForm({
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Clients.form.notes.label")}</FormLabel>
+                <FormLabel>{t("Vendors.form.notes.label")}</FormLabel>
                 <FormControl>
-                  <Textarea placeholder={t("Clients.form.notes.placeholder")} rows={4} {...field} />
+                  <Textarea
+                    placeholder={t("Vendors.form.notes.placeholder")}
+                    {...field}
+                    value={field.value ?? ""}
+                    disabled={loading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -303,8 +362,10 @@ export function ClientForm({
         onOpenChange={setIsCompanyDialogOpen}
         title={t("Companies.add_new")}
         formId="company-form"
+        cancelText={t("General.cancel")}
+        submitText={t("General.save")}
       >
-        <CompanyForm id="company-form" onSubmit={handleCompanySubmit} />
+        <CompanyForm id="company-form" onSubmit={handleCompanySubmit} loading={loading} />
       </FormDialog>
     </>
   );

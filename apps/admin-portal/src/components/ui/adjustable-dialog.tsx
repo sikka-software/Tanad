@@ -77,7 +77,7 @@ const AdjustableDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
-        persist
+        // persist
         className="overflow-hidden"
         dir={locale === "ar" ? "rtl" : "ltr"}
       >

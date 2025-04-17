@@ -5,8 +5,9 @@ import { useTranslations } from "next-intl";
 
 import { Loader2, Trash2, X } from "lucide-react";
 
+import DepartmentCard from "@/components/app/department/department.card";
+import DepartmentsTable from "@/components/app/department/department.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import DepartmentsTable from "@/components/tables/departments-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +19,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
@@ -71,24 +71,6 @@ export default function DepartmentsPage() {
       setIsDeleteDialogOpen(false);
     }
   };
-
-  const renderDepartment = (department: Department) => (
-    <Card key={department.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <h3 className="text-lg font-semibold">{department.name}</h3>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {department.description || t("Departments.no_description")}
-          </p>
-          <p className="text-xs text-gray-500">
-            {t("common.created_at")}: {new Date(department.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <DataPageLayout>
@@ -146,7 +128,7 @@ export default function DepartmentsPage() {
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
               emptyMessage={t("Departments.no_departments_found")}
-              renderItem={renderDepartment}
+              renderItem={(department: Department) => <DepartmentCard department={department} />}
               gridCols="3"
             />
           </div>

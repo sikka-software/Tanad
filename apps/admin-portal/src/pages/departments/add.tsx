@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import DepartmentForm, { type DepartmentFormValues } from "@/forms/department-form";
+import DepartmentForm, { type DepartmentFormValues } from "@/components/app/department/department.form";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";

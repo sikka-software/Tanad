@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 import { Textarea } from "@/ui/textarea";
 
-import { ClientForm, type ClientFormValues } from "@/forms/client-form";
+import { ClientForm, type ClientFormValues } from "@/components/app/client/client.form";
 
 import { supabase } from "@/lib/supabase";
 

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { Loader2, Trash2, X } from "lucide-react";
 
-import EmployeesTable from "@/components/employees/employees.table";
+import EmployeesTable from "@/components/app/employee/employee.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import {
   AlertDialog,
@@ -26,7 +26,7 @@ import { Employee } from "@/types/employee.types";
 import { useEmployees, useDeleteEmployee } from "@/hooks/useEmployees";
 import { useEmployeesStore } from "@/stores/employees.store";
 
-import EmployeeCard from "../../components/employees/employee.card";
+import EmployeeCard from "../../components/app/employee/employee.card";
 
 export default function EmployeesPage() {
   const t = useTranslations();

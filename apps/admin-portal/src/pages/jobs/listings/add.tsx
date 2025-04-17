@@ -5,10 +5,13 @@ import { useRouter } from "next/router";
 
 import { toast } from "sonner";
 
-import { JobListingForm, type JobListingFormValues } from "@/components/forms/job-listing-form";
-import { Button } from "@/components/ui/button";
+import {
+  JobListingForm,
+  type JobListingFormValues,
+} from "@/components/app/job-listing/job-listing.form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+
 import useUserStore from "@/hooks/use-user-store";
 import { useJobListings } from "@/hooks/useJobListings";
 

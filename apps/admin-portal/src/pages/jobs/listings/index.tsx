@@ -1,13 +1,15 @@
 import { useState } from "react";
+
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
+import JobListingCard from "@/components/app/job-listing/job-listing.card";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import { useJobListings } from "@/hooks/useJobListings";
+
 import { JobListing } from "@/types/job-listing.type";
+
+import { useJobListings } from "@/hooks/useJobListings";
 
 export default function JobListingsPage() {
   const t = useTranslations("Jobs");
@@ -26,30 +28,6 @@ export default function JobListingsPage() {
     router.push("/jobs/listings/add");
   };
 
-  const renderListing = (listing: JobListing) => (
-    <Card key={listing.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">{listing.title}</h3>
-            <p className="text-sm text-gray-500">{listing.jobs?.length || 0} jobs</p>
-          </div>
-          <Badge variant={listing.is_active ? "default" : "secondary"}>
-            {listing.is_active ? "Active" : "Inactive"}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {listing.description && <p className="text-sm text-gray-600">{listing.description}</p>}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span>Created: {new Date(listing.createdAt).toLocaleDateString()}</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -65,7 +43,9 @@ export default function JobListingsPage() {
         onViewModeChange={setViewMode}
       />
       <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredListings.map(renderListing)}
+        {filteredListings.map((listing: JobListing) => (
+          <JobListingCard key={listing.id} jobListing={listing} />
+        ))}
       </div>
     </DataPageLayout>
   );

@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 
 import { toast } from "sonner";
 
-import { InvoiceForm, type InvoiceFormValues } from "@/components/forms/invoice-form";
+import { InvoiceForm, type InvoiceFormValues } from "@/components/app/invoice/invoice.form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 

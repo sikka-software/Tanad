@@ -9,8 +9,8 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import ProtectedRoute from "@/components/ProtectedRoute";
-import TemplateEditor from "@/components/TemplateEditor";
+import ProtectedRoute from "@/components/app/ProtectedRoute";
+import TemplateEditor from "@/components/app/TemplateEditor";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -46,6 +46,7 @@ import {
   TableBody,
 } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+
 import useUserStore from "@/hooks/use-user-store";
 
 const defaultTemplate = {

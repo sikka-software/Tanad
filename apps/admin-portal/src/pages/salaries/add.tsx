@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 
 import { useQueryClient } from "@tanstack/react-query";
 
-import { SalaryForm } from "@/components/forms/salary-form";
+import { SalaryForm } from "@/components/app/salary/salary.form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 

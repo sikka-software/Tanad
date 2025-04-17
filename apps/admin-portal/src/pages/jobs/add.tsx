@@ -7,10 +7,10 @@ import { useRouter } from "next/router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { JobForm, type JobFormValues } from "@/components/forms/job-form";
-import { Button } from "@/components/ui/button";
+import { JobForm, type JobFormValues } from "@/components/app/job/job.form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+
 import { createJob } from "@/services/jobService";
 
 export default function AddJobPage() {

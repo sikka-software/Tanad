@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 import Cookies from "js-cookie";
 import { Toaster } from "sonner";
 
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/components/app/ProtectedRoute";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";

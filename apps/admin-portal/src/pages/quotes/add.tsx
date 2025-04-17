@@ -4,10 +4,9 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { QuoteForm, type QuoteFormValues } from "@/components/forms/quote-form";
+import { QuoteForm, type QuoteFormValues } from "@/components/app/quote/quote.form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
@@ -19,7 +18,6 @@ export default function AddQuotePage() {
   const router = useRouter();
   const t = useTranslations();
   const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
   const { user } = useUserStore();
 
   const handleSubmit = async (data: QuoteFormValues) => {

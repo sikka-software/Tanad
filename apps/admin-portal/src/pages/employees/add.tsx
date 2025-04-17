@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { EmployeeForm, type EmployeeFormValues } from "@/components/employees/employee.form";
+import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 

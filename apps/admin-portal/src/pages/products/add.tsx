@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 
 import { useQueryClient } from "@tanstack/react-query";
 
-import { ProductForm } from "@/components/forms/product-form";
+import { ProductForm } from "@/components/app/product/product.form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 

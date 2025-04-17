@@ -3,13 +3,15 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
+import ProductCard from "@/components/app/product/product.card";
+import ProductsTable from "@/components/app/product/product.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ProductsTable from "@/components/tables/products-table";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import { useProducts } from "@/hooks/useProducts";
+
 import { Product } from "@/types/product.type";
+
+import { useProducts } from "@/hooks/useProducts";
 
 export default function ProductsPage() {
   const t = useTranslations("Products");
@@ -25,28 +27,6 @@ export default function ProductsPage() {
           product.sku?.toLowerCase()?.includes(searchQuery.toLowerCase()),
       )
     : [];
-
-  const renderProduct = (product: Product) => (
-    <Card key={product.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <h3 className="text-lg font-semibold">{product.name}</h3>
-      </CardHeader>
-      <CardContent>
-        <p className="mb-2 text-gray-600 dark:text-gray-400">
-          {product.description || t("no_description")}
-        </p>
-        <p className="text-lg font-bold">${Number(product.price).toFixed(2)}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {t("sku_label", { value: product.sku || "N/A" })}
-        </p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {t("stock_label", {
-            value: product.stockQuantity || 0,
-          })}
-        </p>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <DataPageLayout>
@@ -75,7 +55,7 @@ export default function ProductsPage() {
               error={error as Error | null}
               emptyMessage={t("no_products")}
               addFirstItemMessage={t("add_first_product")}
-              renderItem={renderProduct}
+              renderItem={(product) => <ProductCard product={product} />}
               gridCols="3"
             />
           </div>

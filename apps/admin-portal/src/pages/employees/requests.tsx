@@ -3,13 +3,15 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
+import EmployeeRequestCard from "@/components/app/employee-request/employee-request.card";
+import EmployeeRequestsTable from "@/components/app/employee-request/employee-request.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import EmployeeRequestsTable from "@/components/tables/employee-requests-table";
-import { Card, CardContent } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import { useEmployeeRequests } from "@/hooks/useEmployeeRequests";
+
 import { EmployeeRequest } from "@/types/employee-request.type";
+
+import { useEmployeeRequests } from "@/hooks/useEmployeeRequests";
 
 export default function EmployeeRequestsPage() {
   const t = useTranslations("EmployeeRequests");
@@ -26,45 +28,6 @@ export default function EmployeeRequestsPage() {
           request.status.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : [];
-
-  const renderRequest = (request: EmployeeRequest) => (
-    <Card key={request.id} className="transition-shadow hover:shadow-lg">
-      <CardContent className="pt-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold">{request.title}</h3>
-          <div className="space-x-2">
-            <span className="text-sm text-gray-500">{request.type}</span>
-            <span
-              className={`inline-block rounded-full px-2 py-1 text-xs ${
-                request.status === "approved"
-                  ? "bg-green-100 text-green-800"
-                  : request.status === "rejected"
-                  ? "bg-red-100 text-red-800"
-                  : "bg-gray-100 text-gray-800"
-              }`}
-            >
-              {request.status}
-            </span>
-          </div>
-        </div>
-        <p className="mb-2 text-sm text-gray-600">{request.description || t("no_description")}</p>
-        <div className="text-sm text-gray-500">
-          <p>{t("employee_label", { name: request.employeeName })}</p>
-          {request.startDate && (
-            <p>
-              {t("date_range", {
-                start: new Date(request.startDate).toLocaleDateString(),
-                end: request.endDate
-                  ? new Date(request.endDate).toLocaleDateString()
-                  : t("not_specified"),
-              })}
-            </p>
-          )}
-          {request.amount && <p>{t("amount_label", { amount: request.amount.toFixed(2) })}</p>}
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <DataPageLayout>
@@ -93,7 +56,9 @@ export default function EmployeeRequestsPage() {
               error={error as Error | null}
               emptyMessage={t("no_requests")}
               addFirstItemMessage={t("add_first_request")}
-              renderItem={renderRequest}
+              renderItem={(request: EmployeeRequest) => (
+                <EmployeeRequestCard employeeRequest={request} />
+              )}
               gridCols="3"
             />
           </div>

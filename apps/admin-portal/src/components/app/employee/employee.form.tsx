@@ -16,7 +16,7 @@ import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
-import DepartmentForm, { DepartmentFormValues } from "@/forms/department-form";
+import DepartmentForm, { DepartmentFormValues } from "@/components/app/department/department.form";
 
 import { supabase } from "@/lib/supabase";
 

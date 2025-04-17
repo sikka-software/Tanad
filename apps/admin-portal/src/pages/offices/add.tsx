@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { OfficeForm, type OfficeFormValues } from "@/components/forms/office-form";
+import { OfficeForm, type OfficeFormValues } from "@/components/app/office/office.form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";

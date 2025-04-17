@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 
 import { toast } from "sonner";
 
-import { VendorForm, type VendorFormValues } from "@/components/forms/vendor-form";
+import { VendorForm, type VendorFormValues } from "@/components/app/vendor/vendor.form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";

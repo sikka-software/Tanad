@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 import { Textarea } from "@/ui/textarea";
 
-import { ClientForm } from "@/forms/client-form";
+import { ClientForm } from "@/components/app/client/client.form";
 
 import { supabase } from "@/lib/supabase";
 
@@ -80,7 +80,6 @@ export function InvoiceForm({
   loading: externalLoading,
   onSuccess,
   onSubmit,
-  
 }: InvoiceFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(externalLoading || false);
