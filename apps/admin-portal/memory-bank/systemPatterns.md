@@ -1032,3 +1032,62 @@ When implementing cell editing in tables using the `SheetTable` component, follo
    - [ ] Handle errors appropriately
 
 This pattern ensures consistent cell editing behavior across all tables in the application.
+
+## Store Naming Conventions
+
+### Collection Store Pattern
+When implementing stores for collections of data (e.g., warehouses, offices, employees):
+
+1. **File Naming**
+   - Use plural form for the store file name
+   - Example: `warehouses.store.ts`, not `warehouse.store.ts`
+   - This matches the RESTful API convention of using plurals for collections
+
+2. **Store Hook Naming**
+   ```typescript
+   // Correct
+   const useWarehousesStore = create<WarehousesStore>((set) => ({
+     // store implementation
+   }));
+
+   // Incorrect
+   const useWarehouseStore = create<WarehouseStore>((set) => ({
+     // store implementation
+   }));
+   ```
+
+3. **Import Pattern**
+   ```typescript
+   // Correct
+   import useWarehousesStore from "@/stores/warehouses.store";
+
+   // Incorrect
+   import { useWarehouseStore } from "@/stores/warehouse.store";
+   ```
+
+4. **Interface Naming**
+   ```typescript
+   // Correct
+   interface WarehousesStore {
+     selectedRows: string[];
+     setSelectedRows: (ids: string[]) => void;
+     // other methods
+   }
+
+   // Incorrect
+   interface WarehouseStore {
+     // ...
+   }
+   ```
+
+### Implementation Guidelines
+1. Always use plural form for collection stores
+2. Match the store name with the database table name (which are also plural)
+3. Use consistent export/import patterns
+4. Follow the Selection State Management pattern for all collection stores
+
+### Common Pitfalls to Avoid
+1. Don't mix singular and plural naming
+2. Don't create multiple stores for the same collection
+3. Don't use inconsistent import patterns
+4. Don't deviate from the established store interface pattern
