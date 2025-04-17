@@ -1,52 +1,116 @@
-import { useState } from "react";
-
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+import { useState } from "react";
+import { toast } from "sonner";
 
 import JobListingCard from "@/components/app/job-listing/job-listing.card";
+import JobListingsTable from "@/components/app/job-listing/job-listing.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import ConfirmDelete from "@/components/ui/confirm-delete";
+import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
+import SelectionMode from "@/components/ui/selection-mode";
 
 import { JobListing } from "@/types/job-listing.type";
 
-import { useJobListings } from "@/hooks/useJobListings";
+import useUserStore from "@/hooks/use-user-store";
+import { useJobListings, useBulkDeleteJobListings } from "@/hooks/useJobListings";
+import useJobListingsStore from "@/stores/job-listings.store";
 
 export default function JobListingsPage() {
   const t = useTranslations("Jobs");
   const router = useRouter();
+  const user = useUserStore((state) => state.user);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const { jobListings, isLoading } = useJobListings();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { data: jobListings = [], isLoading, error } = useJobListings();
 
-  const filteredListings = (jobListings || []).filter(
+  // Get selection state and actions from the store
+  const { selectedRows, setSelectedRows, clearSelection } = useJobListingsStore();
+  const { mutate: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
+
+  const filteredListings = jobListings.filter(
     (listing: JobListing) =>
       listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (listing.description?.toLowerCase() || "").includes(searchQuery.toLowerCase()),
   );
 
-  const handleCreateListing = () => {
-    router.push("/jobs/listings/add");
+  const handleRowSelectionChange = (rows: JobListing[]) => {
+    const newSelectedIds = rows.map((row) => row.id);
+    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+      setSelectedRows(newSelectedIds);
+    }
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteJobListings(selectedRows);
+      clearSelection();
+      toast.success(t("messages.items_deleted"));
+    } catch (err: unknown) {
+      console.error("Error deleting job listings:", err);
+      toast.error(t("messages.delete_error"), {
+        description: String(err),
+      });
+    } finally {
+      setIsDeleteDialogOpen(false);
+    }
+  };
 
   return (
     <DataPageLayout>
-      <PageSearchAndFilter
-        createHref="/jobs/listings/add"
-        createLabel={t("create_listing")}
-        onSearch={setSearchQuery}
-        searchPlaceholder={t("search_listings")}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
-      <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredListings.map((listing: JobListing) => (
-          <JobListingCard key={listing.id} jobListing={listing} />
-        ))}
+      {selectedRows.length > 0 ? (
+        <SelectionMode
+          selectedRows={selectedRows}
+          clearSelection={clearSelection}
+          isDeleting={isDeleting}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        />
+      ) : (
+        <PageSearchAndFilter
+          title={t("title")}
+          createHref="/jobs/listings/add"
+          createLabel={t("create_listing")}
+          onSearch={setSearchQuery}
+          searchPlaceholder={t("search_listings")}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      )}
+
+      <div>
+        {viewMode === "table" ? (
+          <JobListingsTable
+            data={filteredListings}
+            isLoading={isLoading}
+            error={error instanceof Error ? error : null}
+            onSelectedRowsChange={handleRowSelectionChange}
+          />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredListings}
+              isLoading={isLoading}
+              error={error instanceof Error ? error : null}
+              emptyMessage={t("no_listings_found")}
+              renderItem={(listing: JobListing) => (
+                <JobListingCard key={listing.id} jobListing={listing} />
+              )}
+              gridCols="3"
+            />
+          </div>
+        )}
       </div>
+
+      <ConfirmDelete
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        isDeleting={isDeleting}
+        handleConfirmDelete={handleConfirmDelete}
+        title={t("confirm_delete")}
+        description={t("delete_description", { count: selectedRows.length })}
+      />
     </DataPageLayout>
   );
 }
