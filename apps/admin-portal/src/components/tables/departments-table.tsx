@@ -107,7 +107,7 @@ const DepartmentsTable = ({
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 px-2 py-1">
+                <Button variant="ghost" className="h-4 !p-0 !text-xs">
                   {t("form.locations.multipleLocations", { count: locationIds.length })}
                 </Button>
               </DropdownMenuTrigger>

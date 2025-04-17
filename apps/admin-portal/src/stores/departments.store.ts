@@ -6,14 +6,18 @@ interface DepartmentsState {
   departments: Department[];
   isLoading: boolean;
   error: string | null;
+  selectedRows: string[];
   fetchDepartments: () => Promise<void>;
   updateDepartment: (id: string, updates: Partial<Department>) => Promise<void>;
+  setSelectedRows: (rows: string[]) => void;
+  clearSelection: () => void;
 }
 
 export const useDepartmentsStore = create<DepartmentsState>((set, get) => ({
   departments: [],
   isLoading: false,
   error: null,
+  selectedRows: [],
 
   fetchDepartments: async () => {
     set({ isLoading: true, error: null });
@@ -57,5 +61,13 @@ export const useDepartmentsStore = create<DepartmentsState>((set, get) => ({
     } catch (error) {
       set({ error: (error as Error).message });
     }
+  },
+
+  setSelectedRows: (rows: string[]) => {
+    set({ selectedRows: rows });
+  },
+
+  clearSelection: () => {
+    set({ selectedRows: [] });
   },
 }));

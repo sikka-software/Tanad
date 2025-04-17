@@ -15,13 +15,16 @@ import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import { Department } from "@/types/department.type";
 
 import { useDepartments } from "@/hooks/useDepartments";
+import { useDepartmentsStore } from "@/stores/departments.store";
 
 export default function DepartmentsPage() {
   const t = useTranslations();
   const { data: departments, isLoading, error } = useDepartments();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  
+  // Get selection state and actions from the store
+  const { selectedRows, setSelectedRows, clearSelection } = useDepartmentsStore();
 
   const filteredDepartments = departments?.filter(
     (department) =>
@@ -38,10 +41,6 @@ export default function DepartmentsPage() {
     if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
       setSelectedRows(newSelectedIds);
     }
-  };
-
-  const handleClearSelection = () => {
-    setSelectedRows([]);
   };
 
   const handleDeleteSelected = () => {
@@ -80,7 +79,7 @@ export default function DepartmentsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={handleClearSelection}
+              onClick={clearSelection}
               className="flex items-center gap-2"
             >
               <X className="h-4 w-4" />
