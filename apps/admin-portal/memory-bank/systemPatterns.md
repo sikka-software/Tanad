@@ -4,6 +4,92 @@
 
 The CRUD Module Pattern is a comprehensive approach for implementing full-stack CRUD (Create, Read, Update, Delete) functionality across the application. This pattern encompasses several sub-patterns that work together to provide a complete data management solution.
 
+### Schema-First Development
+
+When implementing any CRUD module, we must first respect and align with the database schema definition in `schema.ts`. This ensures consistency between the database and application layers.
+
+#### Schema Alignment Guidelines
+
+1. **Field Mapping**
+   - All fields defined in the schema must be represented in the model's TypeScript interface
+   - Field types must match the schema types (e.g., `text()`, `boolean()`, `uuid()`)
+   - Required fields in schema must be required in the interface
+   - Optional fields in schema must be nullable in the interface
+
+2. **Validation Rules**
+   - Use Zod schemas that match the database constraints
+   - Required fields should have `min(1)` validation
+   - Unique constraints should be enforced in both frontend and backend
+   - Default values should be respected
+
+3. **Implementation Checklist**
+   - [ ] Review schema definition in `schema.ts`
+   - [ ] Create/update TypeScript interface matching schema
+   - [ ] Implement Zod validation schemas
+   - [ ] Add proper error handling for constraints
+   - [ ] Respect default values
+   - [ ] Handle nullable fields appropriately
+
+4. **Example Schema Alignment**
+   ```typescript
+   // Schema Definition
+   export const offices = pgTable("offices", {
+     id: uuid().primaryKey(),
+     name: text().notNull(),
+     address: text().notNull(),
+     city: text().notNull(),
+     state: text().notNull(),
+     zipCode: text("zip_code").notNull(),
+     phone: text(),
+     email: text(),
+     is_active: boolean().default(true).notNull(),
+     user_id: uuid("user_id").notNull(),
+   });
+
+   // TypeScript Interface
+   export interface Office {
+     id: string;
+     name: string;
+     address: string;
+     city: string;
+     state: string;
+     zip_code: string;
+     phone: string | null;
+     email: string | null;
+     is_active: boolean;
+     user_id: string;
+   }
+
+   // Zod Validation Schema
+   const officeSchema = z.object({
+     name: z.string().min(1, "Required"),
+     address: z.string().min(1, "Required"),
+     city: z.string().min(1, "Required"),
+     state: z.string().min(1, "Required"),
+     zip_code: z.string().min(1, "Required"),
+     phone: z.string().nullable(),
+     email: z.string().email().nullable(),
+     is_active: z.boolean().default(true),
+     user_id: z.string().uuid(),
+   });
+   ```
+
+5. **Common Pitfalls to Avoid**
+   - Don't add fields not in the schema
+   - Don't make required fields optional
+   - Don't ignore default values
+   - Don't skip validation for required fields
+   - Don't forget to handle nullable fields
+
+6. **Schema Evolution**
+   - When schema changes:
+     1. Update TypeScript interfaces
+     2. Update validation schemas
+     3. Update API routes
+     4. Update service layer
+     5. Update UI components
+     6. Update tests
+
 ### Sub-Patterns
 
 1. **SheetTable Pattern**
