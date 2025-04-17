@@ -1388,6 +1388,11 @@
         "required": "Stock quantity is required",
         "placeholder": "Enter stock quantity"
       }
+    },
+    "error": {
+      "delete_referenced": "Cannot delete products",
+      "delete_referenced_description": "The following products cannot be deleted because they are used in quotes: {products}. Please remove them from quotes before deleting.",
+      "delete": "Error deleting products"
     }
   },
   "Invoices": {

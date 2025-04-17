@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+
 import { inArray } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
@@ -26,10 +27,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (referencedProducts.length > 0) {
       const referencedIds = referencedProducts.map((p) => p.id).filter(Boolean);
       return res.status(400).json({
-        error: "Cannot delete products that are used in quotes",
+        error: "cant_delete_products_referenced",
         details: {
           referencedProductIds: referencedIds,
-          message: "Please remove these products from quotes before deleting them",
+          message: "please_remove_products_from_quotes",
         },
       });
     }
@@ -41,4 +42,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error("Error deleting products:", error);
     return res.status(500).json({ message: "Error deleting products" });
   }
-} 
+}

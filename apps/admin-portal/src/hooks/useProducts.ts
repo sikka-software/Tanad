@@ -7,6 +7,7 @@ import {
   fetchProducts,
   updateProduct,
 } from "@/services/productService";
+
 import type { Product } from "@/types/product.type";
 
 // Query keys for products
@@ -99,7 +100,8 @@ export function useBulkDeleteProducts() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete products");
+        const error = await response.json();
+        throw new Error(error.error || "Failed to delete products");
       }
 
       return response.json();
