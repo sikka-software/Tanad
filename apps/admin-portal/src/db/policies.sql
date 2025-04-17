@@ -19,6 +19,7 @@ ALTER TABLE warehouses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE offices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_listings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_listing_jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
 
 
 -- Drop existing policies before recreating
@@ -120,8 +121,6 @@ DROP POLICY IF EXISTS "Users can update department locations through departments
 DROP POLICY IF EXISTS "Users can delete department locations through departments" ON department_locations;
 
 -- TEMPLATES POLICIES
-ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "USERS CAN VIEW THEIR OWN TEMPLATES"
   ON templates FOR SELECT
   TO authenticated
