@@ -1,4 +1,4 @@
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -79,7 +79,7 @@ export default function EditCompanyPage() {
         loading={loading}
         onCancel={() => router.push("/companies")}
         texts={{
-          submit_form: t("Companies.save_changes"),
+          submit_form: t("General.save"),
           cancel: t("General.cancel"),
         }}
       />
@@ -116,7 +116,7 @@ export default function EditCompanyPage() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: (await import(`../../../../locales/${locale}.json`)).default,

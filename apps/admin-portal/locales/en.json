@@ -2357,6 +2357,10 @@
     "add_new": "Add New Company",
     "search_companies": "Search companies",
     "no_companies_found": "No companies found",
+    "edit_company": "Edit Company",
+    "company_details": "Company Details",
+    "create_company": "Create Company",
+    "creating_company": "Creating company...",
     "error_loading_companies": "Error loading companies",
     "form": {
       "name": {

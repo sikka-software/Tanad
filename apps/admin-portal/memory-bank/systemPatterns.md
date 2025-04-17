@@ -1091,3 +1091,82 @@ When implementing stores for collections of data (e.g., warehouses, offices, emp
 2. Don't create multiple stores for the same collection
 3. Don't use inconsistent import patterns
 4. Don't deviate from the established store interface pattern
+
+## Next.js Data Fetching Patterns
+
+### Dynamic Routes and Data Fetching
+
+When implementing dynamic routes (e.g., `[id]`) in Next.js, careful consideration must be given to the data fetching strategy:
+
+```mermaid
+flowchart TD
+    A[Dynamic Route] --> B{Data Nature}
+    B -->|Static/Known at Build| C[getStaticProps + getStaticPaths]
+    B -->|Dynamic/Unknown| D[getServerSideProps]
+```
+
+#### When to Use getServerSideProps
+Use `getServerSideProps` when:
+- Working with dynamic data that changes frequently
+- Routes with dynamic parameters where paths can't be predetermined
+- CRUD operations where new items can be added/removed
+- User-specific or authenticated pages
+
+Example implementation:
+```typescript
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`@/locales/${locale}.json`)).default,
+    },
+  };
+};
+```
+
+#### When to Use getStaticProps + getStaticPaths
+Use `getStaticProps` with `getStaticPaths` when:
+- Data is static or changes infrequently
+- All possible paths are known at build time
+- Pages can be pre-rendered for performance
+- Content is the same for all users
+
+Example implementation:
+```typescript
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths = // fetch all possible paths
+  return {
+    paths,
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
+  return {
+    props: {
+      data: // fetch data for specific path
+      messages: (await import(`@/locales/${locale}.json`)).default,
+    },
+  };
+};
+```
+
+### Implementation Checklist
+When creating a new page with dynamic routes:
+1. Assess data characteristics:
+   - [ ] Is the data dynamic or static?
+   - [ ] Can all paths be known at build time?
+   - [ ] How frequently does the data change?
+   - [ ] Is the content user-specific?
+
+2. Choose appropriate data fetching strategy:
+   - [ ] Use `getServerSideProps` for dynamic/user-specific data
+   - [ ] Use `getStaticProps` + `getStaticPaths` for static/pre-renderable data
+
+3. Common Patterns:
+   - CRUD Operations (e.g., edit pages) → Always use `getServerSideProps`
+   - Blog posts, documentation → Consider `getStaticProps` + `getStaticPaths`
+   - User dashboard → Always use `getServerSideProps`
+
+### Example Components Using This Pattern
+- `/companies/[id]/edit.tsx` - Uses `getServerSideProps`
+- `/blog/[slug].tsx` - Uses `getStaticProps` + `getStaticPaths`
