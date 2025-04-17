@@ -35,7 +35,7 @@ export const dynamicRoutePatterns = [
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/invoices", labelKey: "Invoices.title" },
-      { path: "/invoices/add", labelKey: "Invoices.add_new", is_active: true },
+      { path: "", labelKey: "Invoices.add_new", is_active: true },
     ],
   },
   {
