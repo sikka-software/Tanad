@@ -1,9 +1,7 @@
-import { useForm } from "react-hook-form";
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { DatePicker } from "@/ui/date-picker";
@@ -20,30 +18,33 @@ interface JobFormProps {
   loading?: boolean;
 }
 
-const jobFormSchema = z.object({
-  title: z.string().min(1, "Job title is required"),
-  description: z.string().optional(),
-  requirements: z.string().optional(),
-  location: z.string().optional(),
-  department: z.string().optional(),
-  type: z.string().min(1, "Job type is required"),
-  salary: z
-    .string()
-    .optional()
-    .refine((val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), "Invalid salary"),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-  is_active: z.boolean(),
-});
+const createJobFormSchema = (t: (key: string) => string) =>
+  z.object({
+    title: z.string().min(1, t("Jobs.form.title.required")),
+    description: z.string().optional(),
+    requirements: z.string().optional(),
+    location: z.string().optional(),
+    department: z.string().optional(),
+    type: z.string().min(1, t("Jobs.form.type.required")),
+    salary: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
+        t("Jobs.form.salary.invalid"),
+      ),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
+    is_active: z.boolean(),
+  });
 
-export type JobFormValues = z.infer<typeof jobFormSchema>;
+export type JobFormValues = z.infer<ReturnType<typeof createJobFormSchema>>;
 
 export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormProps) {
-  const router = useRouter();
   const t = useTranslations();
 
   const form = useForm<JobFormValues>({
-    resolver: zodResolver(jobFormSchema),
+    resolver: zodResolver(createJobFormSchema(t)),
     defaultValues: {
       title: "",
       description: "",

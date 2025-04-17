@@ -50,7 +50,7 @@ export interface QuoteFormProps {
   formRef?: RefObject<HTMLFormElement>;
   loading?: boolean;
   user_id?: string | undefined;
-  onSubmit?: (data: QuoteFormValues) => void;
+  onSubmit: (data: QuoteFormValues) => void;
   hideFormButtons?: boolean;
 }
 
@@ -265,39 +265,6 @@ export function QuoteForm({
     }, 0);
   };
 
-  const handleSubmit = async (data: QuoteFormValues) => {
-    if (loading) return;
-
-    try {
-      setIsLoading(true);
-
-      if (onSubmit) {
-        await onSubmit(data);
-      } else {
-        // Handle default submission logic
-        const { error } = await supabase.from("quotes").upsert({
-          ...data,
-          user_id: user_id,
-        });
-
-        if (error) throw error;
-
-        toast.success(t("General.successful_operation"), {
-          description: id ? t("Quotes.success.updated") : t("Quotes.success.created"),
-        });
-        router.push("/quotes");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error(t("General.error_operation"), {
-        description:
-          error instanceof Error ? error.message : t("Quotes.error.something_went_wrong"),
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // Define table columns for the products
   const columns = useMemo(
     () => [
@@ -480,7 +447,7 @@ export function QuoteForm({
                 unit_price: item.unit_price,
               })),
             };
-            handleSubmit(formattedData);
+            onSubmit(formattedData);
           })}
           className="space-y-4"
         >

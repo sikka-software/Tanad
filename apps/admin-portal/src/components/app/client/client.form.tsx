@@ -1,10 +1,8 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -19,6 +17,14 @@ import { CompanyForm, type CompanyFormValues } from "@/components/app/company/co
 import { supabase } from "@/lib/supabase";
 
 import { useCompanies } from "@/hooks/useCompanies";
+
+interface ClientFormProps {
+  id?: string;
+  onSubmit: (data: ClientFormValues) => Promise<void>;
+  loading?: boolean;
+  user_id: string | undefined;
+  defaultValues?: Partial<ClientFormValues>;
+}
 
 export const createClientSchema = (t: (key: string) => string) =>
   z.object({
@@ -37,14 +43,6 @@ export const createClientSchema = (t: (key: string) => string) =>
   });
 
 export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
-
-interface ClientFormProps {
-  id?: string;
-  onSubmit: (data: ClientFormValues) => Promise<void>;
-  loading?: boolean;
-  user_id: string | undefined;
-  defaultValues?: Partial<ClientFormValues>;
-}
 
 export function ClientForm({
   id,
