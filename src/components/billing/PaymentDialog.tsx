@@ -5,12 +5,13 @@ import { useTheme } from "next-themes";
 
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { AlertTriangle, CreditCard, Loader2, ShieldAlert, XCircle } from "lucide-react";
+import { AlertTriangle, CreditCard, Loader2, ShieldAlert, Wallet, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
 
@@ -108,10 +109,9 @@ export function PaymentDialog({
       if (!priceResponse.ok) {
         throw new Error("Failed to get price details");
       }
-
       const priceData = await priceResponse.json();
       setPriceDetails({
-        name: priceData.name || "Subscription",
+        name: priceData.lookup_key || "Subscription",
         price: priceData.price || "0.00 SAR/month",
       });
 
@@ -335,8 +335,8 @@ export function PaymentDialog({
 function PaymentFormContent({
   onSuccess,
   priceId,
-  planName = "Business Plan",
-  planPrice = "49.99 SAR/month",
+  planName,
+  planPrice,
 }: {
   onSuccess: () => void;
   priceId?: string;
@@ -353,6 +353,7 @@ function PaymentFormContent({
     type: "card" | "authentication" | "network" | "general";
   } | null>(null);
   const [saveCard, setSaveCard] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "wallet">("card");
   const { user } = useUserStore();
 
   const isRtl = locale === "ar";
@@ -625,7 +626,7 @@ function PaymentFormContent({
       <div className="mb-4">
         <h3 className="text-xl font-semibold">
           {t("billing.update_to_plan", {
-            plan: planName || "",
+            plan: t(`billing.${planName}`, { fallback: planName || "Subscription" }),
             fallback: `Update to ${planName || "Subscription"}`,
           })}
         </h3>
@@ -643,25 +644,88 @@ function PaymentFormContent({
       </div>
 
       <div className="space-y-6">
-        <div className="space-y-4">
-          <div className="rounded-lg border p-4">
-            <PaymentElement />
-          </div>
+        <Tabs
+          defaultValue="card"
+          value={paymentMethod}
+          onValueChange={(value) => setPaymentMethod(value as "card" | "wallet")}
+          dir={isRtl ? "rtl" : "ltr"}
+          className={isRtl ? "text-right" : "text-left"}
+        >
+          <TabsList className={`grid w-full grid-cols-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+            <TabsTrigger value="card" className="flex items-center justify-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              {t("billing.payment.credit_card", { fallback: "Credit Card" })}
+            </TabsTrigger>
+            <TabsTrigger value="wallet" className="flex items-center justify-center gap-2">
+              <Wallet className="h-4 w-4" />
+              {t("billing.payment.digital_wallet", { fallback: "Digital Wallet" })}
+            </TabsTrigger>
+          </TabsList>
 
-          <div className={`flex items-center ${isRtl ? "space-x-reverse" : ""} space-x-2`}>
-            <Checkbox
-              id="save-card"
-              checked={saveCard}
-              onCheckedChange={(checked) => setSaveCard(checked as boolean)}
-            />
-            <label
-              htmlFor="save-card"
-              className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          <TabsContent value="card" className="pt-4">
+            <div className="rounded-lg border p-4" dir={isRtl ? "rtl" : "ltr"}>
+              <PaymentElement
+                options={{
+                  layout: {
+                    type: "tabs",
+                    defaultCollapsed: false,
+                  },
+                  defaultValues: {
+                    billingDetails: {
+                      address: {
+                        country: "SA",
+                      },
+                    },
+                  },
+                }}
+              />
+            </div>
+
+            <div
+              className={`mt-4 flex items-center ${isRtl ? "flex-row-reverse" : ""} space-x-2 ${isRtl ? "space-x-reverse" : ""}`}
             >
-              {t("billing.payment.save_card", { fallback: "Save card for future payments" })}
-            </label>
-          </div>
-        </div>
+              <Checkbox
+                id="save-card"
+                checked={saveCard}
+                onCheckedChange={(checked) => setSaveCard(checked as boolean)}
+              />
+              <label
+                htmlFor="save-card"
+                className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {t("billing.payment.save_card", { fallback: "Save card for future payments" })}
+              </label>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="wallet" className="space-y-4 pt-4" dir={isRtl ? "rtl" : "ltr"}>
+            <Button
+              variant="outline"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-md border"
+              onClick={() => {
+                // Handle PayPal payment
+                toast.info("PayPal integration coming soon");
+              }}
+            >
+              <span className="text-center font-medium">
+                {t("billing.payment.pay_with_paypal", { fallback: "Pay with PayPal" })}
+              </span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-md border"
+              onClick={() => {
+                // Handle Google Pay
+                toast.info("Google Pay integration coming soon");
+              }}
+            >
+              <span className="text-center font-medium">
+                {t("billing.payment.google_pay", { fallback: "Google Pay" })}
+              </span>
+            </Button>
+          </TabsContent>
+        </Tabs>
 
         <div className="text-muted-foreground text-sm">
           <span>
@@ -709,12 +773,6 @@ function PaymentFormContent({
             t("billing.payment.complete_payment", { fallback: "Complete Payment" })
           )}
         </Button>
-
-        <p className="text-muted-foreground text-center text-xs">
-          {t("billing.payment.test_card", {
-            fallback: "For testing, use card number: 4242 4242 4242 4242, any future date, any CVC",
-          })}
-        </p>
       </div>
     </div>
   );
