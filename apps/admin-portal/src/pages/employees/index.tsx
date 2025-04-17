@@ -3,30 +3,21 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
-import { Loader2, Trash2, X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 
+import { Button } from "@/ui/button";
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+
+import EmployeeCard from "@/components/app/employee/employee.card";
 import EmployeesTable from "@/components/app/employee/employee.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
 import { Employee } from "@/types/employee.types";
 
 import { useEmployees, useDeleteEmployee } from "@/hooks/useEmployees";
 import { useEmployeesStore } from "@/stores/employees.store";
-
-import EmployeeCard from "../../components/app/employee/employee.card";
 
 export default function EmployeesPage() {
   const t = useTranslations();
@@ -139,40 +130,14 @@ export default function EmployeesPage() {
         )}
       </div>
 
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={(open) => {
-          if (!isDeleting) {
-            setIsDeleteDialogOpen(open);
-          }
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("Employees.confirm_delete_title")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("Employees.confirm_delete", { count: selectedRows.length })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>{t("General.cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("General.deleting")}
-                </>
-              ) : (
-                t("General.delete")
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDelete
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        isDeleting={isDeleting}
+        handleConfirmDelete={handleConfirmDelete}
+        title={t("Employees.confirm_delete_title")}
+        description={t("Employees.confirm_delete", { count: selectedRows.length })}
+      />
     </DataPageLayout>
   );
 }

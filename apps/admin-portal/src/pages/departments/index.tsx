@@ -3,22 +3,13 @@ import { useState } from "react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
-import { Loader2, Trash2, X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 
 import DepartmentCard from "@/components/app/department/department.card";
 import DepartmentsTable from "@/components/app/department/department.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import ConfirmDelete from "@/components/ui/confirm-delete";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
@@ -135,40 +126,14 @@ export default function DepartmentsPage() {
         )}
       </div>
 
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={(open) => {
-          if (!isDeleting) {
-            setIsDeleteDialogOpen(open);
-          }
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("Departments.confirm_delete_title")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("Departments.confirm_delete", { count: selectedRows.length })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>{t("General.cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t("General.deleting")}
-                </>
-              ) : (
-                t("General.delete")
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDelete
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        isDeleting={isDeleting}
+        handleConfirmDelete={handleConfirmDelete}
+        title={t("Departments.confirm_delete_title")}
+        description={t("Departments.confirm_delete", { count: selectedRows.length })}
+      />
     </DataPageLayout>
   );
 }
