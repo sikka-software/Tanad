@@ -11,8 +11,8 @@ export interface EmployeeRequest {
   amount?: number;
   attachments?: string[];
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
-export type EmployeeRequestCreateData = Omit<EmployeeRequest, 'id' | 'createdAt' | 'updatedAt'>; 
+export type EmployeeRequestCreateData = Omit<EmployeeRequest, 'id' | 'created_at' | 'updated_at'>; 

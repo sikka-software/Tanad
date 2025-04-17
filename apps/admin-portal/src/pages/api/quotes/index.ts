@@ -7,13 +7,13 @@ import { quotes } from "@/db/schema";
 
 // Helper to convert Drizzle quote to our Quote type
 function convertDrizzleQuote(data: any): any {
-  if (!data.createdAt) {
+  if (!data.created_at) {
     throw new Error("Quote must have a creation date");
   }
 
   return {
     id: data.id,
-    created_at: data.createdAt.toString(),
+    created_at: data.created_at.toString(),
     quote_number: data.quoteNumber,
     issue_date: data.issueDate,
     expiry_date: data.expiryDate,
@@ -36,7 +36,7 @@ function convertDrizzleQuote(data: any): any {
           state: data.client.state,
           zip_code: data.client.zipCode,
           notes: data.client.notes || null,
-          created_at: data.client.createdAt?.toString() || "",
+          created_at: data.client.created_at?.toString() || "",
         }
       : undefined,
   };
@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           with: {
             client: true,
           },
-          orderBy: [desc(quotes.createdAt)],
+          orderBy: [desc(quotes.created_at)],
         });
 
         const data = result.map(convertDrizzleQuote);

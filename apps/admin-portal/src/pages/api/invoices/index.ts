@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     try {
       const invoicesList = await db.query.invoices.findMany({
-        orderBy: desc(invoices.createdAt),
+        orderBy: desc(invoices.created_at),
       });
       return res.status(200).json(invoicesList.map(convertInvoice));
     } catch (error) {

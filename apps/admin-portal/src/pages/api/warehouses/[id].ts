@@ -18,7 +18,7 @@ function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehous
     capacity: data.capacity ? Number(data.capacity) : null,
     is_active: data.is_active,
     notes: data.notes,
-    created_at: data.createdAt?.toString() || "",
+    created_at: data.created_at?.toString() || "",
   };
 }
 

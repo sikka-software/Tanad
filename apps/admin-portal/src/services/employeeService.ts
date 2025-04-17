@@ -44,8 +44,8 @@ export async function fetchEmployees(): Promise<Employee[]> {
     salary: employee.salary,
     status: employee.status,
     notes: employee.notes,
-    created_at: employee.createdAt,
-    updated_at: employee.updatedAt,
+    created_at: employee.created_at,
+    updated_at: employee.updated_at,
   }));
 }
 
@@ -79,8 +79,8 @@ export async function fetchEmployeeById(id: string): Promise<Employee> {
     salary: data.salary,
     status: data.status,
     notes: data.notes,
-    created_at: data.createdAt,
-    updated_at: data.updatedAt,
+    created_at: data.created_at,
+    updated_at: data.updated_at,
   };
 }
 
@@ -153,8 +153,8 @@ export async function updateEmployee(id: string, updates: Partial<Employee>): Pr
     salary: updatedEmployee.salary,
     status: updatedEmployee.status,
     notes: updatedEmployee.notes,
-    created_at: updatedEmployee.createdAt,
-    updated_at: updatedEmployee.updatedAt,
+    created_at: updatedEmployee.created_at,
+    updated_at: updatedEmployee.updated_at,
   };
 }
 
@@ -231,8 +231,8 @@ export async function addEmployee(
     salary: data.salary,
     status: data.status,
     notes: data.notes,
-    created_at: data.createdAt,
-    updated_at: data.updatedAt,
+    created_at: data.created_at,
+    updated_at: data.updated_at,
   };
 }
 

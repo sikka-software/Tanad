@@ -36,8 +36,8 @@ export type ProductProps = {
   note?: NoteProps;
   comments?: CommentProps[];
 
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type NoteProps = {
@@ -46,6 +46,6 @@ export type NoteProps = {
   description?: string;
   content?: any;
   author?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 };

@@ -20,7 +20,7 @@ function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {
     manager: data.manager,
     is_active: data.is_active,
     notes: data.notes,
-    created_at: data.createdAt?.toString() || "",
+    created_at: data.created_at?.toString() || "",
   };
 }
 
@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     try {
       const branchesList = await db.query.branches.findMany({
-        orderBy: desc(branches.createdAt),
+        orderBy: desc(branches.created_at),
       });
       return res.status(200).json(branchesList.map(convertDrizzleBranch));
     } catch (error) {

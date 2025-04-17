@@ -8,13 +8,13 @@ import { Quote } from "@/types/quote.type";
 
 // Helper to convert Drizzle quote to our Quote type
 function convertDrizzleQuote(data: typeof quotes.$inferSelect & { clients?: any }): Quote {
-  if (!data.createdAt) {
+  if (!data.created_at) {
     throw new Error("Quote must have a creation date");
   }
 
   return {
     id: data.id,
-    created_at: data.createdAt.toString(),
+    created_at: data.created_at.toString(),
     quote_number: data.quoteNumber,
     issue_date: data.issueDate,
     expiry_date: data.expiryDate,
@@ -37,7 +37,7 @@ function convertDrizzleQuote(data: typeof quotes.$inferSelect & { clients?: any 
           state: data.clients.state,
           zip_code: data.clients.zipCode,
           notes: data.clients.notes || null,
-          created_at: data.clients.createdAt?.toString() || "",
+          created_at: data.clients.created_at?.toString() || "",
         }
       : undefined,
   };
@@ -68,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 state: true,
                 zipCode: true,
                 notes: true,
-                createdAt: true,
+                created_at: true,
               },
             },
           },

@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const jobsList = await db.select().from(jobs).orderBy(desc(jobs.createdAt));
+    const jobsList = await db.select().from(jobs).orderBy(desc(jobs.created_at));
 
     return res.status(200).json({ jobs: jobsList });
   } catch (error) {

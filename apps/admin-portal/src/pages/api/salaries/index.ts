@@ -9,7 +9,7 @@ import { SalaryCreateData } from "@/types/salary.type";
 function convertDrizzleSalary(data: typeof salaries.$inferSelect) {
   return {
     id: data.id,
-    created_at: data.createdAt?.toString() || "",
+    created_at: data.created_at?.toString() || "",
     pay_period_start: data.payPeriodStart,
     pay_period_end: data.payPeriodEnd,
     payment_date: data.paymentDate,

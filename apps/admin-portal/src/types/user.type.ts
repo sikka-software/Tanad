@@ -44,8 +44,8 @@ export type UserProps = {
   client_id?: string;
   employee_id?: string;
 
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type UserInputProps = {

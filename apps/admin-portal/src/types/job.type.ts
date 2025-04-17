@@ -10,7 +10,7 @@ export interface Job {
   is_active: boolean;
   startDate?: string;
   endDate?: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   user_id: string;
 }

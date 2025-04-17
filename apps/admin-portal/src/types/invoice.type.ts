@@ -74,8 +74,8 @@ export type InvoiceProps = {
   note?: NoteProps;
   comments?: CommentProps[];
 
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type InvoiceInput = Partial<InvoiceProps>;
@@ -93,7 +93,7 @@ export type Invoice = {
   notes?: string;
   client_id?: string;
   client?: Client;
-  createdAt: Date;
+  created_at: Date;
 };
 
-export type InvoiceCreateData = Omit<Invoice, "id" | "createdAt" | "client">;
+export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "client">;

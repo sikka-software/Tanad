@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .select()
         .from(templates)
         .where(eq(templates.user_id, user_id))
-        .orderBy(desc(templates.createdAt));
+        .orderBy(desc(templates.created_at));
 
       return res.status(200).json(result);
     } catch (error) {

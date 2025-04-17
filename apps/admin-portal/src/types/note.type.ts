@@ -4,6 +4,6 @@ export type NoteProps = {
   description?: string;
   content?: any;
   author?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 };

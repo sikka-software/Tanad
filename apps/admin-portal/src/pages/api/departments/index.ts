@@ -17,7 +17,7 @@ function convertDrizzleDepartment(
     name: data.name,
     description: data.description || "",
     locations: data.locations?.map((l) => l.locationId) || [],
-    createdAt: data.createdAt?.toString() || "",
+    created_at: data.created_at?.toString() || "",
     user_id: data.user_id,
   };
 }
@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     try {
       const departmentsList = await db.query.departments.findMany({
-        orderBy: desc(departments.createdAt),
+        orderBy: desc(departments.created_at),
         with: {
           locations: true,
         },

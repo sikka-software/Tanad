@@ -26,8 +26,8 @@ export type ClientProps = {
   note?: NoteProps;
   comments?: CommentProps[];
 
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type ClientInput = Partial<ClientProps>;

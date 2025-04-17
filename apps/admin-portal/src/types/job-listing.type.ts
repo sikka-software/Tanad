@@ -6,8 +6,8 @@ export interface JobListing {
   description: string | null;
   is_active: boolean;
   slug: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   user_id: string;
   jobs?: Job[]; // Optional array of related jobs
 }
@@ -16,7 +16,7 @@ export interface JobListingJob {
   id: string;
   job_listing_id: string;
   job_id: string;
-  createdAt: string;
+  created_at: string;
   job?: Job; // Optional related job
 }
 

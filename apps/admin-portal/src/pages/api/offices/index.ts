@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     try {
       const officesList = await db.query.offices.findMany({
-        orderBy: desc(offices.createdAt),
+        orderBy: desc(offices.created_at),
       });
 
       return res.status(200).json(officesList);

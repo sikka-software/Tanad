@@ -23,7 +23,7 @@ export const companies = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -52,7 +52,7 @@ export const clients = pgTable(
   "clients",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -83,7 +83,7 @@ export const invoices = pgTable(
   "invoices",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -128,7 +128,7 @@ export const invoiceItems = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -159,7 +159,7 @@ export const quotes = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -204,7 +204,7 @@ export const quoteItems = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -260,11 +260,11 @@ export const products = pgTable(
     sku: varchar({ length: 50 }),
     stockQuantity: integer("stock_quantity").default(0),
     user_id: uuid("user_id").notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
-    updatedAt: timestamp("updated_at", {
+    updated_at: timestamp("updated_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -289,8 +289,8 @@ export const employees = pgTable(
     salary: numeric("salary", { precision: 10, scale: 2 }),
     status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
     notes: text("notes"),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
@@ -305,7 +305,7 @@ export const expenses = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -343,7 +343,7 @@ export const vendors = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -372,7 +372,7 @@ export const salaries = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -403,7 +403,7 @@ export const warehouses = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -433,7 +433,7 @@ export const branches = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -472,8 +472,8 @@ export const jobs = pgTable(
     is_active: boolean("is_active").default(true).notNull(),
     startDate: date("start_date"),
     endDate: date("end_date"),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
@@ -490,7 +490,7 @@ export const templates = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -527,14 +527,14 @@ export const employeeRequests = pgTable(
     amount: numeric("amount", { precision: 10, scale: 2 }),
     attachments: jsonb("attachments").default([]),
     notes: text("notes"),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => ({
     employee_idIdx: index("employee_requests_employee_id_idx").on(table.employee_id),
     typeIdx: index("employee_requests_type_idx").on(table.type),
     statusIdx: index("employee_requests_status_idx").on(table.status),
-    createdAtIdx: index("employee_requests_created_at_idx").on(table.createdAt),
+    created_atIdx: index("employee_requests_created_at_idx").on(table.created_at),
   }),
 ).enableRLS();
 
@@ -546,8 +546,8 @@ export const jobListings = pgTable(
     description: text("description"),
     is_active: boolean("is_active").default(true).notNull(),
     slug: varchar("slug", { length: 255 }).notNull().unique(),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
@@ -567,7 +567,7 @@ export const jobListingJobs = pgTable(
     job_id: uuid("job_id")
       .notNull()
       .references(() => jobs.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
     index("job_listing_jobs_job_listing_id_idx").using(
@@ -588,7 +588,7 @@ export const offices = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -615,7 +615,7 @@ export const departments = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", {
+    created_at: timestamp("created_at", {
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
@@ -638,7 +638,7 @@ export const departmentLocations = pgTable(
       .references(() => departments.id, { onDelete: "cascade" }),
     locationType: text("location_type").$type<"office" | "branch" | "warehouse">().notNull(),
     locationId: uuid("location_id").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
     index("department_locations_department_id_idx").using(

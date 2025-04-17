@@ -19,7 +19,7 @@ function convertDrizzleClient(data: typeof clients.$inferSelect): Client {
     state: data.state,
     zip_code: data.zipCode,
     notes: data.notes,
-    created_at: data.createdAt?.toString() || "",
+    created_at: data.created_at?.toString() || "",
   };
 }
 
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     try {
       const clientsList = await db.query.clients.findMany({
-        orderBy: desc(clients.createdAt),
+        orderBy: desc(clients.created_at),
       });
       return res.status(200).json(clientsList.map(convertDrizzleClient));
     } catch (error) {

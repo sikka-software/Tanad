@@ -2493,11 +2493,11 @@
         "name_required": "Name is required",
         "locations_required": "At least one location is required"
       },
-      "updatedAt": {
+      "updated_at": {
         "label": "Updated At",
         "placeholder": "Enter updated at"
       },
-      "createdAt": {
+      "created_at": {
         "label": "Created At",
         "placeholder": "Enter created at"
       }
@@ -2506,8 +2506,8 @@
       "name": "Name",
       "description": "Description",
       "locations": "Locations",
-      "createdAt": "Created At",
-      "updatedAt": "Updated At"
+      "created_at": "Created At",
+      "updated_at": "Updated At"
     },
     "success": {
       "created": "Department created successfully",

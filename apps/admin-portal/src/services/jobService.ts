@@ -12,7 +12,7 @@ export async function fetchJobs(): Promise<Job[]> {
 }
 
 export async function createJob(
-  jobData: Omit<Job, "id" | "createdAt" | "updatedAt" | "user_id">,
+  jobData: Omit<Job, "id" | "created_at" | "updated_at" | "user_id">,
   user_id?: string,
 ): Promise<Job> {
   try {

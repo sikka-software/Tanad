@@ -16,7 +16,7 @@ export async function fetchInvoiceById(id: string): Promise<Invoice> {
   return response.json();
 }
 
-export async function createInvoice(invoice: Omit<Invoice, "id" | "createdAt">): Promise<Invoice> {
+export async function createInvoice(invoice: Omit<Invoice, "id" | "created_at">): Promise<Invoice> {
   const response = await fetch("/api/invoices", {
     method: "POST",
     headers: {

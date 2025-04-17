@@ -2,7 +2,7 @@ export type Department = {
   id: string;
   name: string;
   description: string | null;
-  createdAt: string;
+  created_at: string;
   user_id: string;
   locations: string[];
 };
@@ -12,7 +12,7 @@ export type DepartmentLocation = {
   department_id: string;
   locationType: "office" | "branch" | "warehouse";
   locationId: string;
-  createdAt: string;
+  created_at: string;
 };
 
 export type DepartmentCreateData = {

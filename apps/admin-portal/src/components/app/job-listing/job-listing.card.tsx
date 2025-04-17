@@ -23,7 +23,7 @@ const JobListingCard = ({ jobListing }: { jobListing: JobListing }) => {
             <p className="text-sm text-gray-600">{jobListing.description}</p>
           )}
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span>Created: {new Date(jobListing.createdAt).toLocaleDateString()}</span>
+            <span>Created: {new Date(jobListing.created_at).toLocaleDateString()}</span>
           </div>
         </div>
       </CardContent>

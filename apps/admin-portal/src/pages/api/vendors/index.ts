@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "GET") {
     try {
       const vendorsList = await db.query.vendors.findMany({
-        orderBy: [desc(vendors.createdAt)],
+        orderBy: [desc(vendors.created_at)],
       });
 
       res.status(200).json(vendorsList);

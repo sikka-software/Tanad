@@ -17,7 +17,7 @@ const DepartmentCard = ({ department }: { department: Department }) => {
             {department.description || t("Departments.no_description")}
           </p>
           <p className="text-xs text-gray-500">
-            {t("General.created_at")}: {new Date(department.createdAt).toLocaleDateString()}
+            {t("General.created_at")}: {new Date(department.created_at).toLocaleDateString()}
           </p>
         </div>
       </CardContent>

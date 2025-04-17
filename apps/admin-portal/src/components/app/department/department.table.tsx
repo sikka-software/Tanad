@@ -28,8 +28,8 @@ import { useDepartmentsStore } from "@/stores/departments.store";
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().min(1, "Required");
 const locationSchema = z.string().min(1, "Required");
-const createdAtSchema = z.string().min(1, "Required");
-const updatedAtSchema = z.string().min(1, "Required");
+const created_atSchema = z.string().min(1, "Required");
+const updated_atSchema = z.string().min(1, "Required");
 
 interface DepartmentsTableProps {
   data: Department[];
@@ -151,15 +151,15 @@ const DepartmentsTable = ({
       },
     },
     {
-      accessorKey: "createdAt",
-      header: t("form.createdAt.label"),
-      validationSchema: createdAtSchema,
+      accessorKey: "created_at",
+      header: t("form.created_at.label"),
+      validationSchema: created_atSchema,
       className: "min-w-[180px]",
     },
     {
-      accessorKey: "updatedAt",
-      header: t("form.updatedAt.label"),
-      validationSchema: updatedAtSchema,
+      accessorKey: "updated_at",
+      header: t("form.updated_at.label"),
+      validationSchema: updated_atSchema,
       className: "min-w-[180px]",
     },
   ];

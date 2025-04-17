@@ -23,7 +23,7 @@ export type TransactionProps = {
   payment_method: AcceptedPaymentMethods;
   language: "ar" | "en";
 
-  createdAt: string;
+  created_at: string;
 };
 
 export type TransactionInput = Omit<Partial<TransactionProps>, "invoice_client"> & {

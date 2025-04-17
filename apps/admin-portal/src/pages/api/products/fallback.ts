@@ -9,8 +9,8 @@ const FALLBACK_PRODUCTS = [
     price: "29.99",
     sku: "SKU-001",
     stockQuantity: 15,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   },
   {
     id: "2",
@@ -19,8 +19,8 @@ const FALLBACK_PRODUCTS = [
     price: "39.99",
     sku: "SKU-002",
     stockQuantity: 8,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   },
   {
     id: "3",
@@ -29,8 +29,8 @@ const FALLBACK_PRODUCTS = [
     price: "49.99",
     sku: "SKU-003",
     stockQuantity: 22,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   },
 ];
 

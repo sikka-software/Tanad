@@ -9,7 +9,7 @@ interface EmployeeRequestsStore {
   error: Error | null;
   fetchRequests: () => Promise<void>;
   updateRequest: (id: string, updates: Partial<EmployeeRequest>) => Promise<void>;
-  addRequest: (request: Omit<EmployeeRequest, "id" | "createdAt" | "updatedAt">) => Promise<void>;
+  addRequest: (request: Omit<EmployeeRequest, "id" | "created_at" | "updated_at">) => Promise<void>;
   deleteRequest: (id: string) => Promise<void>;
 }
 

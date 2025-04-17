@@ -45,15 +45,15 @@ export type CompanyProps = {
   note?: NoteProps;
   comments?: CommentProps[];
 
-  createdAt?: string;
-  updatedAt?: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type CompanyInput = Partial<CompanyProps>;
 
 export interface Company {
   id: string;
-  createdAt: string;
+  created_at: string;
   name: string;
   email: string;
   phone?: string;

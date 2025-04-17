@@ -18,7 +18,7 @@ function convertDrizzleClient(data: typeof clients.$inferSelect): Client {
     state: data.state,
     zip_code: data.zipCode,
     notes: data.notes,
-    created_at: data.createdAt?.toString() || "",
+    created_at: data.created_at?.toString() || "",
   };
 }
 

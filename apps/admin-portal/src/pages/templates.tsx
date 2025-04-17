@@ -78,7 +78,7 @@ interface Template {
   type: "invoice" | "quote";
   content: unknown;
   isDefault: boolean;
-  createdAt: string | null;
+  created_at: string | null;
   user_id: string;
 }
 
@@ -331,7 +331,7 @@ export default function TemplatesPage() {
                   <TableCell>{template.type}</TableCell>
                   <TableCell>{template.isDefault ? "Yes" : "No"}</TableCell>
                   <TableCell>
-                    {template.createdAt ? new Date(template.createdAt).toLocaleDateString() : "-"}
+                    {template.created_at ? new Date(template.created_at).toLocaleDateString() : "-"}
                   </TableCell>
                   <TableCell>
                     <Button

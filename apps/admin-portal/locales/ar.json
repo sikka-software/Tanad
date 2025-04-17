@@ -2623,11 +2623,11 @@
         "description_required": "الوصف مطلوب",
         "locations_required": "يجب اختيار موقع واحد على الأقل"
       },
-      "updatedAt": {
+      "updated_at": {
         "label": "تاريخ التحديث",
         "placeholder": "أدخل تاريخ التحديث"
       },
-      "createdAt": {
+      "created_at": {
         "label": "تاريخ الإنشاء",
         "placeholder": "أدخل تاريخ الإنشاء"
       }
@@ -2636,8 +2636,8 @@
       "name": "الاسم",
       "description": "الوصف",
       "locations": "المواقع",
-      "createdAt": "تاريخ الإنشاء",
-      "updatedAt": "تاريخ التحديث"
+      "created_at": "تاريخ الإنشاء",
+      "updated_at": "تاريخ التحديث"
     },
     "success": {
       "created": "تم إنشاء الإدارة بنجاح",
