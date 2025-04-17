@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -19,9 +19,8 @@ const addressSchema = z.string().min(1, "Required");
 const citySchema = z.string().min(1, "Required");
 const stateSchema = z.string().min(1, "Required");
 const zipCodeSchema = z.string().min(1, "Required");
-const capacitySchema = z.number().optional();
+const capacitySchema = z.number().min(0, "Must be >= 0").optional();
 const notesSchema = z.string().optional();
-const is_activeSchema = z.boolean();
 
 interface WarehouseTableProps {
   data: Warehouse[];
@@ -31,39 +30,60 @@ interface WarehouseTableProps {
 }
 
 const WarehouseTable = ({ data, isLoading, error, onSelectedRowsChange }: WarehouseTableProps) => {
-  const t = useTranslations("Warehouses");
-  const { updateWarehouse, selectedRows, setSelectedRows } = useWarehousesStore();
+  const t = useTranslations();
+  const selectionState = useWarehousesStore();
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateWarehouse(rowId, { [columnId]: value });
-  };
-
-  const handleRowSelectionChange = (rows: Warehouse[]) => {
-    setSelectedRows(rows.map((row) => row.id));
-    onSelectedRowsChange?.(rows);
-  };
-
-  // Convert selected row IDs to a record format for the table
-  const rowSelection = selectedRows.reduce((acc: Record<string, boolean>, id: string) => {
-    acc[id] = true;
-    return acc;
-  }, {});
+  // Create a selection state object for the table
+  const rowSelection = Object.fromEntries(selectionState.selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Warehouse>[] = [
-    { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "code", header: t("form.code.label"), validationSchema: codeSchema },
-    { accessorKey: "address", header: t("form.address.label"), validationSchema: addressSchema },
-    { accessorKey: "city", header: t("form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
-    { accessorKey: "zip_code", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
-    { accessorKey: "capacity", header: t("form.capacity.label"), validationSchema: capacitySchema },
+    { accessorKey: "name", header: t("Warehouses.form.name.label"), validationSchema: nameSchema },
+    { accessorKey: "code", header: t("Warehouses.form.code.label"), validationSchema: codeSchema },
     {
-      accessorKey: "is_active",
-      header: t("form.is_active.label"),
-      validationSchema: is_activeSchema,
+      accessorKey: "address",
+      header: t("Warehouses.form.address.label"),
+      validationSchema: addressSchema,
     },
-    { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
+    { accessorKey: "city", header: t("Warehouses.form.city.label"), validationSchema: citySchema },
+    { accessorKey: "state", header: t("Warehouses.form.state.label"), validationSchema: stateSchema },
+    {
+      accessorKey: "zip_code",
+      header: t("Warehouses.form.zip_code.label"),
+      validationSchema: zipCodeSchema,
+    },
+    {
+      accessorKey: "capacity",
+      header: t("Warehouses.form.capacity.label"),
+      validationSchema: capacitySchema,
+    },
+    { accessorKey: "notes", header: t("Warehouses.form.notes.label"), validationSchema: notesSchema },
   ];
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await selectionState.updateWarehouse(rowId, { [columnId]: value });
+  };
+
+  const handleRowSelectionChange = useCallback(
+    (selectedRows: Warehouse[]) => {
+      const selectedIds = selectedRows.map((row) => row.id!);
+      if (JSON.stringify(selectedIds) !== JSON.stringify(selectionState.selectedRows)) {
+        selectionState.setSelectedRows(selectedIds);
+        if (onSelectedRowsChange) {
+          onSelectedRowsChange(selectedRows);
+        }
+      }
+    },
+    [selectionState, onSelectedRowsChange]
+  );
+
+  const handleRowSelectionUpdater = useCallback(
+    (updater: ((old: Record<string, boolean>) => Record<string, boolean>) | Record<string, boolean>) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
+    [data, rowSelection, handleRowSelectionChange]
+  );
 
   if (isLoading) {
     return (
@@ -81,18 +101,16 @@ const WarehouseTable = ({ data, isLoading, error, onSelectedRowsChange }: Wareho
       data={data}
       onEdit={handleEdit}
       showHeader={true}
+      enableRowSelection={true}
+      onRowSelectionChange={handleRowSelectionChange}
       tableOptions={{
         state: {
           rowSelection,
         },
         enableRowSelection: true,
         enableMultiRowSelection: true,
-        getRowId: (row: Warehouse) => row.id,
-        onRowSelectionChange: (updater: any) => {
-          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-          const selectedRows = data.filter((row) => newSelection[row.id]);
-          handleRowSelectionChange(selectedRows);
-        },
+        getRowId: (row: Warehouse) => row.id!,
+        onRowSelectionChange: handleRowSelectionUpdater,
       }}
     />
   );
