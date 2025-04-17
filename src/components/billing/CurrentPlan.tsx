@@ -303,7 +303,9 @@ export default function CurrentPlan() {
             <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-4">
               {subscription.price && subscription.price !== "0 SAR" && (
                 <p className="text-foreground font-medium">
-                  {subscription.price}
+                  {locale === "ar"
+                    ? subscription.price.replace("SAR", "ريال سعودي")
+                    : subscription.price}
                   {subscription.billingCycle && subscription.billingCycle !== "-" && (
                     <span className="text-muted-foreground">
                       {" "}
