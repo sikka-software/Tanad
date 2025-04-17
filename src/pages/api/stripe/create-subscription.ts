@@ -57,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.log(`No valid customer ID provided, looking up by user ID: ${userId}`);
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("stripe_customer_id, email, full_name, language, subscribed_to")
+        .select("stripe_customer_id, email  , subscribed_to")
         .eq("id", userId)
         .single();
 
@@ -80,7 +80,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log("No stripe customer ID found, creating new customer");
         const customer = await stripe.customers.create({
           email: profile?.email || undefined,
-          name: profile?.full_name || undefined,
           metadata: {
             userId: userId,
           },
@@ -205,9 +204,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         subscriptionUpdateParams.default_payment_method = paymentMethodId;
       }
 
-      // Expand latest_invoice and payment_intent to get client_secret if needed
-      subscriptionUpdateParams.expand = ["latest_invoice.payment_intent"];
-
+      // We won't expand payment_intent directly to avoid the error
       subscription = await stripe.subscriptions.update(
         existingSubscription.id,
         subscriptionUpdateParams,
@@ -215,23 +212,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       status = subscription.status;
 
-      // Get client secret from payment intent if available and needed
-      const invoice = subscription.latest_invoice as Stripe.Invoice & {
-        payment_intent?: Stripe.PaymentIntent;
-      };
+      // Safely check for payment intent by retrieving the invoice separately if needed
+      if (subscription.latest_invoice && typeof subscription.latest_invoice === "string") {
+        try {
+          const invoice = (await stripe.invoices.retrieve(subscription.latest_invoice, {
+            expand: ["payment_intent"],
+          })) as Stripe.Response<
+            Stripe.Invoice & {
+              payment_intent?: Stripe.PaymentIntent;
+            }
+          >;
 
-      if (invoice?.payment_intent && typeof invoice.payment_intent !== "string") {
-        clientSecret = invoice.payment_intent.client_secret;
+          if (invoice.payment_intent && typeof invoice.payment_intent !== "string") {
+            clientSecret = invoice.payment_intent.client_secret;
+          }
+        } catch (err) {
+          console.log("No payment intent available on invoice:", err);
+        }
       }
     } else {
       // Create a new subscription
       const subscriptionParams: Stripe.SubscriptionCreateParams = {
         customer: customerIdToUse,
         items: [{ price: priceId }],
-        expand: ["latest_invoice.payment_intent"],
         metadata: {
           userId,
-          language: userProfile?.language || "en",
         },
       };
 
@@ -242,13 +247,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       subscription = await stripe.subscriptions.create(subscriptionParams);
       status = subscription.status;
 
-      // Get client secret from payment intent if available
-      const invoice = subscription.latest_invoice as Stripe.Invoice & {
-        payment_intent?: Stripe.PaymentIntent;
-      };
+      // Safely check for payment intent by retrieving the invoice separately if needed
+      if (subscription.latest_invoice && typeof subscription.latest_invoice === "string") {
+        try {
+          const invoice = (await stripe.invoices.retrieve(subscription.latest_invoice, {
+            expand: ["payment_intent"],
+          })) as Stripe.Response<
+            Stripe.Invoice & {
+              payment_intent?: Stripe.PaymentIntent;
+            }
+          >;
 
-      if (invoice?.payment_intent && typeof invoice.payment_intent !== "string") {
-        clientSecret = invoice.payment_intent.client_secret;
+          if (invoice.payment_intent && typeof invoice.payment_intent !== "string") {
+            clientSecret = invoice.payment_intent.client_secret;
+          }
+        } catch (err) {
+          console.log("No payment intent available on invoice:", err);
+        }
       }
     }
 
@@ -303,12 +318,31 @@ async function getPlanIdForPriceId(stripe: Stripe, priceId: string) {
       return priceId;
     }
 
+    console.log("Price ID:", priceId);
+    console.log("Stripe:", stripe);
+
     // Otherwise, retrieve the price and get the lookup key from it
-    const price = await stripe.prices.retrieve(priceId);
-    if (price.product && typeof price.product === "string") {
-      const product = await stripe.products.retrieve(price.product);
-      return product.metadata?.lookup_key || "tanad_free";
+    const price = await stripe.prices.retrieve(priceId, {
+      expand: ["product"],
+    });
+
+    // First try to get lookup_key from price
+    if (price.lookup_key) {
+      return price.lookup_key;
     }
+
+    // If not found, try getting it from product
+    if (price.product && typeof price.product !== "string") {
+      const product = price.product as Stripe.Product;
+      if (product.metadata?.lookup_key) {
+        return product.metadata.lookup_key;
+      }
+      // Use product name or ID as a fallback identifier
+      return `tanad_${product.name?.toLowerCase().replace(/\s+/g, "_") || product.id}`;
+    }
+
+    console.log("No lookup key found");
+    console.log("Price:", price);
 
     return "tanad_free";
   } catch (error) {
