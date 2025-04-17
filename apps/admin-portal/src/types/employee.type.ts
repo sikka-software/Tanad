@@ -9,7 +9,7 @@ export interface Employee {
   department_id?: string | null;
   hire_date: string;
   salary?: number;
-  status: "active" | "inactive" | "on_leave";
+  status: "active" | "inactive" | "on_leave" | "terminated";
   notes?: string;
   created_at: string;
   updated_at: string;

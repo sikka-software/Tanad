@@ -8,6 +8,7 @@ import {
   fetchEmployees as fetchEmployeesService,
   updateEmployee as updateEmployeeService,
 } from "@/services/employeeService";
+
 import { Employee } from "@/types/employee.type";
 
 // Hook for fetching all employees
@@ -43,36 +44,34 @@ export const useUpdateEmployee = () => {
       // Snapshot the previous values
       const previousEmployees = queryClient.getQueryData(EMPLOYEES_QUERY_KEY);
       const previousEmployee = queryClient.getQueryData([...EMPLOYEES_QUERY_KEY, id]);
-      
+
       // Prepare updates to apply optimistically
       const optimisticUpdates = { ...updates };
-      
+
       // Handle department_id changes to also update the department name for UI
       if (updates.department_id !== undefined) {
         try {
           // Get the current departments from the cache
           const departments: any = queryClient.getQueryData(["departments"]);
-          
+
           if (departments && Array.isArray(departments)) {
             // Find the department with the matching ID
-            const department = departments.find(
-              (d: any) => d.id === updates.department_id
-            );
-            
+            const department = departments.find((d: any) => d.id === updates.department_id);
+
             if (department) {
               // Set the department name for the optimistic update
               optimisticUpdates.department = department.name;
             }
           }
         } catch (error) {
-          console.error('Error getting department name for optimistic update:', error);
+          console.error("Error getting department name for optimistic update:", error);
         }
       }
 
       // Optimistically update the cache
       queryClient.setQueryData(EMPLOYEES_QUERY_KEY, (old: Employee[] | undefined) => {
         if (!old) return old;
-        
+
         return old.map((employee) => {
           if (employee.id === id) {
             return { ...employee, ...optimisticUpdates };
@@ -94,12 +93,10 @@ export const useUpdateEmployee = () => {
       // Manually update the cache with the new data instead of invalidating
       queryClient.setQueryData(EMPLOYEES_QUERY_KEY, (old: Employee[] | undefined) => {
         if (!old) return [updatedEmployee];
-        
-        return old.map(employee => 
-          employee.id === id ? updatedEmployee : employee
-        );
+
+        return old.map((employee) => (employee.id === id ? updatedEmployee : employee));
       });
-      
+
       // Also update the individual employee query data if it exists
       queryClient.setQueryData([...EMPLOYEES_QUERY_KEY, id], updatedEmployee);
     },

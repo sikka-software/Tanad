@@ -1,3 +1,7 @@
+
+# Run the admin portal
+run `./admin.sh` in the root of the project
+
 # Database Management with Drizzle
 
 This directory contains the database schema and utility scripts for managing database connections and migrations.

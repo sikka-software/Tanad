@@ -327,6 +327,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
                     <SelectItem value="active">{t("Employees.form.status.active")}</SelectItem>
                     <SelectItem value="inactive">{t("Employees.form.status.inactive")}</SelectItem>
                     <SelectItem value="on_leave">{t("Employees.form.status.on_leave")}</SelectItem>
+                    <SelectItem value="terminated">{t("Employees.form.status.terminated")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
