@@ -38,9 +38,7 @@ export default function JobListingsPage() {
 
   const handleRowSelectionChange = (rows: JobListing[]) => {
     const newSelectedIds = rows.map((row) => row.id);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
+    setSelectedRows(newSelectedIds);
   };
 
   const handleConfirmDelete = async () => {
