@@ -987,7 +987,7 @@
 
     "free_plan": "Free Plan",
     "upgrade_plan": "Upgrade Plan",
-
+    "next_billing_date_is": "Your next billing date is {date}",
     "payment": {
       "credit_card": "Credit Card",
       "digital_wallet": "Digital Wallet",

@@ -958,7 +958,7 @@
 
     "free_plan": "الباقة المجانية",
     "upgrade_plan": "ترقية الباقة",
-
+    "next_billing_date_is": "تاريخ الفاتورة القادمة هو {date}",
     "payment": {
       "credit_card": "بطاقة ائتمان",
       "digital_wallet": "محفظة رقمية",
