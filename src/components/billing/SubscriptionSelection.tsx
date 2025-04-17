@@ -87,10 +87,8 @@ export default function SubscriptionSelection({
   const locale = useLocale();
   const {
     status: subscriptionStatus,
-    name: subscriptionName,
     refetch: refetchSubscription,
     cancelAt: subscriptionCancelAt,
-    createSubscription,
   } = useSubscription();
   const { loading: pricesLoading, getPlans } = usePricing(TANAD_PRODUCT_ID);
   const { user, fetchUserAndProfile } = useUserStore();

@@ -12,6 +12,7 @@ interface SubscriptionData {
   price: string | null;
   billingCycle: string | null;
   nextBillingDate: string | null;
+  planLookupKey: string | null;
   status:
     | "active"
     | "canceled"
@@ -58,6 +59,7 @@ export function useSubscription() {
     price: "0 SAR",
     billingCycle: "-",
     nextBillingDate: "-",
+    planLookupKey: null,
     status: null,
     isExpired: false,
     cancelAt: null,
@@ -93,6 +95,7 @@ export function useSubscription() {
           price: "0 SAR",
           billingCycle: "-",
           nextBillingDate: "-",
+          planLookupKey: freePlan?.lookup_key || null,
           status: null,
           isExpired: false,
           cancelAt: null,
@@ -117,37 +120,60 @@ export function useSubscription() {
       }
 
       const { subscription } = await response.json();
-
       if (subscription) {
-        // Get price ID and lookup key from subscription
-        const currentPriceId = subscription.items.data[0].price.id;
-        const lookupKey = subscription.items.data[0].price.lookup_key;
+        // Access plan details directly from the plan property
+        const planDetails = subscription.plan || {};
+
+        // Get price ID directly from plan
+        const currentPriceId = planDetails.id || subscription.items?.data[0]?.price?.id;
+
+        // Get plan name from multiple possible sources
+        const planName =
+          planDetails.nickname ||
+          subscription.items?.data[0]?.price?.nickname ||
+          subscription.product?.name ||
+          "Unknown Plan";
+
+        // Get the lookup_key from the plan
+        const planLookupKey =
+          planDetails.lookup_key || subscription.items?.data[0]?.price?.lookup_key || null;
 
         // Try to find matching plan
         let currentPlan = plans.find((plan) => {
-          return plan.priceId === currentPriceId || (lookupKey && plan.lookup_key === lookupKey);
+          return plan.priceId === currentPriceId;
         });
 
+        // Format next billing date from billing_cycle_anchor
+        const nextBillingTimestamp =
+          subscription.billing_cycle_anchor || subscription.current_period_end;
+        const nextBillingDate = nextBillingTimestamp
+          ? new Date(nextBillingTimestamp * 1000).toLocaleDateString()
+          : "-";
+
         if (currentPlan) {
-          // Format next billing date
-          const nextBillingDate = subscription.current_period_end
-            ? new Date(subscription.current_period_end * 1000).toLocaleDateString()
-            : "-";
+          // Calculate price from plan or subscription
+          const priceAmount = planDetails.amount
+            ? (planDetails.amount / 100).toFixed(2)
+            : subscription.items?.data[0]?.price?.unit_amount
+              ? (subscription.items.data[0].price.unit_amount / 100).toFixed(2)
+              : "0";
 
-          // Calculate price from subscription or use plan price
-          const priceAmount = subscription.items.data[0].price.unit_amount
-            ? (subscription.items.data[0].price.unit_amount / 100).toFixed(2)
-            : "0";
-
-          const priceCurrency = subscription.items.data[0].price.currency?.toUpperCase() || "SAR";
+          const priceCurrency =
+            planDetails.currency?.toUpperCase() ||
+            subscription.items?.data[0]?.price?.currency?.toUpperCase() ||
+            "SAR";
 
           // Build subscription data
           const newSubscriptionData: SubscriptionData = {
             id: subscription.id,
-            name: currentPlan.name,
+            name: currentPlan.name || planName,
             price: `${priceAmount} ${priceCurrency}`,
-            billingCycle: subscription.items.data[0].price.recurring?.interval || "-",
+            billingCycle:
+              planDetails.interval ||
+              subscription.items?.data[0]?.price?.recurring?.interval ||
+              "-",
             nextBillingDate,
+            planLookupKey: currentPlan.lookup_key || planLookupKey,
             status: subscription.status,
             isExpired:
               subscription.status === "canceled" || subscription.status === "incomplete_expired",
@@ -157,23 +183,30 @@ export function useSubscription() {
           setSubscriptionData(newSubscriptionData);
           console.log("Subscription loaded:", newSubscriptionData);
         } else {
-          // If plan not found but subscription exists, use subscription data
+          // If plan not found but subscription exists, use subscription data directly
           console.log("Plan not found in available plans, using subscription data directly");
 
-          const productName = subscription.items.data[0].price.product?.name || "Unknown Plan";
-          const priceAmount = subscription.items.data[0].price.unit_amount
-            ? (subscription.items.data[0].price.unit_amount / 100).toFixed(2)
-            : "0";
-          const priceCurrency = subscription.items.data[0].price.currency?.toUpperCase() || "SAR";
+          const priceAmount = planDetails.amount
+            ? (planDetails.amount / 100).toFixed(2)
+            : subscription.items?.data[0]?.price?.unit_amount
+              ? (subscription.items.data[0].price.unit_amount / 100).toFixed(2)
+              : "0";
+
+          const priceCurrency =
+            planDetails.currency?.toUpperCase() ||
+            subscription.items?.data[0]?.price?.currency?.toUpperCase() ||
+            "SAR";
 
           setSubscriptionData({
             id: subscription.id,
-            name: productName,
+            name: planName,
             price: `${priceAmount} ${priceCurrency}`,
-            billingCycle: subscription.items.data[0].price.recurring?.interval || "-",
-            nextBillingDate: subscription.current_period_end
-              ? new Date(subscription.current_period_end * 1000).toLocaleDateString()
-              : "-",
+            billingCycle:
+              planDetails.interval ||
+              subscription.items?.data[0]?.price?.recurring?.interval ||
+              "-",
+            nextBillingDate,
+            planLookupKey,
             status: subscription.status,
             isExpired:
               subscription.status === "canceled" || subscription.status === "incomplete_expired",
@@ -188,6 +221,7 @@ export function useSubscription() {
           price: "0 SAR",
           billingCycle: "-",
           nextBillingDate: "-",
+          planLookupKey: freePlan?.lookup_key || null,
           status: null,
           isExpired: false,
           cancelAt: null,
@@ -198,50 +232,6 @@ export function useSubscription() {
       setError(error instanceof Error ? error.message : "Failed to fetch subscription");
     } finally {
       setLoading(false);
-    }
-  };
-
-  /**
-   * Create a new subscription for the user
-   */
-  const createSubscription = async (planId: string): Promise<CreateSubscriptionResponse> => {
-    try {
-      if (!user || !user.stripe_customer_id) {
-        throw new Error("User not authenticated or missing stripe customer ID");
-      }
-
-      const response = await fetch("/api/stripe/create-subscription", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          planId,
-          customerId: user.stripe_customer_id,
-          userId: user.id,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create subscription");
-      }
-
-      const data = await response.json();
-
-      // Refresh user data and subscription data
-      await fetchUserAndProfile();
-      await fetchSubscription();
-
-      return data;
-    } catch (error) {
-      console.error("Error creating subscription:", error);
-      return {
-        subscriptionId: "",
-        clientSecret: null,
-        status: "error",
-        error: error instanceof Error ? error.message : "Unknown error occurred",
-      };
     }
   };
 
@@ -356,7 +346,7 @@ export function useSubscription() {
     loading,
     error,
     refetch,
-    createSubscription,
+
     updateSubscription,
     cancelSubscription,
   };
