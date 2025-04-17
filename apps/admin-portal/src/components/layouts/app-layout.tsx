@@ -5,15 +5,16 @@ import Cookies from "js-cookie";
 import { Toaster } from "sonner";
 
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { CommandMenu } from "@/components/command-menu";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { CommandMenu } from "@/components/ui/command-menu";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import { LoadingBar } from "@/components/ui/loading-bar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
+
 import { useMainStore } from "@/hooks/main.store";
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {

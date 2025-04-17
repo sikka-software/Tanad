@@ -9,7 +9,7 @@ import {
   updateEmployee as updateEmployeeService,
 } from "@/services/employeeService";
 
-import { Employee } from "@/types/employee.type";
+import { Employee } from "@/types/employee.types";
 
 // Hook for fetching all employees
 export const useEmployees = () => {

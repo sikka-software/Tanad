@@ -1007,7 +1007,7 @@ function SheetTable<
             <TableRow className="border-none">
               {/* Selection checkbox header */}
               {enableRowSelection && (
-                <TableHead className="w-[30px] border-none p-0">
+                <TableHead className="w-[30px] border-y p-0">
                   <div className="flex h-full items-center justify-center">
                     <input
                       type="checkbox"

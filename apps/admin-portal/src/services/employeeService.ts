@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import useUserStore from "@/hooks/use-user-store";
 
-import { Employee } from "@/types/employee.type";
+import { Employee } from "@/types/employee.types";
 
 export const EMPLOYEES_QUERY_KEY = ["employees"] as const;
 

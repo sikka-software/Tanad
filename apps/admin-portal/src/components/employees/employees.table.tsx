@@ -9,7 +9,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Employee } from "@/types/employee.type";
+import { Employee } from "@/types/employee.types";
 
 import { useDepartments } from "@/hooks/useDepartments";
 import { useUpdateEmployee } from "@/hooks/useEmployees";
@@ -29,12 +29,7 @@ interface EmployeesTableProps {
   onSelectedRowsChange?: (selectedRows: Employee[]) => void;
 }
 
-const EmployeesTable = ({
-  data,
-  isLoading,
-  error,
-  onSelectedRowsChange,
-}: EmployeesTableProps) => {
+const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: EmployeesTableProps) => {
   const t = useTranslations("Employees");
   const { data: departments } = useDepartments();
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
@@ -220,8 +215,8 @@ const EmployeesTable = ({
         enableMultiRowSelection: true,
         getRowId: (row) => row.id!,
         onRowSelectionChange: (updater) => {
-          const newSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
-          const selectedRows = data.filter(row => newSelection[row.id!]);
+          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+          const selectedRows = data.filter((row) => newSelection[row.id!]);
           handleRowSelectionChange(selectedRows);
         },
       }}

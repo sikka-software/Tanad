@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 
 import { Loader2, Trash2, X } from "lucide-react";
 
+import EmployeesTable from "@/components/employees/employees.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import EmployeesTable from "@/components/tables/employees-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,14 +18,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
-import { Employee } from "@/types/employee.type";
+import { Employee } from "@/types/employee.types";
 
 import { useEmployees, useDeleteEmployee } from "@/hooks/useEmployees";
 import { useEmployeesStore } from "@/stores/employees.store";
+
+import EmployeeCard from "../../components/employees/employee.card";
 
 export default function EmployeesPage() {
   const t = useTranslations();
@@ -73,24 +74,7 @@ export default function EmployeesPage() {
     }
   };
 
-  const renderEmployee = (employee: Employee) => (
-    <Card key={employee.id} className="transition-shadow hover:shadow-lg">
-      <CardHeader>
-        <h3 className="text-lg font-semibold">
-          {employee.first_name} {employee.last_name}
-        </h3>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600 dark:text-gray-400">{employee.email}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{employee.position}</p>
-          <p className="text-xs text-gray-500">
-            {t("common.created_at")}: {new Date(employee.created_at).toLocaleDateString()}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  const renderEmployee = (employee: Employee) => <EmployeeCard employee={employee} />;
 
   return (
     <DataPageLayout>
