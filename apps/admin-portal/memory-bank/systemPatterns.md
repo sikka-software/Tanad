@@ -1170,3 +1170,324 @@ When creating a new page with dynamic routes:
 ### Example Components Using This Pattern
 - `/companies/[id]/edit.tsx` - Uses `getServerSideProps`
 - `/blog/[slug].tsx` - Uses `getStaticProps` + `getStaticPaths`
+
+## Core Components
+
+### 1. Store Pattern
+```typescript
+interface ModuleState {
+  items: Item[];
+  selectedRows: string[];
+  isLoading: boolean;
+  error: string | null;
+  fetchItems: () => Promise<void>;
+  updateItem: (id: string, updates: Partial<Item>) => Promise<void>;
+  setSelectedRows: (ids: string[]) => void;
+  clearSelection: () => void;
+}
+
+export const useModuleStore = create<ModuleState>((set) => ({
+  items: [],
+  selectedRows: [],
+  isLoading: false,
+  error: null,
+
+  setSelectedRows: (ids: string[]) => {
+    set((state) => {
+      if (JSON.stringify(state.selectedRows) === JSON.stringify(ids)) {
+        return state;
+      }
+      return { ...state, selectedRows: ids };
+    });
+  },
+
+  clearSelection: () => {
+    set((state) => {
+      if (state.selectedRows.length === 0) return state;
+      return { ...state, selectedRows: [] };
+    });
+  },
+}));
+```
+
+### 2. Table Component Pattern
+```typescript
+interface TableProps {
+  data: Item[];
+  isLoading?: boolean;
+  error?: Error | null;
+  onSelectedRowsChange?: (rows: Item[]) => void;
+}
+
+const columns: ExtendedColumnDef<Item>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <input
+        type="checkbox"
+        checked={table.getIsAllRowsSelected()}
+        onChange={table.getToggleAllRowsSelectedHandler()}
+      />
+    ),
+    cell: ({ row }) => (
+      <input
+        type="checkbox"
+        checked={row.getIsSelected()}
+        onChange={row.getToggleSelectedHandler()}
+      />
+    ),
+  },
+  // ... other columns
+];
+```
+
+### 3. Service Layer Pattern
+```typescript
+export async function fetchItems(): Promise<Item[]> {
+  const response = await fetch("/api/items");
+  if (!response.ok) throw new Error("Failed to fetch items");
+  return response.json();
+}
+
+export async function bulkDeleteItems(ids: string[]): Promise<void> {
+  const response = await fetch("/api/items/bulk-delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) throw new Error("Failed to delete items");
+}
+```
+
+### 4. API Routes Pattern
+```typescript
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === "DELETE") {
+    try {
+      const result = await db
+        .delete(items)
+        .where(eq(items.id, id))
+        .returning();
+
+      if (!result.length) {
+        return res.status(404).json({ message: "Item not found" });
+      }
+      return res.status(200).json({ message: "Item deleted successfully" });
+    } catch (error) {
+      return res.status(500).json({ message: "Error deleting item" });
+    }
+  }
+}
+```
+
+## Implementation Steps
+
+1. **Schema and Types**
+   ```typescript
+   // schema.ts
+   export const items = pgTable("items", {
+     id: uuid().primaryKey(),
+     name: text().notNull(),
+     // ... other fields
+   });
+
+   // types.ts
+   export interface Item {
+     id: string;
+     name: string;
+     // ... other fields
+   }
+   ```
+
+2. **Store Setup**
+   - Initialize store with state and actions
+   - Implement selection state management
+   - Add error and loading states
+   - Add CRUD operations
+
+3. **Component Creation**
+   - Create table component with selection
+   - Implement form component for create/edit
+   - Add card component for alternative view
+   - Setup validation schemas
+
+4. **API Layer**
+   - Create service functions for CRUD
+   - Implement API routes
+   - Add bulk operations
+   - Setup error handling
+
+5. **Pages**
+   - Create list page with search/filter
+   - Add create/edit pages
+   - Implement bulk actions
+   - Add loading states
+
+## Best Practices
+
+### 1. Selection State
+```typescript
+const handleRowSelectionChange = (selectedRows: Item[]) => {
+  setSelectedRows(selectedRows.map((row) => row.id));
+  onSelectedRowsChange?.(selectedRows);
+};
+
+const rowSelection = selectedRows.reduce((acc, id) => {
+  acc[id] = true;
+  return acc;
+}, {} as Record<string, boolean>);
+```
+
+### 2. Error Handling
+```typescript
+try {
+  const result = await db.query.items.findFirst({
+    where: eq(items.id, id),
+  });
+
+  if (!result) {
+    return res.status(404).json({ message: "Item not found" });
+  }
+
+  return res.status(200).json(result);
+} catch (error) {
+  console.error("Error:", error);
+  return res.status(500).json({ message: "Internal server error" });
+}
+```
+
+### 3. Loading States
+```typescript
+if (isLoading) {
+  return (
+    <TableSkeleton 
+      columns={columns.map((column) => column.accessorKey as string)} 
+      rows={5} 
+    />
+  );
+}
+
+if (error) {
+  return <ErrorComponent errorMessage={error.message} />;
+}
+```
+
+### 4. Form Validation
+```typescript
+const schema = z.object({
+  name: z.string().min(1, "Required"),
+  email: z.string().email("Invalid email").min(1, "Required"),
+  // ... other fields
+});
+
+const form = useForm({
+  resolver: zodResolver(schema),
+  defaultValues: {
+    name: "",
+    email: "",
+    // ... other fields
+  },
+});
+```
+
+## Common Pitfalls
+
+1. **Selection State**
+   - Always check for changes before updating
+   - Clear selection after actions
+   - Use consistent selection patterns
+
+2. **API Handling**
+   - Handle all error cases
+   - Use consistent error formats
+   - Validate input data
+
+3. **Type Safety**
+   - Use proper TypeScript types
+   - Avoid any types
+   - Keep interfaces consistent
+
+4. **Performance**
+   - Optimize state updates
+   - Implement proper caching
+   - Use optimistic updates
+
+## Example Usage
+
+```typescript
+// pages/items/index.tsx
+export default function ItemsPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { data: items, isLoading, error } = useItems();
+  const { selectedRows, clearSelection } = useItemsStore();
+  const { mutate: deleteItems, isPending: isDeleting } = useBulkDeleteItems();
+
+  const handleConfirmDelete = async () => {
+    if (selectedRows.length === 0) return;
+    await deleteItems(selectedRows);
+    clearSelection();
+    setIsDeleteDialogOpen(false);
+  };
+
+  return (
+    <DataPageLayout>
+      {selectedRows.length > 0 ? (
+        <SelectionMode
+          selectedRows={selectedRows}
+          clearSelection={clearSelection}
+          isDeleting={isDeleting}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        />
+      ) : (
+        <PageSearchAndFilter
+          title={t("title")}
+          createHref="/items/add"
+          createLabel={t("create_item")}
+          onSearch={setSearchQuery}
+          searchPlaceholder={t("search_items")}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      )}
+
+      {/* ... rest of the component */}
+    </DataPageLayout>
+  );
+}
+```
+
+## Testing Considerations
+
+1. **Unit Tests**
+   - Test store actions
+   - Validate form behavior
+   - Check selection logic
+
+2. **Integration Tests**
+   - Test API endpoints
+   - Verify bulk operations
+   - Check error handling
+
+3. **E2E Tests**
+   - Test full CRUD flow
+   - Verify selection behavior
+   - Check loading states
+
+## Maintenance
+
+1. **Code Organization**
+   - Keep related files together
+   - Use consistent naming
+   - Document complex logic
+
+2. **Performance Monitoring**
+   - Track state updates
+   - Monitor API response times
+   - Check rendering performance
+
+3. **Error Tracking**
+   - Log API errors
+   - Monitor client errors
+   - Track validation failures
