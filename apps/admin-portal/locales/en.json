@@ -1768,7 +1768,8 @@
     },
     "messages": {
       "success_deleted": "Salary deleted successfully",
-      "error_delete": "Failed to delete salary"
+      "error_delete": "Failed to delete salary",
+      "success_created": "Salary created successfully"
     },
     "table": {
       "employee_name": "Employee Name",

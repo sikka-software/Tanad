@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -82,6 +83,7 @@ export function SalaryForm({
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const [isEmployeeSaving, setIsEmployeeSaving] = useState(false);
   const { locale } = useRouter();
+  const queryClient = useQueryClient();
 
   const salarySchema = createSalarySchema(t);
 
@@ -174,6 +176,13 @@ export function SalaryForm({
 
       // Get the new employee data
       const newEmployee = await response.json();
+
+      // Update the employees cache to include the new employee
+      const previousEmployees = queryClient.getQueryData(["employees"]) || [];
+      queryClient.setQueryData(
+        ["employees"],
+        [...(Array.isArray(previousEmployees) ? previousEmployees : []), newEmployee],
+      );
 
       // Set the new employee as the selected employee
       const fullName = `${newEmployee.first_name} ${newEmployee.last_name}`;

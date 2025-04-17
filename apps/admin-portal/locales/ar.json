@@ -2157,7 +2157,8 @@
     "messages": {
       "success_deleted": "تم حذف الراتب بنجاح",
       "error_delete": "فشل في حذف الراتب",
-      "error_not_authenticated": "يجب تسجيل الدخول لإنشاء راتب"
+      "error_not_authenticated": "يجب تسجيل الدخول لإنشاء راتب",
+      "success_created": "تم إنشاء الراتب بنجاح"
     },
     "table": {
       "employee_name": "اسم الموظف",
