@@ -1,5 +1,118 @@
 # Technical Context
 
+## Technology Stack
+
+### Frontend Framework
+- Next.js with TypeScript
+- React 18+ features
+
+### State Management
+- React Query for server state
+- Zustand for client state (useUserStore)
+
+### Form Management
+- React Hook Form
+- Zod for schema validation
+- Type-safe form handling
+
+### UI Components
+- shadcn/ui as component library base
+- Tailwind CSS for styling
+- Custom components built on top of shadcn/ui
+
+### Data Layer
+- Supabase for backend
+- Direct Supabase client integration
+- React Query for cache management
+
+### Internationalization
+- next-intl for translations
+- Type-safe translation keys
+- Consistent translation patterns in forms
+
+## Development Tools
+
+### Form Development
+- Window object exposure for form testing
+- Dummy data generation utilities
+- Development-only features
+
+### Type Safety
+- TypeScript for type checking
+- Zod for runtime validation
+- Consistent type patterns across components
+
+### Error Handling
+- Toast notifications using sonner
+- Consistent error message structure
+- Translation support for errors
+
+## Project Structure
+
+### Directory Organization
+```
+src/
+  components/
+    app/          # Business logic components
+      feature/    # Feature-specific components
+    ui/          # Reusable UI components
+  pages/         # Next.js pages
+  hooks/         # Custom hooks and React Query hooks
+  lib/          # Utilities and configurations
+  services/     # API and data services
+  types/        # TypeScript type definitions
+```
+
+### Component Organization
+- Feature-based organization
+- Clear separation of concerns
+- Consistent file naming
+
+## Coding Standards
+
+### Form Components
+- Separate validation logic
+- Consistent prop interfaces
+- Clear type definitions
+- Reusable schema patterns
+
+### Page Components
+- Consistent layout structure
+- Standard error handling
+- Loading state management
+- Cache update patterns
+
+### Styling
+- Tailwind CSS utility classes
+- Consistent spacing
+- Responsive design patterns
+- Maximum width constraints
+
+## Testing and Quality
+
+### Type Safety
+- TypeScript strict mode
+- Zod runtime validation
+- Consistent type usage
+
+### Error Prevention
+- Form validation
+- API error handling
+- Loading state management
+- Type checking
+
+## Performance Considerations
+
+### Caching
+- React Query for data caching
+- Optimistic updates
+- Cache invalidation patterns
+
+### Form Optimization
+- Controlled inputs
+- Debounced validation
+- Efficient re-rendering
+
 ## Data Management Implementation
 
 ### 1. Table Component Implementation

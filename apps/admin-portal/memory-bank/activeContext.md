@@ -26,6 +26,30 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 - Added `useBulkDeleteSalaries` mutation hook
 - Fixed UI refresh issues by properly invalidating queries
 
+### Form Component Standardization
+- Standardized form component structure across the project
+- Moved from component-level to page-level API integration
+- Implemented consistent prop interfaces
+- Added development tools support
+
+### Current Patterns
+1. Form Components
+   - Validation at component level
+   - UI rendering and state management
+   - Window object exposure for development
+   - Consistent prop interface
+
+2. Page Components
+   - API integration
+   - Cache management
+   - Navigation handling
+   - Error management
+
+3. Development Tools
+   - Dummy data generation
+   - Form testing utilities
+   - Development-only features
+
 ## Active Decisions
 
 - Standardize on plural naming for collection stores to avoid confusion
@@ -37,20 +61,53 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 - Handle loading states with `isPending`
 - Show toast notifications for operation feedback
 
+### Form Management
+- Using Zod for schema validation
+- Separating API calls from form components
+- Implementing consistent error handling
+- Supporting development tools
+
+### Component Structure
+- Feature-based organization
+- Clear separation of concerns
+- Consistent file naming
+- Reusable patterns
+
+### Data Flow
+- Page-level API integration
+- React Query for cache management
+- Toast notifications for user feedback
+- Type-safe data handling
+
 ## Next Steps
 
-- Review other store implementations to ensure consistent naming
-- Update any components that might be using incorrect store imports
-- Document the store naming convention in the system patterns
-- Review other resources (quotes, invoices, etc.) for consistent implementation
-- Document any deviations from the pattern
-- Update existing implementations if they don't follow the pattern
+### Immediate Tasks
+1. Apply standardized form pattern to remaining forms
+2. Implement consistent error handling across all forms
+3. Add development tools support to all form components
+4. Update documentation for new patterns
+
+### Future Considerations
+1. Enhanced type safety
+2. Improved error handling
+3. Extended development tools
+4. Performance optimizations
 
 ## Known Issues
 
 - ~~Infinite update loops in selection state~~ (Fixed with stable pattern)
 - Need to verify all existing implementations use the correct pattern
 - None currently, but monitoring for any mutation-related bugs
+
+### Form Components
+- Need to standardize remaining form components
+- Implement consistent error handling
+- Add development tools support
+
+### Development Tools
+- Extend dummy data generation
+- Improve form testing utilities
+- Add more development features
 
 ## Recent Fixes
 
@@ -250,3 +307,15 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 3. Implement more advanced filtering options
 4. Add batch update operations
 5. Improve loading state UIs
+
+### Primary Goals
+1. Standardize all form components
+2. Implement consistent patterns
+3. Improve developer experience
+4. Maintain code quality
+
+### Secondary Goals
+1. Enhance type safety
+2. Optimize performance
+3. Improve error handling
+4. Update documentation

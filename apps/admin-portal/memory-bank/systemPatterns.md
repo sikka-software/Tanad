@@ -1675,3 +1675,104 @@ const handleDelete = async () => {
 ## Other System Patterns
 
 [Additional patterns will be documented here]
+
+## Form Architecture
+
+### Form Component Pattern
+Forms in Tanad follow a consistent pattern:
+1. Separate form logic from API calls
+2. Use Zod for schema validation
+3. Expose form methods through window object for development tools
+4. Follow a consistent prop interface:
+   ```typescript
+   interface FormProps {
+     id?: string;
+     user_id: string | undefined;
+     onSubmit: (data: FormValues) => void;
+     loading?: boolean;
+     initialData?: FormValues;
+   }
+   ```
+
+### Schema Definition Pattern
+```typescript
+export const createSchema = (t: (key: string) => string) =>
+  z.object({
+    // Fields with required validation
+    required_field: z.string().min(1, t("Translation.key.required")),
+    // Optional fields with empty string support
+    optional_field: z.string().optional().or(z.literal("")),
+    // Boolean fields with defaults
+    boolean_field: z.boolean().default(true),
+  });
+
+export type FormValues = z.input<ReturnType<typeof createSchema>>;
+```
+
+### Form Page Pattern
+Pages that contain forms follow this structure:
+1. State management at page level
+2. Direct Supabase integration
+3. Cache updates using React Query
+4. Development tools (dummy data) in development mode
+5. Consistent layout with max-width cards
+6. PageTitle component for form actions
+
+## Component Structure
+
+### UI Components
+- Located in `@/ui/*`
+- Used as building blocks for forms and pages
+- Follow shadcn/ui patterns
+
+### App Components
+- Located in `@/components/app/*`
+- Business logic components
+- Organized by feature/domain
+
+## Data Flow
+1. Form Component
+   - Handles validation
+   - Manages form state
+   - Provides user interface
+
+2. Page Component
+   - Manages API calls
+   - Handles loading states
+   - Updates cache
+   - Manages navigation
+
+3. Services
+   - Direct Supabase queries
+   - Data transformation
+   - Error handling
+
+## Development Patterns
+
+### Dummy Data
+- Available in development mode
+- Accessed through window object
+- Consistent dummy data generation
+- Example:
+  ```typescript
+  const handleDummyData = () => {
+    const dummyData = generateDummyData();
+    const form = (window as any).formName;
+    if (form) {
+      form.setValue("field", dummyData.value);
+    }
+  };
+  ```
+
+### Error Handling
+1. Form-level validation using Zod
+2. API-level error handling with toast notifications
+3. Consistent error message structure
+4. Translation support for all error messages
+
+## Styling Patterns
+- Consistent grid layouts (md:grid-cols-2, md:grid-cols-3)
+- Responsive design patterns
+- Form spacing (space-y-4)
+- Card layouts with max-width constraints
+- Consistent padding and margin usage
