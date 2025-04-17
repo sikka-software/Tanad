@@ -8,8 +8,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const userId = req.headers["x-user-id"] as string;
-  if (!userId) {
+  const user_id = req.headers["x-user-id"] as string;
+  if (!user_id) {
     return res.status(401).json({ error: "User ID is required" });
   }
 
@@ -28,16 +28,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         description: description?.trim() || null,
         is_active: true,
         slug: title.trim().toLowerCase().replace(/\s+/g, "-"),
-        userId: userId,
+        user_id: user_id,
       })
       .returning();
 
     // Then create the job associations if provided
     if (jobs && Array.isArray(jobs) && jobs.length > 0) {
       await db.insert(jobListingJobs).values(
-        jobs.map((jobId: string) => ({
-          jobListingId: newListing.id,
-          jobId: jobId,
+        jobs.map((job_id: string) => ({
+          job_listing_id: newListing.id,
+          job_id: job_id,
         })),
       );
     }

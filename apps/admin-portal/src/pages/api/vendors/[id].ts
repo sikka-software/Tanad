@@ -20,7 +20,7 @@ function convertDrizzleVendor(data: typeof vendors.$inferSelect): Vendor {
     zipCode: data.zipCode,
     notes: data.notes,
     createdAt: data.createdAt?.toString() || "",
-    userId: data.userId,
+    user_id: data.user_id,
   };
 }
 

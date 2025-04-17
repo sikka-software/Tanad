@@ -65,7 +65,7 @@ export default function AddProductPage() {
             <ProductForm
               id="product-form"
               onSuccess={handleSuccess}
-              userId={user?.id}
+              user_id={user?.id}
               loading={loading}
               setLoading={setLoading}
               hideFormButtons

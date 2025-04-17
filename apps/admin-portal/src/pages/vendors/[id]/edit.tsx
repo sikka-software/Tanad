@@ -15,15 +15,15 @@ export default function EditVendorPage() {
   const router = useRouter();
   const t = useTranslations("Vendors");
 
-  const { id: vendorId } = router.query;
+  const { id: vendor_id } = router.query;
 
   const { user } = useUserStore();
 
   useEffect(() => {
-    if (router.isReady && !vendorId) {
+    if (router.isReady && !vendor_id) {
       console.error("Vendor ID not found in URL");
     }
-  }, [router.isReady, vendorId]);
+  }, [router.isReady, vendor_id]);
 
   const handleSuccess = () => {
     // VendorForm handles navigation by default
@@ -51,7 +51,7 @@ export default function EditVendorPage() {
             <CardTitle>{t("vendor_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <VendorForm userId={user?.id} vendorId={vendorId as string} />
+            <VendorForm user_id={user?.id} vendor_id={vendor_id as string} />
           </CardContent>
         </Card>
       </div>

@@ -13,15 +13,15 @@ export default function EditSalaryPage() {
   const router = useRouter();
   const t = useTranslations();
 
-  const { id: salaryId } = router.query; // Get salaryId from URL query
+  const { id: salary_id } = router.query; // Get salary_id from URL query
 
-  // Check if salaryId is valid
+  // Check if salary_id is valid
   useEffect(() => {
-    if (router.isReady && !salaryId) {
+    if (router.isReady && !salary_id) {
       console.error("Salary ID not found in URL");
       // Optionally redirect
     }
-  }, [router.isReady, salaryId]);
+  }, [router.isReady, salary_id]);
 
   const handleSuccess = () => {
     // SalaryForm handles navigation
@@ -45,7 +45,7 @@ export default function EditSalaryPage() {
             <CardTitle>{t("Salaries.salary_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <SalaryForm salaryId={salaryId as string} onSuccess={handleSuccess} />
+            <SalaryForm salary_id={salary_id as string} onSuccess={handleSuccess} />
           </CardContent>
         </Card>
       </div>

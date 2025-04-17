@@ -12,9 +12,9 @@ export interface Branch {
   is_active: boolean;
   notes: string | null;
   created_at: string;
-  // userId field exists in the schema but might not be needed in the interface
+  // user_id field exists in the schema but might not be needed in the interface
   // unless specifically used in the frontend logic beyond RLS.
 }
 
 // Define an explicit type for branch creation data
-export type BranchCreateData = Omit<Branch, "id" | "created_at"> & { userId: string };
+export type BranchCreateData = Omit<Branch, "id" | "created_at"> & { user_id: string };

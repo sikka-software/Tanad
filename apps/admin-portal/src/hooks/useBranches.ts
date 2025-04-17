@@ -40,11 +40,11 @@ export function useCreateBranch() {
 
   return useMutation({
     mutationFn: (newBranch: Omit<Branch, 'id' | 'created_at'> & { user_id: string }) => {
-      // Map user_id to userId for the service function
+      // Map user_id to user_id for the service function
       const { user_id, ...rest } = newBranch;
       const branchData: BranchCreateData = {
         ...rest,
-        userId: user_id,
+        user_id: user_id,
       };
       return createBranch(branchData);
     },

@@ -7,15 +7,15 @@ import { templates } from "@/db/schema";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
-      const { userId } = req.query;
-      if (!userId) {
+      const { user_id } = req.query;
+      if (!user_id) {
         return res.status(400).json({ error: "User ID is required" });
       }
 
       const result = await db
         .select()
         .from(templates)
-        .where(eq(templates.user_id, userId as string));
+        .where(eq(templates.user_id, user_id as string));
 
       return res.status(200).json(result);
     } catch (error) {
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "POST") {
     try {
-      const { name, type, content, isDefault, userId } = req.body;
+      const { name, type, content, isDefault, user_id } = req.body;
 
       // Log request body for debugging
       console.log("Template creation request:", {
@@ -37,18 +37,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         type,
         contentType: typeof content,
         isDefault,
-        userId
+        user_id
       });
 
       // Validate required fields
-      if (!name || !type || !content || !userId) {
+      if (!name || !type || !content || !user_id) {
         return res.status(400).json({ 
           error: "Missing required fields",
           missing: {
             name: !name,
             type: !type,
             content: !content,
-            userId: !userId
+            user_id: !user_id
           }
         });
       }
@@ -76,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await db
           .update(templates)
           .set({ isDefault: false })
-          .where(eq(templates.user_id, userId));
+          .where(eq(templates.user_id, user_id));
       }
 
       // Create new template
@@ -85,7 +85,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         type,
         content: parsedContent,
         isDefault: isDefault || false,
-        user_id: userId,
+        user_id: user_id,
       });
 
       return res.status(201).json(result);

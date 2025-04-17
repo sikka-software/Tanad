@@ -18,7 +18,7 @@ function convertDrizzleDepartment(
     description: data.description || "",
     locations: data.locations?.map((l) => l.locationId) || [],
     createdAt: data.createdAt?.toString() || "",
-    userId: data.userId,
+    user_id: data.user_id,
   };
 }
 

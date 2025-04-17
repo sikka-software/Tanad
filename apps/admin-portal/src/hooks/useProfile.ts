@@ -22,13 +22,13 @@ type ProfileData = {
 type ProfileUpdateData = Partial<Omit<ProfileData, "id">>;
 
 // Function to fetch profile data
-const fetchProfile = async (profileId: string): Promise<ProfileData> => {
-  if (!profileId) {
+const fetchProfile = async (profile_id: string): Promise<ProfileData> => {
+  if (!profile_id) {
     throw new Error("Profile ID is required");
   }
 
-  console.log("[fetchProfile] Fetching profile for ID:", profileId);
-  const response = await fetch(`/api/profile/info?profileId=${profileId}`);
+  console.log("[fetchProfile] Fetching profile for ID:", profile_id);
+  const response = await fetch(`/api/profile/info?profile_id=${profile_id}`);
 
   if (!response.ok) {
     const error = await response.json();
@@ -42,20 +42,20 @@ const fetchProfile = async (profileId: string): Promise<ProfileData> => {
 
 // Function to update profile data
 const updateProfile = async ({
-  profileId,
+  profile_id,
   data,
 }: {
-  profileId: string;
+  profile_id: string;
   data: ProfileUpdateData;
 }): Promise<ProfileData> => {
-  if (!profileId) {
+  if (!profile_id) {
     throw new Error("Profile ID is required");
   }
 
-  console.log("[updateProfile] Updating profile for ID:", profileId);
+  console.log("[updateProfile] Updating profile for ID:", profile_id);
   console.log("[updateProfile] Update data:", data);
   
-  const response = await fetch(`/api/profile/update?profileId=${profileId}`, {
+  const response = await fetch(`/api/profile/update?profile_id=${profile_id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -74,19 +74,19 @@ const updateProfile = async ({
 };
 
 // Hook to fetch profile data
-export function useProfile(profileId: string) {
+export function useProfile(profile_id: string) {
   return useQuery({
-    queryKey: ["profile", profileId],
+    queryKey: ["profile", profile_id],
     queryFn: () => {
-      if (!profileId) {
+      if (!profile_id) {
         throw new Error("Cannot fetch profile: No profile ID provided");
       }
-      return fetchProfile(profileId);
+      return fetchProfile(profile_id);
     },
-    enabled: !!profileId,
+    enabled: !!profile_id,
     staleTime: 60 * 1000, // Consider data fresh for 1 minute
     retry: (failureCount, error) => {
-      // Don't retry if the error is due to missing profileId
+      // Don't retry if the error is due to missing profile_id
       if (error instanceof Error && error.message.includes("No profile ID provided")) {
         return false;
       }
@@ -147,8 +147,8 @@ export function useUpdateProfile() {
 }
 
 // For integrating with the existing user store when needed
-export function useUserAndProfile(profileId: string) {
-  const { data: profile, isLoading, error } = useProfile(profileId);
+export function useUserAndProfile(profile_id: string) {
+  const { data: profile, isLoading, error } = useProfile(profile_id);
   const userStore = useUserStore();
 
   return {
@@ -162,14 +162,14 @@ export function useUserAndProfile(profileId: string) {
 // Example of how to use these hooks in components:
 /*
 // For fetching profile data:
-const { data: profile, isLoading, error } = useProfile(profileId);
+const { data: profile, isLoading, error } = useProfile(profile_id);
 
 // For updating profile data:
 const updateProfileMutation = useUpdateProfile();
 
 const handleSubmit = (formData) => {
   updateProfileMutation.mutate({
-    profileId: "user-profile-id",
+    profile_id: "user-profile-id",
     data: {
       full_name: formData.name,
       email: formData.email,

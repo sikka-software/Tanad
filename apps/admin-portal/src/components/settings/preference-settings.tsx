@@ -52,12 +52,12 @@ const PreferenceSettings = ({
   const [selectedDateFormat, setSelectedDateFormat] = useState<string>("mdy");
   const [selectedTimeFormat, setSelectedTimeFormat] = useState<string>("12h");
 
-  // Get user from the existing store to get profileId
+  // Get user from the existing store to get profile_id
   const { user } = useUserStore();
-  const profileId = user?.id || "";
+  const profile_id = user?.id || "";
 
   // Use the profile hook to fetch data
-  const { data: profile, isLoading: isLoadingProfile } = useProfile(profileId);
+  const { data: profile, isLoading: isLoadingProfile } = useProfile(profile_id);
 
   // Initialize the update mutation
   const updateProfileMutation = useUpdateProfile();
@@ -132,7 +132,7 @@ const PreferenceSettings = ({
       console.log("Current profile:", profile);
 
       await updateProfileMutation.mutateAsync({
-        profileId,
+        profile_id,
         data: {
           user_settings: {
             ...(profile?.user_settings || {}),

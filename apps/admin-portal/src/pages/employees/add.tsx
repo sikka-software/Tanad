@@ -35,7 +35,7 @@ export default function AddEmployeePage() {
           email: data.email.trim(),
           phone: data.phone?.trim() || null,
           position: data.position.trim(),
-          departmentId: data.department || null,
+          department_id: data.department || null,
           hireDate: data.hireDate,
           salary: data.salary ? parseFloat(data.salary) : null,
           status: data.status,

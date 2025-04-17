@@ -23,7 +23,7 @@ function convertDrizzleQuote(data: any): any {
     total: Number(data.total),
     status: data.status,
     notes: data.notes || undefined,
-    client_id: data.clientId,
+    client_id: data.client_id,
     clients: data.client
       ? {
           id: data.client.id,

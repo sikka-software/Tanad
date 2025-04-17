@@ -1,6 +1,6 @@
 export interface EmployeeRequest {
   id: string;
-  employeeId: string;
+  employee_id: string;
   employeeName: string;
   type: 'leave' | 'expense' | 'document' | 'other';
   status: 'pending' | 'approved' | 'rejected';

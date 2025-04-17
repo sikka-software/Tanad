@@ -88,7 +88,7 @@ export function InvoiceForm({
   const [products, setProducts] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
-  const [userId, setUserId] = useState<string | undefined>();
+  const [user_id, setuser_id] = useState<string | undefined>();
   const [clientsLoading, setClientsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
   const t = useTranslations("Invoices");
@@ -102,7 +102,7 @@ export function InvoiceForm({
       // Get user ID
       const { data: userData } = await supabase.auth.getUser();
       if (userData.user) {
-        setUserId(userData.user.id);
+        setuser_id(userData.user.id);
       }
 
       // Fetch clients
@@ -212,8 +212,8 @@ export function InvoiceForm({
     }
   };
 
-  const handleProductSelection = (index: number, productId: string) => {
-    const selectedProduct = products.find((product) => product.id === productId);
+  const handleProductSelection = (index: number, product_id: string) => {
+    const selectedProduct = products.find((product) => product.id === product_id);
     if (selectedProduct) {
       form.setValue(`items.${index}.unit_price`, selectedProduct.price.toString());
       form.setValue(`items.${index}.description`, selectedProduct.description || "");
@@ -640,7 +640,7 @@ export function InvoiceForm({
         cancelText={t("cancel")}
         submitText={t("save")}
       >
-        <ClientForm id="client-form" onSubmit={handleClientAdded} userId={userId} />
+        <ClientForm id="client-form" onSubmit={handleClientAdded} user_id={user_id} />
       </FormDialog>
 
       <Dialog open={isNewProductDialogOpen} onOpenChange={setIsNewProductDialogOpen}>

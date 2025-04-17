@@ -19,7 +19,7 @@ export const checkExistingSlug = async (slug: string) => {
 };
 
 export const fetchPuklasWithLinkCount = async (
-  userId: string,
+  user_id: string,
   options?: OperationOptions
 ) => {
   const { data, error } = await supabase
@@ -30,7 +30,7 @@ export const fetchPuklasWithLinkCount = async (
       pukla_links (id, item_type)
       `
     )
-    .eq("user_id", userId);
+    .eq("user_id", user_id);
 
   if (error) {
     console.error("Error fetching puklas with link count:", error);
@@ -50,13 +50,13 @@ export const fetchPuklasWithLinkCount = async (
 };
 
 export const fetchPuklas = async (
-  userId: string,
+  user_id: string,
   options: OperationOptions
 ) => {
   const { data, error } = await supabase
     .from("puklas")
     .select("*")
-    .eq("user_id", userId);
+    .eq("user_id", user_id);
 
   if (error) {
     console.error("Error fetching pukla links:", error);
@@ -227,10 +227,10 @@ export const fetchAllPuklas = async (options: OperationOptions) => {
   return data;
 };
 
-export const createPukla = async (data: Partial<Pukla>, userId: string) => {
+export const createPukla = async (data: Partial<Pukla>, user_id: string) => {
   const { data: pukla, error } = await supabase
     .from("puklas")
-    .insert([{ ...data, user_id: userId }])
+    .insert([{ ...data, user_id: user_id }])
     .select()
     .single();
 

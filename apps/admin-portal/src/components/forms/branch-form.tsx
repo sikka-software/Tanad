@@ -39,19 +39,19 @@ type BranchFormValues = z.input<typeof branchFormSchema>;
 
 interface BranchFormProps {
   id?: string;
-  branchId?: string;
+  branch_id?: string;
   onSuccess?: (branch: Branch) => void;
   loading?: boolean;
-  userId: string | undefined;
+  user_id: string | undefined;
   setLoading?: (loading: boolean) => void;
 }
 
 export function BranchForm({
   id,
-  branchId,
+  branch_id,
   onSuccess,
   loading: externalLoading = false,
-  userId,
+  user_id,
   setLoading,
 }: BranchFormProps) {
   const router = useRouter();
@@ -110,9 +110,9 @@ export function BranchForm({
   });
 
   useEffect(() => {
-    if (branchId) {
+    if (branch_id) {
       setInternalLoading(true);
-      fetchBranchById(branchId)
+      fetchBranchById(branch_id)
         .then((branch) => {
           form.reset({
             name: branch.name,
@@ -138,12 +138,12 @@ export function BranchForm({
           setInternalLoading(false);
         });
     }
-  }, [branchId, form, t]);
+  }, [branch_id, form, t]);
 
   const onSubmit: SubmitHandler<BranchFormValues> = async (data) => {
     setInternalLoading(true);
     setLoading?.(true);
-    if (!userId) {
+    if (!user_id) {
       toast.error(t("error.title"), {
         description: t("error.not_authenticated"),
       });
@@ -165,13 +165,13 @@ export function BranchForm({
         manager: data.manager?.trim() || null,
         is_active: data.is_active,
         notes: data.notes?.trim() || null,
-        user_id: userId,
+        user_id: user_id,
       };
 
       let result: Branch;
-      if (branchId) {
+      if (branch_id) {
         const { user_id, ...updateData } = branchData;
-        result = await updateBranch(branchId, updateData);
+        result = await updateBranch(branch_id, updateData);
         toast.success(t("General.successful_operation"), {
           description: t("Branches.messages.success_updated"),
         });
@@ -406,7 +406,7 @@ export function BranchForm({
         />
 
         <Button type="submit" disabled={loading} className="w-full">
-          {branchId ? t("Branches.form.update_button") : t("Branches.form.create_button")}
+          {branch_id ? t("Branches.form.update_button") : t("Branches.form.create_button")}
         </Button>
       </form>
     </Form>

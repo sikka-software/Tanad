@@ -58,7 +58,7 @@ export default function AddSalaryPage() {
               onSuccess={handleSuccess}
               loading={loading}
               setLoading={setLoading}
-              userId={user?.id}
+              user_id={user?.id}
             />
           </CardContent>
         </Card>

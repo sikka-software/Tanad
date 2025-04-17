@@ -24,7 +24,7 @@ function convertDrizzleQuote(data: typeof quotes.$inferSelect & { clients?: any 
     total: Number(data.total),
     status: data.status,
     notes: data.notes || undefined,
-    client_id: data.clientId,
+    client_id: data.client_id,
     clients: data.clients
       ? {
           id: data.clients.id,

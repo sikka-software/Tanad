@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           price: price.toString(),
           stockQuantity: parseInt(stock_quantity),
           sku: sku?.trim() || null,
-          userId: req.body.userId,
+          user_id: req.body.user_id,
         })
         .returning();
 

@@ -51,7 +51,7 @@ export interface QuoteFormProps {
   id?: string;
   formRef?: RefObject<HTMLFormElement>;
   loading?: boolean;
-  userId?: string | undefined;
+  user_id?: string | undefined;
   onSubmit?: (data: QuoteFormValues) => void;
   hideFormButtons?: boolean;
 }
@@ -60,7 +60,7 @@ export function QuoteForm({
   id,
   formRef,
   loading,
-  userId,
+  user_id,
   onSubmit,
   hideFormButtons,
 }: QuoteFormProps) {
@@ -234,7 +234,7 @@ export function QuoteForm({
         .insert([
           {
             ...data,
-            user_id: userId,
+            user_id: user_id,
           },
         ])
         .select("*")
@@ -251,8 +251,8 @@ export function QuoteForm({
     }
   };
 
-  const handleProductSelection = (index: number, productId: string) => {
-    const product = products.find((p) => p.id === productId);
+  const handleProductSelection = (index: number, product_id: string) => {
+    const product = products.find((p) => p.id === product_id);
     if (product) {
       form.setValue(`items.${index}.description`, product.description || "");
       form.setValue(`items.${index}.unit_price`, product.price.toString());
@@ -279,7 +279,7 @@ export function QuoteForm({
         // Handle default submission logic
         const { error } = await supabase.from("quotes").upsert({
           ...data,
-          user_id: userId,
+          user_id: user_id,
         });
 
         if (error) throw error;
@@ -728,7 +728,7 @@ export function QuoteForm({
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
-        <ClientForm id="client-form" onSubmit={handleClientAdded} userId={userId} />
+        <ClientForm id="client-form" onSubmit={handleClientAdded} user_id={user_id} />
       </FormDialog>
     </>
   );

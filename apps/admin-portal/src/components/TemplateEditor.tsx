@@ -13,7 +13,7 @@ interface TemplateEditorProps {
     type: "invoice" | "quote";
     content: any;
   };
-  onSave?: (templateId: string, content: string) => void;
+  onSave?: (template_id: string, content: string) => void;
 }
 
 export default function TemplateEditor({ template, onSave }: TemplateEditorProps) {

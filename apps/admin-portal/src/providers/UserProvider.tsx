@@ -5,13 +5,13 @@ import { supabase } from "@/lib/supabase";
 
 // Create a context for the user data
 interface UserContextType {
-  userId: string | null;
+  user_id: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 }
 
 const UserContext = createContext<UserContextType>({
-  userId: null,
+  user_id: null,
   isLoading: true,
   isAuthenticated: false,
 });
@@ -20,7 +20,7 @@ export const useUser = () => useContext(UserContext);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [user_id, setuser_id] = useState<string | null>(null);
 
   // Get user store methods
   const userStore = useUserStore();
@@ -38,15 +38,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           // Also try to get user directly from Supabase
           const { data, error } = await supabase.auth.getUser();
           if (!error && data.user) {
-            const authenticatedUserId = data.user.id;
-            setUserId(authenticatedUserId);
-            console.log("UserProvider: User authenticated from Supabase:", authenticatedUserId);
+            const authenticateduser_id = data.user.id;
+            setuser_id(authenticateduser_id);
+            console.log("UserProvider: User authenticated from Supabase:", authenticateduser_id);
           } else {
             console.log("UserProvider: No user found in Supabase session");
           }
         } else {
           // User already in store
-          setUserId(storeUser.id);
+          setuser_id(storeUser.id);
           console.log("UserProvider: User found in store:", storeUser.id);
         }
       } catch (error) {
@@ -59,19 +59,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     loadUser();
   }, [initialized, storeUser?.id, fetchUserAndProfile]);
 
-  // Update userId when store changes - only when storeUser.id changes
+  // Update user_id when store changes - only when storeUser.id changes
   useEffect(() => {
     if (storeUser?.id) {
-      setUserId(storeUser.id);
-      console.log("UserProvider: Updated userId from store:", storeUser.id);
+      setuser_id(storeUser.id);
+      console.log("UserProvider: Updated user_id from store:", storeUser.id);
     }
   }, [storeUser?.id]);
 
   // Provide the user context
   const value = {
-    userId,
+    user_id,
     isLoading,
-    isAuthenticated: !!userId,
+    isAuthenticated: !!user_id,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

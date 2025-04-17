@@ -61,7 +61,7 @@ export default function AddWarehousePage() {
           <CardContent>
             <WarehouseForm
               id="warehouse-form"
-              userId={user?.id}
+              user_id={user?.id}
               onSuccess={handleSuccess}
               loading={loading}
               setLoading={setLoading}

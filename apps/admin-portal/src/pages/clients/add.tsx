@@ -115,7 +115,7 @@ export default function AddClientPage() {
           <CardContent>
             <ClientForm
               id="client-form"
-              userId={user?.id}
+              user_id={user?.id}
               onSubmit={handleSubmit}
               loading={loading}
             />

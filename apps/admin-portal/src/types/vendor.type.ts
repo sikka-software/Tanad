@@ -10,8 +10,8 @@ export interface Vendor {
   zipCode: string;
   notes: string | null;
   createdAt: string;
-  userId: string;
-  // userId field exists in the schema but might not be needed in the interface
+  user_id: string;
+  // user_id field exists in the schema but might not be needed in the interface
   // unless specifically used in the frontend logic beyond RLS.
 }
 

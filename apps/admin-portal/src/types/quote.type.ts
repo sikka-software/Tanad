@@ -26,7 +26,7 @@ export interface QuoteItem {
 }
 
 export type QuoteCreateData = Omit<Quote, "id" | "created_at" | "clients"> & {
-  userId?: string;
+  user_id?: string;
 };
 
 export type QuoteItemCreateData = Omit<QuoteItem, "id">;

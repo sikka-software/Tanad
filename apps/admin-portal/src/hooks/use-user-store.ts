@@ -106,7 +106,7 @@ const useUserStore = create<UserState>()(
 
           // console.log("[UserStore] Session check result:", {
           //   hasSession: !!session,
-          //   userId: session?.user?.id,
+          //   user_id: session?.user?.id,
           // });
 
           if (session?.user) {
@@ -223,7 +223,7 @@ const useUserStore = create<UserState>()(
 
 // Set up auth state change listener
 supabase.auth.onAuthStateChange(async (event, session) => {
-  // console.log("[UserStore] Auth state changed:", { event, userId: session?.user?.id });
+  // console.log("[UserStore] Auth state changed:", { event, user_id: session?.user?.id });
   const store = useUserStore.getState();
 
   if (event === "SIGNED_IN" && session?.user) {

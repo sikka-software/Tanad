@@ -6,14 +6,29 @@ import { Employee } from "@/types/employee.type";
 export const EMPLOYEES_QUERY_KEY = ["employees"] as const;
 
 export async function fetchEmployees(): Promise<Employee[]> {
-  const { data, error } = await supabase.from("employees").select(`
-    *,
-    department:departments (
-      name
-    )
-  `);
+  const user = useUserStore.getState().user;
+  if (!user?.id) {
+    console.error("No authenticated user found in fetchEmployees");
+    throw new Error("No authenticated user");
+  }
 
-  if (error) throw error;
+  console.log("Fetching employees for user:", user.id);
+  const { data, error } = await supabase
+    .from("employees")
+    .select(`
+      *,
+      department:departments (
+        name
+      )
+    `)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Error fetching employees:", error);
+    throw error;
+  }
+
+  console.log("Fetched employees data:", data);
 
   // Transform the data to match our Employee type
   return data.map((employee: any) => ({
@@ -24,7 +39,7 @@ export async function fetchEmployees(): Promise<Employee[]> {
     phone: employee.phone,
     position: employee.position,
     department: employee.department?.name || null,
-    department_id: employee.departmentId,
+    department_id: employee.department_id,
     hire_date: employee.hireDate,
     salary: employee.salary,
     status: employee.status,
@@ -59,7 +74,7 @@ export async function fetchEmployeeById(id: string): Promise<Employee> {
     phone: data.phone,
     position: data.position,
     department: data.department?.name || null,
-    department_id: data.departmentId,
+    department_id: data.department_id,
     hire_date: data.hireDate,
     salary: data.salary,
     status: data.status,
@@ -82,7 +97,7 @@ export async function updateEmployee(id: string, updates: Partial<Employee>): Pr
   Object.entries(updates).forEach(([key, value]) => {
     // Special case for department_id
     if (key === "department_id") {
-      employeeData["departmentId"] = value;
+      employeeData["department_id"] = value;
     }
     // Skip department field as it's a virtual field
     else if (key === "department") {
@@ -113,7 +128,7 @@ export async function updateEmployee(id: string, updates: Partial<Employee>): Pr
     },
     body: JSON.stringify({
       ...employeeData,
-      userId: user.id,
+      user_id: user.id,
     }),
   });
 
@@ -133,7 +148,7 @@ export async function updateEmployee(id: string, updates: Partial<Employee>): Pr
     phone: updatedEmployee.phone,
     position: updatedEmployee.position,
     department: updatedEmployee.department?.name || null,
-    department_id: updatedEmployee.departmentId,
+    department_id: updatedEmployee.department_id,
     hire_date: updatedEmployee.hireDate,
     salary: updatedEmployee.salary,
     status: updatedEmployee.status,
@@ -146,6 +161,11 @@ export async function updateEmployee(id: string, updates: Partial<Employee>): Pr
 export async function addEmployee(
   employee: Omit<Employee, "id" | "created_at" | "updated_at">,
 ): Promise<Employee> {
+  const user = useUserStore.getState().user;
+  if (!user?.id) {
+    throw new Error("No authenticated user");
+  }
+
   // Convert from snake_case to camelCase for the database
   const employeeData: Record<string, any> = {};
 
@@ -153,7 +173,7 @@ export async function addEmployee(
   Object.entries(employee).forEach(([key, value]) => {
     // Special case for department_id
     if (key === "department_id") {
-      employeeData["departmentId"] = value;
+      employeeData["department_id"] = value;
     }
     // Skip department field as it's a virtual field
     else if (key === "department") {
@@ -176,6 +196,11 @@ export async function addEmployee(
       employeeData[key] = value;
     }
   });
+
+  // Add the user_id to the employee data
+  employeeData.user_id = user.id;
+
+  console.log("Creating employee with data:", employeeData);
 
   const { data, error } = await supabase
     .from("employees")
@@ -201,7 +226,7 @@ export async function addEmployee(
     phone: data.phone,
     position: data.position,
     department: data.department?.name || null,
-    department_id: data.departmentId,
+    department_id: data.department_id,
     hire_date: data.hireDate,
     salary: data.salary,
     status: data.status,

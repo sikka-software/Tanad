@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           state: data.state,
           zipCode: data.zipCode,
           notes: data.notes,
-          userId: data.userId,
+          user_id: data.user_id,
         })
         .returning();
 

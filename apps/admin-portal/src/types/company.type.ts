@@ -66,5 +66,5 @@ export interface Company {
   size?: string;
   notes?: string;
   is_active: boolean;
-  userId: string;
+  user_id: string;
 }

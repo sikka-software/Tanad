@@ -3,13 +3,13 @@ export type Department = {
   name: string;
   description: string | null;
   createdAt: string;
-  userId: string;
+  user_id: string;
   locations: string[];
 };
 
 export type DepartmentLocation = {
   id: string;
-  departmentId: string;
+  department_id: string;
   locationType: "office" | "branch" | "warehouse";
   locationId: string;
   createdAt: string;
@@ -18,5 +18,5 @@ export type DepartmentLocation = {
 export type DepartmentCreateData = {
   name: string;
   description: string | null;
-  userId: string;
+  user_id: string;
 };

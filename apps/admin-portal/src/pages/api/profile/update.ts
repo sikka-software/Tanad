@@ -16,10 +16,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 
   try {
-    const { profileId } = req.query;
+    const { profile_id } = req.query;
     const updateData = req.body;
 
-    if (!profileId || typeof profileId !== "string") {
+    if (!profile_id || typeof profile_id !== "string") {
       return res.status(400).json({ error: "Profile ID is required" });
     }
 
@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
     // Get the current profile
     const existingProfile = await db.query.profiles.findFirst({
-      where: eq(profiles.id, profileId),
+      where: eq(profiles.id, profile_id),
     });
 
     if (!existingProfile) {
@@ -73,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       .set({
         ...sanitizedData,
       })
-      .where(eq(profiles.id, profileId))
+      .where(eq(profiles.id, profile_id))
       .returning();
 
     if (!updatedProfile) {

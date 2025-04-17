@@ -39,7 +39,7 @@ export type ProductFormValues = z.input<ReturnType<typeof createProductSchema>>;
 interface ProductFormProps {
   id?: string;
   onSuccess: (product: any) => void;
-  userId: string | undefined;
+  user_id: string | undefined;
   formRef?: RefObject<HTMLFormElement>;
   hideFormButtons?: boolean;
   loading?: boolean;
@@ -49,7 +49,7 @@ interface ProductFormProps {
 export function ProductForm({
   id,
   onSuccess,
-  userId,
+  user_id,
   formRef,
   hideFormButtons = false,
   loading: externalLoading = false,
@@ -72,7 +72,7 @@ export function ProductForm({
   });
 
   const onSubmit = async (data: ProductFormValues) => {
-    if (!userId) {
+    if (!user_id) {
       toast.error(t("General.error_operation"), {
         description: t("Products.error.not_authenticated"),
       });
@@ -93,7 +93,7 @@ export function ProductForm({
           price: data.price,
           sku: data.sku?.trim() || null,
           stock_quantity: data.stock_quantity,
-          userId: userId,
+          user_id: user_id,
         }),
       });
 

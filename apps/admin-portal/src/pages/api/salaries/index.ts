@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           deductions: salary.deductions,
           notes: salary.notes,
           employeeName: salary.employee_name,
-          userId: salary.userId || "",
+          user_id: salary.user_id || "",
         };
 
         const [data] = await db.insert(salaries).values(dbSalary).returning();

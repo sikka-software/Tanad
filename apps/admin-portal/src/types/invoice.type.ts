@@ -82,7 +82,7 @@ export type InvoiceInput = Partial<InvoiceProps>;
 
 export type Invoice = {
   id: string;
-  userId: string;
+  user_id: string;
   invoiceNumber: string;
   issueDate: Date;
   dueDate: Date;
@@ -91,7 +91,7 @@ export type Invoice = {
   taxRate?: number;
   total: number;
   notes?: string;
-  clientId?: string;
+  client_id?: string;
   client?: Client;
   createdAt: Date;
 };

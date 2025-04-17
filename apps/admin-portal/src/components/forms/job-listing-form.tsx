@@ -43,12 +43,12 @@ export function JobListingForm({ id, onSuccess, onSubmit, loading = false }: Job
     },
   });
 
-  const handleJobSelect = (jobId: string) => {
+  const handleJobSelect = (job_id: string) => {
     setSelectedJobs((prev) => {
-      if (prev.includes(jobId)) {
-        return prev.filter((id) => id !== jobId);
+      if (prev.includes(job_id)) {
+        return prev.filter((id) => id !== job_id);
       }
-      return [...prev, jobId];
+      return [...prev, job_id];
     });
     form.setValue("jobs", selectedJobs);
   };

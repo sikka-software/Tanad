@@ -6,17 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface TemplateViewerProps {
-  templateId: string;
+  template_id: string;
   pdfUrl: string;
-  onEdit?: (templateId: string) => void;
+  onEdit?: (template_id: string) => void;
 }
 
-export default function TemplateViewer({ templateId, pdfUrl, onEdit }: TemplateViewerProps) {
+export default function TemplateViewer({ template_id, pdfUrl, onEdit }: TemplateViewerProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleEdit = () => {
     if (onEdit) {
-      onEdit(templateId);
+      onEdit(template_id);
     }
   };
 

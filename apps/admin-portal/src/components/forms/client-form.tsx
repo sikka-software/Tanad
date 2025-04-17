@@ -42,7 +42,7 @@ interface ClientFormProps {
   id?: string;
   onSubmit: (data: ClientFormValues) => Promise<void>;
   loading?: boolean;
-  userId: string | undefined;
+  user_id: string | undefined;
   defaultValues?: Partial<ClientFormValues>;
 }
 
@@ -50,7 +50,7 @@ export function ClientForm({
   id,
   onSubmit,
   loading = false,
-  userId,
+  user_id,
   defaultValues,
 }: ClientFormProps) {
   const t = useTranslations();
@@ -89,7 +89,7 @@ export function ClientForm({
   const handleCompanySubmit = async (data: CompanyFormValues) => {
     try {
       // Check if user ID is available
-      if (!userId) {
+      if (!user_id) {
         throw new Error(t("error.not_authenticated"));
       }
 
@@ -109,7 +109,7 @@ export function ClientForm({
             size: data.size?.trim() || null,
             notes: data.notes?.trim() || null,
             is_active: data.is_active,
-            user_id: userId,
+            user_id: user_id,
           },
         ])
         .select()

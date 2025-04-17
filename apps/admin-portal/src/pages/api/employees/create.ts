@@ -12,8 +12,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Get the user ID from the Authorization header
-    const userId = req.headers.authorization?.replace("Bearer ", "");
-    if (!userId) {
+    const user_id = req.headers.authorization?.replace("Bearer ", "");
+    if (!user_id) {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -24,7 +24,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       phone,
       position,
       department,
-      departmentId,
+      department_id,
       hireDate,
       salary,
       status,
@@ -34,13 +34,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const [employee] = await db
       .insert(employees)
       .values({
-        userId,
+        user_id,
         first_name,
         last_name,
         email,
         phone,
         position,
-        departmentId,
+        department_id,
         hireDate,
         salary: salary ? sql`${salary}::numeric` : null,
         status,

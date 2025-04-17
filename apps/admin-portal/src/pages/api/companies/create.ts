@@ -23,11 +23,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       size,
       notes,
       is_active,
-      userId,
+      user_id,
     } = req.body;
 
-    if (!name || !email || !userId) {
-      return res.status(400).json({ error: "Name, email, and userId are required" });
+    if (!name || !email || !user_id) {
+      return res.status(400).json({ error: "Name, email, and user_id are required" });
     }
 
     const [company] = await db
@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         size,
         notes,
         is_active,
-        userId,
+        user_id,
       })
       .returning();
 

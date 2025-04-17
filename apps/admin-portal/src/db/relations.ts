@@ -26,7 +26,7 @@ export const clientsRelations = relations(clients, ({ many, one }) => ({
   quotes: many(quotes),
   expenses: many(expenses),
   profile: one(profiles, {
-    fields: [clients.userId],
+    fields: [clients.user_id],
     references: [profiles.id],
   }),
   company: one(companies, {
@@ -37,35 +37,35 @@ export const clientsRelations = relations(clients, ({ many, one }) => ({
 
 export const invoicesRelations = relations(invoices, ({ many, one }) => ({
   client: one(clients, {
-    fields: [invoices.clientId],
+    fields: [invoices.client_id],
     references: [clients.id],
   }),
   items: many(invoiceItems),
   profile: one(profiles, {
-    fields: [invoices.userId],
+    fields: [invoices.user_id],
     references: [profiles.id],
   }),
 }));
 
 export const invoiceItemsRelations = relations(invoiceItems, ({ one }) => ({
   invoice: one(invoices, {
-    fields: [invoiceItems.invoiceId],
+    fields: [invoiceItems.invoice_id],
     references: [invoices.id],
   }),
   product: one(products, {
-    fields: [invoiceItems.productId],
+    fields: [invoiceItems.product_id],
     references: [products.id],
   }),
 }));
 
 export const quotesRelations = relations(quotes, ({ many, one }) => ({
   client: one(clients, {
-    fields: [quotes.clientId],
+    fields: [quotes.client_id],
     references: [clients.id],
   }),
   items: many(quoteItems),
   profile: one(profiles, {
-    fields: [quotes.userId],
+    fields: [quotes.user_id],
     references: [profiles.id],
   }),
 }));
@@ -76,7 +76,7 @@ export const quoteItemsRelations = relations(quoteItems, ({ one }) => ({
     references: [quotes.id],
   }),
   product: one(products, {
-    fields: [quoteItems.productId],
+    fields: [quoteItems.product_id],
     references: [products.id],
   }),
 }));
@@ -96,53 +96,53 @@ export const profilesRelations = relations(profiles, ({ many }) => ({
 
 export const productsRelations = relations(products, ({ one }) => ({
   profile: one(profiles, {
-    fields: [products.userId],
+    fields: [products.user_id],
     references: [profiles.id],
   }),
 }));
 
 export const expensesRelations = relations(expenses, ({ one }) => ({
   client: one(clients, {
-    fields: [expenses.clientId],
+    fields: [expenses.client_id],
     references: [clients.id],
   }),
   profile: one(profiles, {
-    fields: [expenses.userId],
+    fields: [expenses.user_id],
     references: [profiles.id],
   }),
 }));
 
 export const vendorsRelations = relations(vendors, ({ one }) => ({
   profile: one(profiles, {
-    fields: [vendors.userId],
+    fields: [vendors.user_id],
     references: [profiles.id],
   }),
 }));
 
 export const salariesRelations = relations(salaries, ({ one }) => ({
   profile: one(profiles, {
-    fields: [salaries.userId],
+    fields: [salaries.user_id],
     references: [profiles.id],
   }),
 }));
 
 export const warehousesRelations = relations(warehouses, ({ one }) => ({
   profile: one(profiles, {
-    fields: [warehouses.userId],
+    fields: [warehouses.user_id],
     references: [profiles.id],
   }),
 }));
 
 export const branchesRelations = relations(branches, ({ one }) => ({
   profile: one(profiles, {
-    fields: [branches.userId],
+    fields: [branches.user_id],
     references: [profiles.id],
   }),
 }));
 
 export const jobsRelations = relations(jobs, ({ one }) => ({
   profile: one(profiles, {
-    fields: [jobs.userId],
+    fields: [jobs.user_id],
     references: [profiles.id],
   }),
 }));
@@ -151,21 +151,21 @@ export const departmentsRelations = relations(departments, ({ many, one }) => ({
   employees: many(employees),
   locations: many(departmentLocations),
   profile: one(profiles, {
-    fields: [departments.userId],
+    fields: [departments.user_id],
     references: [profiles.id],
   }),
 }));
 
 export const departmentLocationsRelations = relations(departmentLocations, ({ one }) => ({
   department: one(departments, {
-    fields: [departmentLocations.departmentId],
+    fields: [departmentLocations.department_id],
     references: [departments.id],
   }),
 }));
 
 export const employeesRelations = relations(employees, ({ one }) => ({
   department: one(departments, {
-    fields: [employees.departmentId],
+    fields: [employees.department_id],
     references: [departments.id],
   }),
 }));

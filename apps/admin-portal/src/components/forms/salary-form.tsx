@@ -54,20 +54,20 @@ export type SalaryFormValues = z.infer<ReturnType<typeof createSalarySchema>>;
 
 interface SalaryFormProps {
   id?: string;
-  salaryId?: string;
+  salary_id?: string;
   onSuccess?: (salary: Salary) => void;
   loading?: boolean;
   setLoading?: (loading: boolean) => void;
-  userId?: string | null;
+  user_id?: string | null;
 }
 
 export function SalaryForm({
   id,
-  salaryId,
+  salary_id,
   onSuccess,
   loading: externalLoading = false,
   setLoading,
-  userId,
+  user_id,
 }: SalaryFormProps) {
   const router = useRouter();
   const t = useTranslations();
@@ -95,9 +95,9 @@ export function SalaryForm({
 
   // Fetch salary data for editing
   useEffect(() => {
-    if (salaryId) {
+    if (salary_id) {
       setInternalLoading(true);
-      fetch(`/api/salaries/${salaryId}`)
+      fetch(`/api/salaries/${salary_id}`)
         .then((res) => {
           if (!res.ok) throw new Error("Failed to fetch salary");
           return res.json();
@@ -125,7 +125,7 @@ export function SalaryForm({
           setInternalLoading(false);
         });
     }
-  }, [salaryId, form, t]);
+  }, [salary_id, form, t]);
 
   // Data is SalaryFormValues (numbers for amounts)
   const onSubmit: SubmitHandler<SalaryFormValues> = async (data) => {
@@ -146,12 +146,12 @@ export function SalaryForm({
         ...data,
         deductions: data.deductions ? JSON.parse(data.deductions) : null,
         notes: data.notes?.trim() || null,
-        userId: user.id,
+        user_id: user.id,
       };
 
       let result: Salary;
-      if (salaryId) {
-        const response = await fetch(`/api/salaries/${salaryId}`, {
+      if (salary_id) {
+        const response = await fetch(`/api/salaries/${salary_id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(salaryData),

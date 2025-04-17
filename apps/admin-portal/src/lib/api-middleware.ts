@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { supabase } from './supabase';
 
 export interface ExtendedNextApiRequest extends NextApiRequest {
-  userId?: string;
+  user_id?: string;
 }
 
 export type ApiHandler = (
@@ -18,19 +18,19 @@ export const withAuth = (handler: ApiHandler) => {
       
       if (!error && data.session) {
         // Set the user ID on the request object
-        req.userId = data.session.user.id;
-        console.log("User authenticated via Supabase session:", req.userId);
+        req.user_id = data.session.user.id;
+        console.log("User authenticated via Supabase session:", req.user_id);
         return handler(req, res);
       }
       
       // If that fails, try getting from the header or body as fallback
-      const headerUserId = req.headers['x-user-id'] as string;
-      const bodyUserId = req.body?.userId;
+      const headeruser_id = req.headers['x-user-id'] as string;
+      const bodyuser_id = req.body?.user_id;
       
       // Set the user ID if found in header or body
-      if (headerUserId || bodyUserId) {
-        req.userId = headerUserId || bodyUserId;
-        console.log("User authenticated via header/body:", req.userId);
+      if (headeruser_id || bodyuser_id) {
+        req.user_id = headeruser_id || bodyuser_id;
+        console.log("User authenticated via header/body:", req.user_id);
         return handler(req, res);
       }
       

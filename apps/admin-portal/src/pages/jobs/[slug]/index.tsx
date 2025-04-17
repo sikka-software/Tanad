@@ -25,8 +25,8 @@ export default function JobListingPublicPage() {
     }
   }, [slug, jobs]);
 
-  const handleApply = (jobId: string) => {
-    router.push(`/jobs/${jobId}/apply`);
+  const handleApply = (job_id: string) => {
+    router.push(`/jobs/${job_id}/apply`);
   };
 
   return (

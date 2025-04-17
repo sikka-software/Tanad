@@ -53,10 +53,10 @@ export default function InvoicePreviewPage({ invoice }: Props) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { params, locale } = context;
-  const invoiceId = params?.invoice as string;
+  const invoice_id = params?.invoice as string;
 
   try {
-    const invoice = await fetchInvoiceById(invoiceId);
+    const invoice = await fetchInvoiceById(invoice_id);
     if (!invoice) {
       return { notFound: true };
     }

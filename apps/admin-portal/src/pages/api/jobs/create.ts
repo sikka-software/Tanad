@@ -24,16 +24,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       is_active,
       startDate,
       endDate,
-      userId,
+      user_id,
       user_id, // Try to get alternative field name too
     } = req.body;
 
     // Get the user ID - try both camelCase and snake_case versions
-    const effectiveUserId = user_id || userId;
+    const effectiveuser_id = user_id || user_id;
     
-    console.log("Extracted userId:", userId);
     console.log("Extracted user_id:", user_id);
-    console.log("Effective user ID:", effectiveUserId);
+    console.log("Extracted user_id:", user_id);
+    console.log("Effective user ID:", effectiveuser_id);
 
     // Validate required fields
     if (!title) {
@@ -44,11 +44,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "Job type is required" });
     }
     
-    // Validate userId
-    if (!effectiveUserId) {
+    // Validate user_id
+    if (!effectiveuser_id) {
       return res.status(400).json({ 
         error: "User ID is required", 
-        detail: "The userId field is needed to satisfy the RLS policy",
+        detail: "The user_id field is needed to satisfy the RLS policy",
         requestBody: req.body // Include the request body for debugging
       });
     }
@@ -64,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       is_active,
       startDate,
       endDate,
-      userId: effectiveUserId
+      user_id: effectiveuser_id
     });
 
     // Insert using user_id field name to match the database column
@@ -81,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         is_active,
         startDate,
         endDate,
-        userId: effectiveUserId, // This should work with Supabase RLS
+        user_id: effectiveuser_id, // This should work with Supabase RLS
       })
       .returning();
 

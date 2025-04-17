@@ -4,8 +4,8 @@ import { jobListings } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const userId = req.headers["x-user-id"] as string;
-  if (!userId) {
+  const user_id = req.headers["x-user-id"] as string;
+  if (!user_id) {
     return res.status(401).json({ error: "User ID is required" });
   }
 
@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const listings = await db
         .select()
         .from(jobListings)
-        .where(eq(jobListings.userId, userId));
+        .where(eq(jobListings.user_id, user_id));
 
       return res.status(200).json(listings);
     } catch (error) {

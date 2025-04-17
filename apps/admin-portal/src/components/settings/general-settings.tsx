@@ -53,12 +53,12 @@ const GeneralSettings = ({
   const [selectedTimezone, setSelectedTimezone] = useState<string>("UTC");
   const [selectedLanguage, setSelectedLanguage] = useState<string>(lang);
 
-  // Get user from the existing store to get profileId
+  // Get user from the existing store to get profile_id
   const { user } = useUserStore();
-  const profileId = user?.id || "";
+  const profile_id = user?.id || "";
 
   // Use the profile hook to fetch data
-  const { data: profile, isLoading: isLoadingProfile } = useProfile(profileId);
+  const { data: profile, isLoading: isLoadingProfile } = useProfile(profile_id);
 
   // Initialize the update mutation
   const updateProfileMutation = useUpdateProfile();
@@ -129,7 +129,7 @@ const GeneralSettings = ({
       console.log("Current profile:", profile);
 
       await updateProfileMutation.mutateAsync({
-        profileId,
+        profile_id,
         data: {
           full_name: data.name,
           // Email is managed separately through auth system if needed

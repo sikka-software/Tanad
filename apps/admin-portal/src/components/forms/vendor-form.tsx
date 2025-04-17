@@ -39,17 +39,17 @@ export type VendorFormValues = z.input<ReturnType<typeof createVendorSchema>>;
 
 interface VendorFormProps {
   formId?: string;
-  vendorId?: string;
+  vendor_id?: string;
   loading?: boolean;
-  userId: string | undefined;
+  user_id: string | undefined;
   onSubmit?: (data: VendorFormValues) => void;
 }
 
 export function VendorForm({
   formId,
-  vendorId,
+  vendor_id,
   loading: externalLoading = false,
-  userId,
+  user_id,
   onSubmit,
 }: VendorFormProps) {
   const t = useTranslations();
@@ -86,11 +86,11 @@ export function VendorForm({
       value: company.id,
     })) || [];
 
-  // Fetch vendor data if vendorId is provided (edit mode)
+  // Fetch vendor data if vendor_id is provided (edit mode)
   useEffect(() => {
-    if (vendorId) {
+    if (vendor_id) {
       setInternalLoading(true);
-      fetchVendorById(vendorId)
+      fetchVendorById(vendor_id)
         .then((vendor) => {
           form.reset({
             name: vendor.name,
@@ -114,12 +114,12 @@ export function VendorForm({
           setInternalLoading(false);
         });
     }
-  }, [vendorId, form, t]);
+  }, [vendor_id, form, t]);
 
   const handleCompanySubmit = async (data: CompanyFormValues) => {
     try {
       // Check if user ID is available
-      if (!userId) {
+      if (!user_id) {
         throw new Error(t("error.not_authenticated"));
       }
 
@@ -139,7 +139,7 @@ export function VendorForm({
             size: data.size?.trim() || null,
             notes: data.notes?.trim() || null,
             is_active: data.is_active,
-            user_id: userId,
+            user_id: user_id,
           },
         ])
         .select()

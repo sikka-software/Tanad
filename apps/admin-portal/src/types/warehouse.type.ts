@@ -10,9 +10,9 @@ export interface Warehouse {
   is_active: boolean;
   notes: string | null;
   created_at: string;
-  // userId field exists in the schema but might not be needed in the interface
+  // user_id field exists in the schema but might not be needed in the interface
   // unless specifically used in the frontend logic beyond RLS.
 }
 
 // Define an explicit type for warehouse creation data
-export type WarehouseCreateData = Omit<Warehouse, "id" | "created_at"> & { userId: string };
+export type WarehouseCreateData = Omit<Warehouse, "id" | "created_at"> & { user_id: string };

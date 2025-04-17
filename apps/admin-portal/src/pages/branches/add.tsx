@@ -63,7 +63,7 @@ export default function AddBranchPage() {
           <CardContent>
             <BranchForm
               id="branch-form"
-              userId={user?.id}
+              user_id={user?.id}
               onSuccess={handleSuccess}
               loading={loading}
               setLoading={setLoading}

@@ -125,12 +125,12 @@ const SidebarSettings = ({
   const [isDirty, setIsDirty] = useState(false);
   const [menuList, setMenuList] = useState(getMenuList(pathname));
 
-  // Get user from the existing store to get profileId
+  // Get user from the existing store to get profile_id
   const { user } = useUserStore();
-  const profileId = user?.id || "";
+  const profile_id = user?.id || "";
 
   // Use the profile hook to fetch data
-  const { data: profile } = useProfile(profileId);
+  const { data: profile } = useProfile(profile_id);
 
   // Initialize the update mutation
   const updateProfileMutation = useUpdateProfile();
@@ -328,7 +328,7 @@ const SidebarSettings = ({
 
       // Save menu configuration to profile
       const result = await updateProfileMutation.mutateAsync({
-        profileId,
+        profile_id,
         data: {
           user_settings: {
             ...currentUserSettings,

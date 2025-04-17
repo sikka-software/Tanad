@@ -12,7 +12,7 @@ export type Product = {
   user_id: string;
   created_at: string;
   updated_at: string;
-  userId: string;
+  user_id: string;
 };
 
 type ProductsStore = {

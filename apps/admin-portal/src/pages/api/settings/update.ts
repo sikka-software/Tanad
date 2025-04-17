@@ -19,21 +19,21 @@ export default async function handler(
     // First try to get the session from Supabase directly
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
-    // Get the userId from either the session or the request body as fallback
-    const userId = session?.user?.id || req.body.userId;
+    // Get the user_id from either the session or the request body as fallback
+    const user_id = session?.user?.id || req.body.user_id;
     
     console.log("API: Session check result:", { 
       hasSession: !!session, 
-      userId: userId,
-      bodyUserId: req.body.userId
+      user_id: user_id,
+      bodyuser_id: req.body.user_id
     });
 
-    if (!userId) {
+    if (!user_id) {
       return res.status(401).json({ success: false, message: "Unauthorized - No user ID found" });
     }
 
-    // Remove userId from body if it exists, keeping only the settings data
-    const { userId: _, ...settingsData } = req.body;
+    // Remove user_id from body if it exists, keeping only the settings data
+    const { user_id: _, ...settingsData } = req.body;
 
     // Update the profile with the new settings
     const { data, error } = await supabase
@@ -49,7 +49,7 @@ export default async function handler(
           ...(settingsData.language ? { language: settingsData.language } : {}),
         },
       })
-      .eq("id", userId)
+      .eq("id", user_id)
       .select();
 
     // If email was updated, also update it in auth

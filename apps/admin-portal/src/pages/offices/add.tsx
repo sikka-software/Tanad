@@ -113,7 +113,7 @@ export default function AddOfficePage() {
           <CardContent>
             <OfficeForm
               id="office-form"
-              userId={user?.id}
+              user_id={user?.id}
               onSubmit={handleSubmit}
               loading={loading}
             />

@@ -51,11 +51,11 @@ const EmployeesTable = ({ data, isLoading, error }: EmployeesTableProps) => {
 
       if (columnId === "department") {
         // For department changes, handle department_id and department name
-        const departmentId = value as string;
-        updates.department_id = departmentId;
+        const department_id = value as string;
+        updates.department_id = department_id;
 
         // Find the department name for immediate UI display
-        const department = departments?.find((d) => d.id === departmentId);
+        const department = departments?.find((d) => d.id === department_id);
         if (department) {
           updates.department = department.name;
         }

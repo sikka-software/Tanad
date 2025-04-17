@@ -42,12 +42,12 @@ const NotificationSettings = ({
   const t = useTranslations();
   const lang = useLocale();
 
-  // Get user from the existing store to get profileId
+  // Get user from the existing store to get profile_id
   const { user } = useUserStore();
-  const profileId = user?.id || "";
+  const profile_id = user?.id || "";
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   // Use the profile hook to fetch data
-  const { data: profile } = useProfile(profileId);
+  const { data: profile } = useProfile(profile_id);
 
   useEffect(() => {
     setTimeout(() => {
@@ -109,7 +109,7 @@ const NotificationSettings = ({
       console.log("Current profile:", profile);
 
       await updateProfileMutation.mutateAsync({
-        profileId,
+        profile_id,
         data: {
           user_settings: {
             ...(profile?.user_settings || {}),

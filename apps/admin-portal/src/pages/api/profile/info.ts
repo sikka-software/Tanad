@@ -16,14 +16,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
   }
 
   try {
-    const { profileId } = req.query;
+    const { profile_id } = req.query;
 
-    if (!profileId || typeof profileId !== "string") {
+    if (!profile_id || typeof profile_id !== "string") {
       return res.status(400).json({ error: "Profile ID is required" });
     }
 
     const profileData = await db.query.profiles.findFirst({
-      where: eq(profiles.id, profileId),
+      where: eq(profiles.id, profile_id),
     });
 
     if (!profileData) {

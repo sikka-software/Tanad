@@ -29,7 +29,7 @@ export default function AddJobListingPage() {
     try {
       await createJobListing.mutateAsync({
         ...data,
-        userId: user.id,
+        user_id: user.id,
       });
 
       toast.success(t("General.successful_operation"), {

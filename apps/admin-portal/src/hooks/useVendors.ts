@@ -39,7 +39,7 @@ export function useCreateVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newVendor: VendorCreateData & { userId: string }) => {
+    mutationFn: (newVendor: VendorCreateData & { user_id: string }) => {
       return createVendor(newVendor);
     },
     onSuccess: () => {

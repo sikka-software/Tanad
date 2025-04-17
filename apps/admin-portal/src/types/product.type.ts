@@ -13,7 +13,7 @@ export type Product = {
   price: number;
   sku?: string | null;
   stockQuantity?: number;
-  userId: string;
+  user_id: string;
   created_at?: string;
   updated_at?: string;
 };

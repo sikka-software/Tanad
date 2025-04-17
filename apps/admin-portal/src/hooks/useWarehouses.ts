@@ -41,11 +41,11 @@ export function useCreateWarehouse() {
 
   return useMutation({
     mutationFn: (newWarehouse: Omit<Warehouse, 'id' | 'created_at'> & { user_id: string }) => {
-      // Map user_id to userId for the service function
+      // Map user_id to user_id for the service function
       const { user_id, ...rest } = newWarehouse;
       const warehouseData: WarehouseCreateData = {
         ...rest,
-        userId: user_id,
+        user_id: user_id,
       };
       return createWarehouse(warehouseData);
     },

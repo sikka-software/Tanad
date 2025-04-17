@@ -36,19 +36,19 @@ type WarehouseFormValues = z.input<typeof warehouseFormSchema>;
 
 interface WarehouseFormProps {
   id?: string;
-  warehouseId?: string;
+  warehouse_id?: string;
   onSuccess?: (warehouse: Warehouse) => void;
   loading?: boolean;
-  userId: string | undefined;
+  user_id: string | undefined;
   setLoading?: (loading: boolean) => void;
 }
 
 export function WarehouseForm({
   id = "warehouse-form",
-  warehouseId,
+  warehouse_id,
   onSuccess,
   loading: externalLoading = false,
-  userId,
+  user_id,
   setLoading,
 }: WarehouseFormProps) {
   const router = useRouter();
@@ -100,11 +100,11 @@ export function WarehouseForm({
     },
   });
 
-  // Fetch warehouse data if warehouseId is provided (edit mode)
+  // Fetch warehouse data if warehouse_id is provided (edit mode)
   useEffect(() => {
-    if (warehouseId) {
+    if (warehouse_id) {
       setInternalLoading(true);
-      fetchWarehouseById(warehouseId)
+      fetchWarehouseById(warehouse_id)
         .then((warehouse) => {
           form.reset({
             name: warehouse.name,
@@ -128,11 +128,11 @@ export function WarehouseForm({
           setInternalLoading(false);
         });
     }
-  }, [warehouseId, form, t]);
+  }, [warehouse_id, form, t]);
 
   const onSubmit: SubmitHandler<WarehouseFormValues> = async (data) => {
     setInternalLoading(true);
-    if (!userId) {
+    if (!user_id) {
       toast.error(t("General.error_operation"), {
         description: t("General.not_authenticated"),
       });
@@ -154,15 +154,15 @@ export function WarehouseForm({
       };
 
       let result: Warehouse;
-      if (warehouseId) {
-        result = await updateWarehouse(warehouseId, warehouseData);
+      if (warehouse_id) {
+        result = await updateWarehouse(warehouse_id, warehouseData);
         toast.success(t("General.successful_operation"), {
           description: t("Warehouses.messages.success_updated"),
         });
       } else {
         const warehouseCreateData = {
           ...warehouseData,
-          userId: userId,
+          user_id: user_id,
         };
         result = await createWarehouse(warehouseCreateData as unknown as WarehouseCreateData);
         toast.success(t("General.successful_operation"), {

@@ -78,7 +78,7 @@ interface Template {
   content: unknown;
   isDefault: boolean;
   createdAt: string | null;
-  userId: string;
+  user_id: string;
 }
 
 const formSchema = z.object({
@@ -117,7 +117,7 @@ export default function TemplatesPage() {
         return;
       }
 
-      const response = await fetch(`/api/templates?userId=${user.id}`);
+      const response = await fetch(`/api/templates?user_id=${user.id}`);
       if (!response.ok) {
         throw new Error("Failed to fetch templates");
       }
@@ -164,7 +164,7 @@ export default function TemplatesPage() {
           type: values.type,
           content: parsedContent,
           isDefault: values.isDefault,
-          userId: user.id,
+          user_id: user.id,
         }),
       });
 
@@ -196,9 +196,9 @@ export default function TemplatesPage() {
     setSelectedTemplate(template);
   };
 
-  const handleSaveTemplate = async (templateId: string, content: string) => {
+  const handleSaveTemplate = async (template_id: string, content: string) => {
     try {
-      const response = await fetch(`/api/templates/${templateId}`, {
+      const response = await fetch(`/api/templates/${template_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -7,7 +7,7 @@ export interface Employee {
   position: string;
   department?: string | null;
   department_id?: string | null;
-  departmentId?: string | null;
+  department_id?: string | null;
   hire_date: string;
   salary?: number;
   status: "active" | "inactive" | "on_leave" | "terminated";

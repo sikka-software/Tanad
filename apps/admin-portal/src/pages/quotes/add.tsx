@@ -105,7 +105,7 @@ export default function AddQuotePage() {
           <CardContent>
             <QuoteForm
               id="quote-form"
-              userId={user?.id}
+              user_id={user?.id}
               onSubmit={handleSubmit}
               loading={loading}
               hideFormButtons

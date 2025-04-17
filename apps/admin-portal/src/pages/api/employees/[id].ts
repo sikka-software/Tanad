@@ -11,20 +11,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === "PUT") {
     try {
       const {
-        userId,
+        user_id,
         first_name,
         last_name,
         email,
         phone,
         position,
-        departmentId,
+        department_id,
         hireDate,
         salary,
         status,
         notes,
       } = req.body;
 
-      if (!userId) {
+      if (!user_id) {
         return res.status(401).json({ error: "Unauthorized" });
       }
 
@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const [existingEmployee] = await db
         .select()
         .from(employees)
-        .where(sql`${employees.id} = ${id} AND ${employees.userId} = ${userId}`);
+        .where(sql`${employees.id} = ${id} AND ${employees.user_id} = ${user_id}`);
 
       if (!existingEmployee) {
         return res.status(404).json({ error: "Employee not found or access denied" });
@@ -47,7 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           email,
           phone,
           position,
-          departmentId,
+          department_id,
           hireDate,
           salary: salary ? sql`${salary}::numeric` : null,
           status,

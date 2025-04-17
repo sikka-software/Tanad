@@ -40,7 +40,7 @@ export default function AddVendorPage() {
         state: data.state.trim(),
         zipCode: data.zipCode.trim(),
         notes: data.notes?.trim() || null,
-        userId: user?.id,
+        user_id: user?.id,
       };
 
       await createVendorMutation.mutateAsync(vendorData);
@@ -97,7 +97,7 @@ export default function AddVendorPage() {
           <CardContent>
             <VendorForm
               formId="vendor-form"
-              userId={user?.id}
+              user_id={user?.id}
               loading={createVendorMutation.isPending}
               onSubmit={onSubmit}
             />

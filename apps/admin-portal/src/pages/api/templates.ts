@@ -8,15 +8,15 @@ import { templates } from "@/db/schema";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
-      const userId = req.query.userId as string;
-      if (!userId) {
+      const user_id = req.query.user_id as string;
+      if (!user_id) {
         return res.status(400).json({ error: "User ID is required" });
       }
 
       const result = await db
         .select()
         .from(templates)
-        .where(eq(templates.user_id, userId))
+        .where(eq(templates.user_id, user_id))
         .orderBy(desc(templates.createdAt));
 
       return res.status(200).json(result);

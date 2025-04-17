@@ -17,7 +17,7 @@ function convertDrizzleDepartment(
     description: data.description || "",
     locations: data.locations?.map((l) => l.locationId) || [],
     createdAt: data.createdAt?.toString() || "",
-    userId: data.userId,
+    user_id: data.user_id,
   };
 }
 
@@ -67,13 +67,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Delete removed locations
         await db
           .delete(departmentLocations)
-          .where(eq(departmentLocations.departmentId, id as string));
+          .where(eq(departmentLocations.department_id, id as string));
 
         // Insert new locations if any
         if (locations && locations.length > 0) {
           await db.insert(departmentLocations).values(
             locations.map((locationId: string) => ({
-              departmentId: id as string,
+              department_id: id as string,
               locationId,
               locationType: "office", // Default to office type
             })),

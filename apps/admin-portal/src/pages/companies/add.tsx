@@ -47,7 +47,7 @@ export default function AddCompanyPage() {
           size: data.size?.trim() || null,
           notes: data.notes?.trim() || null,
           is_active: data.is_active,
-          userId: user.id,
+          user_id: user.id,
         }),
       });
 

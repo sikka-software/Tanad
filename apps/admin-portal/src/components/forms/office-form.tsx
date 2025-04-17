@@ -23,12 +23,12 @@ export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
 
 export interface OfficeFormProps {
   id?: string;
-  userId: string | undefined;
+  user_id: string | undefined;
   onSubmit: (data: OfficeFormValues) => void;
   loading?: boolean;
 }
 
-export function OfficeForm({ userId, id, onSubmit, loading }: OfficeFormProps) {
+export function OfficeForm({ user_id, id, onSubmit, loading }: OfficeFormProps) {
   const t = useTranslations();
   const form = useForm<OfficeFormValues>({
     resolver: zodResolver(createOfficeSchema(t)),

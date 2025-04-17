@@ -38,7 +38,7 @@ export function useSettingsMutation() {
       // Include the user ID in the request as fallback
       return updateSettings({
         ...settings,
-        userId: user?.id
+        user_id: user?.id
       });
     },
     onSuccess: async (data) => {
