@@ -11,7 +11,7 @@ import SheetTable, { ExtendedColumnDef } from "@/components/ui/sheet-table";
 
 import { Warehouse } from "@/types/warehouse.type";
 
-import { useWarehousesStore } from "@/stores/warehouses.store";
+import useWarehousesStore from "@/stores/warehouses.store";
 
 const nameSchema = z.string().min(1, "Required");
 const codeSchema = z.string().min(1, "Required");
@@ -27,15 +27,27 @@ interface WarehouseTableProps {
   data: Warehouse[];
   isLoading?: boolean;
   error?: Error | null;
+  onSelectedRowsChange?: (rows: Warehouse[]) => void;
 }
 
-const WarehouseTable = ({ data, isLoading, error }: WarehouseTableProps) => {
+const WarehouseTable = ({ data, isLoading, error, onSelectedRowsChange }: WarehouseTableProps) => {
   const t = useTranslations("Warehouses");
-  const { updateWarehouse } = useWarehousesStore();
+  const { updateWarehouse, selectedRows, setSelectedRows } = useWarehousesStore();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateWarehouse(rowId, { [columnId]: value });
   };
+
+  const handleRowSelectionChange = (rows: Warehouse[]) => {
+    setSelectedRows(rows.map((row) => row.id));
+    onSelectedRowsChange?.(rows);
+  };
+
+  // Convert selected row IDs to a record format for the table
+  const rowSelection = selectedRows.reduce((acc: Record<string, boolean>, id: string) => {
+    acc[id] = true;
+    return acc;
+  }, {});
 
   const columns: ExtendedColumnDef<Warehouse>[] = [
     { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
@@ -62,7 +74,28 @@ const WarehouseTable = ({ data, isLoading, error }: WarehouseTableProps) => {
   if (error) {
     return <ErrorComponent errorMessage={error.message} />;
   }
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+
+  return (
+    <SheetTable
+      columns={columns}
+      data={data}
+      onEdit={handleEdit}
+      showHeader={true}
+      tableOptions={{
+        state: {
+          rowSelection,
+        },
+        enableRowSelection: true,
+        enableMultiRowSelection: true,
+        getRowId: (row: Warehouse) => row.id,
+        onRowSelectionChange: (updater: any) => {
+          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+          const selectedRows = data.filter((row) => newSelection[row.id]);
+          handleRowSelectionChange(selectedRows);
+        },
+      }}
+    />
+  );
 };
 
 export default WarehouseTable;

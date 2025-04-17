@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
 import { warehouses } from "@/db/schema";
@@ -21,6 +21,16 @@ function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehous
   };
 }
 
+// Helper to convert our Warehouse type to Drizzle warehouse
+function convertToDrizzleWarehouse(data: Partial<Warehouse>): Partial<typeof warehouses.$inferInsert> {
+  return {
+    ...data,
+    zipCode: data.zip_code,
+    capacity: data.capacity?.toString(),
+  };
+}
+
+// Fetch operations
 export async function fetchWarehouses(): Promise<Warehouse[]> {
   try {
     const response = await fetch("/api/warehouses");
@@ -35,54 +45,93 @@ export async function fetchWarehouses(): Promise<Warehouse[]> {
 }
 
 export async function fetchWarehouseById(id: string): Promise<Warehouse> {
-  const response = await fetch(`/api/warehouses/${id}`);
-  if (!response.ok) {
-    throw new Error(`Warehouse with id ${id} not found`);
+  try {
+    const response = await fetch(`/api/warehouses/${id}`);
+    if (!response.ok) {
+      throw new Error(`Warehouse with id ${id} not found`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error(`Error fetching warehouse ${id}:`, error);
+    throw error;
   }
-  return response.json();
 }
 
+// Create operation
 export async function createWarehouse(warehouse: WarehouseCreateData): Promise<Warehouse> {
-  const response = await fetch("/api/warehouses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(warehouse),
-  });
+  try {
+    const response = await fetch("/api/warehouses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(warehouse),
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to create warehouse");
+    if (!response.ok) {
+      throw new Error("Failed to create warehouse");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error creating warehouse:", error);
+    throw error;
   }
-
-  return response.json();
 }
 
-export async function updateWarehouse(
-  id: string,
-  warehouse: Partial<Omit<Warehouse, "id" | "created_at">>,
-): Promise<Warehouse> {
-  const response = await fetch(`/api/warehouses/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(warehouse),
-  });
+// Update operation
+export async function updateWarehouse(id: string, updates: Partial<Warehouse>): Promise<Warehouse> {
+  try {
+    const response = await fetch(`/api/warehouses/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updates),
+    });
 
-  if (!response.ok) {
-    throw new Error(`Failed to update warehouse with id ${id}`);
+    if (!response.ok) {
+      throw new Error(`Failed to update warehouse with id ${id}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error(`Error updating warehouse ${id}:`, error);
+    throw error;
   }
-
-  return response.json();
 }
 
+// Delete operations
 export async function deleteWarehouse(id: string): Promise<void> {
-  const response = await fetch(`/api/warehouses/${id}`, {
-    method: "DELETE",
-  });
+  try {
+    const response = await fetch(`/api/warehouses/${id}`, {
+      method: "DELETE",
+    });
 
-  if (!response.ok) {
-    throw new Error(`Failed to delete warehouse with id ${id}`);
+    if (!response.ok) {
+      throw new Error(`Failed to delete warehouse with id ${id}`);
+    }
+  } catch (error) {
+    console.error(`Error deleting warehouse ${id}:`, error);
+    throw error;
+  }
+}
+
+export async function bulkDeleteWarehouses(ids: string[]): Promise<void> {
+  try {
+    const response = await fetch("/api/warehouses/bulk-delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete warehouses");
+    }
+  } catch (error) {
+    console.error("Error bulk deleting warehouses:", error);
+    throw error;
   }
 }
