@@ -173,6 +173,9 @@ CREATE POLICY "Users can delete their own companies" ON companies FOR DELETE USI
 
 -- EMPLOYEES POLICIES
 CREATE POLICY "Users can read employees" ON employees FOR SELECT USING (true);
+CREATE POLICY "Users can insert their own employees" ON employees FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own employees" ON employees FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own employees" ON employees FOR DELETE USING (auth.uid() = user_id);
 
 -- EXPENSES POLICIES
 CREATE POLICY "Users can read their own expenses" ON expenses FOR SELECT USING (auth.uid() = user_id);

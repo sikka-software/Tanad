@@ -275,21 +275,28 @@ export const products = pgTable(
   ],
 ).enableRLS();
 
-export const employees = pgTable("employees", {
-  id: uuid().primaryKey().defaultRandom(),
-  first_name: varchar("first_name", { length: 255 }).notNull(),
-  last_name: varchar("last_name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  phone: varchar("phone", { length: 50 }),
-  position: varchar("position", { length: 255 }).notNull(),
-  departmentId: uuid("department_id").references(() => departments.id),
-  hireDate: date("hire_date").notNull(),
-  salary: numeric("salary", { precision: 10, scale: 2 }),
-  status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
-  notes: text("notes"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}).enableRLS();
+export const employees = pgTable(
+  "employees",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    first_name: varchar("first_name", { length: 255 }).notNull(),
+    last_name: varchar("last_name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    phone: varchar("phone", { length: 50 }),
+    position: varchar("position", { length: 255 }).notNull(),
+    departmentId: uuid("department_id").references(() => departments.id),
+    hireDate: date("hire_date").notNull(),
+    salary: numeric("salary", { precision: 10, scale: 2 }),
+    status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    userId: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("employees_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+  ],
+).enableRLS();
 
 export const expenses = pgTable(
   "expenses",
