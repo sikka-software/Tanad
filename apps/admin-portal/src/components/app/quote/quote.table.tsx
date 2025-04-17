@@ -10,7 +10,6 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { Quote } from "@/types/quote.type";
 
-import { useBulkDeleteQuotes } from "@/hooks/useQuotes";
 import { useQuotesStore } from "@/stores/quotes.store";
 
 const quoteNumberSchema = z.string().min(1, "Required");

@@ -1,13 +1,12 @@
-import React from "react";
-
 import { useTranslations } from "next-intl";
-
+import React from "react";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { Quote } from "@/types/quote.type";
 import { Salary } from "@/types/salary.type";
 
 import { useSalariesStore } from "@/stores/salaries.store";
@@ -28,9 +27,10 @@ interface SalariesTableProps {
 }
 
 const SalariesTable = ({ data, isLoading, error, onSelectedRowsChange }: SalariesTableProps) => {
-  const t = useTranslations("Salaries");
-  const { updateSalary } = useSalariesStore();
-  const { selectedRows, setSelectedRows } = useSalariesStore();
+  const t = useTranslations();
+  const { updateSalary, selectedRows, setSelectedRows } = useSalariesStore();
+
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
@@ -45,100 +45,91 @@ const SalariesTable = ({ data, isLoading, error, onSelectedRowsChange }: Salarie
   };
 
   const handleRowSelectionChange = (selectedRows: Salary[]) => {
-    setSelectedRows(selectedRows.map(row => row.id));
+    setSelectedRows(selectedRows.map((row) => row.id));
     onSelectedRowsChange?.(selectedRows);
   };
 
-  // Convert selected row IDs to record format for table
-  const rowSelection = selectedRows.reduce((acc, id) => {
-    acc[id] = true;
-    return acc;
-  }, {} as Record<string, boolean>);
+  const columns: ExtendedColumnDef<Salary>[] = [
+    {
+      accessorKey: "employee_name",
+      header: t("Salaries.form.employee_name.label"),
+      validationSchema: employeeNameSchema,
+    },
+    {
+      accessorKey: "gross_amount",
+      header: t("Salaries.form.gross_amount.label"),
+      validationSchema: grossAmountSchema,
+      cell: ({ getValue }) => formatCurrency(getValue() as number),
+    },
+    {
+      accessorKey: "net_amount",
+      header: t("Salaries.form.net_amount.label"),
+      validationSchema: netAmountSchema,
+      cell: ({ getValue }) => formatCurrency(getValue() as number),
+    },
+    {
+      accessorKey: "payment_date",
+      header: t("Salaries.form.payment_date.label"),
+      validationSchema: paymentDateSchema,
+      cell: ({ getValue }) => formatDate(getValue() as string),
+    },
+    {
+      accessorKey: "pay_period_start",
+      header: t("Salaries.form.pay_period_start.label"),
+      validationSchema: payPeriodStartSchema,
+      cell: ({ getValue }) => formatDate(getValue() as string),
+    },
+    {
+      accessorKey: "pay_period_end",
+      header: t("Salaries.form.pay_period_end.label"),
+      validationSchema: payPeriodEndSchema,
+      cell: ({ getValue }) => formatDate(getValue() as string),
+    },
+    {
+      accessorKey: "notes",
+      header: t("Salaries.form.notes.label"),
+      validationSchema: notesSchema,
+    },
+  ];
 
   if (isLoading) {
-    return <TableSkeleton columns={7} rows={5} />;
+    return (
+      <TableSkeleton
+        columns={columns
+          .map((col) => col.accessorKey || col.id)
+          .filter((key): key is string => !!key)}
+        rows={5}
+      />
+    );
   }
 
   if (error) {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  const columns: ExtendedColumnDef<Salary>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <input
-          type="checkbox"
-          checked={table.getIsAllRowsSelected()}
-          onChange={table.getToggleAllRowsSelectedHandler()}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <input
-          type="checkbox"
-          checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
-          aria-label="Select row"
-        />
-      ),
+  const salaryTableOptions = {
+    state: {
+      rowSelection,
     },
-    {
-      accessorKey: "employee_name",
-      header: t("table.employee_name"),
-      validationSchema: employeeNameSchema,
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
+    getRowId: (row: Salary) => row.id!,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
     },
-    {
-      accessorKey: "gross_amount",
-      header: t("table.gross_amount"),
-      validationSchema: grossAmountSchema,
-      cell: ({ getValue }) => formatCurrency(getValue() as number),
-    },
-    {
-      accessorKey: "net_amount",
-      header: t("table.net_amount"),
-      validationSchema: netAmountSchema,
-      cell: ({ getValue }) => formatCurrency(getValue() as number),
-    },
-    {
-      accessorKey: "payment_date",
-      header: t("table.payment_date"),
-      validationSchema: paymentDateSchema,
-      cell: ({ getValue }) => formatDate(getValue() as string),
-    },
-    {
-      accessorKey: "pay_period_start",
-      header: t("table.pay_period_start"),
-      validationSchema: payPeriodStartSchema,
-      cell: ({ getValue }) => formatDate(getValue() as string),
-    },
-    {
-      accessorKey: "pay_period_end",
-      header: t("table.pay_period_end"),
-      validationSchema: payPeriodEndSchema,
-      cell: ({ getValue }) => formatDate(getValue() as string),
-    },
-    {
-      accessorKey: "notes",
-      header: t("table.notes"),
-      validationSchema: notesSchema,
-    },
-  ];
+  };
 
   return (
     <SheetTable
-      data={data}
       columns={columns}
+      data={data}
       onEdit={handleEdit}
-      state={{ rowSelection }}
+      showHeader={true}
       enableRowSelection={true}
-      enableMultiRowSelection={true}
-      getRowId={(row) => row.id}
-      onRowSelectionChange={(updater) => {
-        const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-        const selectedRows = data.filter((row) => newSelection[row.id]);
-        handleRowSelectionChange(selectedRows);
-      }}
+      onRowSelectionChange={handleRowSelectionChange}
+      tableOptions={salaryTableOptions}
     />
   );
 };
