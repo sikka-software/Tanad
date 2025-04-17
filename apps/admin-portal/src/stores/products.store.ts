@@ -18,18 +18,22 @@ type ProductsStore = {
   products: Product[];
   isLoading: boolean;
   error: string | null;
+  selectedRows: string[];
   fetchProducts: () => Promise<void>;
   createProduct: (
     product: Omit<Product, "id" | "user_id" | "created_at" | "updated_at">,
   ) => Promise<void>;
   updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
+  setSelectedRows: (rows: string[]) => void;
+  clearSelection: () => void;
 };
 
 export const useProductsStore = create<ProductsStore>((set, get) => ({
   products: [],
   isLoading: false,
   error: null,
+  selectedRows: [],
 
   fetchProducts: async () => {
     try {
@@ -98,5 +102,13 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });
     }
+  },
+
+  setSelectedRows: (rows: string[]) => {
+    set({ selectedRows: rows });
+  },
+
+  clearSelection: () => {
+    set({ selectedRows: [] });
   },
 }));

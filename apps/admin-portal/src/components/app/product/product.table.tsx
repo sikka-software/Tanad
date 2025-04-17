@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -22,15 +22,37 @@ interface ProductsTableProps {
   data: Product[];
   isLoading?: boolean;
   error?: Error | null;
+  onSelectedRowsChange?: (selectedRows: Product[]) => void;
 }
 
-const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
+const ProductsTable = ({ data, isLoading, error, onSelectedRowsChange }: ProductsTableProps) => {
   const { updateProduct } = useProductsStore();
+  const { selectedRows, setSelectedRows } = useProductsStore();
   const t = useTranslations();
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateProduct(rowId, { [columnId]: value });
   };
+
+  const handleRowSelectionChange = useCallback(
+    (rows: Product[]) => {
+      const newSelectedIds = rows.map((row) => row.id!);
+      // Only update if the selection has actually changed
+      const currentSelection = new Set(selectedRows);
+      const newSelection = new Set(newSelectedIds);
+
+      if (
+        newSelection.size !== currentSelection.size ||
+        !Array.from(newSelection).every((id) => currentSelection.has(id))
+      ) {
+        setSelectedRows(newSelectedIds);
+        if (onSelectedRowsChange) {
+          onSelectedRowsChange(rows);
+        }
+      }
+    },
+    [selectedRows, setSelectedRows, onSelectedRowsChange],
+  );
 
   const columns: ExtendedColumnDef<Product>[] = [
     { accessorKey: "name", header: t("Products.form.name.label"), validationSchema: nameSchema },
@@ -58,7 +80,32 @@ const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+  // Create a selection state object for the table
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+
+  return (
+    <SheetTable
+      columns={columns}
+      data={data}
+      onEdit={handleEdit}
+      showHeader={true}
+      enableRowSelection={true}
+      onRowSelectionChange={handleRowSelectionChange}
+      tableOptions={{
+        state: {
+          rowSelection,
+        },
+        enableRowSelection: true,
+        enableMultiRowSelection: true,
+        getRowId: (row) => row.id!,
+        onRowSelectionChange: (updater) => {
+          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+          const selectedRows = data.filter((row) => newSelection[row.id!]);
+          handleRowSelectionChange(selectedRows);
+        },
+      }}
+    />
+  );
 };
 
 export default ProductsTable;

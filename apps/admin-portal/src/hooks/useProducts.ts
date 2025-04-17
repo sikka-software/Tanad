@@ -83,3 +83,31 @@ export function useDeleteProduct() {
     },
   });
 }
+
+// Hook to delete multiple products
+export function useDeleteProducts() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (productIds: string[]) => {
+      const response = await fetch("/api/products/bulk-delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ productIds }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to delete products");
+      }
+
+      const result = await response.json();
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+}
