@@ -1,7 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
 import { toast } from "sonner";
 
 import { VendorForm, type VendorFormValues } from "@/components/app/vendor/vendor.form";
@@ -109,10 +108,9 @@ export default function AddVendorPage() {
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
+      messages: (await import(`../../../locales/${locale}.json`)).default,
     },
   };
 };

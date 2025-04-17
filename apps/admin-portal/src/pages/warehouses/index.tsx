@@ -113,10 +113,9 @@ export default function WarehousesPage() {
 
 // Add getStaticProps for translations
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
+      messages: (await import(`../../../locales/${locale}.json`)).default,
     },
   };
 };

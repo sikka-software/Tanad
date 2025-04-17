@@ -1,20 +1,20 @@
-import { useState } from "react";
-
+import { Building2, Mail, Phone, MapPin, NotebookText, Tag } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-
-import { Building2, Mail, Phone, MapPin, NotebookText, Tag } from "lucide-react";
+import { useState } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useClients } from "@/hooks/useClients";
-import { useVendors } from "@/hooks/useVendors";
+
 import { Client } from "@/types/client.type";
 import { Vendor } from "@/types/vendor.type";
+
+import { useClients } from "@/hooks/useClients";
+import { useVendors } from "@/hooks/useVendors";
 
 export default function ContactsPage() {
   const t = useTranslations();
@@ -173,10 +173,9 @@ export default function ContactsPage() {
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (await import(`../../locales/${effectiveLocale}.json`)).default,
+      messages: (await import(`../../locales/${locale}.json`)).default,
     },
   };
 };

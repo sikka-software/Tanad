@@ -1,10 +1,8 @@
-import { useState } from "react";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
@@ -74,10 +72,9 @@ export default function AddWarehousePage() {
 }
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (await import(`../../../locales/${effectiveLocale}.json`)).default,
+      messages: (await import(`../../../locales/${locale}.json`)).default,
     },
   };
 };

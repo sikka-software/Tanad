@@ -24,11 +24,13 @@ interface SalariesTableProps {
   data: Salary[];
   isLoading?: boolean;
   error?: Error | null;
+  onSelectedRowsChange?: (rows: Salary[]) => void;
 }
 
-const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
+const SalariesTable = ({ data, isLoading, error, onSelectedRowsChange }: SalariesTableProps) => {
   const t = useTranslations("Salaries");
   const { updateSalary } = useSalariesStore();
+  const { selectedRows, setSelectedRows } = useSalariesStore();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
@@ -42,60 +44,103 @@ const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
     await updateSalary(rowId, { [columnId]: value });
   };
 
-  const columns: ExtendedColumnDef<Salary>[] = [
-    {
-      accessorKey: "employee_name",
-      header: t("form.employee_name.label"),
-      validationSchema: employeeNameSchema,
-    },
-    {
-      accessorKey: "gross_amount",
-      header: t("form.gross_amount.label"),
-      validationSchema: grossAmountSchema,
-      //   cell: ({ getValue }: CellContext<Salary, number>) => formatCurrency(getValue()),
-    },
-    {
-      accessorKey: "net_amount",
-      header: t("form.net_amount.label"),
-      validationSchema: netAmountSchema,
-      //   cell: ({ getValue }: CellContext<Salary, number>) => formatCurrency(getValue()),
-    },
-    {
-      accessorKey: "payment_date",
-      header: t("form.payment_date.label"),
-      validationSchema: paymentDateSchema,
-      //   cell: ({ getValue }: CellContext<Salary, string>) => formatDate(getValue()),
-    },
-    {
-      accessorKey: "pay_period_start",
-      header: t("form.pay_period_start.label"),
-      validationSchema: payPeriodStartSchema,
-      //   cell: ({ getValue }: CellContext<Salary, string>) => formatDate(getValue()),
-    },
-    {
-      accessorKey: "pay_period_end",
-      header: t("form.pay_period_end.label"),
-      validationSchema: payPeriodEndSchema,
-      //   cell: ({ getValue }: CellContext<Salary, string>) => formatDate(getValue()),
-    },
-    {
-      accessorKey: "notes",
-      header: t("form.notes.label"),
-      validationSchema: notesSchema,
-    },
-  ];
+  const handleRowSelectionChange = (selectedRows: Salary[]) => {
+    setSelectedRows(selectedRows.map(row => row.id));
+    onSelectedRowsChange?.(selectedRows);
+  };
+
+  // Convert selected row IDs to record format for table
+  const rowSelection = selectedRows.reduce((acc, id) => {
+    acc[id] = true;
+    return acc;
+  }, {} as Record<string, boolean>);
 
   if (isLoading) {
-    return (
-      <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
-    );
+    return <TableSkeleton columns={7} rows={5} />;
   }
 
   if (error) {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+  const columns: ExtendedColumnDef<Salary>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllRowsSelected()}
+          onChange={table.getToggleAllRowsSelectedHandler()}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={row.getIsSelected()}
+          onChange={row.getToggleSelectedHandler()}
+          aria-label="Select row"
+        />
+      ),
+    },
+    {
+      accessorKey: "employee_name",
+      header: t("table.employee_name"),
+      validationSchema: employeeNameSchema,
+    },
+    {
+      accessorKey: "gross_amount",
+      header: t("table.gross_amount"),
+      validationSchema: grossAmountSchema,
+      cell: ({ getValue }) => formatCurrency(getValue() as number),
+    },
+    {
+      accessorKey: "net_amount",
+      header: t("table.net_amount"),
+      validationSchema: netAmountSchema,
+      cell: ({ getValue }) => formatCurrency(getValue() as number),
+    },
+    {
+      accessorKey: "payment_date",
+      header: t("table.payment_date"),
+      validationSchema: paymentDateSchema,
+      cell: ({ getValue }) => formatDate(getValue() as string),
+    },
+    {
+      accessorKey: "pay_period_start",
+      header: t("table.pay_period_start"),
+      validationSchema: payPeriodStartSchema,
+      cell: ({ getValue }) => formatDate(getValue() as string),
+    },
+    {
+      accessorKey: "pay_period_end",
+      header: t("table.pay_period_end"),
+      validationSchema: payPeriodEndSchema,
+      cell: ({ getValue }) => formatDate(getValue() as string),
+    },
+    {
+      accessorKey: "notes",
+      header: t("table.notes"),
+      validationSchema: notesSchema,
+    },
+  ];
+
+  return (
+    <SheetTable
+      data={data}
+      columns={columns}
+      onEdit={handleEdit}
+      state={{ rowSelection }}
+      enableRowSelection={true}
+      enableMultiRowSelection={true}
+      getRowId={(row) => row.id}
+      onRowSelectionChange={(updater) => {
+        const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+        const selectedRows = data.filter((row) => newSelection[row.id]);
+        handleRowSelectionChange(selectedRows);
+      }}
+    />
+  );
 };
 
 export default SalariesTable;

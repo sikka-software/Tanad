@@ -1,8 +1,7 @@
-import { useEffect } from "react";
-
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 import { SalaryForm } from "@/components/app/salary/salary.form";
 import { Button } from "@/components/ui/button";
@@ -59,10 +58,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
-  const effectiveLocale = locale ?? "en";
   return {
     props: {
-      messages: (await import(`../../../../locales/${effectiveLocale}.json`)).default, // Adjust path depth
+      messages: (await import(`../../../../locales/${locale}.json`)).default, // Adjust path depth
     },
   };
 };
