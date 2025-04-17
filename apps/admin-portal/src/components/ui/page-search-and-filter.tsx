@@ -41,7 +41,7 @@ const PageSearchAndFilter = ({
   return (
     <div
       className={cn(
-        "bg-background sticky top-0 flex !min-h-12 items-center justify-between gap-4 border-b px-2",
+        "z-10 bg-background sticky top-0 flex !min-h-12 items-center justify-between gap-4 border-b px-2",
         className,
       )}
       {...props}
