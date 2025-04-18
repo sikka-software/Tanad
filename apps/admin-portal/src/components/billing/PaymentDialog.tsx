@@ -1,0 +1,1031 @@
+import { useEffect, useState } from "react";
+
+import { useLocale, useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
+
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { AlertTriangle, CreditCard, Loader2, ShieldAlert, Wallet, XCircle } from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSubscription } from "@/hooks/use-subscription";
+import useUserStore from "@/hooks/use-user-store";
+import { supabase } from "@/lib/supabase";
+
+// Load Stripe with publishable key
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
+
+// PayPal Icon Component
+function PayPalIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} fill="none">
+      <path
+        d="M19.763 7.376c-.216 1.45-1.314 4.5-3.8 4.5h-1.8c-.262 0-.5.15-.608.39l-1.6 5.2c-.08.24-.314.45-.575.45H9.36a.348.348 0 0 1-.338-.45l.48-1.6v-.01l.87-2.78c.08-.26-.1-.55-.375-.55H8.42c-.266 0-.406-.28-.339-.57l.39-1.65h1.37c.262 0 .501-.15.606-.39l1.575-5.2c.08-.24.315-.39.576-.39h5.041c.266 0 .406.24.339.52-.078.27-.214.72-.214.72z"
+        fill="#253B80"
+      />
+      <path
+        d="M6.1 7.4l-2 7.2c-.078.3.084.55.345.55h1.4c.264 0 .504-.19.607-.48l2-6.8c.078-.3-.084-.56-.345-.56H6.77a.72.72 0 0 0-.671.09z"
+        fill="#179BD7"
+      />
+      <path
+        d="M17.012 3.1c-.216 1.45-1.313 4.5-3.8 4.5h-1.8c-.263 0-.5.15-.607.39l-1.6 5.2c-.08.24-.313.45-.575.45H6.61a.348.348 0 0 1-.338-.45l.87-2.79c.08-.26-.1-.55-.375-.55H5.67c-.266 0-.407-.28-.338-.57l.39-1.65h1.37c.262 0 .5-.15.606-.39l1.575-5.2c.08-.24.314-.39.576-.39h5.041c.265 0 .406.24.338.52-.078.27-.214.72-.214.72z"
+        fill="#253B80"
+      />
+      <path
+        d="M3.35 3.13l-2 7.2c-.08.3.083.55.345.55h1.4c.262 0 .503-.19.606-.48l2-6.8c.08-.3-.083-.56-.345-.56h-1.34a.727.727 0 0 0-.67.09h.005z"
+        fill="#179BD7"
+      />
+    </svg>
+  );
+}
+
+// Google Pay Icon Component
+function GooglePayIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} fill="none">
+      <path
+        d="M21.5 12c0-.17-.02-.33-.04-.5h-9.68v1.9h5.53c-.12.65-.48 1.2-.99 1.58v1.31h1.61c.94-.86 1.56-2.13 1.56-3.67l.01-.62z"
+        fill="#4285F4"
+      />
+      <path
+        d="M11.78 21.5c1.34 0 2.47-.44 3.29-1.2l-1.61-1.24c-.45.3-1.02.48-1.68.48-1.28 0-2.38-.87-2.77-2.04H7.36v1.28c.82 1.63 2.46 2.72 4.42 2.72z"
+        fill="#34A853"
+      />
+      <path
+        d="M9.01 17.5c-.1-.3-.16-.62-.16-.96 0-.34.06-.66.15-.96V14.3H7.35c-.32.63-.5 1.34-.5 2.08 0 .74.18 1.45.5 2.08l1.66-1.27v.31z"
+        fill="#FBBC05"
+      />
+      <path
+        d="M11.78 13.54c.72 0 1.37.25 1.88.73l1.42-1.42c-.86-.8-1.98-1.29-3.3-1.29-1.96 0-3.6 1.09-4.42 2.72l1.65 1.28c.39-1.17 1.5-2.02 2.77-2.02z"
+        fill="#EA4335"
+      />
+    </svg>
+  );
+}
+
+function PaymentError({
+  message,
+  type = "general",
+  onRetry,
+}: {
+  message: string;
+  type?: "card" | "authentication" | "network" | "general";
+  onRetry?: () => void;
+}) {
+  const getIcon = () => {
+    switch (type) {
+      case "card":
+        return <CreditCard className="mt-0.5 mr-3 h-5 w-5 shrink-0 text-red-600" />;
+      case "authentication":
+        return <ShieldAlert className="mt-0.5 mr-3 h-5 w-5 shrink-0 text-red-600" />;
+      case "network":
+        return <AlertTriangle className="mt-0.5 mr-3 h-5 w-5 shrink-0 text-red-600" />;
+      default:
+        return <XCircle className="mt-0.5 mr-3 h-5 w-5 shrink-0 text-red-600" />;
+    }
+  };
+
+  return (
+    <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+      <div className="flex items-start">
+        {getIcon()}
+        <div>
+          <p>{message}</p>
+          {onRetry && (
+            <Button
+              onClick={onRetry}
+              variant="ghost"
+              size="sm"
+              className="mt-2 text-red-700 hover:bg-red-100 hover:text-red-800 dark:text-red-300 dark:hover:bg-red-900/30 dark:hover:text-red-200"
+            >
+              Try Again
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// New component for displaying saved payment methods
+function SavedPaymentMethods({
+  paymentMethods,
+  selectedPaymentMethod,
+  setSelectedPaymentMethod,
+  loading,
+  locale,
+}: {
+  paymentMethods: any[];
+  selectedPaymentMethod: string | null;
+  setSelectedPaymentMethod: (id: string | null) => void;
+  loading: boolean;
+  locale: string;
+}) {
+  const t = useTranslations();
+  const isRtl = locale === "ar";
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!paymentMethods.length) {
+    return (
+      <div className="text-muted-foreground py-2 text-sm">
+        {t("billing.payment.no_saved_cards", { fallback: "No saved payment methods found." })}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4" dir={isRtl ? "rtl" : "ltr"}>
+      <div className="text-sm font-medium">
+        {t("billing.payment.saved_cards", { fallback: "Saved Cards" })}
+      </div>
+      <RadioGroup
+        value={selectedPaymentMethod || ""}
+        onValueChange={(value: string) => setSelectedPaymentMethod(value === "" ? null : value)}
+        className="space-y-2"
+      >
+        {paymentMethods.map((method) => (
+          <div
+            key={method.id}
+            className="hover:bg-accent flex items-center space-x-2 rounded-md border p-3"
+            dir={isRtl ? "rtl" : "ltr"}
+          >
+            <RadioGroupItem value={method.id} id={method.id} className={isRtl ? "ml-2" : "mr-2"} />
+            <div className="flex flex-1 items-center justify-between">
+              <div className="flex flex-col">
+                <span className="font-medium">
+                  {method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1)}
+                </span>
+                <span className="text-muted-foreground text-sm">
+                  •••• •••• •••• {method.card.last4} |{" "}
+                  {t("billing.payment.expires", { fallback: "Expires" })} {method.card.exp_month}/
+                  {method.card.exp_year}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </RadioGroup>
+      <div className="flex justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setSelectedPaymentMethod(null)}
+          className="text-muted-foreground"
+        >
+          {t("billing.payment.use_new_card", { fallback: "Use a new card instead" })}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export function PaymentDialog({
+  open,
+  onOpenChange,
+  selectedPlan,
+  onSuccess,
+  customerId,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  selectedPlan: string;
+  onSuccess: () => void;
+  customerId: string;
+}) {
+  const t = useTranslations();
+  const { resolvedTheme } = useTheme();
+  const locale = useLocale();
+  const { user, fetchUserAndProfile } = useUserStore();
+  const { refetch: refetchSubscription } = useSubscription();
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [priceDetails, setPriceDetails] = useState<{
+    name: string;
+    price: string;
+  } | null>(null);
+
+  // Reset states when dialog opens or plan changes
+  useEffect(() => {
+    if (open && selectedPlan) {
+      setClientSecret(null);
+      setError(null);
+      setPriceDetails(null);
+      fetchSetupIntent();
+    }
+  }, [open, selectedPlan]);
+
+  // Fetch client secret for setup intent
+  const fetchSetupIntent = async () => {
+    if (!selectedPlan || !user || !open) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Debug user data
+      console.log("User data before setup:", {
+        id: user?.id,
+        customerId: user?.stripe_customer_id,
+        isAuthenticated: !!user,
+        hasProfile: !!user?.profile,
+      });
+
+      // Fetch price details first
+      const priceResponse = await fetch(`/api/stripe/get-price?priceId=${selectedPlan}`);
+      if (!priceResponse.ok) {
+        throw new Error("Failed to get price details");
+      }
+      const priceData = await priceResponse.json();
+      setPriceDetails({
+        name: priceData.lookup_key || "Subscription",
+        price: priceData.price || "0.00 SAR/month",
+      });
+
+      // Check if we need to obtain a customer ID - if none exists
+      if (!user.stripe_customer_id && user.id && !customerId) {
+        // Look up customer ID from database
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("stripe_customer_id")
+          .eq("id", user.id)
+          .single();
+
+        if (profile?.stripe_customer_id) {
+          customerId = profile.stripe_customer_id;
+        }
+      }
+
+      // Make sure we have a customer ID
+      if (!user?.stripe_customer_id) {
+        // Try to wait for it if it might be loading
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        if (!user?.stripe_customer_id && !user?.id) {
+          setLoading(false);
+          toast.error("User information not available. Please refresh and try again.");
+          return;
+        }
+      }
+
+      // Create a setup intent for the customer
+      const setupResponse = await fetch("/api/stripe/create-setup-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          customerId: customerId || user.stripe_customer_id,
+        }),
+      });
+
+      if (!setupResponse.ok) {
+        const errorData = await setupResponse.json();
+        console.error("Setup response error:", errorData);
+        throw new Error(errorData.message || errorData.error || "Failed to set up payment");
+      }
+
+      const setupData = await setupResponse.json();
+      if (!setupData.clientSecret) {
+        throw new Error("No client secret returned");
+      }
+
+      setClientSecret(setupData.clientSecret);
+    } catch (err: any) {
+      console.error("Payment setup error:", err);
+      if (err.message === "Could not find user profile") {
+        setError(
+          "User profile not found. Please make sure you are logged in with a complete profile.",
+        );
+        // Try to refresh the user data
+        fetchUserAndProfile().catch((e) => console.error("Failed to refresh user data:", e));
+      } else {
+        setError(err.message || "Failed to set up payment");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSuccess = async () => {
+    // Reset state and close dialog
+    setClientSecret(null);
+    setLoading(false);
+    setError(null);
+
+    console.log("Payment successful, closing dialog");
+
+    // Allow some time for the backend to process the subscription
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Close dialog
+    onOpenChange(false);
+
+    // Additional delay before calling parent's success handler
+    // This helps ensure the subscription data is ready when components refresh
+    setTimeout(() => {
+      console.log("Executing onSuccess callback");
+      onSuccess();
+
+      // Force re-render of other components
+      try {
+        // Additional direct refresh of subscription data
+        refetchSubscription()
+          .then(() => {
+            console.log("Subscription data refreshed directly");
+          })
+          .catch((err) => {
+            console.error("Error in direct subscription refresh:", err);
+          });
+      } catch (error) {
+        console.error("Error in delayed refresh:", error);
+      }
+
+      // Show success message
+      toast.success(
+        t("billing.payment.success", {
+          fallback: "Payment successful! Your subscription has been updated.",
+        }),
+      );
+    }, 1500);
+  };
+
+  // Check if Stripe key is available
+  const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+  const isStripeKeyMissing =
+    !stripeKey || stripeKey.includes("pk_test_mock_key") || stripeKey === "";
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className={locale === "ar" ? "text-right" : "text-left"}>
+            {t("billing.payment.dialog_title", { fallback: "Payment Details" })}
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* Error: Missing Stripe Key */}
+        {isStripeKeyMissing && (
+          <div className="rounded-md border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+            <div className="flex items-start">
+              <ShieldAlert className="mt-0.5 mr-3 h-5 w-5 shrink-0 text-red-600" />
+              <div>
+                <h3 className="mb-2 font-semibold">
+                  {t("billing.payment.stripe_key_error", { fallback: "Stripe API Key Error" })}
+                </h3>
+                <p>
+                  {t("billing.payment.missing_stripe_key", {
+                    fallback:
+                      "The Stripe API key is missing or invalid. Please contact the administrator to set up Stripe correctly.",
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="p-6 text-center">
+            <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
+            <p className="text-muted-foreground mt-2 text-sm">
+              {t("billing.payment.setting_up", { fallback: "Setting up payment form..." })}
+            </p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <PaymentError
+            message={error}
+            type="general"
+            onRetry={() => {
+              setError(null);
+              fetchSetupIntent();
+            }}
+          />
+        )}
+
+        {/* Payment Form */}
+        {clientSecret && !loading && !error && (
+          <Elements
+            stripe={stripePromise}
+            options={{
+              clientSecret,
+              appearance: {
+                theme: resolvedTheme === "dark" ? "night" : "stripe",
+                variables: {
+                  colorPrimary: "#0570de",
+                  colorBackground: resolvedTheme === "dark" ? "#1a1a1a" : "#ffffff",
+                  colorText: resolvedTheme === "dark" ? "#ffffff" : "#30313d",
+                  colorTextSecondary: resolvedTheme === "dark" ? "#ffffff" : "#30313d",
+                  colorTextPlaceholder: resolvedTheme === "dark" ? "#9ca3af" : "#6b7280",
+                },
+                rules: {
+                  ".Label": {
+                    color: resolvedTheme === "dark" ? "#ffffff" : "#30313d",
+                    textAlign: locale === "ar" ? "right" : "left",
+                  },
+                  ".Input": {
+                    color: resolvedTheme === "dark" ? "#ffffff" : "#30313d",
+                    backgroundColor: resolvedTheme === "dark" ? "#2d2d2d" : "#ffffff",
+                    textAlign: locale === "ar" ? "right" : "left",
+                    direction: locale === "ar" ? "rtl" : "ltr",
+                  },
+                  ".Tab": {
+                    backgroundColor: resolvedTheme === "dark" ? "#2d2d2d" : "#ffffff",
+                    textAlign: locale === "ar" ? "right" : "left",
+                  },
+                  ".TabSelected": {
+                    backgroundColor: resolvedTheme === "dark" ? "#3d3d3d" : "#f3f4f6",
+                  },
+                },
+              },
+              locale: locale === "ar" ? "ar" : "en",
+              loader: "always",
+            }}
+          >
+            <PaymentFormContent
+              onSuccess={handleSuccess}
+              priceId={selectedPlan}
+              planName={priceDetails?.name}
+              planPrice={priceDetails?.price}
+            />
+          </Elements>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PaymentFormContent({
+  onSuccess,
+  priceId,
+  planName,
+  planPrice,
+}: {
+  onSuccess: () => void;
+  priceId?: string;
+  planName?: string;
+  planPrice?: string;
+}) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<{
+    message: string;
+    type: "card" | "authentication" | "network" | "general";
+  } | null>(null);
+  const [saveCard, setSaveCard] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "wallet">("card");
+  const { user } = useUserStore();
+  const [savedPaymentMethods, setSavedPaymentMethods] = useState<any[]>([]);
+  const [loadingSavedMethods, setLoadingSavedMethods] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [showNewCardForm, setShowNewCardForm] = useState(false);
+
+  const isRtl = locale === "ar";
+
+  // Fetch saved payment methods when component mounts
+  useEffect(() => {
+    const fetchSavedPaymentMethods = async () => {
+      if (!user?.stripe_customer_id) return;
+
+      setLoadingSavedMethods(true);
+      try {
+        const response = await fetch("/api/stripe/get-payment-methods", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customerId: user.stripe_customer_id,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch payment methods");
+        }
+
+        const data = await response.json();
+        setSavedPaymentMethods(data.paymentMethods || []);
+
+        // If there are saved methods, select the first one by default
+        if (data.paymentMethods && data.paymentMethods.length > 0) {
+          setSelectedPaymentMethod(data.paymentMethods[0].id);
+          setShowNewCardForm(false);
+        } else {
+          setShowNewCardForm(true);
+        }
+      } catch (error) {
+        console.error("Error fetching payment methods:", error);
+        setShowNewCardForm(true);
+      } finally {
+        setLoadingSavedMethods(false);
+      }
+    };
+
+    fetchSavedPaymentMethods();
+  }, [user?.stripe_customer_id]);
+
+  // Format price for Arabic display
+  const formatPriceForDisplay = (price: string): string => {
+    if (locale !== "ar") return price;
+
+    // Basic Arabic price formatting
+    const parts = price.split(" ");
+    if (parts.length >= 2) {
+      const amount = parts[0];
+      const currency = parts[1];
+
+      // Convert amount to Arabic numerals
+      const arabicAmount = amount.replace(/[0-9]/g, (d) =>
+        String.fromCharCode(d.charCodeAt(0) + 1584),
+      );
+
+      // Replace SAR with ر.س for Arabic
+      const arabicCurrency = currency === "SAR" ? "ر.س" : currency;
+
+      // Add interval information if present (like /month)
+      let result = `${arabicAmount} ${arabicCurrency}`;
+      if (parts.length > 2 && parts[2].includes("/")) {
+        const interval = parts[2].substring(1); // remove the slash
+        const arabicInterval =
+          interval === "month" ? "شهرياً" : interval === "year" ? "سنوياً" : interval;
+        result += ` ${arabicInterval}`;
+      }
+
+      return result;
+    }
+
+    return price;
+  };
+
+  // Determine error type based on error message
+  const getErrorType = (
+    errorMessage: string,
+  ): "card" | "authentication" | "network" | "general" => {
+    const lowercaseMsg = errorMessage.toLowerCase();
+
+    if (
+      lowercaseMsg.includes("card") ||
+      lowercaseMsg.includes("payment method") ||
+      lowercaseMsg.includes("cvc") ||
+      lowercaseMsg.includes("expiration")
+    ) {
+      return "card";
+    }
+
+    if (
+      lowercaseMsg.includes("authentication") ||
+      lowercaseMsg.includes("auth") ||
+      lowercaseMsg.includes("verify") ||
+      lowercaseMsg.includes("3d secure")
+    ) {
+      return "authentication";
+    }
+
+    if (
+      lowercaseMsg.includes("network") ||
+      lowercaseMsg.includes("connection") ||
+      lowercaseMsg.includes("internet") ||
+      lowercaseMsg.includes("timeout")
+    ) {
+      return "network";
+    }
+
+    return "general";
+  };
+
+  const handleSubmit = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!stripe || !priceId) {
+      return;
+    }
+
+    // Check if we have user data
+    if (!user || (!user.stripe_customer_id && !user.id)) {
+      toast.error("User information is not available. Please refresh and try again.");
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // If we have a selected saved payment method, use it
+      if (selectedPaymentMethod && paymentMethod === "card") {
+        console.log("Using saved payment method:", selectedPaymentMethod);
+
+        // Create subscription with the selected payment method
+        const response = await fetch("/api/stripe/create-subscription", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            priceId,
+            paymentMethodId: selectedPaymentMethod,
+            customerId: user?.stripe_customer_id,
+            userId: user?.id,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || errorData.error || "Subscription creation failed");
+        }
+
+        const data = await response.json();
+        console.log("Subscription created successfully with saved card:", data);
+
+        // Dispatch events and call success handler
+        window.dispatchEvent(new CustomEvent("subscription_updated"));
+
+        // Also dispatch as named constant from CurrentPlan if available
+        if (typeof window !== "undefined") {
+          try {
+            import("@/components/billing/CurrentPlan")
+              .then((module) => {
+                if (module.SUBSCRIPTION_UPDATED_EVENT) {
+                  window.dispatchEvent(new CustomEvent(module.SUBSCRIPTION_UPDATED_EVENT));
+                }
+              })
+              .catch((err) => console.warn("Could not import from CurrentPlan:", err));
+          } catch (err) {
+            console.warn("Error dispatching additional event:", err);
+          }
+        }
+
+        setIsProcessing(false);
+        onSuccess();
+        return;
+      }
+
+      // If using a new card, proceed with the original flow
+      if (!elements) {
+        throw new Error("Stripe Elements not available");
+      }
+
+      // Submit payment details without confirming payment
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        throw new Error(submitError.message);
+      }
+
+      // Continue with the existing payment flow for new cards
+      // ... rest of the existing payment processing code remains the same ...
+
+      // Then confirm the setup
+      const { setupIntent, error } = await stripe.confirmSetup({
+        elements,
+        redirect: "if_required",
+        confirmParams: {
+          // No return_url to prevent page refresh
+        },
+      });
+
+      if (error) {
+        console.error("Setup confirmation error:", error);
+        setError({
+          message: error.message || "Payment processing failed. Please try again.",
+          type: getErrorType(error.message || ""),
+        });
+        setIsProcessing(false);
+        return;
+      }
+
+      if (!setupIntent || setupIntent.status !== "succeeded") {
+        throw new Error("Setup failed. Please try again.");
+      }
+
+      // Create subscription with the setup payment method
+      const paymentMethodId =
+        typeof setupIntent.payment_method === "string"
+          ? setupIntent.payment_method
+          : setupIntent.payment_method?.id;
+
+      if (!paymentMethodId) {
+        throw new Error("No payment method returned from setup.");
+      }
+
+      // Log success of setup intent before proceeding
+      console.log("Setup successful, payment method ID:", paymentMethodId);
+
+      // Log available IDs for debugging
+      console.log("Creating subscription with:", {
+        userId: user?.id,
+        customerId: user?.stripe_customer_id,
+        paymentMethodId,
+      });
+
+      try {
+        const response = await fetch("/api/stripe/create-subscription", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            priceId,
+            paymentMethodId,
+            customerId: user?.stripe_customer_id,
+            userId: user?.id,
+          }),
+        });
+
+        let data;
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || errorData.error || "Subscription creation failed");
+        }
+
+        data = await response.json();
+        console.log("Subscription created successfully:", data);
+
+        // Handle additional payment confirmation if needed
+        if (data.status === "incomplete" && data.clientSecret) {
+          console.log("Additional payment confirmation needed");
+
+          try {
+            const { error: confirmError } = await stripe.confirmCardPayment(data.clientSecret, {
+              // No redirect options to prevent page refresh
+            });
+
+            if (confirmError) {
+              console.error("Payment confirmation error:", confirmError);
+              throw new Error(confirmError.message);
+            }
+
+            console.log("Payment confirmed successfully");
+          } catch (confirmErr) {
+            console.error("Error confirming payment:", confirmErr);
+            setError({
+              message:
+                confirmErr instanceof Error ? confirmErr.message : "Failed to confirm payment",
+              type: "card",
+            });
+            setIsProcessing(false);
+            return;
+          }
+        }
+
+        // Dispatch a custom event for subscription updates
+        console.log("Dispatching subscription_updated event");
+        window.dispatchEvent(new CustomEvent("subscription_updated"));
+
+        // Also dispatch as named constant from CurrentPlan
+        if (typeof window !== "undefined") {
+          try {
+            console.log("Broadcasting subscription update to CurrentPlan");
+            // Try importing the constant
+            import("@/components/billing/CurrentPlan")
+              .then((module) => {
+                if (module.SUBSCRIPTION_UPDATED_EVENT) {
+                  const eventName = module.SUBSCRIPTION_UPDATED_EVENT;
+                  console.log(`Dispatching ${eventName} event`);
+                  window.dispatchEvent(new CustomEvent(eventName));
+                }
+              })
+              .catch((err) => {
+                console.warn("Could not import from CurrentPlan:", err);
+              });
+          } catch (err) {
+            console.warn("Error dispatching additional event:", err);
+          }
+        }
+        // Call success handler
+        console.log("Payment process completed successfully");
+        setIsProcessing(false);
+        onSuccess();
+      } catch (err) {
+        console.error("Payment error:", err);
+        setError({
+          message:
+            err instanceof Error
+              ? err.message
+              : t("billing.payment.error", {
+                  fallback: "An error occurred while processing your payment. Please try again.",
+                }),
+          type: getErrorType(err instanceof Error ? err.message : ""),
+        });
+        setIsProcessing(false);
+      }
+    } catch (err) {
+      console.error("Payment error:", err);
+      setError({
+        message:
+          err instanceof Error
+            ? err.message
+            : t("billing.payment.error", {
+                fallback: "An error occurred while processing your payment. Please try again.",
+              }),
+        type: getErrorType(err instanceof Error ? err.message : ""),
+      });
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col space-y-6" dir={isRtl ? "rtl" : "ltr"}>
+      {/* Header with plan details */}
+      <div className="mb-4">
+        <h3 className="text-xl font-semibold">
+          {t("billing.update_to_plan", {
+            plan: t(`billing.${planName}`, { fallback: planName || "Subscription" }),
+            fallback: `Update to ${planName || "Subscription"}`,
+          })}
+        </h3>
+        <p className="text-muted-foreground mt-1 text-sm">
+          {t("billing.payment.enter_details", {
+            fallback: "Enter your payment details to complete the subscription change",
+          })}
+        </p>
+        <p className="mt-3 font-medium">
+          {t("billing.selected_plan_price", {
+            price: formatPriceForDisplay(planPrice || ""),
+            fallback: `Price: ${formatPriceForDisplay(planPrice || "")}`,
+          })}
+        </p>
+      </div>
+
+      <div className="space-y-6">
+        <Tabs
+          defaultValue="card"
+          value={paymentMethod}
+          onValueChange={(value) => setPaymentMethod(value as "card" | "wallet")}
+          dir={isRtl ? "rtl" : "ltr"}
+          className={isRtl ? "text-right" : "text-left"}
+        >
+          <TabsList className={`grid w-full grid-cols-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+            <TabsTrigger value="card" className="flex items-center justify-center gap-2">
+              <CreditCard className="h-4 w-4" />
+              {t("billing.payment.credit_card", { fallback: "Credit Card" })}
+            </TabsTrigger>
+            <TabsTrigger value="wallet" className="flex items-center justify-center gap-2">
+              <Wallet className="h-4 w-4" />
+              {t("billing.payment.digital_wallet", { fallback: "Digital Wallet" })}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="card" className="pt-4">
+            {/* Display saved payment methods if available */}
+            {savedPaymentMethods.length > 0 && !showNewCardForm && (
+              <div className="mb-6 rounded-lg border p-4">
+                <SavedPaymentMethods
+                  paymentMethods={savedPaymentMethods}
+                  selectedPaymentMethod={selectedPaymentMethod}
+                  setSelectedPaymentMethod={setSelectedPaymentMethod}
+                  loading={loadingSavedMethods}
+                  locale={locale}
+                />
+              </div>
+            )}
+
+            {/* Show the new card form if there are no saved methods or user chose to use a new card */}
+            {(showNewCardForm || savedPaymentMethods.length === 0) && (
+              <>
+                <div className="rounded-lg border p-4" dir={isRtl ? "rtl" : "ltr"}>
+                  <PaymentElement
+                    options={{
+                      layout: {
+                        type: "tabs",
+                        defaultCollapsed: false,
+                      },
+                      defaultValues: {
+                        billingDetails: {
+                          address: {
+                            country: "SA",
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+                <div className="flex items-center space-x-2" dir={isRtl ? "rtl" : "ltr"}>
+                  <Checkbox
+                    id="save-card"
+                    checked={saveCard}
+                    onCheckedChange={(checked) => setSaveCard(checked as boolean)}
+                  />
+                  <label
+                    htmlFor="save-card"
+                    className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {t("billing.payment.save_card", { fallback: "Save card for future payments" })}
+                  </label>
+                </div>
+                {savedPaymentMethods.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowNewCardForm(false);
+                      if (savedPaymentMethods.length > 0 && !selectedPaymentMethod) {
+                        setSelectedPaymentMethod(savedPaymentMethods[0].id);
+                      }
+                    }}
+                    className="text-muted-foreground mt-2"
+                  >
+                    {t("billing.payment.use_saved_card", { fallback: "Use a saved card instead" })}
+                  </Button>
+                )}
+              </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="wallet" className="space-y-4 pt-4" dir={isRtl ? "rtl" : "ltr"}>
+            <Button
+              variant="outline"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-md border"
+              onClick={() => {
+                // Handle PayPal payment
+                toast.info("PayPal integration coming soon");
+              }}
+            >
+              <PayPalIcon className="h-5 w-5" />
+              <span className="text-center font-medium">
+                {t("billing.payment.pay_with_paypal", { fallback: "Pay with PayPal" })}
+              </span>
+            </Button>
+
+            <Button
+              variant="outline"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-md border"
+              onClick={() => {
+                // Handle Google Pay
+                toast.info("Google Pay integration coming soon");
+              }}
+            >
+              <GooglePayIcon className="h-5 w-5" />
+              <span className="text-center font-medium">
+                {t("billing.payment.google_pay", { fallback: "Google Pay" })}
+              </span>
+            </Button>
+          </TabsContent>
+        </Tabs>
+
+        <div className="text-muted-foreground text-sm">
+          <span>
+            {t("billing.payment.terms_agreement_start", {
+              fallback: "By proceeding, you agree to our ",
+            })}
+            <a href="#" className="underline">
+              {t("billing.payment.terms", { fallback: "Terms of Service" })}
+            </a>
+            {t("billing.payment.terms_agreement_middle", {
+              fallback: " and acknowledge our ",
+            })}
+            <a href="#" className="underline">
+              {t("billing.payment.privacy", { fallback: "Privacy Policy" })}
+            </a>
+            {t("billing.payment.terms_agreement_end", {
+              fallback: ".",
+            })}
+          </span>
+        </div>
+
+        {error && (
+          <PaymentError
+            message={error.message}
+            type={error.type}
+            onRetry={() => {
+              setError(null);
+              if (elements) elements.submit();
+            }}
+          />
+        )}
+
+        <Button
+          onClick={handleSubmit}
+          className="w-full"
+          disabled={!stripe || isProcessing}
+          type="button"
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className={`${isRtl ? "ml-2" : "mr-2"} h-4 w-4 animate-spin`} />
+              {t("billing.payment.processing", { fallback: "Processing..." })}
+            </>
+          ) : (
+            t("billing.payment.complete_payment", { fallback: "Complete Payment" })
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}

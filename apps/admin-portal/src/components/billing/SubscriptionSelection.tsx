@@ -5,10 +5,20 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -17,42 +27,54 @@ import { usePricing } from "@/hooks/use-pricing";
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Skeleton } from "../ui/skeleton";
+import { PaymentDialog } from "./PaymentDialog";
 
-// Map plan lookup keys to colors and badges
-const planColors: Record<
-  string,
-  { bgClass: string; textClass: string; badge?: string; headerClass: string; badgeClass?: string }
-> = {
+// Map plan lookup keys to plan titles for direct use in component
+const planTitles: Record<string, string> = {
+  tanad_free: "Free Plan",
+  tanad_standard: "Standard Plan",
+  tanad_pro: "Pro Plan",
+  tanad_business: "Business Plan",
+  tanad_enterprise: "Enterprise Plan",
+};
+
+// Map lookup keys to plan descriptions
+const planDescriptions: Record<string, string> = {
+  tanad_free: "Basic features for individuals",
+  tanad_standard: "Advanced features for small teams",
+  tanad_pro: "Advanced features for growing businesses",
+  tanad_business: "Complete solution for established businesses",
+  tanad_enterprise: "Custom solution for large organizations",
+};
+
+// Plan color configurations
+const planColors: Record<string, any> = {
   tanad_free: {
-    bgClass: "bg-gray-900 dark:bg-gray-900",
-    textClass: "text-white",
+    bgClass: "bg-gray-100 dark:bg-gray-800",
+    textClass: "text-gray-800 dark:text-gray-200",
     headerClass: "bg-gray-800 text-white",
   },
   tanad_standard: {
-    bgClass: "bg-purple-900 dark:bg-purple-900",
-    textClass: "text-white",
-    headerClass: "bg-purple-800 text-white",
+    bgClass: "bg-blue-100 dark:bg-blue-900",
+    textClass: "text-blue-800 dark:text-blue-200",
+    headerClass: "bg-blue-800 text-white",
   },
   tanad_pro: {
-    bgClass: "bg-purple-900 dark:bg-purple-900",
-    textClass: "text-white",
-    badge: "Popular",
+    bgClass: "bg-purple-100 dark:bg-purple-900",
+    textClass: "text-purple-800 dark:text-purple-200",
     headerClass: "bg-purple-800 text-white",
-    badgeClass: "bg-purple-700",
+    badge: "POPULAR",
+    badgeClass: "bg-purple-600",
   },
   tanad_business: {
-    bgClass: "bg-green-900 dark:bg-green-900",
-    textClass: "text-white",
-    headerClass: "bg-green-800 text-white",
+    bgClass: "bg-amber-100 dark:bg-amber-900",
+    textClass: "text-amber-800 dark:text-amber-200",
+    headerClass: "bg-amber-800 text-white",
   },
   tanad_enterprise: {
-    bgClass: "bg-amber-800 dark:bg-amber-800",
-    textClass: "text-white",
-    badge: "Premium",
-    headerClass: "bg-amber-700 text-white",
-    badgeClass: "bg-amber-600",
+    bgClass: "bg-emerald-100 dark:bg-emerald-900",
+    textClass: "text-emerald-800 dark:text-emerald-200",
+    headerClass: "bg-emerald-800 text-white",
   },
 };
 
@@ -93,12 +115,19 @@ function formatPriceForLocale(price: string, locale: string): string {
   return price;
 }
 
-export default function SubscriptionSelection() {
+interface SubscriptionSelectionProps {
+  subscription?: any;
+  disabled?: boolean;
+}
+
+export default function SubscriptionSelection({
+  subscription = {},
+  disabled = false,
+}: SubscriptionSelectionProps) {
   const t = useTranslations();
   const locale = useLocale();
   const {
     status: subscriptionStatus,
-    name: subscriptionName,
     refetch: refetchSubscription,
     cancelAt: subscriptionCancelAt,
     createSubscription,
@@ -107,8 +136,9 @@ export default function SubscriptionSelection() {
   const { user, profile, fetchUserAndProfile } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string>("");
+  const [loading, setLoading] = useState(false);
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
-
+  const [isSelecting, setIsSelecting] = useState(false);
   const plans = getPlans();
   // Sort plans by price (ascending)
   const sortedPlans = [...plans].sort((a, b) => {
@@ -116,7 +146,6 @@ export default function SubscriptionSelection() {
     const priceB = parseFloat(b.price.split(" ")[0]) || 0;
     return priceA - priceB;
   });
-
   // In Arabic, we reverse the order of plans to display from right to left
   const displayPlans = locale === "ar" ? [...sortedPlans].reverse() : sortedPlans;
 
@@ -129,6 +158,18 @@ export default function SubscriptionSelection() {
     priceId: freePlan?.priceId || "",
     lookup_key: freePlan?.lookup_key || "",
   });
+
+  // Set a default selected plan if none is selected
+  useEffect(() => {
+    if (!selectedPlan && sortedPlans.length > 0 && !pricesLoading) {
+      // If no plan is selected yet, select the first non-free plan or the first plan
+      const defaultPlan =
+        sortedPlans.find((plan) => plan.lookup_key !== "tanad_free") || sortedPlans[0];
+      if (defaultPlan) {
+        setSelectedPlan(defaultPlan.priceId);
+      }
+    }
+  }, [selectedPlan, sortedPlans, pricesLoading]);
 
   useEffect(() => {
     if (pricesLoading) return;
@@ -154,25 +195,37 @@ export default function SubscriptionSelection() {
     }
   }, [pricesLoading, profile?.price_id, profile?.subscribed_to, freePlan, plans]);
 
-  const handlePlanSelection = async () => {
-    if (!selectedPlan) return;
-    if (!user) {
-      toast.error(
-        t("Billing.please_sign_in_to_update_your_subscription", {
-          fallback: "Please sign in to update your subscription",
-        }),
-      );
-      return;
-    }
+  // Function to update the selected plan with debounce protection
+  const updateSelectedPlan = (planId: string) => {
+    // If we're already in the process of selecting, ignore rapid changes
+    if (isSelecting) return;
 
-    if (currentPlan.priceId === selectedPlan && !subscriptionCancelAt) {
-      toast.error(
-        t("Billing.you_are_already_subscribed_to_this_plan", {
-          fallback: "You are already subscribed to this plan",
-        }),
-      );
-      return;
+    // Set selection in progress flag
+    setIsSelecting(true);
+
+    // First clear the selection to force re-render
+    setSelectedPlan("");
+
+    // Then set the new selection after a short delay
+    setTimeout(() => {
+      setSelectedPlan(planId);
+      setIsSelecting(false);
+    }, 100);
+  };
+
+  // Update the handlePlanChange function to use the new debounced method
+  const handlePlanChange = (value: string) => {
+    if (selectedPlan === value) {
+      // If clicking the same plan again, use the debounced method
+      updateSelectedPlan(value);
+    } else {
+      setSelectedPlan(value);
     }
+  };
+
+  const handleSelectPlan = async (priceId: string) => {
+    setIsLoading(true);
+    setSelectedPlan(priceId);
 
     setIsPaymentDialogOpen(true);
   };
@@ -208,12 +261,57 @@ export default function SubscriptionSelection() {
     }
   };
 
-  const handlePlanChange = (value: string) => {
-    setSelectedPlan(value);
+  const handlePaymentSuccess = async () => {
+    setIsPaymentDialogOpen(false);
+    setIsLoading(false);
+    setSelectedPlan("");
+
+    // Clear any caches to ensure fresh data
+    console.log("Payment successful, refreshing subscription data");
+
+    try {
+      // Refresh data with multiple retries
+      const maxRetries = 3;
+      let retryCount = 0;
+      let success = false;
+
+      while (retryCount < maxRetries && !success) {
+        try {
+          // Wait a moment for backend to process the subscription
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+
+          // Refresh the data
+          await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
+          console.log("Subscription data refreshed successfully");
+          success = true;
+        } catch (error) {
+          console.error(`Retry ${retryCount + 1}/${maxRetries} failed:`, error);
+          retryCount++;
+        }
+      }
+
+      // Dispatch custom events to notify other components
+      console.log("Broadcasting subscription update events");
+      window.dispatchEvent(new CustomEvent("subscription_updated"));
+
+      // Force UI refresh
+      window.location.hash = "billing";
+    } catch (error) {
+      console.error("Error refreshing subscription data:", error);
+    }
+  };
+
+  const getTranslatedFeatures = (plan: any, featureKeys: string[]) => {
+    return featureKeys.map((key) => {
+      if (key.startsWith("Billing.features.")) {
+        return t(key, { fallback: key.replace("Billing.features.", "") });
+      }
+      return key;
+    });
   };
 
   if (pricesLoading) {
-    return <Skeleton className="h-[600px] w-full" />;
+    return <Skeleton className="h-[400px] w-full" />;
   }
 
   // Hide if user has an active subscription or promotion
@@ -225,8 +323,9 @@ export default function SubscriptionSelection() {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        handlePlanSelection();
+        handleSelectPlan(selectedPlan || "");
       }}
+      className="w-full"
     >
       <Card className="border-none shadow-none">
         <CardHeader className="pb-2 text-center">
@@ -252,106 +351,109 @@ export default function SubscriptionSelection() {
           )}
         </CardHeader>
         <CardContent dir={locale === "ar" ? "rtl" : "ltr"} className="pt-6">
-          <RadioGroup
-            value={selectedPlan}
-            onValueChange={handlePlanChange}
-            className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
-          >
-            {displayPlans.map((plan) => {
-              const planColor = planColors[plan.lookup_key] || {
-                bgClass: "bg-gray-100 dark:bg-gray-800",
-                textClass: "text-gray-800 dark:text-gray-200",
-                headerClass: "bg-gray-800 text-white",
-              };
-              const isCurrentPlan = currentPlan.priceId === plan.priceId;
-              const isDisabled =
-                plan.lookup_key === "tanad_free" && currentPlan.lookup_key === "tanad_free";
+          <div dir={locale === "ar" ? "rtl" : "ltr"}>
+            <RadioGroup
+              value={selectedPlan || ""}
+              onValueChange={handlePlanChange}
+              className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
+              key={`plan-selection-${selectedPlan}`}
+            >
+              {displayPlans.map((plan) => {
+                const isCurrentPlan = currentPlan.priceId === plan.priceId;
+                const isDisabled =
+                  plan.lookup_key === "tanad_free" && currentPlan.lookup_key === "tanad_free";
+                const isPopular =
+                  plan.lookup_key === "tanad_pro" || plan.lookup_key?.includes("_pro");
+                const isSelected = selectedPlan === plan.priceId;
 
-              // Extract amount and format plan name for display
-              const planName = t(`Billing.${plan.lookup_key}`, { fallback: plan.name });
-              const displayPrice = formatPriceForLocale(plan.price, locale);
+                // Get the plan title based on lookup key or translation
+                const planTitle = t(`Billing.${plan.lookup_key}`, {
+                  fallback: planTitles[plan.lookup_key] || plan.name,
+                });
 
-              return (
-                <div key={plan.priceId} className="flex w-full">
-                  <RadioGroupItem
-                    className="sr-only"
-                    value={plan.priceId}
-                    id={plan.priceId}
-                    disabled={isDisabled}
-                  />
-                  <Label
-                    htmlFor={plan.priceId}
+                // Get plan description from our mapping
+                const planDesc = t(`Billing.${plan.lookup_key}_description`, {
+                  fallback: planDescriptions[plan.lookup_key] || `${planTitle} subscription plan`,
+                });
+
+                // Format price for display based on locale
+                const displayPrice = formatPriceForLocale(plan.price, locale);
+                const priceValue = displayPrice.split(" ")[0];
+                const priceInterval = locale === "ar" ? "شهرياً" : "/month";
+
+                return (
+                  <Card
+                    key={plan.priceId}
                     className={cn(
-                      "relative flex h-full w-full cursor-pointer flex-col items-start overflow-hidden rounded-xl border-2 p-0 transition-all",
-                      selectedPlan === plan.priceId
-                        ? "border-primary ring-primary/20 ring-2"
-                        : "border-muted hover:border-muted-foreground/50",
-                      isCurrentPlan && "bg-primary/5",
-                      isDisabled && "cursor-not-allowed opacity-60",
+                      "hover:border-primary/70 relative cursor-pointer transition-all duration-200 hover:shadow-sm",
+                      isPopular ? "border-primary shadow-md" : "",
+                      isSelected
+                        ? "border-primary ring-primary/30 bg-primary/5 shadow-sm ring-2"
+                        : "",
+                      isCurrentPlan && !isSelected ? "bg-muted/50" : "",
+                      isDisabled ? "cursor-not-allowed opacity-60" : "",
                     )}
-                    dir={locale === "ar" ? "rtl" : "ltr"}
+                    onClick={() => {
+                      if (!isDisabled) {
+                        if (selectedPlan === plan.priceId) {
+                          // Use debounced method for re-selecting the same plan
+                          updateSelectedPlan(plan.priceId);
+                        } else {
+                          setSelectedPlan(plan.priceId);
+                        }
+                      }
+                    }}
                   >
-                    {planColor.badge && (
-                      <div
-                        className={cn(
-                          "absolute top-0 z-10 overflow-hidden",
-                          locale === "ar" ? "left-0 rtl:left-0" : "right-0",
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            "w-24 translate-x-[30%] translate-y-[-30%] rotate-45 px-2 py-1 text-center text-[10px] font-medium text-white",
-                            planColor.badgeClass || "bg-primary",
-                          )}
-                        >
-                          {t(`Billing.badge.${planColor.badge.toLowerCase()}`, {
-                            fallback: planColor.badge,
-                          })}
-                        </div>
+                    <RadioGroupItem
+                      className="sr-only"
+                      value={plan.priceId}
+                      id={plan.priceId}
+                      disabled={isDisabled}
+                    />
+
+                    {isPopular && (
+                      <div className="absolute -top-3 right-0 left-0 flex justify-center">
+                        <Badge className="bg-primary hover:bg-primary/90">
+                          {t("Billing.most_popular", { fallback: "Most Popular" })}
+                        </Badge>
                       </div>
                     )}
 
-                    <div className={cn("w-full py-3 text-center", planColor.headerClass)}>
-                      <h3 className="text-xl font-bold">
-                        {t(`Billing.${plan.lookup_key}`, { fallback: planName })}
-                      </h3>
-                    </div>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-xl">{planTitle}</CardTitle>
+                      <CardDescription>{planDesc}</CardDescription>
+                    </CardHeader>
 
-                    <div className={cn("w-full py-3 text-center", planColor.bgClass)}>
-                      <p className={cn("text-2xl font-bold", planColor.textClass)}>
-                        {displayPrice}
-                      </p>
-                    </div>
-
-                    <div className="bg-background w-full flex-1 space-y-4 p-4">
-                      <div className="space-y-3 text-sm">
-                        {plan.features.map((feature, index) => (
-                          <div key={index} className="flex items-start gap-2">
-                            <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
-                            <span>{feature.startsWith("Billing") ? t(feature) : feature}</span>
-                          </div>
-                        ))}
+                    <CardContent className="pb-3">
+                      <div className="mb-4">
+                        <span className="text-3xl font-bold">{priceValue}</span>
+                        <span className="text-muted-foreground ml-1">{priceInterval}</span>
                       </div>
-                    </div>
 
-                    <div className="mt-auto w-full p-4 pt-0">
-                      <Button
-                        type="button"
-                        variant={selectedPlan === plan.priceId ? "default" : "outline"}
-                        className="w-full"
-                        onClick={() => !isDisabled && setSelectedPlan(plan.priceId)}
-                        disabled={isDisabled}
-                      >
-                        {isCurrentPlan
-                          ? t("Billing.current_plan_button", { fallback: "Current Plan" })
-                          : t("Billing.select_plan_button", { fallback: "Select Plan" })}
-                      </Button>
-                    </div>
-                  </Label>
-                </div>
-              );
-            })}
-          </RadioGroup>
+                      <ul className="space-y-2 text-sm">
+                        {getTranslatedFeatures(plan, plan.features).map((feature, index) => (
+                          <li key={index} className="flex items-start">
+                            <Check
+                              className={`${locale === "ar" ? "ml-2" : "mr-2"} mt-0.5 h-4 w-4 shrink-0 text-green-500`}
+                            />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+
+                    {isSelected && (
+                      <div className="absolute right-2 bottom-2">
+                        <Badge variant="outline" className="bg-primary text-primary-foreground">
+                          {t("Billing.selected_plan_button", { fallback: "Selected" })}
+                        </Badge>
+                      </div>
+                    )}
+                  </Card>
+                );
+              })}
+            </RadioGroup>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-center pt-6">
           <Button
@@ -359,12 +461,12 @@ export default function SubscriptionSelection() {
             size="lg"
             className="px-8"
             disabled={
-              isLoading ||
+              loading ||
               !selectedPlan ||
               (currentPlan.priceId === selectedPlan && !subscriptionCancelAt)
             }
           >
-            {isLoading ? (
+            {loading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : currentPlan.priceId === selectedPlan && !subscriptionCancelAt ? (
               t("Billing.current_plan", { fallback: "Current Plan" })
@@ -398,6 +500,16 @@ export default function SubscriptionSelection() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {isPaymentDialogOpen && (
+        <PaymentDialog
+          open={isPaymentDialogOpen}
+          onOpenChange={setIsPaymentDialogOpen}
+          selectedPlan={selectedPlan || ""}
+          onSuccess={handlePaymentSuccess}
+          customerId={profile?.stripe_customer_id || ""}
+        />
+      )}
     </form>
   );
 }

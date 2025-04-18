@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import Stripe from "stripe";
+
 import { getStripeInstance } from "@/lib/stripe-admin";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -48,9 +50,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         typeof latestSubscription.items.data[0].price !== "string"
       ) {
         latestSubscription.items.data[0].price.product = price.product;
+        // Also add the lookup_key if it's available
+        latestSubscription.items.data[0].price.lookup_key = price.lookup_key;
+
+        // If lookup_key is not available in price, try to get it from product metadata
+        if (!price.lookup_key && price.product && typeof price.product !== "string") {
+          const product = price.product as Stripe.Product;
+          if (product.metadata?.lookup_key) {
+            latestSubscription.items.data[0].price.lookup_key = product.metadata.lookup_key;
+          }
+        }
+      }
+
+      // Add the lookup_key to the subscription plan object if it exists
+      const subscriptionWithPlan = latestSubscription as any;
+      if (subscriptionWithPlan.plan) {
+        subscriptionWithPlan.plan.lookup_key =
+          price.lookup_key ||
+          (price.product && typeof price.product !== "string"
+            ? (price.product as Stripe.Product).metadata?.lookup_key
+            : null);
       }
     }
-
     return res.status(200).json({
       subscription: latestSubscription,
     });
