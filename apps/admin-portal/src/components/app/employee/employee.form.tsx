@@ -19,20 +19,30 @@ import DepartmentForm, { DepartmentFormValues } from "@/components/app/departmen
 import { supabase } from "@/lib/supabase";
 
 import { useDepartments, DEPARTMENTS_QUERY_KEY } from "@/hooks/useDepartments";
+import { useEmployeesStore } from "@/stores/employees.store";
 import useUserStore from "@/stores/use-user-store";
 
 interface EmployeeFormProps {
   id?: string;
   onSuccess?: () => void;
   onSubmit: (data: EmployeeFormValues) => Promise<void>;
-  loading?: boolean;
 }
 
 const createEmployeeFormSchema = (t: (key: string) => string) =>
   z.object({
     first_name: z.string().min(1, t("Employees.form.first_name.required")),
     last_name: z.string().min(1, t("Employees.form.last_name.required")),
-    email: z.string().email(t("Employees.form.email.invalid")),
+    email: z
+      .string()
+      .email(t("Employees.form.email.invalid"))
+      .refine(async (email) => {
+        const { data, error } = await supabase
+          .from("employees")
+          .select("id")
+          .eq("email", email)
+          .single();
+        return !data;
+      }, t("Employees.form.email.duplicate")),
     phone: z.string().optional(),
     position: z.string().min(1, t("Employees.form.position.required")),
     department: z.string().nullable(),
@@ -52,7 +62,7 @@ const createEmployeeFormSchema = (t: (key: string) => string) =>
 
 export type EmployeeFormValues = z.infer<ReturnType<typeof createEmployeeFormSchema>>;
 
-export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: EmployeeFormProps) {
+export function EmployeeForm({ id, onSuccess, onSubmit }: EmployeeFormProps) {
   const t = useTranslations();
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const [isDepartmentSaving, setIsDepartmentSaving] = useState(false);
@@ -60,6 +70,7 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
   const { user } = useUserStore();
   const locale = useLocale();
   const queryClient = useQueryClient();
+  const { setLoadingSave, loadingSave } = useEmployeesStore();
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(createEmployeeFormSchema(t)),
@@ -154,10 +165,21 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      setLoadingSave(true);
+      await form.handleSubmit(onSubmit)();
+    } catch (error) {
+      setLoadingSave(false);
+      console.error("Error submitting form:", error);
+    }
+  };
+
   return (
     <>
       <Form {...form}>
-        <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form id={id} onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}

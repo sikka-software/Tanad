@@ -11,6 +11,9 @@ interface EmployeesState {
   updateEmployee: (id: string, updates: Partial<Employee>) => Promise<void>;
   setSelectedRows: (rows: string[]) => void;
   clearSelection: () => void;
+
+  loadingSave: boolean;
+  setLoadingSave: (loading: boolean) => void;
 }
 
 export const useEmployeesStore = create<EmployeesState>((set, get) => ({
@@ -18,6 +21,8 @@ export const useEmployeesStore = create<EmployeesState>((set, get) => ({
   isLoading: false,
   error: null,
   selectedRows: [],
+  loadingSave: false,
+  setLoadingSave: (loading: boolean) => set({ loadingSave: loading }),
 
   fetchEmployees: async () => {
     set({ isLoading: true, error: null });
