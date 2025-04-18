@@ -1,6 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { sql } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { employees } from "@/db/schema";
