@@ -12,11 +12,12 @@ import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import SelectionMode from "@/components/ui/selection-mode";
 
+import { sortClients } from "@/lib/sort-utils";
+
 import { Client } from "@/types/client.type";
 
 import { useClients, useBulkDeleteClients } from "@/hooks/models/useClients";
 import { useClientsStore } from "@/stores/clients.store";
-import { sortClients } from "@/lib/sort-utils";
 
 export default function ClientsPage() {
   const t = useTranslations();
@@ -26,11 +27,22 @@ export default function ClientsPage() {
   const [sortRules, setSortRules] = useState<{ field: string; direction: string }[]>([
     { field: "name", direction: "asc" },
   ]);
+  const [caseSensitive, setCaseSensitive] = useState(false);
+  const [nullsFirst, setNullsFirst] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const handleSortRulesChange = (newSortRules: { field: string; direction: string }[]) => {
     setSortRules(newSortRules);
   };
+
+  const handleCaseSensitiveChange = (value: boolean) => {
+    setCaseSensitive(value);
+  };
+
+  const handleNullsFirstChange = (value: boolean) => {
+    setNullsFirst(value);
+  };
+
   const { selectedRows, setSelectedRows, clearSelection } = useClientsStore();
   const { mutate: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
 
@@ -43,7 +55,10 @@ export default function ClientsPage() {
       client.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const sortedClients = sortClients(filteredClients || [], sortRules);
+  const sortedClients = sortClients(filteredClients || [], sortRules, {
+    caseSensitive,
+    nullsFirst,
+  });
 
   const handleRowSelectionChange = (rows: Client[]) => {
     const newSelectedIds = rows.map((row) => row.id!);
@@ -93,13 +108,17 @@ export default function ClientsPage() {
             onViewModeChange={setViewMode}
             sortRules={sortRules}
             onSortRulesChange={handleSortRulesChange}
+            caseSensitive={caseSensitive}
+            onCaseSensitiveChange={handleCaseSensitiveChange}
+            nullsFirst={nullsFirst}
+            onNullsFirstChange={handleNullsFirstChange}
           />
         )}
         <div>
           {viewMode === "table" ? (
-              <ClientsTable
-                key={`sorted-${sortedClients?.length}-${JSON.stringify(sortRules)}`}
-                data={sortedClients || []}
+            <ClientsTable
+              key={`sorted-${sortedClients?.length}-${JSON.stringify(sortRules)}`}
+              data={sortedClients || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
               onSelectedRowsChange={handleRowSelectionChange}

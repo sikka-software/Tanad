@@ -28,6 +28,10 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   onViewModeChange?: (mode: "table" | "cards") => void;
   sortRules: { field: string; direction: string }[];
   onSortRulesChange: (sortRules: { field: string; direction: string }[]) => void;
+  caseSensitive?: boolean;
+  onCaseSensitiveChange?: (value: boolean) => void;
+  nullsFirst?: boolean;
+  onNullsFirstChange?: (value: boolean) => void;
 }
 
 const PageSearchAndFilter = ({
@@ -41,6 +45,10 @@ const PageSearchAndFilter = ({
   onViewModeChange,
   sortRules,
   onSortRulesChange,
+  caseSensitive,
+  onCaseSensitiveChange,
+  nullsFirst,
+  onNullsFirstChange,
   ...props
 }: PageSearchAndFilterProps) => {
   const t = useTranslations();
@@ -87,7 +95,14 @@ const PageSearchAndFilter = ({
           onClick={() => {}}
         />
 
-        <SortPopover sortRules={sortRules} onSortRulesChange={onSortRulesChange} />
+        <SortPopover 
+          sortRules={sortRules} 
+          onSortRulesChange={onSortRulesChange}
+          caseSensitive={caseSensitive}
+          onCaseSensitiveChange={onCaseSensitiveChange}
+          nullsFirst={nullsFirst}
+          onNullsFirstChange={onNullsFirstChange}
+        />
 
         <Link href={createHref} className="flex items-center">
           <Button size="sm" className="h-8">

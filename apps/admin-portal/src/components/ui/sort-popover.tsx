@@ -24,9 +24,20 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 interface SortPopoverProps {
   sortRules: { field: string; direction: string }[];
   onSortRulesChange: (sortRules: { field: string; direction: string }[]) => void;
+  caseSensitive?: boolean;
+  onCaseSensitiveChange?: (value: boolean) => void;
+  nullsFirst?: boolean;
+  onNullsFirstChange?: (value: boolean) => void;
 }
 
-function SortPopover({ sortRules, onSortRulesChange }: SortPopoverProps) {
+function SortPopover({ 
+  sortRules, 
+  onSortRulesChange,
+  caseSensitive = false,
+  onCaseSensitiveChange,
+  nullsFirst = false,
+  onNullsFirstChange
+}: SortPopoverProps) {
   const t = useTranslations();
   const locale = useLocale();
   const [open, setOpen] = useState(false);
@@ -160,12 +171,20 @@ function SortPopover({ sortRules, onSortRulesChange }: SortPopoverProps) {
           </Button>
 
           <div className="flex items-center space-x-2">
-            <Switch id="case-sensitive" />
+            <Switch 
+              id="case-sensitive" 
+              checked={caseSensitive}
+              onCheckedChange={onCaseSensitiveChange}
+            />
             <Label htmlFor="case-sensitive">{t("General.case_sensitive")}</Label>
           </div>
 
           <div className="flex items-center space-x-2">
-            <Switch id="null-first" />
+            <Switch 
+              id="null-first" 
+              checked={nullsFirst}
+              onCheckedChange={onNullsFirstChange}
+            />
             <Label htmlFor="null-first">{t("General.show_empty_values_first")}</Label>
           </div>
 
