@@ -41,6 +41,15 @@
     "edit_selected": "Edit Selected",
     "view_selected": "View Selected",
     "view_all": "View All",
+    "cards_view": "Cards View",
+    "table_view": "Table View",
+    "sort": "Sort",
+    "sort_options": "Sort Options",
+    "rule": "Rule",
+    "add_another_rule": "Add Another Rule",
+    "reset_all": "Reset All",
+    "apply_sort": "Apply Sort",
+    "select_field": "Select Field",
     "calendars": {
       "gregorian": "Gregorian",
       "hijri": "Hijri"

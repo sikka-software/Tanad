@@ -1,7 +1,3 @@
-import * as React from "react";
-
-import Link from "next/link";
-
 import {
   Search,
   Filter,
@@ -11,11 +7,16 @@ import {
   LayoutGrid,
   Table2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
 import { Button } from "./button";
+import IconButton from "./icon-button";
 import { Input } from "./input";
+import SortPopover from "./sort-popover";
 
 export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivElement> {
   onSearch?: (value: string) => void;
@@ -38,10 +39,11 @@ const PageSearchAndFilter = ({
   onViewModeChange,
   ...props
 }: PageSearchAndFilterProps) => {
+  const t = useTranslations();
   return (
     <div
       className={cn(
-        "z-10 bg-background sticky top-0 flex !min-h-12 items-center justify-between gap-4 border-b px-2",
+        "bg-background sticky top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-b px-2",
         className,
       )}
       {...props}
@@ -64,40 +66,33 @@ const PageSearchAndFilter = ({
       {/* Right section: View Toggle, Filters & Create Button */}
       <div className="flex items-center gap-2">
         {onViewModeChange && (
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8"
+          <IconButton
+            icon={
+              viewMode === "table" ? (
+                <LayoutGrid className="h-4 w-4" />
+              ) : (
+                <Table2 className="h-4 w-4" />
+              )
+            }
+            label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
             onClick={() => onViewModeChange(viewMode === "table" ? "cards" : "table")}
-          >
-            {viewMode === "table" ? (
-              <LayoutGrid className="h-4 w-4" />
-            ) : (
-              <Table2 className="h-4 w-4" />
-            )}
-            <span className="sr-only">
-              {viewMode === "table" ? "Switch to cards view" : "Switch to table view"}
-            </span>
-          </Button>
+          />
         )}
 
-        {/* <Button variant="outline" size="sm" className="h-9">
-          <Filter className="me-2 h-4 w-4" />
-          <span className="hidden sm:inline">Filters</span>
-          <ChevronDown className="ms-1 h-4 w-4" />
-        </Button> */}
+        <IconButton
+          icon={<Filter className="h-4 w-4" />}
+          label={t("General.filter")}
+          onClick={() => {}}
+        />
 
-        <Button variant="outline" size="icon" className="size-8 px-2 sm:px-3">
-          <SlidersHorizontal className="h-4 w-4" />
-          <span className="sr-only">Settings</span>
-        </Button>
+        <SortPopover />
 
-        <Button size="sm" className="h-8">
-          <Link href={createHref} className="flex items-center">
+        <Link href={createHref} className="flex items-center">
+          <Button size="sm" className="h-8">
             <Plus className="me-1 h-4 w-4" />
             <span>{createLabel}</span>
-          </Link>
-        </Button>
+          </Button>
+        </Link>
       </div>
     </div>
   );

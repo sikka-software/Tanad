@@ -36,7 +36,12 @@ interface ClientsTableProps {
   onSelectedRowsChange?: (rows: Client[]) => void;
 }
 
-const ClientsTable = ({ data: unsortedData, isLoading, error, onSelectedRowsChange }: ClientsTableProps) => {
+const ClientsTable = ({
+  data: unsortedData,
+  isLoading,
+  error,
+  onSelectedRowsChange,
+}: ClientsTableProps) => {
   const t = useTranslations("Clients");
   const { updateClient, selectedRows, setSelectedRows } = useClientsStore();
 

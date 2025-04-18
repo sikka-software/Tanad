@@ -23,6 +23,17 @@
     "select_all": "اختر الكل",
     "deselect_all": "إلغاء الاختيار",
     "pick_date": "اختر التاريخ",
+    "cards_view": "عرض البطاقات",
+    "table_view": "عرض الجدول",
+    "sort": "ترتيب",
+    "sort_options": "خيارات الترتيب",
+    "rule": "القاعدة",
+    "add_another_rule": "إضافة قاعدة أخرى",
+    "reset_all": "إعادة ترتيب الكل",
+    "apply_sort": "تطبيق الترتيب",
+    "select_field": "اختر الحقل",
+    
+    
     "calendars": {
       "gregorian": "التقويم الميلادي",
       "hijri": "التقويم الهجري"
