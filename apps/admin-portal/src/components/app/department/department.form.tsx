@@ -12,7 +12,7 @@ import { Input } from "@/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { useBranches } from "@/hooks/useBranches";
 import { useOffices } from "@/hooks/useOffices";
 import { useWarehouses } from "@/hooks/useWarehouses";

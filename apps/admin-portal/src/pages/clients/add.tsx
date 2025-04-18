@@ -15,7 +15,7 @@ import PageTitle from "@/components/ui/page-title";
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddClientPage() {
   const router = useRouter();

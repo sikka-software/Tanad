@@ -30,7 +30,7 @@ type ProductsStore = {
   clearSelection: () => void;
 };
 
-export const useProductsStore = create<ProductsStore>((set, get) => ({
+const useProductsStore = create<ProductsStore>((set, get) => ({
   products: [],
   isLoading: false,
   error: null,
@@ -130,3 +130,5 @@ export const useProductsStore = create<ProductsStore>((set, get) => ({
     set({ selectedRows: [] });
   },
 }));
+
+export default useProductsStore;

@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useMainStore } from "@/hooks/main.store";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 // import { checkExistingSlug } from "@/lib/operations";
 import { supabase } from "@/lib/supabase";
 import { Pukla } from "@/lib/types";

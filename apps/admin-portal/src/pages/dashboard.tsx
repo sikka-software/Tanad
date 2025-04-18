@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
-
+import { Plus, Users, Building2, Briefcase, Package, MapPin } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
-import { Plus, Users, Building2, Briefcase, Package, MapPin } from "lucide-react";
-
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
 import PageTitle from "@/components/ui/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
-import useUserStore from "@/hooks/use-user-store";
+
+import { supabase } from "@/lib/supabase";
+
 import { useBranches } from "@/hooks/useBranches";
 import { useClients } from "@/hooks/useClients";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -21,7 +22,7 @@ import { useJobs } from "@/hooks/useJobs";
 import { useOffices } from "@/hooks/useOffices";
 import { useVendors } from "@/hooks/useVendors";
 import { useWarehouses } from "@/hooks/useWarehouses";
-import { supabase } from "@/lib/supabase";
+import useUserStore from "@/stores/use-user-store";
 
 interface DashboardStats {
   totalInvoices: number;
@@ -195,9 +196,9 @@ export default function Dashboard() {
 
   // Show loading state while waiting for initialization
   if (!initialized) {
-    console.log("[Dashboard] Waiting for user store initialization");
     return (
-      <div className="">
+      <div>
+        <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
         <PageTitle title={t("Dashboard.title")} />
         <div className="p-4">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -219,9 +220,9 @@ export default function Dashboard() {
 
   // Show loading state while fetching stats
   if (loading) {
-    console.log("[Dashboard] Loading stats...");
     return (
-      <div className="">
+      <div>
+        <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
         <PageTitle title={t("Dashboard.title")} />
         <div className="p-4">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -243,7 +244,8 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="">
+      <div>
+        <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
         <PageTitle title={t("Dashboard.title")} />
         <div className="p-4">
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
@@ -253,7 +255,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="">
+    <div>
+      <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
       <PageTitle
         title={t("Dashboard.title")}
         customButton={

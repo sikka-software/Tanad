@@ -36,7 +36,7 @@ import { CACHE_KEY } from "@/lib/constants";
 import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 import { supabase } from "@/lib/supabase";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
 import { NavMain } from "./sidebar-menu";

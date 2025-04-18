@@ -10,6 +10,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import QuoteCard from "@/components/app/quote/quote.card";
 import QuotesTable from "@/components/app/quote/quote.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Quote } from "@/types/quote.type";
@@ -70,58 +71,61 @@ export default function QuotesPage() {
   };
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <SelectionMode
-          selectedRows={selectedRows}
-          clearSelection={clearSelection}
-          isDeleting={isDeleting}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        />
-      ) : (
-        <PageSearchAndFilter
-          title={t("Quotes.title")}
-          createHref="/quotes/add"
-          createLabel={t("Quotes.add_new")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Quotes.search_quotes")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-
-      <div>
-        {viewMode === "table" ? (
-          <QuotesTable
-            data={filteredQuotes}
-            isLoading={isLoading}
-            error={error as Error | null}
-            onSelectedRowsChange={handleRowSelectionChange}
+    <div>
+      <CustomPageMeta title={t("Quotes.title")} description={t("Quotes.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
+          <PageSearchAndFilter
+            title={t("Quotes.title")}
+            createHref="/quotes/add"
+            createLabel={t("Quotes.add_new")}
+            onSearch={setSearchQuery}
+            searchPlaceholder={t("Quotes.search_quotes")}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        )}
+
+        <div>
+          {viewMode === "table" ? (
+            <QuotesTable
               data={filteredQuotes}
               isLoading={isLoading}
               error={error as Error | null}
-              emptyMessage={t("Quotes.no_quotes")}
-              addFirstItemMessage={t("Quotes.add_first_quote")}
-              renderItem={(quote: Quote) => <QuoteCard key={quote.id} quote={quote} />}
-              gridCols="2"
+              onSelectedRowsChange={handleRowSelectionChange}
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={filteredQuotes}
+                isLoading={isLoading}
+                error={error as Error | null}
+                emptyMessage={t("Quotes.no_quotes")}
+                addFirstItemMessage={t("Quotes.add_first_quote")}
+                renderItem={(quote: Quote) => <QuoteCard key={quote.id} quote={quote} />}
+                gridCols="2"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("Quotes.confirm_delete_title")}
-        description={t("Quotes.confirm_delete", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Quotes.confirm_delete_title")}
+          description={t("Quotes.confirm_delete", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

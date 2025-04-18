@@ -3,13 +3,15 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
+
 import SalaryCard from "@/components/app/salary/salary.card";
 import SalariesTable from "@/components/app/salary/salary.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import SelectionMode from "@/components/ui/selection-mode";
 
 import type { Salary } from "@/types/salary.type";
 
@@ -54,55 +56,58 @@ export default function SalariesPage() {
   };
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <SelectionMode
-          selectedRows={selectedRows}
-          clearSelection={clearSelection}
-          isDeleting={isDeleting}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        />
-      ) : (
-        <PageSearchAndFilter
-          title={t("Salaries.title")}
-          createHref="/salaries/add"
-          createLabel={t("Salaries.create_salary")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Salaries.search_salaries")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-      <div>
-        {viewMode === "table" ? (
-          <SalariesTable
-            data={filteredSalaries || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
+    <div>
+      <CustomPageMeta title={t("Salaries.title")} description={t("Salaries.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
+          <PageSearchAndFilter
+            title={t("Salaries.title")}
+            createHref="/salaries/add"
+            createLabel={t("Salaries.create_salary")}
+            onSearch={setSearchQuery}
+            searchPlaceholder={t("Salaries.search_salaries")}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        )}
+        <div>
+          {viewMode === "table" ? (
+            <SalariesTable
               data={filteredSalaries || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("Salaries.no_salaries_found")}
-              renderItem={(salary: Salary) => <SalaryCard key={salary.id} salary={salary} />}
-              gridCols="3"
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={filteredSalaries || []}
+                isLoading={isLoading}
+                error={error instanceof Error ? error : null}
+                emptyMessage={t("Salaries.no_salaries_found")}
+                renderItem={(salary: Salary) => <SalaryCard key={salary.id} salary={salary} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("Salaries.delete_salary")}
-        description={t("Salaries.confirm_delete")}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Salaries.delete_salary")}
+          description={t("Salaries.confirm_delete")}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

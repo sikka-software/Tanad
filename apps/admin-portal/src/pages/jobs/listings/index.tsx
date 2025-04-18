@@ -13,7 +13,7 @@ import SelectionMode from "@/components/ui/selection-mode";
 
 import { JobListing } from "@/types/job-listing.type";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { useJobListings, useBulkDeleteJobListings } from "@/hooks/useJobListings";
 import useJobListingsStore from "@/stores/job-listings.store";
 

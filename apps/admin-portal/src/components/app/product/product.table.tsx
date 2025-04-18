@@ -1,7 +1,5 @@
-import React, { useCallback } from "react";
-
 import { useTranslations } from "next-intl";
-
+import React, { useCallback } from "react";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -10,7 +8,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { Product } from "@/types/product.type";
 
-import { useProductsStore } from "@/stores/products.store";
+import useProductsStore from "@/stores/products.store";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().optional();

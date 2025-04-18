@@ -1,10 +1,10 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 import ClientCard from "@/components/app/client/client.card";
 import ClientsTable from "@/components/app/client/client.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
@@ -14,7 +14,7 @@ import { Client } from "@/types/client.type";
 import { useClients } from "@/hooks/useClients";
 
 export default function ClientsPage() {
-  const t = useTranslations("Clients");
+  const t = useTranslations();
   const { data: clients, isLoading, error } = useClients();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
@@ -31,37 +31,40 @@ export default function ClientsPage() {
   const renderClient = (client: Client) => <ClientCard client={client} />;
 
   return (
-    <DataPageLayout>
-      <PageSearchAndFilter
-        title={t("title")}
-        createHref="/clients/add"
-        createLabel={t("add_new")}
-        onSearch={setSearchQuery}
-        searchPlaceholder={t("search_clients")}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
-      <div>
-        {viewMode === "table" ? (
-          <ClientsTable
-            data={filteredClients || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
-          />
-        ) : (
-          <div className="p-4">
-            <DataModelList
+    <div>
+      <CustomPageMeta title={t("Clients.title")} description={t("Clients.description")} />
+      <DataPageLayout>
+        <PageSearchAndFilter
+          title={t("Clients.title")}
+          createHref="/clients/add"
+          createLabel={t("Clients.add_new")}
+          onSearch={setSearchQuery}
+          searchPlaceholder={t("Clients.search_clients")}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+        <div>
+          {viewMode === "table" ? (
+            <ClientsTable
               data={filteredClients || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("no_clients_found")}
-              renderItem={renderClient}
-              gridCols="3"
             />
-          </div>
-        )}
-      </div>
-    </DataPageLayout>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={filteredClients || []}
+                isLoading={isLoading}
+                error={error instanceof Error ? error : null}
+                emptyMessage={t("Clients.no_clients_found")}
+                renderItem={renderClient}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
+      </DataPageLayout>
+    </div>
   );
 }
 

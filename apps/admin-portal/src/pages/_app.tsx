@@ -14,7 +14,7 @@ import AppLayout from "@/components/layouts/app-layout";
 import AuthLayout from "@/components/layouts/auth-layout";
 import LandingLayout from "@/components/layouts/landing-layout";
 import { LoadingBar } from "@/components/ui/loading-bar";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { QueryProvider } from "@/providers/QueryProvider";
 import "@/styles/globals.css";
 

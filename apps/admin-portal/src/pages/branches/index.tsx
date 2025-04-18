@@ -10,6 +10,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import BranchCard from "@/components/app/branch/branch.card";
 import BranchesTable from "@/components/app/branch/branch.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Branch } from "@/types/branch.type";
@@ -66,57 +67,60 @@ export default function BranchesPage() {
   };
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <SelectionMode
-          selectedRows={selectedRows}
-          clearSelection={clearSelection}
-          isDeleting={isDeleting}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        />
-      ) : (
-        <PageSearchAndFilter
-          title={t("Branches.title")}
-          createHref="/branches/add"
-          createLabel={t("Branches.add_new")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Branches.search_branches")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-
-      <div>
-        {viewMode === "table" ? (
-          <BranchesTable
-            data={filteredBranches || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
-            onSelectedRowsChange={handleRowSelectionChange}
+    <div>
+      <CustomPageMeta title={t("Branches.title")} description={t("Branches.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
+          <PageSearchAndFilter
+            title={t("Branches.title")}
+            createHref="/branches/add"
+            createLabel={t("Branches.add_new")}
+            onSearch={setSearchQuery}
+            searchPlaceholder={t("Branches.search_branches")}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        )}
+
+        <div>
+          {viewMode === "table" ? (
+            <BranchesTable
               data={filteredBranches || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("Branches.no_branches_found")}
-              renderItem={(branch: Branch) => <BranchCard branch={branch} />}
-              gridCols="3"
+              onSelectedRowsChange={handleRowSelectionChange}
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={filteredBranches || []}
+                isLoading={isLoading}
+                error={error instanceof Error ? error : null}
+                emptyMessage={t("Branches.no_branches_found")}
+                renderItem={(branch: Branch) => <BranchCard branch={branch} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("Branches.confirm_delete_title")}
-        description={t("Branches.confirm_delete", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Branches.confirm_delete_title")}
+          description={t("Branches.confirm_delete", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

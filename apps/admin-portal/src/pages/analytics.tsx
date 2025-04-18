@@ -1,11 +1,3 @@
-import { useState, useEffect } from "react";
-import { DateRange } from "react-day-picker";
-
-import { GetStaticProps } from "next";
-import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { useRouter } from "next/router";
-
 import {
   format,
   startOfMonth,
@@ -20,6 +12,12 @@ import {
 } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { GetStaticProps } from "next";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
+import { DateRange } from "react-day-picker";
 import { CartesianGrid, XAxis, BarChart, Bar } from "recharts";
 
 import AnalyticsTable from "@/components/app/AnalyticsTable";
@@ -44,13 +42,15 @@ import {
 } from "@/components/ui/select";
 // UI Components
 import { Skeleton } from "@/components/ui/skeleton";
-// Store
-import { useMainStore } from "@/hooks/main.store";
-import useUserStore from "@/hooks/use-user-store";
+
 import { fakeAnalyticsData } from "@/lib/constants";
 // Utils
 import { fetchPukla, fetchPuklasWithLinkCount } from "@/lib/operations";
 import { supabase } from "@/lib/supabase";
+
+// Store
+import { useMainStore } from "@/hooks/main.store";
+import useUserStore from "@/stores/use-user-store";
 
 export default function Analytics() {
   const t = useTranslations();

@@ -1708,8 +1708,68 @@
   "Reports": {
     "title": "التقارير"
   },
-  "Requests": {
-    "title": "الطلبات"
+  "EmployeeRequests": {
+    "title": "طلبات الموظفين",
+    "description": "طلبات الموظفين",
+    "add_new": "إضافة طلب موظف جديد",
+    "no_employee_requests_found": "لا توجد طلبات موظفين",
+    "search_requests": "بحث عن طلبات الموظفين...",
+    "form": {
+      "validation": {
+        "title_required": "العنوان مطلوب",
+        "type_required": "النوع مطلوب",
+        "employee_required": "الموظف مطلوب",
+        "description_required": "الوصف مطلوب",
+        "start_date_required": "تاريخ البدء مطلوب",
+        "end_date_required": "تاريخ الانتهاء مطلوب",
+        "amount_required": "المبلغ مطلوب",
+        "amount_positive": "المبلغ يجب أن يكون رقماً موجباً"
+      },
+      "title": {
+        "label": "العنوان",
+        "placeholder": "أدخل عنوان الطلب"
+      },
+      "type": {
+        "label": "النوع",
+        "placeholder": "اختر نوع الطلب",
+        "leave": "إجازة",
+        "expense": "مصروفات",
+        "document": "وثيقة",
+        "other": "أخرى"
+      },
+      "employee": {
+        "label": "الموظف",
+        "placeholder": "اختر الموظف"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل وصف الطلب"
+      },
+      "date_range": {
+        "label": "الفترة الزمنية",
+        "start": "تاريخ البدء",
+        "end": "تاريخ الانتهاء"
+      },
+      "amount": {
+        "label": "المبلغ",
+        "placeholder": "أدخل المبلغ"
+      },
+      "attachments": {
+        "label": "المرفقات",
+        "add": "إضافة مرفق",
+        "remove": "إزالة"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل أي ملاحظات إضافية"
+      },
+      "status": {
+        "label": "الحالة",
+        "pending": "قيد الانتظار",
+        "approved": "تمت الموافقة",
+        "rejected": "مرفوض"
+      }
+    }
   },
   "Clients": {
     "title": "العملاء",
@@ -1775,6 +1835,7 @@
     "title": "المستودعات",
     "add_new": "إضافة مستودع جديد",
     "warehouse_details": "تفاصيل المستودع",
+    "search_warehouses": "بحث عن مستودعات...",
     "name": "الاسم",
     "name_required": "اسم المستودع مطلوب",
     "enter_name": "أدخل اسم المستودع",

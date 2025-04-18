@@ -1,17 +1,15 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
-import { Trash2, X } from "lucide-react";
-
-import { Button } from "@/ui/button";
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
 
 import EmployeeCard from "@/components/app/employee/employee.card";
 import EmployeesTable from "@/components/app/employee/employee.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Employee } from "@/types/employee.types";
@@ -68,77 +66,59 @@ export default function EmployeesPage() {
   const renderEmployee = (employee: Employee) => <EmployeeCard employee={employee} />;
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <div className="bg-background sticky top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-b px-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">
-              {selectedRows.length} {t("General.items_selected")}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearSelection}
-              className="flex items-center gap-2"
-            >
-              <X className="h-4 w-4" />
-              {t("General.clear")}
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteSelected}
-              className="flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              {t("General.delete")}
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <PageSearchAndFilter
-          title={t("Employees.title")}
-          createHref="/employees/add"
-          createLabel={t("Employees.add_new")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Employees.search_employees")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-      <div>
-        {viewMode === "table" ? (
-          <EmployeesTable
-            data={filteredEmployees || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
-            onSelectedRowsChange={handleSelectedRowsChange}
+    <div>
+      <CustomPageMeta title={t("Employees.title")} description={t("Employees.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
+          <PageSearchAndFilter
+            title={t("Employees.title")}
+            createHref="/employees/add"
+            createLabel={t("Employees.add_new")}
+            onSearch={setSearchQuery}
+            searchPlaceholder={t("Employees.search_employees")}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        )}
+        <div>
+          {viewMode === "table" ? (
+            <EmployeesTable
               data={filteredEmployees || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("Employees.no_employees_found")}
-              renderItem={renderEmployee}
-              gridCols="3"
+              onSelectedRowsChange={handleSelectedRowsChange}
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={filteredEmployees || []}
+                isLoading={isLoading}
+                error={error instanceof Error ? error : null}
+                emptyMessage={t("Employees.no_employees_found")}
+                renderItem={renderEmployee}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("Employees.confirm_delete_title")}
-        description={t("Employees.confirm_delete", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Employees.confirm_delete_title")}
+          description={t("Employees.confirm_delete", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

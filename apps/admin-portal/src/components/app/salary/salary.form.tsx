@@ -21,7 +21,7 @@ import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee
 
 import type { Salary } from "@/types/salary.type";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { useEmployees } from "@/hooks/useEmployees";
 import { supabase } from "@/lib/supabase";
 

@@ -10,6 +10,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import OfficeCard from "@/components/app/office/office.card";
 import OfficesTable from "@/components/app/office/office.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Office } from "@/types/office.type";
@@ -60,57 +61,60 @@ export default function OfficesPage() {
   };
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <SelectionMode
-          selectedRows={selectedRows}
-          clearSelection={clearSelection}
-          isDeleting={isDeleting}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        />
-      ) : (
-        <PageSearchAndFilter
-          title={t("Offices.title")}
-          createHref="/offices/add"
-          createLabel={t("Offices.add_new")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Offices.search_offices")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-
-      <div>
-        {viewMode === "table" ? (
-          <OfficesTable
-            data={filteredOffices || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
-            onSelectedRowsChange={handleRowSelectionChange}
+    <div>
+      <CustomPageMeta title={t("Offices.title")} description={t("Offices.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
+          <PageSearchAndFilter
+            title={t("Offices.title")}
+            createHref="/offices/add"
+            createLabel={t("Offices.add_new")}
+            onSearch={setSearchQuery}
+            searchPlaceholder={t("Offices.search_offices")}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        )}
+
+        <div>
+          {viewMode === "table" ? (
+            <OfficesTable
               data={filteredOffices || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("Offices.no_offices_found")}
-              renderItem={(office: Office) => <OfficeCard office={office} />}
-              gridCols="3"
+              onSelectedRowsChange={handleRowSelectionChange}
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={filteredOffices || []}
+                isLoading={isLoading}
+                error={error instanceof Error ? error : null}
+                emptyMessage={t("Offices.no_offices_found")}
+                renderItem={(office: Office) => <OfficeCard office={office} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("Offices.confirm_delete_title")}
-        description={t("Offices.confirm_delete", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Offices.confirm_delete_title")}
+          description={t("Offices.confirm_delete", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

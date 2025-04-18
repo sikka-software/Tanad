@@ -1,6 +1,6 @@
 import { JobListing } from "@/types/job-listing.type";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 export async function fetchJobListings(): Promise<JobListing[]> {
   try {

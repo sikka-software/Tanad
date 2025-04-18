@@ -1,10 +1,8 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-
-import { useLocale, useTranslations } from "next-intl";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -20,8 +18,8 @@ import DepartmentForm, { DepartmentFormValues } from "@/components/app/departmen
 
 import { supabase } from "@/lib/supabase";
 
-import useUserStore from "@/hooks/use-user-store";
 import { useDepartments, DEPARTMENTS_QUERY_KEY } from "@/hooks/useDepartments";
+import useUserStore from "@/stores/use-user-store";
 
 interface EmployeeFormProps {
   id?: string;
@@ -327,7 +325,9 @@ export function EmployeeForm({ id, onSuccess, onSubmit, loading = false }: Emplo
                     <SelectItem value="active">{t("Employees.form.status.active")}</SelectItem>
                     <SelectItem value="inactive">{t("Employees.form.status.inactive")}</SelectItem>
                     <SelectItem value="on_leave">{t("Employees.form.status.on_leave")}</SelectItem>
-                    <SelectItem value="terminated">{t("Employees.form.status.terminated")}</SelectItem>
+                    <SelectItem value="terminated">
+                      {t("Employees.form.status.terminated")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

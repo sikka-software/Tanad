@@ -9,7 +9,7 @@ import PageTitle from "@/ui/page-title";
 
 import { WarehouseForm } from "@/components/app/warehouse/warehouse.form";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { warehouseKeys } from "@/hooks/useWarehouses";
 
 export default function AddWarehousePage() {

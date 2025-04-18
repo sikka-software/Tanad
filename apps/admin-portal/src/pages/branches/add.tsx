@@ -15,7 +15,7 @@ import PageTitle from "@/components/ui/page-title";
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { branchKeys } from "@/hooks/useBranches";
 
 export default function AddBranchPage() {

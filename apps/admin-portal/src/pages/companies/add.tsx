@@ -11,7 +11,7 @@ import { CompanyForm, type CompanyFormValues } from "@/components/app/company/co
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { generateDummyData } from "@/lib/dummy-generator";
 
 export default function AddCompanyPage() {

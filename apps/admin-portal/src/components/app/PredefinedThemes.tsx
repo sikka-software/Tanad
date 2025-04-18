@@ -2,7 +2,7 @@ import React from "react";
 
 // Components
 import { SingleThemeThumbnail } from "@/components/app/SingleThemeThumbnail";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { PuklaThemeProps } from "@/lib/types";
 
 interface PredefinedThemesSectionProps {

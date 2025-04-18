@@ -1,8 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-
 import { useTranslations } from "next-intl";
-
-import { Row } from "@tanstack/react-table";
+import React, { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -30,7 +27,7 @@ interface EmployeesTableProps {
 }
 
 const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: EmployeesTableProps) => {
-  const t = useTranslations("Employees");
+  const t = useTranslations();
   const { data: departments } = useDepartments();
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
   const { selectedRows, setSelectedRows } = useEmployeesStore();
@@ -136,32 +133,32 @@ const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: Employ
   const columns: ExtendedColumnDef<Employee>[] = [
     {
       accessorKey: "first_name",
-      header: t("form.first_name.label"),
+      header: t("Employees.form.first_name.label"),
       validationSchema: nameSchema,
     },
     {
       accessorKey: "last_name",
-      header: t("form.last_name.label"),
+      header: t("Employees.form.last_name.label"),
       validationSchema: nameSchema,
     },
     {
       accessorKey: "email",
-      header: t("form.email.label"),
+      header: t("Employees.form.email.label"),
       validationSchema: emailSchema,
     },
     {
       accessorKey: "phone",
-      header: t("form.phone.label"),
+      header: t("Employees.form.phone.label"),
       validationSchema: phoneSchema,
     },
     {
       accessorKey: "position",
-      header: t("form.position.label"),
+      header: t("Employees.form.position.label"),
       validationSchema: positionSchema,
     },
     {
       accessorKey: "department_id",
-      header: t("form.department.label"),
+      header: t("Employees.form.department.label"),
       validationSchema: departmentSchema,
       cellType: "select",
       options: departments?.map((department) => ({
@@ -175,13 +172,14 @@ const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: Employ
     },
     {
       accessorKey: "status",
-      header: t("form.status.label"),
+      header: t("Employees.form.status.label"),
       validationSchema: statusSchema,
       cellType: "select",
       options: [
-        { label: t("form.status.active"), value: "active" },
-        { label: t("form.status.inactive"), value: "inactive" },
-        { label: t("form.status.on_leave"), value: "on_leave" },
+        { label: t("Employees.form.status.active"), value: "active" },
+        { label: t("Employees.form.status.inactive"), value: "inactive" },
+        { label: t("Employees.form.status.on_leave"), value: "on_leave" },
+        { label: t("Employees.form.status.terminated"), value: "terminated" },
       ],
     },
   ];

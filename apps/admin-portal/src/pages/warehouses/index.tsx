@@ -2,24 +2,25 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
 
-import { WarehouseCard } from "@/components/app/warehouse/warehouse.card";
+import WarehouseCard from "@/components/app/warehouse/warehouse.card";
 import WarehouseTable from "@/components/app/warehouse/warehouse.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import SelectionMode from "@/components/ui/selection-mode";
 
-import type { Warehouse } from "@/types/warehouse.type";
+import { Warehouse } from "@/types/warehouse.type";
 
 import { useBulkDeleteWarehouses, useWarehouses } from "@/hooks/useWarehouses";
 import useWarehousesStore from "@/stores/warehouses.store";
 
 export default function WarehousesPage() {
-  const t = useTranslations("Warehouses");
-  const { data: warehouses, isLoading, error } = useWarehouses();
+  const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: warehouses, isLoading, error } = useWarehouses();
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -53,61 +54,61 @@ export default function WarehousesPage() {
     }
   };
 
-  // Render function for a single warehouse card
-  const renderWarehouse = (warehouse: Warehouse) => <WarehouseCard warehouse={warehouse} />;
-
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <SelectionMode
-          selectedRows={selectedRows}
-          clearSelection={clearSelection}
-          isDeleting={isDeleting}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        />
-      ) : (
-        <PageSearchAndFilter
-          title={t("title")}
-          createHref="/warehouses/add"
-          createLabel={t("create_warehouse")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("search_warehouses")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-
-      <div>
-        {viewMode === "table" ? (
-          <WarehouseTable
-            data={filteredWarehouses || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
-            onSelectedRowsChange={handleRowSelectionChange}
+    <div>
+      <CustomPageMeta title={t("Warehouses.title")} description={t("Warehouses.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
+          <PageSearchAndFilter
+            title={t("Warehouses.title")}
+            createHref="/warehouses/add"
+            createLabel={t("Warehouses.create_warehouse")}
+            onSearch={setSearchQuery}
+            searchPlaceholder={t("Warehouses.search_warehouses")}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        )}
+
+        <div>
+          {viewMode === "table" ? (
+            <WarehouseTable
               data={filteredWarehouses || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("no_warehouses_found")}
-              renderItem={renderWarehouse}
-              gridCols="3"
+              onSelectedRowsChange={handleRowSelectionChange}
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={filteredWarehouses || []}
+                isLoading={isLoading}
+                error={error instanceof Error ? error : null}
+                emptyMessage={t("Warehouses.no_warehouses_found")}
+                renderItem={(warehouse) => <WarehouseCard warehouse={warehouse} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("confirm_delete")}
-        description={t("delete_description", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Warehouses.confirm_delete")}
+          description={t("Warehouses.delete_description", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

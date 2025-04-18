@@ -1,10 +1,10 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 
 import InvoiceCard from "@/components/app/invoice/invoice.card";
 import InvoicesTable from "@/components/app/invoice/invoice.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
@@ -14,7 +14,7 @@ import { Invoice } from "@/types/invoice.type";
 import { useInvoices } from "@/hooks/useInvoices";
 
 export default function InvoicesPage() {
-  const t = useTranslations("Invoices");
+  const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const { data: invoices, isLoading, error } = useInvoices();
@@ -29,39 +29,42 @@ export default function InvoicesPage() {
     : [];
 
   return (
-    <DataPageLayout>
-      <PageSearchAndFilter
-        title={t("title")}
-        createHref="/invoices/add"
-        createLabel={t("create_invoice")}
-        onSearch={setSearchQuery}
-        searchPlaceholder={t("search_invoices")}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-      />
+    <div>
+      <CustomPageMeta title={t("Invoices.title")} description={t("Invoices.description")} />
+      <DataPageLayout>
+        <PageSearchAndFilter
+          title={t("Invoices.title")}
+          createHref="/invoices/add"
+          createLabel={t("Invoices.create_invoice")}
+          onSearch={setSearchQuery}
+          searchPlaceholder={t("Invoices.search_invoices")}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
 
-      <div>
-        {viewMode === "table" ? (
-          <InvoicesTable
-            data={filteredInvoices}
-            isLoading={isLoading}
-            error={error as Error | null}
-          />
-        ) : (
-          <div className="p-4">
-            <DataModelList
+        <div>
+          {viewMode === "table" ? (
+            <InvoicesTable
               data={filteredInvoices}
               isLoading={isLoading}
               error={error as Error | null}
-              emptyMessage={t("no_invoices_found")}
-              addFirstItemMessage={t("add_first_invoice")}
-              renderItem={(invoice: Invoice) => <InvoiceCard invoice={invoice} />}
-              gridCols="2"
             />
-          </div>
-        )}
-      </div>
-    </DataPageLayout>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={filteredInvoices}
+                isLoading={isLoading}
+                error={error as Error | null}
+                emptyMessage={t("Invoices.no_invoices_found")}
+                addFirstItemMessage={t("Invoices.add_first_invoice")}
+                renderItem={(invoice: Invoice) => <InvoiceCard invoice={invoice} />}
+                gridCols="2"
+              />
+            </div>
+          )}
+        </div>
+      </DataPageLayout>
+    </div>
   );
 }
 

@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 import { Employee } from "@/types/employee.types";
 

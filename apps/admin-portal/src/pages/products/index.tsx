@@ -1,23 +1,22 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-
-import { Trash2, X } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
+
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
 
 import ProductCard from "@/components/app/product/product.card";
 import ProductsTable from "@/components/app/product/product.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Button } from "@/components/ui/button";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
 import { Product } from "@/types/product.type";
 
 import { useProducts, useBulkDeleteProducts } from "@/hooks/useProducts";
-import { useProductsStore } from "@/stores/products.store";
+import useProductsStore from "@/stores/products.store";
 
 export default function ProductsPage() {
   const t = useTranslations();
@@ -76,81 +75,61 @@ export default function ProductsPage() {
   };
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <div className="bg-background sticky top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-b px-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">
-              {selectedRows.length} {t("General.items_selected")}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearSelection}
-              className="flex items-center gap-2"
-              disabled={isDeleting}
-            >
-              <X className="h-4 w-4" />
-              {t("General.clear")}
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setIsDeleteDialogOpen(true)}
-              className="flex items-center gap-2"
-              disabled={isDeleting}
-            >
-              <Trash2 className="h-4 w-4" />
-              {t("General.delete")}
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <PageSearchAndFilter
-          title={t("Products.title")}
-          createHref="/products/add"
-          createLabel={t("Products.add_new")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Products.search_products")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-
-      <div>
-        {viewMode === "table" ? (
-          <ProductsTable
-            data={filteredProducts}
-            isLoading={isLoading}
-            error={error as Error | null}
-            onSelectedRowsChange={(rows) => setSelectedRows(rows.map((r) => r.id))}
+    <div>
+      <CustomPageMeta title={t("Products.title")} description={t("Products.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
+          <PageSearchAndFilter
+            title={t("Products.title")}
+            createHref="/products/add"
+            createLabel={t("Products.add_new")}
+            onSearch={setSearchQuery}
+            searchPlaceholder={t("Products.search_products")}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        )}
+
+        <div>
+          {viewMode === "table" ? (
+            <ProductsTable
               data={filteredProducts}
               isLoading={isLoading}
               error={error as Error | null}
-              emptyMessage={t("Products.no_products")}
-              addFirstItemMessage={t("Products.add_first_product")}
-              renderItem={(product) => <ProductCard product={product} />}
-              gridCols="3"
+              onSelectedRowsChange={(rows) => setSelectedRows(rows.map((r) => r.id))}
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={filteredProducts}
+                isLoading={isLoading}
+                error={error as Error | null}
+                emptyMessage={t("Products.no_products")}
+                addFirstItemMessage={t("Products.add_first_product")}
+                renderItem={(product) => <ProductCard product={product} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleBulkDelete}
-        title={t("Products.confirm_delete_title")}
-        description={t("Products.confirm_delete", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleBulkDelete}
+          title={t("Products.confirm_delete_title")}
+          description={t("Products.confirm_delete", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

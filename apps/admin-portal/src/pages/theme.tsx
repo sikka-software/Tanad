@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import useMainStore from "@/hooks/main.store";
 // Hooks
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { predefinedThemes } from "@/lib/constants";
 import { supabase } from "@/lib/supabase";
 // Lib

@@ -1,13 +1,12 @@
-import { useTranslations } from "next-intl";
-
 import { MapPin, Code, LayoutGrid, NotebookText } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 import { Warehouse } from "@/types/warehouse.type";
 
-export const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
+const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
   const t = useTranslations("Warehouses");
   return (
     <Card key={warehouse.id} className="transition-shadow hover:shadow-lg">
@@ -52,3 +51,5 @@ export const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
     </Card>
   );
 };
+
+export default WarehouseCard;

@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { FREE_PLAN_ID } from "@/lib/constants";
 import { supabase } from "@/lib/supabase";
 

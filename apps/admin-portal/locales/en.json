@@ -263,6 +263,8 @@
 
   "Dashboard": {
     "title": "Dashboard",
+    "meta_description": "Administrative dashboard showing key business metrics and statistics",
+    "meta_title": "Dashboard | Admin Portal",
     "create_product": "Add Product",
     "total_invoices": "Total Invoices",
     "pending": "Pending",
@@ -2156,6 +2158,7 @@
     "warehouse_details": "Warehouse Details",
     "create_warehouse": "Create Warehouse",
     "no_warehouses_found": "No warehouses found",
+    "search_warehouses": "Search warehouses...",
     "capacity": "Capacity",
     "manager": "Manager",
     "edit": "Edit Warehouse",

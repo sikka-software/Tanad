@@ -3,8 +3,8 @@ import { useTranslations } from "next-intl";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import useUserStore from "@/hooks/use-user-store";
-import type { Profile as UserStoreProfile } from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
+import type { Profile as UserStoreProfile } from "@/stores/use-user-store";
 
 // Types for our profile data
 type ProfileData = {

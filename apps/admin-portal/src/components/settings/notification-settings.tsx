@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/ui/
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/ui/form";
 import { Switch } from "@/ui/switch";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 
 const formSchema = z.object({

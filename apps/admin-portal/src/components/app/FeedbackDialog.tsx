@@ -3,7 +3,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { supabase } from "@/lib/supabase";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 // UI
 import {
   DialogContent,

@@ -10,7 +10,7 @@ import { ProductForm } from "@/components/app/product/product.form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 // Define the Product type
 interface Product {

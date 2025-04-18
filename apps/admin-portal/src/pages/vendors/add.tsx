@@ -10,7 +10,7 @@ import PageTitle from "@/components/ui/page-title";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { useCreateVendor } from "@/hooks/useVendors";
 
 export default function AddVendorPage() {

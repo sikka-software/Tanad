@@ -12,7 +12,7 @@ import PageTitle from "@/components/ui/page-title";
 
 import { supabase } from "@/lib/supabase";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddInvoicePage() {
   const t = useTranslations();

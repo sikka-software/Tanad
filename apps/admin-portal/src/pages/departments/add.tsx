@@ -1,21 +1,21 @@
-import { useState } from "react";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import DepartmentForm, { type DepartmentFormValues } from "@/components/app/department/department.form";
+import DepartmentForm, {
+  type DepartmentFormValues,
+} from "@/components/app/department/department.form";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddDepartmentPage() {
   const router = useRouter();

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
 
