@@ -32,8 +32,11 @@
     "reset_all": "إعادة ترتيب الكل",
     "apply_sort": "تطبيق الترتيب",
     "select_field": "اختر الحقل",
-    
-    
+    "case_sensitive": "حساس للحروف الكبيرة والصغيرة",
+    "show_empty_values_first": "إظهار القيم الفارغة أولاً",
+    "ascending": "تصاعدي",
+    "descending": "تنازلي",
+
     "calendars": {
       "gregorian": "التقويم الميلادي",
       "hijri": "التقويم الهجري"

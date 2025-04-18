@@ -50,6 +50,10 @@
     "reset_all": "Reset All",
     "apply_sort": "Apply Sort",
     "select_field": "Select Field",
+    "case_sensitive": "Case Sensitive",
+    "show_empty_values_first": "Show Empty Values First",
+    "ascending": "Ascending",
+    "descending": "Descending",
     "calendars": {
       "gregorian": "Gregorian",
       "hijri": "Hijri"

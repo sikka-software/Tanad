@@ -1,7 +1,15 @@
 "use client";
 
-import { ArrowDownAZ, ArrowDownZA, ArrowUpDown, Plus, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import {
+  ArrowDownAZ,
+  ArrowDownZA,
+  ArrowUpAZ,
+  ArrowUpAz,
+  ArrowUpDown,
+  Plus,
+  Trash2,
+} from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -19,9 +27,11 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 
 import IconButton from "./icon-button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 export default function SortPopover() {
   const t = useTranslations();
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [sortRules, setSortRules] = useState([{ field: "name", direction: "asc" }]);
 
@@ -53,7 +63,7 @@ export default function SortPopover() {
       <PopoverTrigger asChild>
         <IconButton icon={<ArrowUpDown className="h-4 w-4" />} label={t("General.sort")} />
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
+      <PopoverContent className="w-80" align="end" dir={locale === "ar" ? "rtl" : "ltr"}>
         <div className="grid gap-4">
           <div className="flex items-center justify-between">
             <h4 className="leading-none font-medium">{t("General.sort_options")}</h4>
@@ -106,18 +116,32 @@ export default function SortPopover() {
                     <div
                       className={`rounded-md border p-1 ${rule.direction === "asc" ? "bg-muted" : ""}`}
                     >
-                      <RadioGroupItem value="asc" id={`asc-${index}`} className="sr-only" />
-                      <Label htmlFor={`asc-${index}`} className="cursor-pointer">
-                        <ArrowDownAZ className="h-4 w-4" />
-                      </Label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <RadioGroupItem value="asc" id={`asc-${index}`} className="sr-only" />
+                            <Label htmlFor={`asc-${index}`} className="cursor-pointer">
+                              <ArrowUpAZ className="h-4 w-4" />
+                            </Label>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>{t("General.ascending")}</TooltipContent>
+                      </Tooltip>
                     </div>
                     <div
                       className={`rounded-md border p-1 ${rule.direction === "desc" ? "bg-muted" : ""}`}
                     >
-                      <RadioGroupItem value="desc" id={`desc-${index}`} className="sr-only" />
-                      <Label htmlFor={`desc-${index}`} className="cursor-pointer">
-                        <ArrowDownZA className="h-4 w-4" />
-                      </Label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <RadioGroupItem value="desc" id={`desc-${index}`} className="sr-only" />
+                            <Label htmlFor={`desc-${index}`} className="cursor-pointer">
+                              <ArrowDownAZ className="h-4 w-4" />
+                            </Label>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent>{t("General.descending")}</TooltipContent>
+                      </Tooltip>
                     </div>
                   </RadioGroup>
                 </div>
