@@ -177,6 +177,15 @@ const EmployeeRequestForm = ({
         <form
           id={id || "employee-request-form"}
           onSubmit={form.handleSubmit(onSubmit)}
+          // Debugging
+          // onSubmit={(e) => {
+          //   e.preventDefault();
+          //   console.log("Form submitted");
+          //   // see if any form erros
+          //   const errors = form.formState.errors;
+          //   console.log("errors ", errors);
+          //   console.log("form values ", form.getValues());
+          // }}
           className="space-y-4"
         >
           <input type="hidden" {...form.register("employee_id")} />
@@ -219,21 +228,24 @@ const EmployeeRequestForm = ({
             control={form.control}
             name="type"
             render={({ field }) => (
-              <div className="space-y-2">
-                <label>{t("EmployeeRequests.form.type.label")}</label>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("EmployeeRequests.form.type.placeholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {requestTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <FormItem>
+                <FormLabel>{t("EmployeeRequests.form.type.label")}</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("EmployeeRequests.form.type.placeholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {requestTypes.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
 
@@ -241,10 +253,17 @@ const EmployeeRequestForm = ({
             control={form.control}
             name="title"
             render={({ field }) => (
-              <div className="space-y-2">
-                <label>{t("EmployeeRequests.form.title.label")}</label>
-                <Input {...field} placeholder={t("EmployeeRequests.form.title.placeholder")} />
-              </div>
+              <FormItem>
+                <FormLabel>{t("EmployeeRequests.form.title.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder={t("EmployeeRequests.form.title.placeholder")}
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
 
@@ -252,13 +271,17 @@ const EmployeeRequestForm = ({
             control={form.control}
             name="description"
             render={({ field }) => (
-              <div className="space-y-2">
-                <label>{t("EmployeeRequests.form.description.label")}</label>
-                <Textarea
-                  {...field}
-                  placeholder={t("EmployeeRequests.form.description.placeholder")}
-                />
-              </div>
+              <FormItem>
+                <FormLabel>{t("EmployeeRequests.form.description.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder={t("EmployeeRequests.form.description.placeholder")}
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
 
@@ -267,31 +290,35 @@ const EmployeeRequestForm = ({
               control={form.control}
               name="startDate"
               render={({ field }) => (
-                <div className="space-y-2">
-                  <label>{t("EmployeeRequests.form.date_range.start")}</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "PPP") : t("General.pick_date")}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                <FormItem>
+                  <FormLabel>{t("EmployeeRequests.form.date_range.start")}</FormLabel>
+                  <FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                          disabled={loading}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value ? format(field.value, "PPP") : t("General.pick_date")}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
@@ -299,31 +326,35 @@ const EmployeeRequestForm = ({
               control={form.control}
               name="endDate"
               render={({ field }) => (
-                <div className="space-y-2">
-                  <label>{t("EmployeeRequests.form.date_range.end")}</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "PPP") : t("General.pick_date")}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                <FormItem>
+                  <FormLabel>{t("EmployeeRequests.form.date_range.end")}</FormLabel>
+                  <FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                          disabled={loading}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value ? format(field.value, "PPP") : t("General.pick_date")}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
           </div>
@@ -332,16 +363,20 @@ const EmployeeRequestForm = ({
             control={form.control}
             name="amount"
             render={({ field }) => (
-              <div className="space-y-2">
-                <label>{t("EmployeeRequests.form.amount.label")}</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  {...field}
-                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                  placeholder={t("EmployeeRequests.form.amount.placeholder")}
-                />
-              </div>
+              <FormItem>
+                <FormLabel>{t("EmployeeRequests.form.amount.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    {...field}
+                    onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    placeholder={t("EmployeeRequests.form.amount.placeholder")}
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
 
@@ -349,10 +384,17 @@ const EmployeeRequestForm = ({
             control={form.control}
             name="notes"
             render={({ field }) => (
-              <div className="space-y-2">
-                <label>{t("EmployeeRequests.form.notes.label")}</label>
-                <Textarea {...field} placeholder={t("EmployeeRequests.form.notes.placeholder")} />
-              </div>
+              <FormItem>
+                <FormLabel>{t("EmployeeRequests.form.notes.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder={t("EmployeeRequests.form.notes.placeholder")}
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
         </form>
