@@ -102,27 +102,17 @@ export default function AddClientPage() {
           submit_form: t("Clients.add_new"),
           cancel: t("General.cancel"),
         }}
+        customButton={
+          process.env.NODE_ENV === "development" && (
+            <Button variant="outline" size="sm" onClick={handleDummyData}>
+              Dummy Data
+            </Button>
+          )
+        }
       />
 
-      <div className="p-4">
-        <Card className="max-w-2xl">
-          <CardHeader className="relative">
-            {process.env.NODE_ENV === "development" && (
-              <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
-                Dummy Data
-              </Button>
-            )}
-            <CardTitle>{t("Clients.client_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ClientForm
-              id="client-form"
-              user_id={user?.id}
-              onSubmit={handleSubmit}
-              loading={loading}
-            />
-          </CardContent>
-        </Card>
+      <div className="p-4 max-w-2xl mx-auto">
+        <ClientForm id="client-form" user_id={user?.id} onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );

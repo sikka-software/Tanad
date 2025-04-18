@@ -13,7 +13,7 @@ interface CompaniesState {
   clearSelection: () => void;
 }
 
-export const useCompaniesStore = create<CompaniesState>((set) => ({
+const useCompaniesStore = create<CompaniesState>((set) => ({
   companies: [],
   selectedRows: [],
   isLoading: false,
@@ -73,3 +73,5 @@ export const useCompaniesStore = create<CompaniesState>((set) => ({
     });
   },
 }));
+
+export default useCompaniesStore;

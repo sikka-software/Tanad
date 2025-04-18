@@ -1,15 +1,19 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+
 import { Vendor, VendorCreateData, VendorUpdateData } from "@/types/vendor";
 
 interface VendorsStore {
   vendors: Vendor[];
   isLoading: boolean;
   error: string | null;
+  selectedRows: string[];
   fetchVendors: () => Promise<void>;
   createVendor: (data: VendorCreateData) => Promise<void>;
   updateVendor: (id: string, data: VendorUpdateData) => Promise<void>;
   deleteVendor: (id: string) => Promise<void>;
+  setSelectedRows: (ids: string[]) => void;
+  clearSelection: () => void;
 }
 
 export const useVendorsStore = create<VendorsStore>()(
@@ -18,6 +22,7 @@ export const useVendorsStore = create<VendorsStore>()(
       vendors: [],
       isLoading: false,
       error: null,
+      selectedRows: [],
 
       fetchVendors: async () => {
         set({ isLoading: true, error: null });
@@ -67,9 +72,7 @@ export const useVendorsStore = create<VendorsStore>()(
           }
           const updatedVendor = await response.json();
           set((state) => ({
-            vendors: state.vendors.map((vendor) =>
-              vendor.id === id ? updatedVendor : vendor
-            ),
+            vendors: state.vendors.map((vendor) => (vendor.id === id ? updatedVendor : vendor)),
             isLoading: false,
           }));
         } catch (error) {
@@ -94,7 +97,13 @@ export const useVendorsStore = create<VendorsStore>()(
           set({ error: (error as Error).message, isLoading: false });
         }
       },
+
+      setSelectedRows: (ids: string[]) => {
+        set({ selectedRows: ids });
+      },
+
+      clearSelection: () => set({ selectedRows: [] }),
     }),
-    { name: "vendors-store" }
-  )
-); 
+    { name: "vendors-store" },
+  ),
+);

@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import React from "react";
+import React, { useCallback } from "react";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -8,7 +8,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { Company } from "@/types/company.type";
 
-import { useCompaniesStore } from "@/stores/companies.store";
+import useCompaniesStore from "@/stores/companies.store";
 
 const nameSchema = z.string().min(1, "Required");
 const industrySchema = z.string().optional();
@@ -27,50 +27,42 @@ interface CompaniesTableProps {
   data: Company[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (rows: Company[]) => void;
 }
 
-const CompaniesTable = ({ data, isLoading, error, onSelectedRowsChange }: CompaniesTableProps) => {
+const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
   const t = useTranslations("Companies");
   const { updateCompany, selectedRows, setSelectedRows } = useCompaniesStore();
+
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateCompany(rowId, { [columnId]: value });
   };
 
-  const handleRowSelectionChange = (selectedRows: Company[]) => {
-    setSelectedRows(selectedRows.map((row) => row.id));
-    onSelectedRowsChange?.(selectedRows);
-  };
-
-  const rowSelection = selectedRows.reduce(
-    (acc, id) => {
-      acc[id] = true;
-      return acc;
+  const handleRowSelectionChange = useCallback(
+    (selectedRows: Company[]) => {
+      const selectedIds = selectedRows.map((row) => row.id!);
+      if (JSON.stringify(selectedIds) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(selectedIds);
+      }
     },
-    {} as Record<string, boolean>,
+    [selectedRows, setSelectedRows],
+  );
+
+  const handleRowSelectionUpdater = useCallback(
+    (
+      updater:
+        | ((old: Record<string, boolean>) => Record<string, boolean>)
+        | Record<string, boolean>,
+    ) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
+    [data, rowSelection, handleRowSelectionChange],
   );
 
   const columns: ExtendedColumnDef<Company>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <input
-          type="checkbox"
-          checked={table.getIsAllRowsSelected()}
-          onChange={table.getToggleAllRowsSelectedHandler()}
-          className="h-4 w-4 rounded border-gray-300"
-        />
-      ),
-      cell: ({ row }) => (
-        <input
-          type="checkbox"
-          checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
-          className="h-4 w-4 rounded border-gray-300"
-        />
-      ),
-    },
     { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
     { accessorKey: "industry", header: t("form.industry.label"), validationSchema: industrySchema },
     { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
@@ -99,25 +91,25 @@ const CompaniesTable = ({ data, isLoading, error, onSelectedRowsChange }: Compan
     return <ErrorComponent errorMessage={error.message} />;
   }
 
+  const companyTableOptions = {
+    state: {
+      rowSelection,
+    },
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
+    getRowId: (row: Company) => row.id!,
+    onRowSelectionChange: handleRowSelectionUpdater,
+  };
+
   return (
     <SheetTable
       columns={columns}
       data={data}
       onEdit={handleEdit}
       showHeader={true}
-      tableOptions={{
-        state: {
-          rowSelection,
-        },
-        enableRowSelection: true,
-        enableMultiRowSelection: true,
-        getRowId: (row) => row.id,
-        onRowSelectionChange: (updater) => {
-          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-          const selectedRows = data.filter((row) => newSelection[row.id]);
-          handleRowSelectionChange(selectedRows);
-        },
-      }}
+      enableRowSelection={true}
+      onRowSelectionChange={handleRowSelectionChange}
+      tableOptions={companyTableOptions}
     />
   );
 };

@@ -3,42 +3,89 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { WarehouseForm } from "@/components/app/warehouse/warehouse.form";
+import { WarehouseForm, type WarehouseFormValues } from "@/components/app/warehouse/warehouse.form";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import useUserStore from "@/stores/use-user-store";
+import { createWarehouse } from "@/services/warehouseService";
+
+import type { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
+
 import { warehouseKeys } from "@/hooks/useWarehouses";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddWarehousePage() {
-  const router = useRouter();
   const t = useTranslations();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-
   const { user } = useUserStore();
 
-  const handleSuccess = (warehouse: any) => {
-    setLoading(false);
-    // Update the warehouses cache to include the new warehouse
-    const previousWarehouses = queryClient.getQueryData(warehouseKeys.lists()) || [];
-    queryClient.setQueryData(warehouseKeys.lists(), [
-      ...(Array.isArray(previousWarehouses) ? previousWarehouses : []),
-      warehouse,
-    ]);
+  const handleSubmit = async (data: WarehouseFormValues) => {
+    setLoading(true);
+    try {
+      const warehouseData = {
+        name: data.name.trim(),
+        code: data.code.trim(),
+        address: data.address.trim(),
+        city: data.city.trim(),
+        state: data.state.trim(),
+        zip_code: data.zip_code.trim(),
+        capacity: data.capacity ? parseFloat(data.capacity) : null,
+        is_active: data.is_active,
+        notes: data.notes?.trim() || null,
+      };
 
-    // Navigate to warehouses list
-    router.push("/warehouses");
+      let result: Warehouse;
+
+      const warehouseCreateData = {
+        ...warehouseData,
+        user_id: user?.id,
+      };
+      result = await createWarehouse(warehouseCreateData as WarehouseCreateData);
+      toast.success(t("General.successful_operation"), {
+        description: t("Warehouses.messages.success_created"),
+      });
+
+      const previousWarehouses = queryClient.getQueryData(warehouseKeys.lists()) || [];
+      queryClient.setQueryData(warehouseKeys.lists(), [
+        ...(Array.isArray(previousWarehouses) ? previousWarehouses : []),
+        result,
+      ]);
+
+      router.push("/warehouses");
+    } catch (error) {
+      console.error("Failed to save warehouse:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Warehouses.messages.error_save"),
+      });
+      setLoading(false);
+    }
   };
 
-  if (!user) {
-    router.push("/auth");
-  }
+  const handleDummyData = () => {
+    const form = (window as any).warehouseForm;
+    if (form) {
+      // code randomly
+      form.setValue("code", "WR-" + Math.random().toString(36).substring(2, 5).toUpperCase());
+      form.setValue("name", "Warehouse 1");
+      form.setValue("address", "123 Main St");
+      form.setValue("city", "Anytown");
+      form.setValue("state", "CA");
+      form.setValue("zip_code", "12345");
+      form.setValue("phone", "123-456-7890");
+      form.setValue("email", "warehouse@example.com");
+      form.setValue("notes", "This is a dummy warehouse");
+    }
+  };
 
   return (
     <div>
+      <CustomPageMeta title={t("Warehouses.add_new")} />
       <PageTitle
         title={t("Warehouses.add_new")}
         formButtons
@@ -49,23 +96,17 @@ export default function AddWarehousePage() {
           submit_form: t("Warehouses.add_new"),
           cancel: t("General.cancel"),
         }}
+        customButton={
+          process.env.NODE_ENV === "development" && (
+            <Button variant="outline" size="sm" onClick={handleDummyData}>
+              Dummy Data
+            </Button>
+          )
+        }
       />
 
-      <div className="p-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("Warehouses.warehouse_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <WarehouseForm
-              id="warehouse-form"
-              user_id={user?.id}
-              onSuccess={handleSuccess}
-              loading={loading}
-              setLoading={setLoading}
-            />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <WarehouseForm id="warehouse-form" onSubmit={handleSubmit} />
       </div>
     </div>
   );

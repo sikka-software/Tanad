@@ -8,15 +8,18 @@ interface ClientsState {
   clients: Client[];
   isLoading: boolean;
   error: string | null;
+  selectedRows: string[];
   fetchClients: () => Promise<void>;
   updateClient: (id: string, updates: Partial<Client>) => Promise<void>;
+  setSelectedRows: (ids: string[]) => void;
+  clearSelection: () => void;
 }
 
 export const useClientsStore = create<ClientsState>((set) => ({
   clients: [],
   isLoading: false,
   error: null,
-
+  selectedRows: [],
   fetchClients: async () => {
     const supabase = createClient();
     set({ isLoading: true, error: null });
@@ -45,4 +48,10 @@ export const useClientsStore = create<ClientsState>((set) => ({
       set({ error: (error as Error).message });
     }
   },
+
+  setSelectedRows: (ids: string[]) => {
+    set({ selectedRows: ids });
+  },
+
+  clearSelection: () => set({ selectedRows: [] }),
 }));

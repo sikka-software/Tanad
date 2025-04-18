@@ -12,20 +12,17 @@ import WarehouseTable from "@/components/app/warehouse/warehouse.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Warehouse } from "@/types/warehouse.type";
-
 import { useBulkDeleteWarehouses, useWarehouses } from "@/hooks/useWarehouses";
 import useWarehousesStore from "@/stores/warehouses.store";
 
 export default function WarehousesPage() {
   const t = useTranslations();
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: warehouses, isLoading, error } = useWarehouses();
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { data: warehouses, isLoading, error } = useWarehouses();
 
-  const { selectedRows, setSelectedRows, clearSelection, bulkDeleteWarehouses } =
-    useWarehousesStore();
+  const { selectedRows, clearSelection } = useWarehousesStore();
   const { mutate: deleteItems, isPending: isDeleting } = useBulkDeleteWarehouses();
 
   const filteredWarehouses = warehouses?.filter(
@@ -34,14 +31,6 @@ export default function WarehousesPage() {
       warehouse.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       warehouse.address.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-
-  const handleRowSelectionChange = (rows: Warehouse[]) => {
-    setSelectedRows(rows.map((row) => row.id));
-  };
-
-  const handleDeleteSelected = () => {
-    setIsDeleteDialogOpen(true);
-  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -83,7 +72,6 @@ export default function WarehousesPage() {
               data={filteredWarehouses || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              onSelectedRowsChange={handleRowSelectionChange}
             />
           ) : (
             <div className="p-4">
@@ -112,7 +100,6 @@ export default function WarehousesPage() {
   );
 }
 
-// Add getStaticProps for translations
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {

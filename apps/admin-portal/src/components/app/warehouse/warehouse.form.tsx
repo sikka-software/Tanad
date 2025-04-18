@@ -1,12 +1,6 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
-
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
@@ -14,79 +8,31 @@ import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
-import { createWarehouse, fetchWarehouseById, updateWarehouse } from "@/services/warehouseService";
+const createWarehouseFormSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("Warehouses.form.name.required")),
+    code: z.string().min(1, t("Warehouses.form.code.required")),
+    address: z.string().min(1, t("Warehouses.form.address.required")),
+    city: z.string().min(1, t("Warehouses.form.city.required")),
+    state: z.string().min(1, t("Warehouses.form.state.required")),
+    zip_code: z.string().min(1, t("Warehouses.form.zip_code.required")),
+    capacity: z.string().optional(),
+    is_active: z.boolean().default(true),
+    notes: z.string().optional(),
+  });
 
-import type { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
-
-// Define the schema
-const warehouseFormSchema = z.object({
-  name: z.string().min(1),
-  code: z.string().min(1),
-  address: z.string().min(1),
-  city: z.string().min(1),
-  state: z.string().min(1),
-  zip_code: z.string().min(1),
-  capacity: z.string().optional(),
-  is_active: z.boolean().default(true),
-  notes: z.string().optional(),
-});
-
-// Define the form values type
-type WarehouseFormValues = z.input<typeof warehouseFormSchema>;
+export type WarehouseFormValues = z.input<ReturnType<typeof createWarehouseFormSchema>>;
 
 interface WarehouseFormProps {
   id?: string;
-  warehouse_id?: string;
-  onSuccess?: (warehouse: Warehouse) => void;
   loading?: boolean;
-  user_id: string | undefined;
-  setLoading?: (loading: boolean) => void;
+  onSubmit: (data: WarehouseFormValues) => void;
 }
 
-export function WarehouseForm({
-  id = "warehouse-form",
-  warehouse_id,
-  onSuccess,
-  loading: externalLoading = false,
-  user_id,
-  setLoading,
-}: WarehouseFormProps) {
-  const router = useRouter();
+export function WarehouseForm({ id, onSubmit, loading }: WarehouseFormProps) {
   const t = useTranslations();
-  const [internalLoading, setInternalLoading] = useState(false);
-  const loading = externalLoading || internalLoading;
-
-  // Create schema with translations
-  const getWarehouseSchema = () => {
-    return warehouseFormSchema
-      .refine(() => true, {
-        message: t("Warehouses.form.name.required"),
-        path: ["name"],
-      })
-      .refine(() => true, {
-        message: t("Warehouses.form.code.required"),
-        path: ["code"],
-      })
-      .refine(() => true, {
-        message: t("Warehouses.form.address.required"),
-        path: ["address"],
-      })
-      .refine(() => true, {
-        message: t("Warehouses.form.city.required"),
-        path: ["city"],
-      })
-      .refine(() => true, {
-        message: t("Warehouses.form.state.required"),
-        path: ["state"],
-      })
-      .refine(() => true, {
-        message: t("Warehouses.form.zip_code.required"),
-        path: ["zip_code"],
-      });
-  };
-
   const form = useForm<WarehouseFormValues>({
-    resolver: zodResolver(getWarehouseSchema()),
+    resolver: zodResolver(createWarehouseFormSchema(t)),
     defaultValues: {
       name: "",
       code: "",
@@ -100,90 +46,9 @@ export function WarehouseForm({
     },
   });
 
-  // Fetch warehouse data if warehouse_id is provided (edit mode)
-  useEffect(() => {
-    if (warehouse_id) {
-      setInternalLoading(true);
-      fetchWarehouseById(warehouse_id)
-        .then((warehouse) => {
-          form.reset({
-            name: warehouse.name,
-            code: warehouse.code,
-            address: warehouse.address,
-            city: warehouse.city,
-            state: warehouse.state,
-            zip_code: warehouse.zip_code,
-            capacity: warehouse.capacity ? warehouse.capacity.toString() : "",
-            is_active: warehouse.is_active,
-            notes: warehouse.notes || "",
-          });
-        })
-        .catch((error) => {
-          console.error("Failed to fetch warehouse:", error);
-          toast.error(t("General.error_operation"), {
-            description: t("Warehouses.messages.error_fetch"),
-          });
-        })
-        .finally(() => {
-          setInternalLoading(false);
-        });
-    }
-  }, [warehouse_id, form, t]);
-
-  const onSubmit: SubmitHandler<WarehouseFormValues> = async (data) => {
-    setInternalLoading(true);
-    if (!user_id) {
-      toast.error(t("General.error_operation"), {
-        description: t("General.not_authenticated"),
-      });
-      setInternalLoading(false);
-      return;
-    }
-
-    try {
-      const warehouseData = {
-        name: data.name.trim(),
-        code: data.code.trim(),
-        address: data.address.trim(),
-        city: data.city.trim(),
-        state: data.state.trim(),
-        zip_code: data.zip_code.trim(),
-        capacity: data.capacity ? parseFloat(data.capacity) : null,
-        is_active: data.is_active,
-        notes: data.notes?.trim() || null,
-      };
-
-      let result: Warehouse;
-      if (warehouse_id) {
-        result = await updateWarehouse(warehouse_id, warehouseData);
-        toast.success(t("General.successful_operation"), {
-          description: t("Warehouses.messages.success_updated"),
-        });
-      } else {
-        const warehouseCreateData = {
-          ...warehouseData,
-          user_id: user_id,
-        };
-        result = await createWarehouse(warehouseCreateData as unknown as WarehouseCreateData);
-        toast.success(t("General.successful_operation"), {
-          description: t("Warehouses.messages.success_created"),
-        });
-      }
-
-      if (onSuccess) {
-        onSuccess(result);
-      } else {
-        router.push("/warehouses");
-      }
-    } catch (error) {
-      console.error("Failed to save warehouse:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Warehouses.messages.error_save"),
-      });
-    } finally {
-      setInternalLoading(false);
-    }
-  };
+  if (typeof window !== "undefined") {
+    (window as any).warehouseForm = form;
+  }
 
   return (
     <Form {...form}>

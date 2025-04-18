@@ -1,7 +1,5 @@
-import React from "react";
-
 import { useTranslations } from "next-intl";
-
+import React, { useCallback } from "react";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -27,15 +25,32 @@ interface VendorsTableProps {
   data: Vendor[];
   isLoading?: boolean;
   error?: Error | null;
+  onSelectedRowsChange?: (rows: Vendor[]) => void;
 }
 
-const VendorsTable = ({ data, isLoading, error }: VendorsTableProps) => {
+const VendorsTable = ({ data, isLoading, error, onSelectedRowsChange }: VendorsTableProps) => {
   const t = useTranslations("Vendors");
-  const { updateVendor } = useVendorsStore();
+  const { updateVendor, selectedRows, setSelectedRows } = useVendorsStore();
+
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateVendor(rowId, { [columnId]: value });
   };
+
+  const handleRowSelectionChange = useCallback(
+    (rows: Vendor[]) => {
+      const newSelectedIds = rows.map((row) => row.id!);
+      // Only update if the selection has actually changed
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(newSelectedIds);
+        if (onSelectedRowsChange) {
+          onSelectedRowsChange(rows);
+        }
+      }
+    },
+    [selectedRows, setSelectedRows, onSelectedRowsChange],
+  );
 
   const columns: ExtendedColumnDef<Vendor>[] = [
     { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
@@ -59,7 +74,31 @@ const VendorsTable = ({ data, isLoading, error }: VendorsTableProps) => {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+  const vendorTableOptions = {
+    state: {
+      rowSelection,
+    },
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
+    getRowId: (row: Vendor) => row.id!,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
+  };
+
+  return (
+    <SheetTable
+      columns={columns}
+      data={data}
+      onEdit={handleEdit}
+      showHeader={true}
+      enableRowSelection={true}
+      onRowSelectionChange={handleRowSelectionChange}
+      tableOptions={vendorTableOptions}
+    />
+  );
 };
 
 export default VendorsTable;

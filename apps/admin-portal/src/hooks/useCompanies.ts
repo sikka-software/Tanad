@@ -9,7 +9,7 @@ import {
   updateCompany,
 } from "@/services/companyService";
 
-import type { Company } from "@/types/company.type";
+import type { Company, CompanyCreateData } from "@/types/company.type";
 
 // Query keys for companies
 export const companyKeys = {
@@ -23,7 +23,7 @@ export const companyKeys = {
 // Hook to fetch all companies
 export function useCompanies() {
   return useQuery({
-    queryKey: ["companies"],
+    queryKey: companyKeys.lists(),
     queryFn: fetchCompanies,
   });
 }
@@ -31,7 +31,7 @@ export function useCompanies() {
 // Hook to fetch a single company
 export function useCompany(id: string) {
   return useQuery({
-    queryKey: ["companies", id],
+    queryKey: companyKeys.detail(id),
     queryFn: () => fetchCompanyById(id),
     enabled: !!id,
   });
@@ -41,9 +41,16 @@ export function useCompany(id: string) {
 export function useCreateCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: createCompany,
+    mutationFn: (newCompany: Omit<Company, "id" | "created_at"> & { user_id: string }) => {
+      const { user_id, ...rest } = newCompany;
+      const companyData: CompanyCreateData = {
+        ...rest,
+        user_id: user_id,
+      };
+      return createCompany(companyData);
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
     },
   });
 }

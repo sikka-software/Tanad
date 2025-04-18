@@ -12,10 +12,8 @@ import CompaniesTable from "@/components/app/company/company.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Company } from "@/types/company.type";
-
 import { useCompanies, useBulkDeleteCompanies } from "@/hooks/useCompanies";
-import { useCompaniesStore } from "@/stores/companies.store";
+import useCompaniesStore from "@/stores/companies.store";
 
 export default function CompaniesPage() {
   const t = useTranslations();
@@ -23,12 +21,13 @@ export default function CompaniesPage() {
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { data: companies, isLoading, error } = useCompanies();
+
   const { selectedRows, clearSelection } = useCompaniesStore();
   const { mutate: deleteCompanies, isPending: isDeleting } = useBulkDeleteCompanies();
 
   const filteredCompanies = Array.isArray(companies)
     ? companies.filter(
-        (company: Company) =>
+        (company) =>
           company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           company.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
           company.industry?.toLowerCase()?.includes(searchQuery.toLowerCase()),
@@ -36,10 +35,14 @@ export default function CompaniesPage() {
     : [];
 
   const handleConfirmDelete = async () => {
-    if (selectedRows.length === 0) return;
-    await deleteCompanies(selectedRows);
-    clearSelection();
-    setIsDeleteDialogOpen(false);
+    try {
+      await deleteCompanies(selectedRows);
+      clearSelection();
+    } catch (error) {
+      console.error("Error deleting companies:", error);
+    } finally {
+      setIsDeleteDialogOpen(false);
+    }
   };
 
   return (

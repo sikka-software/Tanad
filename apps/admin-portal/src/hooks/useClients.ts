@@ -7,6 +7,7 @@ import {
   fetchClients,
   updateClient,
 } from "@/services/clientService";
+
 import { Client, ClientCreateData } from "@/types/client.type";
 
 // Hooks
@@ -63,6 +64,30 @@ export function useDeleteClient() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       queryClient.removeQueries({ queryKey: ["clients", variables] });
+    },
+  });
+}
+
+export function useBulkDeleteClients() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      const response = await fetch("/api/clients/bulk-delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete clients");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
     },
   });
 }

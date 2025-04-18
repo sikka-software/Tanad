@@ -258,7 +258,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             </FormItem>
           )}
         />
-        <FormField
+        {/* <FormField
           control={form.control}
           name="is_active"
           render={({ field }) => (
@@ -271,7 +271,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               </FormControl>
             </FormItem>
           )}
-        />
+        /> */}
       </form>
     </Form>
   );

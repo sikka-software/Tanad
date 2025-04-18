@@ -68,3 +68,5 @@ export interface Company {
   is_active: boolean;
   user_id: string;
 }
+
+export type CompanyCreateData = Omit<Company, "id" | "created_at"> & { user_id: string };

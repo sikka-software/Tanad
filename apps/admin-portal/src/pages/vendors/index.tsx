@@ -1,22 +1,32 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import VendorCard from "@/components/app/vendor/vendor.card";
 import VendorsTable from "@/components/app/vendor/vendor.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import ConfirmDelete from "@/components/ui/confirm-delete";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
+import SelectionMode from "@/components/ui/selection-mode";
 
-import { useVendors } from "@/hooks/useVendors";
+import { Vendor } from "@/types/vendor.type";
+
+import { useVendors, useBulkDeleteVendors } from "@/hooks/useVendors";
+import { useVendorsStore } from "@/stores/vendors.store";
 
 // Assuming a useVendors hook exists or will be created
 export default function VendorsPage() {
   const t = useTranslations();
-  const { data: vendors, isLoading, error } = useVendors();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { data: vendors, isLoading, error } = useVendors();
+
+  const { selectedRows, setSelectedRows, clearSelection } = useVendorsStore();
+  const { mutate: deleteVendors, isPending: isDeleting } = useBulkDeleteVendors();
 
   const filteredVendors = vendors?.filter(
     (vendor) =>
@@ -25,40 +35,83 @@ export default function VendorsPage() {
       vendor.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
+  const handleRowSelectionChange = (rows: Vendor[]) => {
+    const newSelectedIds = rows.map((row) => row.id!);
+    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+      setSelectedRows(newSelectedIds);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteVendors(selectedRows, {
+        onSuccess: () => {
+          clearSelection();
+          setIsDeleteDialogOpen(false);
+        },
+        onError: (error: any) => {
+          console.error("Failed to delete vendors:", error);
+          toast.error(t("Vendors.error.bulk_delete"));
+          setIsDeleteDialogOpen(false);
+        },
+      });
+    } catch (error) {
+      console.error("Failed to delete vendors:", error);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
   return (
     <div>
       <CustomPageMeta title={t("Vendors.title")} description={t("Vendors.description")} />
 
       <DataPageLayout>
-        <PageSearchAndFilter
-          title={t("Vendors.title")}
-          createHref="/vendors/add"
-          createLabel={t("Vendors.add_new")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Vendors.search_vendors")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-        <div>
-          {viewMode === "table" ? (
-            <VendorsTable
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          />
+        ) : (
+          <PageSearchAndFilter
+            title={t("Vendors.title")}
+            createHref="/vendors/add"
+            createLabel={t("Vendors.add_new")}
+            onSearch={setSearchQuery}
+            searchPlaceholder={t("Vendors.search_vendors")}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+        )}
+
+        {viewMode === "table" ? (
+          <VendorsTable
+            data={filteredVendors || []}
+            isLoading={isLoading}
+            error={error instanceof Error ? error : null}
+          />
+        ) : (
+          <div className="p-4">
+            <DataModelList
               data={filteredVendors || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
+              emptyMessage={t("Vendors.no_vendors")}
+              renderItem={(vendor) => <VendorCard key={vendor.id} vendor={vendor} />}
+              gridCols="3"
             />
-          ) : (
-            <div className="p-4">
-              <DataModelList
-                data={filteredVendors || []}
-                isLoading={isLoading}
-                error={error instanceof Error ? error : null}
-                emptyMessage={t("Vendors.no_vendors")}
-                renderItem={(vendor) => <VendorCard key={vendor.id} vendor={vendor} />}
-                gridCols="3"
-              />
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Vendors.confirm_delete_title")}
+          description={t("Vendors.confirm_delete", { count: selectedRows.length })}
+        />
       </DataPageLayout>
     </div>
   );

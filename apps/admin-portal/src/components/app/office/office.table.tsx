@@ -33,25 +33,6 @@ const OfficesTable = ({ data, isLoading, error, onSelectedRowsChange }: OfficesT
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
-  const columns: ExtendedColumnDef<Office>[] = [
-    { accessorKey: "name", header: t("Offices.form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "email", header: t("Offices.form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "phone", header: t("Offices.form.phone.label"), validationSchema: phoneSchema },
-    {
-      accessorKey: "address",
-      header: t("Offices.form.address.label"),
-      validationSchema: addressSchema,
-    },
-    { accessorKey: "city", header: t("Offices.form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("Offices.form.state.label"), validationSchema: stateSchema },
-    {
-      accessorKey: "zip_code",
-      header: t("Offices.form.zip_code.label"),
-      validationSchema: zipCodeSchema,
-    },
-    { accessorKey: "notes", header: t("Offices.form.notes.label"), validationSchema: notesSchema },
-  ];
-
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "office_id") return;
     await updateOffice(rowId, { [columnId]: value });
@@ -70,6 +51,25 @@ const OfficesTable = ({ data, isLoading, error, onSelectedRowsChange }: OfficesT
     },
     [selectedRows, setSelectedRows, onSelectedRowsChange],
   );
+
+  const columns: ExtendedColumnDef<Office>[] = [
+    { accessorKey: "name", header: t("Offices.form.name.label"), validationSchema: nameSchema },
+    { accessorKey: "email", header: t("Offices.form.email.label"), validationSchema: emailSchema },
+    { accessorKey: "phone", header: t("Offices.form.phone.label"), validationSchema: phoneSchema },
+    {
+      accessorKey: "address",
+      header: t("Offices.form.address.label"),
+      validationSchema: addressSchema,
+    },
+    { accessorKey: "city", header: t("Offices.form.city.label"), validationSchema: citySchema },
+    { accessorKey: "state", header: t("Offices.form.state.label"), validationSchema: stateSchema },
+    {
+      accessorKey: "zip_code",
+      header: t("Offices.form.zip_code.label"),
+      validationSchema: zipCodeSchema,
+    },
+    { accessorKey: "notes", header: t("Offices.form.notes.label"), validationSchema: notesSchema },
+  ];
 
   if (isLoading) {
     return (

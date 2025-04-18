@@ -1,19 +1,21 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Vendor, VendorCreateData } from '@/types/vendor.type';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import {
   createVendor,
   deleteVendor,
   fetchVendorById,
   fetchVendors,
   updateVendor,
-} from '@/services/vendorService';
+} from "@/services/vendorService";
+
+import type { Vendor, VendorCreateData } from "@/types/vendor.type";
 
 // Query keys for vendors
 export const vendorKeys = {
-  all: ['vendors'] as const,
-  lists: () => [...vendorKeys.all, 'list'] as const,
+  all: ["vendors"] as const,
+  lists: () => [...vendorKeys.all, "list"] as const,
   list: (filters: any) => [...vendorKeys.lists(), { filters }] as const, // Keep filter structure if needed
-  details: () => [...vendorKeys.all, 'detail'] as const,
+  details: () => [...vendorKeys.all, "detail"] as const,
   detail: (id: string) => [...vendorKeys.details(), id] as const,
 };
 
@@ -53,8 +55,13 @@ export function useUpdateVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, vendor }: { id: string; vendor: Partial<Omit<Vendor, 'id' | 'created_at'>> }) =>
-      updateVendor(id, vendor),
+    mutationFn: ({
+      id,
+      vendor,
+    }: {
+      id: string;
+      vendor: Partial<Omit<Vendor, "id" | "created_at">>;
+    }) => updateVendor(id, vendor),
     onSuccess: (data) => {
       // Invalidate both the specific detail and the list queries
       queryClient.invalidateQueries({ queryKey: vendorKeys.detail(data.id) });
@@ -75,4 +82,28 @@ export function useDeleteVendor() {
       queryClient.removeQueries({ queryKey: vendorKeys.detail(variables) });
     },
   });
-} 
+}
+
+export function useBulkDeleteVendors() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      const response = await fetch("/api/vendors/bulk-delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete vendors");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vendors"] });
+    },
+  });
+}
