@@ -1,18 +1,18 @@
-import { useState } from "react";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { useQueryClient } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 import { CompanyForm, type CompanyFormValues } from "@/components/app/company/company.form";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
-import useUserStore from "@/stores/use-user-store";
+
 import { generateDummyData } from "@/lib/dummy-generator";
+
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddCompanyPage() {
   const t = useTranslations();
@@ -89,6 +89,7 @@ export default function AddCompanyPage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Companies.add_new")} />
       <PageTitle
         title={t("Companies.add_new")}
         formButtons

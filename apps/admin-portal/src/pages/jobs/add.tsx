@@ -5,9 +5,11 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import PageTitle from "@/ui/page-title";
+
 import { JobForm, type JobFormValues } from "@/components/app/job/job.form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { createJob } from "@/services/jobService";
 
@@ -58,6 +60,7 @@ export default function AddJobPage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Jobs.add_new")} />
       <PageTitle
         title={t("Jobs.add_new")}
         formButtons

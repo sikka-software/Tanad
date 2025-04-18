@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { toast } from "sonner";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
@@ -59,6 +60,7 @@ export default function AddEmployeePage() {
       toast.success(t("General.successful_operation"), {
         description: t("Employees.success.created"),
       });
+      setLoadingSave(false);
       router.push("/employees");
     } catch (error) {
       console.error(error);
@@ -72,6 +74,7 @@ export default function AddEmployeePage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Employees.add_new")} />
       <PageTitle
         title={t("Employees.add_new")}
         formButtons

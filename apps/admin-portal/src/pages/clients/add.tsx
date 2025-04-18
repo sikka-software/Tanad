@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import PageTitle from "@/ui/page-title";
+
 import { ClientForm, type ClientFormValues } from "@/components/app/client/client.form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
@@ -90,6 +90,7 @@ export default function AddClientPage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Clients.add_new")} />
       <PageTitle
         title={t("Clients.add_new")}
         formButtons

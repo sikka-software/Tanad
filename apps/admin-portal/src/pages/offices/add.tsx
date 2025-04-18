@@ -6,6 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { OfficeForm, type OfficeFormValues } from "@/components/app/office/office.form";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
@@ -86,6 +87,7 @@ export default function AddOfficePage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Offices.add_new")} />
       <PageTitle
         title={t("Offices.add_new")}
         formButtons

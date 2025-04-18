@@ -1,13 +1,12 @@
-import { useState } from "react";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { BranchForm, type BranchFormValues } from "@/components/app/branch/branch.form";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
@@ -15,8 +14,8 @@ import PageTitle from "@/components/ui/page-title";
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
 
-import useUserStore from "@/stores/use-user-store";
 import { branchKeys } from "@/hooks/useBranches";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddBranchPage() {
   const router = useRouter();
@@ -58,10 +57,10 @@ export default function AddBranchPage() {
 
       // Update the branches cache to include the new branch
       const previousBranches = queryClient.getQueryData(branchKeys.lists()) || [];
-      queryClient.setQueryData(
-        branchKeys.lists(),
-        [...(Array.isArray(previousBranches) ? previousBranches : []), newBranch],
-      );
+      queryClient.setQueryData(branchKeys.lists(), [
+        ...(Array.isArray(previousBranches) ? previousBranches : []),
+        newBranch,
+      ]);
 
       toast.success(t("General.successful_operation"), {
         description: t("Branches.messages.success_created"),
@@ -97,6 +96,7 @@ export default function AddBranchPage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Branches.add_new")} />
       <PageTitle
         title={t("Branches.add_new")}
         formButtons

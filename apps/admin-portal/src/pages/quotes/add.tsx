@@ -1,14 +1,14 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-
+import { useState } from "react";
 import { toast } from "sonner";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import PageTitle from "@/ui/page-title";
+
 import { QuoteForm, type QuoteFormValues } from "@/components/app/quote/quote.form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { supabase } from "@/lib/supabase";
 
@@ -83,6 +83,7 @@ export default function AddQuotePage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Quotes.add_new")} />
       <PageTitle
         title={t("Quotes.add_new")}
         formButtons

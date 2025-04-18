@@ -105,7 +105,10 @@ export const invoices = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    index("invoices_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
+    index("invoices_client_id_idx").using(
+      "btree",
+      table.client_id.asc().nullsLast().op("uuid_ops"),
+    ),
     index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     index("invoices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
@@ -281,7 +284,7 @@ export const employees = pgTable(
     id: uuid().primaryKey().defaultRandom(),
     first_name: varchar("first_name", { length: 255 }).notNull(),
     last_name: varchar("last_name", { length: 255 }).notNull(),
-    email: varchar("email", { length: 255 }).notNull().unique(),
+    email: varchar("email", { length: 255 }).notNull(),
     phone: varchar("phone", { length: 50 }),
     position: varchar("position", { length: 255 }).notNull(),
     department_id: uuid("department_id").references(() => departments.id),
@@ -295,6 +298,7 @@ export const employees = pgTable(
   },
   (table) => [
     index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    unique("employees_email_user_id_unique").on(table.email, table.user_id),
   ],
 ).enableRLS();
 
@@ -320,7 +324,10 @@ export const expenses = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    index("expenses_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
+    index("expenses_client_id_idx").using(
+      "btree",
+      table.client_id.asc().nullsLast().op("uuid_ops"),
+    ),
     index("expenses_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     index("expenses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
@@ -553,7 +560,10 @@ export const jobListings = pgTable(
   (table) => [
     index("job_listings_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
     index("job_listings_slug_idx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
-    index("job_listings_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("job_listings_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
   ],
 ).enableRLS();
 

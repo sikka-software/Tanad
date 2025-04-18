@@ -4,14 +4,15 @@ import { useRouter } from "next/router";
 import { toast } from "sonner";
 
 import { VendorForm, type VendorFormValues } from "@/components/app/vendor/vendor.form";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import useUserStore from "@/stores/use-user-store";
 import { useCreateVendor } from "@/hooks/useVendors";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddVendorPage() {
   const router = useRouter();
@@ -71,6 +72,7 @@ export default function AddVendorPage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Vendors.add_new")} />
       <PageTitle
         title={t("Vendors.add_new")}
         formButtons
