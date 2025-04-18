@@ -44,7 +44,7 @@ export default function EditSalaryPage() {
             <CardTitle>{t("Salaries.salary_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <SalaryForm salary_id={salary_id as string} onSuccess={handleSuccess} />
+            <SalaryForm id={salary_id as string} onSubmit={handleSuccess} />
           </CardContent>
         </Card>
       </div>
