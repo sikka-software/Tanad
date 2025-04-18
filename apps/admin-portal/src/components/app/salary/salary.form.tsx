@@ -1,12 +1,10 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { SubmitHandler } from "react-hook-form";
-
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -19,11 +17,12 @@ import { Textarea } from "@/ui/textarea";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
 
+import { supabase } from "@/lib/supabase";
+
 import type { Salary } from "@/types/salary.type";
 
-import useUserStore from "@/stores/use-user-store";
 import { useEmployees } from "@/hooks/useEmployees";
-import { supabase } from "@/lib/supabase";
+import useUserStore from "@/stores/use-user-store";
 
 const createSalarySchema = (t: (key: string) => string) =>
   z.object({
@@ -290,7 +289,7 @@ export function SalaryForm({
                     data={employeeOptions}
                     isLoading={employeesLoading}
                     defaultValue={field.value}
-                    onChange={field.onChange}
+                    onChange={(value) => field.onChange(value || null)}
                     texts={{
                       placeholder: t("Salaries.form.employee_name.placeholder"),
                       searchPlaceholder: t("Employees.search_employees"),
@@ -376,7 +375,9 @@ export function SalaryForm({
                     onSelect={(date) => {
                       if (date) {
                         // Ensure we're working with the local date
-                        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                        const localDate = new Date(
+                          date.getTime() - date.getTimezoneOffset() * 60000,
+                        );
                         field.onChange(localDate.toISOString().split("T")[0]);
                       } else {
                         field.onChange("");
@@ -486,7 +487,7 @@ export function SalaryForm({
         formId="employee-form"
         loadingSave={isEmployeeSaving}
       >
-        <EmployeeForm id="employee-form" onSubmit={handleEmployeeSubmit} loading={isEmployeeSaving} />
+        <EmployeeForm id="employee-form" onSubmit={handleEmployeeSubmit} />
       </FormDialog>
     </>
   );

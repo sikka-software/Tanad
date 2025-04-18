@@ -463,9 +463,8 @@ export function QuoteForm({
                       data={clientOptions}
                       isLoading={clientsLoading}
                       defaultValue={field.value}
-                      onChange={field.onChange}
+                      onChange={(value) => field.onChange(value || null)}
                       renderOption={(option) => {
-                        console.log(option);
                         return (
                           <div className="flex items-center gap-2">
                             <span>{option.label}</span>

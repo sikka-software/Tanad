@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -206,7 +204,7 @@ export function VendorForm({
                       data={companyOptions.map((opt) => ({ ...opt, value: opt.label }))}
                       isLoading={companiesLoading}
                       defaultValue={field.value}
-                      onChange={field.onChange}
+                      onChange={(value) => field.onChange(value || null)}
                       texts={{
                         placeholder: t("Vendors.form.company.placeholder"),
                         searchPlaceholder: t("Vendors.form.company.search_placeholder"),

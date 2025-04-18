@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import { supabase } from "@/lib/supabase";
+
 import { EmployeeRequest } from "@/types/employee-request.type";
 
 interface EmployeeRequestsStore {
@@ -11,6 +12,8 @@ interface EmployeeRequestsStore {
   updateRequest: (id: string, updates: Partial<EmployeeRequest>) => Promise<void>;
   addRequest: (request: Omit<EmployeeRequest, "id" | "created_at" | "updated_at">) => Promise<void>;
   deleteRequest: (id: string) => Promise<void>;
+  setLoadingSave: (loading: boolean) => void;
+  loadingSave: boolean;
 }
 
 export const useEmployeeRequestsStore = create<EmployeeRequestsStore>((set, get) => ({
@@ -31,10 +34,7 @@ export const useEmployeeRequestsStore = create<EmployeeRequestsStore>((set, get)
 
   updateRequest: async (id: string, updates: Partial<EmployeeRequest>) => {
     try {
-      const { error } = await supabase
-        .from("employee_requests")
-        .update(updates)
-        .eq("id", id);
+      const { error } = await supabase.from("employee_requests").update(updates).eq("id", id);
       if (error) throw error;
       await get().fetchRequests();
     } catch (error) {
@@ -61,4 +61,6 @@ export const useEmployeeRequestsStore = create<EmployeeRequestsStore>((set, get)
       set({ error: error as Error });
     }
   },
-})); 
+  setLoadingSave: (loading: boolean) => set({ loadingSave: loading }),
+  loadingSave: false,
+}));

@@ -1,12 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-
-import { useTranslations, useLocale } from "next-intl";
-import { useRouter } from "next/router";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { PlusCircle, Trash2 } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "next/router";
+import { useState, useEffect, useMemo } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -406,7 +404,7 @@ export function InvoiceForm({
                       data={clientOptions}
                       isLoading={clientsLoading}
                       defaultValue={field.value}
-                      onChange={field.onChange}
+                      onChange={(value) => field.onChange(value || null)}
                       texts={{
                         placeholder: t("select_client"),
                         searchPlaceholder: t("search_clients"),

@@ -2,49 +2,40 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { Button } from "@/ui/button";
+import { Calendar } from "@/ui/calendar";
 import { ComboboxAdd } from "@/ui/combobox-add";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormControl, FormItem, FormLabel, FormMessage, FormField } from "@/ui/form";
+import { Form } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
+import { Input } from "@/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Textarea } from "@/ui/textarea";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Form } from "@/components/ui/form";
-import { FormField } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
+import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployeeRequestsStore } from "@/stores/employee-requests.store";
 import { useEmployeesStore } from "@/stores/employees.store";
 import useUserStore from "@/stores/use-user-store";
 
 const createRequestSchema = (t: (key: string) => string) =>
   z.object({
-    employee_id: z
-      .string({ message: t("EmployeeRequests.form.employee.required") })
-      .nonempty({ message: t("EmployeeRequests.form.employee.required") })
-      .uuid({ message: t("EmployeeRequests.form.employee.required") }),
-    employeeName: z
-      .string({ message: t("EmployeeRequests.form.employee.required") })
-      .nonempty({ message: t("EmployeeRequests.form.employee.required") })
-      .min(1),
+    employee_id: z.string({ message: t("EmployeeRequests.form.employee.required") }),
+    // .nonempty({ message: t("EmployeeRequests.form.employee.required") }),
+    // .uuid({ message: t("EmployeeRequests.form.employee.required") }),
+
     type: z.enum(["leave", "expense", "document", "other"]),
     status: z.enum(["pending", "approved", "rejected"]).default("pending"),
     title: z.string({ message: t("EmployeeRequests.form.title.required") }).min(1),
@@ -52,7 +43,7 @@ const createRequestSchema = (t: (key: string) => string) =>
     startDate: z.date().optional(),
     endDate: z.date().optional(),
     amount: z.number().optional(),
-    attachments: z.array(z.any()).default([]),
+    // attachments: z.array(z.any()).default([]),
     notes: z.string().optional(),
   });
 
@@ -61,37 +52,37 @@ export type EmployeeRequestFormValues = z.input<ReturnType<typeof createRequestS
 interface EmployeeRequestFormProps {
   id?: string;
   employee_id?: string;
-  onSuccess?: () => void;
-  onSubmit: (data: EmployeeRequestFormValues) => Promise<void>;
+  onSubmit: (data: EmployeeRequestFormValues) => void;
   loading?: boolean;
 }
 
-const EmployeeRequestForm = ({
-  id,
-  employee_id,
-  onSuccess,
-  onSubmit,
-  loading = false,
-}: EmployeeRequestFormProps) => {
+const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormProps) => {
   const t = useTranslations();
-  const router = useRouter();
-  const { locale } = useRouter();
+  const locale = useLocale();
+
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const { setLoadingSave: setIsEmployeeSaving, loadingSave: isEmployeeSaving } =
     useEmployeesStore();
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useUserStore();
+  const { setLoadingSave, loadingSave } = useEmployeeRequestsStore();
+  const router = useRouter();
 
   const form = useForm<EmployeeRequestFormValues>({
     resolver: zodResolver(createRequestSchema(t)),
+    mode: "onChange",
     defaultValues: {
       employee_id: employee_id || "",
-      employeeName: "",
       type: "leave",
       status: "pending",
       title: "",
-      attachments: [],
+      description: "",
+      startDate: undefined,
+      endDate: undefined,
+      amount: undefined,
+      // attachments: [],
+      notes: "",
     },
   });
 
@@ -100,6 +91,7 @@ const EmployeeRequestForm = ({
     return {
       label: `${emp.first_name} ${emp.last_name}`,
       value: emp.email,
+      id: emp.id,
     };
   });
 
@@ -146,8 +138,7 @@ const EmployeeRequestForm = ({
       );
 
       // Set the new employee as the selected employee
-      const fullName = `${newEmployee.first_name} ${newEmployee.last_name}`;
-      form.setValue("employeeName", fullName);
+      form.setValue("employee_id", newEmployee.id);
 
       // Close the dialog
       setIsEmployeeDialogOpen(false);
@@ -164,6 +155,25 @@ const EmployeeRequestForm = ({
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // errors
+    console.log("errors are ", form.formState.errors);
+    console.log("form values are ", form.getValues("employee_id"));
+    try {
+      setLoadingSave(true);
+      const isValid = await form.trigger();
+      if (!isValid) {
+        setLoadingSave(false);
+        return;
+      }
+      await form.handleSubmit(onSubmit)();
+    } catch (error) {
+      setLoadingSave(false);
+      console.error("Error submitting form:", error);
+    }
+  };
+
   const requestTypes = [
     { label: t("EmployeeRequests.form.type.leave"), value: "leave" },
     { label: t("EmployeeRequests.form.type.expense"), value: "expense" },
@@ -171,12 +181,16 @@ const EmployeeRequestForm = ({
     { label: t("EmployeeRequests.form.type.other"), value: "other" },
   ] as const;
 
+  if (typeof window !== "undefined") {
+    (window as any).employeeRequestForm = form;
+  }
+
   return (
     <>
       <Form {...form}>
         <form
           id={id || "employee-request-form"}
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={handleSubmit}
           // Debugging
           // onSubmit={(e) => {
           //   e.preventDefault();
@@ -188,10 +202,10 @@ const EmployeeRequestForm = ({
           // }}
           className="space-y-4"
         >
-          <input type="hidden" {...form.register("employee_id")} />
+          {/* <input type="hidden" {...form.register("employee_id")} /> */}
           <FormField
             control={form.control}
-            name="employeeName"
+            name="employee_id"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("EmployeeRequests.form.employee.label")} *</FormLabel>
@@ -201,7 +215,11 @@ const EmployeeRequestForm = ({
                     data={employeeOptions}
                     isLoading={employeesLoading}
                     defaultValue={field.value}
-                    onChange={field.onChange}
+                    valueKey={"id"}
+                    onChange={(value) => {
+                      console.log(value);
+                      field.onChange(value || null);
+                    }}
                     renderOption={(item) => {
                       return (
                         <div className="flex flex-col">
@@ -259,7 +277,7 @@ const EmployeeRequestForm = ({
                   <Input
                     {...field}
                     placeholder={t("EmployeeRequests.form.title.placeholder")}
-                    disabled={loading}
+                    disabled={loadingSave}
                   />
                 </FormControl>
                 <FormMessage />
@@ -277,7 +295,7 @@ const EmployeeRequestForm = ({
                   <Textarea
                     {...field}
                     placeholder={t("EmployeeRequests.form.description.placeholder")}
-                    disabled={loading}
+                    disabled={loadingSave}
                   />
                 </FormControl>
                 <FormMessage />
@@ -301,7 +319,7 @@ const EmployeeRequestForm = ({
                             "w-full justify-start text-left font-normal",
                             !field.value && "text-muted-foreground",
                           )}
-                          disabled={loading}
+                          disabled={loadingSave}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {field.value ? format(field.value, "PPP") : t("General.pick_date")}
@@ -337,7 +355,7 @@ const EmployeeRequestForm = ({
                             "w-full justify-start text-left font-normal",
                             !field.value && "text-muted-foreground",
                           )}
-                          disabled={loading}
+                          disabled={loadingSave}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {field.value ? format(field.value, "PPP") : t("General.pick_date")}
@@ -372,7 +390,7 @@ const EmployeeRequestForm = ({
                     {...field}
                     onChange={(e) => field.onChange(e.target.valueAsNumber)}
                     placeholder={t("EmployeeRequests.form.amount.placeholder")}
-                    disabled={loading}
+                    disabled={loadingSave}
                   />
                 </FormControl>
                 <FormMessage />
@@ -390,7 +408,7 @@ const EmployeeRequestForm = ({
                   <Textarea
                     {...field}
                     placeholder={t("EmployeeRequests.form.notes.placeholder")}
-                    disabled={loading}
+                    disabled={loadingSave}
                   />
                 </FormControl>
                 <FormMessage />

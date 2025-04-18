@@ -6,7 +6,7 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
-export const createOfficeSchema = (t: (key: string) => string) =>
+const createOfficeSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Offices.form.name.required")),
     email: z.string().email().optional().or(z.literal("")),
@@ -19,7 +19,7 @@ export const createOfficeSchema = (t: (key: string) => string) =>
 
 export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
 
-export interface OfficeFormProps {
+interface OfficeFormProps {
   id?: string;
   onSubmit: (data: OfficeFormValues) => void;
   loading?: boolean;
