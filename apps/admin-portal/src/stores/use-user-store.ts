@@ -2,7 +2,7 @@ import type { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/component";
 
 // Define strong types for our user data
 export interface Profile {
@@ -82,7 +82,7 @@ const useUserStore = create<UserState>()(
 
       fetchUserAndProfile: async () => {
         const currentState = get();
-
+        const supabase = createClient();
         // If already initialized and we have both user and profile, return early
         if (currentState.initialized && currentState.user && currentState.profile) {
           // console.log(
@@ -153,6 +153,7 @@ const useUserStore = create<UserState>()(
       },
 
       refreshProfile: async () => {
+        const supabase = createClient();
         const user = get().user;
         if (!user) {
           console.log("[UserStore] Skipping profile refresh - no user");
@@ -179,6 +180,7 @@ const useUserStore = create<UserState>()(
 
       signOut: async () => {
         try {
+          const supabase = createClient();
           await supabase.auth.signOut();
           // console.log("[UserStore] Sign out successful");
           set({
@@ -221,6 +223,7 @@ const useUserStore = create<UserState>()(
   ),
 );
 
+const supabase = createClient();
 // Set up auth state change listener
 supabase.auth.onAuthStateChange(async (event, session) => {
   // console.log("[UserStore] Auth state changed:", { event, user_id: session?.user?.id });

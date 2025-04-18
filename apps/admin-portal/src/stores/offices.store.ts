@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-import { supabase } from "@/lib/supabase";
-
 import { Office } from "@/types/office.type";
+
+import { createClient } from "@/utils/supabase/component";
 
 interface OfficesStore {
   offices: Office[];
@@ -22,6 +22,7 @@ export const useOfficesStore = create<OfficesStore>((set) => ({
   selectedRows: [],
 
   fetchOffices: async () => {
+    const supabase = createClient();
     set({ isLoading: true, error: null });
     try {
       const { data, error } = await supabase.from("offices").select("*");
@@ -33,6 +34,7 @@ export const useOfficesStore = create<OfficesStore>((set) => ({
   },
 
   updateOffice: async (id: string, updates: Partial<Office>) => {
+    const supabase = createClient();
     try {
       const { error } = await supabase.from("offices").update(updates).eq("id", id);
 

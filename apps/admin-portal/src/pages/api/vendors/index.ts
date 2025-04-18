@@ -1,15 +1,31 @@
+import { desc, eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { desc } from "drizzle-orm";
+import { Vendor } from "@/types/vendor";
 
 import { db } from "@/db/drizzle";
 import { vendors } from "@/db/schema";
-import { Vendor } from "@/types/vendor";
+import { createClient } from "@/utils/supabase/server-props";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
+
   if (req.method === "GET") {
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const vendorsList = await db.query.vendors.findMany({
+        where: eq(vendors.user_id, user?.id),
         orderBy: [desc(vendors.created_at)],
       });
 

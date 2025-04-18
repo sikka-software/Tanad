@@ -23,7 +23,6 @@ export default function EmployeeRequestsPage() {
   const filteredRequests = Array.isArray(requests)
     ? requests.filter(
         (request: EmployeeRequest) =>
-          request.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
           request.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           request.type.toLowerCase().includes(searchQuery.toLowerCase()) ||
           request.status.toLowerCase().includes(searchQuery.toLowerCase()),

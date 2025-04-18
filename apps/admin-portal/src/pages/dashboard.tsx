@@ -11,8 +11,6 @@ import { Combobox } from "@/components/ui/combobox";
 import PageTitle from "@/components/ui/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { supabase } from "@/lib/supabase";
-
 import { useBranches } from "@/hooks/useBranches";
 import { useClients } from "@/hooks/useClients";
 import { useCompanies } from "@/hooks/useCompanies";
@@ -23,6 +21,7 @@ import { useOffices } from "@/hooks/useOffices";
 import { useVendors } from "@/hooks/useVendors";
 import { useWarehouses } from "@/hooks/useWarehouses";
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 interface DashboardStats {
   totalInvoices: number;
@@ -41,6 +40,7 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
+  const supabase = createClient();
   const [stats, setStats] = useState<DashboardStats>({
     totalInvoices: 0,
     totalProducts: 0,

@@ -1,9 +1,11 @@
+import { desc, eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
-import { desc } from "drizzle-orm";
+
+import { Branch } from "@/types/branch.type";
 
 import { db } from "@/db/drizzle";
 import { branches } from "@/db/schema";
-import { Branch } from "@/types/branch.type";
+import { createClient } from "@/utils/supabase/server-props";
 
 // Helper to convert Drizzle branch to our Branch type
 function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {
@@ -25,9 +27,24 @@ function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
+
   if (req.method === "GET") {
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const branchesList = await db.query.branches.findMany({
+        where: eq(branches.user_id, user?.id),
         orderBy: desc(branches.created_at),
       });
       return res.status(200).json(branchesList.map(convertDrizzleBranch));
@@ -55,4 +72,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(405).json({ message: "Method not allowed" });
-} 
+}

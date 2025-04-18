@@ -1,6 +1,8 @@
 import { create } from "zustand";
-import { supabase } from "@/lib/supabase";
+
 import { Invoice } from "@/types/invoice.type";
+
+import { createClient } from "@/utils/supabase/component";
 
 type InvoicesStore = {
   invoices: Invoice[];
@@ -18,6 +20,7 @@ export const useInvoicesStore = create<InvoicesStore>((set, get) => ({
   error: null,
 
   fetchInvoices: async () => {
+    const supabase = createClient();
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase
@@ -34,6 +37,7 @@ export const useInvoicesStore = create<InvoicesStore>((set, get) => ({
   },
 
   createInvoice: async (invoice) => {
+    const supabase = createClient();
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase
@@ -54,6 +58,7 @@ export const useInvoicesStore = create<InvoicesStore>((set, get) => ({
   },
 
   updateInvoice: async (id, invoice) => {
+    const supabase = createClient();
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase
@@ -75,6 +80,7 @@ export const useInvoicesStore = create<InvoicesStore>((set, get) => ({
   },
 
   deleteInvoice: async (id) => {
+    const supabase = createClient();
     try {
       set({ isLoading: true, error: null });
       const { error } = await supabase.from("invoices").delete().eq("id", id);
@@ -89,4 +95,4 @@ export const useInvoicesStore = create<InvoicesStore>((set, get) => ({
       set({ error: (error as Error).message, isLoading: false });
     }
   },
-})); 
+}));

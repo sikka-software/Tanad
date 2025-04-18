@@ -14,11 +14,10 @@ import { Textarea } from "@/ui/textarea";
 
 import { CompanyForm, type CompanyFormValues } from "@/components/app/company/company.form";
 
-import { supabase } from "@/lib/supabase";
-
 import { fetchVendorById } from "@/services/vendorService";
 
 import { useCompanies } from "@/hooks/useCompanies";
+import { createClient } from "@/utils/supabase/component";
 
 export const createVendorSchema = (t: (key: string) => string) =>
   z.object({
@@ -50,6 +49,7 @@ export function VendorForm({
   user_id,
   onSubmit,
 }: VendorFormProps) {
+  const supabase = createClient();
   const t = useTranslations();
   const { locale } = useRouter();
   const [internalLoading, setInternalLoading] = useState(false);

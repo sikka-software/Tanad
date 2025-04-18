@@ -13,12 +13,13 @@ import EmployeeRequestForm, {
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
-import { supabase } from "@/lib/supabase";
 
 import { useEmployeeRequestsStore } from "@/stores/employee-requests.store";
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 export default function AddEmployeeRequestPage() {
+  const supabase = createClient();
   const router = useRouter();
   const t = useTranslations();
 

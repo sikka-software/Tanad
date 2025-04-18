@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { eq } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { quotes } from "@/db/schema";
+import { createClient } from "@/utils/supabase/server-props";
 
 // Helper to convert Drizzle quote to our Quote type
 function convertDrizzleQuote(data: any): any {
@@ -43,10 +43,24 @@ function convertDrizzleQuote(data: any): any {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
   switch (req.method) {
     case "GET":
       try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user?.id) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
         const result = await db.query.quotes.findMany({
+          where: eq(quotes.user_id, user?.id),
           with: {
             client: true,
           },

@@ -30,7 +30,8 @@ const EmployeeRequestCard = ({ employeeRequest }: { employeeRequest: EmployeeReq
           {employeeRequest.description || t("no_description")}
         </p>
         <div className="text-sm text-gray-500">
-          <p>{t("employee_label", { name: employeeRequest.employeeName })}</p>
+          <p>Employee name here</p>
+          {/* <p>{t("employee_label", { name: employeeRequest.employeeName })}</p> */}
           {employeeRequest.startDate && (
             <p>
               {t("date_range", {

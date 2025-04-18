@@ -1,9 +1,8 @@
 export interface EmployeeRequest {
   id: string;
   employee_id: string;
-  employeeName: string;
-  type: 'leave' | 'expense' | 'document' | 'other';
-  status: 'pending' | 'approved' | 'rejected';
+  type: "leave" | "expense" | "document" | "other";
+  status: "pending" | "approved" | "rejected";
   title: string;
   description?: string;
   startDate?: string;
@@ -15,4 +14,4 @@ export interface EmployeeRequest {
   updated_at: string;
 }
 
-export type EmployeeRequestCreateData = Omit<EmployeeRequest, 'id' | 'created_at' | 'updated_at'>; 
+export type EmployeeRequestCreateData = Omit<EmployeeRequest, "id" | "created_at" | "updated_at">;

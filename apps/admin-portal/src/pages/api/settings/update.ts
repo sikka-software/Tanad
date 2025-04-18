@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "@/lib/supabase";
+
+import { createClient } from "@/utils/supabase/server-props";
 
 type SettingsUpdateResponse = {
   success: boolean;
@@ -9,26 +10,29 @@ type SettingsUpdateResponse = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<SettingsUpdateResponse>
+  res: NextApiResponse<SettingsUpdateResponse>,
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ success: false, message: "Method not allowed" });
   }
 
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
+
   try {
     // First try to get the session from Supabase directly
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    
-    // Get the user_id from either the session or the request body as fallback
-    const user_id = session?.user?.id || req.body.user_id;
-    
-    console.log("API: Session check result:", { 
-      hasSession: !!session, 
-      user_id: user_id,
-      bodyuser_id: req.body.user_id
-    });
 
-    if (!user_id) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    // Get the user_id from either the session or the request body as fallback
+
+    if (!user?.id) {
       return res.status(401).json({ success: false, message: "Unauthorized - No user ID found" });
     }
 
@@ -49,7 +53,7 @@ export default async function handler(
           ...(settingsData.language ? { language: settingsData.language } : {}),
         },
       })
-      .eq("id", user_id)
+      .eq("id", user?.id)
       .select();
 
     // If email was updated, also update it in auth
@@ -58,7 +62,7 @@ export default async function handler(
         const { error: updateAuthError } = await supabase.auth.updateUser({
           email: settingsData.email,
         });
-        
+
         if (updateAuthError) {
           console.warn("Warning: Email updated in profile but not in auth:", updateAuthError);
         }
@@ -71,7 +75,7 @@ export default async function handler(
       console.error("Error updating settings in database:", error);
       return res.status(500).json({
         success: false,
-        message: "Failed to update settings in database"
+        message: "Failed to update settings in database",
       });
     }
 
@@ -79,13 +83,13 @@ export default async function handler(
     return res.status(200).json({
       success: true,
       message: "Settings updated successfully",
-      data: data[0]
+      data: data[0],
     });
   } catch (error) {
     console.error("Error updating settings:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Failed to update settings" 
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update settings",
     });
   }
 }

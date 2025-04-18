@@ -22,7 +22,6 @@ import { Textarea } from "@/ui/textarea";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
 
-import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 import { useEmployees } from "@/hooks/useEmployees";
@@ -32,9 +31,10 @@ import useUserStore from "@/stores/use-user-store";
 
 const createRequestSchema = (t: (key: string) => string) =>
   z.object({
-    employee_id: z.string({ message: t("EmployeeRequests.form.employee.required") }),
-    // .nonempty({ message: t("EmployeeRequests.form.employee.required") }),
-    // .uuid({ message: t("EmployeeRequests.form.employee.required") }),
+    employee_id: z
+      .string({ message: t("EmployeeRequests.form.employee.required") })
+      .nonempty({ message: t("EmployeeRequests.form.employee.required") })
+      .uuid({ message: t("EmployeeRequests.form.employee.required") }),
 
     type: z.enum(["leave", "expense", "document", "other"]),
     status: z.enum(["pending", "approved", "rejected"]).default("pending"),

@@ -21,10 +21,10 @@ import { Textarea } from "@/ui/textarea";
 
 import { ClientForm, type ClientFormValues } from "@/components/app/client/client.form";
 
-import { supabase } from "@/lib/supabase";
-
 import { Client } from "@/types/client.type";
 import { Product } from "@/types/product.type";
+
+import { createClient } from "@/utils/supabase/component";
 
 export interface QuoteItem {
   product_id?: string;
@@ -62,6 +62,7 @@ export function QuoteForm({
   onSubmit,
   hideFormButtons,
 }: QuoteFormProps) {
+  const supabase = createClient();
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();

@@ -1,21 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import type { AppProps } from "next/app";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
-import { useRouter } from "next/router";
-
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useEffect, useState } from "react";
 
 import AppLayout from "@/components/layouts/app-layout";
 import AuthLayout from "@/components/layouts/auth-layout";
 import LandingLayout from "@/components/layouts/landing-layout";
 import { LoadingBar } from "@/components/ui/loading-bar";
-import useUserStore from "@/stores/use-user-store";
+
 import { QueryProvider } from "@/providers/QueryProvider";
+import useUserStore from "@/stores/use-user-store";
 import "@/styles/globals.css";
 
 const arabicFont = IBM_Plex_Sans_Arabic({

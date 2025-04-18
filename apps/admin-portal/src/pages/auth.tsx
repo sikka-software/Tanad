@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
-
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useRouter } from "next/router";
-
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -16,13 +14,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
-import useUserStore from "@/stores/use-user-store";
+
 import { FREE_PLAN_ID } from "@/lib/constants";
-import { supabase } from "@/lib/supabase";
+
+import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 export default function Auth() {
   const t = useTranslations();
   const lang = useLocale();
+  const supabase = createClient();
   const { resolvedTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

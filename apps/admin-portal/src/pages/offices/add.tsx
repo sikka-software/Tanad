@@ -12,11 +12,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
 import { generateDummyData } from "@/lib/dummy-generator";
-import { supabase } from "@/lib/supabase";
 
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 export default function AddOfficePage() {
+  const supabase = createClient();
   const router = useRouter();
   const t = useTranslations();
   const [loading, setLoading] = useState(false);

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/component";
 
 export type Product = {
   id: string;
@@ -37,6 +37,7 @@ const useProductsStore = create<ProductsStore>((set, get) => ({
   selectedRows: [],
 
   fetchProducts: async () => {
+    const supabase = createClient();
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase
@@ -53,6 +54,7 @@ const useProductsStore = create<ProductsStore>((set, get) => ({
   },
 
   createProduct: async (product) => {
+    const supabase = createClient();
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase.from("products").insert([product]).select().single();
@@ -69,6 +71,7 @@ const useProductsStore = create<ProductsStore>((set, get) => ({
   },
 
   updateProduct: async (id, product) => {
+    const supabase = createClient();
     try {
       set({ isLoading: true, error: null });
       const { data, error } = await supabase
@@ -90,6 +93,7 @@ const useProductsStore = create<ProductsStore>((set, get) => ({
   },
 
   deleteProduct: async (id) => {
+    const supabase = createClient();
     try {
       set({ isLoading: true, error: null });
       const { error } = await supabase.from("products").delete().eq("id", id);
@@ -106,6 +110,7 @@ const useProductsStore = create<ProductsStore>((set, get) => ({
   },
 
   bulkDeleteProducts: async (ids: string[]) => {
+    const supabase = createClient();
     try {
       set({ isLoading: true, error: null });
       const { error } = await supabase.from("products").delete().in("id", ids);

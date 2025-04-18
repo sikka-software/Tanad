@@ -1,7 +1,8 @@
 import { create } from "zustand";
 
-import { supabase } from "@/lib/supabase";
 import { Warehouse } from "@/types/warehouse.type";
+
+import { createClient } from "@/utils/supabase/component";
 
 interface WarehousesState {
   selectedRows: string[];
@@ -14,7 +15,7 @@ interface WarehousesState {
 
 const useWarehousesStore = create<WarehousesState>((set) => ({
   selectedRows: [],
-  
+
   setSelectedRows: (ids: string[]) => {
     set((state) => {
       // Only update if the selection has actually changed
@@ -24,7 +25,7 @@ const useWarehousesStore = create<WarehousesState>((set) => ({
       return { ...state, selectedRows: ids };
     });
   },
-  
+
   clearSelection: () => {
     set((state) => {
       // Only update if there are actually selected rows
@@ -36,11 +37,9 @@ const useWarehousesStore = create<WarehousesState>((set) => ({
   },
 
   updateWarehouse: async (id: string, updates: Partial<Warehouse>) => {
+    const supabase = createClient();
     try {
-      const { error } = await supabase
-        .from("warehouses")
-        .update(updates)
-        .eq("id", id);
+      const { error } = await supabase.from("warehouses").update(updates).eq("id", id);
 
       if (error) throw error;
     } catch (error) {
@@ -50,11 +49,9 @@ const useWarehousesStore = create<WarehousesState>((set) => ({
   },
 
   deleteWarehouse: async (id: string) => {
+    const supabase = createClient();
     try {
-      const { error } = await supabase
-        .from("warehouses")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("warehouses").delete().eq("id", id);
 
       if (error) throw error;
     } catch (error) {
@@ -64,11 +61,9 @@ const useWarehousesStore = create<WarehousesState>((set) => ({
   },
 
   bulkDeleteWarehouses: async (ids: string[]) => {
+    const supabase = createClient();
     try {
-      const { error } = await supabase
-        .from("warehouses")
-        .delete()
-        .in("id", ids);
+      const { error } = await supabase.from("warehouses").delete().in("id", ids);
 
       if (error) throw error;
     } catch (error) {

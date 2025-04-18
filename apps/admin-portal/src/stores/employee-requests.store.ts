@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-import { supabase } from "@/lib/supabase";
-
 import { EmployeeRequest } from "@/types/employee-request.type";
+
+import { createClient } from "@/utils/supabase/component";
 
 interface EmployeeRequestsStore {
   requests: EmployeeRequest[];
@@ -22,6 +22,7 @@ export const useEmployeeRequestsStore = create<EmployeeRequestsStore>((set, get)
   error: null,
 
   fetchRequests: async () => {
+    const supabase = createClient();
     set({ isLoading: true, error: null });
     try {
       const { data, error } = await supabase.from("employee_requests").select("*");
@@ -33,6 +34,7 @@ export const useEmployeeRequestsStore = create<EmployeeRequestsStore>((set, get)
   },
 
   updateRequest: async (id: string, updates: Partial<EmployeeRequest>) => {
+    const supabase = createClient();
     try {
       const { error } = await supabase.from("employee_requests").update(updates).eq("id", id);
       if (error) throw error;
@@ -43,6 +45,7 @@ export const useEmployeeRequestsStore = create<EmployeeRequestsStore>((set, get)
   },
 
   addRequest: async (request) => {
+    const supabase = createClient();
     try {
       const { error } = await supabase.from("employee_requests").insert([request]);
       if (error) throw error;
@@ -53,6 +56,7 @@ export const useEmployeeRequestsStore = create<EmployeeRequestsStore>((set, get)
   },
 
   deleteRequest: async (id: string) => {
+    const supabase = createClient();
     try {
       const { error } = await supabase.from("employee_requests").delete().eq("id", id);
       if (error) throw error;

@@ -10,11 +10,11 @@ import PageTitle from "@/ui/page-title";
 import { QuoteForm, type QuoteFormValues } from "@/components/app/quote/quote.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { supabase } from "@/lib/supabase";
-
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 export default function AddQuotePage() {
+  const supabase = createClient();
   const router = useRouter();
   const t = useTranslations();
   const [loading, setLoading] = useState(false);

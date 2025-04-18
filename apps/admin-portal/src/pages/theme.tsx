@@ -1,11 +1,9 @@
-import { useEffect, useState, useRef } from "react";
-import { useForm } from "react-hook-form";
-
+import { Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/router";
-
-import { Loader2 } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -27,13 +25,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 // UI
 import { Separator } from "@/components/ui/separator";
+
+import { predefinedThemes } from "@/lib/constants";
+// Lib
+import { Pukla, PuklaThemeProps, PuklaSettings, AnimationType } from "@/lib/types";
+
 import useMainStore from "@/hooks/main.store";
 // Hooks
 import useUserStore from "@/stores/use-user-store";
-import { predefinedThemes } from "@/lib/constants";
-import { supabase } from "@/lib/supabase";
-// Lib
-import { Pukla, PuklaThemeProps, PuklaSettings, AnimationType } from "@/lib/types";
+import { createClient } from "@/utils/supabase/component";
 
 const ThemePage = () => {
   return <div>Theme</div>;

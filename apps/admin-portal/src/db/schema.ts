@@ -68,9 +68,9 @@ export const clients = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
+    index("clients_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
     index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("clients_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
       columns: [table.company],
       foreignColumns: [companies.id],
@@ -105,12 +105,12 @@ export const invoices = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
+    index("invoices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     index("invoices_client_id_idx").using(
       "btree",
       table.client_id.asc().nullsLast().op("uuid_ops"),
     ),
     index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
-    index("invoices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
       columns: [table.client_id],
       foreignColumns: [clients.id],
@@ -522,7 +522,6 @@ export const employeeRequests = pgTable(
     employee_id: uuid("employee_id")
       .notNull()
       .references(() => employees.id),
-    employeeName: text("employee_name").notNull(),
     type: text("type", { enum: ["leave", "expense", "document", "other"] }).notNull(),
     status: text("status", { enum: ["pending", "approved", "rejected"] })
       .notNull()

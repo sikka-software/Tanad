@@ -14,9 +14,8 @@ import { Textarea } from "@/ui/textarea";
 
 import { CompanyForm, type CompanyFormValues } from "@/components/app/company/company.form";
 
-import { supabase } from "@/lib/supabase";
-
 import { useCompanies } from "@/hooks/useCompanies";
+import { createClient } from "@/utils/supabase/component";
 
 interface ClientFormProps {
   id?: string;
@@ -51,6 +50,7 @@ export function ClientForm({
   user_id,
   defaultValues,
 }: ClientFormProps) {
+  const supabase = createClient();
   const t = useTranslations();
   const { locale } = useRouter();
   const { data: companies, isLoading: companiesLoading } = useCompanies();

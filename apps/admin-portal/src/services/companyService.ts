@@ -1,13 +1,7 @@
 import { Company } from "@/types/company.type";
 
-export async function fetchCompanies(user_id: string): Promise<Company[]> {
-  const response = await fetch("/api/companies", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ user_id }),
-  });
+export async function fetchCompanies(): Promise<Company[]> {
+  const response = await fetch("/api/companies");
   if (!response.ok) {
     throw new Error("Failed to fetch companies");
   }

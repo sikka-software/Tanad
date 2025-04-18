@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-import { supabase } from "@/lib/supabase";
-
 import { Quote } from "@/types/quote.type";
+
+import { createClient } from "@/utils/supabase/component";
 
 interface QuotesStore {
   selectedRows: string[];
@@ -24,6 +24,7 @@ export const useQuotesStore = create<QuotesStore>((set) => ({
   },
   clearSelection: () => set({ selectedRows: [] }),
   updateQuote: async (id: string, updates: Partial<Quote>) => {
+    const supabase = createClient();
     const { error } = await supabase.from("quotes").update(updates).eq("id", id);
 
     if (error) {
@@ -31,6 +32,7 @@ export const useQuotesStore = create<QuotesStore>((set) => ({
     }
   },
   deleteQuotes: async (ids: string[]) => {
+    const supabase = createClient();
     const { error } = await supabase.from("quotes").delete().in("id", ids);
 
     if (error) {

@@ -17,8 +17,6 @@ import { Textarea } from "@/ui/textarea";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
 
-import { supabase } from "@/lib/supabase";
-
 import type { Salary } from "@/types/salary.type";
 
 import { useEmployees } from "@/hooks/useEmployees";

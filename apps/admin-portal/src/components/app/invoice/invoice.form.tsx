@@ -21,64 +21,60 @@ import { Textarea } from "@/ui/textarea";
 
 import { ClientForm } from "@/components/app/client/client.form";
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/component";
 
-const invoiceSchema = z.object({
-  client_id: z.string().min(1, "Client is required"),
-  invoice_number: z.string().min(1, "Invoice number is required"),
-  issue_date: z.date({
-    required_error: "Issue date is required",
-  }),
-  due_date: z.date({
-    required_error: "Due date is required",
-  }),
-  status: z.string().min(1, "Status is required"),
-  subtotal: z.number().min(0, "Subtotal must be a positive number"),
-  tax_rate: z.number().min(0, "Tax rate must be a positive number"),
-  notes: z.string().optional(),
-  items: z
-    .array(
-      z.object({
-        product_id: z.string().optional(),
-        description: z.string().min(1, "Description is required"),
-        quantity: z
-          .string()
-          .min(1, "Quantity is required")
-          .refine(
-            (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
-            "Quantity must be a positive number",
-          ),
-        unit_price: z
-          .string()
-          .min(1, "Price is required")
-          .refine(
-            (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
-            "Price must be a positive number",
-          ),
-      }),
-    )
-    .min(1, "At least one item is required")
-    .refine(
-      (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
-      "Each item must have either a product selected or a description entered",
-    ),
-});
+const createInvoiceSchema = (t: (key: string) => string) =>
+  z.object({
+    client_id: z.string().min(1, t("Invoices.form.client_id.required")),
+    invoice_number: z.string().min(1, t("Invoices.form.invoice_number.required")),
+    issue_date: z.date({
+      required_error: t("Invoices.form.issue_date.required"),
+    }),
+    due_date: z.date({
+      required_error: t("Invoices.form.due_date.required"),
+    }),
+    status: z.string().min(1, t("Invoices.form.status.required")),
+    subtotal: z.number().min(0, t("Invoices.form.subtotal.required")),
+    tax_rate: z.number().min(0, t("Invoices.form.tax_rate.required")),
+    notes: z.string().optional(),
+    items: z
+      .array(
+        z.object({
+          product_id: z.string().optional(),
+          description: z.string().min(1, t("Invoices.form.description.required")),
+          quantity: z
+            .string()
+            .min(1, t("Invoices.form.quantity.required"))
+            .refine(
+              (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
+              t("Invoices.form.quantity.required"),
+            ),
+          unit_price: z
+            .string()
+            .min(1, t("Invoices.form.price.required"))
+            .refine(
+              (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
+              t("Invoices.form.price.required"),
+            ),
+        }),
+      )
+      .min(1, t("Invoices.form.items.required"))
+      .refine(
+        (items) => items.every((item) => item.description?.trim() !== "" || item.product_id),
+        t("Invoices.form.items.required"),
+      ),
+  });
 
-export type InvoiceFormValues = z.infer<typeof invoiceSchema>;
+export type InvoiceFormValues = z.infer<ReturnType<typeof createInvoiceSchema>>;
 
 interface InvoiceFormProps {
   id?: string;
   loading?: boolean;
-  onSuccess?: () => void;
   onSubmit: (data: InvoiceFormValues) => Promise<void>;
 }
 
-export function InvoiceForm({
-  id,
-  loading: externalLoading,
-  onSuccess,
-  onSubmit,
-}: InvoiceFormProps) {
+export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceFormProps) {
+  const supabase = createClient();
   const router = useRouter();
   const [loading, setLoading] = useState(externalLoading || false);
   const [clients, setClients] = useState<any[]>([]);
@@ -148,7 +144,7 @@ export function InvoiceForm({
   }, []);
 
   const form = useForm<InvoiceFormValues>({
-    resolver: zodResolver(invoiceSchema),
+    resolver: zodResolver(createInvoiceSchema(t)),
     defaultValues: {
       client_id: "",
       invoice_number: "",

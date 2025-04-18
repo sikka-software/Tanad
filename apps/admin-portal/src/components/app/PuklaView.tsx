@@ -1,36 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
-import Image from "next/image";
+import { zodResolver } from "@hookform/resolvers/zod";
 import clsx from "clsx";
 import { Loader2 } from "lucide-react";
 import { DynamicIcon } from "lucide-react/dynamic";
-import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
-import Link from "next/link";
 import { motion } from "motion/react";
+import { useTranslations, useLocale } from "next-intl";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-// Types
-import {
-  LinkItemProps,
-  AnimationType,
-  LinkLayoutType,
-  Pukla,
-} from "@/lib/types";
-import { cn, shouldUseLightContent } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
-import { ANIMATIONS } from "@/lib/constants/animations";
+
+import AgeVerificationDialog from "@/components/app/AgeVerificationDialog";
+import MoreOptions from "@/components/app/MoreOptions";
+import PasswordDialog from "@/components/app/PasswordDialog";
+import SocialLinks from "@/components/app/PuklaViewSocialLinks";
 // Components
 import { ShareDialog } from "@/components/app/ShareDialog";
-import PasswordDialog from "@/components/app/PasswordDialog";
-import AgeVerificationDialog from "@/components/app/AgeVerificationDialog";
-import SocialLinks from "@/components/app/PuklaViewSocialLinks";
-import MoreOptions from "@/components/app/MoreOptions";
 // UI
 import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
+import { ANIMATIONS } from "@/lib/constants/animations";
+// Types
+import { LinkItemProps, AnimationType, LinkLayoutType, Pukla } from "@/lib/types";
+import { cn, shouldUseLightContent } from "@/lib/utils";
+
+import { createClient } from "@/utils/supabase/component";
+
 export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
+  const supabase = createClient();
   const t = useTranslations();
   const lang = useLocale();
   const router = useRouter();
@@ -44,15 +43,9 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
   });
 
   const ageSchema = z.object({
-    day: z
-      .string()
-      .min(1, t("Editor.lock_link.requires_date_of_birth.day_required")),
-    month: z
-      .string()
-      .min(1, t("Editor.lock_link.requires_date_of_birth.month_required")),
-    year: z
-      .string()
-      .min(1, t("Editor.lock_link.requires_date_of_birth.year_required")),
+    day: z.string().min(1, t("Editor.lock_link.requires_date_of_birth.day_required")),
+    month: z.string().min(1, t("Editor.lock_link.requires_date_of_birth.month_required")),
+    year: z.string().min(1, t("Editor.lock_link.requires_date_of_birth.year_required")),
   });
 
   const [filteredLinks, setFilteredLinks] = React.useState<LinkItemProps[]>([]);
@@ -72,8 +65,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
   }>({});
   const [verificationError, setVerificationError] = useState("");
 
-  const selectedAnimation = (puklaSettings?.animation ||
-    "fade") as AnimationType;
+  const selectedAnimation = (puklaSettings?.animation || "fade") as AnimationType;
   const animation = ANIMATIONS[selectedAnimation];
 
   const passwordForm = useForm<z.infer<typeof passwordSchema>>({
@@ -96,7 +88,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
             is_password_protected,
             is_age_restricted,
             min_age
-          `
+          `,
           )
           .eq("pukla_id", pukla?.id)
           .eq("is_enabled", true)
@@ -174,9 +166,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
     window.open(link.url, "_blank");
   };
 
-  const handlePasswordSubmit = async (
-    values: z.infer<typeof passwordSchema>
-  ) => {
+  const handlePasswordSubmit = async (values: z.infer<typeof passwordSchema>) => {
     if (!currentLink) return;
 
     try {
@@ -198,9 +188,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
           setShowAgeDialog(true);
         }
       } else {
-        setVerificationError(
-          t("Editor.lock_link.password_protected.invalid_password")
-        );
+        setVerificationError(t("Editor.lock_link.password_protected.invalid_password"));
       }
     } catch (error) {
       console.error("Password verification error:", error);
@@ -214,7 +202,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
     const birthDate = new Date(
       parseInt(values.year),
       parseInt(values.month) - 1,
-      parseInt(values.day)
+      parseInt(values.day),
     );
     const today = new Date();
     const age = today.getFullYear() - birthDate.getFullYear();
@@ -225,16 +213,11 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
         setShowAgeDialog(false);
 
         // If all verifications are complete, open the link
-        if (
-          !currentLink.is_password_protected ||
-          isPasswordVerified[currentLink.id]
-        ) {
+        if (!currentLink.is_password_protected || isPasswordVerified[currentLink.id]) {
           window.open(currentLink.url, "_blank");
         }
       } else {
-        setVerificationError(
-          t("Editor.lock_link.requires_date_of_birth.too_young")
-        );
+        setVerificationError(t("Editor.lock_link.requires_date_of_birth.too_young"));
       }
     } catch (error) {
       console.error("Age verification error:", error);
@@ -275,14 +258,8 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
 
               if (singleLink.item_type === "header") {
                 return (
-                  <div
-                    key={singleLink.id || index}
-                    className="w-full text-center py-4"
-                  >
-                    <h2
-                      className="text-lg font-bold"
-                      style={{ color: puklaTheme?.text_color }}
-                    >
+                  <div key={singleLink.id || index} className="w-full py-4 text-center">
+                    <h2 className="text-lg font-bold" style={{ color: puklaTheme?.text_color }}>
                       {singleLink.title}
                     </h2>
                   </div>
@@ -292,21 +269,17 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
               const currentLayout = singleLink.item_layout;
               const nextLink = linksToRender[index + 1];
               const isCurrentHalfWidth = isHalfWidthLayout(currentLayout);
-              const isNextHalfWidth =
-                nextLink && isHalfWidthLayout(nextLink.item_layout);
+              const isNextHalfWidth = nextLink && isHalfWidthLayout(nextLink.item_layout);
 
               if (isCurrentHalfWidth && isNextHalfWidth) {
                 // Mark the next index as processed
                 processedIndices.add(index + 1);
                 return (
-                  <div
-                    key={`row-${singleLink.id}`}
-                    className="w-full flex justify-center gap-4"
-                  >
+                  <div key={`row-${singleLink.id}`} className="flex w-full justify-center gap-4">
                     <div className={getButtonClasses(currentLayout)}>
                       <a
                         href={singleLink.url}
-                        className="block w-full hover:scale-105 transition-transform"
+                        className="block w-full transition-transform hover:scale-105"
                         onClick={(e) => handleLinkClick(e, singleLink)}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -314,22 +287,19 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                         <div
                           className={cn(
                             buttonVariants({ size: "lg", variant: "outline" }),
-                            "text-center text-wrap border shadow-sm hover:opacity-90 w-full flex items-center justify-center gap-2",
-                            singleLink.item_highlight === "outline" &&
-                              "animate-highlight_outline",
-                            singleLink.item_highlight === "border" &&
-                              "animate-highlight_border",
-                            singleLink.item_highlight === "scale" &&
-                              "animate-highlight_scale",
+                            "flex w-full items-center justify-center gap-2 border text-center text-wrap shadow-sm hover:opacity-90",
+                            singleLink.item_highlight === "outline" && "animate-highlight_outline",
+                            singleLink.item_highlight === "border" && "animate-highlight_border",
+                            singleLink.item_highlight === "scale" && "animate-highlight_scale",
                             {
-                              "h-[100px] flex items-center justify-center":
+                              "flex h-[100px] items-center justify-center":
                                 singleLink.item_layout === "square",
-                              "h-[88px] flex items-center justify-center":
+                              "flex h-[88px] items-center justify-center":
                                 singleLink.item_layout === "double-height",
                               "py-2":
                                 singleLink.item_layout !== "double-height" &&
                                 singleLink.item_layout !== "square",
-                            }
+                            },
                           )}
                           style={{
                             lineBreak: "anywhere",
@@ -339,64 +309,48 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                             backgroundColor: puklaTheme?.button_color,
                           }}
                         >
-                          {singleLink.item_thumbnail?.thumbnail_type ===
-                            "icon" &&
+                          {singleLink.item_thumbnail?.thumbnail_type === "icon" &&
                             singleLink.item_thumbnail?.thumbnail_icon &&
-                            singleLink.item_thumbnail?.thumbnail_icon
-                              .position === "start" && (
+                            singleLink.item_thumbnail?.thumbnail_icon.position === "start" && (
                               <div className="flex items-center justify-center">
                                 <DynamicIcon
-                                  name={
-                                    singleLink.item_thumbnail?.thumbnail_icon
-                                      ?.name as any
-                                  }
+                                  name={singleLink.item_thumbnail?.thumbnail_icon?.name as any}
                                   className="h-5 w-5"
                                 />
                               </div>
                             )}
-                          {singleLink.item_thumbnail?.thumbnail_type ===
-                            "image" &&
+                          {singleLink.item_thumbnail?.thumbnail_type === "image" &&
                             singleLink.item_thumbnail?.thumbnail_image &&
                             singleLink.item_thumbnail?.position === "start" && (
                               <div className="relative h-5 w-5">
                                 <Image
-                                  src={
-                                    singleLink.item_thumbnail?.thumbnail_image
-                                  }
+                                  src={singleLink.item_thumbnail?.thumbnail_image}
                                   alt={singleLink.title}
                                   fill
-                                  className="object-cover rounded-sm"
+                                  className="rounded-sm object-cover"
                                 />
                               </div>
                             )}
                           {singleLink.title}
-                          {singleLink.item_thumbnail?.thumbnail_type ===
-                            "icon" &&
+                          {singleLink.item_thumbnail?.thumbnail_type === "icon" &&
                             singleLink.item_thumbnail?.thumbnail_icon &&
-                            singleLink.item_thumbnail?.thumbnail_icon
-                              .position === "end" && (
+                            singleLink.item_thumbnail?.thumbnail_icon.position === "end" && (
                               <div className="flex items-center justify-center">
                                 <DynamicIcon
-                                  name={
-                                    singleLink.item_thumbnail?.thumbnail_icon
-                                      ?.name as any
-                                  }
+                                  name={singleLink.item_thumbnail?.thumbnail_icon?.name as any}
                                   className="h-5 w-5"
                                 />
                               </div>
                             )}
-                          {singleLink.item_thumbnail?.thumbnail_type ===
-                            "image" &&
+                          {singleLink.item_thumbnail?.thumbnail_type === "image" &&
                             singleLink.item_thumbnail?.thumbnail_image &&
                             singleLink.item_thumbnail?.position === "end" && (
                               <div className="relative h-5 w-5">
                                 <Image
-                                  src={
-                                    singleLink.item_thumbnail?.thumbnail_image
-                                  }
+                                  src={singleLink.item_thumbnail?.thumbnail_image}
                                   alt={singleLink.title}
                                   fill
-                                  className="object-cover rounded-sm"
+                                  className="rounded-sm object-cover"
                                 />
                               </div>
                             )}
@@ -406,7 +360,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                     <div className={getButtonClasses(nextLink.item_layout)}>
                       <a
                         href={nextLink.url}
-                        className="block w-full hover:scale-105 transition-transform"
+                        className="block w-full transition-transform hover:scale-105"
                         onClick={(e) => handleLinkClick(e, nextLink)}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -414,22 +368,19 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                         <div
                           className={cn(
                             buttonVariants({ size: "lg", variant: "outline" }),
-                            "text-center text-wrap border shadow-sm hover:opacity-90 w-full flex items-center justify-center gap-2",
-                            nextLink.item_highlight === "outline" &&
-                              "animate-highlight_outline",
-                            nextLink.item_highlight === "border" &&
-                              "animate-highlight_border",
-                            nextLink.item_highlight === "scale" &&
-                              "animate-highlight_scale",
+                            "flex w-full items-center justify-center gap-2 border text-center text-wrap shadow-sm hover:opacity-90",
+                            nextLink.item_highlight === "outline" && "animate-highlight_outline",
+                            nextLink.item_highlight === "border" && "animate-highlight_border",
+                            nextLink.item_highlight === "scale" && "animate-highlight_scale",
                             {
-                              "h-[100px] flex items-center justify-center":
+                              "flex h-[100px] items-center justify-center":
                                 nextLink.item_layout === "square",
-                              "h-[88px] flex items-center justify-center":
+                              "flex h-[88px] items-center justify-center":
                                 nextLink.item_layout === "double-height",
                               "py-2":
                                 nextLink.item_layout !== "double-height" &&
                                 nextLink.item_layout !== "square",
-                            }
+                            },
                           )}
                           style={{
                             lineBreak: "anywhere",
@@ -441,20 +392,15 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                         >
                           {nextLink.item_thumbnail?.thumbnail_type === "icon" &&
                             nextLink.item_thumbnail?.thumbnail_icon &&
-                            nextLink.item_thumbnail?.thumbnail_icon.position ===
-                              "start" && (
+                            nextLink.item_thumbnail?.thumbnail_icon.position === "start" && (
                               <div className="flex items-center justify-center">
                                 <DynamicIcon
-                                  name={
-                                    nextLink.item_thumbnail?.thumbnail_icon
-                                      ?.name as any
-                                  }
+                                  name={nextLink.item_thumbnail?.thumbnail_icon?.name as any}
                                   className="h-5 w-5"
                                 />
                               </div>
                             )}
-                          {nextLink.item_thumbnail?.thumbnail_type ===
-                            "image" &&
+                          {nextLink.item_thumbnail?.thumbnail_type === "image" &&
                             nextLink.item_thumbnail?.thumbnail_image &&
                             nextLink.item_thumbnail?.position === "start" && (
                               <div className="relative h-5 w-5">
@@ -462,27 +408,22 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                                   src={nextLink.item_thumbnail?.thumbnail_image}
                                   alt={nextLink.title}
                                   fill
-                                  className="object-cover rounded-sm"
+                                  className="rounded-sm object-cover"
                                 />
                               </div>
                             )}
                           {nextLink.title}
                           {nextLink.item_thumbnail?.thumbnail_type === "icon" &&
                             nextLink.item_thumbnail?.thumbnail_icon &&
-                            nextLink.item_thumbnail?.thumbnail_icon.position ===
-                              "end" && (
+                            nextLink.item_thumbnail?.thumbnail_icon.position === "end" && (
                               <div className="flex items-center justify-center">
                                 <DynamicIcon
-                                  name={
-                                    nextLink.item_thumbnail?.thumbnail_icon
-                                      ?.name as any
-                                  }
+                                  name={nextLink.item_thumbnail?.thumbnail_icon?.name as any}
                                   className="h-5 w-5"
                                 />
                               </div>
                             )}
-                          {nextLink.item_thumbnail?.thumbnail_type ===
-                            "image" &&
+                          {nextLink.item_thumbnail?.thumbnail_type === "image" &&
                             nextLink.item_thumbnail?.thumbnail_image &&
                             nextLink.item_thumbnail?.position === "end" && (
                               <div className="relative h-5 w-5">
@@ -490,7 +431,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                                   src={nextLink.item_thumbnail?.thumbnail_image}
                                   alt={nextLink.title}
                                   fill
-                                  className="object-cover rounded-sm"
+                                  className="rounded-sm object-cover"
                                 />
                               </div>
                             )}
@@ -503,14 +444,11 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
               console.log("singleLink", singleLink.item_highlight);
 
               return (
-                <div
-                  key={singleLink.id || index}
-                  className="w-full flex justify-center"
-                >
+                <div key={singleLink.id || index} className="flex w-full justify-center">
                   <div className={getButtonClasses(currentLayout)}>
                     <a
                       href={singleLink.url}
-                      className="block w-full hover:scale-105 transition-transform"
+                      className="block w-full transition-transform hover:scale-105"
                       onClick={(e) => handleLinkClick(e, singleLink)}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -518,22 +456,19 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                       <div
                         className={cn(
                           buttonVariants({ size: "lg", variant: "outline" }),
-                          "text-center text-wrap border shadow-sm hover:opacity-90 w-full flex items-center justify-center gap-2",
-                          singleLink.item_highlight === "outline" &&
-                            "animate-highlight_outline",
-                          singleLink.item_highlight === "border" &&
-                            "animate-highlight_border",
-                          singleLink.item_highlight === "scale" &&
-                            "animate-highlight_scale",
+                          "flex w-full items-center justify-center gap-2 border text-center text-wrap shadow-sm hover:opacity-90",
+                          singleLink.item_highlight === "outline" && "animate-highlight_outline",
+                          singleLink.item_highlight === "border" && "animate-highlight_border",
+                          singleLink.item_highlight === "scale" && "animate-highlight_scale",
                           {
-                            "h-[100px] flex items-center justify-center":
+                            "flex h-[100px] items-center justify-center":
                               singleLink.item_layout === "square",
-                            "h-[88px] flex items-center justify-center":
+                            "flex h-[88px] items-center justify-center":
                               singleLink.item_layout === "double-height",
                             "py-2":
                               singleLink.item_layout !== "double-height" &&
                               singleLink.item_layout !== "square",
-                          }
+                          },
                         )}
                         style={{
                           lineBreak: "anywhere",
@@ -545,20 +480,15 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                       >
                         {singleLink.item_thumbnail?.thumbnail_type === "icon" &&
                           singleLink.item_thumbnail?.thumbnail_icon &&
-                          singleLink.item_thumbnail?.thumbnail_icon.position ===
-                            "start" && (
+                          singleLink.item_thumbnail?.thumbnail_icon.position === "start" && (
                             <div className="flex items-center justify-center">
                               <DynamicIcon
-                                name={
-                                  singleLink.item_thumbnail?.thumbnail_icon
-                                    ?.name as any
-                                }
+                                name={singleLink.item_thumbnail?.thumbnail_icon?.name as any}
                                 className="h-5 w-5"
                               />
                             </div>
                           )}
-                        {singleLink.item_thumbnail?.thumbnail_type ===
-                          "image" &&
+                        {singleLink.item_thumbnail?.thumbnail_type === "image" &&
                           singleLink.item_thumbnail?.thumbnail_image &&
                           singleLink.item_thumbnail?.position === "start" && (
                             <div className="relative h-5 w-5">
@@ -566,27 +496,22 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                                 src={singleLink.item_thumbnail?.thumbnail_image}
                                 alt={singleLink.title}
                                 fill
-                                className="object-cover rounded-sm"
+                                className="rounded-sm object-cover"
                               />
                             </div>
                           )}
                         {singleLink.title}
                         {singleLink.item_thumbnail?.thumbnail_type === "icon" &&
                           singleLink.item_thumbnail?.thumbnail_icon &&
-                          singleLink.item_thumbnail?.thumbnail_icon.position ===
-                            "end" && (
+                          singleLink.item_thumbnail?.thumbnail_icon.position === "end" && (
                             <div className="flex items-center justify-center">
                               <DynamicIcon
-                                name={
-                                  singleLink.item_thumbnail?.thumbnail_icon
-                                    ?.name as any
-                                }
+                                name={singleLink.item_thumbnail?.thumbnail_icon?.name as any}
                                 className="h-5 w-5"
                               />
                             </div>
                           )}
-                        {singleLink.item_thumbnail?.thumbnail_type ===
-                          "image" &&
+                        {singleLink.item_thumbnail?.thumbnail_type === "image" &&
                           singleLink.item_thumbnail?.thumbnail_image &&
                           singleLink.item_thumbnail?.position === "end" && (
                             <div className="relative h-5 w-5">
@@ -594,7 +519,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                                 src={singleLink.item_thumbnail?.thumbnail_image}
                                 alt={singleLink.title}
                                 fill
-                                className="object-cover rounded-sm"
+                                className="rounded-sm object-cover"
                               />
                             </div>
                           )}
@@ -626,12 +551,9 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                 <motion.div
                   key={singleLink.id || index}
                   variants={animation.item}
-                  className="w-full text-center py-4"
+                  className="w-full py-4 text-center"
                 >
-                  <h2
-                    className="text-lg font-bold"
-                    style={{ color: puklaTheme?.text_color }}
-                  >
+                  <h2 className="text-lg font-bold" style={{ color: puklaTheme?.text_color }}>
                     {singleLink.title}
                   </h2>
                 </motion.div>
@@ -641,8 +563,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
             const currentLayout = singleLink.item_layout;
             const nextLink = linksToRender[index + 1];
             const isCurrentHalfWidth = isHalfWidthLayout(currentLayout);
-            const isNextHalfWidth =
-              nextLink && isHalfWidthLayout(nextLink.item_layout);
+            const isNextHalfWidth = nextLink && isHalfWidthLayout(nextLink.item_layout);
 
             if (isCurrentHalfWidth && isNextHalfWidth) {
               processedIndices.add(index + 1);
@@ -650,12 +571,12 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                 <motion.div
                   key={`row-${singleLink.id}`}
                   variants={animation.item}
-                  className="w-full flex justify-center gap-4"
+                  className="flex w-full justify-center gap-4"
                 >
                   <div className={getButtonClasses(currentLayout)}>
                     <a
                       href={singleLink.url}
-                      className="block w-full hover:scale-105 transition-transform"
+                      className="block w-full transition-transform hover:scale-105"
                       onClick={(e) => handleLinkClick(e, singleLink)}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -663,22 +584,19 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                       <div
                         className={cn(
                           buttonVariants({ size: "lg", variant: "outline" }),
-                          "text-center text-wrap border shadow-sm hover:opacity-90 w-full flex items-center justify-center gap-2",
-                          singleLink.item_highlight === "outline" &&
-                            "animate-highlight_outline",
-                          singleLink.item_highlight === "border" &&
-                            "animate-highlight_border",
-                          singleLink.item_highlight === "scale" &&
-                            "animate-highlight_scale",
+                          "flex w-full items-center justify-center gap-2 border text-center text-wrap shadow-sm hover:opacity-90",
+                          singleLink.item_highlight === "outline" && "animate-highlight_outline",
+                          singleLink.item_highlight === "border" && "animate-highlight_border",
+                          singleLink.item_highlight === "scale" && "animate-highlight_scale",
                           {
-                            "h-[100px] flex items-center justify-center":
+                            "flex h-[100px] items-center justify-center":
                               singleLink.item_layout === "square",
-                            "h-[88px] flex items-center justify-center":
+                            "flex h-[88px] items-center justify-center":
                               singleLink.item_layout === "double-height",
                             "py-2":
                               singleLink.item_layout !== "double-height" &&
                               singleLink.item_layout !== "square",
-                          }
+                          },
                         )}
                         style={{
                           lineBreak: "anywhere",
@@ -690,20 +608,15 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                       >
                         {singleLink.item_thumbnail?.thumbnail_type === "icon" &&
                           singleLink.item_thumbnail?.thumbnail_icon &&
-                          singleLink.item_thumbnail?.thumbnail_icon.position ===
-                            "start" && (
+                          singleLink.item_thumbnail?.thumbnail_icon.position === "start" && (
                             <div className="flex items-center justify-center">
                               <DynamicIcon
-                                name={
-                                  singleLink.item_thumbnail?.thumbnail_icon
-                                    ?.name as any
-                                }
+                                name={singleLink.item_thumbnail?.thumbnail_icon?.name as any}
                                 className="h-5 w-5"
                               />
                             </div>
                           )}
-                        {singleLink.item_thumbnail?.thumbnail_type ===
-                          "image" &&
+                        {singleLink.item_thumbnail?.thumbnail_type === "image" &&
                           singleLink.item_thumbnail?.thumbnail_image &&
                           singleLink.item_thumbnail?.position === "start" && (
                             <div className="relative h-5 w-5">
@@ -711,27 +624,22 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                                 src={singleLink.item_thumbnail?.thumbnail_image}
                                 alt={singleLink.title}
                                 fill
-                                className="object-cover rounded-sm"
+                                className="rounded-sm object-cover"
                               />
                             </div>
                           )}
                         {singleLink.title}
                         {singleLink.item_thumbnail?.thumbnail_type === "icon" &&
                           singleLink.item_thumbnail?.thumbnail_icon &&
-                          singleLink.item_thumbnail?.thumbnail_icon.position ===
-                            "end" && (
+                          singleLink.item_thumbnail?.thumbnail_icon.position === "end" && (
                             <div className="flex items-center justify-center">
                               <DynamicIcon
-                                name={
-                                  singleLink.item_thumbnail?.thumbnail_icon
-                                    ?.name as any
-                                }
+                                name={singleLink.item_thumbnail?.thumbnail_icon?.name as any}
                                 className="h-5 w-5"
                               />
                             </div>
                           )}
-                        {singleLink.item_thumbnail?.thumbnail_type ===
-                          "image" &&
+                        {singleLink.item_thumbnail?.thumbnail_type === "image" &&
                           singleLink.item_thumbnail?.thumbnail_image &&
                           singleLink.item_thumbnail?.position === "end" && (
                             <div className="relative h-5 w-5">
@@ -739,7 +647,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                                 src={singleLink.item_thumbnail?.thumbnail_image}
                                 alt={singleLink.title}
                                 fill
-                                className="object-cover rounded-sm"
+                                className="rounded-sm object-cover"
                               />
                             </div>
                           )}
@@ -749,7 +657,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                   <div className={getButtonClasses(nextLink.item_layout)}>
                     <a
                       href={nextLink.url}
-                      className="block w-full hover:scale-105 transition-transform"
+                      className="block w-full transition-transform hover:scale-105"
                       onClick={(e) => handleLinkClick(e, nextLink)}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -757,22 +665,19 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                       <div
                         className={cn(
                           buttonVariants({ size: "lg", variant: "outline" }),
-                          "text-center text-wrap border shadow-sm hover:opacity-90 w-full flex items-center justify-center gap-2",
-                          nextLink.item_highlight === "outline" &&
-                            "animate-highlight_outline",
-                          nextLink.item_highlight === "border" &&
-                            "animate-highlight_border",
-                          nextLink.item_highlight === "scale" &&
-                            "animate-highlight_scale",
+                          "flex w-full items-center justify-center gap-2 border text-center text-wrap shadow-sm hover:opacity-90",
+                          nextLink.item_highlight === "outline" && "animate-highlight_outline",
+                          nextLink.item_highlight === "border" && "animate-highlight_border",
+                          nextLink.item_highlight === "scale" && "animate-highlight_scale",
                           {
-                            "h-[100px] flex items-center justify-center":
+                            "flex h-[100px] items-center justify-center":
                               nextLink.item_layout === "square",
-                            "h-[88px] flex items-center justify-center":
+                            "flex h-[88px] items-center justify-center":
                               nextLink.item_layout === "double-height",
                             "py-2":
                               nextLink.item_layout !== "double-height" &&
                               nextLink.item_layout !== "square",
-                          }
+                          },
                         )}
                         style={{
                           lineBreak: "anywhere",
@@ -784,14 +689,10 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                       >
                         {nextLink.item_thumbnail?.thumbnail_type === "icon" &&
                           nextLink.item_thumbnail?.thumbnail_icon &&
-                          nextLink.item_thumbnail?.thumbnail_icon.position ===
-                            "start" && (
+                          nextLink.item_thumbnail?.thumbnail_icon.position === "start" && (
                             <div className="flex items-center justify-center">
                               <DynamicIcon
-                                name={
-                                  nextLink.item_thumbnail?.thumbnail_icon
-                                    ?.name as any
-                                }
+                                name={nextLink.item_thumbnail?.thumbnail_icon?.name as any}
                                 className="h-5 w-5"
                               />
                             </div>
@@ -804,21 +705,17 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                                 src={nextLink.item_thumbnail?.thumbnail_image}
                                 alt={nextLink.title}
                                 fill
-                                className="object-cover rounded-sm"
+                                className="rounded-sm object-cover"
                               />
                             </div>
                           )}
                         {nextLink.title}
                         {nextLink.item_thumbnail?.thumbnail_type === "icon" &&
                           nextLink.item_thumbnail?.thumbnail_icon &&
-                          nextLink.item_thumbnail?.thumbnail_icon.position ===
-                            "end" && (
+                          nextLink.item_thumbnail?.thumbnail_icon.position === "end" && (
                             <div className="flex items-center justify-center">
                               <DynamicIcon
-                                name={
-                                  nextLink.item_thumbnail?.thumbnail_icon
-                                    ?.name as any
-                                }
+                                name={nextLink.item_thumbnail?.thumbnail_icon?.name as any}
                                 className="h-5 w-5"
                               />
                             </div>
@@ -831,7 +728,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                                 src={nextLink.item_thumbnail?.thumbnail_image}
                                 alt={nextLink.title}
                                 fill
-                                className="object-cover rounded-sm"
+                                className="rounded-sm object-cover"
                               />
                             </div>
                           )}
@@ -846,12 +743,12 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
               <motion.div
                 key={singleLink.id || index}
                 variants={animation.item}
-                className="w-full flex justify-center"
+                className="flex w-full justify-center"
               >
                 <div className={getButtonClasses(currentLayout)}>
                   <a
                     href={singleLink.url}
-                    className="block w-full hover:scale-105 transition-transform"
+                    className="block w-full transition-transform hover:scale-105"
                     onClick={(e) => handleLinkClick(e, singleLink)}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -859,22 +756,19 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                     <div
                       className={cn(
                         buttonVariants({ size: "lg", variant: "outline" }),
-                        "text-center text-wrap border shadow-sm hover:opacity-90 w-full flex items-center justify-center gap-2",
-                        singleLink.item_highlight === "outline" &&
-                          "animate-highlight_outline",
-                        singleLink.item_highlight === "border" &&
-                          "animate-highlight_border",
-                        singleLink.item_highlight === "scale" &&
-                          "animate-highlight_scale",
+                        "flex w-full items-center justify-center gap-2 border text-center text-wrap shadow-sm hover:opacity-90",
+                        singleLink.item_highlight === "outline" && "animate-highlight_outline",
+                        singleLink.item_highlight === "border" && "animate-highlight_border",
+                        singleLink.item_highlight === "scale" && "animate-highlight_scale",
                         {
-                          "h-[100px] flex items-center justify-center":
+                          "flex h-[100px] items-center justify-center":
                             singleLink.item_layout === "square",
-                          "h-[88px] flex items-center justify-center":
+                          "flex h-[88px] items-center justify-center":
                             singleLink.item_layout === "double-height",
                           "py-2":
                             singleLink.item_layout !== "double-height" &&
                             singleLink.item_layout !== "square",
-                        }
+                        },
                       )}
                       style={{
                         lineBreak: "anywhere",
@@ -886,14 +780,10 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                     >
                       {singleLink.item_thumbnail?.thumbnail_type === "icon" &&
                         singleLink.item_thumbnail?.thumbnail_icon &&
-                        singleLink.item_thumbnail?.thumbnail_icon.position ===
-                          "start" && (
+                        singleLink.item_thumbnail?.thumbnail_icon.position === "start" && (
                           <div className="flex items-center justify-center">
                             <DynamicIcon
-                              name={
-                                singleLink.item_thumbnail?.thumbnail_icon
-                                  ?.name as any
-                              }
+                              name={singleLink.item_thumbnail?.thumbnail_icon?.name as any}
                               className="h-5 w-5"
                             />
                           </div>
@@ -906,21 +796,17 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                               src={singleLink.item_thumbnail?.thumbnail_image}
                               alt={singleLink.title}
                               fill
-                              className="object-cover rounded-sm"
+                              className="rounded-sm object-cover"
                             />
                           </div>
                         )}
                       {singleLink.title}
                       {singleLink.item_thumbnail?.thumbnail_type === "icon" &&
                         singleLink.item_thumbnail?.thumbnail_icon &&
-                        singleLink.item_thumbnail?.thumbnail_icon.position ===
-                          "end" && (
+                        singleLink.item_thumbnail?.thumbnail_icon.position === "end" && (
                           <div className="flex items-center justify-center">
                             <DynamicIcon
-                              name={
-                                singleLink.item_thumbnail?.thumbnail_icon
-                                  ?.name as any
-                              }
+                              name={singleLink.item_thumbnail?.thumbnail_icon?.name as any}
                               className="h-5 w-5"
                             />
                           </div>
@@ -933,7 +819,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                               src={singleLink.item_thumbnail?.thumbnail_image}
                               alt={singleLink.title}
                               fill
-                              className="object-cover rounded-sm"
+                              className="rounded-sm object-cover"
                             />
                           </div>
                         )}
@@ -950,8 +836,8 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
 
   if (isLoading || !isInitialized) {
     return (
-      <div className="flex items-center h-screen justify-center py-8">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="flex h-screen items-center justify-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -960,7 +846,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
     <div
       dir="ltr"
       // dir={lang === "ar" ? "rtl" : "ltr"}
-      className={clsx("min-h-screen w-full relative")}
+      className={clsx("relative min-h-screen w-full")}
       style={{
         backgroundColor: puklaTheme?.background_image
           ? "transparent"
@@ -1013,22 +899,19 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
 
       <div
         className={clsx(
-          "no-scrollbar z-30 flex w-full flex-1 flex-col items-center overflow-auto px-4 py-8"
+          "no-scrollbar z-30 flex w-full flex-1 flex-col items-center overflow-auto px-4 py-8",
         )}
       >
         <div className="flex w-full max-w-sm flex-1 flex-col">
-          <div className="mb-6 flex flex-col items-center gap-4 border-white border-opacity-20 p-4 text-white">
+          <div className="border-opacity-20 mb-6 flex flex-col items-center gap-4 border-white p-4 text-white">
             {!puklaSettings?.hide_avatar && (
               <div
                 className={cn("mt-10 bg-gray-100", {
                   "h-24 w-24 rounded-full":
-                    puklaSettings?.avatar_shape === "circle" ||
-                    !puklaSettings?.avatar_shape,
+                    puklaSettings?.avatar_shape === "circle" || !puklaSettings?.avatar_shape,
                   "h-24 w-24": puklaSettings?.avatar_shape === "square",
-                  "h-24 w-32":
-                    puklaSettings?.avatar_shape === "horizontal_rectangle",
-                  "h-32 w-24":
-                    puklaSettings?.avatar_shape === "vertical_rectangle",
+                  "h-24 w-32": puklaSettings?.avatar_shape === "horizontal_rectangle",
+                  "h-32 w-24": puklaSettings?.avatar_shape === "vertical_rectangle",
                 })}
                 style={{
                   backgroundImage: `url(${pukla?.avatar_url})`,
@@ -1068,13 +951,9 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
               )}
             </div>
             {/* Render social links at the top if position is "top" or not specified */}
-            {(!puklaSettings?.socials_position ||
-              puklaSettings?.socials_position === "top") && (
+            {(!puklaSettings?.socials_position || puklaSettings?.socials_position === "top") && (
               <>
-                <SocialLinks
-                  links={puklaSettings?.social_links}
-                  theme={puklaTheme}
-                />
+                <SocialLinks links={puklaSettings?.social_links} theme={puklaTheme} />
                 <Separator className="w-full" />
               </>
             )}
@@ -1084,12 +963,9 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
 
           {/* Render social links at the bottom if position is "bottom" */}
           {puklaSettings?.socials_position === "bottom" && (
-            <div className="flex flex-col items-center justify-center w-full mt-4 mb-4 gap-4">
+            <div className="mt-4 mb-4 flex w-full flex-col items-center justify-center gap-4">
               <Separator className="w-full" />
-              <SocialLinks
-                links={puklaSettings?.social_links}
-                theme={puklaTheme}
-              />
+              <SocialLinks links={puklaSettings?.social_links} theme={puklaTheme} />
             </div>
           )}
         </div>
@@ -1106,7 +982,7 @@ export const PuklaView: React.FC<{ pukla?: Pukla }> = ({ pukla }) => {
                     ? "/assets/pukla-logo-full-white.png"
                     : "/assets/pukla-logo-full-black.png"
                 }
-                className="w-auto h-6 opacity-75 hover:opacity-100 transition-opacity"
+                className="h-6 w-auto opacity-75 transition-opacity hover:opacity-100"
               />
             </div>
           </Link>

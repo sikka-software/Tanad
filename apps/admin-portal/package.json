@@ -1,6 +1,6 @@
 {
   "name": "@tanad/admin",
-  "version": "0.12.4",
+  "version": "0.12.5",
   "license": "Proprietary",
   "author": {
     "name": "Sikka Software",
@@ -53,6 +53,7 @@
     "@radix-ui/react-switch": "^1.1.4",
     "@radix-ui/react-tabs": "^1.1.4",
     "@radix-ui/react-tooltip": "^1.2.0",
+    "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.4",
     "@tailwindcss/postcss": "^4.1.4",
     "@tanstack/react-query": "^5.74.3",

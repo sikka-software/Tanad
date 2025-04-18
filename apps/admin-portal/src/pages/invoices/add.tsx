@@ -10,11 +10,11 @@ import PageTitle from "@/ui/page-title";
 import { InvoiceForm, type InvoiceFormValues } from "@/components/app/invoice/invoice.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { supabase } from "@/lib/supabase";
-
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 export default function AddInvoicePage() {
+  const supabase = createClient();
   const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);

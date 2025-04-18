@@ -1,10 +1,11 @@
+import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { desc } from "drizzle-orm";
+import { Department } from "@/types/department.type";
 
 import { db } from "@/db/drizzle";
 import { departmentLocations, departments } from "@/db/schema";
-import { Department } from "@/types/department.type";
+import { createClient } from "@/utils/supabase/server-props";
 
 // Helper to convert Drizzle department to our Department type
 function convertDrizzleDepartment(
@@ -23,9 +24,23 @@ function convertDrizzleDepartment(
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
   if (req.method === "GET") {
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const departmentsList = await db.query.departments.findMany({
+        where: eq(departments.user_id, user?.id),
         orderBy: desc(departments.created_at),
         with: {
           locations: true,

@@ -1,10 +1,11 @@
-import { desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { WarehouseCreateData } from "@/types/warehouse.type";
 
 import { db } from "@/db/drizzle";
 import { warehouses } from "@/db/schema";
+import { createClient } from "@/utils/supabase/server-props";
 
 // Helper to convert Drizzle warehouse to our Warehouse type
 function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect) {
@@ -40,9 +41,24 @@ function convertToDrizzleWarehouse(data: WarehouseCreateData & { user_id: string
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
+
   if (req.method === "GET") {
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const warehousesList = await db.query.warehouses.findMany({
+        where: eq(warehouses.user_id, user?.id),
         orderBy: desc(warehouses.created_at),
       });
       return res.status(200).json(warehousesList.map(convertDrizzleWarehouse));
@@ -56,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const data = req.body as WarehouseCreateData & { user_id: string };
       const drizzleWarehouse = convertToDrizzleWarehouse(data);
-      
+
       const [newWarehouse] = await db.insert(warehouses).values(drizzleWarehouse).returning();
       return res.status(201).json(convertDrizzleWarehouse(newWarehouse));
     } catch (error) {

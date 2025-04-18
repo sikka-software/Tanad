@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
-
+import type { LucideIcon } from "lucide-react";
+import { User2, LogOut, MessageSquareWarning, CreditCard, Search } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
-import type { LucideIcon } from "lucide-react";
-import { User2, LogOut, MessageSquareWarning, CreditCard, Search } from "lucide-react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -34,9 +32,9 @@ import {
 
 import { CACHE_KEY } from "@/lib/constants";
 import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
-import { supabase } from "@/lib/supabase";
 
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
 import { NavMain } from "./sidebar-menu";
@@ -64,6 +62,7 @@ type Group = {
 };
 
 export function AppSidebar() {
+  const supabase = createClient();
   const t = useTranslations();
   const lang = useLocale();
   const [open, setOpen] = useState(false);

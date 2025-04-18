@@ -1,19 +1,18 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-
-import { GetStaticProps } from "next";
-import { useLocale, useTranslations } from "next-intl";
-
 import { User } from "@supabase/supabase-js";
 import { EyeOff } from "lucide-react";
 import { Eye } from "lucide-react";
+import { GetStaticProps } from "next";
+import { useLocale, useTranslations } from "next-intl";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/lib/supabase";
+
+import { createClient } from "@/utils/supabase/component";
 
 interface ProfileFormValues {
   name: string;
@@ -28,6 +27,7 @@ interface PasswordFormValues {
 }
 
 export default function Account() {
+  const supabase = createClient();
   const t = useTranslations();
   const lang = useLocale();
 

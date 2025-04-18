@@ -1,17 +1,13 @@
-import React from "react";
-import { useTranslations, useLocale } from "next-intl";
-import { toast } from "sonner";
 import { Upload } from "lucide-react";
-// UI
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useTranslations, useLocale } from "next-intl";
+import React from "react";
+import { toast } from "sonner";
 
-import { supabase } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
+// UI
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+import { createClient } from "@/utils/supabase/component";
 
 type UpdateAvatarDialogProps = {
   openDialog: boolean;
@@ -26,14 +22,13 @@ export const UpdateAvatarDialog: React.FC<UpdateAvatarDialogProps> = ({
   puklaId,
   onAvatarUpdate,
 }) => {
+  const supabase = createClient();
   const t = useTranslations();
   const lang = useLocale();
   const [uploading, setUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -43,9 +38,7 @@ export const UpdateAvatarDialog: React.FC<UpdateAvatarDialogProps> = ({
       // Upload file to Supabase storage
       const fileExt = file.name.split(".").pop();
       const fileName = `${puklaId}-${Date.now()}.${fileExt}`;
-      const { data, error } = await supabase.storage
-        .from("pukla_avatars")
-        .upload(fileName, file);
+      const { data, error } = await supabase.storage.from("pukla_avatars").upload(fileName, file);
 
       if (error) throw error;
 
@@ -67,10 +60,7 @@ export const UpdateAvatarDialog: React.FC<UpdateAvatarDialogProps> = ({
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-      <DialogContent
-        className="sm:max-w-md"
-        dir={lang === "ar" ? "rtl" : "ltr"}
-      >
+      <DialogContent className="sm:max-w-md" dir={lang === "ar" ? "rtl" : "ltr"}>
         <DialogHeader>
           <DialogTitle>{t("MyPuklas.update_avatar")}</DialogTitle>
         </DialogHeader>

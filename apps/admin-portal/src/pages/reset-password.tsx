@@ -1,16 +1,14 @@
 // This page is used to reset the password. the url will be coming from supabase email and it will have a token
 // we will use the token to reset the password
-import { useEffect } from "react";
-import { useState } from "react";
-
+import { Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useRouter } from "next/router";
-
-import { Loader2 } from "lucide-react";
-import { Eye, EyeOff } from "lucide-react";
+import { useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -19,9 +17,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
-import { supabase } from "@/lib/supabase";
+
+import { createClient } from "@/utils/supabase/component";
 
 const ResetPassword = () => {
+  const supabase = createClient();
   const t = useTranslations("Auth");
   const lang = useLocale();
   const { resolvedTheme } = useTheme();

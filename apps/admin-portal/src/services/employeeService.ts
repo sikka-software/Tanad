@@ -1,11 +1,12 @@
-import { supabase } from "@/lib/supabase";
-import useUserStore from "@/stores/use-user-store";
-
 import { Employee } from "@/types/employee.types";
+
+import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 export const EMPLOYEES_QUERY_KEY = ["employees"] as const;
 
 export async function fetchEmployees(): Promise<Employee[]> {
+  const supabase = createClient();
   const user = useUserStore.getState().user;
   if (!user?.id) {
     console.error("No authenticated user found in fetchEmployees");
@@ -15,12 +16,14 @@ export async function fetchEmployees(): Promise<Employee[]> {
   console.log("Fetching employees for user:", user.id);
   const { data, error } = await supabase
     .from("employees")
-    .select(`
+    .select(
+      `
       *,
       department:departments (
         name
       )
-    `)
+    `,
+    )
     .eq("user_id", user.id);
 
   if (error) {
@@ -50,6 +53,7 @@ export async function fetchEmployees(): Promise<Employee[]> {
 }
 
 export async function fetchEmployeeById(id: string): Promise<Employee> {
+  const supabase = createClient();
   const { data, error } = await supabase
     .from("employees")
     .select(
@@ -161,6 +165,7 @@ export async function updateEmployee(id: string, updates: Partial<Employee>): Pr
 export async function addEmployee(
   employee: Omit<Employee, "id" | "created_at" | "updated_at">,
 ): Promise<Employee> {
+  const supabase = createClient();
   const user = useUserStore.getState().user;
   if (!user?.id) {
     throw new Error("No authenticated user");
@@ -237,6 +242,7 @@ export async function addEmployee(
 }
 
 export async function deleteEmployee(id: string): Promise<void> {
+  const supabase = createClient();
   const { error } = await supabase.from("employees").delete().eq("id", id);
 
   if (error) throw error;

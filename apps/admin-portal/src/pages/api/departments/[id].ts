@@ -1,11 +1,11 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { supabase } from "@/lib/supabase";
-
 import { eq } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
+
+import { Department } from "@/types/department.type";
 
 import { db } from "@/db/drizzle";
 import { departmentLocations, departments } from "@/db/schema";
-import { Department } from "@/types/department.type";
+import { createClient } from "@/utils/supabase/server-props";
 
 function convertDrizzleDepartment(
   data: typeof departments.$inferSelect & {
@@ -26,7 +26,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { id } = req.query;
 
   if (req.method === "GET") {
+    const supabase = createClient({
+      req,
+      res,
+      query: {},
+      resolvedUrl: "",
+    });
     try {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
       const department = await db.query.departments.findFirst({
         where: eq(departments.id, id as string),
         with: {
@@ -108,9 +118,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
       // Delete department locations first
-      await db
-        .delete(departmentLocations)
-        .where(eq(departmentLocations.department_id, id));
+      await db.delete(departmentLocations).where(eq(departmentLocations.department_id, id));
 
       // Delete the department
       const [deletedDepartment] = await db

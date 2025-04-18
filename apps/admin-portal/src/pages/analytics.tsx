@@ -46,13 +46,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fakeAnalyticsData } from "@/lib/constants";
 // Utils
 import { fetchPukla, fetchPuklasWithLinkCount } from "@/lib/operations";
-import { supabase } from "@/lib/supabase";
 
 // Store
 import { useMainStore } from "@/hooks/main.store";
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 export default function Analytics() {
+  const supabase = createClient();
   const t = useTranslations();
   const router = useRouter();
   const { profile } = useUserStore();

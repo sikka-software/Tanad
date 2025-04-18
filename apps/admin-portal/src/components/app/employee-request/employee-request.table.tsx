@@ -32,11 +32,6 @@ const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTable
 
   const columns: ExtendedColumnDef<EmployeeRequest>[] = [
     {
-      accessorKey: "employeeName",
-      header: t("EmployeeRequests.form.employee.label"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) => row.original.employeeName,
-    },
-    {
       accessorKey: "type",
       header: t("EmployeeRequests.form.type.label"),
       cell: ({ row }: { row: { original: EmployeeRequest } }) => (

@@ -1,10 +1,11 @@
+import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { desc } from "drizzle-orm";
+import { Client } from "@/types/client.type";
 
 import { db } from "@/db/drizzle";
 import { clients } from "@/db/schema";
-import { Client } from "@/types/client.type";
+import { createClient } from "@/utils/supabase/server-props";
 
 // Helper to convert Drizzle client to our Client type
 function convertDrizzleClient(data: typeof clients.$inferSelect): Client {
@@ -24,9 +25,24 @@ function convertDrizzleClient(data: typeof clients.$inferSelect): Client {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
+
   if (req.method === "GET") {
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const clientsList = await db.query.clients.findMany({
+        where: eq(clients.user_id, user?.id),
         orderBy: desc(clients.created_at),
       });
       return res.status(200).json(clientsList.map(convertDrizzleClient));

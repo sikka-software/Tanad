@@ -1,9 +1,8 @@
-import { toast } from "sonner";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import { supabase } from "@/lib/supabase";
-import useUserStore from "@/stores/use-user-store";
+import { Button } from "@/components/ui/button";
 // UI
 import {
   DialogContent,
@@ -12,7 +11,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+
+import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 interface FeedbackDialogProps {
   onOpenChange?: (open: boolean) => void;
@@ -24,6 +25,7 @@ export function FeedbackDialog({ onOpenChange }: FeedbackDialogProps) {
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useUserStore();
+  const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,9 +62,7 @@ export function FeedbackDialog({ onOpenChange }: FeedbackDialogProps) {
     <DialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
       <DialogHeader>
         <DialogTitle>{t("Feedback.give_feedback")}</DialogTitle>
-        <DialogDescription>
-          {t("Feedback.feedback_dialog_description")}
-        </DialogDescription>
+        <DialogDescription>{t("Feedback.feedback_dialog_description")}</DialogDescription>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="space-y-4">
         <Textarea
@@ -74,12 +74,10 @@ export function FeedbackDialog({ onOpenChange }: FeedbackDialogProps) {
         />
         <Button
           type="submit"
-          className="w-full plausible-event-name=feedback_sent"
+          className="plausible-event-name=feedback_sent w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting
-            ? t("Feedback.submitting")
-            : t("Feedback.submit_feedback")}
+          {isSubmitting ? t("Feedback.submitting") : t("Feedback.submit_feedback")}
         </Button>
       </form>
     </DialogContent>

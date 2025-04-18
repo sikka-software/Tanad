@@ -16,19 +16,20 @@ import { Textarea } from "@/ui/textarea";
 
 import DepartmentForm, { DepartmentFormValues } from "@/components/app/department/department.form";
 
-import { supabase } from "@/lib/supabase";
-
 import { useDepartments, DEPARTMENTS_QUERY_KEY } from "@/hooks/useDepartments";
 import { useEmployeesStore } from "@/stores/employees.store";
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 interface EmployeeFormProps {
   id?: string;
   onSubmit: (data: EmployeeFormValues) => Promise<void>;
 }
 
-const createEmployeeFormSchema = (t: (key: string) => string) =>
-  z.object({
+const createEmployeeFormSchema = (t: (key: string) => string) => {
+  const supabase = createClient();
+
+  return z.object({
     first_name: z.string().min(1, t("Employees.form.first_name.required")),
     last_name: z.string().min(1, t("Employees.form.last_name.required")),
     email: z
@@ -61,10 +62,11 @@ const createEmployeeFormSchema = (t: (key: string) => string) =>
     status: z.enum(["active", "inactive", "on_leave"]),
     notes: z.string().optional(),
   });
-
+};
 export type EmployeeFormValues = z.infer<ReturnType<typeof createEmployeeFormSchema>>;
 
 export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
+  const supabase = createClient();
   const t = useTranslations();
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const [isDepartmentSaving, setIsDepartmentSaving] = useState(false);

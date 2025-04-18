@@ -1,9 +1,11 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { desc, eq } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
+
+import { SalaryCreateData } from "@/types/salary.type";
 
 import { db } from "@/db/drizzle";
 import { salaries } from "@/db/schema";
-import { SalaryCreateData } from "@/types/salary.type";
+import { createClient } from "@/utils/supabase/server-props";
 
 // Helper to convert Drizzle salary to our Salary type
 function convertDrizzleSalary(data: typeof salaries.$inferSelect) {
@@ -22,20 +24,38 @@ function convertDrizzleSalary(data: typeof salaries.$inferSelect) {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
   try {
     switch (req.method) {
       case "GET": {
-        if (!db) throw new Error("Database connection not initialized");
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user?.id) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
         const data = await db.query.salaries.findMany({
+          where: eq(salaries.user_id, user?.id),
           orderBy: desc(salaries.paymentDate),
         });
         return res.status(200).json(data.map(convertDrizzleSalary));
       }
 
       case "POST": {
-        if (!db) throw new Error("Database connection not initialized");
         const salary = req.body as SalaryCreateData;
-        
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user?.id) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
         // Map salary data to match Drizzle schema
         const dbSalary = {
           payPeriodStart: salary.pay_period_start,
@@ -46,7 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           deductions: salary.deductions,
           notes: salary.notes,
           employeeName: salary.employee_name,
-          user_id: salary.user_id || "",
+          user_id: user?.id,
         };
 
         const [data] = await db.insert(salaries).values(dbSalary).returning();
