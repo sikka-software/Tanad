@@ -107,15 +107,6 @@ const ClientsTable = ({
     [selectedRows, setSelectedRows, onSelectedRowsChange],
   );
 
-  const [data, setData] = useState(unsortedData);
-
-  useEffect(() => {
-    const sortedData = [...unsortedData].sort((a, b) => {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-    setData(sortedData);
-  }, [unsortedData]);
-
   if (isLoading) {
     return (
       <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
@@ -131,7 +122,7 @@ const ClientsTable = ({
     getRowId: (row: Client) => row.id!,
     onRowSelectionChange: (updater: any) => {
       const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      const selectedRows = unsortedData.filter((row) => newSelection[row.id!]);
       handleRowSelectionChange(selectedRows);
     },
   };
@@ -143,7 +134,7 @@ const ClientsTable = ({
   return (
     <SheetTable
       columns={columns}
-      data={data}
+      data={unsortedData}
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
