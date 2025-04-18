@@ -60,7 +60,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
   const router = useRouter();
-  const { user, initialized } = useUserStore();
+  const { user } = useUserStore();
 
   // Use our existing hooks
   const { data: employees } = useEmployees();
@@ -109,10 +109,9 @@ export default function Dashboard() {
     let isMounted = true;
 
     async function fetchDashboardStats() {
-      if (!isMounted || !initialized || !user?.id) {
+      if (!isMounted || !user?.id) {
         console.log("[Dashboard] Skipping fetch - conditions not met:", {
           isMounted,
-          initialized,
           hasUser: !!user?.id,
         });
         return;
@@ -182,7 +181,6 @@ export default function Dashboard() {
     };
   }, [
     user?.id,
-    initialized,
     employees,
     departments,
     jobs,
@@ -193,54 +191,6 @@ export default function Dashboard() {
     warehouses,
     branches,
   ]);
-
-  // Show loading state while waiting for initialization
-  if (!initialized) {
-    return (
-      <div>
-        <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
-        <PageTitle title={t("Dashboard.title")} />
-        <div className="p-4">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-4 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-1/2" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show loading state while fetching stats
-  if (loading) {
-    return (
-      <div>
-        <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
-        <PageTitle title={t("Dashboard.title")} />
-        <div className="p-4">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <Skeleton className="h-4 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-1/2" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -296,7 +246,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalInvoices}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalInvoices}</div>
+                  )}
                   <p className="mt-1 text-xs text-gray-500">
                     {stats.pendingInvoices} {t("Dashboard.pending")}
                   </p>
@@ -312,7 +266,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalProducts}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalProducts}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -324,7 +282,26 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
+                {loading ? (
+                  <Skeleton className="h-8 w-1/2" />
+                ) : (
+                  <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-gray-500">
+                  {t("Revenue.title")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <Skeleton className="h-8 w-1/2" />
+                ) : (
+                  <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
+                )}
               </CardContent>
             </Card>
 
@@ -335,7 +312,11 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.pendingInvoices}</div>
+                {loading ? (
+                  <Skeleton className="h-8 w-1/2" />
+                ) : (
+                  <div className="text-2xl font-bold">{stats.pendingInvoices}</div>
+                )}
                 <p className="mt-1 text-xs text-gray-500">
                   {((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}%{" "}
                   {t("Dashboard.of_total")}
@@ -358,7 +339,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalClients}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalClients}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -372,7 +357,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalCompanies}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalCompanies}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -386,7 +375,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalVendors}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalVendors}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -406,7 +399,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalOffices}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalOffices}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -420,7 +417,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalWarehouses}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalWarehouses}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -434,7 +435,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalBranches}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalBranches}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -454,7 +459,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalEmployees}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalEmployees}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -468,7 +477,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalDepartments}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalDepartments}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -482,7 +495,11 @@ export default function Dashboard() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalJobs}</div>
+                  {loading ? (
+                    <Skeleton className="h-8 w-1/2" />
+                  ) : (
+                    <div className="text-2xl font-bold">{stats.totalJobs}</div>
+                  )}
                 </CardContent>
               </Card>
             </Link>
@@ -496,7 +513,11 @@ export default function Dashboard() {
               <CardTitle>{t("Invoices.title")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">{t("Invoices.title")}</p>
+              {loading ? (
+                <Skeleton className="h-8 w-1/2" />
+              ) : (
+                <p className="text-sm text-gray-500">{t("Invoices.title")}</p>
+              )}
             </CardContent>
           </Card>
 
@@ -505,7 +526,11 @@ export default function Dashboard() {
               <CardTitle>{t("Dashboard.popular_products")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500">{t("Dashboard.popular_products_list")}</p>
+              {loading ? (
+                <Skeleton className="h-8 w-1/2" />
+              ) : (
+                <p className="text-sm text-gray-500">{t("Dashboard.popular_products_list")}</p>
+              )}
             </CardContent>
           </Card>
         </div>
