@@ -25,13 +25,14 @@ export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
   const [sortRules, setSortRules] = useState<{ field: string; direction: string }[]>([
-    { field: "name", direction: "asc" },
+    { field: "created_at", direction: "desc" },
   ]);
   const [caseSensitive, setCaseSensitive] = useState(false);
   const [nullsFirst, setNullsFirst] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const sortableColumns = [
+    { value: "created_at", label: t("General.created_at") },
     { value: "name", label: t("Clients.form.name.label") },
     { value: "email", label: t("Clients.form.email.label") },
     { value: "phone", label: t("Clients.form.phone.label") },
@@ -41,7 +42,6 @@ export default function ClientsPage() {
     { value: "city", label: t("Clients.form.city.label") },
     { value: "state", label: t("Clients.form.state.label") },
     { value: "zip_code", label: t("Clients.form.zip_code.label") },
-    { value: "created_at", label: t("General.created_at") },
   ];
 
   const handleSortRulesChange = (newSortRules: { field: string; direction: string }[]) => {
