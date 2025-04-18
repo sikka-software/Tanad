@@ -1,10 +1,8 @@
-import { useState } from "react";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { JobForm, type JobFormValues } from "@/components/app/job/job.form";
@@ -25,15 +23,15 @@ export default function AddJobPage() {
       // Use the jobService function that handles the user ID properly
       const newJob = await createJob({
         title: data.title.trim(),
-        description: data.description?.trim() || undefined,
-        requirements: data.requirements?.trim() || undefined,
-        location: data.location?.trim() || undefined,
-        department: data.department?.trim() || undefined,
+        description: data.description?.trim() || null,
+        requirements: data.requirements?.trim() || null,
+        location: data.location?.trim() || null,
+        department: data.department?.trim() || null,
         type: data.type.trim(),
-        salary: data.salary ? parseFloat(data.salary) : undefined,
+        salary: data.salary ? parseFloat(data.salary) : null,
         is_active: data.is_active,
-        startDate: data.startDate?.toISOString() || undefined,
-        endDate: data.endDate?.toISOString() || undefined,
+        startDate: data.startDate?.toISOString() || null,
+        endDate: data.endDate?.toISOString() || null,
       });
 
       // Update the jobs cache to include the new job

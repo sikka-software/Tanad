@@ -1,10 +1,8 @@
-import { useState } from "react";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { OfficeForm, type OfficeFormValues } from "@/components/app/office/office.form";
@@ -51,7 +49,7 @@ export default function AddOfficePage() {
 
       if (error) throw error;
 
-      //     Update the clients cache to include the new client
+      // Update the clients cache to include the new client
       const previousOffices = queryClient.getQueryData(["offices"]) || [];
       queryClient.setQueryData(
         ["offices"],
