@@ -1,0 +1,103 @@
+FROM node:20-slim AS base
+
+# Install pnpm and required dependencies
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN npm install -g pnpm@10.6.2
+
+# Builder base
+FROM base AS builder-base
+WORKDIR /app
+
+# Copy only package files first
+COPY package.json turbo.json pnpm-lock.yaml pnpm-workspace.yaml ./
+
+# Install dependencies without patches
+RUN pnpm install --frozen-lockfile
+
+
+# admin-portal builder
+FROM builder-base AS admin-portal-builder
+ARG WORKSPACE
+ARG MODIFIED_FILES
+ARG DIRECTUS_URL
+ARG DIRECTUS_TOKEN
+ARG DATABASE_URL
+ARG NEXT_PUBLIC_STRIPE_PRODUCT_ID
+ARG NEXT_PUBLIC_STRIPE_SECRET_KEY
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_SUPABASE_URL
+
+WORKDIR /app
+
+# Copy the entire admin-portal directory first
+COPY apps/admin-portal ./apps/admin-portal
+
+# Set environment variables for build time
+ENV DIRECTUS_URL=${DIRECTUS_URL} \
+    DIRECTUS_TOKEN=${DIRECTUS_TOKEN} \
+    DATABASE_URL=${DATABASE_URL} \
+    NEXT_PUBLIC_STRIPE_PRODUCT_ID=${NEXT_PUBLIC_STRIPE_PRODUCT_ID} \
+    NEXT_PUBLIC_STRIPE_SECRET_KEY=${NEXT_PUBLIC_STRIPE_SECRET_KEY} \
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY} \
+    NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL} \
+    NEXT_TELEMETRY_DISABLED=1
+
+# Create .env file for Next.js
+RUN printf "DIRECTUS_URL=${DIRECTUS_URL}\n\
+DIRECTUS_TOKEN=${DIRECTUS_TOKEN}\n\
+DATABASE_URL=${DATABASE_URL}\n\
+NEXT_PUBLIC_STRIPE_PRODUCT_ID=${NEXT_PUBLIC_STRIPE_PRODUCT_ID}\n\
+NEXT_PUBLIC_STRIPE_SECRET_KEY=${NEXT_PUBLIC_STRIPE_SECRET_KEY}\n\
+NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}\n\
+NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}\n\
+NEXT_TELEMETRY_DISABLED=1" > /app/apps/admin-portal/.env
+
+# Install dependencies
+RUN set -e && \
+    pnpm install --frozen-lockfile
+
+# Build landing
+RUN set -e && \
+    pnpm build --filter @tanad/admin
+
+# Verify build artifacts exist
+RUN set -e && \
+    test -d /app/apps/admin-portal/.next/standalone && \
+    test -d /app/apps/admin-portal/.next/static && \
+    test -d /app/apps/admin-portal/public && \
+    echo "Build artifacts verified successfully"
+
+# Admin portal production image
+FROM base AS admin-portal
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs && \
+    mkdir -p /app/apps/admin-portal/.next/static && \
+    chown -R nextjs:nodejs /app
+
+USER nextjs
+
+# Copy build artifacts with explicit paths
+COPY --from=admin-portal-builder --chown=nextjs:nodejs /app/apps/admin-portal/.next/standalone/ ./
+COPY --from=admin-portal-builder --chown=nextjs:nodejs /app/apps/admin-portal/.next/static/ ./apps/admin-portal/.next/static/
+COPY --from=admin-portal-builder --chown=nextjs:nodejs /app/apps/admin-portal/public/ ./apps/admin-portal/public/
+
+# Set all required environment variables
+ENV NODE_ENV=production \
+    PORT=3037 \
+    HOSTNAME=0.0.0.0 \
+    SERVICE_FQDN_SIKKA=/ \
+    DIRECTUS_TOKEN=${DIRECTUS_TOKEN} \
+    DIRECTUS_URL=${DIRECTUS_URL} \
+    DATABASE_URL=${DATABASE_URL} \
+    NEXT_PUBLIC_STRIPE_PRODUCT_ID=${NEXT_PUBLIC_STRIPE_PRODUCT_ID} \
+    NEXT_PUBLIC_STRIPE_SECRET_KEY=${NEXT_PUBLIC_STRIPE_SECRET_KEY} \
+    NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY} \
+    NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL} \
+    NEXT_TELEMETRY_DISABLED=1   
+EXPOSE 3037
+CMD ["node", "apps/admin-portal/server.js"]
+

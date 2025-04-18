@@ -1,0 +1,115 @@
+import { GetStaticProps } from "next";
+import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import SalaryCard from "@/components/app/salary/salary.card";
+import SalariesTable from "@/components/app/salary/salary.table";
+import DataPageLayout from "@/components/layouts/data-page-layout";
+import ConfirmDelete from "@/components/ui/confirm-delete";
+import DataModelList from "@/components/ui/data-model-list";
+import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
+import SelectionMode from "@/components/ui/selection-mode";
+
+import type { Salary } from "@/types/salary.type";
+
+import { useSalaries, useBulkDeleteSalaries } from "@/hooks/useSalaries";
+import { useSalariesStore } from "@/stores/salaries.store";
+
+export default function SalariesPage() {
+  const t = useTranslations();
+  const { data: salaries, isLoading, error } = useSalaries();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { selectedRows, clearSelection } = useSalariesStore();
+  const { mutate: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
+
+  const filteredSalaries = salaries?.filter(
+    (salary) =>
+      salary.employee_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (salary.notes || "").toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteSalaries(selectedRows, {
+        onSuccess: () => {
+          clearSelection();
+          setIsDeleteDialogOpen(false);
+          toast.success(t("Salaries.success.title"), {
+            description: t("Salaries.messages.success_deleted"),
+          });
+        },
+        onError: () => {
+          toast.error(t("Salaries.error.title"), {
+            description: t("Salaries.messages.error_delete"),
+          });
+        },
+      });
+    } catch (error) {
+      console.error("Failed to delete salaries:", error);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
+  return (
+    <DataPageLayout>
+      {selectedRows.length > 0 ? (
+        <SelectionMode
+          selectedRows={selectedRows}
+          clearSelection={clearSelection}
+          isDeleting={isDeleting}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        />
+      ) : (
+        <PageSearchAndFilter
+          title={t("Salaries.title")}
+          createHref="/salaries/add"
+          createLabel={t("Salaries.create_salary")}
+          onSearch={setSearchQuery}
+          searchPlaceholder={t("Salaries.search_salaries")}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+        />
+      )}
+      <div>
+        {viewMode === "table" ? (
+          <SalariesTable
+            data={filteredSalaries || []}
+            isLoading={isLoading}
+            error={error instanceof Error ? error : null}
+          />
+        ) : (
+          <div className="p-4">
+            <DataModelList
+              data={filteredSalaries || []}
+              isLoading={isLoading}
+              error={error instanceof Error ? error : null}
+              emptyMessage={t("Salaries.no_salaries_found")}
+              renderItem={(salary: Salary) => <SalaryCard key={salary.id} salary={salary} />}
+              gridCols="3"
+            />
+          </div>
+        )}
+      </div>
+
+      <ConfirmDelete
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+        isDeleting={isDeleting}
+        handleConfirmDelete={handleConfirmDelete}
+        title={t("Salaries.delete_salary")}
+        description={t("Salaries.confirm_delete")}
+      />
+    </DataPageLayout>
+  );
+}
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`../../../locales/${locale}.json`)).default,
+    },
+  };
+};

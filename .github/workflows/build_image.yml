@@ -1,0 +1,59 @@
+name: Build & Push Docker Images
+
+on:
+  push:
+    branches: [main]
+
+env:
+  NODE_VERSION: "21.x"
+  ADMIN_PORTAL_DEPLOY_WEBHOOK: https://a01.sikka.io/api/v1/deploy?uuid=oogggwg80w48ssw8ccg4o0wo&force=true
+jobs:
+  admin-portal:
+    name: "Admin Portal"
+    runs-on: [self-hosted, linux, x64, A01]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: false
+
+      - uses: Infisical/secrets-action@v1.0.9
+        with:
+          method: "universal"
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-slug: tanad-nxa-m
+          env-slug: prod
+          domain: https://secrets.sikka.io
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u zaaakher --password-stdin
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile.admin
+          push: true
+          tags: ghcr.io/sikka-software/tanad:admin
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            DIRECTUS_TOKEN=${{ env.DIRECTUS_TOKEN }}
+            DIRECTUS_URL=${{ env.DIRECTUS_URL }}
+            DATABASE_URL=${{ env.DATABASE_URL }}
+            NEXT_PUBLIC_STRIPE_PRODUCT_ID=${{ env.NEXT_PUBLIC_STRIPE_PRODUCT_ID }}
+            NEXT_PUBLIC_STRIPE_SECRET_KEY=${{ env.NEXT_PUBLIC_STRIPE_SECRET_KEY }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ env.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_SUPABASE_URL=${{ env.NEXT_PUBLIC_SUPABASE_URL }}
+
+      - name: Trigger Dokploy Deployment
+        run: |
+          curl '${{ env.ADMIN_PORTAL_DEPLOY_WEBHOOK }}' \
+          --header 'Authorization: Bearer ${{ secrets.A01_COOLIFY_TOKEN }}'
