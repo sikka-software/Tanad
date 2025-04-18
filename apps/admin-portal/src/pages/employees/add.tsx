@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -15,7 +14,6 @@ import useUserStore from "@/stores/use-user-store";
 export default function AddEmployeePage() {
   const t = useTranslations();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { user } = useUserStore();
 
   const { loadingSave, setLoadingSave } = useEmployeesStore();
@@ -47,15 +45,6 @@ export default function AddEmployeePage() {
         const errorData = await response.json();
         throw new Error(errorData.error || t("Employees.messages.error"));
       }
-
-      // Get the new employee data
-      const newEmployee = await response.json();
-
-      const previousEmployees = queryClient.getQueryData(["employees"]) || [];
-      queryClient.setQueryData(
-        ["employees"],
-        [...(Array.isArray(previousEmployees) ? previousEmployees : []), newEmployee],
-      );
 
       toast.success(t("General.successful_operation"), {
         description: t("Employees.success.created"),

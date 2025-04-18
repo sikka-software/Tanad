@@ -1,12 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
+import { ComboboxAdd } from "@/ui/combobox-add";
+import { FormControl, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormDialog } from "@/ui/form-dialog";
+
+import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Form } from "@/components/ui/form";
@@ -21,15 +28,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ComboboxAdd } from "@/ui/combobox-add";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/ui/form";
-import { FormDialog } from "@/ui/form-dialog";
 
 import { cn } from "@/lib/utils";
+
 import { useEmployees } from "@/hooks/useEmployees";
-import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useEmployeesStore } from "@/stores/employees.store";
 import useUserStore from "@/stores/use-user-store";
 
 const requestSchema = z.object({
@@ -67,8 +70,9 @@ const EmployeeRequestForm = ({
   const router = useRouter();
   const { locale } = useRouter();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { setLoadingSave: setIsEmployeeSaving, loadingSave: isEmployeeSaving } =
+    useEmployeesStore();
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
-  const [isEmployeeSaving, setIsEmployeeSaving] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useUserStore();
 
@@ -85,10 +89,13 @@ const EmployeeRequestForm = ({
   });
 
   // Format employees for ComboboxAdd
-  const employeeOptions = employees.map((emp) => ({
-    label: `${emp.first_name} ${emp.last_name}`,
-    value: `${emp.first_name} ${emp.last_name}`,
-  }));
+  const employeeOptions = employees.map((emp) => {
+    console.log(emp.email);
+    return {
+      label: `${emp.first_name} ${emp.last_name}`,
+      value: emp.email,
+    };
+  });
 
   const handleEmployeeSubmit = async (data: EmployeeFormValues) => {
     setIsEmployeeSaving(true);
@@ -148,8 +155,6 @@ const EmployeeRequestForm = ({
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Employees.error.create"),
       });
-    } finally {
-      setIsEmployeeSaving(false);
     }
   };
 
@@ -352,7 +357,7 @@ const EmployeeRequestForm = ({
         formId="employee-form"
         loadingSave={isEmployeeSaving}
       >
-        <EmployeeForm id="employee-form" onSubmit={handleEmployeeSubmit} loading={isEmployeeSaving} />
+        <EmployeeForm id="employee-form" onSubmit={handleEmployeeSubmit} />
       </FormDialog>
     </>
   );

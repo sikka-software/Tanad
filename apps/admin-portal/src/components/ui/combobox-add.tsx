@@ -194,7 +194,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                 <CommandGroup className={cn("max-h-[200px]", data.length > 0 && "overflow-y-auto")}>
                   {data.map((item: any, i) => (
                     <CommandItem
-                      key={i}
+                      key={item[valueKey]}
                       onSelect={() => {
                         const newValue = getProperty(item, valueKey);
                         setValue(newValue === value ? "" : (newValue as string));
