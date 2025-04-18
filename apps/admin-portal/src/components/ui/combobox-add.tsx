@@ -9,11 +9,9 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  //   CommandInputProps,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-// import { HelperText } from "@/components/ui/helper-text";
 import { Label } from "@/components/ui/label";
 import { PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,8 +38,6 @@ type ComboboxAddTypes<T> = {
   hideInput?: boolean;
   direction?: "rtl" | "ltr";
   inputProps?: any;
-  //   TODO: fix this
-  //   inputProps?: CommandInputProps;
   id?: string;
   /** The label of the input field   */
   label?: any;
@@ -75,9 +71,6 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = React.useState(defaultValue);
     const containerRef = React.useRef<HTMLDivElement>(null);
-    // function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
-    //   return key.split(".").reduce((o, k) => (o || {})[k], obj);
-    // }
 
     function getProperty<T>(obj: T, key: string): any {
       return key.split(".").reduce((o: any, k: string) => (o || {})[k], obj);
@@ -129,13 +122,6 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                       ? renderSelected(selectedItem)
                       : getProperty(selectedItem, labelKey)
                     : props.texts?.placeholder || ". . ."}
-                  {/* {value
-                    ? getProperty(
-                        data.find((item: any) => item[valueKey] === value) ||
-                          {},
-                        labelKey,
-                      )
-                    : props.texts?.placeholder || ". . ."} */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={cn(
@@ -153,7 +139,6 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                     <path d="m6 9 6 6 6-6" />
                   </svg>
                 </button>
-                {/* <HelperText helperText={props.helperText} /> */}
               </div>
             )}
           </PopoverTrigger>
@@ -164,7 +149,6 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
               props.helperText && "-mt-4",
             )}
             dir={direction}
-            // container={containerRef.current}
           >
             <Command
               filter={(value, search) => {

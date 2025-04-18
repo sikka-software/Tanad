@@ -90,7 +90,6 @@ const EmployeeRequestForm = ({
 
   // Format employees for ComboboxAdd
   const employeeOptions = employees.map((emp) => {
-    console.log(emp.email);
     return {
       label: `${emp.first_name} ${emp.last_name}`,
       value: emp.email,
@@ -193,6 +192,14 @@ const EmployeeRequestForm = ({
                     isLoading={employeesLoading}
                     defaultValue={field.value}
                     onChange={field.onChange}
+                    renderOption={(item) => {
+                      return (
+                        <div className="flex flex-col">
+                          <span>{item.label}</span>
+                          <span className="text-sm text-muted-foreground">{item.value}</span>
+                        </div>
+                      );
+                    }}
                     texts={{
                       placeholder: t("EmployeeRequests.form.employee.placeholder"),
                       searchPlaceholder: t("Employees.search_employees"),
