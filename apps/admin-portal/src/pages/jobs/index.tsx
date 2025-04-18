@@ -1,8 +1,9 @@
+import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import JobCard from "@/components/app/job/job.card";
-import { JobTable } from "@/components/app/job/job.table";
+import JobTable from "@/components/app/job/job.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import ConfirmDelete from "@/components/ui/confirm-delete";
 import DataModelList from "@/components/ui/data-model-list";
@@ -51,9 +52,9 @@ export default function JobsPage() {
         <PageSearchAndFilter
           title={t("Jobs.title")}
           createHref="/jobs/add"
-          createLabel={t("Jobs.create")}
+          createLabel={t("Jobs.create_job")}
           onSearch={setSearchQuery}
-          searchPlaceholder={t("Jobs.search")}
+          searchPlaceholder={t("Jobs.search_jobs")}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
@@ -73,7 +74,7 @@ export default function JobsPage() {
               data={filteredData}
               isLoading={isLoading}
               error={error}
-              emptyMessage={t("Jobs.empty")}
+              emptyMessage={t("Jobs.no_jobs_found")}
               renderItem={(job) => <JobCard job={job} />}
               gridCols="3"
             />
@@ -92,3 +93,11 @@ export default function JobsPage() {
     </DataPageLayout>
   );
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      messages: (await import(`../../../locales/${locale}.json`)).default,
+    },
+  };
+};
