@@ -3,19 +3,20 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import { ProductForm, ProductFormValues } from "@/components/app/product/product.form";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { createProduct } from "@/services/productService";
 
 import type { Product, ProductCreateData } from "@/types/product.type";
 
-import { productKeys } from "@/hooks/useProducts";
+import { productKeys } from "@/hooks/models/useProducts";
 import useUserStore from "@/stores/use-user-store";
-
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -24,25 +25,6 @@ export default function AddProductPage() {
   const { user } = useUserStore();
 
   const [loading, setLoading] = useState(false);
-
-  const handleSuccess = (newProduct: Product) => {
-    // Update the products cache to include the new product
-    const previousProducts = queryClient.getQueryData(["products"]) || [];
-    queryClient.setQueryData(
-      ["products"],
-      [...(Array.isArray(previousProducts) ? previousProducts : []), newProduct],
-    );
-
-    // Navigate to products list
-    router.push("/products");
-  };
-
-  const handleDummyData = () => {
-    const form = (window as any).productForm;
-    if (form) {
-      form.setValue("name", "Product 1");
-    }
-  };
 
   const handleSubmit = async (data: ProductFormValues) => {
     setLoading(true);
@@ -61,44 +43,41 @@ export default function AddProductPage() {
         ...productData,
         user_id: user?.id,
       };
-      result = await createProduct(productCreateData as ProductCreateData);
-
-      // const response = await fetch("/api/products/create", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({
-      //     name: data.name.trim(),
-      //     description: data.description?.trim() || null,
-      //     price: data.price,
-      //     sku: data.sku?.trim() || null,
-      //     stock_quantity: data.stock_quantity,
-      //     user_id: user_id,
-      //   }),
-      // });
-
-      // if (!response.ok) {
-      //   const errorData = await response.json();
-      //   throw new Error(errorData.error || t("Products.error.create"));
-      // }
-
-      // const result = await response.json();
-
+      result = await createProduct(productCreateData as unknown as ProductCreateData);
       toast.success(t("General.successful_operation"), {
         description: t("Products.success.created"),
       });
 
-      onSuccess(result.product);
+      const previousProducts = queryClient.getQueryData(productKeys.lists()) || [];
+      queryClient.setQueryData(productKeys.lists(), [
+        ...(Array.isArray(previousProducts) ? previousProducts : []),
+        result,
+      ]);
+
+      router.push("/products");
     } catch (error) {
+      console.error("Failed to save product:", error);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Products.error.create"),
       });
+      setLoading(false);
+    }
+  };
+
+  const handleDummyData = () => {
+    const form = (window as any).productForm;
+    if (form) {
+      form.setValue("name", "Product 1");
+      form.setValue("description", "Description 1");
+      form.setValue("price", "100");
+      form.setValue("sku", Math.random().toString(36).substring(2, 15));
+      form.setValue("stock_quantity", "100");
     }
   };
 
   return (
-    <div className="">
+    <div>
+      <CustomPageMeta title={t("Products.add_new")} />
       <PageTitle
         title={t("Products.add_new")}
         formButtons

@@ -7,21 +7,27 @@ import {
   fetchDepartments,
   updateDepartment,
 } from "@/services/departmentService";
+
 import { Department, DepartmentCreateData } from "@/types/department.type";
 
-export const DEPARTMENTS_QUERY_KEY = ["departments"] as const;
-
+export const departmentKeys = {
+  all: ["departments"] as const,
+  lists: () => [...departmentKeys.all, "list"] as const,
+  list: (filters: any) => [...departmentKeys.lists(), { filters }] as const,
+  details: () => [...departmentKeys.all, "detail"] as const,
+  detail: (id: string) => [...departmentKeys.details(), id] as const,
+};
 // Hooks
 export function useDepartments() {
   return useQuery({
-    queryKey: DEPARTMENTS_QUERY_KEY,
+    queryKey: departmentKeys.lists(),
     queryFn: fetchDepartments,
   });
 }
 
 export function useDepartment(id: string) {
   return useQuery({
-    queryKey: [...DEPARTMENTS_QUERY_KEY, id],
+    queryKey: departmentKeys.detail(id),
     queryFn: () => fetchDepartmentById(id),
   });
 }
@@ -32,7 +38,7 @@ export function useCreateDepartment() {
   return useMutation({
     mutationFn: (department: DepartmentCreateData) => createDepartment(department),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: DEPARTMENTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
   });
 }
@@ -57,7 +63,7 @@ export function useUpdateDepartment() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
   });
 }
@@ -68,7 +74,7 @@ export function useDeleteDepartment() {
   return useMutation({
     mutationFn: (id: string) => deleteDepartment(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: DEPARTMENTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
   });
 }
@@ -95,7 +101,7 @@ export const useDeleteDepartments = () => {
       return result;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["departments"] });
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
   });
 };

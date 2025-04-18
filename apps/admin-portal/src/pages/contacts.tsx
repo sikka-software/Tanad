@@ -16,8 +16,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Client } from "@/types/client.type";
 import { Vendor } from "@/types/vendor.type";
 
-import { useClients } from "@/hooks/useClients";
-import { useVendors } from "@/hooks/useVendors";
+import { useClients } from "@/hooks/models/useClients";
+import { useVendors } from "@/hooks/models/useVendors";
 
 export default function ContactsPage() {
   const t = useTranslations();

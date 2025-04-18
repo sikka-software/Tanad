@@ -3,8 +3,6 @@ import { Employee } from "@/types/employee.types";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
-export const EMPLOYEES_QUERY_KEY = ["employees"] as const;
-
 export async function fetchEmployees(): Promise<Employee[]> {
   const supabase = createClient();
   const user = useUserStore.getState().user;

@@ -61,7 +61,7 @@ export interface Company {
   address?: string;
   city?: string;
   state?: string;
-  zipCode?: string;
+  zip_code?: string;
   industry?: string;
   size?: string;
   notes?: string;

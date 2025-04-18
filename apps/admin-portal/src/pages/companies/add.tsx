@@ -17,7 +17,7 @@ import { createCompany } from "@/services/companyService";
 
 import { Company, CompanyCreateData } from "@/types/company.type";
 
-import { companyKeys } from "@/hooks/useCompanies";
+import { companyKeys } from "@/hooks/models/useCompanies";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddCompanyPage() {
@@ -38,7 +38,7 @@ export default function AddCompanyPage() {
         address: data.address?.trim() || null,
         city: data.city?.trim() || null,
         state: data.state?.trim() || null,
-        zipCode: data.zipCode?.trim() || null,
+        zip_code: data.zip_code?.trim() || null,
         industry: data.industry?.trim() || null,
         size: data.size?.trim() || null,
         notes: data.notes?.trim() || null,
@@ -52,6 +52,7 @@ export default function AddCompanyPage() {
         user_id: user?.id,
       };
       result = await createCompany(companyCreateData as CompanyCreateData);
+
       toast.success(t("General.successful_operation"), {
         description: t("Companies.messages.success_created"),
       });

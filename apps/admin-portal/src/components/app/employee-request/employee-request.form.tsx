@@ -24,7 +24,7 @@ import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee
 
 import { cn } from "@/lib/utils";
 
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployees } from "@/hooks/models/useEmployees";
 import { useEmployeeRequestsStore } from "@/stores/employee-requests.store";
 import { useEmployeesStore } from "@/stores/employees.store";
 import useUserStore from "@/stores/use-user-store";

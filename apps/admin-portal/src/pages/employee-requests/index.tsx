@@ -12,7 +12,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { EmployeeRequest } from "@/types/employee-request.type";
 
-import { useEmployeeRequests } from "@/hooks/useEmployeeRequests";
+import { useEmployeeRequests } from "@/hooks/models/useEmployeeRequests";
 
 export default function EmployeeRequestsPage() {
   const t = useTranslations();

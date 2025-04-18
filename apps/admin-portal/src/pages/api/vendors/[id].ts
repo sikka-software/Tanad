@@ -1,10 +1,10 @@
+import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { eq } from "drizzle-orm";
+import { Vendor } from "@/types/vendor.type";
 
 import { db } from "@/db/drizzle";
 import { vendors } from "@/db/schema";
-import { Vendor } from "@/types/vendor.type";
 
 // Helper to convert Drizzle vendor to our Vendor type
 function convertDrizzleVendor(data: typeof vendors.$inferSelect): Vendor {
@@ -17,7 +17,7 @@ function convertDrizzleVendor(data: typeof vendors.$inferSelect): Vendor {
     address: data.address,
     city: data.city,
     state: data.state,
-    zipCode: data.zipCode,
+    zip_code: data.zip_code,
     notes: data.notes,
     created_at: data.created_at?.toString() || "",
     user_id: data.user_id,
@@ -56,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           address: data.address,
           city: data.city,
           state: data.state,
-          zipCode: data.zipCode,
+          zip_code: data.zip_code,
           notes: data.notes,
         })
         .where(eq(vendors.id, id))

@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
 import useUserStore from "@/stores/use-user-store";
-import { useJobListings } from "@/hooks/useJobListings";
+import { useJobListings } from "@/hooks/models/useJobListings";
 
 export default function AddJobListingPage() {
   const t = useTranslations();

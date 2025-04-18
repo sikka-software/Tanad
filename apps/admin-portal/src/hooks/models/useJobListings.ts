@@ -8,18 +8,31 @@ import {
 
 import { JobListing } from "@/types/job-listing.type";
 
+export const jobListingKeys = {
+  all: ["jobListings"] as const,
+  lists: () => [...jobListingKeys.all, "list"] as const,
+  list: (filters: any) => [...jobListingKeys.lists(), { filters }] as const,
+  details: () => [...jobListingKeys.all, "detail"] as const,
+  detail: (id: string) => [...jobListingKeys.details(), id] as const,
+};
+
 export function useJobListings() {
   const queryClient = useQueryClient();
 
   const query = useQuery<JobListing[]>({
-    queryKey: ["jobListings"],
+    queryKey: jobListingKeys.lists(),
     queryFn: fetchJobListings,
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: Pick<JobListing, 'title' | 'user_id'> & { description?: string | undefined; jobs?: string[] }) => createJobListing(data),
+    mutationFn: (
+      data: Pick<JobListing, "title" | "user_id"> & {
+        description?: string | undefined;
+        jobs?: string[];
+      },
+    ) => createJobListing(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobListings"] });
+      queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() });
     },
   });
 
@@ -34,7 +47,7 @@ export function useBulkDeleteJobListings() {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteJobListings(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobListings"] });
+      queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() });
     },
   });
 }

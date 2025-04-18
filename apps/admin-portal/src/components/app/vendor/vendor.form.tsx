@@ -16,7 +16,7 @@ import { CompanyForm, type CompanyFormValues } from "@/components/app/company/co
 
 import { fetchVendorById } from "@/services/vendorService";
 
-import { useCompanies } from "@/hooks/useCompanies";
+import { useCompanies } from "@/hooks/models/useCompanies";
 import { createClient } from "@/utils/supabase/component";
 
 export const createVendorSchema = (t: (key: string) => string) =>
@@ -28,7 +28,7 @@ export const createVendorSchema = (t: (key: string) => string) =>
     address: z.string().min(1, t("Vendors.form.address.required")),
     city: z.string().min(1, t("Vendors.form.city.required")),
     state: z.string().min(1, t("Vendors.form.state.required")),
-    zipCode: z.string().min(5, t("Vendors.form.zip_code.required")),
+    zip_code: z.string().min(5, t("Vendors.form.zip_code.required")),
     notes: z.string().nullable(),
   });
 
@@ -67,7 +67,7 @@ export function VendorForm({
       address: "",
       city: "",
       state: "",
-      zipCode: "",
+      zip_code: "",
       notes: "",
     },
   });
@@ -98,7 +98,7 @@ export function VendorForm({
             address: vendor.address,
             city: vendor.city,
             state: vendor.state,
-            zipCode: vendor.zipCode,
+            zip_code: vendor.zip_code,
             notes: vendor.notes || "",
           });
         })
@@ -132,7 +132,7 @@ export function VendorForm({
             address: data.address?.trim() || null,
             city: data.city?.trim() || null,
             state: data.state?.trim() || null,
-            zip_code: data.zipCode?.trim() || null,
+            zip_code: data.zip_code?.trim() || null,
             industry: data.industry?.trim() || null,
             size: data.size?.trim() || null,
             notes: data.notes?.trim() || null,
@@ -317,7 +317,7 @@ export function VendorForm({
 
             <FormField
               control={form.control}
-              name="zipCode"
+              name="zip_code"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("Vendors.form.zip_code.label")} *</FormLabel>

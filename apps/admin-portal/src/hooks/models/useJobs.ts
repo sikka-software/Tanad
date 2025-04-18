@@ -11,16 +11,24 @@ import {
 
 import { Job } from "@/types/job.type";
 
+export const jobKeys = {
+  all: ["jobs"] as const,
+  lists: () => [...jobKeys.all, "list"] as const,
+  list: (filters: any) => [...jobKeys.lists(), { filters }] as const,
+  details: () => [...jobKeys.all, "detail"] as const,
+  detail: (id: string) => [...jobKeys.details(), id] as const,
+};
+
 export function useJobs() {
   return useQuery({
-    queryKey: ["jobs"],
+    queryKey: jobKeys.lists(),
     queryFn: fetchJobs,
   });
 }
 
 export function useJob(id: string) {
   return useQuery({
-    queryKey: ["jobs", id],
+    queryKey: jobKeys.detail(id),
     queryFn: () => fetchJobById(id),
     enabled: !!id,
   });
@@ -31,7 +39,7 @@ export function useCreateJob() {
   return useMutation({
     mutationFn: (job: Job) => createJob(job),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
     },
   });
 }
@@ -41,8 +49,8 @@ export function useUpdateJob() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Job> }) => updateJob(id, data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["jobs", data.id] });
-      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: jobKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
     },
   });
 }
@@ -52,8 +60,8 @@ export function useDeleteJob() {
   return useMutation({
     mutationFn: deleteJob,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["jobs"] });
-      queryClient.removeQueries({ queryKey: ["jobs", variables] });
+      queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
+      queryClient.removeQueries({ queryKey: jobKeys.detail(variables) });
     },
   });
 }
@@ -63,7 +71,7 @@ export function useBulkDeleteJobs() {
   return useMutation({
     mutationFn: bulkDeleteJobs,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
     },
   });
 }

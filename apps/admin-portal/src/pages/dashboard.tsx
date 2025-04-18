@@ -12,15 +12,15 @@ import PageTitle from "@/components/ui/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/ui/stat-card";
 
-import { useBranches } from "@/hooks/useBranches";
-import { useClients } from "@/hooks/useClients";
-import { useCompanies } from "@/hooks/useCompanies";
-import { useDepartments } from "@/hooks/useDepartments";
-import { useEmployees } from "@/hooks/useEmployees";
-import { useJobs } from "@/hooks/useJobs";
-import { useOffices } from "@/hooks/useOffices";
-import { useVendors } from "@/hooks/useVendors";
-import { useWarehouses } from "@/hooks/useWarehouses";
+import { useBranches } from "@/hooks/models/useBranches";
+import { useClients } from "@/hooks/models/useClients";
+import { useCompanies } from "@/hooks/models/useCompanies";
+import { useDepartments } from "@/hooks/models/useDepartments";
+import { useEmployees } from "@/hooks/models/useEmployees";
+import { useJobs } from "@/hooks/models/useJobs";
+import { useOffices } from "@/hooks/models/useOffices";
+import { useVendors } from "@/hooks/models/useVendors";
+import { useWarehouses } from "@/hooks/models/useWarehouses";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 

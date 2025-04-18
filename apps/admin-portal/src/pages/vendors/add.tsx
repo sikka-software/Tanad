@@ -1,34 +1,34 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { toast } from "sonner";
+
+import { Button } from "@/ui/button";
+import PageTitle from "@/ui/page-title";
 
 import { VendorForm, type VendorFormValues } from "@/components/app/vendor/vendor.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { useCreateVendor } from "@/hooks/useVendors";
+import { createVendor } from "@/services/vendorService";
+
+import { Vendor, VendorCreateData } from "@/types/vendor.type";
+
+import { vendorKeys } from "@/hooks/models/useVendors";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddVendorPage() {
-  const router = useRouter();
   const t = useTranslations();
-  const createVendorMutation = useCreateVendor();
-
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const { user } = useUserStore();
 
-  const onSubmit = async (data: VendorFormValues) => {
-    if (!user?.id) {
-      toast.error(t("error.title"), {
-        description: t("error.not_authenticated"),
-      });
-      return;
-    }
-
+  const handleSubmit = async (data: VendorFormValues) => {
+    setLoading(true);
     try {
       const vendorData = {
         name: data.name.trim(),
@@ -38,21 +38,32 @@ export default function AddVendorPage() {
         address: data.address.trim(),
         city: data.city.trim(),
         state: data.state.trim(),
-        zipCode: data.zipCode.trim(),
+        zip_code: data.zip_code.trim(),
         notes: data.notes?.trim() || null,
         user_id: user?.id,
       };
 
-      await createVendorMutation.mutateAsync(vendorData);
+      let result: Vendor;
+
+      result = await createVendor(vendorData as VendorCreateData);
+
       toast.success(t("General.successful_operation"), {
         description: t("Vendors.messages.success_created"),
       });
+
+      const previousVendors = queryClient.getQueryData(vendorKeys.lists()) || [];
+      queryClient.setQueryData(vendorKeys.lists(), [
+        ...(Array.isArray(previousVendors) ? previousVendors : []),
+        result,
+      ]);
+
       router.push("/vendors");
     } catch (error) {
       console.error("Failed to save vendor:", error);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Vendors.messages.error_save"),
       });
+      setLoading(false);
     }
   };
 
@@ -66,7 +77,7 @@ export default function AddVendorPage() {
       form.setValue("address", dummyData.address);
       form.setValue("city", dummyData.city);
       form.setValue("state", dummyData.state);
-      form.setValue("zipCode", dummyData.zipCode);
+      form.setValue("zip_code", dummyData.zip_code);
     }
   };
 
@@ -77,7 +88,7 @@ export default function AddVendorPage() {
         title={t("Vendors.add_new")}
         formButtons
         formId="vendor-form"
-        loading={createVendorMutation.isPending}
+        loading={loading}
         onCancel={() => router.push("/vendors")}
         texts={{
           submit_form: t("Vendors.add_new"),
@@ -96,8 +107,8 @@ export default function AddVendorPage() {
         <VendorForm
           formId="vendor-form"
           user_id={user?.id}
-          loading={createVendorMutation.isPending}
-          onSubmit={onSubmit}
+          loading={loading}
+          onSubmit={handleSubmit}
         />
       </div>
     </div>

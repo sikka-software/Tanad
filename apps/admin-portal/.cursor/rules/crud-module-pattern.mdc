@@ -48,7 +48,7 @@ When implementing any CRUD module, we must first respect and align with the data
      address: text().notNull(),
      city: text().notNull(),
      state: text().notNull(),
-     zipCode: text("zip_code").notNull(),
+     zip_code: text("zip_code").notNull(),
      phone: text(),
      email: text(),
      is_active: boolean().default(true).notNull(),

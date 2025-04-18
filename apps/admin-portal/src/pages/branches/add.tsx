@@ -13,7 +13,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { branchKeys } from "@/hooks/useBranches";
+import { branchKeys } from "@/hooks/models/useBranches";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -88,7 +88,7 @@ export default function AddBranchPage() {
       form.setValue("address", dummyData.address);
       form.setValue("city", dummyData.city);
       form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zipCode);
+      form.setValue("zip_code", dummyData.zip_code);
       form.setValue("manager", dummyData.name);
       form.setValue("is_active", true);
       form.setValue("notes", "Test branch notes");

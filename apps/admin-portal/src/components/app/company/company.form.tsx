@@ -21,7 +21,7 @@ export const createCompanySchema = (t: (key: string) => string) =>
     address: z.string().optional(),
     city: z.string().optional(),
     state: z.string().optional(),
-    zipCode: z.string().optional(),
+    zip_code: z.string().optional(),
     industry: z.string().optional(),
     size: z.string().optional(),
     notes: z.string().optional(),
@@ -51,7 +51,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
       address: "",
       city: "",
       state: "",
-      zipCode: "",
+      zip_code: "",
       industry: "",
       size: "",
       notes: "",
@@ -191,7 +191,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
           />
           <FormField
             control={form.control}
-            name="zipCode"
+            name="zip_code"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("Companies.form.zip_code.label")}</FormLabel>

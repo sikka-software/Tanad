@@ -16,7 +16,7 @@ function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect) {
     address: data.address,
     city: data.city,
     state: data.state,
-    zip_code: data.zipCode,
+    zip_code: data.zip_code,
     capacity: data.capacity ? Number(data.capacity) : null,
     is_active: data.is_active,
     notes: data.notes,
@@ -32,7 +32,7 @@ function convertToDrizzleWarehouse(data: WarehouseCreateData & { user_id: string
     address: data.address,
     city: data.city,
     state: data.state,
-    zipCode: data.zip_code,
+    zip_code: data.zip_code,
     capacity: data.capacity?.toString(),
     is_active: data.is_active,
     notes: data.notes,
@@ -70,6 +70,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "POST") {
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const data = req.body as WarehouseCreateData & { user_id: string };
       const drizzleWarehouse = convertToDrizzleWarehouse(data);
 

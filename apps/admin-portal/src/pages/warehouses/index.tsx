@@ -12,7 +12,7 @@ import WarehouseTable from "@/components/app/warehouse/warehouse.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { useBulkDeleteWarehouses, useWarehouses } from "@/hooks/useWarehouses";
+import { useBulkDeleteWarehouses, useWarehouses } from "@/hooks/models/useWarehouses";
 import useWarehousesStore from "@/stores/warehouses.store";
 
 export default function WarehousesPage() {

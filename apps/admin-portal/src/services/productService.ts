@@ -17,17 +17,22 @@ export async function fetchProductById(id: string): Promise<Product> {
 }
 
 export async function createProduct(product: Omit<Product, "id" | "created_at">): Promise<Product> {
-  const response = await fetch("/api/products", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(product),
-  });
-  if (!response.ok) {
-    throw new Error("Failed to create product");
+  try {
+    const response = await fetch("/api/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(product),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to create product");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error creating product:", error);
+    throw error;
   }
-  return response.json();
 }
 
 export async function updateProduct(

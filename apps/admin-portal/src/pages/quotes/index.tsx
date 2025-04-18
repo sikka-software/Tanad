@@ -15,7 +15,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Quote } from "@/types/quote.type";
 
-import { useQuotes, useBulkDeleteQuotes } from "@/hooks/useQuotes";
+import { useQuotes, useBulkDeleteQuotes } from "@/hooks/models/useQuotes";
 import { useQuotesStore } from "@/stores/quotes.store";
 
 export default function QuotesPage() {

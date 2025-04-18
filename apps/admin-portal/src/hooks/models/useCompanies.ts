@@ -61,8 +61,8 @@ export function useUpdateCompany() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Company> }) => updateCompany(id, data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["companies", data.id] });
-      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: companyKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
     },
   });
 }
@@ -73,8 +73,8 @@ export function useDeleteCompany() {
   return useMutation({
     mutationFn: deleteCompany,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["companies"] });
-      queryClient.removeQueries({ queryKey: ["companies", variables] });
+      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
+      queryClient.removeQueries({ queryKey: companyKeys.detail(variables) });
     },
   });
 }
@@ -85,7 +85,7 @@ export function useBulkDeleteCompanies() {
   return useMutation({
     mutationFn: bulkDeleteCompanies,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
     },
   });
 }

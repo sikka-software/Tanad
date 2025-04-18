@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { eq } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
+
+import { Client } from "@/types/client.type";
 
 import { db } from "@/db/drizzle";
 import { clients } from "@/db/schema";
-import { Client } from "@/types/client.type";
 
 // Helper to convert Drizzle client to our Client type
 function convertDrizzleClient(data: typeof clients.$inferSelect): Client {
@@ -16,7 +17,7 @@ function convertDrizzleClient(data: typeof clients.$inferSelect): Client {
     address: data.address,
     city: data.city,
     state: data.state,
-    zip_code: data.zipCode,
+    zip_code: data.zip_code,
     notes: data.notes,
     created_at: data.created_at?.toString() || "",
   };
@@ -48,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const dbClient = req.body.zip_code
         ? {
             ...req.body,
-            zipCode: req.body.zip_code,
+            zip_code: req.body.zip_code,
           }
         : req.body;
 
@@ -80,4 +81,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(405).json({ message: "Method not allowed" });
-} 
+}

@@ -15,7 +15,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Office } from "@/types/office.type";
 
-import { useOffices, useBulkDeleteOffices } from "@/hooks/useOffices";
+import { useOffices, useBulkDeleteOffices } from "@/hooks/models/useOffices";
 import { useOfficesStore } from "@/stores/offices.store";
 
 export default function OfficesPage() {

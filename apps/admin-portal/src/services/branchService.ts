@@ -13,7 +13,7 @@ function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {
     address: data.address,
     city: data.city,
     state: data.state,
-    zip_code: data.zipCode,
+    zip_code: data.zip_code,
     phone: data.phone,
     email: data.email,
     manager: data.manager,

@@ -15,7 +15,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Branch } from "@/types/branch.type";
 
-import { useBranches, useBulkDeleteBranches } from "@/hooks/useBranches";
+import { useBranches, useBulkDeleteBranches } from "@/hooks/models/useBranches";
 import { useBranchesStore } from "@/stores/branches.store";
 
 export default function BranchesPage() {

@@ -8,8 +8,8 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { Employee } from "@/types/employee.types";
 
-import { useDepartments } from "@/hooks/useDepartments";
-import { useUpdateEmployee } from "@/hooks/useEmployees";
+import { useDepartments } from "@/hooks/models/useDepartments";
+import { useUpdateEmployee } from "@/hooks/models/useEmployees";
 import { useEmployeesStore } from "@/stores/employees.store";
 
 const nameSchema = z.string().min(1, "Required");

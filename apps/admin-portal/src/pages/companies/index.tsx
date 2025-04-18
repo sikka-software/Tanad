@@ -12,7 +12,7 @@ import CompaniesTable from "@/components/app/company/company.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { useCompanies, useBulkDeleteCompanies } from "@/hooks/useCompanies";
+import { useCompanies, useBulkDeleteCompanies } from "@/hooks/models/useCompanies";
 import useCompaniesStore from "@/stores/companies.store";
 
 export default function CompaniesPage() {

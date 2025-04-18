@@ -10,17 +10,25 @@ import {
 
 import { Client, ClientCreateData } from "@/types/client.type";
 
+export const clientKeys = {
+  all: ["clients"] as const,
+  lists: () => [...clientKeys.all, "list"] as const,
+  list: (filters: any) => [...clientKeys.lists(), { filters }] as const,
+  details: () => [...clientKeys.all, "detail"] as const,
+  detail: (id: string) => [...clientKeys.details(), id] as const,
+};
+
 // Hooks
 export function useClients() {
   return useQuery({
-    queryKey: ["clients"],
+    queryKey: clientKeys.lists(),
     queryFn: fetchClients,
   });
 }
 
 export function useClient(id: string) {
   return useQuery({
-    queryKey: ["clients", id],
+    queryKey: clientKeys.detail(id),
     queryFn: () => fetchClientById(id),
     enabled: !!id,
   });
@@ -33,7 +41,7 @@ export function useCreateClient() {
     mutationFn: (newClient: Omit<Client, "id" | "created_at">) =>
       createClient(newClient as ClientCreateData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
     },
   });
 }
@@ -50,8 +58,8 @@ export function useUpdateClient() {
       client: Partial<Omit<Client, "id" | "created_at">>;
     }) => updateClient(id, client),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["clients", data.id] });
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      queryClient.invalidateQueries({ queryKey: clientKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
     },
   });
 }
@@ -62,8 +70,8 @@ export function useDeleteClient() {
   return useMutation({
     mutationFn: (id: string) => deleteClient(id),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
-      queryClient.removeQueries({ queryKey: ["clients", variables] });
+      queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
+      queryClient.removeQueries({ queryKey: clientKeys.detail(variables) });
     },
   });
 }
@@ -87,7 +95,7 @@ export function useBulkDeleteClients() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
     },
   });
 }

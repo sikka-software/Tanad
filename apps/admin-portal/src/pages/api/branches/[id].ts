@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { eq } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
+
+import { Branch } from "@/types/branch.type";
 
 import { db } from "@/db/drizzle";
 import { branches } from "@/db/schema";
-import { Branch } from "@/types/branch.type";
 
 // Helper to convert Drizzle branch to our Branch type
 function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {
@@ -14,7 +15,7 @@ function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {
     address: data.address,
     city: data.city,
     state: data.state,
-    zip_code: data.zipCode,
+    zip_code: data.zip_code,
     phone: data.phone,
     email: data.email,
     manager: data.manager,
@@ -49,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Map branch data to match Drizzle schema
       const dbBranch = {
         ...req.body,
-        zipCode: req.body.zip_code,
+        zip_code: req.body.zip_code,
         is_active: req.body.is_active,
       };
 
@@ -81,4 +82,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(405).json({ message: "Method not allowed" });
-} 
+}

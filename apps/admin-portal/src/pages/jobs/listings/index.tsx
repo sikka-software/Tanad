@@ -14,7 +14,7 @@ import SelectionMode from "@/components/ui/selection-mode";
 import { JobListing } from "@/types/job-listing.type";
 
 import useUserStore from "@/stores/use-user-store";
-import { useJobListings, useBulkDeleteJobListings } from "@/hooks/useJobListings";
+import { useJobListings, useBulkDeleteJobListings } from "@/hooks/models/useJobListings";
 import useJobListingsStore from "@/stores/job-listings.store";
 
 export default function JobListingsPage() {

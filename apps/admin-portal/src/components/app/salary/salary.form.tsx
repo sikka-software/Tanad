@@ -19,7 +19,7 @@ import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee
 
 import type { Salary } from "@/types/salary.type";
 
-import { useEmployees } from "@/hooks/useEmployees";
+import { useEmployees } from "@/hooks/models/useEmployees";
 import useUserStore from "@/stores/use-user-store";
 
 const createSalarySchema = (t: (key: string) => string) =>

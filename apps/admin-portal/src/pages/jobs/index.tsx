@@ -12,7 +12,7 @@ import SelectionMode from "@/components/ui/selection-mode";
 
 import { Job } from "@/types/job.type";
 
-import { useJobs, useBulkDeleteJobs } from "@/hooks/useJobs";
+import { useJobs, useBulkDeleteJobs } from "@/hooks/models/useJobs";
 import { useJobsStore } from "@/stores/jobs.store";
 
 export default function JobsPage() {

@@ -11,10 +11,18 @@ import {
 
 import type { Salary } from "@/types/salary.type";
 
+export const salaryKeys = {
+  all: ["salaries"] as const,
+  lists: () => [...salaryKeys.all, "list"] as const,
+  list: (filters: any) => [...salaryKeys.lists(), { filters }] as const,
+  details: () => [...salaryKeys.all, "detail"] as const,
+  detail: (id: string) => [...salaryKeys.details(), id] as const,
+};
+
 // Hook to fetch all salaries
 export function useSalaries() {
   return useQuery({
-    queryKey: ["salaries"],
+    queryKey: salaryKeys.lists(),
     queryFn: fetchSalaries,
   });
 }
@@ -22,7 +30,7 @@ export function useSalaries() {
 // Hook to fetch a single salary by ID
 export function useSalary(id: string) {
   return useQuery({
-    queryKey: ["salaries", id],
+    queryKey: salaryKeys.detail(id),
     queryFn: () => fetchSalaryById(id),
     enabled: !!id,
   });
@@ -35,7 +43,7 @@ export function useCreateSalary() {
   return useMutation({
     mutationFn: createSalary,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["salaries"] });
+      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
     },
   });
 }
@@ -53,8 +61,8 @@ export function useUpdateSalary() {
       salary: Partial<Omit<Salary, "id" | "created_at">>;
     }) => updateSalary(id, salary),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["salaries", data.id] });
-      queryClient.invalidateQueries({ queryKey: ["salaries"] });
+      queryClient.invalidateQueries({ queryKey: salaryKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
     },
   });
 }
@@ -66,7 +74,7 @@ export function useDeleteSalary() {
   return useMutation({
     mutationFn: deleteSalary,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["salaries"] });
+      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
     },
   });
 }
@@ -78,7 +86,7 @@ export function useBulkDeleteSalaries() {
   return useMutation({
     mutationFn: bulkDeleteSalaries,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["salaries"] });
+      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
     },
   });
 }

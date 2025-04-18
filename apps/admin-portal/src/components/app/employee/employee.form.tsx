@@ -16,7 +16,7 @@ import { Textarea } from "@/ui/textarea";
 
 import DepartmentForm, { DepartmentFormValues } from "@/components/app/department/department.form";
 
-import { useDepartments, DEPARTMENTS_QUERY_KEY } from "@/hooks/useDepartments";
+import { useDepartments, DEPARTMENTS_QUERY_KEY } from "@/hooks/models/useDepartments";
 import { useEmployeesStore } from "@/stores/employees.store";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";

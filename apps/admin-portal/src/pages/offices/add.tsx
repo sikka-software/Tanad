@@ -5,21 +5,24 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/ui/button";
+import PageTitle from "@/ui/page-title";
+
 import { OfficeForm, type OfficeFormValues } from "@/components/app/office/office.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
+import { createOffice } from "@/services/officeService";
+
+import { Office, OfficeCreateData } from "@/types/office.type";
+
+import { officeKeys } from "@/hooks/models/useOffices";
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 export default function AddOfficePage() {
-  const supabase = createClient();
-  const router = useRouter();
   const t = useTranslations();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useUserStore();
@@ -27,47 +30,36 @@ export default function AddOfficePage() {
   const handleSubmit = async (data: OfficeFormValues) => {
     setLoading(true);
     try {
-      // Check if user ID is available
-      if (!user?.id) {
-        throw new Error(t("Offices.error.not_authenticated"));
-      }
+      const officeData = {
+        name: data.name.trim(),
+        email: data.email?.trim(),
+        phone: data.phone?.trim(),
+        address: data.address.trim(),
+        city: data.city.trim(),
+        state: data.state.trim(),
+        zip_code: data.zip_code.trim(),
+        user_id: user?.id,
+      };
 
-      const { data: newOffice, error } = await supabase
-        .from("offices")
-        .insert([
-          {
-            name: data.name.trim(),
-            email: data.email?.trim(),
-            phone: data.phone?.trim(),
-            address: data.address.trim(),
-            city: data.city.trim(),
-            state: data.state.trim(),
-            zip_code: data.zip_code.trim(),
-            user_id: user?.id,
-          },
-        ])
-        .select()
-        .single();
+      let result: Office;
 
-      if (error) throw error;
-
-      // Update the clients cache to include the new client
-      const previousOffices = queryClient.getQueryData(["offices"]) || [];
-      queryClient.setQueryData(
-        ["offices"],
-        [...(Array.isArray(previousOffices) ? previousOffices : []), newOffice],
-      );
+      result = await createOffice(officeData as OfficeCreateData);
 
       toast.success(t("General.successful_operation"), {
         description: t("Offices.success.created"),
       });
+
+      const previousOffices = queryClient.getQueryData(["offices"]) || [];
+      queryClient.setQueryData(
+        ["offices"],
+        [...(Array.isArray(previousOffices) ? previousOffices : []), result],
+      );
 
       router.push("/offices");
     } catch (error) {
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Offices.error.creating"),
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -82,7 +74,7 @@ export default function AddOfficePage() {
       form.setValue("address", dummyData.address);
       form.setValue("city", dummyData.city);
       form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zipCode);
+      form.setValue("zip_code", dummyData.zip_code);
     }
   };
 

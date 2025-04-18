@@ -1,21 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
-  EMPLOYEES_QUERY_KEY,
-  addEmployee as addEmployeeService,
-  deleteEmployee as deleteEmployeeService,
+  addEmployee,
+  deleteEmployee,
   fetchEmployeeById,
-  fetchEmployees as fetchEmployeesService,
-  updateEmployee as updateEmployeeService,
+  fetchEmployees,
+  updateEmployee,
 } from "@/services/employeeService";
 
 import { Employee } from "@/types/employee.types";
 
+export const employeeKeys = {
+  all: ["employees"] as const,
+  lists: () => [...employeeKeys.all, "list"] as const,
+  list: (filters: any) => [...employeeKeys.lists(), { filters }] as const,
+  details: () => [...employeeKeys.all, "detail"] as const,
+  detail: (id: string) => [...employeeKeys.details(), id] as const,
+};
+
 // Hook for fetching all employees
 export const useEmployees = () => {
   return useQuery({
-    queryKey: EMPLOYEES_QUERY_KEY,
-    queryFn: fetchEmployeesService,
+    queryKey: employeeKeys.lists(),
+    queryFn: fetchEmployees,
     staleTime: 10000, // Consider data fresh for 10 seconds
   });
 };
@@ -23,7 +30,7 @@ export const useEmployees = () => {
 // Hook for fetching a single employee by ID
 export const useEmployee = (id: string) => {
   return useQuery({
-    queryKey: [...EMPLOYEES_QUERY_KEY, id],
+    queryKey: employeeKeys.detail(id),
     queryFn: () => fetchEmployeeById(id),
     enabled: !!id,
   });
@@ -35,15 +42,15 @@ export const useUpdateEmployee = () => {
 
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Employee> }) =>
-      updateEmployeeService(id, updates),
+      updateEmployee(id, updates),
     onMutate: async ({ id, updates }) => {
       // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: EMPLOYEES_QUERY_KEY });
-      await queryClient.cancelQueries({ queryKey: [...EMPLOYEES_QUERY_KEY, id] });
+      await queryClient.cancelQueries({ queryKey: employeeKeys.lists() });
+      await queryClient.cancelQueries({ queryKey: employeeKeys.detail(id) });
 
       // Snapshot the previous values
-      const previousEmployees = queryClient.getQueryData(EMPLOYEES_QUERY_KEY);
-      const previousEmployee = queryClient.getQueryData([...EMPLOYEES_QUERY_KEY, id]);
+      const previousEmployees = queryClient.getQueryData(employeeKeys.lists());
+      const previousEmployee = queryClient.getQueryData(employeeKeys.detail(id));
 
       // Prepare updates to apply optimistically
       const optimisticUpdates = { ...updates };
@@ -69,7 +76,7 @@ export const useUpdateEmployee = () => {
       }
 
       // Optimistically update the cache
-      queryClient.setQueryData(EMPLOYEES_QUERY_KEY, (old: Employee[] | undefined) => {
+      queryClient.setQueryData(employeeKeys.lists(), (old: Employee[] | undefined) => {
         if (!old) return old;
 
         return old.map((employee) => {
@@ -81,7 +88,7 @@ export const useUpdateEmployee = () => {
       });
 
       if (previousEmployee) {
-        queryClient.setQueryData([...EMPLOYEES_QUERY_KEY, id], (old: Employee | undefined) => {
+        queryClient.setQueryData(employeeKeys.detail(id), (old: Employee | undefined) => {
           if (!old) return old;
           return { ...old, ...optimisticUpdates };
         });
@@ -91,22 +98,22 @@ export const useUpdateEmployee = () => {
     },
     onSuccess: (updatedEmployee, { id }) => {
       // Manually update the cache with the new data instead of invalidating
-      queryClient.setQueryData(EMPLOYEES_QUERY_KEY, (old: Employee[] | undefined) => {
+      queryClient.setQueryData(employeeKeys.lists(), (old: Employee[] | undefined) => {
         if (!old) return [updatedEmployee];
 
         return old.map((employee) => (employee.id === id ? updatedEmployee : employee));
       });
 
       // Also update the individual employee query data if it exists
-      queryClient.setQueryData([...EMPLOYEES_QUERY_KEY, id], updatedEmployee);
+      queryClient.setQueryData(employeeKeys.detail(id), updatedEmployee);
     },
     onError: (err, { id }, context) => {
       // Roll back to the previous values if mutation fails
       if (context?.previousEmployees) {
-        queryClient.setQueryData(EMPLOYEES_QUERY_KEY, context.previousEmployees);
+        queryClient.setQueryData(employeeKeys.lists(), context.previousEmployees);
       }
       if (context?.previousEmployee) {
-        queryClient.setQueryData([...EMPLOYEES_QUERY_KEY, id], context.previousEmployee);
+        queryClient.setQueryData(employeeKeys.detail(id), context.previousEmployee);
       }
     },
     // Don't invalidate queries on settle - we're manually updating the cache
@@ -119,9 +126,9 @@ export const useAddEmployee = () => {
 
   return useMutation({
     mutationFn: (employee: Omit<Employee, "id" | "created_at" | "updated_at">) =>
-      addEmployeeService(employee),
+      addEmployee(employee),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: EMPLOYEES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
     },
   });
 };
@@ -131,16 +138,16 @@ export const useDeleteEmployee = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteEmployeeService(id),
+    mutationFn: (id: string) => deleteEmployee(id),
     onMutate: async (id) => {
       // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: EMPLOYEES_QUERY_KEY });
+      await queryClient.cancelQueries({ queryKey: employeeKeys.lists() });
 
       // Snapshot the previous value
-      const previousEmployees = queryClient.getQueryData(EMPLOYEES_QUERY_KEY);
+      const previousEmployees = queryClient.getQueryData(employeeKeys.lists());
 
       // Optimistically remove the employee from the list
-      queryClient.setQueryData(EMPLOYEES_QUERY_KEY, (old: Employee[] | undefined) => {
+      queryClient.setQueryData(employeeKeys.lists(), (old: Employee[] | undefined) => {
         if (!old) return old;
         return old.filter((employee) => employee.id !== id);
       });
@@ -150,12 +157,12 @@ export const useDeleteEmployee = () => {
     onError: (_, __, context) => {
       // Roll back to the previous value if mutation fails
       if (context?.previousEmployees) {
-        queryClient.setQueryData(EMPLOYEES_QUERY_KEY, context.previousEmployees);
+        queryClient.setQueryData(employeeKeys.lists(), context.previousEmployees);
       }
     },
     onSettled: () => {
       // Always refetch to ensure cache consistency
-      queryClient.invalidateQueries({ queryKey: EMPLOYEES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
     },
   });
 };

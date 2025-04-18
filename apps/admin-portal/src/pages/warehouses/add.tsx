@@ -15,7 +15,7 @@ import { createWarehouse } from "@/services/warehouseService";
 
 import type { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
 
-import { warehouseKeys } from "@/hooks/useWarehouses";
+import { warehouseKeys } from "@/hooks/models/useWarehouses";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddWarehousePage() {

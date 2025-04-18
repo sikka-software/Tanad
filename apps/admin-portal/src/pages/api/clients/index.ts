@@ -18,7 +18,7 @@ function convertDrizzleClient(data: typeof clients.$inferSelect): Client {
     address: data.address,
     city: data.city,
     state: data.state,
-    zip_code: data.zipCode,
+    zip_code: data.zip_code,
     notes: data.notes,
     created_at: data.created_at?.toString() || "",
   };
@@ -57,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Map client data to match Drizzle schema
       const dbClient = {
         ...req.body,
-        zipCode: req.body.zip_code,
+        zip_code: req.body.zip_code,
       };
 
       const [client] = await db.insert(clients).values(dbClient).returning();

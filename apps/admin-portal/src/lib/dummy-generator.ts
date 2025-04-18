@@ -39,7 +39,7 @@ export const generateDummyData = () => {
     address: fakeAddresses[Math.floor(Math.random() * fakeAddresses.length)],
     city: fakeCities[Math.floor(Math.random() * fakeCities.length)],
     state: fakeStates[Math.floor(Math.random() * fakeStates.length)],
-    zipCode: fakeZipCodes[Math.floor(Math.random() * fakeZipCodes.length)],
+    zip_code: fakeZipCodes[Math.floor(Math.random() * fakeZipCodes.length)],
     locations: fakeLocations[Math.floor(Math.random() * fakeLocations.length)],
   };
 };

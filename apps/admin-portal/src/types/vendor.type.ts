@@ -7,7 +7,7 @@ export interface Vendor {
   address: string;
   city: string;
   state: string;
-  zipCode: string;
+  zip_code: string;
   notes: string | null;
   created_at: string;
   user_id: string;

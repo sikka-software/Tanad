@@ -8,7 +8,7 @@ import PageTitle from "@/ui/page-title";
 
 import { CompanyForm, type CompanyFormValues } from "@/components/app/company/company.form";
 
-import { useCompany, useUpdateCompany } from "@/hooks/useCompanies";
+import { useCompany, useUpdateCompany } from "@/hooks/models/useCompanies";
 
 export default function EditCompanyPage() {
   const t = useTranslations();
@@ -34,7 +34,7 @@ export default function EditCompanyPage() {
           address: data.address?.trim() || undefined,
           city: data.city?.trim() || undefined,
           state: data.state?.trim() || undefined,
-          zipCode: data.zipCode?.trim() || undefined,
+          zip_code: data.zip_code?.trim() || undefined,
           industry: data.industry?.trim() || undefined,
           size: data.size?.trim() || undefined,
           notes: data.notes?.trim() || undefined,
@@ -102,7 +102,7 @@ export default function EditCompanyPage() {
                 address: company.address || "",
                 city: company.city || "",
                 state: company.state || "",
-                zipCode: company.zipCode || "",
+                zip_code: company.zip_code || "",
                 industry: company.industry || "",
                 size: company.size || "",
                 notes: company.notes || "",

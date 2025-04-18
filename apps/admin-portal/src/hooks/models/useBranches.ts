@@ -1,5 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { Branch, BranchCreateData } from '@/types/branch.type';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import {
   createBranch,
   deleteBranch,
@@ -7,14 +7,16 @@ import {
   fetchBranches,
   updateBranch,
   bulkDeleteBranches,
-} from '@/services/branchService';
+} from "@/services/branchService";
+
+import type { Branch, BranchCreateData } from "@/types/branch.type";
 
 // Query keys for branches
 export const branchKeys = {
-  all: ['branches'] as const,
-  lists: () => [...branchKeys.all, 'list'] as const,
+  all: ["branches"] as const,
+  lists: () => [...branchKeys.all, "list"] as const,
   list: (filters: any) => [...branchKeys.lists(), { filters }] as const,
-  details: () => [...branchKeys.all, 'detail'] as const,
+  details: () => [...branchKeys.all, "detail"] as const,
   detail: (id: string) => [...branchKeys.details(), id] as const,
 };
 
@@ -40,7 +42,7 @@ export function useCreateBranch() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newBranch: Omit<Branch, 'id' | 'created_at'> & { user_id: string }) => {
+    mutationFn: (newBranch: Omit<Branch, "id" | "created_at"> & { user_id: string }) => {
       // Map user_id to user_id for the service function
       const { user_id, ...rest } = newBranch;
       const branchData: BranchCreateData = {
@@ -61,8 +63,13 @@ export function useUpdateBranch() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, branch }: { id: string; branch: Partial<Omit<Branch, 'id' | 'created_at'>> }) =>
-      updateBranch(id, branch),
+    mutationFn: ({
+      id,
+      branch,
+    }: {
+      id: string;
+      branch: Partial<Omit<Branch, "id" | "created_at">>;
+    }) => updateBranch(id, branch),
     onSuccess: (data) => {
       // Invalidate both the specific detail and the list queries
       queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
@@ -96,4 +103,4 @@ export function useBulkDeleteBranches() {
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
     },
   });
-} 
+}

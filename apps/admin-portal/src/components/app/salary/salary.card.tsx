@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { Salary } from "@/types/salary.type";
 
-import { useDeleteSalary } from "@/hooks/useSalaries";
+import { useDeleteSalary } from "@/hooks/models/useSalaries";
 
 // Helper to format date string (optional)
 const formatDate = (dateString: string | null | undefined) => {

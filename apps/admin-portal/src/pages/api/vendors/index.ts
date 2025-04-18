@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           address: data.address,
           city: data.city,
           state: data.state,
-          zipCode: data.zipCode,
+          zip_code: data.zip_code,
           notes: data.notes,
           user_id: data.user_id,
         })

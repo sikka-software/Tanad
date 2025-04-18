@@ -11,7 +11,7 @@ import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
 import { Invoice } from "@/types/invoice.type";
 
-import { useInvoices } from "@/hooks/useInvoices";
+import { useInvoices } from "@/hooks/models/useInvoices";
 
 export default function InvoicesPage() {
   const t = useTranslations();

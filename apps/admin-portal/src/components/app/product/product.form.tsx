@@ -54,7 +54,7 @@ export function ProductForm({ id, onSubmit, loading }: ProductFormProps) {
   });
 
   if (typeof window !== "undefined") {
-    (window as any).warehproouseForm = form;
+    (window as any).productForm = form;
   }
 
   return (

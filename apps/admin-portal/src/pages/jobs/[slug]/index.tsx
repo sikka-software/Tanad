@@ -5,7 +5,7 @@ import { Building2, MapPin, Calendar, DollarSign } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useJobs } from "@/hooks/useJobs";
+import { useJobs } from "@/hooks/models/useJobs";
 import { Job } from "@/types/job.type";
 import { JobListing } from "@/types/job-listing.type";
 

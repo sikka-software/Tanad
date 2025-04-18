@@ -13,7 +13,7 @@ function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehous
     address: data.address,
     city: data.city,
     state: data.state,
-    zip_code: data.zipCode,
+    zip_code: data.zip_code,
     capacity: data.capacity ? Number(data.capacity) : null,
     is_active: data.is_active,
     notes: data.notes,
@@ -25,7 +25,7 @@ function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehous
 function convertToDrizzleWarehouse(data: Partial<Warehouse>): Partial<typeof warehouses.$inferInsert> {
   return {
     ...data,
-    zipCode: data.zip_code,
+    zip_code: data.zip_code,
     capacity: data.capacity?.toString(),
   };
 }

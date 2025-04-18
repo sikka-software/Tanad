@@ -14,7 +14,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Employee } from "@/types/employee.types";
 
-import { useEmployees, useDeleteEmployee } from "@/hooks/useEmployees";
+import { useEmployees, useDeleteEmployee } from "@/hooks/models/useEmployees";
 import { useEmployeesStore } from "@/stores/employees.store";
 
 export default function EmployeesPage() {

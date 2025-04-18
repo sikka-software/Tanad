@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { Company } from "@/types/company.type";
+
 import { db } from "@/db/drizzle";
 import { companies } from "@/db/schema";
-import { Company } from "@/types/company.type";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -18,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       address,
       city,
       state,
-      zipCode,
+      zip_code,
       industry,
       size,
       notes,
@@ -40,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         address,
         city,
         state,
-        zipCode,
+        zip_code,
         industry,
         size,
         notes,

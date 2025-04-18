@@ -15,7 +15,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Product } from "@/types/product.type";
 
-import { useProducts, useBulkDeleteProducts } from "@/hooks/useProducts";
+import { useProducts, useBulkDeleteProducts } from "@/hooks/models/useProducts";
 import useProductsStore from "@/stores/products.store";
 
 export default function ProductsPage() {

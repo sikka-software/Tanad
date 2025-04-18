@@ -71,7 +71,7 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
     { accessorKey: "address", header: t("form.address.label"), validationSchema: addressSchema },
     { accessorKey: "city", header: t("form.city.label"), validationSchema: citySchema },
     { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
-    { accessorKey: "zipCode", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
+    { accessorKey: "zip_code", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
     { accessorKey: "size", header: t("form.size.label"), validationSchema: sizeSchema },
     {
       accessorKey: "is_active",

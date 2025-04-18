@@ -108,7 +108,7 @@ export function useBulkDeleteVendors() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["vendors"] });
+      queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
     },
   });
 }

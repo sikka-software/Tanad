@@ -13,9 +13,9 @@ import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
 import useUserStore from "@/stores/use-user-store";
-import { useBranches } from "@/hooks/useBranches";
-import { useOffices } from "@/hooks/useOffices";
-import { useWarehouses } from "@/hooks/useWarehouses";
+import { useBranches } from "@/hooks/models/useBranches";
+import { useOffices } from "@/hooks/models/useOffices";
+import { useWarehouses } from "@/hooks/models/useWarehouses";
 
 export const createDepartmentSchema = (t: (key: string) => string) =>
   z.object({

@@ -10,17 +10,25 @@ import {
 
 import { Office, OfficeCreateData } from "@/types/office.type";
 
+export const officeKeys = {
+  all: ["offices"] as const,
+  lists: () => [...officeKeys.all, "list"] as const,
+  list: (filters: any) => [...officeKeys.lists(), { filters }] as const,
+  details: () => [...officeKeys.all, "detail"] as const,
+  detail: (id: string) => [...officeKeys.details(), id] as const,
+};
+
 // Hooks
 export function useOffices() {
   return useQuery({
-    queryKey: ["offices"],
+    queryKey: officeKeys.lists(),
     queryFn: fetchOffices,
   });
 }
 
 export function useOffice(id: string) {
   return useQuery({
-    queryKey: ["offices", id],
+    queryKey: officeKeys.detail(id),
     queryFn: () => fetchOfficeById(id),
     enabled: !!id,
   });
@@ -28,12 +36,17 @@ export function useOffice(id: string) {
 
 export function useCreateOffice() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (newOffice: Omit<Office, "id" | "created_at">) =>
-      createOffice(newOffice as OfficeCreateData),
+    mutationFn: (newCompany: Omit<Office, "id" | "created_at"> & { user_id: string }) => {
+      const { user_id, ...rest } = newCompany;
+      const companyData: OfficeCreateData = {
+        ...rest,
+        user_id: user_id,
+      };
+      return createOffice(companyData);
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["offices"] });
+      queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
     },
   });
 }
@@ -50,8 +63,8 @@ export function useUpdateOffice() {
       office: Partial<Omit<Office, "id" | "created_at">>;
     }) => updateOffice(id, office),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["offices", data.id] });
-      queryClient.invalidateQueries({ queryKey: ["offices"] });
+      queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
     },
   });
 }
@@ -62,8 +75,8 @@ export function useDeleteOffice() {
   return useMutation({
     mutationFn: deleteOffice,
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["offices"] });
-      queryClient.removeQueries({ queryKey: ["offices", variables] });
+      queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
+      queryClient.removeQueries({ queryKey: officeKeys.detail(variables) });
     },
   });
 }
@@ -87,7 +100,7 @@ export function useBulkDeleteOffices() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["offices"] });
+      queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
     },
   });
 }

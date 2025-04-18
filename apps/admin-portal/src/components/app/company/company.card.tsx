@@ -59,7 +59,7 @@ const CompanyCard = ({ company }: { company: Company }) => {
               <MapPin className="h-4 w-4" />
               <span>
                 {[company.address, company.city, company.state].filter(Boolean).join(", ")}
-                {company.zipCode && ` ${company.zipCode}`}
+                {company.zip_code && ` ${company.zip_code}`}
               </span>
             </div>
           )}

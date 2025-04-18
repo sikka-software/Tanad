@@ -2,11 +2,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
 import { ClientForm, type ClientFormValues } from "@/components/app/client/client.form";
@@ -14,11 +13,14 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
+import { createClient } from "@/services/clientService";
+
+import { Client, ClientCreateData } from "@/types/client.type";
+
+import { clientKeys } from "@/hooks/models/useClients";
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 export default function AddClientPage() {
-  const supabase = createClient();
   const router = useRouter();
   const t = useTranslations();
   const [loading, setLoading] = useState(false);
@@ -28,49 +30,43 @@ export default function AddClientPage() {
   const handleSubmit = async (data: ClientFormValues) => {
     setLoading(true);
     try {
-      // Check if user ID is available
-      if (!user?.id) {
-        throw new Error(t("Clients.error.not_authenticated"));
-      }
+      const clientData = {
+        name: data.name.trim(),
+        email: data.email.trim(),
+        phone: data.phone.trim(),
+        company: data.company || null,
+        address: data.address.trim(),
+        city: data.city.trim(),
+        state: data.state.trim(),
+        zip_code: data.zip_code.trim(),
+        notes: data.notes?.trim() || null,
+      };
 
-      const { data: newClient, error } = await supabase
-        .from("clients")
-        .insert([
-          {
-            name: data.name.trim(),
-            email: data.email.trim(),
-            phone: data.phone.trim(),
-            company: data.company || null,
-            address: data.address.trim(),
-            city: data.city.trim(),
-            state: data.state.trim(),
-            zip_code: data.zip_code.trim(),
-            notes: data.notes?.trim() || null,
-            user_id: user?.id,
-          },
-        ])
-        .select()
-        .single();
+      let result: Client;
 
-      if (error) throw error;
+      const clientCreateData = {
+        ...clientData,
+        user_id: user?.id,
+      };
 
-      // Update the clients cache to include the new client
-      const previousClients = queryClient.getQueryData(["clients"]) || [];
-      queryClient.setQueryData(
-        ["clients"],
-        [...(Array.isArray(previousClients) ? previousClients : []), newClient],
-      );
+      result = await createClient(clientCreateData as ClientCreateData);
 
       toast.success(t("General.successful_operation"), {
         description: t("Clients.success.created"),
       });
 
+      const previousClients = queryClient.getQueryData(clientKeys.lists()) || [];
+      queryClient.setQueryData(clientKeys.lists(), [
+        ...(Array.isArray(previousClients) ? previousClients : []),
+        result,
+      ]);
+
       router.push("/clients");
     } catch (error) {
+      console.error("Failed to save client:", error);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Clients.error.create"),
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -85,7 +81,7 @@ export default function AddClientPage() {
       form.setValue("address", dummyData.address);
       form.setValue("city", dummyData.city);
       form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zipCode);
+      form.setValue("zip_code", dummyData.zip_code);
     }
   };
 
@@ -111,7 +107,7 @@ export default function AddClientPage() {
         }
       />
 
-      <div className="p-4 max-w-2xl mx-auto">
+      <div className="mx-auto max-w-2xl p-4">
         <ClientForm id="client-form" user_id={user?.id} onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>

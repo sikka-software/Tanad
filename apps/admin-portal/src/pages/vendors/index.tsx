@@ -14,7 +14,7 @@ import SelectionMode from "@/components/ui/selection-mode";
 
 import { Vendor } from "@/types/vendor.type";
 
-import { useVendors, useBulkDeleteVendors } from "@/hooks/useVendors";
+import { useVendors, useBulkDeleteVendors } from "@/hooks/models/useVendors";
 import { useVendorsStore } from "@/stores/vendors.store";
 
 // Assuming a useVendors hook exists or will be created

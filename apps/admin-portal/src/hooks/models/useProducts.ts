@@ -22,7 +22,7 @@ export const productKeys = {
 // Hook to fetch all products
 export function useProducts() {
   return useQuery({
-    queryKey: ["products"],
+    queryKey: productKeys.lists(),
     queryFn: fetchProducts,
   });
 }
@@ -108,7 +108,7 @@ export function useBulkDeleteProducts() {
     },
     onSuccess: () => {
       // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
     },
   });
 }

@@ -60,7 +60,7 @@ const VendorsTable = ({ data, isLoading, error, onSelectedRowsChange }: VendorsT
     { accessorKey: "address", header: t("form.address.label"), validationSchema: addressSchema },
     { accessorKey: "city", header: t("form.city.label"), validationSchema: citySchema },
     { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
-    { accessorKey: "zipCode", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
+    { accessorKey: "zip_code", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
     { accessorKey: "products", header: t("form.products.label"), validationSchema: productsSchema },
     { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
   ];

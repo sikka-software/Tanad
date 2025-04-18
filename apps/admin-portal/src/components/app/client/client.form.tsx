@@ -14,7 +14,7 @@ import { Textarea } from "@/ui/textarea";
 
 import { CompanyForm, type CompanyFormValues } from "@/components/app/company/company.form";
 
-import { useCompanies } from "@/hooks/useCompanies";
+import { useCompanies } from "@/hooks/models/useCompanies";
 import { createClient } from "@/utils/supabase/component";
 
 interface ClientFormProps {
@@ -102,7 +102,7 @@ export function ClientForm({
             address: data.address?.trim() || null,
             city: data.city?.trim() || null,
             state: data.state?.trim() || null,
-            zip_code: data.zipCode?.trim() || null,
+            zip_code: data.zip_code?.trim() || null,
             industry: data.industry?.trim() || null,
             size: data.size?.trim() || null,
             notes: data.notes?.trim() || null,

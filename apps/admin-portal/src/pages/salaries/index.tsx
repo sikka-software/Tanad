@@ -15,7 +15,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import type { Salary } from "@/types/salary.type";
 
-import { useSalaries, useBulkDeleteSalaries } from "@/hooks/useSalaries";
+import { useSalaries, useBulkDeleteSalaries } from "@/hooks/models/useSalaries";
 import { useSalariesStore } from "@/stores/salaries.store";
 
 export default function SalariesPage() {
