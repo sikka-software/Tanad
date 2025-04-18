@@ -16,13 +16,21 @@ import { Client } from "@/types/client.type";
 
 import { useClients, useBulkDeleteClients } from "@/hooks/models/useClients";
 import { useClientsStore } from "@/stores/clients.store";
+import { sortClients } from "@/lib/sort-utils";
 
 export default function ClientsPage() {
   const t = useTranslations();
   const { data: clients, isLoading, error } = useClients();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [sortRules, setSortRules] = useState<{ field: string; direction: string }[]>([
+    { field: "name", direction: "asc" },
+  ]);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleSortRulesChange = (newSortRules: { field: string; direction: string }[]) => {
+    setSortRules(newSortRules);
+  };
   const { selectedRows, setSelectedRows, clearSelection } = useClientsStore();
   const { mutate: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
 
@@ -34,6 +42,8 @@ export default function ClientsPage() {
         .includes(searchQuery.toLowerCase()) ||
       client.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  const sortedClients = sortClients(filteredClients || [], sortRules);
 
   const handleRowSelectionChange = (rows: Client[]) => {
     const newSelectedIds = rows.map((row) => row.id!);
@@ -81,12 +91,14 @@ export default function ClientsPage() {
             searchPlaceholder={t("Clients.search_clients")}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
+            sortRules={sortRules}
+            onSortRulesChange={handleSortRulesChange}
           />
         )}
         <div>
           {viewMode === "table" ? (
             <ClientsTable
-              data={filteredClients || []}
+              data={sortClients(filteredClients || [], sortRules)}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
               onSelectedRowsChange={handleRowSelectionChange}
@@ -94,7 +106,7 @@ export default function ClientsPage() {
           ) : (
             <div className="p-4">
               <DataModelList
-                data={filteredClients || []}
+                data={sortedClients || []}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Clients.no_clients_found")}

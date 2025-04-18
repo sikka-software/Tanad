@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  ArrowDownAZ,
-  ArrowDownZA,
-  ArrowUpAZ,
-  ArrowUpAz,
-  ArrowUpDown,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { ArrowDownAZ, ArrowUpAZ, ArrowUpDown, Plus, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -29,24 +21,28 @@ import { Switch } from "@/components/ui/switch";
 import IconButton from "./icon-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
-export default function SortPopover() {
+interface SortPopoverProps {
+  sortRules: { field: string; direction: string }[];
+  onSortRulesChange: (sortRules: { field: string; direction: string }[]) => void;
+}
+
+function SortPopover({ sortRules, onSortRulesChange }: SortPopoverProps) {
   const t = useTranslations();
   const locale = useLocale();
   const [open, setOpen] = useState(false);
-  const [sortRules, setSortRules] = useState([{ field: "name", direction: "asc" }]);
 
   const addSortRule = () => {
-    setSortRules([...sortRules, { field: "name", direction: "asc" }]);
+    onSortRulesChange([...sortRules, { field: "name", direction: "asc" }]);
   };
 
   const removeSortRule = (index: number) => {
-    setSortRules(sortRules.filter((_, i) => i !== index));
+    onSortRulesChange(sortRules.filter((_, i) => i !== index));
   };
 
   const updateSortRule = (index: number, field: string, value: string) => {
     const newRules = [...sortRules];
     newRules[index] = { ...newRules[index], [field]: value };
-    setSortRules(newRules);
+    onSortRulesChange(newRules);
   };
 
   const applySort = () => {
@@ -55,7 +51,7 @@ export default function SortPopover() {
   };
 
   const resetSort = () => {
-    setSortRules([{ field: "name", direction: "asc" }]);
+    onSortRulesChange([{ field: "name", direction: "asc" }]);
   };
 
   return (
@@ -114,7 +110,9 @@ export default function SortPopover() {
                     onValueChange={(value) => updateSortRule(index, "direction", value)}
                   >
                     <div
-                      className={`rounded-md border p-1 ${rule.direction === "asc" ? "bg-muted" : ""}`}
+                      className={`rounded-md border p-1 ${
+                        rule.direction === "asc" ? "bg-muted" : ""
+                      }`}
                     >
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -129,7 +127,9 @@ export default function SortPopover() {
                       </Tooltip>
                     </div>
                     <div
-                      className={`rounded-md border p-1 ${rule.direction === "desc" ? "bg-muted" : ""}`}
+                      className={`rounded-md border p-1 ${
+                        rule.direction === "desc" ? "bg-muted" : ""
+                      }`}
                     >
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -199,3 +199,5 @@ export default function SortPopover() {
     </Popover>
   );
 }
+
+export default SortPopover;

@@ -26,6 +26,8 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   searchPlaceholder?: string;
   viewMode?: "table" | "cards";
   onViewModeChange?: (mode: "table" | "cards") => void;
+  sortRules: { field: string; direction: string }[];
+  onSortRulesChange: (sortRules: { field: string; direction: string }[]) => void;
 }
 
 const PageSearchAndFilter = ({
@@ -37,6 +39,8 @@ const PageSearchAndFilter = ({
   searchPlaceholder = "Search...",
   viewMode = "table",
   onViewModeChange,
+  sortRules,
+  onSortRulesChange,
   ...props
 }: PageSearchAndFilterProps) => {
   const t = useTranslations();
@@ -48,7 +52,6 @@ const PageSearchAndFilter = ({
       )}
       {...props}
     >
-      {/* Left section: Title & Search */}
       <div className="flex flex-1 items-center gap-4">
         {title && <h2 className="hidden text-xl font-medium md:block">{title}</h2>}
 
@@ -63,7 +66,6 @@ const PageSearchAndFilter = ({
         </div>
       </div>
 
-      {/* Right section: View Toggle, Filters & Create Button */}
       <div className="flex items-center gap-2">
         {onViewModeChange && (
           <IconButton
@@ -85,7 +87,7 @@ const PageSearchAndFilter = ({
           onClick={() => {}}
         />
 
-        <SortPopover />
+        <SortPopover sortRules={sortRules} onSortRulesChange={onSortRulesChange} />
 
         <Link href={createHref} className="flex items-center">
           <Button size="sm" className="h-8">
