@@ -31,6 +31,19 @@ export default function ClientsPage() {
   const [nullsFirst, setNullsFirst] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  const sortableColumns = [
+    { value: "name", label: t("Clients.form.name.label") },
+    { value: "email", label: t("Clients.form.email.label") },
+    { value: "phone", label: t("Clients.form.phone.label") },
+    { value: "company", label: t("Clients.form.company.label") },
+    { value: "company_details.name", label: t("Clients.form.company_name.label") },
+    { value: "address", label: t("Clients.form.address.label") },
+    { value: "city", label: t("Clients.form.city.label") },
+    { value: "state", label: t("Clients.form.state.label") },
+    { value: "zip_code", label: t("Clients.form.zip_code.label") },
+    { value: "created_at", label: t("General.created_at") },
+  ];
+
   const handleSortRulesChange = (newSortRules: { field: string; direction: string }[]) => {
     setSortRules(newSortRules);
   };
@@ -108,6 +121,7 @@ export default function ClientsPage() {
             onViewModeChange={setViewMode}
             sortRules={sortRules}
             onSortRulesChange={handleSortRulesChange}
+            sortableColumns={sortableColumns}
             caseSensitive={caseSensitive}
             onCaseSensitiveChange={handleCaseSensitiveChange}
             nullsFirst={nullsFirst}

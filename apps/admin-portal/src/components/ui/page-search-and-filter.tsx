@@ -18,6 +18,11 @@ import IconButton from "./icon-button";
 import { Input } from "./input";
 import SortPopover from "./sort-popover";
 
+interface SortableColumn {
+  value: string;
+  label: string;
+}
+
 export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivElement> {
   onSearch?: (value: string) => void;
   title?: string;
@@ -28,6 +33,7 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   onViewModeChange?: (mode: "table" | "cards") => void;
   sortRules: { field: string; direction: string }[];
   onSortRulesChange: (sortRules: { field: string; direction: string }[]) => void;
+  sortableColumns: SortableColumn[];
   caseSensitive?: boolean;
   onCaseSensitiveChange?: (value: boolean) => void;
   nullsFirst?: boolean;
@@ -45,6 +51,7 @@ const PageSearchAndFilter = ({
   onViewModeChange,
   sortRules,
   onSortRulesChange,
+  sortableColumns,
   caseSensitive,
   onCaseSensitiveChange,
   nullsFirst,
@@ -98,6 +105,7 @@ const PageSearchAndFilter = ({
         <SortPopover 
           sortRules={sortRules} 
           onSortRulesChange={onSortRulesChange}
+          columns={sortableColumns}
           caseSensitive={caseSensitive}
           onCaseSensitiveChange={onCaseSensitiveChange}
           nullsFirst={nullsFirst}

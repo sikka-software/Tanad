@@ -21,9 +21,15 @@ import { Switch } from "@/components/ui/switch";
 import IconButton from "./icon-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
+interface SortableColumn {
+  value: string;
+  label: string;
+}
+
 interface SortPopoverProps {
   sortRules: { field: string; direction: string }[];
   onSortRulesChange: (sortRules: { field: string; direction: string }[]) => void;
+  columns: SortableColumn[];
   caseSensitive?: boolean;
   onCaseSensitiveChange?: (value: boolean) => void;
   nullsFirst?: boolean;
@@ -33,6 +39,7 @@ interface SortPopoverProps {
 function SortPopover({ 
   sortRules, 
   onSortRulesChange,
+  columns,
   caseSensitive = false,
   onCaseSensitiveChange,
   nullsFirst = false,
@@ -43,7 +50,7 @@ function SortPopover({
   const [open, setOpen] = useState(false);
 
   const addSortRule = () => {
-    onSortRulesChange([...sortRules, { field: "name", direction: "asc" }]);
+    onSortRulesChange([...sortRules, { field: columns[0].value, direction: "asc" }]);
   };
 
   const removeSortRule = (index: number) => {
@@ -105,13 +112,11 @@ function SortPopover({
                       <SelectValue placeholder={t("General.select_field")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="name">{t("General.name")}</SelectItem>
-                      <SelectItem value="email">{t("General.email")}</SelectItem>
-                      <SelectItem value="phone">{t("General.phone")}</SelectItem>
-                      <SelectItem value="address">{t("General.address")}</SelectItem>
-                      <SelectItem value="city">{t("General.city")}</SelectItem>
-                      <SelectItem value="region">{t("General.region")}</SelectItem>
-                      <SelectItem value="postalCode">{t("General.postal_code")}</SelectItem>
+                      {columns.map((column) => (
+                        <SelectItem key={column.value} value={column.value}>
+                          {column.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
 
