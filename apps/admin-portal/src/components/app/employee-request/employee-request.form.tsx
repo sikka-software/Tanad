@@ -278,7 +278,7 @@ const EmployeeRequestForm = ({
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "PPP") : t("pick_date")}
+                        {field.value ? format(field.value, "PPP") : t("General.pick_date")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -310,7 +310,7 @@ const EmployeeRequestForm = ({
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "PPP") : t("pick_date")}
+                        {field.value ? format(field.value, "PPP") : t("General.pick_date")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">

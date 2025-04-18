@@ -22,6 +22,7 @@
     "view_selected": "عرض المختارة",
     "select_all": "اختر الكل",
     "deselect_all": "إلغاء الاختيار",
+    "pick_date": "اختر التاريخ",
     "calendars": {
       "gregorian": "التقويم الميلادي",
       "hijri": "التقويم الهجري"
@@ -683,7 +684,6 @@
     "pukla_slug_too_long": "الرابط المخصص طويل",
     "pukla_slug_invalid": "الرابط المخصص غير صالح",
     "title": "البكلات",
-
     "pukla_description": "الوصف",
     "pukla_description_placeholder": "أدخل الوصف",
     "success_creating_pukla": "تم إنشاء البكلة بنجاح",
@@ -712,7 +712,6 @@
     "start_creating_a_pukla": "ابدأ في إنشاء بكلات لصفحتك الخاصة بك والمزيد.",
     "start_creating_short_links": "ابدأ في إنشاء روابط قصيرة لحملاتك التسويقية وبرامج الإحالة والمزيد.",
     "this_custom_slug_is_not_allowed": "هذا الرابط المخصص غير مسموح به",
-
     "custom_slug_can_only_contain_letters_numbers_and_hyphens": "يمكن أن يحتوي الرابط المخصص على أحرف وأرقام وشرطات فقط",
     "validation": {
       "title_required": "العنوان مطلوب",
@@ -1336,7 +1335,6 @@
     "total_puklas": "تم العثور على {count} بكلة",
     "loading": "جاري تحميل البكلات..."
   },
-
   "Dashboard": {
     "title": "لوحة التحكم",
     "create_product": "إضافة منتج",
@@ -1830,7 +1828,6 @@
       }
     }
   },
-
   "Warehouses": {
     "title": "المستودعات",
     "add_new": "إضافة مستودع جديد",
@@ -2195,7 +2192,6 @@
       "warehouse": "مخزن"
     }
   },
-
   "Salaries": {
     "title": "الرواتب",
     "add_new": "إضافة راتب جديد",
