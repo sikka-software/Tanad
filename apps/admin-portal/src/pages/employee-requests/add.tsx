@@ -3,9 +3,7 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
 import EmployeeRequestForm, {
@@ -42,19 +40,8 @@ export default function AddEmployeeRequestPage() {
         }}
       />
 
-      <div className="p-4">
-        <Card className="mx-auto max-w-2xl">
-          <CardHeader className="relative">
-            <CardTitle>{t("EmployeeRequests.employee_request_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <EmployeeRequestForm
-              id="employee-request-form"
-              onSubmit={handleSubmit}
-              loading={loading}
-            />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <EmployeeRequestForm id="employee-request-form" onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );
