@@ -80,9 +80,9 @@ export default function Billing() {
         dir={locale === "ar" ? "rtl" : "ltr"}
       >
         <div className="mb-10 space-y-2">
-          <h1 className="text-3xl font-bold">{t("billing.title")}</h1>
+          <h1 className="text-3xl font-bold">{t("Billing.title")}</h1>
           <p className="text-muted-foreground">
-            {t("billing.manage_description", {
+            {t("Billing.manage_description", {
               fallback: "Manage your subscription and billing information",
             })}
           </p>
@@ -99,9 +99,9 @@ export default function Billing() {
         {showSubscriptionSelection && (
           <div className="w-full" id="plans">
             <div className="mb-6">
-              <h2 className="mb-2 text-2xl font-bold">{t("billing.available_plans")}</h2>
+              <h2 className="mb-2 text-2xl font-bold">{t("Billing.available_plans")}</h2>
               <p className="text-muted-foreground">
-                {t("billing.choose_plan_description", {
+                {t("Billing.choose_plan_description", {
                   fallback: "Choose the plan that works best for you and your team",
                 })}
               </p>
@@ -114,9 +114,9 @@ export default function Billing() {
             >
               <div className="mb-8 flex justify-center">
                 <TabsList>
-                  <TabsTrigger value="monthly">{t("billing.monthly_billing")}</TabsTrigger>
+                  <TabsTrigger value="monthly">{t("Billing.monthly_billing")}</TabsTrigger>
                   <TabsTrigger value="yearly">
-                    {t("billing.yearly_billing", {
+                    {t("Billing.yearly_billing", {
                       discount: "20%",
                       fallback: "Yearly Billing (Save 20%)",
                     })}
@@ -134,7 +134,7 @@ export default function Billing() {
                 <div id="yearlyPlans">
                   <Skeleton className="h-32 w-full" />
                   <div className="text-muted-foreground mt-4 text-center">
-                    {t("billing.yearly_plans_coming_soon")}
+                    {t("Billing.yearly_plans_coming_soon")}
                   </div>
                 </div>
               </TabsContent>
@@ -146,8 +146,8 @@ export default function Billing() {
         <div className="bg-muted/30 flex items-start gap-3 rounded-lg p-6">
           <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
           <div>
-            <h3 className="font-medium">{t("billing.need_custom_solution")}</h3>
-            <p className="text-muted-foreground">{t("billing.contact_sales_description")}</p>
+            <h3 className="font-medium">{t("Billing.need_custom_solution")}</h3>
+            <p className="text-muted-foreground">{t("Billing.contact_sales_description")}</p>
             <Button
               variant="link"
               className="h-auto px-0"
@@ -159,7 +159,7 @@ export default function Billing() {
                 window.location.href = `mailto:tanad@sikka.io?subject=${subject}&body=${body}&from=${user.email}`;
               }}
             >
-              {t("billing.contact_sales")}
+              {t("Billing.contact_sales")}
             </Button>
           </div>
         </div>

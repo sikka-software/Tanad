@@ -203,43 +203,43 @@ export default function CurrentPlan() {
       case "paid":
         return (
           <Badge variant="outline" className="border-green-500 bg-green-50 text-green-700">
-            {t("billing.invoice_status_paid", { fallback: "Paid" })}
+            {t("Billing.invoice_status_paid", { fallback: "Paid" })}
           </Badge>
         );
       case "open":
         return (
           <Badge variant="outline" className="border-blue-500 bg-blue-50 text-blue-700">
-            {t("billing.invoice_status_open", { fallback: "Open" })}
+            {t("Billing.invoice_status_open", { fallback: "Open" })}
           </Badge>
         );
       case "void":
         return (
           <Badge variant="outline" className="border-gray-500 bg-gray-50 text-gray-700">
-            {t("billing.invoice_status_void", { fallback: "Void" })}
+            {t("Billing.invoice_status_void", { fallback: "Void" })}
           </Badge>
         );
       case "uncollectible":
         return (
           <Badge variant="outline" className="border-red-500 bg-red-50 text-red-700">
-            {t("billing.invoice_status_uncollectible", { fallback: "Uncollectible" })}
+            {t("Billing.invoice_status_uncollectible", { fallback: "Uncollectible" })}
           </Badge>
         );
       case "draft":
         return (
           <Badge variant="outline" className="border-amber-500 bg-amber-50 text-amber-700">
-            {t("billing.invoice_status_draft", { fallback: "Draft" })}
+            {t("Billing.invoice_status_draft", { fallback: "Draft" })}
           </Badge>
         );
       case "pending":
         return (
           <Badge variant="outline" className="border-purple-500 bg-purple-50 text-purple-700">
-            {t("billing.invoice_status_pending", { fallback: "Pending" })}
+            {t("Billing.invoice_status_pending", { fallback: "Pending" })}
           </Badge>
         );
       case "overdue":
         return (
           <Badge variant="outline" className="border-red-500 bg-red-50 text-red-700">
-            {t("billing.invoice_status_overdue", { fallback: "Overdue" })}
+            {t("Billing.invoice_status_overdue", { fallback: "Overdue" })}
           </Badge>
         );
       default:
@@ -259,7 +259,7 @@ export default function CurrentPlan() {
 
     if (lookupKey && lookupKey in planTitles) {
       // Use translation if available for this lookup key
-      return t(`billing.${lookupKey}`, {
+      return t(`Billing.${lookupKey}`, {
         fallback: planTitles[lookupKey],
       });
     }
@@ -273,28 +273,28 @@ export default function CurrentPlan() {
       <div className="bg-background rounded-lg border p-6">
         <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div>
-            <h2 className="text-xl font-bold">{t("billing.current_plan.title")}</h2>
+            <h2 className="text-xl font-bold">{t("Billing.current_plan.title")}</h2>
             <div className="mt-1 flex items-center gap-2">
               <span className="text-lg font-medium">
                 {subscription.planLookupKey
-                  ? t(`billing.${subscription.planLookupKey}`, {
+                  ? t(`Billing.${subscription.planLookupKey}`, {
                       fallback: subscription.planLookupKey,
                     })
-                  : t("billing.tanad_free", { fallback: "Free Plan" })}
+                  : t("Billing.tanad_free", { fallback: "Free Plan" })}
               </span>
               {subscription.status === "active" && !subscription.cancelAt && (
                 <Badge variant="outline" className="border-green-500 bg-green-50 text-green-700">
-                  {t("billing.subscription_status.active")}
+                  {t("Billing.subscription_status.active")}
                 </Badge>
               )}
               {subscription.status === "trialing" && (
                 <Badge variant="outline" className="border-blue-500 bg-blue-50 text-blue-700">
-                  {t("billing.subscription_status.trialing")}
+                  {t("Billing.subscription_status.trialing")}
                 </Badge>
               )}
               {subscription.cancelAt && (
                 <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
-                  {t("billing.canceling")}
+                  {t("Billing.canceling")}
                 </Badge>
               )}
             </div>
@@ -324,7 +324,7 @@ export default function CurrentPlan() {
               {/* Billing cycle badge */}
               {subscription.billingCycle && subscription.billingCycle !== "-" && (
                 <Badge variant="outline" className="text-xs">
-                  {t(`billing.${subscription.billingCycle}_billing`, {
+                  {t(`Billing.${subscription.billingCycle}_billing`, {
                     fallback:
                       subscription.billingCycle === "month" ? "Monthly billing" : "Annual billing",
                   })}
@@ -336,7 +336,7 @@ export default function CurrentPlan() {
             {subscription.cancelAt && (
               <p className="mt-2 flex items-center text-sm text-orange-600">
                 <span className="mr-2 inline-block h-2 w-2 rounded-full bg-orange-500"></span>
-                {t("billing.subscription_cancels_on", {
+                {t("Billing.subscription_cancels_on", {
                   date: new Date(Number(subscription.cancelAt) * 1000).toLocaleDateString(
                     locale === "ar" ? "ar-SA" : "en-US",
                     { year: "numeric", month: "long", day: "numeric" },
@@ -357,11 +357,11 @@ export default function CurrentPlan() {
               <p className="text-muted-foreground mt-2 flex items-center">
                 <span className="mr-2 inline-block h-2 w-2 rounded-full bg-green-500"></span>
                 {locale === "ar"
-                  ? t("billing.next_billing_date_is", {
+                  ? t("Billing.next_billing_date_is", {
                       date: nextBillingDate,
                       fallback: `تاريخ الفاتورة القادمة هو ${nextBillingDate}`,
                     })
-                  : t("billing.next_billing_date_is", {
+                  : t("Billing.next_billing_date_is", {
                       date: nextBillingDate,
                       fallback: `Your subscription will automatically renew on ${nextBillingDate}`,
                     })}
@@ -374,7 +374,7 @@ export default function CurrentPlan() {
               className="bg-background hover:bg-accent"
               onClick={() => setIsHistoryDialogOpen(true)}
             >
-              {t("billing.history", { fallback: "Billing History" })}
+              {t("Billing.history", { fallback: "Billing History" })}
             </Button>
             <Button
               variant="ghost"
@@ -382,10 +382,10 @@ export default function CurrentPlan() {
               onClick={(e) => {
                 e.preventDefault();
                 refreshData();
-                toast.success(t("billing.data_refreshed", { fallback: "Billing data refreshed" }));
+                toast.success(t("Billing.data_refreshed", { fallback: "Billing data refreshed" }));
               }}
               className="ml-2 h-9 w-9"
-              title={t("billing.current_plan.refresh", { fallback: "Refresh" })}
+              title={t("Billing.current_plan.refresh", { fallback: "Refresh" })}
             >
               <RefreshCcw className="h-4 w-4" />
             </Button>
@@ -408,7 +408,7 @@ export default function CurrentPlan() {
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle>
-                {t("billing.history_dialog_title", { fallback: "Billing History" })}
+                {t("Billing.history_dialog_title", { fallback: "Billing History" })}
               </DialogTitle>
               <Button
                 variant="ghost"
@@ -419,7 +419,7 @@ export default function CurrentPlan() {
                 }}
                 disabled={isLoadingHistory}
                 className="h-8 w-8"
-                aria-label={t("billing.current_plan.refresh", { fallback: "Refresh" })}
+                aria-label={t("Billing.current_plan.refresh", { fallback: "Refresh" })}
               >
                 <RefreshCcw className={`h-4 w-4 ${isLoadingHistory ? "animate-spin" : ""}`} />
               </Button>
@@ -436,7 +436,7 @@ export default function CurrentPlan() {
             ) : billingHistory.length > 0 ? (
               <>
                 <p className="text-muted-foreground mb-4 text-sm">
-                  {t("billing.history_description", {
+                  {t("Billing.history_description", {
                     fallback: "Your billing history and past invoices",
                   })}
                 </p>
@@ -444,15 +444,15 @@ export default function CurrentPlan() {
                   <Table>
                     <TableHeader className="bg-background sticky top-0">
                       <TableRow>
-                        <TableHead>{t("billing.invoice_date", { fallback: "Date" })}</TableHead>
+                        <TableHead>{t("Billing.invoice_date", { fallback: "Date" })}</TableHead>
                         <TableHead>
-                          {t("billing.invoice_number", { fallback: "Invoice" })}
+                          {t("Billing.invoice_number", { fallback: "Invoice" })}
                         </TableHead>
-                        <TableHead>{t("billing.invoice_amount", { fallback: "Amount" })}</TableHead>
-                        <TableHead>{t("billing.invoice_status", { fallback: "Status" })}</TableHead>
-                        <TableHead>{t("billing.invoice_plan", { fallback: "Plan" })}</TableHead>
+                        <TableHead>{t("Billing.invoice_amount", { fallback: "Amount" })}</TableHead>
+                        <TableHead>{t("Billing.invoice_status", { fallback: "Status" })}</TableHead>
+                        <TableHead>{t("Billing.invoice_plan", { fallback: "Plan" })}</TableHead>
                         <TableHead className="text-right">
-                          {t("billing.actions", { fallback: "Actions" })}
+                          {t("Billing.actions", { fallback: "Actions" })}
                         </TableHead>
                       </TableRow>
                     </TableHeader>
@@ -471,13 +471,13 @@ export default function CurrentPlan() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-primary hover:text-primary/80 inline-flex items-center"
-                                aria-label={t("billing.download_invoice", {
+                                aria-label={t("Billing.download_invoice", {
                                   fallback: "Download Invoice",
                                 })}
                               >
                                 <Download className="mr-1 h-4 w-4" />
                                 <span className="sr-only">
-                                  {t("billing.download_invoice", { fallback: "Download Invoice" })}
+                                  {t("Billing.download_invoice", { fallback: "Download Invoice" })}
                                 </span>
                               </a>
                             )}
@@ -492,10 +492,10 @@ export default function CurrentPlan() {
               <div className="text-muted-foreground flex flex-col items-center py-8 text-center">
                 <AlertCircle className="text-muted-foreground/70 mb-2 h-12 w-12" />
                 <p className="mb-1">
-                  {t("billing.no_history", { fallback: "No billing history found" })}
+                  {t("Billing.no_history", { fallback: "No billing history found" })}
                 </p>
                 <p className="text-sm">
-                  {t("billing.no_history_description", {
+                  {t("Billing.no_history_description", {
                     fallback: "Your invoices will appear here once you've been billed",
                   })}
                 </p>

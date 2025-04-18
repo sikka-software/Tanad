@@ -67,27 +67,27 @@ export function ConfirmReactivateSubscription({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-blue-500" />
-            {t("billing.reactivate_subscription.title")}
+            {t("Billing.reactivate_subscription.title")}
           </DialogTitle>
           <DialogDescription className="pt-2">
-            {t("billing.reactivate_subscription.description")}
+            {t("Billing.reactivate_subscription.description")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="text-sm">
           <ul className="list-disc space-y-2 pl-5">
-            <li>{t("billing.reactivate_subscription.benefit_1")}</li>
-            <li>{t("billing.reactivate_subscription.benefit_2")}</li>
+            <li>{t("Billing.reactivate_subscription.benefit_1")}</li>
+            <li>{t("Billing.reactivate_subscription.benefit_2")}</li>
           </ul>
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={loading}>
-            {t("billing.reactivate_subscription.go_back")}
+            {t("Billing.reactivate_subscription.go_back")}
           </Button>
           <Button onClick={handleReactivateSubscription} disabled={loading} className="gap-2">
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {t("billing.reactivate_subscription.confirm")}
+            {t("Billing.reactivate_subscription.confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

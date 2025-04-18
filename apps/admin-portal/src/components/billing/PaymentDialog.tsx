@@ -140,7 +140,7 @@ function SavedPaymentMethods({
   if (!paymentMethods.length) {
     return (
       <div className="text-muted-foreground py-2 text-sm">
-        {t("billing.payment.no_saved_cards", { fallback: "No saved payment methods found." })}
+        {t("Billing.payment.no_saved_cards", { fallback: "No saved payment methods found." })}
       </div>
     );
   }
@@ -148,7 +148,7 @@ function SavedPaymentMethods({
   return (
     <div className="space-y-4" dir={isRtl ? "rtl" : "ltr"}>
       <div className="text-sm font-medium">
-        {t("billing.payment.saved_cards", { fallback: "Saved Cards" })}
+        {t("Billing.payment.saved_cards", { fallback: "Saved Cards" })}
       </div>
       <RadioGroup
         value={selectedPaymentMethod || ""}
@@ -169,7 +169,7 @@ function SavedPaymentMethods({
                 </span>
                 <span className="text-muted-foreground text-sm">
                   •••• •••• •••• {method.card.last4} |{" "}
-                  {t("billing.payment.expires", { fallback: "Expires" })} {method.card.exp_month}/
+                  {t("Billing.payment.expires", { fallback: "Expires" })} {method.card.exp_month}/
                   {method.card.exp_year}
                 </span>
               </div>
@@ -184,7 +184,7 @@ function SavedPaymentMethods({
           onClick={() => setSelectedPaymentMethod(null)}
           className="text-muted-foreground"
         >
-          {t("billing.payment.use_new_card", { fallback: "Use a new card instead" })}
+          {t("Billing.payment.use_new_card", { fallback: "Use a new card instead" })}
         </Button>
       </div>
     </div>
@@ -354,7 +354,7 @@ export function PaymentDialog({
 
       // Show success message
       toast.success(
-        t("billing.payment.success", {
+        t("Billing.payment.success", {
           fallback: "Payment successful! Your subscription has been updated.",
         }),
       );
@@ -371,7 +371,7 @@ export function PaymentDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className={locale === "ar" ? "text-right" : "text-left"}>
-            {t("billing.payment.dialog_title", { fallback: "Payment Details" })}
+            {t("Billing.payment.dialog_title", { fallback: "Payment Details" })}
           </DialogTitle>
         </DialogHeader>
 
@@ -382,10 +382,10 @@ export function PaymentDialog({
               <ShieldAlert className="mt-0.5 mr-3 h-5 w-5 shrink-0 text-red-600" />
               <div>
                 <h3 className="mb-2 font-semibold">
-                  {t("billing.payment.stripe_key_error", { fallback: "Stripe API Key Error" })}
+                  {t("Billing.payment.stripe_key_error", { fallback: "Stripe API Key Error" })}
                 </h3>
                 <p>
-                  {t("billing.payment.missing_stripe_key", {
+                  {t("Billing.payment.missing_stripe_key", {
                     fallback:
                       "The Stripe API key is missing or invalid. Please contact the administrator to set up Stripe correctly.",
                   })}
@@ -400,7 +400,7 @@ export function PaymentDialog({
           <div className="p-6 text-center">
             <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
             <p className="text-muted-foreground mt-2 text-sm">
-              {t("billing.payment.setting_up", { fallback: "Setting up payment form..." })}
+              {t("Billing.payment.setting_up", { fallback: "Setting up payment form..." })}
             </p>
           </div>
         )}
@@ -818,7 +818,7 @@ function PaymentFormContent({
           message:
             err instanceof Error
               ? err.message
-              : t("billing.payment.error", {
+              : t("Billing.payment.error", {
                   fallback: "An error occurred while processing your payment. Please try again.",
                 }),
           type: getErrorType(err instanceof Error ? err.message : ""),
@@ -831,7 +831,7 @@ function PaymentFormContent({
         message:
           err instanceof Error
             ? err.message
-            : t("billing.payment.error", {
+            : t("Billing.payment.error", {
                 fallback: "An error occurred while processing your payment. Please try again.",
               }),
         type: getErrorType(err instanceof Error ? err.message : ""),
@@ -845,18 +845,18 @@ function PaymentFormContent({
       {/* Header with plan details */}
       <div className="mb-4">
         <h3 className="text-xl font-semibold">
-          {t("billing.update_to_plan", {
-            plan: t(`billing.${planName}`, { fallback: planName || "Subscription" }),
+          {t("Billing.update_to_plan", {
+            plan: t(`Billing.${planName}`, { fallback: planName || "Subscription" }),
             fallback: `Update to ${planName || "Subscription"}`,
           })}
         </h3>
         <p className="text-muted-foreground mt-1 text-sm">
-          {t("billing.payment.enter_details", {
+          {t("Billing.payment.enter_details", {
             fallback: "Enter your payment details to complete the subscription change",
           })}
         </p>
         <p className="mt-3 font-medium">
-          {t("billing.selected_plan_price", {
+          {t("Billing.selected_plan_price", {
             price: formatPriceForDisplay(planPrice || ""),
             fallback: `Price: ${formatPriceForDisplay(planPrice || "")}`,
           })}
@@ -874,11 +874,11 @@ function PaymentFormContent({
           <TabsList className={`grid w-full grid-cols-2 ${isRtl ? "flex-row-reverse" : ""}`}>
             <TabsTrigger value="card" className="flex items-center justify-center gap-2">
               <CreditCard className="h-4 w-4" />
-              {t("billing.payment.credit_card", { fallback: "Credit Card" })}
+              {t("Billing.payment.credit_card", { fallback: "Credit Card" })}
             </TabsTrigger>
             <TabsTrigger value="wallet" className="flex items-center justify-center gap-2">
               <Wallet className="h-4 w-4" />
-              {t("billing.payment.digital_wallet", { fallback: "Digital Wallet" })}
+              {t("Billing.payment.digital_wallet", { fallback: "Digital Wallet" })}
             </TabsTrigger>
           </TabsList>
 
@@ -926,7 +926,7 @@ function PaymentFormContent({
                     htmlFor="save-card"
                     className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    {t("billing.payment.save_card", { fallback: "Save card for future payments" })}
+                    {t("Billing.payment.save_card", { fallback: "Save card for future payments" })}
                   </label>
                 </div>
                 {savedPaymentMethods.length > 0 && (
@@ -941,7 +941,7 @@ function PaymentFormContent({
                     }}
                     className="text-muted-foreground mt-2"
                   >
-                    {t("billing.payment.use_saved_card", { fallback: "Use a saved card instead" })}
+                    {t("Billing.payment.use_saved_card", { fallback: "Use a saved card instead" })}
                   </Button>
                 )}
               </>
@@ -959,7 +959,7 @@ function PaymentFormContent({
             >
               <PayPalIcon className="h-5 w-5" />
               <span className="text-center font-medium">
-                {t("billing.payment.pay_with_paypal", { fallback: "Pay with PayPal" })}
+                {t("Billing.payment.pay_with_paypal", { fallback: "Pay with PayPal" })}
               </span>
             </Button>
 
@@ -973,7 +973,7 @@ function PaymentFormContent({
             >
               <GooglePayIcon className="h-5 w-5" />
               <span className="text-center font-medium">
-                {t("billing.payment.google_pay", { fallback: "Google Pay" })}
+                {t("Billing.payment.google_pay", { fallback: "Google Pay" })}
               </span>
             </Button>
           </TabsContent>
@@ -981,19 +981,19 @@ function PaymentFormContent({
 
         <div className="text-muted-foreground text-sm">
           <span>
-            {t("billing.payment.terms_agreement_start", {
+            {t("Billing.payment.terms_agreement_start", {
               fallback: "By proceeding, you agree to our ",
             })}
             <a href="#" className="underline">
-              {t("billing.payment.terms", { fallback: "Terms of Service" })}
+              {t("Billing.payment.terms", { fallback: "Terms of Service" })}
             </a>
-            {t("billing.payment.terms_agreement_middle", {
+            {t("Billing.payment.terms_agreement_middle", {
               fallback: " and acknowledge our ",
             })}
             <a href="#" className="underline">
-              {t("billing.payment.privacy", { fallback: "Privacy Policy" })}
+              {t("Billing.payment.privacy", { fallback: "Privacy Policy" })}
             </a>
-            {t("billing.payment.terms_agreement_end", {
+            {t("Billing.payment.terms_agreement_end", {
               fallback: ".",
             })}
           </span>
@@ -1019,10 +1019,10 @@ function PaymentFormContent({
           {isProcessing ? (
             <>
               <Loader2 className={`${isRtl ? "ml-2" : "mr-2"} h-4 w-4 animate-spin`} />
-              {t("billing.payment.processing", { fallback: "Processing..." })}
+              {t("Billing.payment.processing", { fallback: "Processing..." })}
             </>
           ) : (
-            t("billing.payment.complete_payment", { fallback: "Complete Payment" })
+            t("Billing.payment.complete_payment", { fallback: "Complete Payment" })
           )}
         </Button>
       </div>

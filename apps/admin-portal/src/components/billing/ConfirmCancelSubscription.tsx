@@ -38,10 +38,10 @@ export default function ConfirmCancelSubscription({
         {isCanceling ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            {t("billing.cancel_subscription.canceling")}
+            {t("Billing.cancel_subscription.canceling")}
           </>
         ) : (
-          t("billing.cancel_subscription.button")
+          t("Billing.cancel_subscription.button")
         )}
       </Button>
 
@@ -51,24 +51,24 @@ export default function ConfirmCancelSubscription({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-yellow-500" />
-              {t("billing.cancel_subscription.title")}
+              {t("Billing.cancel_subscription.title")}
             </DialogTitle>
             <DialogDescription className="pt-2">
-              {t("billing.cancel_subscription.description")}
+              {t("Billing.cancel_subscription.description")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="text-sm">
             <ul className="list-disc space-y-2 pl-5">
-              <li>{t("billing.cancel_subscription.consequence_1")}</li>
-              <li>{t("billing.cancel_subscription.consequence_2")}</li>
-              <li>{t("billing.cancel_subscription.consequence_3")}</li>
+              <li>{t("Billing.cancel_subscription.consequence_1")}</li>
+              <li>{t("Billing.cancel_subscription.consequence_2")}</li>
+              <li>{t("Billing.cancel_subscription.consequence_3")}</li>
             </ul>
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="ghost" onClick={() => setOpen(false)} disabled={isCanceling}>
-              {t("billing.cancel_subscription.go_back")}
+              {t("Billing.cancel_subscription.go_back")}
             </Button>
             <Button
               variant="destructive"
@@ -80,7 +80,7 @@ export default function ConfirmCancelSubscription({
               className="gap-2"
             >
               {isCanceling && <Loader2 className="h-4 w-4 animate-spin" />}
-              {t("billing.cancel_subscription.confirm")}
+              {t("Billing.cancel_subscription.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

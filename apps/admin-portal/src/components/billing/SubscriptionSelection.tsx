@@ -477,7 +477,7 @@ export default function SubscriptionSelection({
         </CardFooter>
       </Card>
 
-      <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
+      {/* <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
@@ -499,7 +499,7 @@ export default function SubscriptionSelection({
             </Button>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       {isPaymentDialogOpen && (
         <PaymentDialog
