@@ -1,7 +1,4 @@
-import { Job } from "@/types/job.type";
-import { JobFormValues } from "@/schemas/job.schema";
-
-import useUserStore from "@/hooks/use-user-store";
+import { Job, JobCreateData } from "@/types/job.type";
 
 export async function fetchJobs(): Promise<Job[]> {
   try {
@@ -29,7 +26,7 @@ export async function fetchJobById(id: string): Promise<Job> {
   }
 }
 
-export async function createJob(job: JobFormValues): Promise<Job> {
+export async function createJob(job: JobCreateData): Promise<Job> {
   try {
     const response = await fetch("/api/jobs", {
       method: "POST",

@@ -14,3 +14,7 @@ export interface Job {
   updated_at: string;
   user_id: string;
 }
+
+export type JobCreateData = Omit<Job, "id" | "created_at" | "updated_at" | "user_id"> & {
+  user_id?: string;
+};

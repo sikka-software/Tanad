@@ -1,7 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { Job } from "@/types/job.type";
-import { JobFormValues } from "@/schemas/job.schema";
 import {
   fetchJobs,
   fetchJobById,
@@ -10,6 +8,8 @@ import {
   deleteJob,
   bulkDeleteJobs,
 } from "@/services/jobService";
+
+import { Job } from "@/types/job.type";
 
 export function useJobs() {
   return useQuery({
@@ -29,7 +29,7 @@ export function useJob(id: string) {
 export function useCreateJob() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (job: JobFormValues) => createJob(job),
+    mutationFn: (job: Job) => createJob(job),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
     },
@@ -66,4 +66,4 @@ export function useBulkDeleteJobs() {
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
     },
   });
-} 
+}
