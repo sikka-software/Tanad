@@ -35,10 +35,13 @@ const createEmployeeFormSchema = (t: (key: string) => string) =>
       .string()
       .email(t("Employees.form.email.invalid"))
       .refine(async (email) => {
+        const { user } = useUserStore.getState();
+        if (!user?.id) return true; // If no user, skip validation
         const { data, error } = await supabase
           .from("employees")
           .select("id")
           .eq("email", email)
+          .eq("user_id", user.id)
           .single();
         return !data;
       }, t("Employees.form.email.duplicate")),
