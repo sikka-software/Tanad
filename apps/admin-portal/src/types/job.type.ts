@@ -1,15 +1,15 @@
 export interface Job {
   id: string;
   title: string;
-  description?: string;
-  requirements?: string;
-  location?: string;
-  department?: string;
+  description: string | null;
+  requirements: string | null;
+  location: string | null;
+  department: string | null;
   type: string;
-  salary?: number;
+  salary: number | null;
   is_active: boolean;
-  startDate?: string;
-  endDate?: string;
+  startDate: string | null;
+  endDate: string | null;
   created_at: string;
   updated_at: string;
   user_id: string;

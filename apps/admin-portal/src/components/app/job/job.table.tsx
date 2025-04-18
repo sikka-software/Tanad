@@ -1,7 +1,5 @@
-import React from "react";
-
 import { useTranslations } from "next-intl";
-
+import React from "react";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -10,6 +8,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { Job } from "@/types/job.type";
 
+import { jobs } from "@/db/schema";
 import { useJobsStore } from "@/stores/jobs.store";
 
 const titleSchema = z.string().min(1, "Required");
@@ -20,38 +19,68 @@ const salarySchema = z.number().min(0, "Salary must be positive");
 const descriptionSchema = z.string().optional();
 const is_activeSchema = z.boolean();
 
-interface JobsTableProps {
+interface JobTableProps {
   data: Job[];
   isLoading?: boolean;
   error?: Error | null;
+  onSelectedRowsChange?: (rows: Job[]) => void;
 }
 
-const JobsTable = ({ data, isLoading, error }: JobsTableProps) => {
-  const t = useTranslations("Jobs");
-  const { updateJob } = useJobsStore();
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateJob(rowId, { [columnId]: value });
-  };
+export function JobTable({ data, isLoading, error, onSelectedRowsChange }: JobTableProps) {
+  const t = useTranslations();
 
   const columns: ExtendedColumnDef<Job>[] = [
-    { accessorKey: "title", header: t("form.title.label"), validationSchema: titleSchema },
-    { accessorKey: "type", header: t("form.type.label"), validationSchema: typeSchema },
+    {
+      id: "select",
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllRowsSelected()}
+          onChange={table.getToggleAllRowsSelectedHandler()}
+        />
+      ),
+      cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={row.getIsSelected()}
+          onChange={row.getToggleSelectedHandler()}
+        />
+      ),
+    },
+    {
+      accessorKey: "title",
+      header: t("Job.form.title.label"),
+      cell: ({ row }) => row.getValue("title"),
+      validationSchema: titleSchema,
+    },
+    {
+      accessorKey: "type",
+      header: t("Job.form.type.label"),
+      cell: ({ row }) => row.getValue("type"),
+      validationSchema: typeSchema,
+    },
     {
       accessorKey: "department",
-      header: t("form.department.label"),
+      header: t("Job.form.department.label"),
+      cell: ({ row }) => row.getValue("department"),
       validationSchema: departmentSchema,
     },
-    { accessorKey: "location", header: t("form.location.label"), validationSchema: locationSchema },
-    { accessorKey: "salary", header: t("form.salary.label"), validationSchema: salarySchema },
     {
-      accessorKey: "description",
-      header: t("form.description.label"),
-      validationSchema: descriptionSchema,
+      accessorKey: "location",
+      header: t("Job.form.location.label"),
+      cell: ({ row }) => row.getValue("location"),
+      validationSchema: locationSchema,
+    },
+    {
+      accessorKey: "salary",
+      header: t("Job.form.salary.label"),
+      cell: ({ row }) => row.getValue("salary"),
+      validationSchema: salarySchema,
     },
     {
       accessorKey: "is_active",
-      header: t("form.is_active.label"),
+      header: t("Job.form.is_active.label"),
+      cell: ({ row }) => (row.getValue("is_active") ? "Yes" : "No"),
       validationSchema: is_activeSchema,
     },
   ];
@@ -66,7 +95,14 @@ const JobsTable = ({ data, isLoading, error }: JobsTableProps) => {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
-};
-
-export default JobsTable;
+  return (
+    <SheetTable
+      data={data}
+      columns={columns}
+      onSelectedRowsChange={onSelectedRowsChange}
+      enableRowSelection
+      enableMultiRowSelection
+      getRowId={(row) => row.id}
+    />
+  );
+}

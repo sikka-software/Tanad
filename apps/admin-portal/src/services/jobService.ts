@@ -1,66 +1,94 @@
 import { Job } from "@/types/job.type";
+import { JobFormValues } from "@/schemas/job.schema";
 
 import useUserStore from "@/hooks/use-user-store";
 
 export async function fetchJobs(): Promise<Job[]> {
-  const response = await fetch("/api/jobs");
-  if (!response.ok) {
+  try {
+    const response = await fetch("/api/jobs");
+    if (!response.ok) {
+      throw new Error("Failed to fetch jobs");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching jobs:", error);
     throw new Error("Failed to fetch jobs");
   }
-  const data = await response.json();
-  return data.jobs;
 }
 
-export async function createJob(
-  jobData: Omit<Job, "id" | "created_at" | "updated_at" | "user_id">,
-  user_id?: string,
-): Promise<Job> {
+export async function fetchJobById(id: string): Promise<Job> {
   try {
-    // First try to use provided user_id
-    let finaluser_id = user_id;
-
-    // If not provided, get user from Zustand store
-    if (!finaluser_id) {
-      const userStore = useUserStore.getState();
-      const user = userStore.user;
-
-      if (user && user.id) {
-        finaluser_id = user.id;
-      }
-    }
-
-    if (!finaluser_id) {
-      console.error("No user ID available");
-      throw new Error("You must be logged in to create a job");
-    }
-
-    // Add user ID to job data (IMPORTANT: use user_id to match the RLS policy)
-    const jobWithuser_id = {
-      ...jobData,
-      user_id: finaluser_id, // Keep camelCase for TypeScript
-    };
-
-    console.log("Creating job with payload:", JSON.stringify(jobWithuser_id, null, 2));
-
-    const response = await fetch("/api/jobs/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(jobWithuser_id),
-    });
-
-    const result = await response.json();
-    console.log("Response from server:", result);
-
+    const response = await fetch(`/api/jobs/${id}`);
     if (!response.ok) {
-      console.error("Server response error:", result);
-      throw new Error(result.error || result.details || "Failed to create job");
+      throw new Error(`Job with id ${id} not found`);
     }
-
-    return result;
+    return response.json();
   } catch (error) {
-    console.error("Error in createJob service:", error);
-    throw error;
+    console.error(`Error fetching job ${id}:`, error);
+    throw new Error(`Failed to fetch job with id ${id}`);
+  }
+}
+
+export async function createJob(job: JobFormValues): Promise<Job> {
+  try {
+    const response = await fetch("/api/jobs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(job),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to create job");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error creating job:", error);
+    throw new Error("Failed to create job");
+  }
+}
+
+export async function updateJob(id: string, updates: Partial<Job>): Promise<Job> {
+  try {
+    const response = await fetch(`/api/jobs/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to update job with id ${id}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error(`Error updating job ${id}:`, error);
+    throw new Error(`Failed to update job with id ${id}`);
+  }
+}
+
+export async function deleteJob(id: string): Promise<void> {
+  try {
+    const response = await fetch(`/api/jobs/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to delete job with id ${id}`);
+    }
+  } catch (error) {
+    console.error(`Error deleting job ${id}:`, error);
+    throw new Error(`Failed to delete job with id ${id}`);
+  }
+}
+
+export async function bulkDeleteJobs(ids: string[]): Promise<void> {
+  try {
+    const response = await fetch("/api/jobs/bulk-delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete jobs");
+    }
+  } catch (error) {
+    console.error("Error deleting jobs:", error);
+    throw new Error("Failed to delete jobs");
   }
 }
