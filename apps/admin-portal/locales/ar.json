@@ -936,7 +936,7 @@
     "analytics_overview_description": "عرض التحليلات العامة بالنسبة لبكلتك",
     "select_date_range": "اختر نطاق التاريخ"
   },
-  "billing": {
+  "Billing": {
     "tanad_free": "الباقة المجانية",
     "tanad_business": "الباقة التجارية",
     "tanad_premium": "الباقة الممتازة",
@@ -2591,15 +2591,11 @@
   "JobListing": {
     "title": "الوظائف"
   },
-  "Applicants": {
-    "title": "المتقدمين"
-  },
+
   "Calendar": {
     "title": "التقويم"
   },
-  "Expenses": {
-    "title": "المصروفات"
-  },
+
   "Companies": {
     "title": "الشركات",
     "add_new": "إضافة شركة",

@@ -966,7 +966,7 @@
     "analytics_overview_description": "View general analytics for your Pukla",
     "select_date_range": "Pick a date range"
   },
-  "billing": {
+  "Billing": {
     "tanad_free": "Free Plan",
     "tanad_pro": "Pro Plan",
     "tanad_business": "Business Plan",
@@ -2481,9 +2481,6 @@
 
   "Calendar": {
     "title": "Calendar"
-  },
-  "Expenses": {
-    "title": "Expenses"
   },
 
   "form": {

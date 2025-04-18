@@ -1,6 +1,5 @@
-import { useLocale, useTranslations } from "next-intl";
-
 import { Loader2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 import {
   AlertDialog,
@@ -31,14 +30,14 @@ const ConfirmCancelSubscription = ({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" className="w-full">
-          {t("cancel_subscription.cancel_button")}
+          {t("Billing.cancel_subscription.cancel_button")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent dir={locale === "ar" ? "rtl" : "ltr"}>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t("cancel_subscription.confirm_title")}</AlertDialogTitle>
+          <AlertDialogTitle>{t("Billing.cancel_subscription.confirm_title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            {t("cancel_subscription.confirm_description")}
+            {t("Billing.cancel_subscription.confirm_description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -50,10 +49,10 @@ const ConfirmCancelSubscription = ({
             {isCanceling ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                {t("cancel_subscription.canceling")}
+                {t("Billing.cancel_subscription.canceling")}
               </div>
             ) : (
-              t("cancel_subscription.confirm_button")
+              t("Billing.cancel_subscription.confirm_button")
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

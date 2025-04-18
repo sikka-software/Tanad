@@ -15,7 +15,7 @@ export default function Billing() {
 
   // Show subscription management for active subscriptions (including canceled ones)
   const showSubscriptionManagement =
-    subscription.status === "active" && subscription.name !== t("billing.free_plan");
+    subscription.status === "active" && subscription.name !== t("Billing.free_plan");
 
   // Show subscription selection for new/free/expired users
   const showSubscriptionSelection =
@@ -35,7 +35,7 @@ export default function Billing() {
   console.log("showSubscriptionSelection is ", showSubscriptionSelection);
   return (
     <>
-      <CustomPageMeta title={t("billing.title")} description={t("billing.description")} />
+      <CustomPageMeta title={t("Billing.title")} description={t("Billing.description")} />
       <main className={`flex flex-col items-center justify-between`}>
         {/* Show subscription selection for new/free/expired users */}
         {showSubscriptionSelection && (

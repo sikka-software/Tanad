@@ -1,21 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import { useLocale, useTranslations } from "next-intl";
-
 import { Check, Loader2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+import { TANAD_PRODUCT_ID } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+
 import { usePricing } from "@/hooks/use-pricing";
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
-import { TANAD_PRODUCT_ID } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Skeleton } from "../ui/skeleton";
@@ -104,7 +104,7 @@ export default function SubscriptionSelection() {
     createSubscription,
   } = useSubscription();
   const { loading: pricesLoading, getPlans } = usePricing(TANAD_PRODUCT_ID);
-  const { user, fetchUserAndProfile } = useUserStore();
+  const { user, profile, fetchUserAndProfile } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<string>("");
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
@@ -135,7 +135,7 @@ export default function SubscriptionSelection() {
 
     const newCurrentPlan = { ...currentPlan };
     const currentTier = plans.find(
-      (plan) => plan.priceId === user?.price_id || plan.lookup_key === user?.subscribed_to,
+      (plan) => plan.priceId === profile?.price_id || plan.lookup_key === profile?.subscribed_to,
     );
 
     if (currentTier) {
@@ -152,13 +152,13 @@ export default function SubscriptionSelection() {
     ) {
       setCurrentPlan(newCurrentPlan);
     }
-  }, [pricesLoading, user?.price_id, user?.subscribed_to, freePlan, plans]);
+  }, [pricesLoading, profile?.price_id, profile?.subscribed_to, freePlan, plans]);
 
   const handlePlanSelection = async () => {
     if (!selectedPlan) return;
     if (!user) {
       toast.error(
-        t("please_sign_in_to_update_your_subscription", {
+        t("Billing.please_sign_in_to_update_your_subscription", {
           fallback: "Please sign in to update your subscription",
         }),
       );
@@ -167,7 +167,7 @@ export default function SubscriptionSelection() {
 
     if (currentPlan.priceId === selectedPlan && !subscriptionCancelAt) {
       toast.error(
-        t("you_are_already_subscribed_to_this_plan", {
+        t("Billing.you_are_already_subscribed_to_this_plan", {
           fallback: "You are already subscribed to this plan",
         }),
       );
@@ -188,7 +188,7 @@ export default function SubscriptionSelection() {
           toast.error(result.error);
         } else {
           toast.success(
-            t("billing.subscription_updated_successfully", {
+            t("Billing.subscription_updated_successfully", {
               fallback: "Subscription updated successfully",
             }),
           );
@@ -198,7 +198,7 @@ export default function SubscriptionSelection() {
       }
     } catch (error) {
       toast.error(
-        t("billing.subscription_update_failed", {
+        t("Billing.subscription_update_failed", {
           fallback: "Failed to update subscription",
         }),
       );
@@ -231,17 +231,17 @@ export default function SubscriptionSelection() {
       <Card className="border-none shadow-none">
         <CardHeader className="pb-2 text-center">
           <h2 className="text-3xl font-bold">
-            {t("billing.subscription_plans", { fallback: "Subscription Plans" })}
+            {t("Billing.subscription_plans", { fallback: "Subscription Plans" })}
           </h2>
           <p className="text-muted-foreground">
-            {t("billing.choose_the_right_plan", {
+            {t("Billing.choose_the_right_plan", {
               fallback: "Choose the plan that best fits your business needs",
             })}
           </p>
           {subscriptionCancelAt && (
             <div className="mt-4 rounded-md bg-amber-50 p-2 text-amber-800 dark:bg-amber-950 dark:text-amber-200">
               <p className="text-sm font-medium">
-                {t("billing.subscription_cancels_on", {
+                {t("Billing.subscription_cancels_on", {
                   date: new Date(Number(subscriptionCancelAt) * 1000).toLocaleDateString(
                     locale === "ar" ? "ar-SA" : "en-US",
                   ),
@@ -268,7 +268,7 @@ export default function SubscriptionSelection() {
                 plan.lookup_key === "tanad_free" && currentPlan.lookup_key === "tanad_free";
 
               // Extract amount and format plan name for display
-              const planName = t(`billing.${plan.lookup_key}`, { fallback: plan.name });
+              const planName = t(`Billing.${plan.lookup_key}`, { fallback: plan.name });
               const displayPrice = formatPriceForLocale(plan.price, locale);
 
               return (
@@ -304,7 +304,7 @@ export default function SubscriptionSelection() {
                             planColor.badgeClass || "bg-primary",
                           )}
                         >
-                          {t(`billing.badge.${planColor.badge.toLowerCase()}`, {
+                          {t(`Billing.badge.${planColor.badge.toLowerCase()}`, {
                             fallback: planColor.badge,
                           })}
                         </div>
@@ -313,7 +313,7 @@ export default function SubscriptionSelection() {
 
                     <div className={cn("w-full py-3 text-center", planColor.headerClass)}>
                       <h3 className="text-xl font-bold">
-                        {t(`billing.${plan.lookup_key}`, { fallback: planName })}
+                        {t(`Billing.${plan.lookup_key}`, { fallback: planName })}
                       </h3>
                     </div>
 
@@ -328,7 +328,7 @@ export default function SubscriptionSelection() {
                         {plan.features.map((feature, index) => (
                           <div key={index} className="flex items-start gap-2">
                             <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
-                            <span>{feature.startsWith("billing.") ? t(feature) : feature}</span>
+                            <span>{feature.startsWith("Billing") ? t(feature) : feature}</span>
                           </div>
                         ))}
                       </div>
@@ -343,8 +343,8 @@ export default function SubscriptionSelection() {
                         disabled={isDisabled}
                       >
                         {isCurrentPlan
-                          ? t("billing.current_plan_button", { fallback: "Current Plan" })
-                          : t("billing.select_plan_button", { fallback: "Select Plan" })}
+                          ? t("Billing.current_plan_button", { fallback: "Current Plan" })
+                          : t("Billing.select_plan_button", { fallback: "Select Plan" })}
                       </Button>
                     </div>
                   </Label>
@@ -367,9 +367,9 @@ export default function SubscriptionSelection() {
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : currentPlan.priceId === selectedPlan && !subscriptionCancelAt ? (
-              t("billing.current_plan", { fallback: "Current Plan" })
+              t("Billing.current_plan", { fallback: "Current Plan" })
             ) : (
-              t("billing.update_plan", { fallback: "Update Plan" })
+              t("Billing.update_plan", { fallback: "Update Plan" })
             )}
           </Button>
         </CardFooter>
@@ -379,12 +379,12 @@ export default function SubscriptionSelection() {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {t("billing.payment_details", { fallback: "Payment Details" })}
+              {t("Billing.payment_details", { fallback: "Payment Details" })}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <p>
-              {t("billing.payment_dialog_description", {
+              {t("Billing.payment_dialog_description", {
                 fallback: "Complete your subscription by providing payment details.",
               })}
             </p>
@@ -392,7 +392,7 @@ export default function SubscriptionSelection() {
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                t("billing.complete_subscription", { fallback: "Complete Subscription" })
+                t("Billing.complete_subscription", { fallback: "Complete Subscription" })
               )}
             </Button>
           </div>

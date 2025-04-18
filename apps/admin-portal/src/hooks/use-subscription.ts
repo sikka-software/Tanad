@@ -1,10 +1,10 @@
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
-import { useTranslations } from "next-intl";
+import { TANAD_PRODUCT_ID } from "@/lib/constants";
 
 import { usePricing } from "@/hooks/use-pricing";
 import useUserStore from "@/hooks/use-user-store";
-import { TANAD_PRODUCT_ID } from "@/lib/constants";
 
 interface SubscriptionData {
   id: string | null;
@@ -54,7 +54,7 @@ export function useSubscription() {
   const { getPlans, loading: plansLoading } = usePricing(TANAD_PRODUCT_ID);
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData>({
     id: null,
-    name: t("billing.free_plan", { fallback: "Free Plan" }),
+    name: t("Billing.free_plan", { fallback: "Free Plan" }),
     price: "0 SAR",
     billingCycle: "-",
     nextBillingDate: "-",
@@ -64,7 +64,7 @@ export function useSubscription() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user, loading: userLoading, fetchUserAndProfile } = useUserStore();
+  const { user, profile, loading: userLoading, fetchUserAndProfile } = useUserStore();
 
   const fetchSubscription = async () => {
     setLoading(true);
@@ -85,7 +85,7 @@ export function useSubscription() {
       );
 
       // If no user or customer ID, return free plan
-      if (!user || !user.stripe_customer_id) {
+      if (!user || !profile?.stripe_customer_id) {
         console.log("No customer ID found, returning free plan");
         setSubscriptionData({
           id: null,
@@ -108,7 +108,7 @@ export function useSubscription() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          customerId: user.stripe_customer_id,
+          customerId: profile?.stripe_customer_id,
         }),
       });
 
@@ -206,7 +206,7 @@ export function useSubscription() {
    */
   const createSubscription = async (priceId: string): Promise<CreateSubscriptionResponse> => {
     try {
-      if (!user || !user.stripe_customer_id) {
+      if (!user || !profile?.stripe_customer_id) {
         throw new Error("User not authenticated or missing stripe customer ID");
       }
 
@@ -217,7 +217,7 @@ export function useSubscription() {
         },
         body: JSON.stringify({
           priceId,
-          customerId: user.stripe_customer_id,
+          customerId: profile?.stripe_customer_id,
           userId: user.id,
         }),
       });
@@ -342,7 +342,7 @@ export function useSubscription() {
     if (!userLoading && !plansLoading) {
       fetchSubscription();
     }
-  }, [user?.stripe_customer_id, user?.id, user?.subscribed_to, plansLoading, userLoading]);
+  }, [profile?.stripe_customer_id, user?.id, profile?.subscribed_to, plansLoading, userLoading]);
 
   // The subscription data and utility functions to expose
   return {
