@@ -1,8 +1,9 @@
-import type { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 import { supabase } from "@/lib/supabase";
+
+import { ExtendedUser } from "@/types";
 
 // Define strong types for our user data
 export interface Profile {
@@ -43,12 +44,12 @@ export interface Profile {
 }
 
 export interface UserState {
-  user: User | null;
+  user: ExtendedUser | null;
   profile: Profile | null;
   loading: boolean;
   initialized: boolean;
   isAuthenticated: boolean;
-  setUser: (user: User | null) => void;
+  setUser: (user: ExtendedUser | null) => void;
   setProfile: (profile: Profile | null) => void;
   fetchUserAndProfile: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -67,7 +68,6 @@ const useUserStore = create<UserState>()(
       isAuthenticated: false,
 
       setUser: (user) => {
-        console.log("[UserStore] Setting user:", user?.id);
         set({ user, isAuthenticated: !!user });
       },
 
@@ -124,8 +124,20 @@ const useUserStore = create<UserState>()(
                 throw profileError;
               }
 
+              // Copy stripe_customer_id from profile to user object
+              const updatedUser = {
+                ...session.user,
+                stripe_customer_id: profile?.stripe_customer_id || undefined,
+                profile: profile,
+              };
+
               // console.log("[UserStore] Profile fetched successfully:", profile?.id);
-              set({ profile, loading: false, initialized: true });
+              set({
+                user: updatedUser,
+                profile,
+                loading: false,
+                initialized: true,
+              });
             } catch (error) {
               console.error("[UserStore] Error fetching profile:", error);
               set({ loading: false, initialized: true });
@@ -169,8 +181,18 @@ const useUserStore = create<UserState>()(
 
           if (error) throw error;
 
-          // console.log("[UserStore] Profile refreshed:", profile?.id);
-          set({ profile, loading: false });
+          // Copy stripe_customer_id from profile to user object
+          const updatedUser = {
+            ...user,
+            stripe_customer_id: profile?.stripe_customer_id || undefined,
+            profile: profile,
+          };
+
+          set({
+            user: updatedUser,
+            profile,
+            loading: false,
+          });
         } catch (error) {
           console.error("[UserStore] Error refreshing profile:", error);
           set({ loading: false });
@@ -242,7 +264,15 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 
         if (error) throw error;
 
-        // console.log("[UserStore] Profile fetched on auth change:", profile?.id);
+        // Copy stripe_customer_id from profile to user
+        const updatedUser = {
+          ...session.user,
+          stripe_customer_id: profile?.stripe_customer_id || undefined,
+          profile: profile,
+        };
+
+        // Update both user and profile
+        store.setUser(updatedUser);
         store.setProfile(profile);
       } catch (error) {
         console.error("[UserStore] Error fetching profile on auth change:", error);

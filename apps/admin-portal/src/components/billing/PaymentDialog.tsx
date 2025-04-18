@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
-
-import { useLocale, useTranslations } from "next-intl";
-import { useTheme } from "next-themes";
-
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { AlertTriangle, CreditCard, Loader2, ShieldAlert, Wallet, XCircle } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -13,9 +11,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { supabase } from "@/lib/supabase";
+
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
-import { supabase } from "@/lib/supabase";
 
 // Load Stripe with publishable key
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
@@ -117,12 +117,14 @@ function SavedPaymentMethods({
   paymentMethods,
   selectedPaymentMethod,
   setSelectedPaymentMethod,
+  onUseNewCard,
   loading,
   locale,
 }: {
   paymentMethods: any[];
   selectedPaymentMethod: string | null;
   setSelectedPaymentMethod: (id: string | null) => void;
+  onUseNewCard: () => void;
   loading: boolean;
   locale: string;
 }) {
@@ -158,8 +160,13 @@ function SavedPaymentMethods({
         {paymentMethods.map((method) => (
           <div
             key={method.id}
-            className="hover:bg-accent flex items-center space-x-2 rounded-md border p-3"
+            className={`flex items-center space-x-2 rounded-md border p-3 transition-colors ${
+              selectedPaymentMethod === method.id
+                ? "border-primary bg-primary/5"
+                : "hover:bg-accent"
+            }`}
             dir={isRtl ? "rtl" : "ltr"}
+            onClick={() => setSelectedPaymentMethod(method.id)}
           >
             <RadioGroupItem value={method.id} id={method.id} className={isRtl ? "ml-2" : "mr-2"} />
             <div className="flex flex-1 items-center justify-between">
@@ -178,12 +185,7 @@ function SavedPaymentMethods({
         ))}
       </RadioGroup>
       <div className="flex justify-between">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setSelectedPaymentMethod(null)}
-          className="text-muted-foreground"
-        >
+        <Button variant="outline" size="sm" onClick={onUseNewCard} className="mt-2">
           {t("Billing.payment.use_new_card", { fallback: "Use a new card instead" })}
         </Button>
       </div>
@@ -227,6 +229,30 @@ export function PaymentDialog({
     }
   }, [open, selectedPlan]);
 
+  // In the PaymentDialog component, above the useEffect for fetchSetupIntent
+  useEffect(() => {
+    // Debug function to check for customer ID
+    if (open) {
+      console.log("Payment Dialog Debug Info:", {
+        userObj: {
+          id: user?.id,
+          stripe_customer_id: user?.stripe_customer_id,
+          hasProfile: !!user?.profile,
+          profileStripeId: user?.profile?.stripe_customer_id,
+        },
+        passedCustomerId: customerId,
+        selectedPlan,
+      });
+
+      // If no stripe_customer_id but we have a passed customerId, use that
+      if (user && !user.stripe_customer_id && customerId) {
+        console.log("Setting stripe_customer_id from passed prop:", customerId);
+        // This is just client-side for this session
+        user.stripe_customer_id = customerId;
+      }
+    }
+  }, [open, user, customerId, selectedPlan]);
+
   // Fetch client secret for setup intent
   const fetchSetupIntent = async () => {
     if (!selectedPlan || !user || !open) return;
@@ -254,8 +280,21 @@ export function PaymentDialog({
         price: priceData.price || "0.00 SAR/month",
       });
 
-      // Check if we need to obtain a customer ID - if none exists
-      if (!user.stripe_customer_id && user.id && !customerId) {
+      // Prioritize using the customerId passed as prop
+      let stripeCustomerId = customerId;
+
+      // If no customerId prop, try getting from user.stripe_customer_id
+      if (!stripeCustomerId && user.stripe_customer_id) {
+        stripeCustomerId = user.stripe_customer_id;
+      }
+
+      // If still no customer ID, check the profile
+      if (!stripeCustomerId && user.profile?.stripe_customer_id) {
+        stripeCustomerId = user.profile.stripe_customer_id;
+      }
+
+      // If still no customer ID and we have user.id, try looking it up
+      if (!stripeCustomerId && user.id) {
         // Look up customer ID from database
         const { data: profile } = await supabase
           .from("profiles")
@@ -264,20 +303,34 @@ export function PaymentDialog({
           .single();
 
         if (profile?.stripe_customer_id) {
-          customerId = profile.stripe_customer_id;
+          stripeCustomerId = profile.stripe_customer_id;
+        } else {
+          // No customer ID found, may need to create one
+          console.log("No Stripe customer ID found for user");
         }
       }
 
       // Make sure we have a customer ID
-      if (!user?.stripe_customer_id) {
+      if (!stripeCustomerId) {
         // Try to wait for it if it might be loading
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        if (!user?.stripe_customer_id && !user?.id) {
+
+        // Check again
+        if (!stripeCustomerId && !user?.id) {
           setLoading(false);
           toast.error("User information not available. Please refresh and try again.");
           return;
         }
+
+        // If we still don't have a customer ID, we might need to create one
+        if (!stripeCustomerId) {
+          setError("No Stripe customer ID found. Please contact support.");
+          setLoading(false);
+          return;
+        }
       }
+
+      console.log("Using customer ID for setup intent:", stripeCustomerId);
 
       // Create a setup intent for the customer
       const setupResponse = await fetch("/api/stripe/create-setup-intent", {
@@ -286,7 +339,7 @@ export function PaymentDialog({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          customerId: customerId || user.stripe_customer_id,
+          customerId: stripeCustomerId,
         }),
       });
 
@@ -365,6 +418,9 @@ export function PaymentDialog({
   const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
   const isStripeKeyMissing =
     !stripeKey || stripeKey.includes("pk_test_mock_key") || stripeKey === "";
+
+  // Log the customerId value before rendering
+  console.log("PaymentDialog about to render with customerId:", customerId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -461,6 +517,7 @@ export function PaymentDialog({
               priceId={selectedPlan}
               planName={priceDetails?.name}
               planPrice={priceDetails?.price}
+              customerId={customerId}
             />
           </Elements>
         )}
@@ -474,11 +531,13 @@ function PaymentFormContent({
   priceId,
   planName,
   planPrice,
+  customerId,
 }: {
   onSuccess: () => void;
   priceId?: string;
   planName?: string;
   planPrice?: string;
+  customerId?: string;
 }) {
   const t = useTranslations();
   const locale = useLocale();
@@ -502,7 +561,22 @@ function PaymentFormContent({
   // Fetch saved payment methods when component mounts
   useEffect(() => {
     const fetchSavedPaymentMethods = async () => {
-      if (!user?.stripe_customer_id) return;
+      // First try to use passed prop customerId
+      let customerIdToUse = customerId;
+
+      // Then fall back to user.stripe_customer_id if available
+      if (!customerIdToUse && user?.stripe_customer_id) {
+        customerIdToUse = user.stripe_customer_id;
+      }
+
+      // If no customer ID, exit
+      if (!customerIdToUse) {
+        console.log("No customer ID available for fetching payment methods");
+        setShowNewCardForm(true);
+        return;
+      }
+
+      console.log("Fetching payment methods with customerId:", customerIdToUse);
 
       setLoadingSavedMethods(true);
       try {
@@ -512,7 +586,7 @@ function PaymentFormContent({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            customerId: user.stripe_customer_id,
+            customerId: customerIdToUse,
           }),
         });
 
@@ -521,17 +595,27 @@ function PaymentFormContent({
         }
 
         const data = await response.json();
-        setSavedPaymentMethods(data.paymentMethods || []);
+        const methods = data.paymentMethods || [];
+        setSavedPaymentMethods(methods);
 
-        // If there are saved methods, select the first one by default
-        if (data.paymentMethods && data.paymentMethods.length > 0) {
-          setSelectedPaymentMethod(data.paymentMethods[0].id);
+        // Manage visibility and selection based on available methods
+        if (methods.length > 0) {
+          // If there are saved methods, select the first one by default
+          // unless one is already selected
+          if (!selectedPaymentMethod) {
+            console.log("Auto-selecting first saved payment method:", methods[0].id);
+            setSelectedPaymentMethod(methods[0].id);
+          }
           setShowNewCardForm(false);
         } else {
+          // If no saved methods, show the new card form
+          console.log("No saved payment methods found, showing new card form");
+          setSelectedPaymentMethod(null);
           setShowNewCardForm(true);
         }
       } catch (error) {
         console.error("Error fetching payment methods:", error);
+        setSelectedPaymentMethod(null);
         setShowNewCardForm(true);
       } finally {
         setLoadingSavedMethods(false);
@@ -539,7 +623,7 @@ function PaymentFormContent({
     };
 
     fetchSavedPaymentMethods();
-  }, [user?.stripe_customer_id]);
+  }, [customerId, user?.stripe_customer_id, selectedPaymentMethod]);
 
   // Format price for Arabic display
   const formatPriceForDisplay = (price: string): string => {
@@ -619,18 +703,60 @@ function PaymentFormContent({
     }
 
     // Check if we have user data
-    if (!user || (!user.stripe_customer_id && !user.id)) {
+    if (!user) {
       toast.error("User information is not available. Please refresh and try again.");
+      setIsProcessing(false);
       return;
     }
+
+    // Make sure we have a customer ID, either from user object or profile
+    let customerIdToUse = user?.stripe_customer_id;
+    const customerSource = customerIdToUse ? "user object" : "";
+
+    if (!customerIdToUse && user?.profile?.stripe_customer_id) {
+      customerIdToUse = user.profile.stripe_customer_id;
+      console.log("Using customer ID from profile");
+    }
+
+    // If we still don't have it, check the passed prop
+    if (!customerIdToUse && customerId) {
+      console.log("Using passed customer ID prop:", customerId);
+      customerIdToUse = customerId;
+    }
+
+    if (!customerIdToUse) {
+      console.error("No Stripe customer ID available from any source");
+      setError({
+        message: "Customer ID not found. Please try refreshing the page.",
+        type: "general",
+      });
+      setIsProcessing(false);
+      return;
+    }
+
+    console.log(
+      `Using customer ID: ${customerIdToUse} (source: ${customerSource || "passed prop or profile"})`,
+    );
 
     setIsProcessing(true);
     setError(null);
 
     try {
+      // Check if we're using a saved card or a new card
+      const isUsingSavedCard =
+        paymentMethod === "card" && selectedPaymentMethod && !showNewCardForm;
+
+      console.log("Payment method state:", {
+        paymentMethod,
+        selectedPaymentMethod,
+        showNewCardForm,
+        isUsingSavedCard,
+      });
+
       // If we have a selected saved payment method, use it
-      if (selectedPaymentMethod && paymentMethod === "card") {
+      if (isUsingSavedCard) {
         console.log("Using saved payment method:", selectedPaymentMethod);
+        console.log("With customer ID:", customerIdToUse);
 
         // Create subscription with the selected payment method
         const response = await fetch("/api/stripe/create-subscription", {
@@ -641,8 +767,8 @@ function PaymentFormContent({
           body: JSON.stringify({
             priceId,
             paymentMethodId: selectedPaymentMethod,
-            customerId: user?.stripe_customer_id,
-            userId: user?.id,
+            customerId: customerIdToUse,
+            userId: user.id,
           }),
         });
 
@@ -730,7 +856,7 @@ function PaymentFormContent({
       // Log available IDs for debugging
       console.log("Creating subscription with:", {
         userId: user?.id,
-        customerId: user?.stripe_customer_id,
+        customerId: customerIdToUse,
         paymentMethodId,
       });
 
@@ -743,7 +869,7 @@ function PaymentFormContent({
           body: JSON.stringify({
             priceId,
             paymentMethodId,
-            customerId: user?.stripe_customer_id,
+            customerId: customerIdToUse,
             userId: user?.id,
           }),
         });
@@ -890,6 +1016,7 @@ function PaymentFormContent({
                   paymentMethods={savedPaymentMethods}
                   selectedPaymentMethod={selectedPaymentMethod}
                   setSelectedPaymentMethod={setSelectedPaymentMethod}
+                  onUseNewCard={() => setShowNewCardForm(true)}
                   loading={loadingSavedMethods}
                   locale={locale}
                 />
@@ -899,6 +1026,13 @@ function PaymentFormContent({
             {/* Show the new card form if there are no saved methods or user chose to use a new card */}
             {(showNewCardForm || savedPaymentMethods.length === 0) && (
               <>
+                <div className="mb-4">
+                  <div className="mb-2 text-sm font-medium">
+                    {savedPaymentMethods.length > 0
+                      ? t("Billing.payment.new_card", { fallback: "New Card" })
+                      : t("Billing.payment.payment_details", { fallback: "Payment Details" })}
+                  </div>
+                </div>
                 <div className="rounded-lg border p-4" dir={isRtl ? "rtl" : "ltr"}>
                   <PaymentElement
                     options={{
@@ -916,7 +1050,7 @@ function PaymentFormContent({
                     }}
                   />
                 </div>
-                <div className="flex items-center space-x-2" dir={isRtl ? "rtl" : "ltr"}>
+                <div className="mt-3 flex items-center space-x-2" dir={isRtl ? "rtl" : "ltr"}>
                   <Checkbox
                     id="save-card"
                     checked={saveCard}
@@ -931,15 +1065,16 @@ function PaymentFormContent({
                 </div>
                 {savedPaymentMethods.length > 0 && (
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
                     onClick={() => {
                       setShowNewCardForm(false);
-                      if (savedPaymentMethods.length > 0 && !selectedPaymentMethod) {
+                      // If no card is currently selected, select the first saved card
+                      if (!selectedPaymentMethod && savedPaymentMethods.length > 0) {
                         setSelectedPaymentMethod(savedPaymentMethods[0].id);
                       }
                     }}
-                    className="text-muted-foreground mt-2"
+                    className="mt-4"
                   >
                     {t("Billing.payment.use_saved_card", { fallback: "Use a saved card instead" })}
                   </Button>
