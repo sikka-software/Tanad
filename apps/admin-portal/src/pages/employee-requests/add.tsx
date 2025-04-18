@@ -3,12 +3,14 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import PageTitle from "@/ui/page-title";
 
 import EmployeeRequestForm, {
   type EmployeeRequestFormValues,
 } from "@/components/app/employee-request/employee-request.form";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 import { supabase } from "@/lib/supabase";
@@ -22,12 +24,51 @@ export default function AddEmployeeRequestPage() {
   const queryClient = useQueryClient();
   const { user } = useUserStore();
 
-  const handleSubmit = async (data: EmployeeRequestFormValues) => {};
+  const handleSubmit = async (data: EmployeeRequestFormValues) => {
+    console.log(data);
+    setLoading(true);
+    try {
+      // Check if user ID is available
+      if (!user?.id) {
+        throw new Error(t("EmployeeRequests.error.not_authenticated"));
+      }
 
+      const { data: newRequest, error } = await supabase
+        .from("employee_requests")
+        .insert([
+          {
+            employee_id: data.employee_id,
+            employeeName: data.employeeName,
+            type: data.type,
+            status: data.status,
+            title: data.title,
+            attachments: data.attachments,
+            description: data.description,
+            notes: data.notes,
+            user_id: user?.id,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast.success(t("General.successful_operation"), {
+        description: t("EmployeeRequests.success.created"),
+      });
+
+      router.push("/employee-requests");
+    } catch (error) {
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("EmployeeRequests.error.creating"),
+      });
+    }
+  };
   const handleDummyData = () => {};
 
   return (
     <div>
+      <CustomPageMeta title={t("EmployeeRequests.add_new")} />
       <PageTitle
         title={t("EmployeeRequests.add_new")}
         formButtons

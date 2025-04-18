@@ -35,21 +35,28 @@ import { useEmployees } from "@/hooks/useEmployees";
 import { useEmployeesStore } from "@/stores/employees.store";
 import useUserStore from "@/stores/use-user-store";
 
-const requestSchema = z.object({
-  employee_id: z.string().uuid(),
-  employeeName: z.string().min(1),
-  type: z.enum(["leave", "expense", "document", "other"]),
-  status: z.enum(["pending", "approved", "rejected"]).default("pending"),
-  title: z.string().min(1),
-  description: z.string().optional(),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-  amount: z.number().optional(),
-  attachments: z.array(z.any()).default([]),
-  notes: z.string().optional(),
-});
+const createRequestSchema = (t: (key: string) => string) =>
+  z.object({
+    employee_id: z
+      .string({ message: t("EmployeeRequests.form.employee.required") })
+      .nonempty({ message: t("EmployeeRequests.form.employee.required") })
+      .uuid({ message: t("EmployeeRequests.form.employee.required") }),
+    employeeName: z
+      .string({ message: t("EmployeeRequests.form.employee.required") })
+      .nonempty({ message: t("EmployeeRequests.form.employee.required") })
+      .min(1),
+    type: z.enum(["leave", "expense", "document", "other"]),
+    status: z.enum(["pending", "approved", "rejected"]).default("pending"),
+    title: z.string({ message: t("EmployeeRequests.form.title.required") }).min(1),
+    description: z.string().optional(),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
+    amount: z.number().optional(),
+    attachments: z.array(z.any()).default([]),
+    notes: z.string().optional(),
+  });
 
-export type EmployeeRequestFormValues = z.input<typeof requestSchema>;
+export type EmployeeRequestFormValues = z.input<ReturnType<typeof createRequestSchema>>;
 
 interface EmployeeRequestFormProps {
   id?: string;
@@ -77,7 +84,7 @@ const EmployeeRequestForm = ({
   const { user } = useUserStore();
 
   const form = useForm<EmployeeRequestFormValues>({
-    resolver: zodResolver(requestSchema),
+    resolver: zodResolver(createRequestSchema(t)),
     defaultValues: {
       employee_id: employee_id || "",
       employeeName: "",
@@ -157,16 +164,6 @@ const EmployeeRequestForm = ({
     }
   };
 
-  const handleSubmit = async (data: EmployeeRequestFormValues) => {
-    try {
-      await onSubmit(data);
-      form.reset();
-      onSuccess?.();
-    } catch (error) {
-      console.error("Error submitting form:", error);
-    }
-  };
-
   const requestTypes = [
     { label: t("EmployeeRequests.form.type.leave"), value: "leave" },
     { label: t("EmployeeRequests.form.type.expense"), value: "expense" },
@@ -177,7 +174,11 @@ const EmployeeRequestForm = ({
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form
+          id={id || "employee-request-form"}
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4"
+        >
           <input type="hidden" {...form.register("employee_id")} />
           <FormField
             control={form.control}
@@ -196,7 +197,7 @@ const EmployeeRequestForm = ({
                       return (
                         <div className="flex flex-col">
                           <span>{item.label}</span>
-                          <span className="text-sm text-muted-foreground">{item.value}</span>
+                          <span className="text-muted-foreground text-sm">{item.value}</span>
                         </div>
                       );
                     }}

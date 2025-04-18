@@ -1,8 +1,6 @@
-import { useForm } from "react-hook-form";
-
-import { useTranslations } from "next-intl";
-
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
@@ -23,12 +21,11 @@ export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
 
 export interface OfficeFormProps {
   id?: string;
-  user_id: string | undefined;
   onSubmit: (data: OfficeFormValues) => void;
   loading?: boolean;
 }
 
-export function OfficeForm({ user_id, id, onSubmit, loading }: OfficeFormProps) {
+export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
   const t = useTranslations();
   const form = useForm<OfficeFormValues>({
     resolver: zodResolver(createOfficeSchema(t)),

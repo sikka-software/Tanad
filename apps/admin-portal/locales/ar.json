@@ -1725,7 +1725,8 @@
       },
       "title": {
         "label": "العنوان",
-        "placeholder": "أدخل عنوان الطلب"
+        "placeholder": "أدخل عنوان الطلب",
+        "required": "العنوان مطلوب"
       },
       "type": {
         "label": "النوع",
@@ -1737,11 +1738,14 @@
       },
       "employee": {
         "label": "الموظف",
-        "placeholder": "اختر الموظف"
+        "placeholder": "اختر الموظف",
+        "required": "الموظف مطلوب",
+        "no_employees": "لا يوجد موظفين"
       },
       "description": {
         "label": "الوصف",
-        "placeholder": "أدخل وصف الطلب"
+        "placeholder": "أدخل وصف الطلب",
+        "required": "الوصف مطلوب"
       },
       "date_range": {
         "label": "الفترة الزمنية",
@@ -1750,7 +1754,8 @@
       },
       "amount": {
         "label": "المبلغ",
-        "placeholder": "أدخل المبلغ"
+        "placeholder": "أدخل المبلغ",
+        "required": "المبلغ مطلوب"
       },
       "attachments": {
         "label": "المرفقات",
@@ -1759,7 +1764,8 @@
       },
       "notes": {
         "label": "ملاحظات",
-        "placeholder": "أدخل أي ملاحظات إضافية"
+        "placeholder": "أدخل أي ملاحظات إضافية",
+        "required": "الملاحظات مطلوبة"
       },
       "status": {
         "label": "الحالة",

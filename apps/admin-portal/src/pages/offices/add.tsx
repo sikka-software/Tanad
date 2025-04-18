@@ -111,12 +111,7 @@ export default function AddOfficePage() {
             <CardTitle>{t("Offices.office_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <OfficeForm
-              id="office-form"
-              user_id={user?.id}
-              onSubmit={handleSubmit}
-              loading={loading}
-            />
+            <OfficeForm id="office-form" onSubmit={handleSubmit} loading={loading} />
           </CardContent>
         </Card>
       </div>

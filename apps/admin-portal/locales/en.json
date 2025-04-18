@@ -1954,6 +1954,75 @@
   "Requests": {
     "title": "Requests"
   },
+  "EmployeeRequests": {
+    "title": "Employee Requests",
+    "description": "Employee Requests",
+    "add_new": "Add New Employee Request",
+    "no_employee_requests_found": "No employee requests found",
+    "search_requests": "Search employee requests...",
+    "form": {
+      "validation": {
+        "title_required": "Title is required",
+        "type_required": "Type is required",
+        "employee_required": "Employee is required",
+        "description_required": "Description is required",
+        "start_date_required": "Start date is required",
+        "end_date_required": "End date is required",
+        "amount_required": "Amount is required",
+        "amount_positive": "Amount must be a positive number"
+      },
+      "title": {
+        "label": "Title",
+        "placeholder": "Enter request title",
+        "required": "Title is required"
+      },
+      "type": {
+        "label": "Type",
+        "placeholder": "Select request type",
+        "leave": "Leave",
+        "expense": "Expense",
+        "document": "Document",
+        "other": "Other"
+      },
+      "employee": {
+        "label": "Employee",
+        "placeholder": "Select employee",
+        "required": "Employee is required",
+        "no_employees": "No employees found"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter request description",
+        "required": "Description is required"
+      },
+      "date_range": {
+        "label": "Date Range",
+        "start": "Start Date",
+        "end": "End Date"
+      },
+      "amount": {
+        "label": "Amount",
+        "placeholder": "Enter amount",
+        "required": "Amount is required"
+      },
+      "attachments": {
+        "label": "Attachments",
+        "add": "Add Attachment",
+        "remove": "Remove"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter any additional notes",
+        "required": "Notes are required"
+      },
+      "status": {
+        "label": "Status",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      }
+    }
+  },
   "Applicants": {
     "title": "Applicants",
     "add_new": "Add New Applicant",
