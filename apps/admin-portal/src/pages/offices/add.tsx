@@ -49,11 +49,11 @@ export default function AddOfficePage() {
         description: t("Offices.success.created"),
       });
 
-      const previousOffices = queryClient.getQueryData(["offices"]) || [];
-      queryClient.setQueryData(
-        ["offices"],
-        [...(Array.isArray(previousOffices) ? previousOffices : []), result],
-      );
+      const previousOffices = queryClient.getQueryData(officeKeys.lists()) || [];
+      queryClient.setQueryData(officeKeys.lists(), [
+        ...(Array.isArray(previousOffices) ? previousOffices : []),
+        result,
+      ]);
 
       router.push("/offices");
     } catch (error) {

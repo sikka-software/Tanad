@@ -24,7 +24,7 @@ import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee
 
 import { cn } from "@/lib/utils";
 
-import { useEmployees } from "@/hooks/models/useEmployees";
+import { employeeKeys, useEmployees } from "@/hooks/models/useEmployees";
 import { useEmployeeRequestsStore } from "@/stores/employee-requests.store";
 import { useEmployeesStore } from "@/stores/employees.store";
 import useUserStore from "@/stores/use-user-store";
@@ -131,11 +131,11 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
       const newEmployee = await response.json();
 
       // Update the employees cache to include the new employee
-      const previousEmployees = queryClient.getQueryData(["employees"]) || [];
-      queryClient.setQueryData(
-        ["employees"],
-        [...(Array.isArray(previousEmployees) ? previousEmployees : []), newEmployee],
-      );
+      const previousEmployees = queryClient.getQueryData(employeeKeys.lists()) || [];
+      queryClient.setQueryData(employeeKeys.lists(), [
+        ...(Array.isArray(previousEmployees) ? previousEmployees : []),
+        newEmployee,
+      ]);
 
       // Set the new employee as the selected employee
       form.setValue("employee_id", newEmployee.id);

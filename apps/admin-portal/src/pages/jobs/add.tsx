@@ -13,6 +13,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { createJob } from "@/services/jobService";
 
+import { jobKeys } from "@/hooks/models/useJobs";
+
 export default function AddJobPage() {
   const t = useTranslations();
   const router = useRouter();
@@ -37,11 +39,11 @@ export default function AddJobPage() {
       });
 
       // Update the jobs cache to include the new job
-      const previousJobs = queryClient.getQueryData(["jobs"]) || [];
-      queryClient.setQueryData(
-        ["jobs"],
-        [...(Array.isArray(previousJobs) ? previousJobs : []), newJob],
-      );
+      const previousJobs = queryClient.getQueryData(jobKeys.lists()) || [];
+      queryClient.setQueryData(jobKeys.lists(), [
+        ...(Array.isArray(previousJobs) ? previousJobs : []),
+        newJob,
+      ]);
 
       toast.success(t("General.successful_operation"), {
         description: t("Jobs.messages.job_created"),

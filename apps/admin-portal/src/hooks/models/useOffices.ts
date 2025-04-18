@@ -8,7 +8,7 @@ import {
   updateOffice,
 } from "@/services/officeService";
 
-import { Office, OfficeCreateData } from "@/types/office.type";
+import type { Office, OfficeCreateData } from "@/types/office.type";
 
 export const officeKeys = {
   all: ["offices"] as const,
@@ -37,13 +37,13 @@ export function useOffice(id: string) {
 export function useCreateOffice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newCompany: Omit<Office, "id" | "created_at"> & { user_id: string }) => {
-      const { user_id, ...rest } = newCompany;
-      const companyData: OfficeCreateData = {
+    mutationFn: (newOffice: Omit<Office, "id" | "created_at"> & { user_id: string }) => {
+      const { user_id, ...rest } = newOffice;
+      const officeData: OfficeCreateData = {
         ...rest,
         user_id: user_id,
       };
-      return createOffice(companyData);
+      return createOffice(officeData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });

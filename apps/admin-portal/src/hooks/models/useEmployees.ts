@@ -10,6 +10,8 @@ import {
 
 import { Employee } from "@/types/employee.types";
 
+import { departmentKeys } from "./useDepartments";
+
 export const employeeKeys = {
   all: ["employees"] as const,
   lists: () => [...employeeKeys.all, "list"] as const,
@@ -59,7 +61,7 @@ export const useUpdateEmployee = () => {
       if (updates.department_id !== undefined) {
         try {
           // Get the current departments from the cache
-          const departments: any = queryClient.getQueryData(["departments"]);
+          const departments: any = queryClient.getQueryData(departmentKeys.lists());
 
           if (departments && Array.isArray(departments)) {
             // Find the department with the matching ID

@@ -16,7 +16,7 @@ import { Textarea } from "@/ui/textarea";
 
 import DepartmentForm, { DepartmentFormValues } from "@/components/app/department/department.form";
 
-import { useDepartments, DEPARTMENTS_QUERY_KEY } from "@/hooks/models/useDepartments";
+import { useDepartments, departmentKeys } from "@/hooks/models/useDepartments";
 import { useEmployeesStore } from "@/stores/employees.store";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
@@ -140,14 +140,14 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
       }
 
       // Update the departments cache
-      const previousDepartments = queryClient.getQueryData(DEPARTMENTS_QUERY_KEY) || [];
-      queryClient.setQueryData(DEPARTMENTS_QUERY_KEY, [
+      const previousDepartments = queryClient.getQueryData(departmentKeys.lists()) || [];
+      queryClient.setQueryData(departmentKeys.lists(), [
         ...(Array.isArray(previousDepartments) ? previousDepartments : []),
         newDepartment,
       ]);
 
       // Also set the individual department query data
-      queryClient.setQueryData([...DEPARTMENTS_QUERY_KEY, newDepartment.id], newDepartment);
+      queryClient.setQueryData(departmentKeys.detail(newDepartment.id), newDepartment);
 
       // Set the new department as the selected department
       form.setValue("department", newDepartment.id);
@@ -184,6 +184,10 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
       console.error("Error submitting form:", error);
     }
   };
+
+  if (typeof window !== "undefined") {
+    (window as any).employeeForm = form;
+  }
 
   return (
     <>

@@ -17,9 +17,11 @@ import { Textarea } from "@/ui/textarea";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
 
+import { generateDummyEmployee } from "@/lib/dummy-factory";
+
 import type { Salary } from "@/types/salary.type";
 
-import { useEmployees } from "@/hooks/models/useEmployees";
+import { employeeKeys, useEmployees } from "@/hooks/models/useEmployees";
 import useUserStore from "@/stores/use-user-store";
 
 const createSalarySchema = (t: (key: string) => string) =>
@@ -56,32 +58,19 @@ export type SalaryFormValues = z.infer<ReturnType<typeof createSalarySchema>>;
 
 interface SalaryFormProps {
   id?: string;
-  salary_id?: string;
-  onSuccess?: (salary: Salary) => void;
   loading?: boolean;
-  setLoading?: (loading: boolean) => void;
-  user_id?: string | null;
+  onSubmit: (data: SalaryFormValues) => void;
 }
 
-export function SalaryForm({
-  id,
-  salary_id,
-  onSuccess,
-  loading: externalLoading = false,
-  setLoading,
-  user_id,
-}: SalaryFormProps) {
+export function SalaryForm({ id, onSubmit, loading }: SalaryFormProps) {
   const router = useRouter();
   const t = useTranslations();
-  const [internalLoading, setInternalLoading] = useState(false);
-  const loading = externalLoading || internalLoading;
   const { user } = useUserStore();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const [isEmployeeSaving, setIsEmployeeSaving] = useState(false);
   const { locale } = useRouter();
   const queryClient = useQueryClient();
-
   const salarySchema = createSalarySchema(t);
 
   // Use SalaryFormValues directly with useForm
@@ -104,40 +93,6 @@ export function SalaryForm({
     label: `${emp.first_name} ${emp.last_name}`,
     value: `${emp.first_name} ${emp.last_name}`,
   }));
-
-  // Fetch salary data for editing
-  useEffect(() => {
-    if (salary_id) {
-      setInternalLoading(true);
-      fetch(`/api/salaries/${salary_id}`)
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to fetch salary");
-          return res.json();
-        })
-        .then((salary: Salary) => {
-          // Reset with numbers for amounts
-          form.reset({
-            employee_name: salary.employee_name,
-            pay_period_start: salary.pay_period_start?.split("T")[0] || "",
-            pay_period_end: salary.pay_period_end?.split("T")[0] || "",
-            payment_date: salary.payment_date?.split("T")[0] || "",
-            gross_amount: salary.gross_amount ?? 0, // Reset with number
-            net_amount: salary.net_amount ?? 0, // Reset with number
-            deductions: salary.deductions ? JSON.stringify(salary.deductions, null, 2) : "",
-            notes: salary.notes || "",
-          });
-        })
-        .catch((error) => {
-          console.error("Failed to fetch salary:", error);
-          toast.error(t("Salaries.error.title"), {
-            description: t("Salaries.messages.error_fetch"),
-          });
-        })
-        .finally(() => {
-          setInternalLoading(false);
-        });
-    }
-  }, [salary_id, form, t]);
 
   const handleEmployeeSubmit = async (data: EmployeeFormValues) => {
     setIsEmployeeSaving(true);
@@ -175,11 +130,11 @@ export function SalaryForm({
       const newEmployee = await response.json();
 
       // Update the employees cache to include the new employee
-      const previousEmployees = queryClient.getQueryData(["employees"]) || [];
-      queryClient.setQueryData(
-        ["employees"],
-        [...(Array.isArray(previousEmployees) ? previousEmployees : []), newEmployee],
-      );
+      const previousEmployees = queryClient.getQueryData(employeeKeys.lists()) || [];
+      queryClient.setQueryData(employeeKeys.lists(), [
+        ...(Array.isArray(previousEmployees) ? previousEmployees : []),
+        newEmployee,
+      ]);
 
       // Set the new employee as the selected employee
       const fullName = `${newEmployee.first_name} ${newEmployee.last_name}`;
@@ -202,74 +157,9 @@ export function SalaryForm({
     }
   };
 
-  // Data is SalaryFormValues (numbers for amounts)
-  const onSubmit: SubmitHandler<SalaryFormValues> = async (data) => {
-    setInternalLoading(true);
-    setLoading?.(true);
-    if (!user?.id) {
-      toast.error(t("Salaries.error.title"), {
-        description: t("Salaries.messages.error_not_authenticated"),
-      });
-      setInternalLoading(false);
-      setLoading?.(false);
-      return;
-    }
-
-    try {
-      // Use data directly (amounts are numbers)
-      const salaryData = {
-        ...data,
-        deductions: data.deductions ? JSON.parse(data.deductions) : null,
-        notes: data.notes?.trim() || null,
-        user_id: user.id,
-      };
-
-      let result: Salary;
-      if (salary_id) {
-        const response = await fetch(`/api/salaries/${salary_id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(salaryData),
-        });
-        if (!response.ok) throw new Error("Failed to update salary");
-        result = await response.json();
-        toast.success(t("General.successful_operation"), {
-          description: t("Salaries.messages.success_updated"),
-        });
-      } else {
-        const response = await fetch("/api/salaries", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(salaryData),
-        });
-        if (!response.ok) throw new Error("Failed to create salary");
-        result = await response.json();
-        toast.success(t("General.successful_operation"), {
-          description: t("Salaries.messages.success_created"),
-        });
-      }
-
-      if (onSuccess) {
-        onSuccess(result);
-      } else {
-        router.push("/salaries");
-      }
-    } catch (error) {
-      console.error("Failed to save salary:", error);
-      const description =
-        error instanceof SyntaxError
-          ? t("Salaries.form.deductions.invalid_json")
-          : error instanceof Error
-            ? error.message
-            : t("Salaries.messages.error_save");
-      toast.error(t("Salaries.error.title"), {
-        description,
-      });
-    } finally {
-      setInternalLoading(false);
-      setLoading?.(false);
-    }
-  };
+  if (typeof window !== "undefined") {
+    (window as any).salaryForm = form;
+  }
 
   return (
     <>
@@ -484,6 +374,7 @@ export function SalaryForm({
         title={t("Employees.add_new")}
         formId="employee-form"
         loadingSave={isEmployeeSaving}
+        dummyData={() => process.env.NODE_ENV === "development" && generateDummyEmployee()}
       >
         <EmployeeForm id="employee-form" onSubmit={handleEmployeeSubmit} />
       </FormDialog>

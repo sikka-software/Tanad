@@ -5,15 +5,17 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import DepartmentForm, {
   type DepartmentFormValues,
 } from "@/components/app/department/department.form";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
+import { departmentKeys } from "@/hooks/models/useDepartments";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -66,11 +68,11 @@ export default function AddDepartmentPage() {
         newDepartment.locations = data.locations;
       }
 
-      const previousDepartments = queryClient.getQueryData(["departments"]) || [];
-      queryClient.setQueryData(
-        ["departments"],
-        [...(Array.isArray(previousDepartments) ? previousDepartments : []), newDepartment],
-      );
+      const previousDepartments = queryClient.getQueryData(departmentKeys.lists()) || [];
+      queryClient.setQueryData(departmentKeys.lists(), [
+        ...(Array.isArray(previousDepartments) ? previousDepartments : []),
+        newDepartment,
+      ]);
 
       // Also set the individual department query data
       queryClient.setQueryData(["departments", newDepartment.id], newDepartment);
@@ -81,10 +83,10 @@ export default function AddDepartmentPage() {
 
       router.push("/departments");
     } catch (error) {
+      console.error("Failed to save department:", error);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Departments.error.create"),
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -95,12 +97,13 @@ export default function AddDepartmentPage() {
     if (form) {
       form.setValue("name", dummyData.name);
       form.setValue("description", dummyData.description);
-      form.setValue("locations", dummyData.locations);
+      // form.setValue("locations", dummyData.locations);
     }
   };
 
   return (
     <div>
+      <CustomPageMeta title={t("Departments.add_new")} />
       <PageTitle
         title={t("Departments.add_new")}
         formButtons
@@ -111,17 +114,17 @@ export default function AddDepartmentPage() {
           submit_form: t("Departments.add_new"),
           cancel: t("General.cancel"),
         }}
+        customButton={
+          process.env.NODE_ENV === "development" && (
+            <Button variant="outline" size="sm" onClick={handleDummyData}>
+              Dummy Data
+            </Button>
+          )
+        }
       />
 
-      <div className="p-4">
-        <Card className="mx-auto max-w-2xl">
-          <CardHeader className="relative">
-            <CardTitle>{t("Departments.department_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DepartmentForm id="department-form" onSubmit={handleSubmit} loading={loading} />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <DepartmentForm id="department-form" onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );

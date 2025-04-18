@@ -1,36 +1,5 @@
-import { desc, eq, inArray } from "drizzle-orm";
-
-import { db } from "@/db/drizzle";
-import { warehouses } from "@/db/schema";
 import { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
 
-// Helper to convert Drizzle warehouse to our Warehouse type
-function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehouse {
-  return {
-    id: data.id,
-    name: data.name,
-    code: data.code,
-    address: data.address,
-    city: data.city,
-    state: data.state,
-    zip_code: data.zip_code,
-    capacity: data.capacity ? Number(data.capacity) : null,
-    is_active: data.is_active,
-    notes: data.notes,
-    created_at: data.created_at?.toString() || "",
-  };
-}
-
-// Helper to convert our Warehouse type to Drizzle warehouse
-function convertToDrizzleWarehouse(data: Partial<Warehouse>): Partial<typeof warehouses.$inferInsert> {
-  return {
-    ...data,
-    zip_code: data.zip_code,
-    capacity: data.capacity?.toString(),
-  };
-}
-
-// Fetch operations
 export async function fetchWarehouses(): Promise<Warehouse[]> {
   try {
     const response = await fetch("/api/warehouses");

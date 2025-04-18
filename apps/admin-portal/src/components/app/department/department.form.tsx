@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-
-import { useLocale, useTranslations } from "next-intl";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
@@ -12,10 +10,10 @@ import { Input } from "@/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
-import useUserStore from "@/stores/use-user-store";
 import { useBranches } from "@/hooks/models/useBranches";
 import { useOffices } from "@/hooks/models/useOffices";
 import { useWarehouses } from "@/hooks/models/useWarehouses";
+import useUserStore from "@/stores/use-user-store";
 
 export const createDepartmentSchema = (t: (key: string) => string) =>
   z.object({
@@ -108,6 +106,10 @@ export default function DepartmentForm({
       </div>
     );
   };
+
+  if (typeof window !== "undefined") {
+    (window as any).departmentForm = form;
+  }
 
   return (
     <Form {...form}>

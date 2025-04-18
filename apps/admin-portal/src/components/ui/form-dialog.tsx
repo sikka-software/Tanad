@@ -1,7 +1,6 @@
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +21,7 @@ interface FormDialogProps {
   cancelText?: string;
   submitText?: string;
   loadingSave?: boolean;
+  dummyData?: () => void;
 }
 
 export function FormDialog({
@@ -32,6 +32,7 @@ export function FormDialog({
   formId,
   onCancel,
   loadingSave,
+  dummyData,
 }: FormDialogProps) {
   const t = useTranslations();
   const { locale } = useRouter();
@@ -48,7 +49,15 @@ export function FormDialog({
         dir={locale === "ar" ? "rtl" : "ltr"}
       >
         <DialogHeader className="sticky top-0 z-10 border-b p-4">
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle>
+            {title}
+
+            {dummyData && (
+              <Button variant="outline" size="sm" className="ms-4" onClick={dummyData}>
+                Generate
+              </Button>
+            )}
+          </DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto p-4">{children}</div>
         <DialogFooter className="sticky bottom-0 flex justify-end gap-2 border-t p-4">
