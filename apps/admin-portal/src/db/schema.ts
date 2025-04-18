@@ -42,9 +42,9 @@ export const companies = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
+    index("companies_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("companies_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
   ],
 ).enableRLS();
 
@@ -278,30 +278,6 @@ export const products = pgTable(
   ],
 ).enableRLS();
 
-export const employees = pgTable(
-  "employees",
-  {
-    id: uuid().primaryKey().defaultRandom(),
-    first_name: varchar("first_name", { length: 255 }).notNull(),
-    last_name: varchar("last_name", { length: 255 }).notNull(),
-    email: varchar("email", { length: 255 }).notNull(),
-    phone: varchar("phone", { length: 50 }),
-    position: varchar("position", { length: 255 }).notNull(),
-    department_id: uuid("department_id").references(() => departments.id),
-    hireDate: date("hire_date").notNull(),
-    salary: numeric("salary", { precision: 10, scale: 2 }),
-    status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
-    notes: text("notes"),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    unique("employees_email_user_id_unique").on(table.email, table.user_id),
-  ],
-).enableRLS();
-
 export const expenses = pgTable(
   "expenses",
   {
@@ -515,6 +491,30 @@ export const templates = pgTable(
   ],
 ).enableRLS();
 
+export const employees = pgTable(
+  "employees",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    first_name: varchar("first_name", { length: 255 }).notNull(),
+    last_name: varchar("last_name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 50 }),
+    position: varchar("position", { length: 255 }).notNull(),
+    department_id: uuid("department_id").references(() => departments.id),
+    hireDate: date("hire_date").notNull(),
+    salary: numeric("salary", { precision: 10, scale: 2 }),
+    status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
+    notes: text("notes"),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    user_id: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    unique("employees_email_user_id_unique").on(table.email, table.user_id),
+  ],
+).enableRLS();
+
 export const employeeRequests = pgTable(
   "employee_requests",
   {
@@ -536,13 +536,18 @@ export const employeeRequests = pgTable(
     notes: text("notes"),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    user_id: uuid("user_id").notNull(),
   },
-  (table) => ({
-    employee_idIdx: index("employee_requests_employee_id_idx").on(table.employee_id),
-    typeIdx: index("employee_requests_type_idx").on(table.type),
-    statusIdx: index("employee_requests_status_idx").on(table.status),
-    created_atIdx: index("employee_requests_created_at_idx").on(table.created_at),
-  }),
+  (table) => [
+    index("employee_requests_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("employee_requests_employee_id_idx").on(table.employee_id),
+    index("employee_requests_type_idx").on(table.type),
+    index("employee_requests_status_idx").on(table.status),
+    index("employee_requests_created_at_idx").on(table.created_at),
+  ],
 ).enableRLS();
 
 export const jobListings = pgTable(

@@ -11,6 +11,8 @@ import {
 
 import type { Company } from "@/types/company.type";
 
+import useUserStore from "@/stores/use-user-store";
+
 // Query keys for companies
 export const companyKeys = {
   all: ["companies"] as const,
@@ -22,9 +24,10 @@ export const companyKeys = {
 
 // Hook to fetch all companies
 export function useCompanies() {
+  const { user } = useUserStore();
   return useQuery({
     queryKey: ["companies"],
-    queryFn: fetchCompanies,
+    queryFn: () => fetchCompanies(user?.id || ""),
   });
 }
 

@@ -127,7 +127,7 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
      selectedRows: string[];
      isLoading: boolean;
      error: string | null;
-     fetchCompanies: () => Promise<void>;
+     fetchCompanies: (userId) => Promise<void>;
      updateCompany: (id: string, updates: Partial<Company>) => Promise<void>;
      setSelectedRows: (ids: string[]) => void;
      clearSelection: () => void;
