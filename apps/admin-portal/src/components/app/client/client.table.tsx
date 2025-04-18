@@ -1,6 +1,6 @@
 import { MoreHorizontal } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { z } from "zod";
 
 import { Button } from "@/ui/button";
@@ -36,7 +36,7 @@ interface ClientsTableProps {
   onSelectedRowsChange?: (rows: Client[]) => void;
 }
 
-const ClientsTable = ({ data, isLoading, error, onSelectedRowsChange }: ClientsTableProps) => {
+const ClientsTable = ({ data: unsortedData, isLoading, error, onSelectedRowsChange }: ClientsTableProps) => {
   const t = useTranslations("Clients");
   const { updateClient, selectedRows, setSelectedRows } = useClientsStore();
 
@@ -90,7 +90,7 @@ const ClientsTable = ({ data, isLoading, error, onSelectedRowsChange }: ClientsT
 
   const handleRowSelectionChange = useCallback(
     (rows: Client[]) => {
-      const newSelectedIds = rows.map((row) => row.id!);
+      const newSelectedIds = rows.map((row: Client) => row.id!);
       // Only update if the selection has actually changed
       if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
         setSelectedRows(newSelectedIds);
@@ -101,6 +101,15 @@ const ClientsTable = ({ data, isLoading, error, onSelectedRowsChange }: ClientsT
     },
     [selectedRows, setSelectedRows, onSelectedRowsChange],
   );
+
+  const [data, setData] = useState(unsortedData);
+
+  useEffect(() => {
+    const sortedData = [...unsortedData].sort((a, b) => {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+    setData(sortedData);
+  }, [unsortedData]);
 
   if (isLoading) {
     return (
