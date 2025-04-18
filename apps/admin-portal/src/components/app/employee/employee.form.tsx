@@ -24,7 +24,6 @@ import useUserStore from "@/stores/use-user-store";
 
 interface EmployeeFormProps {
   id?: string;
-  onSuccess?: () => void;
   onSubmit: (data: EmployeeFormValues) => Promise<void>;
 }
 
@@ -62,7 +61,7 @@ const createEmployeeFormSchema = (t: (key: string) => string) =>
 
 export type EmployeeFormValues = z.infer<ReturnType<typeof createEmployeeFormSchema>>;
 
-export function EmployeeForm({ id, onSuccess, onSubmit }: EmployeeFormProps) {
+export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
   const t = useTranslations();
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const [isDepartmentSaving, setIsDepartmentSaving] = useState(false);
@@ -169,6 +168,11 @@ export function EmployeeForm({ id, onSuccess, onSubmit }: EmployeeFormProps) {
     e.preventDefault();
     try {
       setLoadingSave(true);
+      const isValid = await form.trigger();
+      if (!isValid) {
+        setLoadingSave(false);
+        return;
+      }
       await form.handleSubmit(onSubmit)();
     } catch (error) {
       setLoadingSave(false);

@@ -2345,7 +2345,8 @@
         "label": "Email",
         "placeholder": "Enter email address",
         "required": "Email is required",
-        "invalid": "Invalid email address"
+        "invalid": "Invalid email address",
+        "duplicate": "Email address is already in use"
       },
       "phone": {
         "label": "Phone Number",
