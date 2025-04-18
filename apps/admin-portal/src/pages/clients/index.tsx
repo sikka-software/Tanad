@@ -97,8 +97,9 @@ export default function ClientsPage() {
         )}
         <div>
           {viewMode === "table" ? (
-            <ClientsTable
-              data={sortClients(filteredClients || [], sortRules)}
+              <ClientsTable
+                key={`sorted-${sortedClients?.length}-${JSON.stringify(sortRules)}`}
+                data={sortedClients || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
               onSelectedRowsChange={handleRowSelectionChange}

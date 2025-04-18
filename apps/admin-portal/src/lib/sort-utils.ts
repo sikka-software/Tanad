@@ -8,9 +8,13 @@ export const sortClients = (
 
   return [...clients].sort((a, b) => {
     for (const rule of sortRules) {
-      const field = rule.field as keyof Client;
-      const aValue = String(a[field]).toLowerCase();
-      const bValue = String(b[field]).toLowerCase();
+      // Handle nested fields like company_details.name
+      const getNestedValue = (obj: Client, path: string) => {
+        return path.split('.').reduce((o: any, p) => (o?.[p] ?? ''), obj);
+      };
+      
+      const aValue = String(getNestedValue(a, rule.field)).toLowerCase();
+      const bValue = String(getNestedValue(b, rule.field)).toLowerCase();
 
       if (aValue < bValue) return rule.direction === "asc" ? -1 : 1;
       if (aValue > bValue) return rule.direction === "asc" ? 1 : -1;

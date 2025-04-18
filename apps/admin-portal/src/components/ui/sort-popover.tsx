@@ -47,7 +47,7 @@ function SortPopover({ sortRules, onSortRulesChange }: SortPopoverProps) {
 
   const applySort = () => {
     console.log("Applying sort:", sortRules);
-    setOpen(false);
+    // State changes will automatically propagate to parent through onSortRulesChange
   };
 
   const resetSort = () => {
@@ -190,8 +190,8 @@ function SortPopover({ sortRules, onSortRulesChange }: SortPopoverProps) {
               </svg>
               {t("General.reset_all")}
             </Button>
-            <Button onClick={applySort} className="flex-1">
-              {t("General.apply_sort")}
+            <Button onClick={() => setOpen(false)} className="flex-1">
+              {t("General.done")}
             </Button>
           </div>
         </div>
