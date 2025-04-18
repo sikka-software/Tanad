@@ -27,13 +27,12 @@ export type BranchFormValues = z.input<ReturnType<typeof createBranchSchema>>;
 
 export interface BranchFormProps {
   id?: string;
-  user_id: string | undefined;
   onSubmit: (data: BranchFormValues) => void;
   loading?: boolean;
   initialData?: BranchFormValues;
 }
 
-export function BranchForm({ user_id, id, onSubmit, loading, initialData }: BranchFormProps) {
+export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormProps) {
   const t = useTranslations();
   const form = useForm<BranchFormValues>({
     resolver: zodResolver(createBranchSchema(t)),

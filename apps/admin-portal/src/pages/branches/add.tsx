@@ -5,11 +5,11 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/ui/button";
+import PageTitle from "@/ui/page-title";
+
 import { BranchForm, type BranchFormValues } from "@/components/app/branch/branch.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
@@ -108,27 +108,17 @@ export default function AddBranchPage() {
           submit_form: t("Branches.add_new"),
           cancel: t("General.cancel"),
         }}
+        customButton={
+          process.env.NODE_ENV === "development" && (
+            <Button variant="outline" size="sm" onClick={handleDummyData}>
+              Dummy Data
+            </Button>
+          )
+        }
       />
 
-      <div className="p-4">
-        <Card className="mx-auto max-w-2xl">
-          <CardHeader className="relative">
-            {process.env.NODE_ENV === "development" && (
-              <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
-                Dummy Data
-              </Button>
-            )}
-            <CardTitle>{t("Branches.branch_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <BranchForm
-              id="branch-form"
-              user_id={user?.id}
-              onSubmit={handleSubmit}
-              loading={loading}
-            />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <BranchForm id="branch-form" onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );

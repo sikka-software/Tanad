@@ -52,7 +52,11 @@ export function WarehouseForm({ id, onSubmit, loading }: WarehouseFormProps) {
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        id={id || "warehouse-form"}
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4"
+      >
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}

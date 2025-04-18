@@ -49,3 +49,5 @@ export type NoteProps = {
   created_at?: string;
   updated_at?: string;
 };
+
+export type ProductCreateData = Omit<Product, "id" | "created_at"> & { user_id: string };

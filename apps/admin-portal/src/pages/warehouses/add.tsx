@@ -21,9 +21,10 @@ import useUserStore from "@/stores/use-user-store";
 export default function AddWarehousePage() {
   const t = useTranslations();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useUserStore();
+
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (data: WarehouseFormValues) => {
     setLoading(true);
