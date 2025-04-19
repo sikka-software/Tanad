@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Invoice, InvoiceCreateData } from '@/types/invoice.type';
+import { Invoice, InvoiceCreateData } from '@/modules/invoice/invoice.type';
 import { 
   createInvoice, 
   deleteInvoice, 

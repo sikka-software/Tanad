@@ -6,7 +6,7 @@ import { Calendar, DollarSign, MapPin, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { Job } from "@/types/job.type";
+import { Job } from "@/modules/job/job.type";
 
 const JobCard = ({ job }: { job: Job }) => {
   const t = useTranslations();

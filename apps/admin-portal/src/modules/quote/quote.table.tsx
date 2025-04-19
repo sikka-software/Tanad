@@ -8,9 +8,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Quote } from "@/types/quote.type";
+import { Quote } from "@/modules/quote/quote.type";
 
-import { useQuotesStore } from "@/stores/quotes.store";
+import { useQuotesStore } from "@/modules/quote/quote.store";
 
 const quoteNumberSchema = z.string().min(1, "Required");
 const statusSchema = z.enum(["draft", "sent", "accepted", "rejected", "expired"]);

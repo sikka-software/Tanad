@@ -8,7 +8,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
-import { useEmployeesStore } from "@/stores/employees.store";
+import { useEmployeesStore } from "@/modules/employee/employee.store";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddEmployeePage() {

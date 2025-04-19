@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Salary } from "@/types/salary.type";
+import { Salary } from "@/modules/salary/salary.type";
 import { deleteSalary, updateSalary as updateSalaryService } from "@/services/salaryService";
 
 interface SalariesStore {

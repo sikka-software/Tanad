@@ -13,7 +13,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { createProduct } from "@/services/productService";
 
-import type { Product, ProductCreateData } from "@/types/product.type";
+import type { Product, ProductCreateData } from "@/modules/product/product.type";
 
 import { productKeys } from "@/hooks/models/useProducts";
 import useUserStore from "@/stores/use-user-store";

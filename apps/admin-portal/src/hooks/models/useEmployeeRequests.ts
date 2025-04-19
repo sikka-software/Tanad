@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { useEmployeeRequestsStore } from "@/stores/employee-requests.store";
+import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
 
 export const employeeRequestKeys = {
   all: ["employeeRequests"] as const,

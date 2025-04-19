@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Warehouse } from "@/types/warehouse.type";
+import { Warehouse } from "@/modules/warehouse/warehouse.type";
 
 import { createClient } from "@/utils/supabase/component";
 

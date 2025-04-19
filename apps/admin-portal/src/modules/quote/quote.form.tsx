@@ -22,7 +22,7 @@ import { Textarea } from "@/ui/textarea";
 import { ClientForm, type ClientFormValues } from "@/modules/client/client.form";
 
 import { Client } from "@/types/client.type";
-import { Product } from "@/types/product.type";
+import { Product } from "@/modules/product/product.type";
 
 import { createClient } from "@/utils/supabase/component";
 

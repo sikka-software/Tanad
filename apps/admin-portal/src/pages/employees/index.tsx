@@ -12,10 +12,10 @@ import EmployeesTable from "@/modules/employee/employee.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Employee } from "@/types/employee.types";
+import { Employee } from "@/modules/employee/employee.types";
 
 import { useEmployees, useDeleteEmployee } from "@/hooks/models/useEmployees";
-import { useEmployeesStore } from "@/stores/employees.store";
+import { useEmployeesStore } from "@/modules/employee/employee.store";
 
 export default function EmployeesPage() {
   const t = useTranslations();

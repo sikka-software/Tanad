@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { SalaryCreateData } from "@/types/salary.type";
+import { SalaryCreateData } from "@/modules/salary/salary.type";
 
 import { db } from "@/db/drizzle";
 import { salaries } from "@/db/schema";

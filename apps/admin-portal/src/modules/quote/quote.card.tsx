@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { Quote } from "@/types/quote.type";
+import { Quote } from "@/modules/quote/quote.type";
 
 function getQuoteStatusColor(status: string): string {
   switch (status.toLowerCase()) {

@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { Vendor } from "@/types/vendor.type";
+import { Vendor } from "@/modules/vendor/vendor.type";
 
 const VendorCard = ({ vendor }: { vendor: Vendor }) => {
   const t = useTranslations("Vendors");

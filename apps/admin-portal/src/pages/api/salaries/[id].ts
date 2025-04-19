@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '@/db/drizzle';
 import { salaries } from '@/db/schema';
-import { Salary } from '@/types/salary.type';
+import { Salary } from '@/modules/salary/salary.type';
 
 // Helper to convert Drizzle salary to our Salary type
 function convertDrizzleSalary(data: typeof salaries.$inferSelect) {

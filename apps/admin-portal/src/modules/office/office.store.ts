@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Office } from "@/types/office.type";
+import { Office } from "@/modules/office/office.type";
 
 import { createClient } from "@/utils/supabase/component";
 

@@ -13,7 +13,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { createWarehouse } from "@/services/warehouseService";
 
-import type { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
+import type { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
 
 import { warehouseKeys } from "@/hooks/models/useWarehouses";
 import useUserStore from "@/stores/use-user-store";

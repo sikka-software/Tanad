@@ -6,9 +6,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Vendor } from "@/types/vendor.type";
+import { Vendor } from "@/modules/vendor/vendor.type";
 
-import { useVendorsStore } from "@/stores/vendor.store";
+import { useVendorsStore } from "@/modules/vendor/vendor.store";
 
 const nameSchema = z.string().min(1, "Required");
 const companySchema = z.string().optional();

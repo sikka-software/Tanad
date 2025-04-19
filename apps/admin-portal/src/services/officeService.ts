@@ -1,4 +1,4 @@
-import { Office, OfficeCreateData } from "@/types/office.type";
+import { Office, OfficeCreateData } from "@/modules/office/office.type";
 
 export async function fetchOffices(): Promise<Office[]> {
   try {

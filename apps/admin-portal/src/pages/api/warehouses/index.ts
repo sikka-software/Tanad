@@ -1,7 +1,7 @@
 import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { WarehouseCreateData } from "@/types/warehouse.type";
+import { WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
 
 import { db } from "@/db/drizzle";
 import { warehouses } from "@/db/schema";

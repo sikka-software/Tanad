@@ -1,4 +1,4 @@
-import { Employee } from "@/types/employee.types";
+import { Employee } from "@/modules/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";

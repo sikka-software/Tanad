@@ -13,10 +13,10 @@ import BranchesTable from "@/modules/branch/branch.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Branch } from "@/types/branch.type";
+import { Branch } from "@/modules/branch/branch.type";
 
 import { useBranches, useBulkDeleteBranches } from "@/hooks/models/useBranches";
-import { useBranchesStore } from "@/stores/branches.store";
+import { useBranchesStore } from "@/modules/branch/branch.store";
 
 export default function BranchesPage() {
   const t = useTranslations();

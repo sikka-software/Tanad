@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Company } from "@/types/company.type";
+import { Company } from "@/modules/company/company.type";
 
 import { db } from "@/db/drizzle";
 import { companies } from "@/db/schema";

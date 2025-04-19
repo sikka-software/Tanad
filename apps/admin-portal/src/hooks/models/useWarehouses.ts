@@ -8,7 +8,7 @@ import {
   updateWarehouse,
 } from "@/services/warehouseService";
 
-import type { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
+import type { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
 
 // Query keys for warehouses
 export const warehouseKeys = {

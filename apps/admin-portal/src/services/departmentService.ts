@@ -1,4 +1,4 @@
-import { Department, DepartmentCreateData } from "@/types/department.type";
+import { Department, DepartmentCreateData } from "@/modules/department/department.type";
 
 export async function fetchDepartments(): Promise<Department[]> {
   const response = await fetch("/api/departments");

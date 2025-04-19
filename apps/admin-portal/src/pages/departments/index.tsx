@@ -12,11 +12,11 @@ import DepartmentsTable from "@/modules/department/department.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Department } from "@/types/department.type";
+import { Department } from "@/modules/department/department.type";
 
 import { useDepartments } from "@/hooks/models/useDepartments";
 import { useDeleteDepartments } from "@/hooks/models/useDepartments";
-import { useDepartmentsStore } from "@/stores/departments.store";
+import { useDepartmentsStore } from "@/modules/department/department.store";
 
 export default function DepartmentsPage() {
   const t = useTranslations();

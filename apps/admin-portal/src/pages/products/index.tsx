@@ -13,10 +13,10 @@ import ProductsTable from "@/modules/product/product.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Product } from "@/types/product.type";
+import { Product } from "@/modules/product/product.type";
 
 import { useProducts, useBulkDeleteProducts } from "@/hooks/models/useProducts";
-import useProductsStore from "@/stores/products.store";
+import useProductsStore from "@/modules/product/product.store";
 
 export default function ProductsPage() {
   const t = useTranslations();

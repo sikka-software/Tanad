@@ -9,7 +9,7 @@ import {
   updateCompany,
 } from "@/services/companyService";
 
-import type { Company, CompanyCreateData } from "@/types/company.type";
+import type { Company, CompanyCreateData } from "@/modules/company/company.type";
 
 // Query keys for companies
 export const companyKeys = {

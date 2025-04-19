@@ -8,7 +8,7 @@ import {
   updateDepartment,
 } from "@/services/departmentService";
 
-import { Department, DepartmentCreateData } from "@/types/department.type";
+import { Department, DepartmentCreateData } from "@/modules/department/department.type";
 
 export const departmentKeys = {
   all: ["departments"] as const,

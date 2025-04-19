@@ -11,9 +11,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Invoice } from "@/types/invoice.type";
+import { Invoice } from "@/modules/invoice/invoice.type";
 
-import { useInvoicesStore } from "@/stores/invoices.store";
+import { useInvoicesStore } from "@/modules/invoice/invoice.store";
 
 const invoiceNumberSchema = z.string().min(1, "Required");
 const issueDateSchema = z.date();

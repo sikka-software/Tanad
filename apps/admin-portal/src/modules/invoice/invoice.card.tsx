@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { Invoice } from "@/types/invoice.type";
+import { Invoice } from "@/modules/invoice/invoice.type";
 
 function getInvoiceStatusColor(status: string): string {
   switch (status.toLowerCase()) {

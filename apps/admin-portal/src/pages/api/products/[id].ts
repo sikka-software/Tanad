@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Product } from "@/types/product.type";
+import { Product } from "@/modules/product/product.type";
 
-import useProductsStore from "@/stores/products.store";
+import useProductsStore from "@/modules/product/product.store";
 
 export default async function handler(
   req: NextApiRequest,

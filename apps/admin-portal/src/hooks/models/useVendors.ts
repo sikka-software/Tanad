@@ -8,7 +8,7 @@ import {
   updateVendor,
 } from "@/services/vendorService";
 
-import type { Vendor, VendorCreateData } from "@/types/vendor.type";
+import type { Vendor, VendorCreateData } from "@/modules/vendor/vendor.type";
 
 // Query keys for vendors
 export const vendorKeys = {

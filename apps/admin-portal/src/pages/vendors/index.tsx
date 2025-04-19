@@ -14,10 +14,10 @@ import VendorsTable from "@/modules/vendor/vendor.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Vendor } from "@/types/vendor.type";
+import { Vendor } from "@/modules/vendor/vendor.type";
 
 import { useVendors, useBulkDeleteVendors } from "@/hooks/models/useVendors";
-import { useVendorsStore } from "@/stores/vendor.store";
+import { useVendorsStore } from "@/modules/vendor/vendor.store";
 
 // Assuming a useVendors hook exists or will be created
 export default function VendorsPage() {

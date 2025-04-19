@@ -2,7 +2,7 @@ import { desc, eq } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
 import { branches } from "@/db/schema";
-import { Branch, BranchCreateData } from "@/types/branch.type";
+import { Branch, BranchCreateData } from "@/modules/branch/branch.type";
 
 // Helper to convert Drizzle branch to our Branch type
 function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {

@@ -8,7 +8,7 @@ import {
   updateEmployee,
 } from "@/services/employeeService";
 
-import { Employee } from "@/types/employee.types";
+import { Employee } from "@/modules/employee/employee.types";
 
 import { departmentKeys } from "./useDepartments";
 

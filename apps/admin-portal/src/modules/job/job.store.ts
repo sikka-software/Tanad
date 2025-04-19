@@ -4,7 +4,7 @@ import { applyFilters } from "@/lib/filter-utils";
 import { applySort } from "@/lib/sort-utils";
 
 import { FilterCondition } from "@/types/common.type";
-import { Job } from "@/types/job.type";
+import { Job } from "@/modules/job/job.type";
 
 import { createClient } from "@/utils/supabase/component";
 

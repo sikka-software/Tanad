@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Department } from "@/types/department.type";
+import { Department } from "@/modules/department/department.type";
 
 interface DepartmentsState {
   departments: Department[];

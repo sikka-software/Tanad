@@ -13,10 +13,10 @@ import OfficesTable from "@/modules/office/office.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Office } from "@/types/office.type";
+import { Office } from "@/modules/office/office.type";
 
 import { useOffices, useBulkDeleteOffices } from "@/hooks/models/useOffices";
-import { useOfficesStore } from "@/stores/offices.store";
+import { useOfficesStore } from "@/modules/office/office.store";
 
 export default function OfficesPage() {
   const t = useTranslations();

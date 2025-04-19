@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Quote } from "@/types/quote.type";
+import { Quote } from "@/modules/quote/quote.type";
 
 import { db } from "@/db/drizzle";
 import { quotes } from "@/db/schema";

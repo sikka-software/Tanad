@@ -7,9 +7,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Job } from "@/types/job.type";
+import { Job } from "@/modules/job/job.type";
 
-import { useJobsStore } from "@/stores/job.store";
+import { useJobsStore } from "@/modules/job/job.store";
 
 const titleSchema = z.string().min(1, "Required");
 const typeSchema = z.string().min(1, "Required");

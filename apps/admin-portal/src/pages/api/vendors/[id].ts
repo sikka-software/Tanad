@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Vendor } from "@/types/vendor.type";
+import { Vendor } from "@/modules/vendor/vendor.type";
 
 import { db } from "@/db/drizzle";
 import { vendors } from "@/db/schema";

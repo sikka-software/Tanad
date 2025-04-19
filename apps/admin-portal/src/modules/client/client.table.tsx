@@ -8,7 +8,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { Client } from "@/types/client.type";
 
-import { useClientsStore } from "@/stores/client.store";
+import { useClientsStore } from "@/modules/client/client.store";
 
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");

@@ -9,7 +9,7 @@ import {
   bulkDeleteJobs,
 } from "@/services/jobService";
 
-import { Job } from "@/types/job.type";
+import { Job } from "@/modules/job/job.type";
 
 export const jobKeys = {
   all: ["jobs"] as const,

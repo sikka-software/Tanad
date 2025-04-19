@@ -5,10 +5,10 @@ import {
 } from "@/lib/constants/invoice-consts";
 import { ClientProps } from "@/types/client.type";
 import { CommentProps } from "@/types/comment.type";
-import { CompanyProps } from "@/types/company.type";
+import { CompanyProps } from "@/modules/company/company.type";
 import { DiscountProps } from "@/types/discount.type";
 import { NoteProps } from "@/types/note.type";
-import { ProductProps } from "@/types/product.type";
+import { ProductProps } from "@/modules/product/product.type";
 import { TransactionProps } from "@/types/transaction.type";
 
 import { Client } from "./client.type";

@@ -17,13 +17,13 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Department } from "@/types/department.type";
+import { Department } from "@/modules/department/department.type";
 
 import { useBranches } from "@/hooks/models/useBranches";
 import { useUpdateDepartment } from "@/hooks/models/useDepartments";
 import { useOffices } from "@/hooks/models/useOffices";
 import { useWarehouses } from "@/hooks/models/useWarehouses";
-import { useDepartmentsStore } from "@/stores/departments.store";
+import { useDepartmentsStore } from "@/modules/department/department.store";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().min(1, "Required");

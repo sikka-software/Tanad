@@ -6,9 +6,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Branch } from "@/types/branch.type";
+import { Branch } from "@/modules/branch/branch.type";
 
-import { useBranchesStore } from "@/stores/branches.store";
+import { useBranchesStore } from "@/modules/branch/branch.store";
 
 // Validation schemas
 const nameSchema = z.string().min(1, "Required");

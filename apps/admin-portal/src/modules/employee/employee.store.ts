@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Employee } from "@/types/employee.types";
+import { Employee } from "@/modules/employee/employee.types";
 
 interface EmployeesState {
   employees: Employee[];

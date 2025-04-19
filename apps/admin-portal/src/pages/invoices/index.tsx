@@ -9,7 +9,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
-import { Invoice } from "@/types/invoice.type";
+import { Invoice } from "@/modules/invoice/invoice.type";
 
 import { useInvoices } from "@/hooks/models/useInvoices";
 

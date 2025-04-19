@@ -15,7 +15,7 @@ import { generateDummyData } from "@/lib/dummy-generator";
 
 import { createVendor } from "@/services/vendorService";
 
-import { Vendor, VendorCreateData } from "@/types/vendor.type";
+import { Vendor, VendorCreateData } from "@/modules/vendor/vendor.type";
 
 import { vendorKeys } from "@/hooks/models/useVendors";
 import useUserStore from "@/stores/use-user-store";

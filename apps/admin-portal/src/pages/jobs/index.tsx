@@ -14,10 +14,10 @@ import JobTable from "@/modules/job/job.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Job } from "@/types/job.type";
+import { Job } from "@/modules/job/job.type";
 
 import { useJobs, useBulkDeleteJobs } from "@/hooks/models/useJobs";
-import { useJobsStore } from "@/stores/job.store";
+import { useJobsStore } from "@/modules/job/job.store";
 
 export default function JobsPage() {
   const t = useTranslations();

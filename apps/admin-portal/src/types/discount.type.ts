@@ -1,6 +1,6 @@
 import { CommentProps } from "@/types/comment.type";
 import { MultiLangString } from "@/types/common.type";
-import { InvoiceProps } from "@/types/invoice.type";
+import { InvoiceProps } from "@/modules/invoice/invoice.type";
 import { NoteProps } from "@/types/note.type";
 
 export type DiscountProps = {

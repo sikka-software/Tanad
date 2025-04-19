@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
-import { Branch } from "@/types/branch.type";
-import { updateBranch as updateBranchService } from "@/services/branchService";
+import { Branch } from "@/modules/branch/branch.type";
+import { updateBranch as updateBranchService } from "@/services/branch.service";
 
 interface BranchesStore {
   selectedRows: string[];

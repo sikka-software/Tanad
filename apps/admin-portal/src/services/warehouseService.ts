@@ -1,4 +1,4 @@
-import { Warehouse, WarehouseCreateData } from "@/types/warehouse.type";
+import { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
 
 export async function fetchWarehouses(): Promise<Warehouse[]> {
   try {

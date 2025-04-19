@@ -14,7 +14,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { useEmployeeRequestsStore } from "@/stores/employee-requests.store";
+import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 

@@ -13,10 +13,10 @@ import QuotesTable from "@/modules/quote/quote.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Quote } from "@/types/quote.type";
+import { Quote } from "@/modules/quote/quote.type";
 
 import { useQuotes, useBulkDeleteQuotes } from "@/hooks/models/useQuotes";
-import { useQuotesStore } from "@/stores/quotes.store";
+import { useQuotesStore } from "@/modules/quote/quote.store";
 
 export default function QuotesPage() {
   const t = useTranslations();

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { FilterCondition } from "@/types/common.type";
-import { Quote } from "@/types/quote.type";
+import { Quote } from "@/modules/quote/quote.type";
 
 import { createClient } from "@/utils/supabase/component";
 

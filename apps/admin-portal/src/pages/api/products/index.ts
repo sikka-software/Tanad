@@ -1,7 +1,7 @@
 import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import type { Product, ProductCreateData } from "@/types/product.type";
+import type { Product, ProductCreateData } from "@/modules/product/product.type";
 
 import { db } from "@/db/drizzle";
 import { products } from "@/db/schema";

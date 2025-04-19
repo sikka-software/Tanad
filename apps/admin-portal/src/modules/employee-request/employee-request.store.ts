@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { EmployeeRequest } from "@/types/employee-request.type";
+import { EmployeeRequest } from "@/modules/employee-request/employee-request.type";
 
 import { createClient } from "@/utils/supabase/component";
 

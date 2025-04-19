@@ -9,7 +9,7 @@ import {
   bulkDeleteSalaries,
 } from "@/services/salaryService";
 
-import type { Salary } from "@/types/salary.type";
+import type { Salary } from "@/modules/salary/salary.type";
 
 export const salaryKeys = {
   all: ["salaries"] as const,

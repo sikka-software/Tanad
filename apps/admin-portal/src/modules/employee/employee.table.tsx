@@ -6,11 +6,11 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Employee } from "@/types/employee.types";
+import { Employee } from "@/modules/employee/employee.types";
 
 import { useDepartments } from "@/hooks/models/useDepartments";
 import { useUpdateEmployee } from "@/hooks/models/useEmployees";
-import { useEmployeesStore } from "@/stores/employees.store";
+import { useEmployeesStore } from "@/modules/employee/employee.store";
 
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");

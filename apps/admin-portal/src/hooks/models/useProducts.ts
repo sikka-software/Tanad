@@ -8,7 +8,7 @@ import {
   updateProduct,
 } from "@/services/productService";
 
-import type { Product } from "@/types/product.type";
+import type { Product } from "@/modules/product/product.type";
 
 // Query keys for products
 export const productKeys = {

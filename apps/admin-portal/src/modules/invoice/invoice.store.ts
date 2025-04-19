@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import { Invoice } from "@/types/invoice.type";
+import { Invoice } from "@/modules/invoice/invoice.type";
 
 import { createClient } from "@/utils/supabase/component";
 

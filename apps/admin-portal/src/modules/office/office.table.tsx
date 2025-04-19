@@ -6,9 +6,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Office } from "@/types/office.type";
+import { Office } from "@/modules/office/office.type";
 
-import { useOfficesStore } from "@/stores/offices.store";
+import { useOfficesStore } from "@/modules/office/office.store";
 
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");

@@ -13,7 +13,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createClient } from "@/services/clientService";
+import { createClient } from "@/services/client.service";
 
 import { Client, ClientCreateData } from "@/types/client.type";
 

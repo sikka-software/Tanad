@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { Warehouse } from "@/types/warehouse.type";
+import { Warehouse } from "@/modules/warehouse/warehouse.type";
 
 const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
   const t = useTranslations("Warehouses");

@@ -1,4 +1,4 @@
-import { Vendor, VendorCreateData } from "@/types/vendor.type";
+import { Vendor, VendorCreateData } from "@/modules/vendor/vendor.type";
 
 export async function fetchVendors(): Promise<Vendor[]> {
   try {

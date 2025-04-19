@@ -15,7 +15,7 @@ import { generateDummyData } from "@/lib/dummy-generator";
 
 import { createCompany } from "@/services/companyService";
 
-import { Company, CompanyCreateData } from "@/types/company.type";
+import { Company, CompanyCreateData } from "@/modules/company/company.type";
 
 import { companyKeys } from "@/hooks/models/useCompanies";
 import useUserStore from "@/stores/use-user-store";

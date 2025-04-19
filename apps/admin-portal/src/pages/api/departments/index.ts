@@ -1,7 +1,7 @@
 import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Department } from "@/types/department.type";
+import { Department } from "@/modules/department/department.type";
 
 import { db } from "@/db/drizzle";
 import { departmentLocations, departments } from "@/db/schema";

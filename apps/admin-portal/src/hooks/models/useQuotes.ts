@@ -9,7 +9,7 @@ import {
   bulkDeleteQuotes,
 } from "@/services/quoteService";
 
-import { Quote } from "@/types/quote.type";
+import { Quote } from "@/modules/quote/quote.type";
 
 export const quoteKeys = {
   all: ["quotes"] as const,

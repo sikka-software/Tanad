@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { Job } from "@/types/job.type";
+import { Job } from "@/modules/job/job.type";
 
 import { useJobs } from "@/hooks/models/useJobs";
 

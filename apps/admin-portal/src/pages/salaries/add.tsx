@@ -13,7 +13,7 @@ import { generateDummySalary } from "@/lib/dummy-factory";
 
 import { createSalary } from "@/services/salaryService";
 
-import { Salary, SalaryCreateData } from "@/types/salary.type";
+import { Salary, SalaryCreateData } from "@/modules/salary/salary.type";
 
 import { salaryKeys } from "@/hooks/models/useSalaries";
 import useUserStore from "@/stores/use-user-store";

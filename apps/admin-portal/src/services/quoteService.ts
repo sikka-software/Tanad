@@ -1,4 +1,4 @@
-import { Quote, QuoteItem, QuoteCreateData, QuoteItemCreateData } from "@/types/quote.type";
+import { Quote, QuoteItem, QuoteCreateData, QuoteItemCreateData } from "@/modules/quote/quote.type";
 
 export async function fetchQuotes(): Promise<Quote[]> {
   try {

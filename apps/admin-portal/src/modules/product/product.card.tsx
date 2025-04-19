@@ -2,7 +2,7 @@ import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { Product } from "@/types/product.type";
+import { Product } from "@/modules/product/product.type";
 
 const ProductCard = ({ product }: { product: Product }) => {
   const t = useTranslations("Products");

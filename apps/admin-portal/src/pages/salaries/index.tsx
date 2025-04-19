@@ -13,10 +13,10 @@ import SalariesTable from "@/modules/salary/salary.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import type { Salary } from "@/types/salary.type";
+import type { Salary } from "@/modules/salary/salary.type";
 
 import { useSalaries, useBulkDeleteSalaries } from "@/hooks/models/useSalaries";
-import { useSalariesStore } from "@/stores/salaries.store";
+import { useSalariesStore } from "@/modules/salary/salary.store";
 
 export default function SalariesPage() {
   const t = useTranslations();

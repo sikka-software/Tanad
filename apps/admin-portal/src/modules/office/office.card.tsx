@@ -2,7 +2,7 @@ import { Mail, Phone, MapPin, Building2 } from "lucide-react";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { Office } from "@/types/office.type";
+import { Office } from "@/modules/office/office.type";
 
 const OfficeCard = ({ office }: { office: Office }) => {
   return (

@@ -15,7 +15,7 @@ import { generateDummyData } from "@/lib/dummy-generator";
 
 import { createOffice } from "@/services/officeService";
 
-import { Office, OfficeCreateData } from "@/types/office.type";
+import { Office, OfficeCreateData } from "@/modules/office/office.type";
 
 import { officeKeys } from "@/hooks/models/useOffices";
 import useUserStore from "@/stores/use-user-store";

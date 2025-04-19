@@ -8,7 +8,7 @@ import {
   updateOffice,
 } from "@/services/officeService";
 
-import type { Office, OfficeCreateData } from "@/types/office.type";
+import type { Office, OfficeCreateData } from "@/modules/office/office.type";
 
 export const officeKeys = {
   all: ["offices"] as const,

@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
 import { warehouses } from "@/db/schema";
-import { Warehouse } from "@/types/warehouse.type";
+import { Warehouse } from "@/modules/warehouse/warehouse.type";
 
 // Helper to convert Drizzle warehouse to our Warehouse type
 function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehouse {

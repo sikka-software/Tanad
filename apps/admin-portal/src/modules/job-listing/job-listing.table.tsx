@@ -6,7 +6,7 @@ import TableSkeleton from "@/components/ui/table-skeleton";
 
 import { JobListing } from "@/types/job-listing.type";
 
-import useJobListingsStore from "@/stores/job-listings.store";
+import useJobListingsStore from "@/modules/job-listing/job-listing.store";
 
 interface JobListingsTableProps {
   data: JobListing[];

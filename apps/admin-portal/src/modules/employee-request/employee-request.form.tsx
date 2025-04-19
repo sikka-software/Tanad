@@ -25,8 +25,8 @@ import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employ
 import { cn } from "@/lib/utils";
 
 import { employeeKeys, useEmployees } from "@/hooks/models/useEmployees";
-import { useEmployeeRequestsStore } from "@/stores/employee-requests.store";
-import { useEmployeesStore } from "@/stores/employees.store";
+import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
+import { useEmployeesStore } from "@/modules/employee/employee.store";
 import useUserStore from "@/stores/use-user-store";
 
 const createRequestSchema = (t: (key: string) => string) =>

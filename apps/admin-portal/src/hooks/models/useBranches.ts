@@ -7,9 +7,9 @@ import {
   fetchBranches,
   updateBranch,
   bulkDeleteBranches,
-} from "@/services/branchService";
+} from "@/services/branch.service";
 
-import type { Branch, BranchCreateData } from "@/types/branch.type";
+import type { Branch, BranchCreateData } from "@/modules/branch/branch.type";
 
 // Query keys for branches
 export const branchKeys = {

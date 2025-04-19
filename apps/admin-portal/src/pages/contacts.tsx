@@ -13,7 +13,7 @@ import PageTitle from "@/components/ui/page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Client } from "@/types/client.type";
-import { Vendor } from "@/types/vendor.type";
+import { Vendor } from "@/modules/vendor/vendor.type";
 
 import { useClients } from "@/hooks/models/useClients";
 import { useVendors } from "@/hooks/models/useVendors";

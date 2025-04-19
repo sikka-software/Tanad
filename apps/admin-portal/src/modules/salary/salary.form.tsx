@@ -19,7 +19,7 @@ import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employ
 
 import { generateDummyEmployee } from "@/lib/dummy-factory";
 
-import type { Salary } from "@/types/salary.type";
+import type { Salary } from "@/modules/salary/salary.type";
 
 import { employeeKeys, useEmployees } from "@/hooks/models/useEmployees";
 import useUserStore from "@/stores/use-user-store";

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Branch } from "@/types/branch.type";
+import { Branch } from "@/modules/branch/branch.type";
 
 import { db } from "@/db/drizzle";
 import { branches } from "@/db/schema";

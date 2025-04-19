@@ -4,14 +4,15 @@ import { applyFilters } from "@/lib/filter-utils";
 import { applySort } from "@/lib/sort-utils";
 
 import { FilterCondition } from "@/types/common.type";
-import { Company } from "@/types/company.type";
+import { Vendor, VendorCreateData, VendorUpdateData } from "@/modules/vendor/vendor.type";
 
-type CompaniesStates = {
-  companies: Company[];
+import { createClient } from "@/utils/supabase/component";
+
+type VendorStates = {
+  vendors: Vendor[];
   isLoading: boolean;
   error: string | null;
   selectedRows: string[];
-
   filterConditions: FilterCondition[];
   filterCaseSensitive: boolean;
   searchQuery: string;
@@ -22,8 +23,11 @@ type CompaniesStates = {
   sortNullsFirst: boolean;
 };
 
-type CompaniesActions = {
-  updateCompany: (id: string, updates: Partial<Company>) => Promise<void>;
+type VendorActions = {
+  fetchVendors: () => Promise<void>;
+  createVendor: (data: VendorCreateData) => Promise<void>;
+  updateVendor: (id: string, data: VendorUpdateData) => Promise<void>;
+  deleteVendor: (id: string) => Promise<void>;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
   setFilterConditions: (filterConditions: FilterCondition[]) => void;
@@ -34,12 +38,12 @@ type CompaniesActions = {
   setSortRules: (sortRules: { field: string; direction: string }[]) => void;
   setSortCaseSensitive: (sortCaseSensitive: boolean) => void;
   setSortNullsFirst: (sortNullsFirst: boolean) => void;
-  getFilteredCompanies: (data: Company[]) => Company[];
-  getSortedCompanies: (data: Company[]) => Company[];
+  getFilteredVendors: (data: Vendor[]) => Vendor[];
+  getSortedVendors: (data: Vendor[]) => Vendor[];
 };
 
-const useCompanyStore = create<CompaniesStates & CompaniesActions>((set, get) => ({
-  companies: [],
+export const useVendorsStore = create<VendorStates & VendorActions>((set, get) => ({
+  vendors: [],
   isLoading: false,
   error: null,
   selectedRows: [],
@@ -53,7 +57,7 @@ const useCompanyStore = create<CompaniesStates & CompaniesActions>((set, get) =>
   sortCaseSensitive: false,
   sortNullsFirst: false,
 
-  getFilteredCompanies: (data: Company[]) => {
+  getFilteredVendors: (data: Vendor[]) => {
     const { searchQuery, filterConditions, filterCaseSensitive } = get();
 
     // If no data, return empty array
@@ -64,8 +68,8 @@ const useCompanyStore = create<CompaniesStates & CompaniesActions>((set, get) =>
     // First apply search if there is a search query
     let filtered = data;
     if (searchQuery) {
-      filtered = filtered.filter((company) =>
-        company.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      filtered = filtered.filter((vendor) =>
+        vendor.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -77,10 +81,10 @@ const useCompanyStore = create<CompaniesStates & CompaniesActions>((set, get) =>
     return filtered;
   },
 
-  getSortedCompanies: (data: Company[]) => {
+  getSortedVendors: (data: Vendor[]) => {
     const { sortRules, sortCaseSensitive, sortNullsFirst } = get();
 
-    return applySort("companies", data, sortRules, {
+    return applySort("vendors", data, sortRules, {
       caseSensitive: sortCaseSensitive,
       nullsFirst: sortNullsFirst,
     });
@@ -116,32 +120,8 @@ const useCompanyStore = create<CompaniesStates & CompaniesActions>((set, get) =>
   setIsDeleteDialogOpen: (isDeleteDialogOpen: boolean) => {
     set({ isDeleteDialogOpen });
   },
-
-  updateCompany: async (id: string, updates: Partial<Company>) => {
-    try {
-      const response = await fetch(`/api/companies/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updates),
-      });
-
-      if (!response.ok) throw new Error("Failed to update company");
-
-      set((state) => ({
-        companies: state.companies.map((company) =>
-          company.id === id ? { ...company, ...updates } : company,
-        ),
-      }));
-    } catch (error) {
-      set({ error: (error as Error).message });
-    }
-  },
-
   setSelectedRows: (ids: string[]) => {
     set((state) => {
-      // Only update if the selection has actually changed
       if (JSON.stringify(state.selectedRows) === JSON.stringify(ids)) {
         return state;
       }
@@ -151,13 +131,82 @@ const useCompanyStore = create<CompaniesStates & CompaniesActions>((set, get) =>
 
   clearSelection: () => {
     set((state) => {
-      // Only update if there are actually selected rows
       if (state.selectedRows.length === 0) {
         return state;
       }
       return { ...state, selectedRows: [] };
     });
   },
-}));
 
-export default useCompanyStore;
+  fetchVendors: async () => {
+    const supabase = createClient();
+    set({ isLoading: true, error: null });
+    try {
+      const { data, error } = await supabase.from("vendors").select("*");
+      if (error) throw error;
+      set({ vendors: data as Vendor[], isLoading: false });
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
+
+  createVendor: async (data: VendorCreateData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch("/api/vendors", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to create vendor");
+      }
+      const newVendor = await response.json();
+      set((state) => ({
+        vendors: [...state.vendors, newVendor],
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
+
+  updateVendor: async (id: string, data: VendorUpdateData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`/api/vendors/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update vendor");
+      }
+      const updatedVendor = await response.json();
+      set((state) => ({
+        vendors: state.vendors.map((vendor) => (vendor.id === id ? updatedVendor : vendor)),
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
+
+  deleteVendor: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await fetch(`/api/vendors/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete vendor");
+      }
+      set((state) => ({
+        vendors: state.vendors.filter((vendor) => vendor.id !== id),
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
+}));

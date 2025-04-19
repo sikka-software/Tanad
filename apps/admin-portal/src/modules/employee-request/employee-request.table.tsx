@@ -8,9 +8,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { EmployeeRequest } from "@/types/employee-request.type";
+import { EmployeeRequest } from "@/modules/employee-request/employee-request.type";
 
-import { useEmployeeRequestsStore } from "@/stores/employee-requests.store";
+import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
 
 const titleSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().optional();

@@ -10,7 +10,7 @@ import EmployeeRequestsTable from "@/modules/employee-request/employee-request.t
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { EmployeeRequest } from "@/types/employee-request.type";
+import { EmployeeRequest } from "@/modules/employee-request/employee-request.type";
 
 import { useEmployeeRequests } from "@/hooks/models/useEmployeeRequests";
 

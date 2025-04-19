@@ -16,7 +16,7 @@ import SelectionMode from "@/components/ui/selection-mode";
 import { Client } from "@/types/client.type";
 
 import { useClients, useBulkDeleteClients } from "@/hooks/models/useClients";
-import { useClientsStore } from "@/stores/client.store";
+import { useClientsStore } from "@/modules/client/client.store";
 
 export default function ClientsPage() {
   const t = useTranslations();

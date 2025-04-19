@@ -14,7 +14,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { useCompanies, useBulkDeleteCompanies } from "@/hooks/models/useCompanies";
-import useCompanyStore from "@/stores/company.store";
+import useCompanyStore from "@/modules/company/company.store";
 
 export default function CompaniesPage() {
   const t = useTranslations();

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { Salary } from "@/types/salary.type";
+import { Salary } from "@/modules/salary/salary.type";
 
 import { useDeleteSalary } from "@/hooks/models/useSalaries";
 
