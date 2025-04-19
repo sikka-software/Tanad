@@ -21,7 +21,22 @@ import SortPopover from "./sort-popover";
 
 interface SortableColumn {
   value: string;
-  label: string;
+  translationKey: string;
+}
+
+export interface FilterCondition {
+  id: number;
+  field: string;
+  operator: string;
+  value: string;
+  type: "text" | "number" | "date";
+  conjunction: "and" | "or";
+}
+
+export interface FilterableField {
+  id: string;
+  type: "text" | "number" | "date";
+  translationKey: string;
 }
 
 export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -39,6 +54,11 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   onCaseSensitiveChange?: (value: boolean) => void;
   nullsFirst?: boolean;
   onNullsFirstChange?: (value: boolean) => void;
+  filterableFields?: FilterableField[];
+  filterConditions?: FilterCondition[];
+  onFilterConditionsChange?: (conditions: FilterCondition[]) => void;
+  filterCaseSensitive?: boolean;
+  onFilterCaseSensitiveChange?: (value: boolean) => void;
 }
 
 const PageSearchAndFilter = ({
@@ -57,6 +77,11 @@ const PageSearchAndFilter = ({
   onCaseSensitiveChange,
   nullsFirst,
   onNullsFirstChange,
+  filterableFields,
+  filterConditions,
+  onFilterConditionsChange,
+  filterCaseSensitive,
+  onFilterCaseSensitiveChange,
   ...props
 }: PageSearchAndFilterProps) => {
   const t = useTranslations();
@@ -97,7 +122,13 @@ const PageSearchAndFilter = ({
           />
         )}
 
-        <FilterPopover />
+        <FilterPopover
+          fields={filterableFields}
+          conditions={filterConditions}
+          onConditionsChange={onFilterConditionsChange}
+          caseSensitive={filterCaseSensitive}
+          onCaseSensitiveChange={onFilterCaseSensitiveChange}
+        />
         <SortPopover
           sortRules={sortRules}
           onSortRulesChange={onSortRulesChange}

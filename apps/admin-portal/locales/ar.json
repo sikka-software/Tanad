@@ -53,6 +53,29 @@
       "ar": "العربية",
       "en": "English"
     },
+    "filter": {
+      "title": "فرز",
+      "value": {
+        "placeholder": "القيمة"
+      }
+    },
+    "add_filter_condition": "إضافة قاعدة فرز",
+    "apply_filters": "تطبيق الفرز",
+    "saved_filters": "الفروز المحفوظة",
+    "save_current_filter": "حفظ الفرز الحالي",
+    "apply_filter": "تطبيق الفرز",
+    "field": "الحقل",
+    "operator": "المعامل",
+    "operators": {
+      "equals": "يساوي",
+      "not_equals": "لا يساوي",
+      "contains": "يحتوي",
+      "not_contains": "لا يحتوي",
+      "starts_with": "يبدأ بـ",
+      "ends_with": "ينتهي بـ",
+      "is_empty": "فارغ",
+      "is_not_empty": "ليس فارغ"
+    },
     "sidebar_search": "ابحث عن صفحة",
     "saving": "جاري الحفظ...",
     "cancel": "إلغاء",
@@ -123,7 +146,7 @@
     "updating": "جاري التحديث...",
     "updated": "تم التحديث",
     "select": "اختر",
-    "filter": "تصفية",
+    "filter_options": "خيارات الفرز",
     "reset": "إعادة تعيين",
     "reload": "إعادة تحميل",
     "more": "المزيد",
@@ -2364,6 +2387,10 @@
         "label": "الراتب",
         "placeholder": "أدخل الراتب"
       },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة"
+      },
       "start_date": {
         "label": "تاريخ البدء",
         "placeholder": "أدخل تاريخ البدء"
@@ -2377,6 +2404,9 @@
       },
       "created_at": {
         "label": "تاريخ الإنشاء"
+      },
+      "updated_at": {
+        "label": "تاريخ التحديث"
       }
     }
   },

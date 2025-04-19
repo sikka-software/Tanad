@@ -15,7 +15,35 @@
     "updated": "Updated",
     "select": "Select",
     "search": "Search",
-    "filter": "Filter",
+    "filter_options": "Filter Options",
+
+    "filter": {
+      "title": "Filter",
+      "value": {
+        "placeholder": "Value"
+      }
+    },
+    "apply_filters": "Apply Filter",
+    "save_current_filter": "Save Current Filter",
+    "apply_filter": "Apply Filter",
+
+    "saved_filters": "Saved Filters",
+    "field": "Field",
+    "operator": "Operator",
+    "add_filter_condition": "Add filter condition",
+    "operators": {
+      "equals": "Equals",
+      "contains": "Contains",
+      "startsWith": "Starts with",
+      "endsWith": "Ends with",
+      "isEmpty": "Is empty",
+      "isNotEmpty": "Is not empty",
+      "greaterThan": "Greater than",
+      "lessThan": "Less than",
+      "between": "Between",
+      "before": "Before",
+      "after": "After"
+    },
     "reset": "Reset",
     "reload": "Reload",
     "more": "More",
@@ -1905,6 +1933,14 @@
         "label": "Salary",
         "placeholder": "Enter salary"
       },
+      "position": {
+        "label": "Position",
+        "placeholder": "Enter position"
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Select status"
+      },
       "start_date": {
         "label": "Start Date"
       },
@@ -1916,6 +1952,9 @@
       },
       "created_at": {
         "label": "Created Date"
+      },
+      "updated_at": {
+        "label": "Updated Date"
       }
     }
   },

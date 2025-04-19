@@ -4,7 +4,6 @@ import { Filter, Plus, Trash2, Save, Clock, Check } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -32,10 +31,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const TEXT_OPERATORS = [
   { value: "equals", label: "Equals" },
   { value: "contains", label: "Contains" },
-  { value: "startsWith", label: "Starts with" },
-  { value: "endsWith", label: "Ends with" },
-  { value: "isEmpty", label: "Is empty" },
-  { value: "isNotEmpty", label: "Is not empty" },
+  { value: "starts_with", label: "Starts with" },
+  { value: "ends_with", label: "Ends with" },
+  { value: "is_empty", label: "Is empty" },
+  { value: "is_not_empty", label: "Is not empty" },
 ];
 
 const NUMBER_OPERATORS = [
@@ -56,21 +55,6 @@ const DATE_OPERATORS = [
   { value: "isNotEmpty", label: "Is not empty" },
 ];
 
-// Define field types
-const FIELDS = [
-  { id: "name", label: "Name", type: "text" },
-  { id: "email", label: "Email", type: "text" },
-  { id: "phone", label: "Phone", type: "text" },
-  { id: "address", label: "Address", type: "text" },
-  { id: "city", label: "City", type: "text" },
-  { id: "region", label: "Region", type: "text" },
-  { id: "postalCode", label: "Postal Code", type: "text" },
-  { id: "createdAt", label: "Created Date", type: "date" },
-  { id: "lastOrder", label: "Last Order", type: "date" },
-  { id: "orderCount", label: "Order Count", type: "number" },
-  { id: "totalSpent", label: "Total Spent", type: "number" },
-];
-
 // Saved filter presets
 const SAVED_FILTERS = [
   { id: 1, name: "High Value Customers", conditions: [] },
@@ -78,18 +62,54 @@ const SAVED_FILTERS = [
   { id: 3, name: "Inactive Customers", conditions: [] },
 ];
 
-export default function FilterPopover() {
+interface FilterCondition {
+  id: number;
+  field: string;
+  operator: string;
+  value: string;
+  type: "text" | "number" | "date";
+  conjunction: "and" | "or";
+}
+
+interface FilterPopoverProps {
+  fields?: Array<{
+    id: string;
+    translationKey: string;
+    type: "text" | "number" | "date";
+  }>;
+  conditions?: FilterCondition[];
+  onConditionsChange?: (conditions: FilterCondition[]) => void;
+  caseSensitive?: boolean;
+  onCaseSensitiveChange?: (value: boolean) => void;
+}
+
+export default function FilterPopover({
+  fields = [],
+  conditions: externalConditions,
+  onConditionsChange,
+  caseSensitive = false,
+  onCaseSensitiveChange,
+}: FilterPopoverProps) {
   const t = useTranslations();
   const locale = useLocale();
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState(0);
-  const [filterConditions, setFilterConditions] = useState([
-    { id: 1, field: "name", operator: "contains", value: "", type: "text", conjunction: "and" },
-  ]);
+  const [filterConditions, setFilterConditions] = useState<FilterCondition[]>(
+    externalConditions || [
+      {
+        id: 1,
+        field: fields[0]?.id || "name",
+        operator: "contains",
+        value: "",
+        type: fields[0]?.type || "text",
+        conjunction: "and",
+      },
+    ],
+  );
   const [activeTab, setActiveTab] = useState("filters");
 
   const getOperatorsForField = (fieldId: string) => {
-    const field = FIELDS.find((f) => f.id === fieldId);
+    const field = fields.find((f) => f.id === fieldId);
     if (!field) return TEXT_OPERATORS;
 
     switch (field.type) {
@@ -102,60 +122,70 @@ export default function FilterPopover() {
     }
   };
 
-  const getFieldType = (fieldId: string) => {
-    const field = FIELDS.find((f) => f.id === fieldId);
+  const getFieldType = (fieldId: string): "text" | "number" | "date" => {
+    const field = fields.find((f) => f.id === fieldId);
     return field?.type || "text";
   };
 
   const addFilterCondition = () => {
     const newId = Math.max(0, ...filterConditions.map((c) => c.id)) + 1;
-    const newCondition = {
+    const newCondition: FilterCondition = {
       id: newId,
-      field: "name",
+      field: fields[0]?.id || "name",
       operator: "contains",
       value: "",
-      type: "text",
+      type: fields[0]?.type || "text",
       conjunction: "and",
     };
-    setFilterConditions([...filterConditions, newCondition]);
+    const newConditions = [...filterConditions, newCondition];
+    setFilterConditions(newConditions);
+    onConditionsChange?.(newConditions);
   };
 
   const removeFilterCondition = (id: number) => {
-    setFilterConditions(filterConditions.filter((condition) => condition.id !== id));
+    const newConditions = filterConditions.filter((condition) => condition.id !== id);
+    setFilterConditions(newConditions);
+    onConditionsChange?.(newConditions);
   };
 
   const updateFilterCondition = (id: number, field: string, value: string) => {
-    setFilterConditions(
-      filterConditions.map((condition) => {
-        if (condition.id === id) {
-          const updatedCondition = { ...condition, [field]: value };
+    const newConditions = filterConditions.map((condition) => {
+      if (condition.id === id) {
+        const updatedCondition = { ...condition, [field]: value };
 
-          // If field changed, update the operator and type
-          if (field === "field") {
-            const fieldType = getFieldType(value);
-            updatedCondition.type = fieldType;
+        // If field changed, update the operator and type
+        if (field === "field") {
+          const fieldType = getFieldType(value);
+          updatedCondition.type = fieldType;
 
-            // Set default operator based on field type
-            switch (fieldType) {
-              case "number":
-                updatedCondition.operator = "equals";
-                break;
-              case "date":
-                updatedCondition.operator = "equals";
-                break;
-              default:
-                updatedCondition.operator = "contains";
-            }
-
-            // Reset value when changing field type
-            updatedCondition.value = "";
+          // Set default operator based on field type
+          switch (fieldType) {
+            case "number":
+              updatedCondition.operator = "equals";
+              break;
+            case "date":
+              updatedCondition.operator = "equals";
+              break;
+            default:
+              updatedCondition.operator = "contains";
           }
 
-          return updatedCondition;
+          // Reset value when changing field type
+          updatedCondition.value = "";
         }
-        return condition;
-      }),
-    );
+
+        // Ensure conjunction is always "and" or "or"
+        if (field === "conjunction" && value !== "and" && value !== "or") {
+          updatedCondition.conjunction = "and";
+        }
+
+        return updatedCondition as FilterCondition;
+      }
+      return condition;
+    });
+
+    setFilterConditions(newConditions);
+    onConditionsChange?.(newConditions);
   };
 
   const applyFilters = () => {
@@ -164,15 +194,24 @@ export default function FilterPopover() {
       (c) => c.value !== "" || c.operator === "isEmpty" || c.operator === "isNotEmpty",
     );
 
-    console.log("Applying filters:", validConditions);
     setActiveFilters(validConditions.length);
+    onConditionsChange?.(validConditions);
     setOpen(false);
   };
 
   const resetFilters = () => {
-    setFilterConditions([
-      { id: 1, field: "name", operator: "contains", value: "", type: "text", conjunction: "and" },
-    ]);
+    const defaultConditions: FilterCondition[] = [
+      {
+        id: 1,
+        field: fields[0]?.id || "name",
+        operator: "contains",
+        value: "",
+        type: fields[0]?.type || "text",
+        conjunction: "and",
+      },
+    ];
+    setFilterConditions(defaultConditions);
+    onConditionsChange?.(defaultConditions);
   };
 
   const renderValueInput = (condition: any) => {
@@ -220,7 +259,7 @@ export default function FilterPopover() {
       return (
         <Input
           type="number"
-          placeholder="Value"
+          placeholder={t("General.filter.value.placeholder")}
           className="mt-2"
           value={value}
           onChange={(e) => updateFilterCondition(id, "value", e.target.value)}
@@ -231,7 +270,7 @@ export default function FilterPopover() {
     return (
       <Input
         type="text"
-        placeholder="Value"
+        placeholder={t("General.filter.value.placeholder")}
         className="mt-2"
         value={value}
         onChange={(e) => updateFilterCondition(id, "value", e.target.value)}
@@ -243,18 +282,22 @@ export default function FilterPopover() {
     <div className="relative">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <IconButton icon={<Filter className="h-4 w-4" />} label={t("General.filter")} />
+          <IconButton
+            icon={<Filter className="h-4 w-4" />}
+            label={t("General.filter.title")}
+            badge={activeFilters > 0 ? activeFilters : undefined}
+          />
         </PopoverTrigger>
         <PopoverContent className="w-96" align="end" dir={locale === "ar" ? "rtl" : "ltr"}>
           <Tabs defaultValue="filters" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4 grid grid-cols-2">
-              <TabsTrigger value="filters">Custom Filters</TabsTrigger>
-              <TabsTrigger value="saved">Saved Filters</TabsTrigger>
+              <TabsTrigger value="filters">{t("General.filter_options")}</TabsTrigger>
+              <TabsTrigger value="saved">{t("General.saved_filters")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="filters" className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="leading-none font-medium">Filter Options</h4>
+                <h4 className="leading-none font-medium">{t("General.filter_options")}</h4>
                 <div className="flex gap-2">
                   <Button
                     variant="ghost"
@@ -300,7 +343,7 @@ export default function FilterPopover() {
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <Label>Field</Label>
+                        <Label>{t("General.field")}</Label>
                         <Select
                           value={condition.field}
                           onValueChange={(value) =>
@@ -311,9 +354,9 @@ export default function FilterPopover() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            {FIELDS.map((field) => (
+                            {fields.map((field) => (
                               <SelectItem key={field.id} value={field.id}>
-                                {field.label}
+                                {t(field.translationKey)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -321,7 +364,7 @@ export default function FilterPopover() {
                       </div>
 
                       <div>
-                        <Label>Operator</Label>
+                        <Label>{t("General.operator")}</Label>
                         <Select
                           value={condition.operator}
                           onValueChange={(value) =>
@@ -334,7 +377,7 @@ export default function FilterPopover() {
                           <SelectContent>
                             {getOperatorsForField(condition.field).map((op) => (
                               <SelectItem key={op.value} value={op.value}>
-                                {op.label}
+                                {t(`General.operators.${op.value}`)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -354,12 +397,16 @@ export default function FilterPopover() {
                 onClick={addFilterCondition}
               >
                 <Plus className="mr-1 h-3.5 w-3.5" />
-                Add filter condition
+                {t("General.add_filter_condition")}
               </Button>
 
               <div className="flex items-center space-x-2">
-                <Switch id="case-sensitive" />
-                <Label htmlFor="case-sensitive">Case sensitive</Label>
+                <Switch
+                  id="case-sensitive"
+                  checked={caseSensitive}
+                  onCheckedChange={onCaseSensitiveChange}
+                />
+                <Label htmlFor="case-sensitive">{t("General.case_sensitive")}</Label>
               </div>
 
               <Separator />
@@ -381,20 +428,23 @@ export default function FilterPopover() {
                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                     <path d="M3 3v5h5" />
                   </svg>
-                  Reset All
+                  {t("General.reset_all")}
                 </Button>
                 <Button onClick={applyFilters} className="flex-1">
-                  Apply Filters
+                  {t("General.apply_filters")}
                 </Button>
               </div>
             </TabsContent>
 
-            <TabsContent value="saved" className="space-y-4">
+            <TabsContent value="saved" className="relative space-y-4">
+              <div className="bg-background/80 absolute inset-0 z-10 h-full w-full flex items-center justify-center">
+                <div className="flex items-center  h-fit text-4xl p-4 bg-background rounded-md font-bold border  justify-between m-auto my-auto w-fit">{t("General.soon")}</div>
+              </div>
               <div className="flex items-center justify-between">
-                <h4 className="leading-none font-medium">Saved Filters</h4>
+                <h4 className="leading-none font-medium">{t("General.saved_filters")}</h4>
                 <Button variant="outline" size="sm" className="h-8">
                   <Plus className="mr-1 h-3.5 w-3.5" />
-                  Save Current
+                  {t("General.save_current_filter")}
                 </Button>
               </div>
 
@@ -404,7 +454,6 @@ export default function FilterPopover() {
                     key={filter.id}
                     className="hover:bg-muted flex cursor-pointer items-center justify-between rounded-md p-2"
                     onClick={() => {
-                      console.log(`Loading saved filter: ${filter.name}`);
                       // In a real app, we would load the filter conditions here
                       setActiveTab("filters");
                     }}
@@ -436,7 +485,7 @@ export default function FilterPopover() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
                           <Check className="mr-2 h-4 w-4" />
-                          <span>Apply</span>
+                          <span>{t("General.apply_filter")}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <svg
@@ -454,11 +503,11 @@ export default function FilterPopover() {
                             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
                             <path d="m15 5 4 4" />
                           </svg>
-                          <span>Edit</span>
+                          <span>{t("General.edit")}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
-                          <span>Delete</span>
+                          <span>{t("General.delete")}</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

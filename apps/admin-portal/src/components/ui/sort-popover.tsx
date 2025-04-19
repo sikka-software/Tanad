@@ -23,7 +23,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 interface SortableColumn {
   value: string;
-  label: string;
+  translationKey: string;
 }
 
 interface SortPopoverProps {
@@ -130,7 +130,7 @@ function SortPopover({
                     <SelectContent>
                       {columns.map((column) => (
                         <SelectItem key={column.value} value={column.value}>
-                          {column.label}
+                          {t(column.translationKey)}
                         </SelectItem>
                       ))}
                     </SelectContent>
