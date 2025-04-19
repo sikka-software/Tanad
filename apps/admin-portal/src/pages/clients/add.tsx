@@ -13,11 +13,11 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createClient } from "@/services/client.service";
+import { createClient } from "@/modules/client/client.service";
 
 import { Client, ClientCreateData } from "@/types/client.type";
 
-import { clientKeys } from "@/hooks/models/useClients";
+import { clientKeys } from "@/modules/client/client.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddClientPage() {

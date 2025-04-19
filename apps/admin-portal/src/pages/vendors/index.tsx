@@ -16,7 +16,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Vendor } from "@/modules/vendor/vendor.type";
 
-import { useVendors, useBulkDeleteVendors } from "@/hooks/models/useVendors";
+import { useVendors, useBulkDeleteVendors } from "@/modules/vendor/vendor.hooks";
 import { useVendorsStore } from "@/modules/vendor/vendor.store";
 
 // Assuming a useVendors hook exists or will be created

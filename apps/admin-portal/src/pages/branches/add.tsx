@@ -13,7 +13,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { branchKeys } from "@/hooks/models/useBranches";
+import { branchKeys } from "@/modules/branch/branch.hooks";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 

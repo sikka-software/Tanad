@@ -13,11 +13,11 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createCompany } from "@/services/companyService";
+import { createCompany } from "@/modules/company/company.service";
 
 import { Company, CompanyCreateData } from "@/modules/company/company.type";
 
-import { companyKeys } from "@/hooks/models/useCompanies";
+import { companyKeys } from "@/modules/company/company.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddCompanyPage() {

@@ -8,7 +8,7 @@ import PageTitle from "@/ui/page-title";
 
 import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
 
-import { useCompany, useUpdateCompany } from "@/hooks/models/useCompanies";
+import { useCompany, useUpdateCompany } from "@/modules/company/company.hooks";
 
 export default function EditCompanyPage() {
   const t = useTranslations();

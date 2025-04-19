@@ -11,11 +11,11 @@ import PageTitle from "@/ui/page-title";
 import { WarehouseForm, type WarehouseFormValues } from "@/modules/warehouse/warehouse.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { createWarehouse } from "@/services/warehouseService";
+import { createWarehouse } from "@/modules/warehouse/warehouse.service";
 
 import type { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
 
-import { warehouseKeys } from "@/hooks/models/useWarehouses";
+import { warehouseKeys } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddWarehousePage() {

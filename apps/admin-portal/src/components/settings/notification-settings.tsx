@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/ui/form";
 import { Switch } from "@/ui/switch";
 
 import useUserStore from "@/stores/use-user-store";
-import { useProfile, useUpdateProfile } from "@/hooks/models/useProfile";
+import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 
 const formSchema = z.object({
   email_updates: z.boolean(),

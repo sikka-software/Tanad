@@ -7,7 +7,7 @@ import {
   updateJob,
   deleteJob,
   bulkDeleteJobs,
-} from "@/services/jobService";
+} from "@/modules/job/job.service";
 
 import { Job } from "@/modules/job/job.type";
 

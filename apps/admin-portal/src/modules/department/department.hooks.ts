@@ -6,8 +6,7 @@ import {
   fetchDepartmentById,
   fetchDepartments,
   updateDepartment,
-} from "@/services/departmentService";
-
+} from "@/modules/department/department.service";
 import { Department, DepartmentCreateData } from "@/modules/department/department.type";
 
 export const departmentKeys = {

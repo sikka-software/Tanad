@@ -6,7 +6,7 @@ import {
   fetchWarehouseById,
   fetchWarehouses,
   updateWarehouse,
-} from "@/services/warehouseService";
+} from "@/modules/warehouse/warehouse.service";
 
 import type { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
 

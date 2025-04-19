@@ -6,7 +6,7 @@ import {
   fetchClientById,
   fetchClients,
   updateClient,
-} from "@/services/client.service";
+} from "@/modules/client/client.service";
 
 import { Client, ClientCreateData } from "@/types/client.type";
 

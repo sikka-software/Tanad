@@ -13,11 +13,11 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createVendor } from "@/services/vendorService";
+import { createVendor } from "@/modules/vendor/vendor.service";
 
 import { Vendor, VendorCreateData } from "@/modules/vendor/vendor.type";
 
-import { vendorKeys } from "@/hooks/models/useVendors";
+import { vendorKeys } from "@/modules/vendor/vendor.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddVendorPage() {

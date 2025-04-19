@@ -14,9 +14,9 @@ import { Textarea } from "@/ui/textarea";
 
 import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
 
-import { fetchVendorById } from "@/services/vendorService";
+import { fetchVendorById } from "@/modules/vendor/vendor.service";
 
-import { useCompanies } from "@/hooks/models/useCompanies";
+import { useCompanies } from "@/modules/company/company.hooks";
 import { createClient } from "@/utils/supabase/component";
 
 export const createVendorSchema = (t: (key: string) => string) =>

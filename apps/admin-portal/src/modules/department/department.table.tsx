@@ -19,10 +19,10 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { Department } from "@/modules/department/department.type";
 
-import { useBranches } from "@/hooks/models/useBranches";
-import { useUpdateDepartment } from "@/hooks/models/useDepartments";
-import { useOffices } from "@/hooks/models/useOffices";
-import { useWarehouses } from "@/hooks/models/useWarehouses";
+import { useBranches } from "@/modules/branch/branch.hooks";
+import { useUpdateDepartment } from "@/modules/department/department.hooks";
+import { useOffices } from "@/modules/office/office.hooks";
+import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import { useDepartmentsStore } from "@/modules/department/department.store";
 
 const nameSchema = z.string().min(1, "Required");

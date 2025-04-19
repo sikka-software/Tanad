@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 
 import { Invoice } from "@/modules/invoice/invoice.type";
-import { fetchInvoiceById } from "@/services/invoiceService";
+import { fetchInvoiceById } from "@/modules/invoice/invoice.service";
 
 interface Props {
   invoice: Invoice;

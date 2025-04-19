@@ -21,7 +21,7 @@ import { generateDummyEmployee } from "@/lib/dummy-factory";
 
 import type { Salary } from "@/modules/salary/salary.type";
 
-import { employeeKeys, useEmployees } from "@/hooks/models/useEmployees";
+import { employeeKeys, useEmployees } from "@/modules/employee.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 const createSalarySchema = (t: (key: string) => string) =>

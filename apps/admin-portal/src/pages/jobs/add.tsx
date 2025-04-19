@@ -13,9 +13,9 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createJob } from "@/services/jobService";
+import { createJob } from "@/modules/job/job.service";
 
-import { jobKeys } from "@/hooks/models/useJobs";
+import { jobKeys } from "@/modules/job/job.hooks";
 
 export default function AddJobPage() {
   const t = useTranslations();

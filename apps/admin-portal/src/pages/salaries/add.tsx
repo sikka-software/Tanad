@@ -11,11 +11,11 @@ import PageTitle from "@/components/ui/page-title";
 
 import { generateDummySalary } from "@/lib/dummy-factory";
 
-import { createSalary } from "@/services/salaryService";
+import { createSalary } from "@/modules/salary/salary.service";
 
 import { Salary, SalaryCreateData } from "@/modules/salary/salary.type";
 
-import { salaryKeys } from "@/hooks/models/useSalaries";
+import { salaryKeys } from "@/modules/salary/salary.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddSalaryPage() {

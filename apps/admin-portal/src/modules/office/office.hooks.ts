@@ -6,7 +6,7 @@ import {
   fetchOfficeById,
   fetchOffices,
   updateOffice,
-} from "@/services/officeService";
+} from "@/modules/office/office.service";
 
 import type { Office, OfficeCreateData } from "@/modules/office/office.type";
 

@@ -10,9 +10,9 @@ import { Input } from "@/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
-import { useBranches } from "@/hooks/models/useBranches";
-import { useOffices } from "@/hooks/models/useOffices";
-import { useWarehouses } from "@/hooks/models/useWarehouses";
+import { useBranches } from "@/modules/branch/branch.hooks";
+import { useOffices } from "@/modules/office/office.hooks";
+import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export const createDepartmentSchema = (t: (key: string) => string) =>

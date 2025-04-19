@@ -11,11 +11,11 @@ import PageTitle from "@/ui/page-title";
 import { ProductForm, ProductFormValues } from "@/modules/product/product.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { createProduct } from "@/services/productService";
+import { createProduct } from "@/modules/product/product.service";
 
 import type { Product, ProductCreateData } from "@/modules/product/product.type";
 
-import { productKeys } from "@/hooks/models/useProducts";
+import { productKeys } from "@/modules/product/product.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddProductPage() {

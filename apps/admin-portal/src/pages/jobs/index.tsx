@@ -16,7 +16,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Job } from "@/modules/job/job.type";
 
-import { useJobs, useBulkDeleteJobs } from "@/hooks/models/useJobs";
+import { useJobs, useBulkDeleteJobs } from "@/modules/job/job.hooks";
 import { useJobsStore } from "@/modules/job/job.store";
 
 export default function JobsPage() {

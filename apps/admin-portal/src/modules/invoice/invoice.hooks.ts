@@ -6,7 +6,7 @@ import {
   fetchInvoiceById, 
   fetchInvoices, 
   updateInvoice 
-} from '@/services/invoiceService';
+} from '@/modules/invoice/invoice.service';
 
 // Query keys
 export const invoiceKeys = {

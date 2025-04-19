@@ -4,9 +4,8 @@ import {
   fetchJobListings,
   bulkDeleteJobListings,
   createJobListing,
-} from "@/services/jobListingService";
-
-import { JobListing } from "@/types/job-listing.type";
+} from "@/modules/job-listing/job-listing.service";
+import { JobListing } from "@/modules/job-listing/job-listing.type";
 
 export const jobListingKeys = {
   all: ["jobListings"] as const,

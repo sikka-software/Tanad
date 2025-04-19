@@ -7,7 +7,7 @@ import {
   fetchSalaries,
   updateSalary,
   bulkDeleteSalaries,
-} from "@/services/salaryService";
+} from "@/modules/salary/salary.service";
 
 import type { Salary } from "@/modules/salary/salary.type";
 

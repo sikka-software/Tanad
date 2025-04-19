@@ -7,7 +7,7 @@ import {
   fetchBranches,
   updateBranch,
   bulkDeleteBranches,
-} from "@/services/branch.service";
+} from "@/modules/branch/branch.service";
 
 import type { Branch, BranchCreateData } from "@/modules/branch/branch.type";
 

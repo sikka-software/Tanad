@@ -13,7 +13,7 @@ import CompaniesTable from "@/modules/company/company.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { useCompanies, useBulkDeleteCompanies } from "@/hooks/models/useCompanies";
+import { useCompanies, useBulkDeleteCompanies } from "@/modules/company/company.hooks";
 import useCompanyStore from "@/modules/company/company.store";
 
 export default function CompaniesPage() {

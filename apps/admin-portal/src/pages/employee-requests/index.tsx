@@ -5,14 +5,13 @@ import { useState } from "react";
 import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 
-import EmployeeRequestCard from "@/modules/employee-request/employee-request.card";
-import EmployeeRequestsTable from "@/modules/employee-request/employee-request.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import EmployeeRequestCard from "@/modules/employee-request/employee-request.card";
+import { useEmployeeRequests } from "@/modules/employee-request/employee-request.hooks";
+import EmployeeRequestsTable from "@/modules/employee-request/employee-request.table";
 import { EmployeeRequest } from "@/modules/employee-request/employee-request.type";
-
-import { useEmployeeRequests } from "@/hooks/models/useEmployeeRequests";
 
 export default function EmployeeRequestsPage() {
   const t = useTranslations();

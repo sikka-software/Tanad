@@ -15,7 +15,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { departmentKeys } from "@/hooks/models/useDepartments";
+import { departmentKeys } from "@/modules/department/department.hooks";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 

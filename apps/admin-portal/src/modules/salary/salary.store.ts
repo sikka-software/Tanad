@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { Salary } from "@/modules/salary/salary.type";
-import { deleteSalary, updateSalary as updateSalaryService } from "@/services/salaryService";
+import { deleteSalary, updateSalary as updateSalaryService } from "@/modules/salary/salary.service";
 
 interface SalariesStore {
   selectedRows: string[];

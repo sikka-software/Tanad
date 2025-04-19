@@ -14,8 +14,8 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import { Department } from "@/modules/department/department.type";
 
-import { useDepartments } from "@/hooks/models/useDepartments";
-import { useDeleteDepartments } from "@/hooks/models/useDepartments";
+import { useDepartments } from "@/modules/department/department.hooks";
+import { useDeleteDepartments } from "@/modules/department/department.hooks";
 import { useDepartmentsStore } from "@/modules/department/department.store";
 
 export default function DepartmentsPage() {

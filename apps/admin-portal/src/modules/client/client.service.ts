@@ -1,4 +1,4 @@
-import { Client, ClientCreateData } from "@/types/client.type";
+import { Client, ClientCreateData } from "@/modules/client/client.type";
 
 export async function fetchClients(): Promise<Client[]> {
   try {

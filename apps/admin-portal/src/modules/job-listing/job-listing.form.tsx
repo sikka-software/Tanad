@@ -12,7 +12,7 @@ import { Textarea } from "@/ui/textarea";
 
 import { Job } from "@/modules/job/job.type";
 
-import { useJobs } from "@/hooks/models/useJobs";
+import { useJobs } from "@/modules/job/job.hooks";
 
 interface JobListingFormProps {
   id?: string;

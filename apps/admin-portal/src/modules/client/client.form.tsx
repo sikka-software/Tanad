@@ -14,7 +14,7 @@ import { Textarea } from "@/ui/textarea";
 
 import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
 
-import { useCompanies } from "@/hooks/models/useCompanies";
+import { useCompanies } from "@/modules/company/company.hooks";
 import { createClient } from "@/utils/supabase/component";
 
 interface ClientFormProps {

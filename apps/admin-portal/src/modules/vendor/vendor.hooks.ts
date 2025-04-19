@@ -6,7 +6,7 @@ import {
   fetchVendorById,
   fetchVendors,
   updateVendor,
-} from "@/services/vendorService";
+} from "@/modules/vendor/vendor.service";
 
 import type { Vendor, VendorCreateData } from "@/modules/vendor/vendor.type";
 

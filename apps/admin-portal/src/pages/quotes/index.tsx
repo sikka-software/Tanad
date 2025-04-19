@@ -1,6 +1,5 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -8,15 +7,14 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import QuoteCard from "@/modules/quote/quote.card";
-import QuotesTable from "@/modules/quote/quote.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Quote } from "@/modules/quote/quote.type";
-
-import { useQuotes, useBulkDeleteQuotes } from "@/hooks/models/useQuotes";
+import QuoteCard from "@/modules/quote/quote.card";
+import { useQuotes, useBulkDeleteQuotes } from "@/modules/quote/quote.hooks";
 import { useQuotesStore } from "@/modules/quote/quote.store";
+import QuotesTable from "@/modules/quote/quote.table";
+import { Quote } from "@/modules/quote/quote.type";
 
 export default function QuotesPage() {
   const t = useTranslations();

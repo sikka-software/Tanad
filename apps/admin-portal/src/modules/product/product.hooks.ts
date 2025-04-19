@@ -6,7 +6,7 @@ import {
   fetchProductById,
   fetchProducts,
   updateProduct,
-} from "@/services/productService";
+} from "@/modules/product/product.service";
 
 import type { Product } from "@/modules/product/product.type";
 

@@ -13,11 +13,11 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createOffice } from "@/services/officeService";
+import { createOffice } from "@/modules/office/office.service";
 
 import { Office, OfficeCreateData } from "@/modules/office/office.type";
 
-import { officeKeys } from "@/hooks/models/useOffices";
+import { officeKeys } from "@/modules/office/office.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddOfficePage() {

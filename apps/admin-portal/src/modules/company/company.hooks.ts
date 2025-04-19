@@ -7,7 +7,7 @@ import {
   fetchCompanyById,
   fetchCompanies,
   updateCompany,
-} from "@/services/companyService";
+} from "@/modules/company/company.service";
 
 import type { Company, CompanyCreateData } from "@/modules/company/company.type";
 
