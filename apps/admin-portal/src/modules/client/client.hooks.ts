@@ -8,7 +8,7 @@ import {
   updateClient,
 } from "@/modules/client/client.service";
 
-import { Client, ClientCreateData } from "@/types/client.type";
+import { Client, ClientCreateData } from "./client.type";
 
 export const clientKeys = {
   all: ["clients"] as const,

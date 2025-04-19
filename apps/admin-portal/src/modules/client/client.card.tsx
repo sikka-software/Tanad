@@ -2,7 +2,7 @@ import { Mail, Phone, Building2, MapPin } from "lucide-react";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { Client } from "@/types/client.type";
+import { Client } from "./client.type";
 
 const ClientCard = ({ client }: { client: Client }) => {
   return (

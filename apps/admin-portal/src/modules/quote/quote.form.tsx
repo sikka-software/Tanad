@@ -20,10 +20,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/ui/textarea";
 
 import { ClientForm, type ClientFormValues } from "@/modules/client/client.form";
-
-import { Client } from "@/types/client.type";
+import { Client } from "@/modules/client/client.type";
 import { Product } from "@/modules/product/product.type";
-
 import { createClient } from "@/utils/supabase/component";
 
 export interface QuoteItem {

@@ -8,16 +8,14 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { ClientForm, type ClientFormValues } from "@/modules/client/client.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createClient } from "@/modules/client/client.service";
-
-import { Client, ClientCreateData } from "@/types/client.type";
-
+import { ClientForm, type ClientFormValues } from "@/modules/client/client.form";
 import { clientKeys } from "@/modules/client/client.hooks";
+import { createClient } from "@/modules/client/client.service";
+import { Client, ClientCreateData } from "@/modules/client/client.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddClientPage() {

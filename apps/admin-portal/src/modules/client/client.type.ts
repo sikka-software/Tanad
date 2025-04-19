@@ -1,36 +1,4 @@
-import { CommentProps } from "./comment.type";
-import { CompanyProps } from "./company.type";
-import { InvoiceProps } from "./invoice.type";
-import { NoteProps } from "./note.type";
-import { UserProps } from "./user.type";
-import { Company } from "./company.type";
-
-export type ClientProps = {
-  _id: string;
-  profile: UserProps;
-
-  invoices?: InvoiceProps[];
-  companies?: (CompanyProps | string)[];
-
-  website?: string;
-  street?: string;
-  district?: string;
-  city?: string;
-  state?: string;
-  province?: string;
-  zip_code?: any;
-  country_code?: any;
-  country?: string;
-  photo?: any;
-
-  note?: NoteProps;
-  comments?: CommentProps[];
-
-  created_at?: string;
-  updated_at?: string;
-};
-
-export type ClientInput = Partial<ClientProps>;
+import { Company } from "@/modules/company/company.type";
 
 export interface Client {
   id: string;
@@ -47,4 +15,6 @@ export interface Client {
   created_at: string;
 }
 
-export type ClientCreateData = Omit<Client, "id" | "created_at" | "company_details"> & { user_id?: string };
+export type ClientCreateData = Omit<Client, "id" | "created_at" | "company_details"> & {
+  user_id?: string;
+};

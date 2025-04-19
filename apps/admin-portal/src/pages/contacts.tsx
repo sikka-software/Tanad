@@ -4,19 +4,18 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
 
-import ClientCard from "@/modules/client/client.card";
-import VendorCard from "@/modules/vendor/vendor.card";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { buttonVariants } from "@/components/ui/button";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { Client } from "@/types/client.type";
-import { Vendor } from "@/modules/vendor/vendor.type";
-
+import ClientCard from "@/modules/client/client.card";
 import { useClients } from "@/modules/client/client.hooks";
+import { Client } from "@/modules/client/client.type";
+import VendorCard from "@/modules/vendor/vendor.card";
 import { useVendors } from "@/modules/vendor/vendor.hooks";
+import { Vendor } from "@/modules/vendor/vendor.type";
 
 export default function ContactsPage() {
   const t = useTranslations();
