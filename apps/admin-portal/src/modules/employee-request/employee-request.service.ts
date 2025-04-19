@@ -1,4 +1,4 @@
-import { EmployeeRequest } from "./employee-request.type";
+import { EmployeeRequest, EmployeeRequestCreateData } from "./employee-request.type";
 
 export async function fetchEmployeeRequests(): Promise<EmployeeRequest[]> {
   try {
@@ -6,10 +6,11 @@ export async function fetchEmployeeRequests(): Promise<EmployeeRequest[]> {
     if (!response.ok) {
       throw new Error("Failed to fetch employee requests");
     }
-    return response.json();
+    const data = await response.json();
+    return data.requests || [];
   } catch (error) {
-    console.error("Error fetching jobs:", error);
-    throw new Error("Failed to fetch jobs");
+    console.error("Error fetching employee requests:", error);
+    throw new Error("Failed to fetch employee requests");
   }
 }
 
@@ -27,7 +28,7 @@ export async function fetchEmployeeRequestById(id: string): Promise<EmployeeRequ
 }
 
 export async function createEmployeeRequest(
-  employeeRequest: EmployeeRequest,
+  employeeRequest: EmployeeRequestCreateData,
 ): Promise<EmployeeRequest> {
   try {
     const response = await fetch("/api/employee-requests", {

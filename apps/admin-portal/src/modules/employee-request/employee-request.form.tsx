@@ -20,12 +20,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
-import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
-
 import { cn } from "@/lib/utils";
 
-import { employeeKeys, useEmployees } from "@/modules/employee.hooks";
 import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
+import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
+import { employeeKeys, useEmployees } from "@/modules/employee/employee.hooks";
 import { useEmployeesStore } from "@/modules/employee/employee.store";
 import useUserStore from "@/stores/use-user-store";
 
@@ -213,6 +212,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                   <ComboboxAdd
                     direction={locale === "ar" ? "rtl" : "ltr"}
                     data={employeeOptions}
+                    disabled={loadingSave}
                     isLoading={employeesLoading}
                     defaultValue={field.value}
                     valueKey={"id"}
@@ -249,7 +249,11 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
               <FormItem>
                 <FormLabel>{t("EmployeeRequests.form.type.label")}</FormLabel>
                 <FormControl>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    disabled={loadingSave}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder={t("EmployeeRequests.form.type.placeholder")} />
                     </SelectTrigger>

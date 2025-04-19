@@ -1,8 +1,7 @@
-import * as React from "react";
-
 import { LabelProps } from "@radix-ui/react-label";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { Plus } from "lucide-react";
+import * as React from "react";
 
 import {
   Command,
@@ -15,6 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
+
 import { cn } from "@/lib/utils";
 
 import { Button } from "./button";
@@ -32,6 +32,7 @@ type ComboboxAddTypes<T> = {
   isLoading?: boolean;
   helperText?: any;
   popoverClassName?: string;
+  disabled?: boolean;
   /** This the same value as the one with the key valueKey */
   defaultValue?: string;
   preview?: boolean;
@@ -94,8 +95,11 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
       >
         {props.label && <Label {...labelProps}>{props.label}</Label>}
 
-        <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
-          <PopoverTrigger asChild>
+        <PopoverPrimitive.Root
+          open={open}
+          onOpenChange={props.disabled ? undefined : handleOpenChange}
+        >
+          <PopoverTrigger disabled={props.disabled} asChild>
             {props.isLoading ? (
               <Skeleton className="h-[40px] w-full" />
             ) : (
@@ -107,6 +111,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                   )}
                 ></div>
                 <button
+                  disabled={props.disabled}
                   role="combobox"
                   type="button"
                   aria-expanded={open}

@@ -8,7 +8,6 @@ import {
   deleteJob,
   bulkDeleteJobs,
 } from "@/modules/job/job.service";
-
 import { Job } from "@/modules/job/job.type";
 
 export const jobKeys = {

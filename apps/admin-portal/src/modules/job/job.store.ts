@@ -4,8 +4,8 @@ import { applyFilters } from "@/lib/filter-utils";
 import { applySort } from "@/lib/sort-utils";
 
 import { FilterCondition } from "@/types/common.type";
-import { Job } from "@/modules/job/job.type";
 
+import { Job } from "@/modules/job/job.type";
 import { createClient } from "@/utils/supabase/component";
 
 type JobStates = {
@@ -24,7 +24,6 @@ type JobStates = {
 };
 
 type JobActions = {
-  fetchJobs: () => Promise<void>;
   updateJob: (id: string, data: Partial<Job>) => Promise<void>;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
@@ -134,18 +133,6 @@ export const useJobsStore = create<JobStates & JobActions>((set, get) => ({
       }
       return { ...state, selectedRows: [] };
     });
-  },
-
-  fetchJobs: async () => {
-    const supabase = createClient();
-    set({ isLoading: true, error: null });
-    try {
-      const { data, error } = await supabase.from("jobs").select("*");
-      if (error) throw error;
-      set({ jobs: data as Job[], isLoading: false });
-    } catch (error) {
-      set({ error: (error as Error).message, isLoading: false });
-    }
   },
 
   updateJob: async (id: string, updates: Partial<Job>) => {
