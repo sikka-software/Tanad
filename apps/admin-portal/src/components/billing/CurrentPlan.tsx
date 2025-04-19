@@ -46,38 +46,40 @@ interface BillingHistoryItem {
   subscriptionId?: string;
 }
 
-export default function CurrentPlan() {
+// Separated BillingHistoryDialog component
+interface BillingHistoryDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  user: any;
+}
+
+function BillingHistoryDialog({ open, onOpenChange, user }: BillingHistoryDialogProps) {
   const t = useTranslations();
   const locale = useLocale();
-  const subscription = useSubscription();
-  const { user, fetchUserAndProfile } = useUserStore();
-  const { getPlans } = usePricing(TANAD_PRODUCT_ID);
-  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [billingHistory, setBillingHistory] = useState<BillingHistoryItem[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(Date.now());
 
-  // Memoize the refresh function to prevent unnecessary re-renders
-  const refreshData = useCallback(async () => {
-    if (!user) return;
-
-    // Refresh both subscription data and user data
-    try {
-      console.log("Manually refreshing subscription and user data");
-      //  await fetchUserAndProfile();
-      await subscription.refetch();
-      setLastRefreshTime(Date.now()); // Update refresh timestamp
-    } catch (error) {
-      console.error("Error refreshing data:", error);
-    }
-  }, [user, fetchUserAndProfile, subscription]);
-
-  // Fetch billing history when dialog opens or when subscription changes
+  // Fetch billing history when dialog opens
   useEffect(() => {
-    if ((isHistoryDialogOpen || subscription.id) && user) {
+    if (open && user) {
       fetchBillingHistory();
     }
-  }, [isHistoryDialogOpen, user, lastRefreshTime, subscription.id]);
+  }, [open, user, lastRefreshTime]);
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
 
   // Fetch billing history
   const fetchBillingHistory = async () => {
@@ -167,75 +169,7 @@ export default function CurrentPlan() {
     }
   };
 
-  // Additional refresh when subscription changes
-  useEffect(() => {
-    // If subscription data changes, refresh billing history data
-    if (subscription.id && !isHistoryDialogOpen) {
-      console.log("Subscription changed, pre-fetching billing history");
-      fetchBillingHistory();
-    }
-  }, [subscription.id, subscription.status]);
-
-  if (subscription.loading || isLoadingHistory || !user) {
-    return <Skeleton className="h-24 w-full rounded-lg" />;
-  }
-
-  // Format the next billing date if available
-  const formatNextBillingDate = () => {
-    if (!subscription.nextBillingDate || subscription.nextBillingDate === "-") return null;
-
-    try {
-      let date;
-      if (subscription.nextBillingDate.includes("/")) {
-        // Parse DD/MM/YYYY format
-        const parts = subscription.nextBillingDate.split("/");
-        date = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-      } else if (typeof subscription.nextBillingDate === "number") {
-        // Handle Unix timestamp (seconds)
-        date = new Date(subscription.nextBillingDate * 1000);
-      } else {
-        // Try to parse as regular date
-        date = new Date(subscription.nextBillingDate);
-      }
-
-      if (isNaN(date.getTime())) return subscription.nextBillingDate;
-
-      // Format the date based on locale
-      const options: Intl.DateTimeFormatOptions = {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      };
-
-      try {
-        return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", options);
-      } catch (e) {
-        // Fallback for browsers that don't support the locale
-        return date.toLocaleDateString("en-US", options);
-      }
-    } catch (error) {
-      console.error("Error formatting date:", error);
-      return subscription.nextBillingDate;
-    }
-  };
-
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch (e) {
-      return dateString;
-    }
-  };
-
-  const nextBillingDate = formatNextBillingDate();
-
-  // Status badge for invoices - enhance to show more payment states
+  // Status badge for invoices
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "paid":
@@ -312,6 +246,211 @@ export default function CurrentPlan() {
     // Fall back to the basic formatting if no lookup key matched
     return planName;
   };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[700px]" dir={locale === "ar" ? "rtl" : "ltr"}>
+        <DialogHeader>
+          <div className="flex items-center justify-between">
+            <DialogTitle>
+              {t("Billing.billing_history.title", { fallback: "Billing History" })}
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.preventDefault();
+                fetchBillingHistory();
+              }}
+              disabled={isLoadingHistory}
+              className="h-8 w-8"
+              aria-label={t("Billing.current_plan.refresh", { fallback: "Refresh" })}
+            >
+              <RefreshCcw className={`h-4 w-4 ${isLoadingHistory ? "animate-spin" : ""}`} />
+            </Button>
+          </div>
+        </DialogHeader>
+
+        <div className="mt-4">
+          {isLoadingHistory ? (
+            <div className="py-8">
+              <Skeleton className="mb-2 h-12 w-full" />
+              <Skeleton className="mb-2 h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ) : billingHistory.length > 0 ? (
+            <>
+              <p className="text-muted-foreground mb-4 text-sm">
+                {t("Billing.billing_history.description", {
+                  fallback: "Your billing history and past invoices",
+                })}
+              </p>
+              <div className="max-h-[50vh] overflow-auto">
+                <Table>
+                  <TableHeader className="bg-background sticky top-0">
+                    <TableRow>
+                      <TableHead>
+                        {t("Billing.billing_history.invoice_date", { fallback: "Date" })}
+                      </TableHead>
+                      <TableHead>
+                        {t("Billing.billing_history.invoice_number", { fallback: "Invoice" })}
+                      </TableHead>
+                      <TableHead>
+                        {t("Billing.billing_history.invoice_amount", { fallback: "Amount" })}
+                      </TableHead>
+                      <TableHead>
+                        {t("Billing.billing_history.invoice_status", { fallback: "Status" })}
+                      </TableHead>
+                      <TableHead>
+                        {t("Billing.billing_history.invoice_plan", { fallback: "Plan" })}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t("Billing.billing_history.actions", { fallback: "Actions" })}
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {billingHistory.map((invoice) => (
+                      <TableRow key={invoice.id}>
+                        <TableCell>{formatDate(invoice.date)}</TableCell>
+                        <TableCell>{invoice.number}</TableCell>
+                        <TableCell>{invoice.amount}</TableCell>
+                        <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                        <TableCell>{formatBillingHistoryPlanName(invoice.planName)}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {invoice.pdfUrl && (
+                              <>
+                                <a
+                                  href={invoice.pdfUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:text-primary/80 inline-flex items-center"
+                                  aria-label={t("Billing.billing_history.view_invoice", {
+                                    fallback: "View Invoice",
+                                  })}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  <span className="sr-only">
+                                    {t("Billing.billing_history.view_invoice", {
+                                      fallback: "View Invoice",
+                                    })}
+                                  </span>
+                                </a>
+                                <a
+                                  href={invoice.pdfUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download
+                                  className="text-primary hover:text-primary/80 inline-flex items-center"
+                                  aria-label={t("Billing.billing_history.download_invoice", {
+                                    fallback: "Download Invoice",
+                                  })}
+                                >
+                                  <Download className="h-4 w-4" />
+                                  <span className="sr-only">
+                                    {t("Billing.billing_history.download_invoice", {
+                                      fallback: "Download Invoice",
+                                    })}
+                                  </span>
+                                </a>
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </>
+          ) : (
+            <div className="text-muted-foreground flex flex-col items-center py-8 text-center">
+              <AlertCircle className="text-muted-foreground/70 mb-2 h-12 w-12" />
+              <p className="mb-1">
+                {t("Billing.no_history", { fallback: "No billing history found" })}
+              </p>
+              <p className="text-sm">
+                {t("Billing.no_history_description", {
+                  fallback: "Your invoices will appear here once you've been billed",
+                })}
+              </p>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export default function CurrentPlan() {
+  const t = useTranslations();
+  const locale = useLocale();
+  const subscription = useSubscription();
+  const { user, fetchUserAndProfile } = useUserStore();
+  const { getPlans } = usePricing(TANAD_PRODUCT_ID);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [lastRefreshTime, setLastRefreshTime] = useState<number>(Date.now());
+
+  // Memoize the refresh function to prevent unnecessary re-renders
+  const refreshData = useCallback(async () => {
+    if (!user) return;
+
+    // Refresh both subscription data and user data
+    try {
+      console.log("Manually refreshing subscription and user data");
+      //  await fetchUserAndProfile();
+      await subscription.refetch();
+      setLastRefreshTime(Date.now()); // Update refresh timestamp
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
+  }, [user, fetchUserAndProfile, subscription]);
+
+  if (subscription.loading || !user) {
+    return <Skeleton className="h-24 w-full rounded-lg" />;
+  }
+
+  // Format the next billing date if available
+  const formatNextBillingDate = () => {
+    if (!subscription.nextBillingDate || subscription.nextBillingDate === "-") return null;
+
+    try {
+      let date;
+      if (subscription.nextBillingDate.includes("/")) {
+        // Parse DD/MM/YYYY format
+        const parts = subscription.nextBillingDate.split("/");
+        date = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      } else if (typeof subscription.nextBillingDate === "number") {
+        // Handle Unix timestamp (seconds)
+        date = new Date(subscription.nextBillingDate * 1000);
+      } else {
+        // Try to parse as regular date
+        date = new Date(subscription.nextBillingDate);
+      }
+
+      if (isNaN(date.getTime())) return subscription.nextBillingDate;
+
+      // Format the date based on locale
+      const options: Intl.DateTimeFormatOptions = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+
+      try {
+        return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", options);
+      } catch (e) {
+        // Fallback for browsers that don't support the locale
+        return date.toLocaleDateString("en-US", options);
+      }
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return subscription.nextBillingDate;
+    }
+  };
+
+  const nextBillingDate = formatNextBillingDate();
 
   return (
     <>
@@ -438,148 +577,12 @@ export default function CurrentPlan() {
         </div>
       </div>
 
-      {/* Billing History Dialog */}
-      <Dialog
+      {/* Use the separate billing history dialog component */}
+      <BillingHistoryDialog
         open={isHistoryDialogOpen}
-        onOpenChange={(open) => {
-          setIsHistoryDialogOpen(open);
-          // Re-fetch data when the dialog is opened
-          if (open && user) {
-            fetchBillingHistory();
-          }
-        }}
-      >
-        <DialogContent className="sm:max-w-[700px]" dir={locale === "ar" ? "rtl" : "ltr"}>
-          <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle>
-                {t("Billing.billing_history.title", { fallback: "Billing History" })}
-              </DialogTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={(e) => {
-                  e.preventDefault();
-                  fetchBillingHistory();
-                }}
-                disabled={isLoadingHistory}
-                className="h-8 w-8"
-                aria-label={t("Billing.current_plan.refresh", { fallback: "Refresh" })}
-              >
-                <RefreshCcw className={`h-4 w-4 ${isLoadingHistory ? "animate-spin" : ""}`} />
-              </Button>
-            </div>
-          </DialogHeader>
-
-          <div className="mt-4">
-            {isLoadingHistory ? (
-              <div className="py-8">
-                <Skeleton className="mb-2 h-12 w-full" />
-                <Skeleton className="mb-2 h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
-              </div>
-            ) : billingHistory.length > 0 ? (
-              <>
-                <p className="text-muted-foreground mb-4 text-sm">
-                  {t("Billing.billing_history.description", {
-                    fallback: "Your billing history and past invoices",
-                  })}
-                </p>
-                <div className="max-h-[50vh] overflow-auto">
-                  <Table>
-                    <TableHeader className="bg-background sticky top-0">
-                      <TableRow>
-                        <TableHead>
-                          {t("Billing.billing_history.invoice_date", { fallback: "Date" })}
-                        </TableHead>
-                        <TableHead>
-                          {t("Billing.billing_history.invoice_number", { fallback: "Invoice" })}
-                        </TableHead>
-                        <TableHead>
-                          {t("Billing.billing_history.invoice_amount", { fallback: "Amount" })}
-                        </TableHead>
-                        <TableHead>
-                          {t("Billing.billing_history.invoice_status", { fallback: "Status" })}
-                        </TableHead>
-                        <TableHead>
-                          {t("Billing.billing_history.invoice_plan", { fallback: "Plan" })}
-                        </TableHead>
-                        <TableHead className="text-right">
-                          {t("Billing.billing_history.actions", { fallback: "Actions" })}
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {billingHistory.map((invoice) => (
-                        <TableRow key={invoice.id}>
-                          <TableCell>{formatDate(invoice.date)}</TableCell>
-                          <TableCell>{invoice.number}</TableCell>
-                          <TableCell>{invoice.amount}</TableCell>
-                          <TableCell>{getStatusBadge(invoice.status)}</TableCell>
-                          <TableCell>{formatBillingHistoryPlanName(invoice.planName)}</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              {invoice.pdfUrl && (
-                                <>
-                                  <a
-                                    href={invoice.pdfUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-primary hover:text-primary/80 inline-flex items-center"
-                                    aria-label={t("Billing.billing_history.view_invoice", {
-                                      fallback: "View Invoice",
-                                    })}
-                                  >
-                                    <Eye className="h-4 w-4" />
-                                    <span className="sr-only">
-                                      {t("Billing.billing_history.view_invoice", {
-                                        fallback: "View Invoice",
-                                      })}
-                                    </span>
-                                  </a>
-                                  <a
-                                    href={invoice.pdfUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    download
-                                    className="text-primary hover:text-primary/80 inline-flex items-center"
-                                    aria-label={t("Billing.billing_history.download_invoice", {
-                                      fallback: "Download Invoice",
-                                    })}
-                                  >
-                                    <Download className="h-4 w-4" />
-                                    <span className="sr-only">
-                                      {t("Billing.billing_history.download_invoice", {
-                                        fallback: "Download Invoice",
-                                      })}
-                                    </span>
-                                  </a>
-                                </>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </>
-            ) : (
-              <div className="text-muted-foreground flex flex-col items-center py-8 text-center">
-                <AlertCircle className="text-muted-foreground/70 mb-2 h-12 w-12" />
-                <p className="mb-1">
-                  {t("Billing.no_history", { fallback: "No billing history found" })}
-                </p>
-                <p className="text-sm">
-                  {t("Billing.no_history_description", {
-                    fallback: "Your invoices will appear here once you've been billed",
-                  })}
-                </p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+        onOpenChange={setIsHistoryDialogOpen}
+        user={user}
+      />
     </>
   );
 }
