@@ -48,7 +48,7 @@ function sortData<T>(
         const bStr = String(bRawValue);
         const aCompare = caseSensitive ? aStr : aStr.toLowerCase();
         const bCompare = caseSensitive ? bStr : bStr.toLowerCase();
-        
+
         if (aCompare < bCompare) return rule.direction === "asc" ? -1 : 1;
         if (aCompare > bCompare) return rule.direction === "asc" ? 1 : -1;
         continue;
@@ -63,9 +63,7 @@ function sortData<T>(
 
         case "boolean":
           if (aRawValue !== bRawValue) {
-            return rule.direction === "asc" 
-              ? (aRawValue ? 1 : -1)
-              : (aRawValue ? -1 : 1);
+            return rule.direction === "asc" ? (aRawValue ? 1 : -1) : aRawValue ? -1 : 1;
           }
           break;
 
@@ -74,7 +72,7 @@ function sortData<T>(
           const bStr = bRawValue as string;
           const aCompare = caseSensitive ? aStr : aStr.toLowerCase();
           const bCompare = caseSensitive ? bStr : bStr.toLowerCase();
-          
+
           if (aCompare < bCompare) return rule.direction === "asc" ? -1 : 1;
           if (aCompare > bCompare) return rule.direction === "asc" ? 1 : -1;
           break;
@@ -130,7 +128,7 @@ const models = [
  *   { field: 'age', direction: 'asc' },
  * ];
  *
- * const sortedItems = sortFactory('userModel', items, sortRules);
+ * const sortedItems = applySort('userModel', items, sortRules);
  * console.log(sortedItems);
  * // Output: [
  * //   { name: 'Bob', age: 25 },
@@ -139,7 +137,7 @@ const models = [
  * // ]
  * ```
  */
-export const sortFactory = <T>(
+export const applySort = <T>(
   model: string,
   items: T[],
   sortRules: { field: string; direction: string }[],

@@ -12,7 +12,7 @@ import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import SelectionMode from "@/components/ui/selection-mode";
 
-import { sortFactory } from "@/lib/sort-utils";
+import { applySort } from "@/lib/sort-utils";
 
 import { Client } from "@/types/client.type";
 
@@ -42,7 +42,7 @@ export default function ClientsPage() {
       client.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const sortedClients = sortFactory("clients", filteredClients || [], sortRules, {
+  const sortedClients = applySort("clients", filteredClients || [], sortRules, {
     caseSensitive,
     nullsFirst,
   });

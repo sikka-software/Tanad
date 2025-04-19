@@ -13,7 +13,7 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/components/app/job/job.op
 import JobTable from "@/components/app/job/job.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { sortFactory } from "@/lib/sort-utils";
+import { applySort } from "@/lib/sort-utils";
 
 import { Job } from "@/types/job.type";
 
@@ -45,7 +45,7 @@ export default function JobsPage() {
   }, [jobs, getFilteredJobs, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedJobs = useMemo(() => {
-    return sortFactory("jobs", filteredJobs, sortRules, {
+    return applySort("jobs", filteredJobs, sortRules, {
       caseSensitive: sortCaseSensitive,
       nullsFirst: sortNullsFirst,
     });
