@@ -32,11 +32,11 @@ export default function JobsPage() {
   const sortRules = useJobsStore((state) => state.sortRules);
   const sortCaseSensitive = useJobsStore((state) => state.sortCaseSensitive);
   const sortNullsFirst = useJobsStore((state) => state.sortNullsFirst);
-  const getFilteredJobs = useJobsStore((state) => state.getFilteredJobs);
   const searchQuery = useJobsStore((state) => state.searchQuery);
   const filterConditions = useJobsStore((state) => state.filterConditions);
   const filterCaseSensitive = useJobsStore((state) => state.filterCaseSensitive);
-
+  const getFilteredJobs = useJobsStore((state) => state.getFilteredJobs);
+  const getSortedJobs = useJobsStore((state) => state.getSortedJobs);
   const { data: jobs, isLoading, error } = useJobs();
   const { mutate: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
 
@@ -45,10 +45,7 @@ export default function JobsPage() {
   }, [jobs, getFilteredJobs, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedJobs = useMemo(() => {
-    return applySort("jobs", filteredJobs, sortRules, {
-      caseSensitive: sortCaseSensitive,
-      nullsFirst: sortNullsFirst,
-    });
+    return getSortedJobs(filteredJobs);
   }, [filteredJobs, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleRowSelectionChange = (rows: Job[]) => {

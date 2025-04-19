@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import { applyFilters } from "@/lib/filter-utils";
+import { applySort } from "@/lib/sort-utils";
 
 import { FilterCondition } from "@/types/common.type";
 import { Job } from "@/types/job.type";
@@ -37,6 +38,7 @@ type JobActions = {
   setSortCaseSensitive: (sortCaseSensitive: boolean) => void;
   setSortNullsFirst: (sortNullsFirst: boolean) => void;
   getFilteredJobs: (data: Job[]) => Job[];
+  getSortedJobs: (data: Job[]) => Job[];
 };
 
 export const useJobsStore = create<JobStates & JobActions>((set, get) => ({
@@ -78,6 +80,14 @@ export const useJobsStore = create<JobStates & JobActions>((set, get) => ({
     return filtered;
   },
 
+  getSortedJobs: (data: Job[]) => {
+    const { sortRules, sortCaseSensitive, sortNullsFirst } = get();
+
+    return applySort("jobs", data, sortRules, {
+      caseSensitive: sortCaseSensitive,
+      nullsFirst: sortNullsFirst,
+    });
+  },
   setSortRules: (sortRules: { field: string; direction: string }[]) => {
     set({ sortRules });
   },
