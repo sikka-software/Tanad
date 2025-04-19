@@ -45,8 +45,11 @@ function sortData<T>(
       const aCompare = caseSensitive ? aValue : aValue.toLowerCase();
       const bCompare = caseSensitive ? bValue : bValue.toLowerCase();
 
+      console.log(`Comparing ${rule.field}: ${aCompare} vs ${bCompare}, direction: ${rule.direction}`);
+
       if (aCompare < bCompare) return rule.direction === "asc" ? -1 : 1;
       if (aCompare > bCompare) return rule.direction === "asc" ? 1 : -1;
+      if (aCompare === bCompare) continue;
     }
     return 0;
   });

@@ -117,6 +117,7 @@ const JobTable = ({ data, isLoading, error, onSelectedRowsChange }: JobTableProp
 
   return (
     <SheetTable
+      id="job-table"
       columns={columns}
       data={data}
       onEdit={handleEdit}

@@ -38,6 +38,8 @@ export default function JobsPage() {
   const filteredData =
     jobs?.filter((job) => job.title.toLowerCase().includes(searchQuery.toLowerCase())) ?? [];
 
+  console.log("Data being sorted:", filteredData);
+
   const sortedJobs = sortFactory("jobs", filteredData || [], sortRules, {
     caseSensitive,
     nullsFirst,

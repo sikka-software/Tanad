@@ -107,7 +107,6 @@ function SortPopover({
                   <Select
                     dir={locale === "ar" ? "rtl" : "ltr"}
                     value={rule.field}
-                    defaultValue={rule.field}
                     onValueChange={(value) => updateSortRule(index, "field", value)}
                   >
                     <SelectTrigger>
