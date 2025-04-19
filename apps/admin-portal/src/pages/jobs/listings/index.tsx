@@ -2,12 +2,13 @@ import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import SelectionMode from "@/components/ui/selection-mode";
 
 import JobListingCard from "@/modules/job-listing/job-listing.card";
 import { useJobListings, useBulkDeleteJobListings } from "@/modules/job-listing/job-listing.hooks";

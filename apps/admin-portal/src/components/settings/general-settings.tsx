@@ -17,7 +17,7 @@ import { Skeleton } from "@/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import useUserStore from "@/stores/use-user-store";
-import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
+import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
 
 import BetaFlag from "../ui/beta-flag";
 
