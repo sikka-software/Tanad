@@ -21,7 +21,7 @@ function sortData<T>(
     for (const rule of sortRules) {
       // Handle nested fields like company_details.name
       const getNestedValue = (obj: T, path: string) => {
-        return path.split(".").reduce((o: any, p) => o?.[p] ?? "", obj);
+        return path.split(".").reduce((o: any, p) => o?.[p] ?? null, obj);
       };
 
       const aRawValue = getNestedValue(a, rule.field);
@@ -38,18 +38,55 @@ function sortData<T>(
         return nullsFirst ? 1 : -1;
       }
 
-      // Convert to string and handle case sensitivity
-      const aValue = String(aRawValue);
-      const bValue = String(bRawValue);
+      // Determine the type of the values and compare accordingly
+      const aType = typeof aRawValue;
+      const bType = typeof bRawValue;
 
-      const aCompare = caseSensitive ? aValue : aValue.toLowerCase();
-      const bCompare = caseSensitive ? bValue : bValue.toLowerCase();
+      // If types don't match, convert both to strings
+      if (aType !== bType) {
+        const aStr = String(aRawValue);
+        const bStr = String(bRawValue);
+        const aCompare = caseSensitive ? aStr : aStr.toLowerCase();
+        const bCompare = caseSensitive ? bStr : bStr.toLowerCase();
+        
+        if (aCompare < bCompare) return rule.direction === "asc" ? -1 : 1;
+        if (aCompare > bCompare) return rule.direction === "asc" ? 1 : -1;
+        continue;
+      }
 
-      console.log(`Comparing ${rule.field}: ${aCompare} vs ${bCompare}, direction: ${rule.direction}`);
+      // Handle different types
+      switch (aType) {
+        case "number":
+          const aDiff = (aRawValue as number) - (bRawValue as number);
+          if (aDiff !== 0) return rule.direction === "asc" ? aDiff : -aDiff;
+          break;
 
-      if (aCompare < bCompare) return rule.direction === "asc" ? -1 : 1;
-      if (aCompare > bCompare) return rule.direction === "asc" ? 1 : -1;
-      if (aCompare === bCompare) continue;
+        case "boolean":
+          if (aRawValue !== bRawValue) {
+            return rule.direction === "asc" 
+              ? (aRawValue ? 1 : -1)
+              : (aRawValue ? -1 : 1);
+          }
+          break;
+
+        case "string":
+          const aStr = aRawValue as string;
+          const bStr = bRawValue as string;
+          const aCompare = caseSensitive ? aStr : aStr.toLowerCase();
+          const bCompare = caseSensitive ? bStr : bStr.toLowerCase();
+          
+          if (aCompare < bCompare) return rule.direction === "asc" ? -1 : 1;
+          if (aCompare > bCompare) return rule.direction === "asc" ? 1 : -1;
+          break;
+
+        default:
+          // For dates or other types, convert to string
+          const aVal = String(aRawValue);
+          const bVal = String(bRawValue);
+          if (aVal < bVal) return rule.direction === "asc" ? -1 : 1;
+          if (aVal > bVal) return rule.direction === "asc" ? 1 : -1;
+          break;
+      }
     }
     return 0;
   });

@@ -50,7 +50,9 @@ function SortPopover({
   const [open, setOpen] = useState(false);
 
   const addSortRule = () => {
-    onSortRulesChange([...sortRules, { field: columns[0].value, direction: "asc" }]);
+    if (sortRules.length < 3) {
+      onSortRulesChange([...sortRules, { field: columns[0].value, direction: "asc" }]);
+    }
   };
 
   const removeSortRule = (index: number) => {
@@ -64,8 +66,7 @@ function SortPopover({
   };
 
   const applySort = () => {
-    console.log("Applying sort:", sortRules);
-    // State changes will automatically propagate to parent through onSortRulesChange
+    setOpen(false);
   };
 
   const resetSort = () => {
@@ -81,6 +82,11 @@ function SortPopover({
         <div className="grid gap-4">
           <div className="flex items-center justify-between">
             <h4 className="leading-none font-medium">{t("General.sort_options")}</h4>
+            {sortRules.length > 1 && (
+              <span className="text-muted-foreground text-xs">
+                {t("General.sort_priority_hint")}
+              </span>
+            )}
           </div>
 
           <div className="grid gap-3">
@@ -89,18 +95,27 @@ function SortPopover({
                 {index > 0 && <Separator className="my-1" />}
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground text-sm">
-                    {t("General.rule")} {index + 1}
+                    {index === 0
+                      ? t("General.primary_sort")
+                      : index === 1
+                        ? t("General.secondary_sort")
+                        : t("General.tertiary_sort")}
                   </span>
                   {index > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0"
-                      onClick={() => removeSortRule(index)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      <span className="sr-only">{t("General.remove")}</span>
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                          onClick={() => removeSortRule(index)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span className="sr-only">{t("General.remove")}</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>{t("General.remove_sort_rule")}</TooltipContent>
+                    </Tooltip>
                   )}
                 </div>
                 <div className="grid grid-cols-[1fr_auto] gap-2">
@@ -166,28 +181,48 @@ function SortPopover({
             ))}
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-muted-foreground mt-1 justify-start text-sm"
-            onClick={addSortRule}
-          >
-            <Plus className="me-1 h-3.5 w-3.5" />
-            {t("General.add_another_rule")}
-          </Button>
+          {sortRules.length < 3 && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-muted-foreground mt-1 justify-start text-sm"
+              onClick={addSortRule}
+            >
+              <Plus className="me-1 h-3.5 w-3.5" />
+              {t("General.add_another_rule")}
+            </Button>
+          )}
 
           <div className="flex items-center space-x-2">
-            <Switch
-              id="case-sensitive"
-              checked={caseSensitive}
-              onCheckedChange={onCaseSensitiveChange}
-            />
-            <Label htmlFor="case-sensitive">{t("General.case_sensitive")}</Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="case-sensitive"
+                    checked={caseSensitive}
+                    onCheckedChange={onCaseSensitiveChange}
+                  />
+                  <Label htmlFor="case-sensitive">{t("General.case_sensitive")}</Label>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{t("General.case_sensitive_hint")}</TooltipContent>
+            </Tooltip>
           </div>
 
           <div className="flex items-center space-x-2">
-            <Switch id="null-first" checked={nullsFirst} onCheckedChange={onNullsFirstChange} />
-            <Label htmlFor="null-first">{t("General.show_empty_values_first")}</Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="null-first"
+                    checked={nullsFirst}
+                    onCheckedChange={onNullsFirstChange}
+                  />
+                  <Label htmlFor="null-first">{t("General.show_empty_values_first")}</Label>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{t("General.empty_values_hint")}</TooltipContent>
+            </Tooltip>
           </div>
 
           <Separator />
@@ -211,7 +246,7 @@ function SortPopover({
               </svg>
               {t("General.reset_all")}
             </Button>
-            <Button onClick={() => setOpen(false)} className="flex-1">
+            <Button onClick={applySort} className="flex-1">
               {t("General.done")}
             </Button>
           </div>
