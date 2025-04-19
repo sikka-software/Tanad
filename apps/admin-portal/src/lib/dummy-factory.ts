@@ -30,7 +30,7 @@ export const generateDummyEmployee = () => {
     form.setValue("email", "john.doe@example.com");
     form.setValue("phone", "1234567890");
     form.setValue("position", "Software Engineer");
-    form.setValue("hireDate", new Date());
+    form.setValue("hire_date", new Date());
     form.setValue("salary", "100000");
     form.setValue("status", "active");
     form.setValue("notes", "This is a note");

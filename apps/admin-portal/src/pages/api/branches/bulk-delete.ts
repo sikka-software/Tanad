@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { eq } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { branches } from "@/db/schema";
@@ -29,4 +29,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error("Error deleting branches:", error);
     return res.status(500).json({ message: "Error deleting branches" });
   }
-} 
+}

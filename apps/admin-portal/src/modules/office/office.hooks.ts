@@ -7,7 +7,6 @@ import {
   fetchOffices,
   updateOffice,
 } from "@/modules/office/office.service";
-
 import type { Office, OfficeCreateData } from "@/modules/office/office.type";
 
 export const officeKeys = {
@@ -37,16 +36,13 @@ export function useOffice(id: string) {
 export function useCreateOffice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newOffice: Omit<Office, "id" | "created_at"> & { user_id: string }) => {
-      const { user_id, ...rest } = newOffice;
-      const officeData: OfficeCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createOffice(officeData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
+    mutationFn: (office: OfficeCreateData) => createOffice(office),
+    onSuccess: (newOffice) => {
+      const previousOffices = queryClient.getQueryData(officeKeys.lists()) || [];
+      queryClient.setQueryData(officeKeys.lists(), [
+        ...(Array.isArray(previousOffices) ? previousOffices : []),
+        newOffice,
+      ]);
     },
   });
 }

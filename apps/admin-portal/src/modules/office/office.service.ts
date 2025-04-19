@@ -26,7 +26,7 @@ export async function fetchOfficeById(id: string): Promise<Office> {
   }
 }
 
-export async function createOffice(office: OfficeCreateData) {
+export async function createOffice(office: OfficeCreateData): Promise<Office> {
   try {
     const response = await fetch("/api/offices", {
       method: "POST",
@@ -39,7 +39,6 @@ export async function createOffice(office: OfficeCreateData) {
     if (!response.ok) {
       throw new Error("Failed to create office");
     }
-
     return response.json();
   } catch (error) {
     console.error("Error creating office:", error);

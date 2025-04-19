@@ -114,7 +114,7 @@ export function SalaryForm({ id, onSubmit, loading }: SalaryFormProps) {
           phone: data.phone?.trim() || null,
           position: data.position.trim(),
           department_id: data.department || null,
-          hireDate: data.hireDate,
+          hire_date: data.hire_date,
           salary: data.salary ? parseFloat(data.salary) : null,
           status: data.status,
           notes: data.notes?.trim() || null,

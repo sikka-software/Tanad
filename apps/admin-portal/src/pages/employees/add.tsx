@@ -3,54 +3,43 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 
-import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import PageTitle from "@/components/ui/page-title";
 
+import { generateDummyData } from "@/lib/dummy-generator";
+
+import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
+import { useCreateEmployee } from "@/modules/employee/employee.hooks";
 import { useEmployeesStore } from "@/modules/employee/employee.store";
-import useUserStore from "@/stores/use-user-store";
 
 export default function AddEmployeePage() {
   const t = useTranslations();
   const router = useRouter();
-  const { user } = useUserStore();
-
   const { loadingSave, setLoadingSave } = useEmployeesStore();
+  const { mutate: createEmployee } = useCreateEmployee();
 
   const handleSubmit = async (data: EmployeeFormValues) => {
     setLoadingSave(true);
     try {
-      const response = await fetch("/api/employees/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.id}`,
-        },
-        body: JSON.stringify({
-          first_name: data.first_name.trim(),
-          last_name: data.last_name.trim(),
-          email: data.email.trim(),
-          phone: data.phone?.trim() || null,
-          position: data.position.trim(),
-          department_id: data.department || null,
-          hireDate: data.hireDate,
-          salary: data.salary ? parseFloat(data.salary) : null,
-          status: data.status,
-          notes: data.notes?.trim() || null,
-        }),
+      await createEmployee({
+        first_name: data.first_name.trim(),
+        last_name: data.last_name.trim(),
+        email: data.email.trim(),
+        phone: data.phone?.trim() || undefined,
+        position: data.position.trim(),
+        hire_date: data.hire_date?.toISOString(),
+        salary: data.salary ? parseFloat(data.salary) : undefined,
+        status: data.status,
+        notes: data.notes?.trim() || undefined,
+        department_id: data.department || undefined,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t("Employees.messages.error"));
-      }
 
       toast.success(t("General.successful_operation"), {
         description: t("Employees.success.created"),
       });
-      setLoadingSave(false);
       router.push("/employees");
+      setLoadingSave(false);
     } catch (error) {
       console.error(error);
       setLoadingSave(false);
@@ -58,6 +47,22 @@ export default function AddEmployeePage() {
         description: error instanceof Error ? error.message : t("Employees.error.create"),
       });
       throw error;
+    }
+  };
+
+  const handleDummyData = () => {
+    const dummyData = generateDummyData();
+    const form = (window as any).employeeForm;
+    if (form) {
+      form.setValue("first_name", dummyData.first_name);
+      form.setValue("last_name", dummyData.last_name);
+      form.setValue("email", dummyData.email);
+      form.setValue("phone", dummyData.phone);
+      form.setValue("position", dummyData.employee_position);
+      form.setValue("hire_date", dummyData.employee_hire_date);
+      form.setValue("salary", dummyData.employee_salary);
+      form.setValue("status", dummyData.employee_status);
+      form.setValue("notes", dummyData.employee_notes);
     }
   };
 
@@ -74,16 +79,16 @@ export default function AddEmployeePage() {
           submit_form: t("Employees.add_new"),
           cancel: t("General.cancel"),
         }}
+        customButton={
+          process.env.NODE_ENV === "development" && (
+            <Button variant="outline" size="sm" onClick={handleDummyData}>
+              Dummy Data
+            </Button>
+          )
+        }
       />
-      <div className="p-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("Employees.employee_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <EmployeeForm id="employee-form" onSubmit={handleSubmit} />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <EmployeeForm id="employee-form" onSubmit={handleSubmit} />
       </div>
     </div>
   );

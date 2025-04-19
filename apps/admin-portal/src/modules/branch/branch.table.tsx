@@ -9,6 +9,8 @@ import TableSkeleton from "@/ui/table-skeleton";
 import { useBranchStore } from "@/modules/branch/branch.store";
 import { Branch } from "@/modules/branch/branch.type";
 
+import { useUpdateBranch } from "./branch.hooks";
+
 const nameSchema = z.string().min(1, "Required");
 const codeSchema = z.string().min(1, "Required");
 const addressSchema = z.string().min(1, "Required");
@@ -28,7 +30,7 @@ interface BranchesTableProps {
 
 const BranchesTable = ({ data, isLoading, error }: BranchesTableProps) => {
   const t = useTranslations();
-  const updateBranch = useBranchStore((state) => state.updateBranch);
+  const { mutate: updateBranch } = useUpdateBranch();
   const selectedRows = useBranchStore((state) => state.selectedRows);
   const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
 
@@ -67,7 +69,7 @@ const BranchesTable = ({ data, isLoading, error }: BranchesTableProps) => {
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "branch_id") return;
-    await updateBranch(rowId, { [columnId]: value });
+    await updateBranch({ id: rowId, branch: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

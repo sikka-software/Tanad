@@ -1,62 +1,64 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import EmployeeCard from "@/modules/employee/employee.card";
-import EmployeesTable from "@/modules/employee/employee.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Employee } from "@/modules/employee/employee.types";
-
-import { useEmployees, useDeleteEmployee } from "@/modules/employee.hooks";
+import EmployeeCard from "@/modules/employee/employee.card";
+import { useEmployees, useBulkDeleteEmployees } from "@/modules/employee/employee.hooks";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/employee/employee.options";
 import { useEmployeesStore } from "@/modules/employee/employee.store";
+import EmployeesTable from "@/modules/employee/employee.table";
+import { Employee } from "@/modules/employee/employee.types";
 
 export default function EmployeesPage() {
   const t = useTranslations();
+
+  const viewMode = useEmployeesStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useEmployeesStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useEmployeesStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useEmployeesStore((state) => state.selectedRows);
+  const clearSelection = useEmployeesStore((state) => state.clearSelection);
+  const sortRules = useEmployeesStore((state) => state.sortRules);
+  const sortCaseSensitive = useEmployeesStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useEmployeesStore((state) => state.sortNullsFirst);
+  const searchQuery = useEmployeesStore((state) => state.searchQuery);
+  const filterConditions = useEmployeesStore((state) => state.filterConditions);
+  const filterCaseSensitive = useEmployeesStore((state) => state.filterCaseSensitive);
+  const getFilteredEmployees = useEmployeesStore((state) => state.getFilteredEmployees);
+  const getSortedEmployees = useEmployeesStore((state) => state.getSortedEmployees);
+
   const { data: employees, isLoading, error } = useEmployees();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { mutate: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
 
-  // Get selection state and actions from the store
-  const { selectedRows, setSelectedRows, clearSelection } = useEmployeesStore();
-  const { mutate: deleteEmployee, isPending: isDeleting } = useDeleteEmployee();
+  const filteredEmployees = useMemo(() => {
+    return getFilteredEmployees(employees || []);
+  }, [employees, getFilteredEmployees, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const filteredEmployees = employees?.filter(
-    (employee) =>
-      employee.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employee.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      employee.email.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  const selectedEmployees = selectedRows
-    .map((id) => employees?.find((emp) => emp.id === id))
-    .filter((emp): emp is Employee => emp !== undefined);
-
-  const handleSelectedRowsChange = (rows: Employee[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedRows.length === 0) return;
-    setIsDeleteDialogOpen(true);
-  };
+  const sortedEmployees = useMemo(() => {
+    return getSortedEmployees(filteredEmployees);
+  }, [filteredEmployees, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
     try {
-      // Delete each selected employee
-      await Promise.all(selectedRows.map((id) => deleteEmployee(id)));
-      clearSelection();
-      setIsDeleteDialogOpen(false);
+      await deleteEmployees(selectedRows, {
+        onSuccess: () => {
+          clearSelection();
+          setIsDeleteDialogOpen(false);
+        },
+        onError: (error: any) => {
+          console.error("Failed to delete employees:", error);
+          toast.error(t("Employees.error.bulk_delete"));
+          setIsDeleteDialogOpen(false);
+        },
+      });
     } catch (error) {
       console.error("Failed to delete employees:", error);
       setIsDeleteDialogOpen(false);
@@ -78,13 +80,13 @@ export default function EmployeesPage() {
           />
         ) : (
           <PageSearchAndFilter
+            store={useEmployeesStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
             title={t("Employees.title")}
             createHref="/employees/add"
             createLabel={t("Employees.add_new")}
-            onSearch={setSearchQuery}
             searchPlaceholder={t("Employees.search_employees")}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
           />
         )}
         <div>
@@ -93,7 +95,6 @@ export default function EmployeesPage() {
               data={filteredEmployees || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              onSelectedRowsChange={handleSelectedRowsChange}
             />
           ) : (
             <div className="p-4">

@@ -8,14 +8,13 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { JobForm, type JobFormValues } from "@/modules/job/job.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createJob } from "@/modules/job/job.service";
-
+import { JobForm, type JobFormValues } from "@/modules/job/job.form";
 import { jobKeys } from "@/modules/job/job.hooks";
+import { createJob } from "@/modules/job/job.service";
 
 export default function AddJobPage() {
   const t = useTranslations();

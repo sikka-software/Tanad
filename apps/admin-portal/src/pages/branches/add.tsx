@@ -81,7 +81,7 @@ export default function AddBranchPage() {
     const dummyData = generateDummyData();
     const form = (window as any).branchForm;
     if (form) {
-      form.setValue("name", dummyData.name);
+      form.setValue("name", dummyData.full_name);
       form.setValue("code", "BR-" + Math.random().toString(36).substr(2, 6));
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
@@ -89,7 +89,7 @@ export default function AddBranchPage() {
       form.setValue("city", dummyData.city);
       form.setValue("state", dummyData.state);
       form.setValue("zip_code", dummyData.zip_code);
-      form.setValue("manager", dummyData.name);
+      form.setValue("manager", dummyData.full_name);
       form.setValue("is_active", true);
       form.setValue("notes", "Test branch notes");
     }

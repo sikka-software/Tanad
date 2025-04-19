@@ -505,7 +505,7 @@ export const employees = pgTable(
     phone: varchar("phone", { length: 50 }),
     position: varchar("position", { length: 255 }).notNull(),
     department_id: uuid("department_id").references(() => departments.id),
-    hireDate: date("hire_date").notNull(),
+    hire_date: date("hire_date").notNull(),
     salary: numeric("salary", { precision: 10, scale: 2 }),
     status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
     notes: text("notes"),

@@ -15,7 +15,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/ui/textarea";
 
 import DepartmentForm, { DepartmentFormValues } from "@/modules/department/department.form";
-
 import { useDepartments, departmentKeys } from "@/modules/department/department.hooks";
 import { useEmployeesStore } from "@/modules/employee/employee.store";
 import useUserStore from "@/stores/use-user-store";
@@ -49,7 +48,7 @@ const createEmployeeFormSchema = (t: (key: string) => string) => {
     phone: z.string().optional(),
     position: z.string().min(1, t("Employees.form.position.required")),
     department: z.string().nullable(),
-    hireDate: z.date({
+    hire_date: z.date({
       required_error: t("Employees.form.hire_date.required"),
     }),
     salary: z
@@ -59,7 +58,7 @@ const createEmployeeFormSchema = (t: (key: string) => string) => {
         (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
         t("Employees.form.salary.invalid"),
       ),
-    status: z.enum(["active", "inactive", "on_leave"]),
+    status: z.enum(["active", "inactive", "on_leave", "terminated"]),
     notes: z.string().optional(),
   });
 };
@@ -85,7 +84,7 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
       phone: "",
       position: "",
       department: null,
-      hireDate: undefined,
+      hire_date: undefined,
       salary: "",
       status: "active",
       notes: "",
@@ -307,7 +306,7 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
-              name="hireDate"
+              name="hire_date"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>

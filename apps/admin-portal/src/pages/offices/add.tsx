@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -8,29 +7,23 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { OfficeForm, type OfficeFormValues } from "@/modules/office/office.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createOffice } from "@/modules/office/office.service";
-
-import { Office, OfficeCreateData } from "@/modules/office/office.type";
-
-import { officeKeys } from "@/modules/office/office.hooks";
-import useUserStore from "@/stores/use-user-store";
+import { OfficeForm, type OfficeFormValues } from "@/modules/office/office.form";
+import { useCreateOffice } from "@/modules/office/office.hooks";
 
 export default function AddOfficePage() {
   const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
+  const { mutate: createOffice } = useCreateOffice();
 
   const handleSubmit = async (data: OfficeFormValues) => {
     setLoading(true);
     try {
-      const officeData = {
+      await createOffice({
         name: data.name.trim(),
         email: data.email?.trim(),
         phone: data.phone?.trim(),
@@ -38,24 +31,14 @@ export default function AddOfficePage() {
         city: data.city.trim(),
         state: data.state.trim(),
         zip_code: data.zip_code.trim(),
-        user_id: user?.id,
-      };
-
-      let result: Office;
-
-      result = await createOffice(officeData as OfficeCreateData);
+        is_active: true,
+      });
 
       toast.success(t("General.successful_operation"), {
         description: t("Offices.success.created"),
       });
-
-      const previousOffices = queryClient.getQueryData(officeKeys.lists()) || [];
-      queryClient.setQueryData(officeKeys.lists(), [
-        ...(Array.isArray(previousOffices) ? previousOffices : []),
-        result,
-      ]);
-
       router.push("/offices");
+      setLoading(false);
     } catch (error) {
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Offices.error.creating"),
@@ -68,7 +51,7 @@ export default function AddOfficePage() {
     const dummyData = generateDummyData();
     const form = (window as any).officeForm;
     if (form) {
-      form.setValue("name", dummyData.name);
+      form.setValue("name", dummyData.full_name);
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
       form.setValue("address", dummyData.address);

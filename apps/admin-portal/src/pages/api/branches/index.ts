@@ -1,30 +1,9 @@
 import { desc, eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Branch } from "@/modules/branch/branch.type";
-
 import { db } from "@/db/drizzle";
 import { branches } from "@/db/schema";
 import { createClient } from "@/utils/supabase/server-props";
-
-// Helper to convert Drizzle branch to our Branch type
-function convertDrizzleBranch(data: typeof branches.$inferSelect): Branch {
-  return {
-    id: data.id,
-    name: data.name,
-    code: data.code,
-    address: data.address,
-    city: data.city,
-    state: data.state,
-    zip_code: data.zip_code,
-    phone: data.phone,
-    email: data.email,
-    manager: data.manager,
-    is_active: data.is_active,
-    notes: data.notes,
-    created_at: data.created_at?.toString() || "",
-  };
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createClient({
@@ -47,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: eq(branches.user_id, user?.id),
         orderBy: desc(branches.created_at),
       });
-      return res.status(200).json(branchesList.map(convertDrizzleBranch));
+      return res.status(200).json(branchesList);
     } catch (error) {
       console.error("Error fetching branches:", error);
       return res.status(500).json({ message: "Error fetching branches" });
@@ -64,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
 
       const [branch] = await db.insert(branches).values(dbBranch).returning();
-      return res.status(201).json(convertDrizzleBranch(branch));
+      return res.status(201).json(branch);
     } catch (error) {
       console.error("Error creating branch:", error);
       return res.status(500).json({ message: "Error creating branch" });

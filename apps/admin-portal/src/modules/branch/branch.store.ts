@@ -5,7 +5,6 @@ import { applySort } from "@/lib/sort-utils";
 
 import { FilterCondition } from "@/types/common.type";
 
-import { updateBranch as updateBranchService } from "@/modules/branch/branch.service";
 import { Branch } from "@/modules/branch/branch.type";
 
 type BranchStates = {
@@ -24,7 +23,6 @@ type BranchStates = {
 };
 
 type BranchActions = {
-  updateBranch: (id: string, data: Partial<Branch>) => Promise<void>;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
   setFilterConditions: (filterConditions: FilterCondition[]) => void;
@@ -133,14 +131,5 @@ export const useBranchStore = create<BranchStates & BranchActions>((set, get) =>
       }
       return { ...state, selectedRows: [] };
     });
-  },
-
-  updateBranch: async (id: string, data: Partial<Branch>) => {
-    try {
-      await updateBranchService(id, data);
-    } catch (error) {
-      console.error("Error updating branch:", error);
-      throw error;
-    }
   },
 }));

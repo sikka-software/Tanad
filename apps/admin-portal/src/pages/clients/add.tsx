@@ -75,7 +75,7 @@ export default function AddClientPage() {
     const dummyData = generateDummyData();
     const form = (window as any).clientForm;
     if (form) {
-      form.setValue("name", dummyData.name);
+      form.setValue("name", dummyData.full_name);
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
       form.setValue("address", dummyData.address);

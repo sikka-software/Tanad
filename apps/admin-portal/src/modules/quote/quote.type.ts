@@ -1,4 +1,4 @@
-import { Client } from "./client.type";
+import { Client } from "@/modules/client/client.type";
 
 export interface Quote {
   id: string;

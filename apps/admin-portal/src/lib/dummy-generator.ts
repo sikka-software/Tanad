@@ -1,7 +1,30 @@
 // This will generate fake emails, fake names, fake numbers etc
 
 export const generateDummyData = () => {
-  const fakeNames = ["John", "Jane", "Jim", "Jill", "Jack", "Jill", "Jim", "Jill", "Jim", "Jill"];
+  const fakeFirstNames = [
+    "John",
+    "Jane",
+    "Jim",
+    "Jill",
+    "Jack",
+    "Jill",
+    "Jim",
+    "Jill",
+    "Jim",
+    "Jill",
+  ];
+  const fakeLastNames = [
+    "Doe",
+    "Smith",
+    "Johnson",
+    "Williams",
+    "Brown",
+    "Jones",
+    "Garcia",
+    "Miller",
+    "Davis",
+    "Rodriguez",
+  ];
   const fakeEmails = [
     "john@example.com",
     "jane@example.com",
@@ -57,21 +80,50 @@ export const generateDummyData = () => {
   const fakeJobTypes = ["Full-Time", "Part-Time", "Contract", "Temporary"];
   const fakeJobSalaries = ["100000", "50000", "75000", "120000", "80000"];
   const fakeJobIsActive = [true, false];
-  const fakeJobStartDate = ["2021-01-01", "2021-02-01", "2021-03-01", "2021-04-01", "2021-05-01"];
-  const fakeJobEndDate = ["2021-01-01", "2021-02-01", "2021-03-01", "2021-04-01", "2021-05-01"];
+
+  const fakeEmployeeStatus = ["active", "inactive", "on_leave", "terminated"];
+  const fakeEmployeeDepartments = ["Sales", "Marketing", "HR", "IT", "Finance"];
+  const fakeEmployeePositions = [
+    "Software Engineer",
+    "Product Manager",
+    "Sales Manager",
+    "Marketing Manager",
+    "HR Manager",
+  ];
+
+  const fakeEmployeeSalaries = ["100000", "50000", "75000", "120000", "80000"];
+  const fakeEmployeeNotes = ["Note 1", "Note 2", "Note 3", "Note 4", "Note 5"];
+
+  const generateRandomDate = () => {
+    const startDate = new Date("2021-01-01");
+    const endDate = new Date();
+    return new Date(
+      startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()),
+    );
+  };
 
   return {
+    employee_status: fakeEmployeeStatus[Math.floor(Math.random() * fakeEmployeeStatus.length)],
+    employee_department:
+      fakeEmployeeDepartments[Math.floor(Math.random() * fakeEmployeeDepartments.length)],
+    employee_position:
+      fakeEmployeePositions[Math.floor(Math.random() * fakeEmployeePositions.length)],
+    employee_hire_date: generateRandomDate(),
+    employee_salary: fakeEmployeeSalaries[Math.floor(Math.random() * fakeEmployeeSalaries.length)],
+    employee_notes: fakeEmployeeNotes[Math.floor(Math.random() * fakeEmployeeNotes.length)],
     job_location: fakeJobLocations[Math.floor(Math.random() * fakeJobLocations.length)],
     job_department: fakeJobDepartments[Math.floor(Math.random() * fakeJobDepartments.length)],
     job_type: fakeJobTypes[Math.floor(Math.random() * fakeJobTypes.length)],
     job_salary: fakeJobSalaries[Math.floor(Math.random() * fakeJobSalaries.length)],
     job_is_active: fakeJobIsActive[Math.floor(Math.random() * fakeJobIsActive.length)],
-    job_start_date: fakeJobStartDate[Math.floor(Math.random() * fakeJobStartDate.length)],
-    job_end_date: fakeJobEndDate[Math.floor(Math.random() * fakeJobEndDate.length)],
+    job_start_date: generateRandomDate(),
+    job_end_date: generateRandomDate(),
     job_title: fakeJobTitles[Math.floor(Math.random() * fakeJobTitles.length)],
     job_description: fakeJobDescriptions[Math.floor(Math.random() * fakeJobDescriptions.length)],
     requirements: fakeJobRequirements[Math.floor(Math.random() * fakeJobRequirements.length)],
-    name: fakeNames[Math.floor(Math.random() * fakeNames.length)],
+    first_name: fakeFirstNames[Math.floor(Math.random() * fakeFirstNames.length)],
+    last_name: fakeLastNames[Math.floor(Math.random() * fakeLastNames.length)],
+    full_name: `${fakeFirstNames[Math.floor(Math.random() * fakeFirstNames.length)]} ${fakeLastNames[Math.floor(Math.random() * fakeLastNames.length)]}`,
     description: fakeDescriptions[Math.floor(Math.random() * fakeDescriptions.length)],
     email: fakeEmails[Math.floor(Math.random() * fakeEmails.length)],
     phone: fakeNumbers[Math.floor(Math.random() * fakeNumbers.length)],

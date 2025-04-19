@@ -95,7 +95,7 @@ export default function AddDepartmentPage() {
     const dummyData = generateDummyData();
     const form = (window as any).departmentForm;
     if (form) {
-      form.setValue("name", dummyData.name);
+      form.setValue("name", dummyData.full_name);
       form.setValue("description", dummyData.description);
       // form.setValue("locations", dummyData.locations);
     }

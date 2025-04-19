@@ -2,13 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { departmentKeys } from "@/modules/department/department.hooks";
 import {
-  addEmployee,
+  createEmployee,
   deleteEmployee,
   fetchEmployeeById,
   fetchEmployees,
   updateEmployee,
 } from "@/modules/employee/employee.service";
-import { Employee } from "@/modules/employee/employee.types";
+import { Employee, EmployeeCreateData } from "@/modules/employee/employee.types";
 
 export const employeeKeys = {
   all: ["employees"] as const,
@@ -121,14 +121,16 @@ export const useUpdateEmployee = () => {
 };
 
 // Hook for adding a new employee
-export const useAddEmployee = () => {
+export const useCreateEmployee = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (employee: Omit<Employee, "id" | "created_at" | "updated_at">) =>
-      addEmployee(employee),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
+    mutationFn: (employee: EmployeeCreateData) => createEmployee(employee),
+    onSuccess: (newEmployee) => {
+      const previousEmployees = queryClient.getQueryData(employeeKeys.lists()) || [];
+      queryClient.setQueryData(employeeKeys.lists(), [
+        ...(Array.isArray(previousEmployees) ? previousEmployees : []),
+        newEmployee,
+      ]);
     },
   });
 };
@@ -166,3 +168,27 @@ export const useDeleteEmployee = () => {
     },
   });
 };
+
+export function useBulkDeleteEmployees() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (ids: string[]) => {
+      const response = await fetch("/api/employees/bulk-delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete offices");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
+    },
+  });
+}
