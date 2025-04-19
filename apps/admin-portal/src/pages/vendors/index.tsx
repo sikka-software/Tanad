@@ -1,75 +1,53 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
-import VendorCard from "@/components/app/vendor/vendor.card";
-import VendorsTable from "@/components/app/vendor/vendor.table";
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
+
+import VendorCard from "@/modules/vendor/vendor.card";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/vendor/vendor.options";
+import VendorsTable from "@/modules/vendor/vendor.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import SelectionMode from "@/components/ui/selection-mode";
-
-import { applySort } from "@/lib/sort-utils";
 
 import { Vendor } from "@/types/vendor.type";
 
 import { useVendors, useBulkDeleteVendors } from "@/hooks/models/useVendors";
-import { useVendorsStore } from "@/stores/vendors.store";
+import { useVendorsStore } from "@/stores/vendor.store";
 
 // Assuming a useVendors hook exists or will be created
 export default function VendorsPage() {
   const t = useTranslations();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [sortRules, setSortRules] = useState<{ field: string; direction: string }[]>([
-    { field: "created_at", direction: "desc" },
-  ]);
-  const [caseSensitive, setCaseSensitive] = useState(false);
-  const [nullsFirst, setNullsFirst] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const sortableColumns = [
-    { value: "created_at", label: t("General.created_at") },
-    { value: "name", label: t("Vendors.form.name.label") },
-    { value: "email", label: t("Vendors.form.email.label") },
-    { value: "phone", label: t("Vendors.form.phone.label") },
-    { value: "company", label: t("Vendors.form.company.label") },
-    { value: "address", label: t("Vendors.form.address.label") },
-    { value: "city", label: t("Vendors.form.city.label") },
-    { value: "state", label: t("Vendors.form.state.label") },
-    { value: "zip_code", label: t("Vendors.form.zip_code.label") },
-  ];
-
-  const handleSortRulesChange = (newSortRules: { field: string; direction: string }[]) => {
-    setSortRules(newSortRules);
-  };
-
-  const handleCaseSensitiveChange = (value: boolean) => {
-    setCaseSensitive(value);
-  };
-
-  const handleNullsFirstChange = (value: boolean) => {
-    setNullsFirst(value);
-  };
+  const viewMode = useVendorsStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useVendorsStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useVendorsStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useVendorsStore((state) => state.selectedRows);
+  const setSelectedRows = useVendorsStore((state) => state.setSelectedRows);
+  const clearSelection = useVendorsStore((state) => state.clearSelection);
+  const sortRules = useVendorsStore((state) => state.sortRules);
+  const sortCaseSensitive = useVendorsStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useVendorsStore((state) => state.sortNullsFirst);
+  const searchQuery = useVendorsStore((state) => state.searchQuery);
+  const filterConditions = useVendorsStore((state) => state.filterConditions);
+  const filterCaseSensitive = useVendorsStore((state) => state.filterCaseSensitive);
+  const getFilteredVendors = useVendorsStore((state) => state.getFilteredVendors);
+  const getSortedVendors = useVendorsStore((state) => state.getSortedVendors);
 
   const { data: vendors, isLoading, error } = useVendors();
-  const { selectedRows, setSelectedRows, clearSelection } = useVendorsStore();
   const { mutate: deleteVendors, isPending: isDeleting } = useBulkDeleteVendors();
 
-  const filteredVendors = vendors?.filter(
-    (vendor) =>
-      vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (vendor.company || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.email.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredVendors = useMemo(() => {
+    return getFilteredVendors(vendors || []);
+  }, [vendors, getFilteredVendors, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const sortedVendors = applySort("vendors", filteredVendors || [], sortRules, {
-    caseSensitive,
-    nullsFirst,
-  });
+  const sortedVendors = useMemo(() => {
+    return getSortedVendors(filteredVendors);
+  }, [filteredVendors, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleRowSelectionChange = (rows: Vendor[]) => {
     const newSelectedIds = rows.map((row) => row.id!);
@@ -111,20 +89,13 @@ export default function VendorsPage() {
           />
         ) : (
           <PageSearchAndFilter
+            store={useVendorsStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
             title={t("Vendors.title")}
             createHref="/vendors/add"
             createLabel={t("Vendors.add_new")}
-            onSearch={setSearchQuery}
             searchPlaceholder={t("Vendors.search_vendors")}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            sortRules={sortRules}
-            onSortRulesChange={handleSortRulesChange}
-            sortableColumns={sortableColumns}
-            caseSensitive={caseSensitive}
-            onCaseSensitiveChange={handleCaseSensitiveChange}
-            nullsFirst={nullsFirst}
-            onNullsFirstChange={handleNullsFirstChange}
           />
         )}
 
@@ -134,6 +105,7 @@ export default function VendorsPage() {
             data={sortedVendors || []}
             isLoading={isLoading}
             error={error instanceof Error ? error : null}
+            onSelectedRowsChange={handleRowSelectionChange}
           />
         ) : (
           <div className="p-4">

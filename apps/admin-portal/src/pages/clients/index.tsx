@@ -1,10 +1,11 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
-import ClientCard from "@/components/app/client/client.card";
-import ClientsTable from "@/components/app/client/client.table";
+import ClientCard from "@/modules/client/client.card";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/client/client.options";
+import ClientsTable from "@/modules/client/client.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import ConfirmDelete from "@/components/ui/confirm-delete";
@@ -12,53 +13,39 @@ import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import SelectionMode from "@/components/ui/selection-mode";
 
-import { applySort } from "@/lib/sort-utils";
-
 import { Client } from "@/types/client.type";
 
 import { useClients, useBulkDeleteClients } from "@/hooks/models/useClients";
-import { useClientsStore } from "@/stores/clients.store";
+import { useClientsStore } from "@/stores/client.store";
 
 export default function ClientsPage() {
   const t = useTranslations();
+
+  const viewMode = useClientsStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useClientsStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useClientsStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useClientsStore((state) => state.selectedRows);
+  const setSelectedRows = useClientsStore((state) => state.setSelectedRows);
+  const clearSelection = useClientsStore((state) => state.clearSelection);
+  const sortRules = useClientsStore((state) => state.sortRules);
+  const sortCaseSensitive = useClientsStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useClientsStore((state) => state.sortNullsFirst);
+  const searchQuery = useClientsStore((state) => state.searchQuery);
+  const filterConditions = useClientsStore((state) => state.filterConditions);
+  const filterCaseSensitive = useClientsStore((state) => state.filterCaseSensitive);
+  const getFilteredClients = useClientsStore((state) => state.getFilteredClients);
+  const getSortedClients = useClientsStore((state) => state.getSortedClients);
+
   const { data: clients, isLoading, error } = useClients();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [sortRules, setSortRules] = useState<{ field: string; direction: string }[]>([
-    { field: "created_at", direction: "desc" },
-  ]);
-  const [caseSensitive, setCaseSensitive] = useState(false);
-  const [nullsFirst, setNullsFirst] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { selectedRows, setSelectedRows, clearSelection } = useClientsStore();
   const { mutate: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
 
-  const filteredClients = clients?.filter(
-    (client) =>
-      client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (client.company_details?.name || "Unknown Company")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredClients = useMemo(() => {
+    return getFilteredClients(clients || []);
+  }, [clients, getFilteredClients, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const sortedClients = applySort("clients", filteredClients || [], sortRules, {
-    caseSensitive,
-    nullsFirst,
-  });
-
-  const sortableColumns = [
-    { value: "created_at", label: t("General.created_at") },
-    { value: "name", label: t("Clients.form.name.label") },
-    { value: "email", label: t("Clients.form.email.label") },
-    { value: "phone", label: t("Clients.form.phone.label") },
-    { value: "company", label: t("Clients.form.company.label") },
-    { value: "company_details.name", label: t("Clients.form.company_name.label") },
-    { value: "address", label: t("Clients.form.address.label") },
-    { value: "city", label: t("Clients.form.city.label") },
-    { value: "state", label: t("Clients.form.state.label") },
-    { value: "zip_code", label: t("Clients.form.zip_code.label") },
-  ];
+  const sortedClients = useMemo(() => {
+    return getSortedClients(filteredClients);
+  }, [filteredClients, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleRowSelectionChange = (rows: Client[]) => {
     const newSelectedIds = rows.map((row) => row.id!);
@@ -99,20 +86,13 @@ export default function ClientsPage() {
           />
         ) : (
           <PageSearchAndFilter
+            store={useClientsStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
             title={t("Clients.title")}
             createHref="/clients/add"
             createLabel={t("Clients.add_new")}
-            onSearch={setSearchQuery}
             searchPlaceholder={t("Clients.search_clients")}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            sortRules={sortRules}
-            onSortRulesChange={(value) => setSortRules(value)}
-            sortableColumns={sortableColumns}
-            caseSensitive={caseSensitive}
-            onCaseSensitiveChange={(value) => setCaseSensitive(value)}
-            nullsFirst={nullsFirst}
-            onNullsFirstChange={(value) => setNullsFirst(value)}
           />
         )}
         <div>

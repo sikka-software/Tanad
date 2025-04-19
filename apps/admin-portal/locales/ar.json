@@ -2649,6 +2649,16 @@
     "phone": "الهاتف",
     "address": "العنوان"
   },
+  "Forms": {
+    "created_at": {
+      "label": "تاريخ الإنشاء",
+      "placeholder": "أدخل تاريخ الإنشاء"
+    },
+    "updated_at": {
+      "label": "تاريخ التحديث",
+      "placeholder": "أدخل تاريخ التحديث"
+    }
+  },
   "Companies": {
     "title": "الشركات",
     "add_new": "إضافة شركة",
@@ -2711,6 +2721,12 @@
         "name_required": "اسم الشركة مطلوب",
         "email_required": "البريد الإلكتروني مطلوب",
         "email_invalid": "البريد الإلكتروني غير صالح"
+      },
+      "created_at": {
+        "label": "تاريخ الإنشاء"
+      },
+      "updated_at": {
+        "label": "تاريخ التحديث"
       }
     }
   },

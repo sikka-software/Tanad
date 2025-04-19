@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import { InvoiceForm, type InvoiceFormValues } from "@/components/app/invoice/invoice.form";
+import { InvoiceForm, type InvoiceFormValues } from "@/modules/invoice/invoice.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import useUserStore from "@/stores/use-user-store";

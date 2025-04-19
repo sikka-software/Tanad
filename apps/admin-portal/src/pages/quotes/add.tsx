@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import { QuoteForm, type QuoteFormValues } from "@/components/app/quote/quote.form";
+import { QuoteForm, type QuoteFormValues } from "@/modules/quote/quote.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import useUserStore from "@/stores/use-user-store";

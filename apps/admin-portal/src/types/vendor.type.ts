@@ -11,9 +11,7 @@ export interface Vendor {
   notes: string | null;
   created_at: string;
   user_id: string;
-  // user_id field exists in the schema but might not be needed in the interface
-  // unless specifically used in the frontend logic beyond RLS.
+  updated_at: string;
 }
-
-// Define an explicit type for vendor creation data
-export type VendorCreateData = Omit<Vendor, "id" | "created_at">;
+export type VendorCreateData = Omit<Vendor, "id" | "created_at" | "updated_at">;
+export type VendorUpdateData = Partial<VendorCreateData>;

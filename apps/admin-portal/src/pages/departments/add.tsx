@@ -10,7 +10,7 @@ import PageTitle from "@/ui/page-title";
 
 import DepartmentForm, {
   type DepartmentFormValues,
-} from "@/components/app/department/department.form";
+} from "@/modules/department/department.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";

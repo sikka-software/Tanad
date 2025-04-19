@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { JobForm, type JobFormValues } from "@/components/app/job/job.form";
+import { JobForm, type JobFormValues } from "@/modules/job/job.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";

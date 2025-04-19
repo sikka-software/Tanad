@@ -21,6 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
       }
+      
       const result = await db.select().from(jobs).where(eq(jobs.user_id, user?.id));
       return res.status(200).json(result);
     } catch (error) {

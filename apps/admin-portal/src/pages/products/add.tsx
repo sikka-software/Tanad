@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { ProductForm, ProductFormValues } from "@/components/app/product/product.form";
+import { ProductForm, ProductFormValues } from "@/modules/product/product.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { createProduct } from "@/services/productService";

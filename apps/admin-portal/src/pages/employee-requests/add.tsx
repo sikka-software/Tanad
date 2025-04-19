@@ -9,7 +9,7 @@ import PageTitle from "@/ui/page-title";
 
 import EmployeeRequestForm, {
   type EmployeeRequestFormValues,
-} from "@/components/app/employee-request/employee-request.form";
+} from "@/modules/employee-request/employee-request.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";

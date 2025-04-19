@@ -8,8 +8,8 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import SalaryCard from "@/components/app/salary/salary.card";
-import SalariesTable from "@/components/app/salary/salary.table";
+import SalaryCard from "@/modules/salary/salary.card";
+import SalariesTable from "@/modules/salary/salary.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 

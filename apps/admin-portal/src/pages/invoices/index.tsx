@@ -2,8 +2,8 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import InvoiceCard from "@/components/app/invoice/invoice.card";
-import InvoicesTable from "@/components/app/invoice/invoice.table";
+import InvoiceCard from "@/modules/invoice/invoice.card";
+import InvoicesTable from "@/modules/invoice/invoice.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import DataModelList from "@/components/ui/data-model-list";

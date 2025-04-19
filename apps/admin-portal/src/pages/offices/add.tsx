@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { OfficeForm, type OfficeFormValues } from "@/components/app/office/office.form";
+import { OfficeForm, type OfficeFormValues } from "@/modules/office/office.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";

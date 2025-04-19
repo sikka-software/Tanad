@@ -1,7 +1,3 @@
-import type { Client } from "@/types/client.type";
-import type { Office } from "@/types/office.type";
-import type { Vendor } from "@/types/vendor.type";
-
 interface SortOptions {
   caseSensitive?: boolean;
   nullsFirst?: boolean;
@@ -102,6 +98,7 @@ const models = [
   "employee_requests",
   "salaries",
   "jobs",
+  "companies",
 ];
 
 // The sorting factory to handle any of our models accurately and correctly.

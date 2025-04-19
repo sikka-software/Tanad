@@ -7,8 +7,8 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import DepartmentCard from "@/components/app/department/department.card";
-import DepartmentsTable from "@/components/app/department/department.table";
+import DepartmentCard from "@/modules/department/department.card";
+import DepartmentsTable from "@/modules/department/department.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 

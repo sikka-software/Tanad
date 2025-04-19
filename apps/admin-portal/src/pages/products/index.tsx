@@ -8,8 +8,8 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import ProductCard from "@/components/app/product/product.card";
-import ProductsTable from "@/components/app/product/product.table";
+import ProductCard from "@/modules/product/product.card";
+import ProductsTable from "@/modules/product/product.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 

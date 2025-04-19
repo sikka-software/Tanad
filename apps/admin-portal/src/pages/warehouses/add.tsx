@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { WarehouseForm, type WarehouseFormValues } from "@/components/app/warehouse/warehouse.form";
+import { WarehouseForm, type WarehouseFormValues } from "@/modules/warehouse/warehouse.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { createWarehouse } from "@/services/warehouseService";

@@ -7,8 +7,8 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import WarehouseCard from "@/components/app/warehouse/warehouse.card";
-import WarehouseTable from "@/components/app/warehouse/warehouse.table";
+import WarehouseCard from "@/modules/warehouse/warehouse.card";
+import WarehouseTable from "@/modules/warehouse/warehouse.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 

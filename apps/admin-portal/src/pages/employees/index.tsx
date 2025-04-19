@@ -7,8 +7,8 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import EmployeeCard from "@/components/app/employee/employee.card";
-import EmployeesTable from "@/components/app/employee/employee.table";
+import EmployeeCard from "@/modules/employee/employee.card";
+import EmployeesTable from "@/modules/employee/employee.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 

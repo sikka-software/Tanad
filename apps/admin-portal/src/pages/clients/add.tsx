@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { ClientForm, type ClientFormValues } from "@/components/app/client/client.form";
+import { ClientForm, type ClientFormValues } from "@/modules/client/client.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";

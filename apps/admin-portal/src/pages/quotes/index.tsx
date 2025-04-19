@@ -8,8 +8,8 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import QuoteCard from "@/components/app/quote/quote.card";
-import QuotesTable from "@/components/app/quote/quote.table";
+import QuoteCard from "@/modules/quote/quote.card";
+import QuotesTable from "@/modules/quote/quote.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 

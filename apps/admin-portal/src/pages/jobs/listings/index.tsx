@@ -3,8 +3,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import JobListingCard from "@/components/app/job-listing/job-listing.card";
-import JobListingsTable from "@/components/app/job-listing/job-listing.table";
+import JobListingCard from "@/modules/job-listing/job-listing.card";
+import JobListingsTable from "@/modules/job-listing/job-listing.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import ConfirmDelete from "@/components/ui/confirm-delete";
 import DataModelList from "@/components/ui/data-model-list";

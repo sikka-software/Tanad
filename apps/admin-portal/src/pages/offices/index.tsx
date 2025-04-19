@@ -8,8 +8,8 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import OfficeCard from "@/components/app/office/office.card";
-import OfficesTable from "@/components/app/office/office.table";
+import OfficeCard from "@/modules/office/office.card";
+import OfficesTable from "@/modules/office/office.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 

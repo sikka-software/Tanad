@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { SalaryForm, SalaryFormValues } from "@/components/app/salary/salary.form";
+import { SalaryForm, SalaryFormValues } from "@/modules/salary/salary.form";
 import { Button } from "@/components/ui/button";
 import PageTitle from "@/components/ui/page-title";
 

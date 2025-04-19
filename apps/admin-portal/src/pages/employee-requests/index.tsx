@@ -5,8 +5,8 @@ import { useState } from "react";
 import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 
-import EmployeeRequestCard from "@/components/app/employee-request/employee-request.card";
-import EmployeeRequestsTable from "@/components/app/employee-request/employee-request.table";
+import EmployeeRequestCard from "@/modules/employee-request/employee-request.card";
+import EmployeeRequestsTable from "@/modules/employee-request/employee-request.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 

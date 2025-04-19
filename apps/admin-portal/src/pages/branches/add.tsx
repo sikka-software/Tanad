@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { BranchForm, type BranchFormValues } from "@/components/app/branch/branch.form";
+import { BranchForm, type BranchFormValues } from "@/modules/branch/branch.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";

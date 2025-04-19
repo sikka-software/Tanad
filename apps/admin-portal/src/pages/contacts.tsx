@@ -4,11 +4,10 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";
 
-import ClientCard from "@/components/app/client/client.card";
-import VendorCard from "@/components/app/vendor/vendor.card";
+import ClientCard from "@/modules/client/client.card";
+import VendorCard from "@/modules/vendor/vendor.card";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import DataModelList from "@/components/ui/data-model-list";
 import PageTitle from "@/components/ui/page-title";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

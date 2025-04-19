@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 
-import { EmployeeForm, type EmployeeFormValues } from "@/components/app/employee/employee.form";
+import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";

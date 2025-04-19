@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import { CompanyForm, type CompanyFormValues } from "@/components/app/company/company.form";
+import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
 
 import { useCompany, useUpdateCompany } from "@/hooks/models/useCompanies";
 

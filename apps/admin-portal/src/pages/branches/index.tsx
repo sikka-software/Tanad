@@ -8,8 +8,8 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import BranchCard from "@/components/app/branch/branch.card";
-import BranchesTable from "@/components/app/branch/branch.table";
+import BranchCard from "@/modules/branch/branch.card";
+import BranchesTable from "@/modules/branch/branch.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
