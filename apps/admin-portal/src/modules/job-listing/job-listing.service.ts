@@ -88,7 +88,7 @@ export async function createJobListing(
 
 export async function updateJobListing(id: string, jobListing: Partial<JobListing>) {
   try {
-    const response = await fetch(`/api/job-listings/${id}`, {
+    const response = await fetch(`/api/jobs/listings/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -97,7 +97,8 @@ export async function updateJobListing(id: string, jobListing: Partial<JobListin
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to update job listing with id ${id}`);
+      const error = await response.json();
+      throw new Error(error.message || `Failed to update job listing with id ${id}`);
     }
 
     return response.json();

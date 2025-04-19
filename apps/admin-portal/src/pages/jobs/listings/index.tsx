@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import ConfirmDelete from "@/components/ui/confirm-delete";
 import DataModelList from "@/components/ui/data-model-list";
@@ -59,58 +60,61 @@ export default function JobListingsPage() {
   };
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <SelectionMode
-          selectedRows={selectedRows}
-          clearSelection={clearSelection}
-          isDeleting={isDeleting}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        />
-      ) : (
-        <PageSearchAndFilter
-          store={useJobListingsStore}
-          sortableColumns={SORTABLE_COLUMNS}
-          filterableFields={FILTERABLE_FIELDS}
-          title={t("JobListings.title")}
-          createHref="/jobs/listings/add"
-          createLabel={t("JobListings.create_listing")}
-          searchPlaceholder={t("JobListings.search_listings")}
-        />
-      )}
-
-      <div>
-        {viewMode === "table" ? (
-          <JobListingsTable
-            data={sortedListings}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
+    <div>
+      <CustomPageMeta title={t("JobListings.title")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
+          <PageSearchAndFilter
+            store={useJobListingsStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
+            title={t("JobListings.title")}
+            createHref="/jobs/listings/add"
+            createLabel={t("JobListings.create_listing")}
+            searchPlaceholder={t("JobListings.search_listings")}
+          />
+        )}
+
+        <div>
+          {viewMode === "table" ? (
+            <JobListingsTable
               data={sortedListings}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("JobListings.no_listings_found")}
-              renderItem={(listing: JobListing) => (
-                <JobListingCard key={listing.id} jobListing={listing} />
-              )}
-              gridCols="3"
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={sortedListings}
+                isLoading={isLoading}
+                error={error instanceof Error ? error : null}
+                emptyMessage={t("JobListings.no_listings_found")}
+                renderItem={(listing: JobListing) => (
+                  <JobListingCard key={listing.id} jobListing={listing} />
+                )}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("JobListings.confirm_delete")}
-        description={t("JobListings.delete_description", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("JobListings.confirm_delete")}
+          description={t("JobListings.delete_description", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 
