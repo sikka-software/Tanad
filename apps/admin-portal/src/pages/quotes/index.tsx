@@ -20,13 +20,30 @@ import { useQuotesStore } from "@/stores/quotes.store";
 
 export default function QuotesPage() {
   const t = useTranslations();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const isDeleteDialogOpen = useQuotesStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useQuotesStore((state) => state.setIsDeleteDialogOpen);
+  const searchQuery = useQuotesStore((state) => state.searchQuery);
+  const setSearchQuery = useQuotesStore((state) => state.setSearchQuery);
+  const viewMode = useQuotesStore((state) => state.viewMode);
+  const setViewMode = useQuotesStore((state) => state.setViewMode);
+  const selectedRows = useQuotesStore((state) => state.selectedRows);
+  const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
+  const clearSelection = useQuotesStore((state) => state.clearSelection);
+  const sortRules = useQuotesStore((state) => state.sortRules);
+  const setSortRules = useQuotesStore((state) => state.setSortRules);
+  const sortCaseSensitive = useQuotesStore((state) => state.sortCaseSensitive);
+  const setSortCaseSensitive = useQuotesStore((state) => state.setSortCaseSensitive);
+  const sortNullsFirst = useQuotesStore((state) => state.sortNullsFirst);
+  const setSortNullsFirst = useQuotesStore((state) => state.setSortNullsFirst);
+  const filterConditions = useQuotesStore((state) => state.filterConditions);
+  const setFilterConditions = useQuotesStore((state) => state.setFilterConditions);
+  const filterCaseSensitive = useQuotesStore((state) => state.filterCaseSensitive);
+  const setFilterCaseSensitive = useQuotesStore((state) => state.setFilterCaseSensitive);
+
   const { data: quotes, isLoading, error } = useQuotes();
 
   // Get selection state and actions from the store
-  const { selectedRows, setSelectedRows, clearSelection } = useQuotesStore();
   const { mutate: deleteQuotes, isPending: isDeleting } = useBulkDeleteQuotes();
 
   const filteredQuotes = Array.isArray(quotes)

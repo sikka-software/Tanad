@@ -1,15 +1,8 @@
-import {
-  Search,
-  Filter,
-  ChevronDown,
-  SlidersHorizontal,
-  Plus,
-  LayoutGrid,
-  Table2,
-} from "lucide-react";
+import { Search, Plus, LayoutGrid, Table2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import * as React from "react";
+import { StoreApi, useStore } from "zustand";
 
 import { cn } from "@/lib/utils";
 
@@ -22,50 +15,60 @@ import { Input } from "./input";
 import SortPopover from "./sort-popover";
 
 export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivElement> {
-  onSearch?: (value: string) => void;
+  store: StoreApi<{
+    searchQuery: string;
+    setSearchQuery: (searchQuery: string) => void;
+    filterConditions: FilterCondition[];
+    setFilterConditions: (filterConditions: FilterCondition[]) => void;
+    filterCaseSensitive: boolean;
+    setFilterCaseSensitive: (filterCaseSensitive: boolean) => void;
+    viewMode: "table" | "cards";
+    setViewMode: (viewMode: "table" | "cards") => void;
+    isDeleteDialogOpen: boolean;
+    setIsDeleteDialogOpen: (isDeleteDialogOpen: boolean) => void;
+    sortRules: { field: string; direction: string }[];
+    setSortRules: (sortRules: { field: string; direction: string }[]) => void;
+    sortCaseSensitive: boolean;
+    setSortCaseSensitive: (sortCaseSensitive: boolean) => void;
+    sortNullsFirst: boolean;
+    setSortNullsFirst: (sortNullsFirst: boolean) => void;
+    clearSelection: () => void;
+    setSelectedRows: (ids: string[]) => void;
+  }>;
   title?: string;
   createHref?: string;
   createLabel?: string;
   searchPlaceholder?: string;
-  viewMode?: "table" | "cards";
-  onViewModeChange?: (mode: "table" | "cards") => void;
-  sortRules: { field: string; direction: string }[];
-  onSortRulesChange: (sortRules: { field: string; direction: string }[]) => void;
   sortableColumns: SortableColumn[];
-  caseSensitive?: boolean;
-  onCaseSensitiveChange?: (value: boolean) => void;
-  nullsFirst?: boolean;
-  onNullsFirstChange?: (value: boolean) => void;
   filterableFields?: FilterableField[];
-  filterConditions?: FilterCondition[];
-  onFilterConditionsChange?: (conditions: FilterCondition[]) => void;
-  filterCaseSensitive?: boolean;
-  onFilterCaseSensitiveChange?: (value: boolean) => void;
 }
 
 const PageSearchAndFilter = ({
+  store,
   className,
-  onSearch,
   title = "Items",
   createHref = "#",
   createLabel = "Create",
   searchPlaceholder = "Search...",
-  viewMode = "table",
-  onViewModeChange,
-  sortRules,
-  onSortRulesChange,
   sortableColumns,
-  caseSensitive,
-  onCaseSensitiveChange,
-  nullsFirst,
-  onNullsFirstChange,
   filterableFields,
-  filterConditions,
-  onFilterConditionsChange,
-  filterCaseSensitive,
-  onFilterCaseSensitiveChange,
   ...props
 }: PageSearchAndFilterProps) => {
+  const viewMode = useStore(store, (state) => state.viewMode);
+  const setViewMode = useStore(store, (state) => state.setViewMode);
+  const searchQuery = useStore(store, (state) => state.searchQuery);
+  const setSearchQuery = useStore(store, (state) => state.setSearchQuery);
+  const filterConditions = useStore(store, (state) => state.filterConditions);
+  const onFilterConditionsChange = useStore(store, (state) => state.setFilterConditions);
+  const filterCaseSensitive = useStore(store, (state) => state.filterCaseSensitive);
+  const onFilterCaseSensitiveChange = useStore(store, (state) => state.setFilterCaseSensitive);
+  const sortRules = useStore(store, (state) => state.sortRules);
+  const onSortRulesChange = useStore(store, (state) => state.setSortRules);
+  const sortCaseSensitive = useStore(store, (state) => state.sortCaseSensitive);
+  const setSortCaseSensitive = useStore(store, (state) => state.setSortCaseSensitive);
+  const sortNullsFirst = useStore(store, (state) => state.sortNullsFirst);
+  const setSortNullsFirst = useStore(store, (state) => state.setSortNullsFirst);
+
   const t = useTranslations();
   return (
     <div
@@ -83,26 +86,25 @@ const PageSearchAndFilter = ({
             type="text"
             placeholder={searchPlaceholder}
             className="bg-muted/50 h-8 w-full ps-9 focus-visible:ring-1"
-            onChange={(e) => onSearch?.(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchQuery}
           />
           <Search className="text-muted-foreground absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2" />
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        {onViewModeChange && (
-          <IconButton
-            icon={
-              viewMode === "table" ? (
-                <LayoutGrid className="h-4 w-4" />
-              ) : (
-                <Table2 className="h-4 w-4" />
-              )
-            }
-            label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
-            onClick={() => onViewModeChange(viewMode === "table" ? "cards" : "table")}
-          />
-        )}
+        <IconButton
+          icon={
+            viewMode === "table" ? (
+              <LayoutGrid className="h-4 w-4" />
+            ) : (
+              <Table2 className="h-4 w-4" />
+            )
+          }
+          label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
+          onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
+        />
 
         <FilterPopover
           fields={filterableFields}
@@ -112,13 +114,13 @@ const PageSearchAndFilter = ({
           onCaseSensitiveChange={onFilterCaseSensitiveChange}
         />
         <SortPopover
+          columns={sortableColumns}
           sortRules={sortRules}
           onSortRulesChange={onSortRulesChange}
-          columns={sortableColumns}
-          caseSensitive={caseSensitive}
-          onCaseSensitiveChange={onCaseSensitiveChange}
-          nullsFirst={nullsFirst}
-          onNullsFirstChange={onNullsFirstChange}
+          caseSensitive={sortCaseSensitive}
+          onCaseSensitiveChange={setSortCaseSensitive}
+          nullsFirst={sortNullsFirst}
+          onNullsFirstChange={setSortNullsFirst}
         />
 
         <Link href={createHref} className="flex items-center">

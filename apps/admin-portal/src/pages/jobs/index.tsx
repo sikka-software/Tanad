@@ -23,25 +23,18 @@ import { useJobsStore } from "@/stores/jobs.store";
 export default function JobsPage() {
   const t = useTranslations();
 
+  const viewMode = useJobsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useJobsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useJobsStore((state) => state.setIsDeleteDialogOpen);
   const searchQuery = useJobsStore((state) => state.searchQuery);
-  const setSearchQuery = useJobsStore((state) => state.setSearchQuery);
-  const viewMode = useJobsStore((state) => state.viewMode);
-  const setViewMode = useJobsStore((state) => state.setViewMode);
   const selectedRows = useJobsStore((state) => state.selectedRows);
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const clearSelection = useJobsStore((state) => state.clearSelection);
   const sortRules = useJobsStore((state) => state.sortRules);
-  const setSortRules = useJobsStore((state) => state.setSortRules);
   const sortCaseSensitive = useJobsStore((state) => state.sortCaseSensitive);
-  const setSortCaseSensitive = useJobsStore((state) => state.setSortCaseSensitive);
   const sortNullsFirst = useJobsStore((state) => state.sortNullsFirst);
-  const setSortNullsFirst = useJobsStore((state) => state.setSortNullsFirst);
   const filterConditions = useJobsStore((state) => state.filterConditions);
-  const setFilterConditions = useJobsStore((state) => state.setFilterConditions);
   const filterCaseSensitive = useJobsStore((state) => state.filterCaseSensitive);
-  const setFilterCaseSensitive = useJobsStore((state) => state.setFilterCaseSensitive);
 
   const { data: jobs, isLoading, error } = useJobs();
   const { mutate: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
@@ -97,25 +90,13 @@ export default function JobsPage() {
         />
       ) : (
         <PageSearchAndFilter
+          store={useJobsStore}
           title={t("Jobs.title")}
           createHref="/jobs/add"
           createLabel={t("Jobs.create_job")}
-          onSearch={setSearchQuery}
           searchPlaceholder={t("Jobs.search_jobs")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          sortRules={sortRules}
-          onSortRulesChange={setSortRules}
           sortableColumns={SORTABLE_COLUMNS}
-          caseSensitive={sortCaseSensitive}
-          onCaseSensitiveChange={setSortCaseSensitive}
-          nullsFirst={sortNullsFirst}
-          onNullsFirstChange={setSortNullsFirst}
           filterableFields={FILTERABLE_FIELDS}
-          filterConditions={filterConditions}
-          onFilterConditionsChange={setFilterConditions}
-          filterCaseSensitive={filterCaseSensitive}
-          onFilterCaseSensitiveChange={setFilterCaseSensitive}
         />
       )}
 
