@@ -19,15 +19,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid job listing ID" });
   }
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   if (req.method === "GET") {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user?.id) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
       const branch = await db.query.branches.findFirst({
         where: eq(branches.id, id as string),
       });
@@ -44,14 +44,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "PUT") {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user?.id) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      // Map branch data to match Drizzle schema
       const existingBranch = await db.query.branches.findFirst({
         where: eq(branches.id, id as string),
       });
@@ -89,23 +81,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "DELETE") {
     try {
-      const supabase = createClient({
-        req,
-        res,
-        query: {},
-        resolvedUrl: "",
-      });
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user?.id) {
-        return res
-          .status(401)
-          .json({ message: "Unauthorized, you must be logged in to delete a branch" });
-      }
-
       await db.delete(branches).where(eq(branches.id, id as string));
       return res.status(204).end();
     } catch (error) {

@@ -76,8 +76,8 @@ export async function deleteJob(id: string): Promise<void> {
 
 export async function bulkDeleteJobs(ids: string[]): Promise<void> {
   try {
-    const response = await fetch("/api/jobs/bulk-delete", {
-      method: "POST",
+    const response = await fetch("/api/jobs", {
+      method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),
     });

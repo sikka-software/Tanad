@@ -24,7 +24,6 @@ type JobStates = {
 };
 
 type JobActions = {
-  updateJob: (id: string, data: Partial<Job>) => Promise<void>;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
   setFilterConditions: (filterConditions: FilterCondition[]) => void;
@@ -135,18 +134,18 @@ export const useJobsStore = create<JobStates & JobActions>((set, get) => ({
     });
   },
 
-  updateJob: async (id: string, updates: Partial<Job>) => {
-    const supabase = createClient();
-    try {
-      const { error } = await supabase.from("jobs").update(updates).eq("id", id);
+  // updateJob: async (id: string, updates: Partial<Job>) => {
+  //   const supabase = createClient();
+  //   try {
+  //     const { error } = await supabase.from("jobs").update(updates).eq("id", id);
 
-      if (error) throw error;
+  //     if (error) throw error;
 
-      set((state) => ({
-        jobs: state.jobs.map((job) => (job.id === id ? { ...job, ...updates } : job)),
-      }));
-    } catch (error) {
-      set({ error: (error as Error).message });
-    }
-  },
+  //     set((state) => ({
+  //       jobs: state.jobs.map((job) => (job.id === id ? { ...job, ...updates } : job)),
+  //     }));
+  //   } catch (error) {
+  //     set({ error: (error as Error).message });
+  //   }
+  // },
 }));

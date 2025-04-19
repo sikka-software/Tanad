@@ -13,15 +13,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     resolvedUrl: "",
   });
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   if (req.method === "GET") {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user?.id) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
       const branchesList = await db.query.branches.findMany({
         where: eq(branches.user_id, user?.id),
         orderBy: desc(branches.created_at),

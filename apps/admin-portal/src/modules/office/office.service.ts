@@ -84,8 +84,8 @@ export async function deleteOffice(id: string) {
 
 export async function bulkDeleteOffices(ids: string[]): Promise<void> {
   try {
-    const response = await fetch("/api/offices/bulk-delete", {
-      method: "POST",
+    const response = await fetch("/api/offices", {
+      method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
@@ -93,7 +93,7 @@ export async function bulkDeleteOffices(ids: string[]): Promise<void> {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to delete warehouses");
+      throw new Error("Failed to delete offices");
     }
   } catch (error) {
     console.error("Error bulk deleting offices:", error);

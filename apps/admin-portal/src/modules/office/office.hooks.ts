@@ -6,6 +6,7 @@ import {
   fetchOfficeById,
   fetchOffices,
   updateOffice,
+  bulkDeleteOffices,
 } from "@/modules/office/office.service";
 import type { Office, OfficeCreateData } from "@/modules/office/office.type";
 
@@ -81,20 +82,7 @@ export function useBulkDeleteOffices() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/offices/bulk-delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete offices");
-      }
-    },
+    mutationFn: bulkDeleteOffices,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
     },
