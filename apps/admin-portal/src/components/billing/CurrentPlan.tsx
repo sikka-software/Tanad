@@ -1,4 +1,4 @@
-import { AlertCircle, Download, RefreshCcw } from "lucide-react";
+import { AlertCircle, Download, Eye, RefreshCcw } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
+import { supabase } from "@/lib/supabase";
 
 import { usePricing } from "@/hooks/use-pricing";
 import { useSubscription } from "@/hooks/use-subscription";
@@ -63,29 +64,13 @@ export default function CurrentPlan() {
     // Refresh both subscription data and user data
     try {
       console.log("Manually refreshing subscription and user data");
-      await fetchUserAndProfile();
+      //  await fetchUserAndProfile();
       await subscription.refetch();
       setLastRefreshTime(Date.now()); // Update refresh timestamp
     } catch (error) {
       console.error("Error refreshing data:", error);
     }
   }, [user, fetchUserAndProfile, subscription]);
-
-  // Listen for subscription update events
-  useEffect(() => {
-    const handleSubscriptionUpdate = () => {
-      console.log("Subscription update event detected, refreshing data");
-      refreshData();
-    };
-
-    // Add event listener
-    window.addEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdate);
-
-    // Clean up
-    return () => {
-      window.removeEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdate);
-    };
-  }, [refreshData]);
 
   // Fetch billing history when dialog opens or when subscription changes
   useEffect(() => {
@@ -101,85 +86,84 @@ export default function CurrentPlan() {
     setIsLoadingHistory(true);
     setBillingHistory([]); // Clear previous data when loading
     try {
-      console.log(
-        "Fetching billing history for user",
-        user.id,
-        "with customer ID:",
-        user?.stripe_customer_id,
-      );
-      const response = await fetch("/api/stripe/billing-history", {
+      // Get customer ID using multiple sources similar to PaymentDialog
+      let stripeCustomerId = user.stripe_customer_id;
+
+      // If no customer ID in user object, check the profile
+      if (!stripeCustomerId && user.profile?.stripe_customer_id) {
+        stripeCustomerId = user.profile.stripe_customer_id;
+        console.log("Using customer ID from profile:", stripeCustomerId);
+      }
+
+      // If still no customer ID, try to fetch it from Supabase
+      if (!stripeCustomerId && user.id) {
+        console.log("Attempting to get customer ID from database for user:", user.id);
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("stripe_customer_id")
+          .eq("id", user.id)
+          .single();
+
+        if (profile?.stripe_customer_id) {
+          stripeCustomerId = profile.stripe_customer_id;
+          console.log("Retrieved customer ID from database:", stripeCustomerId);
+        }
+      }
+
+      if (!stripeCustomerId) {
+        console.log("No Stripe customer ID available");
+        toast.error("No billing information available");
+        setIsLoadingHistory(false);
+        return;
+      }
+
+      // For debugging, check if we are in development mode
+      // You can temporarily uncomment this to test with a specific URL that works in Postman
+      const apiUrl =
+        process.env.NODE_ENV === "development"
+          ? "/api/stripe/get-invoices" // Default relative URL
+          : // ? 'http://localhost:3037/api/stripe/get-invoices'  // Uncomment this to test with exact Postman URL
+            "/api/stripe/get-invoices"; // Production URL (relative)
+
+      console.log("Fetching billing history for user:", stripeCustomerId, "using URL:", apiUrl);
+      const response = await fetch(apiUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          customerId: user?.stripe_customer_id, // Add customer ID if available
-          limit: 100, // Fetch more invoices to ensure we get everything
-          includeDrafts: true, // Include draft invoices to see all invoices
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId: stripeCustomerId }),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to fetch billing history");
+        console.error("Invoice API error:", response.status, response.statusText);
+        const errorText = await response.text();
+        console.error("Error details:", errorText);
+        throw new Error(`Failed to fetch invoices: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log("Billing history fetched:", data.invoices?.length || 0, "invoices");
+      console.log("API response for invoices:", {
+        status: response.status,
+        invoicesCount: Array.isArray(data) ? data.length : "not an array",
+        data: data,
+      });
 
-      if (data.error) {
-        console.warn("Warning from billing history API:", data.error);
-      }
-
-      // If we have invoices, display them
-      if (data.invoices && data.invoices.length > 0) {
+      // Check if response has invoices property and use that
+      if (data && data.invoices && Array.isArray(data.invoices)) {
+        console.log(`Found ${data.invoices.length} invoices in the response`);
         setBillingHistory(data.invoices);
       } else {
-        // If we don't have invoices, try to refresh one more time after a delay
-        // This helps if the subscription was just created
-        console.log("No invoices found, will retry once after delay");
-        setTimeout(() => {
-          if (isHistoryDialogOpen) {
-            // Only retry if dialog is still open
-            console.log("Retrying billing history fetch after delay");
-            refreshBillingHistoryDelayed();
-          }
-        }, 2000);
+        // Fallback to using the whole response if it's an array
+        if (Array.isArray(data)) {
+          setBillingHistory(data);
+        } else {
+          console.error("Invoice data is not in expected format", data);
+          setBillingHistory([]);
+        }
       }
     } catch (error) {
       console.error("Error fetching billing history:", error);
       toast.error("Failed to load billing history");
     } finally {
       setIsLoadingHistory(false);
-    }
-  };
-
-  // Function to retry billing history fetch with delay
-  const refreshBillingHistoryDelayed = async () => {
-    try {
-      const response = await fetch("/api/stripe/billing-history", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          customerId: user?.stripe_customer_id,
-          limit: 100,
-          includeDrafts: true,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch billing history on retry");
-      }
-
-      const data = await response.json();
-      console.log("Retry billing history fetched:", data.invoices?.length || 0, "invoices");
-      setBillingHistory(data.invoices || []);
-    } catch (error) {
-      console.error("Error on retry billing history fetch:", error);
     }
   };
 
@@ -192,7 +176,7 @@ export default function CurrentPlan() {
     }
   }, [subscription.id, subscription.status]);
 
-  if (subscription.loading) {
+  if (subscription.loading || isLoadingHistory || !user) {
     return <Skeleton className="h-24 w-full rounded-lg" />;
   }
 
@@ -257,43 +241,45 @@ export default function CurrentPlan() {
       case "paid":
         return (
           <Badge variant="outline" className="border-green-500 bg-green-50 text-green-700">
-            {t("Billing.invoice_status_paid", { fallback: "Paid" })}
+            {t("Billing.billing_history.invoice_status_paid", { fallback: "Paid" })}
           </Badge>
         );
       case "open":
         return (
           <Badge variant="outline" className="border-blue-500 bg-blue-50 text-blue-700">
-            {t("Billing.invoice_status_open", { fallback: "Open" })}
+            {t("Billing.billing_history.invoice_status_open", { fallback: "Open" })}
           </Badge>
         );
       case "void":
         return (
           <Badge variant="outline" className="border-gray-500 bg-gray-50 text-gray-700">
-            {t("Billing.invoice_status_void", { fallback: "Void" })}
+            {t("Billing.billing_history.invoice_status_void", { fallback: "Void" })}
           </Badge>
         );
       case "uncollectible":
         return (
           <Badge variant="outline" className="border-red-500 bg-red-50 text-red-700">
-            {t("Billing.invoice_status_uncollectible", { fallback: "Uncollectible" })}
+            {t("Billing.billing_history.invoice_status_uncollectible", {
+              fallback: "Uncollectible",
+            })}
           </Badge>
         );
       case "draft":
         return (
           <Badge variant="outline" className="border-amber-500 bg-amber-50 text-amber-700">
-            {t("Billing.invoice_status_draft", { fallback: "Draft" })}
+            {t("Billing.billing_history.invoice_status_draft", { fallback: "Draft" })}
           </Badge>
         );
       case "pending":
         return (
           <Badge variant="outline" className="border-purple-500 bg-purple-50 text-purple-700">
-            {t("Billing.invoice_status_pending", { fallback: "Pending" })}
+            {t("Billing.billing_history.invoice_status_pending", { fallback: "Pending" })}
           </Badge>
         );
       case "overdue":
         return (
           <Badge variant="outline" className="border-red-500 bg-red-50 text-red-700">
-            {t("Billing.invoice_status_overdue", { fallback: "Overdue" })}
+            {t("Billing.billing_history.invoice_status_overdue", { fallback: "Overdue" })}
           </Badge>
         );
       default:
@@ -303,6 +289,11 @@ export default function CurrentPlan() {
 
   // Format the plan name for billing history items
   const formatBillingHistoryPlanName = (planName: string) => {
+    // Check if planName is undefined or null
+    if (!planName) {
+      return t("Billing.billing_history.unknown_plan", { fallback: "Unknown Plan" });
+    }
+
     // Try to extract a lookup key if it follows our naming convention
     let lookupKey = "";
     if (planName.toLowerCase().includes("tanad_")) {
@@ -458,11 +449,11 @@ export default function CurrentPlan() {
           }
         }}
       >
-        <DialogContent className="sm:max-w-[700px]">
+        <DialogContent className="sm:max-w-[700px]" dir={locale === "ar" ? "rtl" : "ltr"}>
           <DialogHeader>
             <div className="flex items-center justify-between">
               <DialogTitle>
-                {t("Billing.history_dialog_title", { fallback: "Billing History" })}
+                {t("Billing.billing_history.title", { fallback: "Billing History" })}
               </DialogTitle>
               <Button
                 variant="ghost"
@@ -490,7 +481,7 @@ export default function CurrentPlan() {
             ) : billingHistory.length > 0 ? (
               <>
                 <p className="text-muted-foreground mb-4 text-sm">
-                  {t("Billing.history_description", {
+                  {t("Billing.billing_history.description", {
                     fallback: "Your billing history and past invoices",
                   })}
                 </p>
@@ -498,15 +489,23 @@ export default function CurrentPlan() {
                   <Table>
                     <TableHeader className="bg-background sticky top-0">
                       <TableRow>
-                        <TableHead>{t("Billing.invoice_date", { fallback: "Date" })}</TableHead>
                         <TableHead>
-                          {t("Billing.invoice_number", { fallback: "Invoice" })}
+                          {t("Billing.billing_history.invoice_date", { fallback: "Date" })}
                         </TableHead>
-                        <TableHead>{t("Billing.invoice_amount", { fallback: "Amount" })}</TableHead>
-                        <TableHead>{t("Billing.invoice_status", { fallback: "Status" })}</TableHead>
-                        <TableHead>{t("Billing.invoice_plan", { fallback: "Plan" })}</TableHead>
+                        <TableHead>
+                          {t("Billing.billing_history.invoice_number", { fallback: "Invoice" })}
+                        </TableHead>
+                        <TableHead>
+                          {t("Billing.billing_history.invoice_amount", { fallback: "Amount" })}
+                        </TableHead>
+                        <TableHead>
+                          {t("Billing.billing_history.invoice_status", { fallback: "Status" })}
+                        </TableHead>
+                        <TableHead>
+                          {t("Billing.billing_history.invoice_plan", { fallback: "Plan" })}
+                        </TableHead>
                         <TableHead className="text-right">
-                          {t("Billing.actions", { fallback: "Actions" })}
+                          {t("Billing.billing_history.actions", { fallback: "Actions" })}
                         </TableHead>
                       </TableRow>
                     </TableHeader>
@@ -519,22 +518,45 @@ export default function CurrentPlan() {
                           <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                           <TableCell>{formatBillingHistoryPlanName(invoice.planName)}</TableCell>
                           <TableCell className="text-right">
-                            {invoice.pdfUrl && (
-                              <a
-                                href={invoice.pdfUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-primary hover:text-primary/80 inline-flex items-center"
-                                aria-label={t("Billing.download_invoice", {
-                                  fallback: "Download Invoice",
-                                })}
-                              >
-                                <Download className="mr-1 h-4 w-4" />
-                                <span className="sr-only">
-                                  {t("Billing.download_invoice", { fallback: "Download Invoice" })}
-                                </span>
-                              </a>
-                            )}
+                            <div className="flex items-center justify-end gap-2">
+                              {invoice.pdfUrl && (
+                                <>
+                                  <a
+                                    href={invoice.pdfUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-primary hover:text-primary/80 inline-flex items-center"
+                                    aria-label={t("Billing.billing_history.view_invoice", {
+                                      fallback: "View Invoice",
+                                    })}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                    <span className="sr-only">
+                                      {t("Billing.billing_history.view_invoice", {
+                                        fallback: "View Invoice",
+                                      })}
+                                    </span>
+                                  </a>
+                                  <a
+                                    href={invoice.pdfUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    download
+                                    className="text-primary hover:text-primary/80 inline-flex items-center"
+                                    aria-label={t("Billing.billing_history.download_invoice", {
+                                      fallback: "Download Invoice",
+                                    })}
+                                  >
+                                    <Download className="h-4 w-4" />
+                                    <span className="sr-only">
+                                      {t("Billing.billing_history.download_invoice", {
+                                        fallback: "Download Invoice",
+                                      })}
+                                    </span>
+                                  </a>
+                                </>
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))}

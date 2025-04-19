@@ -964,6 +964,26 @@
       "title": "الباقة الحالية",
       "refresh": "تحديث"
     },
+    "billing_history": {
+      "title": "سجل الفواتير",
+      "description": "تاريخ الدفعات السابقة",
+      "no_history": "لم يتم العثور على سجل فواتير",
+      "no_history_description": "ستظهر الفواتير هنا بمجرد أن تكون قد تم الفوترة",
+      "invoice_date": "تاريخ الفوتر",
+      "invoice_number": "رقم الفوتر",
+      "invoice_amount": "مبلغ الفوتر",
+      "invoice_status": "حالة الفوتر",
+      "invoice_plan": "الخطة المستخدمة",
+      "actions": "الإجراءات",
+      "invoice_status_paid": "مدفوع",
+      "invoice_status_open": "مفتوح",
+      "invoice_status_void": "ملغي",
+      "invoice_status_uncollectible": "غير قابل للتحصيل",
+      "invoice_status_draft": "مسودة",
+      "invoice_status_pending": "قيد الإنتظار",
+      "invoice_status_overdue": "متأخر",
+      "unknown_plan": "لا يوجد خطة حالية"
+    },
     "most_popular": "الأكثر طلباً",
     "subscription_updated_successfully": "تم تحديث الاشتراك بنجاح",
     "subscription_update_failed": "فشل تحديث الاشتراك",
@@ -1211,6 +1231,16 @@
     "billing": {
       "title": "الدفع",
       "description": "إدارة معلومات الدفع والاشتراك",
+      "unknown_plan": "لا يوجد خطة حالية",
+
+      "history_description": "تاريخ الدفعات السابقة",
+
+      "invoice_date": "تاريخ الفوتر",
+      "invoice_number": "رقم الفوتر",
+      "invoice_amount": "مبلغ الفوتر",
+      "invoice_status": "حالة الفوتر",
+      "invoice_plan": "الخطة المستخدمة",
+      "actions": "الإجراءات",
       "current_plan": {
         "title": "الخطة الحالية",
         "change_plan": "تغيير الخطة"
