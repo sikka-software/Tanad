@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-
 import Stripe from "stripe";
 
 import { getPlanIdForPriceId } from "@/lib/stripe";
@@ -344,15 +343,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           // Finalize the invoice and attempt to collect payment if needed
           if (invoice.status === "draft" && invoice.id) {
-            await stripe.invoices.finalizeInvoice(invoice.id);
-            if (paymentMethodId) {
+            // Ensure we have a valid invoice ID
+            const invoiceId = invoice.id;
+            const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoiceId);
+            console.log(
+              `Finalized invoice: ${finalizedInvoice.id}, status: ${finalizedInvoice.status}`,
+            );
+
+            if (paymentMethodId && finalizedInvoice.status !== "paid" && finalizedInvoice.id) {
               try {
-                const paidInvoice = await stripe.invoices.pay(invoice.id);
-                console.log(
-                  `Invoice paid for update: ${paidInvoice.id}, status: ${paidInvoice.status}`,
-                );
+                // Ensure we have a valid invoice ID
+                const paidInvoice = await stripe.invoices.pay(finalizedInvoice.id);
+                console.log(`Invoice paid: ${paidInvoice.id}, status: ${paidInvoice.status}`);
               } catch (payError) {
-                console.error("Error paying update invoice:", payError);
+                console.error("Error paying invoice:", payError);
               }
             }
           }
@@ -410,65 +414,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       subscription = await stripe.subscriptions.create(subscriptionParams);
       status = subscription.status;
 
-      // Safely check for payment intent by retrieving the invoice separately if needed
-      if (subscription.latest_invoice && typeof subscription.latest_invoice === "string") {
-        try {
-          // First, retrieve the invoice without expanding payment_intent
-          const basicInvoice = await stripe.invoices.retrieve(subscription.latest_invoice);
+      // Immediately create an invoice for the subscription
+      try {
+        // First, retrieve the latest_invoice to check if it exists
+        if (subscription.latest_invoice && typeof subscription.latest_invoice === "string") {
+          console.log(`Subscription already has an invoice: ${subscription.latest_invoice}`);
 
-          // Only try to expand payment_intent if the invoice status suggests it might have a payment
-          if (
-            basicInvoice.status === "paid" ||
-            basicInvoice.status === "open" ||
-            (basicInvoice as any).payment_intent ||
-            (basicInvoice as any).charge
-          ) {
-            try {
-              const invoice = (await stripe.invoices.retrieve(subscription.latest_invoice, {
-                expand: ["payment_intent"],
-              })) as Stripe.Response<
-                Stripe.Invoice & {
-                  payment_intent?: Stripe.PaymentIntent;
-                }
-              >;
+          // Retrieve the invoice to check its status
+          const latestInvoice = await stripe.invoices.retrieve(subscription.latest_invoice);
+          console.log(`Latest invoice status: ${latestInvoice.status}`);
 
-              if (invoice.payment_intent && typeof invoice.payment_intent !== "string") {
-                clientSecret = invoice.payment_intent.client_secret;
-                console.log(
-                  `Retrieved client secret from latest invoice: ${subscription.latest_invoice}`,
-                );
-              }
-            } catch (expandErr: any) {
-              console.log(`Could not expand payment_intent on invoice: ${expandErr.message}`);
+          // If it's a draft, finalize it and attempt payment
+          if (latestInvoice.status === "draft" && latestInvoice.id) {
+            // Ensure we have a valid invoice ID
+            const invoiceId = latestInvoice.id;
+            const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoiceId);
+            console.log(
+              `Finalized invoice: ${finalizedInvoice.id}, status: ${finalizedInvoice.status}`,
+            );
 
-              // Try to check if there's a payment intent ID we can use directly
-              if (
-                (basicInvoice as any).payment_intent &&
-                typeof (basicInvoice as any).payment_intent === "string"
-              ) {
-                try {
-                  const paymentIntent = await stripe.paymentIntents.retrieve(
-                    (basicInvoice as any).payment_intent,
-                  );
-                  clientSecret = paymentIntent.client_secret;
-                  console.log(`Retrieved client secret directly from payment intent`);
-                } catch (piErr: any) {
-                  console.log(`Error retrieving payment intent directly: ${piErr.message}`);
-                }
+            if (paymentMethodId && finalizedInvoice.status !== "paid" && finalizedInvoice.id) {
+              try {
+                // Ensure we have a valid invoice ID
+                const paidInvoice = await stripe.invoices.pay(finalizedInvoice.id);
+                console.log(`Invoice paid: ${paidInvoice.id}, status: ${paidInvoice.status}`);
+              } catch (payError) {
+                console.error("Error paying invoice:", payError);
               }
             }
-          } else {
-            console.log(
-              `Invoice ${basicInvoice.id} status is ${basicInvoice.status}, skipping payment_intent expansion`,
-            );
           }
-        } catch (err) {
-          console.log("Error accessing latest invoice:", err);
-        }
-      } else {
-        // If no invoice was created automatically, create one manually
-        console.log("No invoice found for new subscription, creating invoice manually");
-        try {
+        } else {
+          // If no invoice was created automatically, create one manually
+          console.log("No invoice found for new subscription, creating invoice manually");
+
           const invoice = await stripe.invoices.create({
             customer: customerIdToUse,
             subscription: subscription.id,
@@ -476,73 +454,114 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             description: `New subscription to ${lookupKey}`,
           });
 
+          console.log(`Created manual invoice: ${invoice.id}, status: ${invoice.status}`);
+
           // Finalize the invoice and attempt to collect payment if needed
           if (invoice.status === "draft" && invoice.id) {
-            await stripe.invoices.finalizeInvoice(invoice.id);
-            if (paymentMethodId) {
+            // Ensure we have a valid invoice ID
+            const invoiceId = invoice.id;
+            const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoiceId);
+            console.log(
+              `Finalized invoice: ${finalizedInvoice.id}, status: ${finalizedInvoice.status}`,
+            );
+
+            if (paymentMethodId && finalizedInvoice.status !== "paid" && finalizedInvoice.id) {
               try {
-                const paidInvoice = await stripe.invoices.pay(invoice.id);
+                // Ensure we have a valid invoice ID
+                const paidInvoice = await stripe.invoices.pay(finalizedInvoice.id);
                 console.log(`Invoice paid: ${paidInvoice.id}, status: ${paidInvoice.status}`);
               } catch (payError) {
                 console.error("Error paying invoice:", payError);
               }
             }
           }
-
-          console.log(
-            `Manual invoice created for new subscription: ${invoice.id}, status: ${invoice.status}`,
-          );
-
-          // Try to get client secret in a safer way
-          if (invoice.id) {
-            try {
-              // Wait a moment for Stripe to process the invoice
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-
-              // Don't expand payment_intent directly to avoid errors
-              const retrievedInvoice = await stripe.invoices.retrieve(invoice.id);
-
-              // If the invoice has a payment intent, retrieve it directly
-              if (
-                (retrievedInvoice as any).payment_intent &&
-                typeof (retrievedInvoice as any).payment_intent === "string"
-              ) {
-                const paymentIntent = await stripe.paymentIntents.retrieve(
-                  (retrievedInvoice as any).payment_intent,
-                );
-                clientSecret = paymentIntent.client_secret;
-                console.log("Retrieved client secret from manual invoice payment intent");
-              }
-            } catch (retrieveError) {
-              console.error("Error retrieving manual invoice payment intent:", retrieveError);
-            }
-          }
-        } catch (invoiceError: any) {
-          console.error("Error creating manual invoice for new subscription:", invoiceError);
         }
+      } catch (invoiceError) {
+        console.error("Error creating or managing invoice:", invoiceError);
       }
     }
 
     // Update user's subscription status in our database
     if (userId) {
       try {
-        const { error: updateError } = await supabase
+        // Force a delay to ensure the database transaction completes
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // First check if profile exists and create it if it doesn't
+        const { data: profileCheck, error: profileCheckError } = await supabase
           .from("profiles")
-          .update({
+          .select("id, subscribed_to, stripe_customer_id")
+          .eq("id", userId)
+          .maybeSingle();
+
+        console.log(`Profile check result:`, profileCheck, profileCheckError);
+
+        if (!profileCheck && !profileCheckError) {
+          // Profile doesn't exist, create it first
+          console.log(`Creating new profile for user ${userId}`);
+          const { error: createError } = await supabase.from("profiles").insert({
+            id: userId,
             subscribed_to: lookupKey,
             price_id: priceId,
-          })
-          .eq("id", userId);
+            stripe_customer_id: customerIdToUse,
+          });
 
-        if (updateError) {
-          console.warn(`Could not update profile subscription status: ${updateError.message}`);
-          // Continue with the subscription process even if we can't update the profile
+          if (createError) {
+            console.error(`Failed to create profile: ${createError.message}`, createError);
+          } else {
+            console.log(`Created new profile for user ${userId} with subscription ${lookupKey}`);
+          }
         } else {
-          console.log(`Updated user ${userId} subscription to plan ${lookupKey}`);
+          // Profile exists, update it
+          console.log(`Updating existing profile for user ${userId}`);
+
+          // Use upsert instead of update to ensure the record exists
+          const { error: upsertError } = await supabase.from("profiles").upsert({
+            id: userId,
+            subscribed_to: lookupKey,
+            price_id: priceId,
+            stripe_customer_id: customerIdToUse,
+            updated_at: new Date().toISOString(),
+          });
+
+          if (upsertError) {
+            console.error(
+              `Failed to update profile subscription status: ${upsertError.message}`,
+              upsertError,
+            );
+
+            // Try direct update as fallback
+            const { error: directUpdateError } = await supabase
+              .from("profiles")
+              .update({
+                subscribed_to: lookupKey,
+                price_id: priceId,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", userId);
+
+            if (directUpdateError) {
+              console.error(`Direct update also failed: ${directUpdateError.message}`);
+            } else {
+              console.log(
+                `Successfully updated user ${userId} subscription to plan ${lookupKey} using direct update`,
+              );
+            }
+          } else {
+            console.log(`Successfully upserted user ${userId} subscription to plan ${lookupKey}`);
+          }
         }
+
+        // Verify the update was successful
+        const { data: verifyProfile } = await supabase
+          .from("profiles")
+          .select("subscribed_to, price_id, stripe_customer_id")
+          .eq("id", userId)
+          .single();
+
+        console.log(`Profile after update:`, verifyProfile);
       } catch (dbError) {
-        console.warn(`Error updating profile subscription status: ${dbError}`);
-        // Continue with the subscription process even if we can't update the profile
+        console.error(`Error updating profile subscription status: ${dbError}`);
       }
     }
 

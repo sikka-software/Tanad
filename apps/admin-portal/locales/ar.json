@@ -1023,6 +1023,7 @@
       "credit_card": "بطاقة ائتمان",
       "digital_wallet": "محفظة رقمية",
       "card_holder_name": "اسم حامل البطاقة",
+      "payment_details": "تفاصيل الدفع",
       "card_holder_placeholder": "محمد أحمد",
       "email": "البريد الإلكتروني",
       "email_placeholder": "example@domain.com",

@@ -34,51 +34,115 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get customer info if we have userId but no customerId
     let customerIdToUse = customerId;
     if (!customerIdToUse && userId) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("stripe_customer_id")
-        .eq("id", userId)
-        .single();
+      console.log(`Looking up customer ID for user: ${userId}`);
 
-      if (profile?.stripe_customer_id) {
-        customerIdToUse = profile.stripe_customer_id;
-      } else {
+      // Try to find the profile with retries
+      let retryCount = 0;
+      const maxRetries = 3;
+      let profileFound = false;
+      let profile = null;
+
+      while (retryCount < maxRetries && !profileFound) {
+        // If this is a retry, wait before trying again
+        if (retryCount > 0) {
+          console.log(`Retry ${retryCount}/${maxRetries} finding user profile, waiting...`);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("stripe_customer_id, email")
+          .eq("id", userId)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error(
+            `Attempt ${retryCount + 1}/${maxRetries} - Error finding user profile:`,
+            profileError,
+          );
+          retryCount++;
+        } else if (profileData) {
+          profileFound = true;
+          profile = profileData;
+          console.log(`Found user profile:`, profileData);
+
+          if (profile.stripe_customer_id) {
+            console.log(`Found existing stripe customer ID: ${profile.stripe_customer_id}`);
+            customerIdToUse = profile.stripe_customer_id;
+          }
+        } else {
+          console.log(
+            `Profile not found for user ${userId}, retry ${retryCount + 1}/${maxRetries}`,
+          );
+          retryCount++;
+        }
+      }
+
+      if (!customerIdToUse) {
+        console.log(`No customer ID found for user ${userId} after ${maxRetries} attempts`);
         // No customer ID found, return empty history
         return res.status(200).json({ invoices: [] });
       }
     }
 
-    // Fetch invoices from Stripe
-    const invoices = await stripe.invoices.list({
-      customer: customerIdToUse,
-      limit: Number(limit),
-      expand: ["data.subscription", "data.lines.data.price.product", "data.payment_intent"],
-      status: includeDrafts ? undefined : "paid", // Only fetch paid invoices by default, or all if includeDrafts is true
-    });
+    console.log(`Fetching invoices for customer: ${customerIdToUse}`);
 
-    console.log(`Found ${invoices.data.length} invoices for customer ${customerIdToUse}`);
-
-    // If we didn't find any paid invoices, also try to get any other non-draft invoices
-    if (invoices.data.length === 0 && !includeDrafts) {
-      const pendingInvoices = await stripe.invoices.list({
+    // Fetch invoices from Stripe with error handling
+    let allInvoices = [];
+    try {
+      // First, get paid invoices
+      const paidInvoices = await stripe.invoices.list({
         customer: customerIdToUse,
         limit: Number(limit),
         expand: ["data.subscription", "data.lines.data.price.product", "data.payment_intent"],
-        status: "open", // Try to find open invoices too
+        status: "paid",
       });
 
       console.log(
-        `Found ${pendingInvoices.data.length} open invoices for customer ${customerIdToUse}`,
+        `Found ${paidInvoices.data.length} paid invoices for customer ${customerIdToUse}`,
       );
+      allInvoices = [...paidInvoices.data];
 
-      // Combine the arrays
-      invoices.data = [...invoices.data, ...pendingInvoices.data];
+      // If requested or if no paid invoices, get open invoices too
+      if (paidInvoices.data.length === 0 || includeDrafts) {
+        const openInvoices = await stripe.invoices.list({
+          customer: customerIdToUse,
+          limit: Number(limit),
+          expand: ["data.subscription", "data.lines.data.price.product", "data.payment_intent"],
+          status: "open",
+        });
+
+        console.log(
+          `Found ${openInvoices.data.length} open invoices for customer ${customerIdToUse}`,
+        );
+        allInvoices = [...allInvoices, ...openInvoices.data];
+      }
+
+      // If requested, include draft invoices
+      if (includeDrafts) {
+        const draftInvoices = await stripe.invoices.list({
+          customer: customerIdToUse,
+          limit: Number(limit),
+          expand: ["data.subscription", "data.lines.data.price.product", "data.payment_intent"],
+          status: "draft",
+        });
+
+        console.log(
+          `Found ${draftInvoices.data.length} draft invoices for customer ${customerIdToUse}`,
+        );
+        allInvoices = [...allInvoices, ...draftInvoices.data];
+      }
+    } catch (stripeError: any) {
+      console.error("Error fetching invoices from Stripe:", stripeError);
+      // Return an empty list rather than failing completely
+      return res.status(200).json({
+        invoices: [],
+        error: stripeError.message,
+      });
     }
 
-    // Filter out draft invoices if needed and sort by creation date (newest first)
-    const filteredInvoices = invoices.data
-      .filter((invoice) => includeDrafts || invoice.status !== "draft")
-      .sort((a, b) => b.created - a.created);
+    // Filter and sort by creation date (newest first)
+    const filteredInvoices = allInvoices.sort((a, b) => b.created - a.created);
 
     // Format invoice data for the frontend
     const formattedInvoices = filteredInvoices.map((invoice) => {

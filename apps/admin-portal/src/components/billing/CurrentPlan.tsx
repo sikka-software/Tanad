@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-
-import { useLocale, useTranslations } from "next-intl";
-
 import { AlertCircle, Download, RefreshCcw } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +15,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+import { TANAD_PRODUCT_ID } from "@/lib/constants";
+
 import { usePricing } from "@/hooks/use-pricing";
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/hooks/use-user-store";
-import { TANAD_PRODUCT_ID } from "@/lib/constants";
 
 // Create a pub/sub event for subscription updates
 export const SUBSCRIPTION_UPDATED_EVENT = "subscription_updated";
@@ -89,18 +89,10 @@ export default function CurrentPlan() {
 
   // Fetch billing history when dialog opens or when subscription changes
   useEffect(() => {
-    if (isHistoryDialogOpen && user) {
+    if ((isHistoryDialogOpen || subscription.id) && user) {
       fetchBillingHistory();
     }
-  }, [isHistoryDialogOpen, user, lastRefreshTime]);
-
-  // Also refresh data when subscription ID changes
-  useEffect(() => {
-    if (subscription.id) {
-      // This ensures we refresh billing history after a new subscription
-      fetchBillingHistory();
-    }
-  }, [subscription.id]);
+  }, [isHistoryDialogOpen, user, lastRefreshTime, subscription.id]);
 
   // Fetch billing history
   const fetchBillingHistory = async () => {
@@ -109,7 +101,12 @@ export default function CurrentPlan() {
     setIsLoadingHistory(true);
     setBillingHistory([]); // Clear previous data when loading
     try {
-      console.log("Fetching billing history for user", user.id);
+      console.log(
+        "Fetching billing history for user",
+        user.id,
+        "with customer ID:",
+        user?.stripe_customer_id,
+      );
       const response = await fetch("/api/stripe/billing-history", {
         method: "POST",
         headers: {
@@ -117,8 +114,9 @@ export default function CurrentPlan() {
         },
         body: JSON.stringify({
           userId: user.id,
+          customerId: user?.stripe_customer_id, // Add customer ID if available
           limit: 100, // Fetch more invoices to ensure we get everything
-          includeDrafts: false, // Skip draft invoices by default
+          includeDrafts: true, // Include draft invoices to see all invoices
         }),
       });
 
@@ -129,7 +127,26 @@ export default function CurrentPlan() {
 
       const data = await response.json();
       console.log("Billing history fetched:", data.invoices?.length || 0, "invoices");
-      setBillingHistory(data.invoices || []);
+
+      if (data.error) {
+        console.warn("Warning from billing history API:", data.error);
+      }
+
+      // If we have invoices, display them
+      if (data.invoices && data.invoices.length > 0) {
+        setBillingHistory(data.invoices);
+      } else {
+        // If we don't have invoices, try to refresh one more time after a delay
+        // This helps if the subscription was just created
+        console.log("No invoices found, will retry once after delay");
+        setTimeout(() => {
+          if (isHistoryDialogOpen) {
+            // Only retry if dialog is still open
+            console.log("Retrying billing history fetch after delay");
+            refreshBillingHistoryDelayed();
+          }
+        }, 2000);
+      }
     } catch (error) {
       console.error("Error fetching billing history:", error);
       toast.error("Failed to load billing history");
@@ -137,6 +154,43 @@ export default function CurrentPlan() {
       setIsLoadingHistory(false);
     }
   };
+
+  // Function to retry billing history fetch with delay
+  const refreshBillingHistoryDelayed = async () => {
+    try {
+      const response = await fetch("/api/stripe/billing-history", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          customerId: user?.stripe_customer_id,
+          limit: 100,
+          includeDrafts: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch billing history on retry");
+      }
+
+      const data = await response.json();
+      console.log("Retry billing history fetched:", data.invoices?.length || 0, "invoices");
+      setBillingHistory(data.invoices || []);
+    } catch (error) {
+      console.error("Error on retry billing history fetch:", error);
+    }
+  };
+
+  // Additional refresh when subscription changes
+  useEffect(() => {
+    // If subscription data changes, refresh billing history data
+    if (subscription.id && !isHistoryDialogOpen) {
+      console.log("Subscription changed, pre-fetching billing history");
+      fetchBillingHistory();
+    }
+  }, [subscription.id, subscription.status]);
 
   if (subscription.loading) {
     return <Skeleton className="h-24 w-full rounded-lg" />;

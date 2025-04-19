@@ -1041,6 +1041,7 @@
       "credit_card": "Credit Card",
       "digital_wallet": "Digital Wallet",
       "card_holder_name": "Cardholder Name",
+      "payment_details": "Payment Details",
       "card_holder_placeholder": "John Smith",
       "email": "Email",
       "email_placeholder": "john@example.com",
