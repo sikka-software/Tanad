@@ -205,6 +205,11 @@ export default function FilterPopover({
     ];
     setFilterConditions(defaultConditions);
     onConditionsChange?.(defaultConditions);
+    setActiveFilters(0);
+    setOpen(false);
+    if (onCaseSensitiveChange) {
+      onCaseSensitiveChange(false);
+    }
   };
 
   const renderValueInput = (condition: any) => {
