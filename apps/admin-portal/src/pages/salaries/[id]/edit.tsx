@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import { SalaryForm } from "@/components/app/salary/salary.form";
+import { SalaryForm } from "@/modules/salary/salary.form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
@@ -44,7 +44,7 @@ export default function EditSalaryPage() {
             <CardTitle>{t("Salaries.salary_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <SalaryForm salary_id={salary_id as string} onSuccess={handleSuccess} />
+            <SalaryForm id={salary_id as string} onSubmit={handleSuccess} />
           </CardContent>
         </Card>
       </div>

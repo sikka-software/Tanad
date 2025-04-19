@@ -30,7 +30,7 @@ import { Switch } from "@/components/ui/switch";
 
 import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 
 interface SortableItemProps {

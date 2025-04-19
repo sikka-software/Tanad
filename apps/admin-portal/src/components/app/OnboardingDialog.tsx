@@ -1,12 +1,10 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Sparkles, Loader2, Trash, ArrowDown } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { QRCodeSVG } from "qrcode.react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -24,17 +22,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useMainStore } from "@/hooks/main.store";
-import useUserStore from "@/hooks/use-user-store";
-// import { checkExistingSlug } from "@/lib/operations";
-import { supabase } from "@/lib/supabase";
+
 import { Pukla } from "@/lib/types";
+
+import { useMainStore } from "@/hooks/main.store";
+import useUserStore from "@/stores/use-user-store";
+// import { checkExistingSlug } from "@/lib/operations";
+import { createClient } from "@/utils/supabase/component";
 
 interface OnboardingDialogProps {
   onClose?: () => void;
 }
 
 export function OnboardingDialog({ onClose }: OnboardingDialogProps) {
+  const supabase = createClient();
   const t = useTranslations();
   const router = useRouter();
   const { user } = useUserStore();

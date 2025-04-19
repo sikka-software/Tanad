@@ -1,96 +1,119 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo } from "react";
+import { toast } from "sonner";
 
-import JobCard from "@/components/app/job/job.card";
-import JobTable from "@/components/app/job/job.table";
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
+
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import SelectionMode from "@/components/ui/selection-mode";
 
-import { Job } from "@/types/job.type";
-
-import { useJobs, useBulkDeleteJobs } from "@/hooks/useJobs";
-import { useJobsStore } from "@/stores/jobs.store";
+import JobCard from "@/modules/job/job.card";
+import { useJobs, useBulkDeleteJobs } from "@/modules/job/job.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/job/job.options";
+import { useJobsStore } from "@/modules/job/job.store";
+import JobTable from "@/modules/job/job.table";
 
 export default function JobsPage() {
   const t = useTranslations();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const viewMode = useJobsStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useJobsStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useJobsStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useJobsStore((state) => state.selectedRows);
+  const clearSelection = useJobsStore((state) => state.clearSelection);
+  const sortRules = useJobsStore((state) => state.sortRules);
+  const sortCaseSensitive = useJobsStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useJobsStore((state) => state.sortNullsFirst);
+  const searchQuery = useJobsStore((state) => state.searchQuery);
+  const filterConditions = useJobsStore((state) => state.filterConditions);
+  const filterCaseSensitive = useJobsStore((state) => state.filterCaseSensitive);
+  const getFilteredJobs = useJobsStore((state) => state.getFilteredJobs);
+  const getSortedJobs = useJobsStore((state) => state.getSortedJobs);
 
   const { data: jobs, isLoading, error } = useJobs();
-  const { selectedRows, setSelectedRows, clearSelection } = useJobsStore();
   const { mutate: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
 
-  const handleRowSelectionChange = (selectedJobs: Job[]) => {
-    setSelectedRows(selectedJobs.map((job) => job.id));
-  };
+  const filteredJobs = useMemo(() => {
+    return getFilteredJobs(jobs || []);
+  }, [jobs, getFilteredJobs, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedJobs = useMemo(() => {
+    return getSortedJobs(filteredJobs);
+  }, [filteredJobs, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
-    if (selectedRows.length === 0) return;
-    await deleteJobs(selectedRows);
-    clearSelection();
-    setIsDeleteDialogOpen(false);
+    try {
+      await deleteJobs(selectedRows, {
+        onSuccess: () => {
+          clearSelection();
+          setIsDeleteDialogOpen(false);
+        },
+        onError: (error: any) => {
+          console.error("Failed to delete jobs:", error);
+          toast.error(t("Jobs.error.bulk_delete"));
+          setIsDeleteDialogOpen(false);
+        },
+      });
+    } catch (error) {
+      console.error("Failed to delete jobs:", error);
+      setIsDeleteDialogOpen(false);
+    }
   };
 
-  const filteredData =
-    jobs?.filter((job) => job.title.toLowerCase().includes(searchQuery.toLowerCase())) ?? [];
-
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <SelectionMode
-          selectedRows={selectedRows}
-          clearSelection={clearSelection}
-          isDeleting={isDeleting}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        />
-      ) : (
-        <PageSearchAndFilter
-          title={t("Jobs.title")}
-          createHref="/jobs/add"
-          createLabel={t("Jobs.create_job")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Jobs.search_jobs")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-
-      <div>
-        {viewMode === "table" ? (
-          <JobTable
-            data={filteredData}
-            isLoading={isLoading}
-            error={error}
-            onSelectedRowsChange={handleRowSelectionChange}
+    <div>
+      <CustomPageMeta title={t("Jobs.title")} description={t("Jobs.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
-              data={filteredData}
-              isLoading={isLoading}
-              error={error}
-              emptyMessage={t("Jobs.no_jobs_found")}
-              renderItem={(job) => <JobCard job={job} />}
-              gridCols="3"
-            />
-          </div>
+          <PageSearchAndFilter
+            store={useJobsStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
+            title={t("Jobs.title")}
+            createHref="/jobs/add"
+            createLabel={t("Jobs.create_job")}
+            searchPlaceholder={t("Jobs.search_jobs")}
+          />
         )}
-      </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("Jobs.delete.title")}
-        description={t("Jobs.delete.description", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <div className="flex-1 overflow-hidden">
+          {viewMode === "table" ? (
+            <JobTable data={sortedJobs} isLoading={isLoading} error={error} />
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={sortedJobs}
+                isLoading={isLoading}
+                error={error}
+                emptyMessage={t("Jobs.no_jobs_found")}
+                renderItem={(job) => <JobCard job={job} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
+
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Jobs.delete.title")}
+          description={t("Jobs.delete.description", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

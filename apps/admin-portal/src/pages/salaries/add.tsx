@@ -3,12 +3,20 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import { SalaryForm } from "@/components/app/salary/salary.form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SalaryForm, SalaryFormValues } from "@/modules/salary/salary.form";
+import { Button } from "@/components/ui/button";
 import PageTitle from "@/components/ui/page-title";
 
-import useUserStore from "@/hooks/use-user-store";
+import { generateDummySalary } from "@/lib/dummy-factory";
+
+import { createSalary } from "@/modules/salary/salary.service";
+
+import { Salary, SalaryCreateData } from "@/modules/salary/salary.type";
+
+import { salaryKeys } from "@/modules/salary/salary.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddSalaryPage() {
   const router = useRouter();
@@ -20,14 +28,55 @@ export default function AddSalaryPage() {
   const handleSuccess = (salary: any) => {
     setLoading(false);
     // Update the salaries cache to include the new salary
-    const previousSalaries = queryClient.getQueryData(["salaries"]) || [];
-    queryClient.setQueryData(
-      ["salaries"],
-      [...(Array.isArray(previousSalaries) ? previousSalaries : []), salary],
-    );
+    const previousSalaries = queryClient.getQueryData(salaryKeys.lists()) || [];
+    queryClient.setQueryData(salaryKeys.lists(), [
+      ...(Array.isArray(previousSalaries) ? previousSalaries : []),
+      salary,
+    ]);
 
     // Navigate to salaries list
     router.push("/salaries");
+  };
+
+  // Data is SalaryFormValues (numbers for amounts)
+  const handleSubmit = async (data: SalaryFormValues) => {
+    setLoading?.(true);
+    try {
+      const salaryData = {
+        ...data,
+        deductions: data.deductions ? JSON.parse(data.deductions) : null,
+        notes: data.notes?.trim() || null,
+        user_id: user?.id,
+      };
+
+      let result: Salary;
+
+      result = await createSalary(salaryData as SalaryCreateData);
+
+      toast.success(t("General.successful_operation"), {
+        description: t("Salaries.messages.success_created"),
+      });
+
+      const previousSalaries = queryClient.getQueryData(salaryKeys.lists()) || [];
+      queryClient.setQueryData(salaryKeys.lists(), [
+        ...(Array.isArray(previousSalaries) ? previousSalaries : []),
+        result,
+      ]);
+
+      router.push("/salaries");
+    } catch (error) {
+      console.error("Failed to save salary:", error);
+      const description =
+        error instanceof SyntaxError
+          ? t("Salaries.form.deductions.invalid_json")
+          : error instanceof Error
+            ? error.message
+            : t("Salaries.messages.error_save");
+      toast.error(t("Salaries.error.title"), {
+        description,
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,23 +91,17 @@ export default function AddSalaryPage() {
           submit_form: t("Salaries.add_new"),
           cancel: t("General.cancel"),
         }}
+        customButton={
+          process.env.NODE_ENV === "development" && (
+            <Button variant="outline" size="sm" onClick={generateDummySalary}>
+              Dummy Data
+            </Button>
+          )
+        }
       />
 
-      <div className="p-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("Salaries.salary_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SalaryForm
-              id="salary-form"
-              onSuccess={handleSuccess}
-              loading={loading}
-              setLoading={setLoading}
-              user_id={user?.id}
-            />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <SalaryForm id="salary-form" onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );

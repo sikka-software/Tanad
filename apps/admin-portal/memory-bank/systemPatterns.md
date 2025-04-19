@@ -43,7 +43,7 @@ When implementing any CRUD module, we must first respect and align with the data
      address: text().notNull(),
      city: text().notNull(),
      state: text().notNull(),
-     zipCode: text("zip_code").notNull(),
+     zip_code: text("zip_code").notNull(),
      phone: text(),
      email: text(),
      is_active: boolean().default(true).notNull(),
@@ -443,7 +443,7 @@ The SheetTable Pattern is a standardized approach for implementing editable, sel
 
 4. **Implementation Pattern**
 
-   - Uses store for state management (e.g., `useOfficesStore`, `useQuotesStore`)
+   - Uses store for state management (e.g., `useOfficeStore`, `useQuotesStore`)
    - Implements `handleEdit` for cell updates
    - Implements `handleRowSelectionChange` for selection management
    - Configures table options with consistent settings
@@ -1111,7 +1111,7 @@ When implementing stores for collections of data (e.g., warehouses, offices, emp
 
    ```typescript
    // Correct
-   const useWarehousesStore = create<WarehousesStore>((set) => ({
+   const useWarehouseStore = create<WarehousesStore>((set) => ({
      // store implementation
    }));
 
@@ -1127,7 +1127,7 @@ When implementing stores for collections of data (e.g., warehouses, offices, emp
    // Correct
    // Incorrect
    import { useWarehouseStore } from "@/stores/warehouse.store";
-   import useWarehousesStore from "@/stores/warehouses.store";
+   import useWarehouseStore from "@/stores/warehouses.store";
    ```
 
 4. **Interface Naming**

@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
-
+import { Search } from "lucide-react";
 import { GetStaticPropsContext } from "next";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
-import { Search } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useDebounce } from "use-debounce";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { supabase } from "@/lib/supabase";
+
+import { createClient } from "@/utils/supabase/component";
 
 type Pukla = {
   id: string;
@@ -28,6 +27,7 @@ type Pukla = {
 };
 
 export default function DirectoryPage() {
+  const supabase = createClient();
   const t = useTranslations();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");

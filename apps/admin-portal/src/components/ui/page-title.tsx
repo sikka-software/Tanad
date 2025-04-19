@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { Loader2, Plus } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "./button";
 
@@ -31,10 +30,20 @@ const PageTitle = ({
   };
 }) => {
   return (
-    <div className="bg-background sticky top-0 flex !min-h-12 items-center justify-between border-b bg-background p-2 py-0">
+    <div className="bg-background bg-background sticky top-0 flex !min-h-12 items-center justify-between border-b p-2 py-0">
       <h2 className="ms-2 text-xl font-bold">{title}</h2>
       {formButtons && (
         <div className="flex gap-2 p-0">
+          {customButton
+            ? customButton
+            : createButtonLink && (
+                <Link href={createButtonLink}>
+                  <Button disabled={createButtonDisabled} size="sm" className="h-8">
+                    <Plus className="h-4 w-4" />
+                    {createButtonText}
+                  </Button>
+                </Link>
+              )}
           <Button variant="outline" size="sm" className="h-8" onClick={onCancel}>
             {texts?.cancel}
           </Button>
@@ -43,16 +52,6 @@ const PageTitle = ({
           </Button>
         </div>
       )}
-      {customButton
-        ? customButton
-        : createButtonLink && (
-            <Link href={createButtonLink}>
-              <Button disabled={createButtonDisabled} size="sm" className="h-8">
-                <Plus className="h-4 w-4" />
-                {createButtonText}
-              </Button>
-            </Link>
-          )}
     </div>
   );
 };

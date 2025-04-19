@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { Building2, MapPin, DollarSign } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Building2, MapPin, Calendar, DollarSign } from "lucide-react";
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useJobs } from "@/hooks/useJobs";
-import { Job } from "@/types/job.type";
-import { JobListing } from "@/types/job-listing.type";
+
+import { JobListing } from "@/modules/job-listing/job-listing.type";
+import { useJobs } from "@/modules/job/job.hooks";
+import { Job } from "@/modules/job/job.type";
 
 export default function JobListingPublicPage() {
   const t = useTranslations("Jobs");
@@ -34,9 +35,7 @@ export default function JobListingPublicPage() {
       {listing && (
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold">{listing.title}</h1>
-          {listing.description && (
-            <p className="text-lg text-gray-600">{listing.description}</p>
-          )}
+          {listing.description && <p className="text-lg text-gray-600">{listing.description}</p>}
         </div>
       )}
 
@@ -72,13 +71,8 @@ export default function JobListingPublicPage() {
                   </div>
                 )}
               </div>
-              {job.description && (
-                <p className="text-sm text-gray-600">{job.description}</p>
-              )}
-              <Button
-                className="w-full"
-                onClick={() => handleApply(job.id)}
-              >
+              {job.description && <p className="text-sm text-gray-600">{job.description}</p>}
+              <Button className="w-full" onClick={() => handleApply(job.id)}>
                 {t("Apply Now")}
               </Button>
             </CardContent>
@@ -87,4 +81,4 @@ export default function JobListingPublicPage() {
       </div>
     </div>
   );
-} 
+}

@@ -96,6 +96,12 @@ export const commandList = [
       },
       {
         icon: Briefcase,
+        label: "EmployeeRequests.title",
+        shortcut: "⌘R",
+        href: "/employee-requests",
+      },
+      {
+        icon: Briefcase,
         label: "Jobs.title",
         shortcut: "⌘J",
         href: "/jobs",

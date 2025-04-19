@@ -1,21 +1,22 @@
-import { useState, useEffect } from "react";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
 
-import { ClientForm, type ClientFormValues } from "@/components/app/client/client.form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
+import { Button } from "@/ui/button";
+import PageTitle from "@/ui/page-title";
+
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
-import { supabase } from "@/lib/supabase";
 
-import useUserStore from "@/hooks/use-user-store";
+import { ClientForm, type ClientFormValues } from "@/modules/client/client.form";
+import { clientKeys } from "@/modules/client/client.hooks";
+import { createClient } from "@/modules/client/client.service";
+import { Client, ClientCreateData } from "@/modules/client/client.type";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddClientPage() {
   const router = useRouter();
@@ -27,49 +28,43 @@ export default function AddClientPage() {
   const handleSubmit = async (data: ClientFormValues) => {
     setLoading(true);
     try {
-      // Check if user ID is available
-      if (!user?.id) {
-        throw new Error(t("Clients.error.not_authenticated"));
-      }
+      const clientData = {
+        name: data.name.trim(),
+        email: data.email.trim(),
+        phone: data.phone.trim(),
+        company: data.company || null,
+        address: data.address.trim(),
+        city: data.city.trim(),
+        state: data.state.trim(),
+        zip_code: data.zip_code.trim(),
+        notes: data.notes?.trim() || null,
+      };
 
-      const { data: newClient, error } = await supabase
-        .from("clients")
-        .insert([
-          {
-            name: data.name.trim(),
-            email: data.email.trim(),
-            phone: data.phone.trim(),
-            company: data.company || null,
-            address: data.address.trim(),
-            city: data.city.trim(),
-            state: data.state.trim(),
-            zip_code: data.zip_code.trim(),
-            notes: data.notes?.trim() || null,
-            user_id: user?.id,
-          },
-        ])
-        .select()
-        .single();
+      let result: Client;
 
-      if (error) throw error;
+      const clientCreateData = {
+        ...clientData,
+        user_id: user?.id,
+      };
 
-      // Update the clients cache to include the new client
-      const previousClients = queryClient.getQueryData(["clients"]) || [];
-      queryClient.setQueryData(
-        ["clients"],
-        [...(Array.isArray(previousClients) ? previousClients : []), newClient],
-      );
+      result = await createClient(clientCreateData as ClientCreateData);
 
       toast.success(t("General.successful_operation"), {
         description: t("Clients.success.created"),
       });
 
+      const previousClients = queryClient.getQueryData(clientKeys.lists()) || [];
+      queryClient.setQueryData(clientKeys.lists(), [
+        ...(Array.isArray(previousClients) ? previousClients : []),
+        result,
+      ]);
+
       router.push("/clients");
     } catch (error) {
+      console.error("Failed to save client:", error);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Clients.error.create"),
       });
-    } finally {
       setLoading(false);
     }
   };
@@ -78,18 +73,19 @@ export default function AddClientPage() {
     const dummyData = generateDummyData();
     const form = (window as any).clientForm;
     if (form) {
-      form.setValue("name", dummyData.name);
+      form.setValue("name", dummyData.full_name);
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
       form.setValue("address", dummyData.address);
       form.setValue("city", dummyData.city);
       form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zipCode);
+      form.setValue("zip_code", dummyData.zip_code);
     }
   };
 
   return (
     <div>
+      <CustomPageMeta title={t("Clients.add_new")} />
       <PageTitle
         title={t("Clients.add_new")}
         formButtons
@@ -100,27 +96,17 @@ export default function AddClientPage() {
           submit_form: t("Clients.add_new"),
           cancel: t("General.cancel"),
         }}
+        customButton={
+          process.env.NODE_ENV === "development" && (
+            <Button variant="outline" size="sm" onClick={handleDummyData}>
+              Dummy Data
+            </Button>
+          )
+        }
       />
 
-      <div className="p-4">
-        <Card className="max-w-2xl">
-          <CardHeader className="relative">
-            {process.env.NODE_ENV === "development" && (
-              <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
-                Dummy Data
-              </Button>
-            )}
-            <CardTitle>{t("Clients.client_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ClientForm
-              id="client-form"
-              user_id={user?.id}
-              onSubmit={handleSubmit}
-              loading={loading}
-            />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <ClientForm id="client-form" user_id={user?.id} onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );

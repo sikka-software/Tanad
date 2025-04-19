@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-import useUserStore from "@/hooks/use-user-store";
-import { supabase } from "@/lib/supabase";
+import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 // Create a context for the user data
 interface UserContextType {
@@ -19,6 +19,7 @@ const UserContext = createContext<UserContextType>({
 export const useUser = () => useContext(UserContext);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const supabase = createClient();
   const [isLoading, setIsLoading] = useState(true);
   const [user_id, setuser_id] = useState<string | null>(null);
 

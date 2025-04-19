@@ -35,7 +35,7 @@ export const clients = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
   },
@@ -75,7 +75,10 @@ export const invoices = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    index("invoices_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
+    index("invoices_client_id_idx").using(
+      "btree",
+      table.client_id.asc().nullsLast().op("uuid_ops"),
+    ),
     index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     index("invoices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
@@ -247,7 +250,7 @@ export const employees = pgTable("employees", {
   phone: varchar("phone", { length: 50 }),
   position: varchar("position", { length: 255 }).notNull(),
   department: varchar("department", { length: 255 }),
-  hireDate: date("hire_date").notNull(),
+  hire_date: date("hire_date").notNull(),
   salary: numeric("salary", { precision: 10, scale: 2 }),
   is_active: boolean("is_active").default(true).notNull(),
   notes: text("notes"),
@@ -277,7 +280,10 @@ export const expenses = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    index("expenses_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
+    index("expenses_client_id_idx").using(
+      "btree",
+      table.client_id.asc().nullsLast().op("uuid_ops"),
+    ),
     index("expenses_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     index("expenses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
@@ -311,7 +317,7 @@ export const vendors = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
   },
@@ -369,7 +375,7 @@ export const warehouses = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     capacity: numeric({ precision: 10, scale: 2 }),
     is_active: boolean("is_active").default(true).notNull(),
     notes: text(),
@@ -399,7 +405,7 @@ export const branches = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     phone: text(),
     email: text(),
     manager: text(),

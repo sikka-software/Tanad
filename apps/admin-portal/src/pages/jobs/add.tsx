@@ -5,11 +5,16 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { JobForm, type JobFormValues } from "@/components/app/job/job.form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
+import { Button } from "@/ui/button";
+import PageTitle from "@/ui/page-title";
 
-import { createJob } from "@/services/jobService";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+
+import { generateDummyData } from "@/lib/dummy-generator";
+
+import { JobForm, type JobFormValues } from "@/modules/job/job.form";
+import { jobKeys } from "@/modules/job/job.hooks";
+import { createJob } from "@/modules/job/job.service";
 
 export default function AddJobPage() {
   const t = useTranslations();
@@ -35,11 +40,11 @@ export default function AddJobPage() {
       });
 
       // Update the jobs cache to include the new job
-      const previousJobs = queryClient.getQueryData(["jobs"]) || [];
-      queryClient.setQueryData(
-        ["jobs"],
-        [...(Array.isArray(previousJobs) ? previousJobs : []), newJob],
-      );
+      const previousJobs = queryClient.getQueryData(jobKeys.lists()) || [];
+      queryClient.setQueryData(jobKeys.lists(), [
+        ...(Array.isArray(previousJobs) ? previousJobs : []),
+        newJob,
+      ]);
 
       toast.success(t("General.successful_operation"), {
         description: t("Jobs.messages.job_created"),
@@ -56,8 +61,26 @@ export default function AddJobPage() {
     }
   };
 
+  const handleDummyData = () => {
+    const dummyData = generateDummyData();
+    const form = (window as any).jobForm;
+    if (form) {
+      form.setValue("title", dummyData.job_title);
+      form.setValue("description", dummyData.job_description);
+      form.setValue("requirements", dummyData.requirements);
+      form.setValue("location", dummyData.job_location);
+      form.setValue("department", dummyData.job_department);
+      form.setValue("type", dummyData.job_type);
+      form.setValue("salary", dummyData.job_salary);
+      form.setValue("is_active", dummyData.job_is_active);
+      form.setValue("startDate", dummyData.job_start_date);
+      form.setValue("endDate", dummyData.job_end_date);
+    }
+  };
+
   return (
     <div>
+      <CustomPageMeta title={t("Jobs.add_new")} />
       <PageTitle
         title={t("Jobs.add_new")}
         formButtons
@@ -68,17 +91,17 @@ export default function AddJobPage() {
           submit_form: t("Jobs.add_new"),
           cancel: t("General.cancel"),
         }}
+        customButton={
+          process.env.NODE_ENV === "development" && (
+            <Button variant="outline" size="sm" onClick={handleDummyData}>
+              Dummy Data
+            </Button>
+          )
+        }
       />
 
-      <div className="p-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("Jobs.job_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <JobForm id="job-form" onSubmit={handleSubmit} loading={loading} />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <JobForm id="job-form" onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );

@@ -1,35 +1,49 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
-import SalaryCard from "@/components/app/salary/salary.card";
-import SalariesTable from "@/components/app/salary/salary.table";
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
+
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import SelectionMode from "@/components/ui/selection-mode";
 
-import type { Salary } from "@/types/salary.type";
-
-import { useSalaries, useBulkDeleteSalaries } from "@/hooks/useSalaries";
-import { useSalariesStore } from "@/stores/salaries.store";
+import SalaryCard from "@/modules/salary/salary.card";
+import { useSalaries, useBulkDeleteSalaries } from "@/modules/salary/salary.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/salary/salary.options";
+import { useSalaryStore } from "@/modules/salary/salary.store";
+import SalariesTable from "@/modules/salary/salary.table";
 
 export default function SalariesPage() {
   const t = useTranslations();
+
+  const viewMode = useSalaryStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useSalaryStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useSalaryStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useSalaryStore((state) => state.selectedRows);
+  const clearSelection = useSalaryStore((state) => state.clearSelection);
+  const sortRules = useSalaryStore((state) => state.sortRules);
+  const sortCaseSensitive = useSalaryStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useSalaryStore((state) => state.sortNullsFirst);
+  const searchQuery = useSalaryStore((state) => state.searchQuery);
+  const filterConditions = useSalaryStore((state) => state.filterConditions);
+  const filterCaseSensitive = useSalaryStore((state) => state.filterCaseSensitive);
+  const getFilteredSalaries = useSalaryStore((state) => state.getFilteredSalaries);
+  const getSortedSalaries = useSalaryStore((state) => state.getSortedSalaries);
+
   const { data: salaries, isLoading, error } = useSalaries();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { selectedRows, clearSelection } = useSalariesStore();
   const { mutate: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
 
-  const filteredSalaries = salaries?.filter(
-    (salary) =>
-      salary.employee_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (salary.notes || "").toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredSalaries = useMemo(() => {
+    return getFilteredSalaries(salaries || []);
+  }, [salaries, getFilteredSalaries, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedSalaries = useMemo(() => {
+    return getSortedSalaries(filteredSalaries);
+  }, [filteredSalaries, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
     try {
@@ -54,55 +68,58 @@ export default function SalariesPage() {
   };
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <SelectionMode
-          selectedRows={selectedRows}
-          clearSelection={clearSelection}
-          isDeleting={isDeleting}
-          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        />
-      ) : (
-        <PageSearchAndFilter
-          title={t("Salaries.title")}
-          createHref="/salaries/add"
-          createLabel={t("Salaries.create_salary")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Salaries.search_salaries")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-      <div>
-        {viewMode === "table" ? (
-          <SalariesTable
-            data={filteredSalaries || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
+    <div>
+      <CustomPageMeta title={t("Salaries.title")} description={t("Salaries.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
-              data={filteredSalaries || []}
+          <PageSearchAndFilter
+            store={useSalaryStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
+            title={t("Salaries.title")}
+            createHref="/salaries/add"
+            createLabel={t("Salaries.create_salary")}
+            searchPlaceholder={t("Salaries.search_salaries")}
+          />
+        )}
+        <div>
+          {viewMode === "table" ? (
+            <SalariesTable
+              data={sortedSalaries}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("Salaries.no_salaries_found")}
-              renderItem={(salary: Salary) => <SalaryCard key={salary.id} salary={salary} />}
-              gridCols="3"
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={sortedSalaries}
+                isLoading={isLoading}
+                error={error instanceof Error ? error : null}
+                emptyMessage={t("Salaries.no_salaries_found")}
+                renderItem={(salary) => <SalaryCard key={salary.id} salary={salary} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("Salaries.delete_salary")}
-        description={t("Salaries.confirm_delete")}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Salaries.delete_salary")}
+          description={t("Salaries.confirm_delete")}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

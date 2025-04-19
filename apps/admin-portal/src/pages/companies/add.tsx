@@ -1,18 +1,22 @@
-import { useState } from "react";
-
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
+import { useState } from "react";
+import { toast } from "sonner";
 
-import { useQueryClient } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Button } from "@/ui/button";
+import PageTitle from "@/ui/page-title";
 
-import { CompanyForm, type CompanyFormValues } from "@/components/app/company/company.form";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
-import useUserStore from "@/hooks/use-user-store";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+
 import { generateDummyData } from "@/lib/dummy-generator";
+
+import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
+import { companyKeys } from "@/modules/company/company.hooks";
+import { createCompany } from "@/modules/company/company.service";
+import { Company, CompanyCreateData } from "@/modules/company/company.type";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddCompanyPage() {
   const t = useTranslations();
@@ -22,65 +26,56 @@ export default function AddCompanyPage() {
   const { user } = useUserStore();
 
   const handleSubmit = async (data: CompanyFormValues) => {
-    if (!user?.id) {
-      router.push("/auth");
-      return;
-    }
-
     setLoading(true);
     try {
-      const response = await fetch("/api/companies/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: data.name.trim(),
-          email: data.email.trim(),
-          phone: data.phone?.trim() || null,
-          website: data.website?.trim() || null,
-          address: data.address?.trim() || null,
-          city: data.city?.trim() || null,
-          state: data.state?.trim() || null,
-          zipCode: data.zipCode?.trim() || null,
-          industry: data.industry?.trim() || null,
-          size: data.size?.trim() || null,
-          notes: data.notes?.trim() || null,
-          is_active: data.is_active,
-          user_id: user.id,
-        }),
+      const companyData = {
+        name: data.name.trim(),
+        email: data.email.trim(),
+        phone: data.phone?.trim() || null,
+        website: data.website?.trim() || null,
+        address: data.address?.trim() || null,
+        city: data.city?.trim() || null,
+        state: data.state?.trim() || null,
+        zip_code: data.zip_code?.trim() || null,
+        industry: data.industry?.trim() || null,
+        size: data.size?.trim() || null,
+        notes: data.notes?.trim() || null,
+        is_active: data.is_active,
+      };
+
+      let result: Company;
+
+      const companyCreateData = {
+        ...companyData,
+        user_id: user?.id,
+      };
+      result = await createCompany(companyCreateData as CompanyCreateData);
+
+      toast.success(t("General.successful_operation"), {
+        description: t("Companies.success.created"),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t("Companies.messages.error"));
-      }
-
-      // Get the new company data
-      const newCompany = await response.json();
-
-      // Update the companies cache to include the new company
-      const previousCompanies = queryClient.getQueryData(["companies", user.id]) || [];
-      queryClient.setQueryData(
-        ["companies", user.id],
-        [...(Array.isArray(previousCompanies) ? previousCompanies : []), newCompany],
-      );
+      const previousCompanies = queryClient.getQueryData(companyKeys.lists()) || [];
+      queryClient.setQueryData(companyKeys.lists(), [
+        ...(Array.isArray(previousCompanies) ? previousCompanies : []),
+        result,
+      ]);
 
       router.push("/companies");
     } catch (error) {
-      console.error(error);
-      throw error;
-    } finally {
+      console.error("Failed to save company:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Companies.error.creating"),
+      });
       setLoading(false);
     }
   };
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
-    // Access form through window since it's exposed by the form component
     const form = (window as any).companyForm;
     if (form) {
-      form.setValue("name", dummyData.name);
+      form.setValue("name", dummyData.full_name);
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
       form.setValue("address", dummyData.address);
@@ -89,6 +84,7 @@ export default function AddCompanyPage() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Companies.add_new")} />
       <PageTitle
         title={t("Companies.add_new")}
         formButtons
@@ -99,22 +95,17 @@ export default function AddCompanyPage() {
           submit_form: t("Companies.add_new"),
           cancel: t("General.cancel"),
         }}
+        customButton={
+          process.env.NODE_ENV === "development" && (
+            <Button variant="outline" size="sm" onClick={handleDummyData}>
+              Dummy Data
+            </Button>
+          )
+        }
       />
 
-      <div className="p-4">
-        <Card>
-          <CardHeader className="relative">
-            {process.env.NODE_ENV === "development" && (
-              <Button variant="outline" className="absolute end-4 top-4" onClick={handleDummyData}>
-                Dummy Data
-              </Button>
-            )}
-            <CardTitle>{t("Companies.company_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <CompanyForm id="company-form" onSubmit={handleSubmit} loading={loading} />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <CompanyForm id="company-form" onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );

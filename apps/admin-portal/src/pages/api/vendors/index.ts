@@ -1,24 +1,43 @@
+import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
-
-import { desc } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
 import { vendors } from "@/db/schema";
-import { Vendor } from "@/types/vendor";
+import { createClient } from "@/utils/supabase/server-props";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
+
   if (req.method === "GET") {
     try {
-      const vendorsList = await db.query.vendors.findMany({
-        orderBy: [desc(vendors.created_at)],
-      });
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      res.status(200).json(vendorsList);
+      if (!user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const result = await db.select().from(vendors).where(eq(vendors.user_id, user?.id));
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch vendors" });
     }
-  } else if (req.method === "POST") {
+  }
+  if (req.method === "POST") {
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user?.id) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
       const data = req.body;
       const [newVendor] = await db
         .insert(vendors)
@@ -30,9 +49,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           address: data.address,
           city: data.city,
           state: data.state,
-          zipCode: data.zipCode,
+          zip_code: data.zip_code,
           notes: data.notes,
-          user_id: data.user_id,
+          user_id: user?.id,
         })
         .returning();
 
@@ -40,8 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       res.status(500).json({ error: "Failed to create vendor" });
     }
-  } else {
-    res.setHeader("Allow", ["GET", "POST"]);
-    res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
+
+  res.status(405).json({ error: `Method ${req.method} Not Allowed` });
 }

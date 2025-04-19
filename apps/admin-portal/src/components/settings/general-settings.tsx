@@ -16,7 +16,7 @@ import { Separator } from "@/ui/separator";
 import { Skeleton } from "@/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 
 import BetaFlag from "../ui/beta-flag";

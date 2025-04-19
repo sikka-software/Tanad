@@ -16,7 +16,7 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 ### Current Implementation Standards
 
 - Store naming convention: Use plural form for collection stores (e.g., `warehouses.store.ts`, not `warehouse.store.ts`)
-- Store imports should match the file name exactly (e.g., `import useWarehousesStore from "@/stores/warehouses.store"`)
+- Store imports should match the file name exactly (e.g., `import useWarehouseStore from "@/stores/warehouses.store"`)
 - Components should use the store's interface as defined in the store file
 
 ### Data Mutation Implementation
@@ -27,19 +27,23 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 - Fixed UI refresh issues by properly invalidating queries
 
 ### Form Component Standardization
+
 - Standardized form component structure across the project
 - Moved from component-level to page-level API integration
 - Implemented consistent prop interfaces
 - Added development tools support
 
 ### Current Patterns
+
 1. Form Components
+
    - Validation at component level
    - UI rendering and state management
    - Window object exposure for development
    - Consistent prop interface
 
 2. Page Components
+
    - API integration
    - Cache management
    - Navigation handling
@@ -62,18 +66,21 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 - Show toast notifications for operation feedback
 
 ### Form Management
+
 - Using Zod for schema validation
 - Separating API calls from form components
 - Implementing consistent error handling
 - Supporting development tools
 
 ### Component Structure
+
 - Feature-based organization
 - Clear separation of concerns
 - Consistent file naming
 - Reusable patterns
 
 ### Data Flow
+
 - Page-level API integration
 - React Query for cache management
 - Toast notifications for user feedback
@@ -82,12 +89,14 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 ## Next Steps
 
 ### Immediate Tasks
+
 1. Apply standardized form pattern to remaining forms
 2. Implement consistent error handling across all forms
 3. Add development tools support to all form components
 4. Update documentation for new patterns
 
 ### Future Considerations
+
 1. Enhanced type safety
 2. Improved error handling
 3. Extended development tools
@@ -100,11 +109,13 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 - None currently, but monitoring for any mutation-related bugs
 
 ### Form Components
+
 - Need to standardize remaining form components
 - Implement consistent error handling
 - Add development tools support
 
 ### Development Tools
+
 - Extend dummy data generation
 - Improve form testing utilities
 - Add more development features
@@ -127,7 +138,7 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
      selectedRows: string[];
      isLoading: boolean;
      error: string | null;
-     fetchCompanies: () => Promise<void>;
+     fetchCompanies: (userId) => Promise<void>;
      updateCompany: (id: string, updates: Partial<Company>) => Promise<void>;
      setSelectedRows: (ids: string[]) => void;
      clearSelection: () => void;
@@ -172,8 +183,8 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 
    ```typescript
    export async function bulkDeleteCompanies(ids: string[]): Promise<void> {
-     const response = await fetch("/api/companies/bulk-delete", {
-       method: "POST",
+     const response = await fetch("/api/companies", {
+       method: "DELETE",
        headers: { "Content-Type": "application/json" },
        body: JSON.stringify({ ids }),
      });
@@ -187,6 +198,7 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
    - Consistent response handling
 
 5. **API Routes Pattern**
+
    ```typescript
    if (req.method === "DELETE") {
      try {
@@ -203,6 +215,7 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
      }
    }
    ```
+
    - RESTful endpoints
    - Proper error handling
    - Input validation
@@ -309,12 +322,14 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 5. Improve loading state UIs
 
 ### Primary Goals
+
 1. Standardize all form components
 2. Implement consistent patterns
 3. Improve developer experience
 4. Maintain code quality
 
 ### Secondary Goals
+
 1. Enhance type safety
 2. Optimize performance
 3. Improve error handling

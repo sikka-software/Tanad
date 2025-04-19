@@ -1,14 +1,16 @@
-import { useEffect } from "react";
-
 import { GetStaticProps, GetStaticPaths } from "next";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 import NoPuklaFound from "@/components/app/NoPuklaFound";
 import { PuklaView } from "@/components/app/PuklaView";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { supabase } from "@/lib/supabase";
+
+import { createClient as createClientComponent } from "@/utils/supabase/component";
+import { createClient as createClientStaticProps } from "@/utils/supabase/static-props";
 
 export default function RedirectPage({ pukla }: { pukla: any }) {
+  const supabase = createClientComponent();
   const router = useRouter();
 
   const logClick = async () => {
@@ -69,7 +71,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
   const code = params?.code as string;
-
+  const supabase = createClientStaticProps();
   // Fetch the pukla data for the given slug
   const { data: pukla, error } = await supabase
     .from("puklas")

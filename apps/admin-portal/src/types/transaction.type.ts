@@ -1,5 +1,4 @@
 import { AcceptedPaymentMethods } from "@/lib/constants/payment-consts";
-import { ClientProps } from "@/types/client.type";
 
 export type TransactionStatus = "completed" | "pending" | "failed" | "cancelled" | "refunded";
 
@@ -15,9 +14,8 @@ export type TransactionProps = {
   fort_id: string;
   token_name: string;
   agreement_id: string;
-  invoice_id: any; //TODO: change to InvoiceProps
-  invoice_payment: any; //TODO: change to PaymentProps
-  invoice_client: ClientProps;
+  invoice_id: any;
+  invoice_payment: any;
   payment_token: any;
   payment_details?: any;
   payment_method: AcceptedPaymentMethods;

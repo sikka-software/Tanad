@@ -34,7 +34,7 @@ export const companies = pgTable(
     address: text(),
     city: text(),
     state: text(),
-    zipCode: text("zip_code"),
+    zip_code: text("zip_code"),
     industry: text(),
     size: text(),
     notes: text(),
@@ -42,9 +42,9 @@ export const companies = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
+    index("companies_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("companies_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
   ],
 ).enableRLS();
 
@@ -63,14 +63,14 @@ export const clients = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
+    index("clients_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
     index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("clients_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
       columns: [table.company],
       foreignColumns: [companies.id],
@@ -105,9 +105,12 @@ export const invoices = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    index("invoices_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
-    index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     index("invoices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("invoices_client_id_idx").using(
+      "btree",
+      table.client_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     foreignKey({
       columns: [table.client_id],
       foreignColumns: [clients.id],
@@ -275,29 +278,6 @@ export const products = pgTable(
   ],
 ).enableRLS();
 
-export const employees = pgTable(
-  "employees",
-  {
-    id: uuid().primaryKey().defaultRandom(),
-    first_name: varchar("first_name", { length: 255 }).notNull(),
-    last_name: varchar("last_name", { length: 255 }).notNull(),
-    email: varchar("email", { length: 255 }).notNull().unique(),
-    phone: varchar("phone", { length: 50 }),
-    position: varchar("position", { length: 255 }).notNull(),
-    department_id: uuid("department_id").references(() => departments.id),
-    hireDate: date("hire_date").notNull(),
-    salary: numeric("salary", { precision: 10, scale: 2 }),
-    status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
-    notes: text("notes"),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-  ],
-).enableRLS();
-
 export const expenses = pgTable(
   "expenses",
   {
@@ -320,7 +300,10 @@ export const expenses = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    index("expenses_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
+    index("expenses_client_id_idx").using(
+      "btree",
+      table.client_id.asc().nullsLast().op("uuid_ops"),
+    ),
     index("expenses_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     index("expenses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
@@ -347,6 +330,10 @@ export const vendors = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
     name: text().notNull(),
     email: text().notNull(),
     phone: text().notNull(),
@@ -354,7 +341,7 @@ export const vendors = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
   },
@@ -412,7 +399,7 @@ export const warehouses = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     capacity: numeric({ precision: 10, scale: 2 }),
     is_active: boolean("is_active").default(true).notNull(),
     notes: text(),
@@ -442,7 +429,7 @@ export const branches = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     phone: text(),
     email: text(),
     manager: text(),
@@ -508,6 +495,30 @@ export const templates = pgTable(
   ],
 ).enableRLS();
 
+export const employees = pgTable(
+  "employees",
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    first_name: varchar("first_name", { length: 255 }).notNull(),
+    last_name: varchar("last_name", { length: 255 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    phone: varchar("phone", { length: 50 }),
+    position: varchar("position", { length: 255 }).notNull(),
+    department_id: uuid("department_id").references(() => departments.id),
+    hire_date: date("hire_date").notNull(),
+    salary: numeric("salary", { precision: 10, scale: 2 }),
+    status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
+    notes: text("notes"),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    user_id: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    unique("employees_email_user_id_unique").on(table.email, table.user_id),
+  ],
+).enableRLS();
+
 export const employeeRequests = pgTable(
   "employee_requests",
   {
@@ -515,7 +526,6 @@ export const employeeRequests = pgTable(
     employee_id: uuid("employee_id")
       .notNull()
       .references(() => employees.id),
-    employeeName: text("employee_name").notNull(),
     type: text("type", { enum: ["leave", "expense", "document", "other"] }).notNull(),
     status: text("status", { enum: ["pending", "approved", "rejected"] })
       .notNull()
@@ -529,13 +539,18 @@ export const employeeRequests = pgTable(
     notes: text("notes"),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    user_id: uuid("user_id").notNull(),
   },
-  (table) => ({
-    employee_idIdx: index("employee_requests_employee_id_idx").on(table.employee_id),
-    typeIdx: index("employee_requests_type_idx").on(table.type),
-    statusIdx: index("employee_requests_status_idx").on(table.status),
-    created_atIdx: index("employee_requests_created_at_idx").on(table.created_at),
-  }),
+  (table) => [
+    index("employee_requests_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("employee_requests_employee_id_idx").on(table.employee_id),
+    index("employee_requests_type_idx").on(table.type),
+    index("employee_requests_status_idx").on(table.status),
+    index("employee_requests_created_at_idx").on(table.created_at),
+  ],
 ).enableRLS();
 
 export const jobListings = pgTable(
@@ -553,7 +568,10 @@ export const jobListings = pgTable(
   (table) => [
     index("job_listings_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
     index("job_listings_slug_idx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
-    index("job_listings_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("job_listings_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
   ],
 ).enableRLS();
 
@@ -596,7 +614,7 @@ export const offices = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     phone: text(),
     email: text(),
     is_active: boolean().default(true).notNull(),

@@ -6,6 +6,7 @@ ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE departments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE department_locations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
+ALTER TABLE employee_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE invoice_items ENABLE ROW LEVEL SECURITY;
@@ -119,6 +120,11 @@ DROP POLICY IF EXISTS "Users can read department locations through departments" 
 DROP POLICY IF EXISTS "Users can insert department locations through departments" ON department_locations;
 DROP POLICY IF EXISTS "Users can update department locations through departments" ON department_locations;
 DROP POLICY IF EXISTS "Users can delete department locations through departments" ON department_locations;
+
+DROP POLICY IF EXISTS "Users can read their own employee requests" ON employee_requests;
+DROP POLICY IF EXISTS "Users can insert their own employee requests" ON employee_requests;
+DROP POLICY IF EXISTS "Users can update their own employee requests" ON employee_requests;
+DROP POLICY IF EXISTS "Users can delete their own employee requests" ON employee_requests;
 
 -- TEMPLATES POLICIES
 CREATE POLICY "USERS CAN VIEW THEIR OWN TEMPLATES"
@@ -237,6 +243,28 @@ CREATE POLICY "USERS CAN UPDATE THEIR OWN EMPLOYEES"
 
 CREATE POLICY "USERS CAN DELETE THEIR OWN EMPLOYEES"
   ON employees FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- EMPLOYEE REQUESTS POLICIES
+CREATE POLICY "USERS CAN READ THEIR OWN EMPLOYEE REQUESTS"
+  ON employee_requests FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "USERS CAN INSERT THEIR OWN EMPLOYEE REQUESTS"
+  ON employee_requests FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "USERS CAN UPDATE THEIR OWN EMPLOYEE REQUESTS"
+  ON employee_requests FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "USERS CAN DELETE THEIR OWN EMPLOYEE REQUESTS"
+  ON employee_requests FOR DELETE
   TO authenticated
   USING (auth.uid() = user_id);
 
@@ -579,7 +607,7 @@ CREATE POLICY "USERS CAN REMOVE JOBS FROM THEIR LISTINGS"
       WHERE job_listings.id = job_listing_jobs.job_listing_id
       AND job_listings.user_id = auth.uid()
     )
-  ); 
+  );
 
 -- OFFICES POLICIES
 CREATE POLICY "USERS CAN READ THEIR OWN OFFICES"
@@ -601,7 +629,7 @@ CREATE POLICY "USERS CAN UPDATE THEIR OWN OFFICES"
 CREATE POLICY "USERS CAN DELETE THEIR OWN OFFICES"
   ON offices FOR DELETE
   TO authenticated
-  USING (auth.uid() = user_id); 
+  USING (auth.uid() = user_id);
 
 -- DEPARTMENTS POLICIES
 CREATE POLICY "USERS CAN READ THEIR OWN DEPARTMENTS"

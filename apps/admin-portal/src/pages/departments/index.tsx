@@ -1,56 +1,50 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useMemo, useState } from "react";
 
-import { Trash2, X } from "lucide-react";
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
 
-import DepartmentCard from "@/components/app/department/department.card";
-import DepartmentsTable from "@/components/app/department/department.table";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Button } from "@/components/ui/button";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
-import { Department } from "@/types/department.type";
-
-import { useDepartments } from "@/hooks/useDepartments";
-import { useDeleteDepartments } from "@/hooks/useDepartments";
-import { useDepartmentsStore } from "@/stores/departments.store";
+import DepartmentCard from "@/modules/department/department.card";
+import { useDepartments } from "@/modules/department/department.hooks";
+import { useDeleteDepartments } from "@/modules/department/department.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/department/department.options";
+import { useDepartmentsStore } from "@/modules/department/department.store";
+import DepartmentsTable from "@/modules/department/department.table";
 
 export default function DepartmentsPage() {
   const t = useTranslations();
-  const { data: departments, isLoading, error } = useDepartments();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Get selection state and actions from the store
-  const { selectedRows, setSelectedRows, clearSelection } = useDepartmentsStore();
+  const viewMode = useDepartmentsStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useDepartmentsStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useDepartmentsStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useDepartmentsStore((state) => state.selectedRows);
+  const setSelectedRows = useDepartmentsStore((state) => state.setSelectedRows);
+  const clearSelection = useDepartmentsStore((state) => state.clearSelection);
+  const sortRules = useDepartmentsStore((state) => state.sortRules);
+  const sortCaseSensitive = useDepartmentsStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useDepartmentsStore((state) => state.sortNullsFirst);
+  const searchQuery = useDepartmentsStore((state) => state.searchQuery);
+  const filterConditions = useDepartmentsStore((state) => state.filterConditions);
+  const filterCaseSensitive = useDepartmentsStore((state) => state.filterCaseSensitive);
+  const getFilteredDepartments = useDepartmentsStore((state) => state.getFilteredDepartments);
+  const getSortedDepartments = useDepartmentsStore((state) => state.getSortedDepartments);
+
+  const { data: departments, isLoading, error } = useDepartments();
   const { mutate: deleteDepartments, isPending: isDeleting } = useDeleteDepartments();
 
-  const filteredDepartments = departments?.filter(
-    (department) =>
-      department.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      department.description?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredDepartments = useMemo(() => {
+    return getFilteredDepartments(departments || []);
+  }, [departments, getFilteredDepartments, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const selectedDepartments = selectedRows
-    .map((id) => departments?.find((dept) => dept.id === id))
-    .filter((dept): dept is Department => dept !== undefined);
-
-  const handleSelectedRowsChange = (rows: Department[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedRows.length === 0) return;
-    setIsDeleteDialogOpen(true);
-  };
+  const sortedDepartments = useMemo(() => {
+    return getSortedDepartments(filteredDepartments);
+  }, [filteredDepartments, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
     try {
@@ -64,77 +58,58 @@ export default function DepartmentsPage() {
   };
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <div className="bg-background sticky top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-b px-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">
-              {selectedRows.length} {t("General.items_selected")}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearSelection}
-              className="flex items-center gap-2"
-            >
-              <X className="h-4 w-4" />
-              {t("General.clear")}
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteSelected}
-              className="flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              {t("General.delete")}
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <PageSearchAndFilter
-          title={t("Departments.title")}
-          createHref="/departments/add"
-          createLabel={t("Departments.add_new")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Departments.search_departments")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-      <div>
-        {viewMode === "table" ? (
-          <DepartmentsTable
-            data={filteredDepartments || []}
-            isLoading={isLoading}
-            error={error instanceof Error ? error : null}
-            onSelectedRowsChange={handleSelectedRowsChange}
+    <div>
+      <CustomPageMeta title={t("Departments.title")} description={t("Departments.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
-              data={filteredDepartments || []}
+          <PageSearchAndFilter
+            store={useDepartmentsStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
+            title={t("Departments.title")}
+            createHref="/departments/add"
+            createLabel={t("Departments.add_new")}
+            searchPlaceholder={t("Departments.search_departments")}
+          />
+        )}
+        <div>
+          {viewMode === "table" ? (
+            <DepartmentsTable
+              data={sortedDepartments}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              emptyMessage={t("Departments.no_departments_found")}
-              renderItem={(department: Department) => <DepartmentCard department={department} />}
-              gridCols="3"
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={sortedDepartments}
+                isLoading={isLoading}
+                error={error instanceof Error ? error : null}
+                emptyMessage={t("Departments.no_departments_found")}
+                renderItem={(department) => <DepartmentCard department={department} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleConfirmDelete}
-        title={t("Departments.confirm_delete_title")}
-        description={t("Departments.confirm_delete", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Departments.confirm_delete_title")}
+          description={t("Departments.confirm_delete", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

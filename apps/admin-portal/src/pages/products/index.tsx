@@ -1,49 +1,51 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-
-import { Trash2, X } from "lucide-react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
-import ProductCard from "@/components/app/product/product.card";
-import ProductsTable from "@/components/app/product/product.table";
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
+
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Button } from "@/components/ui/button";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 
-import { Product } from "@/types/product.type";
-
-import { useProducts, useBulkDeleteProducts } from "@/hooks/useProducts";
-import { useProductsStore } from "@/stores/products.store";
+import ProductCard from "@/modules/product/product.card";
+import { useProducts, useBulkDeleteProducts } from "@/modules/product/product.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/product/product.options";
+import { useProductStore } from "@/modules/product/product.store";
+import ProductsTable from "@/modules/product/product.table";
 
 export default function ProductsPage() {
   const t = useTranslations();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { data: products, isLoading, error } = useProducts();
 
-  // Get selection state and actions from the store
-  const { selectedRows, setSelectedRows, clearSelection } = useProductsStore();
+  const viewMode = useProductStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useProductStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useProductStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useProductStore((state) => state.selectedRows);
+  const clearSelection = useProductStore((state) => state.clearSelection);
+  const sortRules = useProductStore((state) => state.sortRules);
+  const sortCaseSensitive = useProductStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useProductStore((state) => state.sortNullsFirst);
+  const searchQuery = useProductStore((state) => state.searchQuery);
+  const filterConditions = useProductStore((state) => state.filterConditions);
+  const filterCaseSensitive = useProductStore((state) => state.filterCaseSensitive);
+  const getFilteredProducts = useProductStore((state) => state.getFilteredProducts);
+  const getSortedProducts = useProductStore((state) => state.getSortedProducts);
+
+  const { data: products, isLoading, error } = useProducts();
   const { mutate: deleteProducts, isPending: isDeleting } = useBulkDeleteProducts();
 
-  const filteredProducts = Array.isArray(products)
-    ? products.filter(
-        (product: Product) =>
-          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.description?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
-          product.sku?.toLowerCase()?.includes(searchQuery.toLowerCase()),
-      )
-    : [];
+  const filteredProducts = useMemo(() => {
+    return getFilteredProducts(products || []);
+  }, [products, getFilteredProducts, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const selectedProducts = selectedRows
-    .map((id) => products?.find((prod) => prod.id === id))
-    .filter((prod): prod is Product => prod !== undefined);
+  const sortedProducts = useMemo(() => {
+    return getSortedProducts(filteredProducts);
+  }, [filteredProducts, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  const handleBulkDelete = () => {
+  const handleConfirmDelete = () => {
     if (selectedRows.length === 0) return;
     deleteProducts(selectedRows, {
       onSuccess: () => {
@@ -76,81 +78,60 @@ export default function ProductsPage() {
   };
 
   return (
-    <DataPageLayout>
-      {selectedRows.length > 0 ? (
-        <div className="bg-background sticky top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-b px-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">
-              {selectedRows.length} {t("General.items_selected")}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearSelection}
-              className="flex items-center gap-2"
-              disabled={isDeleting}
-            >
-              <X className="h-4 w-4" />
-              {t("General.clear")}
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setIsDeleteDialogOpen(true)}
-              className="flex items-center gap-2"
-              disabled={isDeleting}
-            >
-              <Trash2 className="h-4 w-4" />
-              {t("General.delete")}
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <PageSearchAndFilter
-          title={t("Products.title")}
-          createHref="/products/add"
-          createLabel={t("Products.add_new")}
-          onSearch={setSearchQuery}
-          searchPlaceholder={t("Products.search_products")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
-      )}
-
-      <div>
-        {viewMode === "table" ? (
-          <ProductsTable
-            data={filteredProducts}
-            isLoading={isLoading}
-            error={error as Error | null}
-            onSelectedRowsChange={(rows) => setSelectedRows(rows.map((r) => r.id))}
+    <div>
+      <CustomPageMeta title={t("Products.title")} description={t("Products.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           />
         ) : (
-          <div className="p-4">
-            <DataModelList
-              data={filteredProducts}
+          <PageSearchAndFilter
+            store={useProductStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
+            title={t("Products.title")}
+            createHref="/products/add"
+            createLabel={t("Products.add_new")}
+            searchPlaceholder={t("Products.search_products")}
+          />
+        )}
+
+        <div>
+          {viewMode === "table" ? (
+            <ProductsTable
+              data={sortedProducts}
               isLoading={isLoading}
               error={error as Error | null}
-              emptyMessage={t("Products.no_products")}
-              addFirstItemMessage={t("Products.add_first_product")}
-              renderItem={(product) => <ProductCard product={product} />}
-              gridCols="3"
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={sortedProducts}
+                isLoading={isLoading}
+                error={error as Error | null}
+                emptyMessage={t("Products.no_products")}
+                addFirstItemMessage={t("Products.add_first_product")}
+                renderItem={(product) => <ProductCard product={product} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <ConfirmDelete
-        isDeleteDialogOpen={isDeleteDialogOpen}
-        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
-        isDeleting={isDeleting}
-        handleConfirmDelete={handleBulkDelete}
-        title={t("Products.confirm_delete_title")}
-        description={t("Products.confirm_delete", { count: selectedRows.length })}
-      />
-    </DataPageLayout>
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={handleConfirmDelete}
+          title={t("Products.confirm_delete_title")}
+          description={t("Products.confirm_delete", { count: selectedRows.length })}
+        />
+      </DataPageLayout>
+    </div>
   );
 }
 

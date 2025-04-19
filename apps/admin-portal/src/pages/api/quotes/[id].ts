@@ -1,8 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { eq } from "drizzle-orm";
-
-import { Quote } from "@/types/quote.type";
+import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { quotes } from "@/db/schema";
@@ -36,7 +33,7 @@ function convertDrizzleQuote(data: any): any {
           address: data.client.address,
           city: data.client.city,
           state: data.client.state,
-          zip_code: data.client.zipCode,
+          zip_code: data.client.zip_code,
           notes: data.client.notes || null,
           created_at: data.client.created_at?.toString() || "",
         }

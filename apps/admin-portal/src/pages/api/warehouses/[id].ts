@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
 import { warehouses } from "@/db/schema";
-import { Warehouse } from "@/types/warehouse.type";
+import { Warehouse } from "@/modules/warehouse/warehouse.type";
 
 // Helper to convert Drizzle warehouse to our Warehouse type
 function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehouse {
@@ -14,7 +14,7 @@ function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect): Warehous
     address: data.address,
     city: data.city,
     state: data.state,
-    zip_code: data.zipCode,
+    zip_code: data.zip_code,
     capacity: data.capacity ? Number(data.capacity) : null,
     is_active: data.is_active,
     notes: data.notes,
@@ -47,7 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Map warehouse data to match Drizzle schema
       const dbWarehouse = {
         ...req.body,
-        zipCode: req.body.zip_code,
+        zip_code: req.body.zip_code,
         is_active: req.body.is_active,
         capacity: req.body.capacity?.toString(),
       };

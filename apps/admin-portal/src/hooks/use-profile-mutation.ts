@@ -1,11 +1,11 @@
-import { useTranslations } from "next-intl";
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/component";
 
 export const useProfileMutation = () => {
+  const supabase = createClient();
   const queryClient = useQueryClient();
   const t = useTranslations();
 

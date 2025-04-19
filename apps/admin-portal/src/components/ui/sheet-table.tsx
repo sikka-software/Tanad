@@ -15,10 +15,6 @@
  * - Real-time validation with Zod schemas
  * - Keyboard shortcuts (Ctrl+Z, Ctrl+V, etc.)
  */
-import React, { useState, useCallback, useEffect } from "react";
-
-import { useTranslations } from "next-intl";
-
 import {
   useReactTable,
   getCoreRowModel,
@@ -31,6 +27,8 @@ import {
 } from "@tanstack/react-table";
 // ** import icons
 import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
 import {
@@ -117,6 +115,7 @@ interface FooterProps {
  * Includes footer props and additional TanStack table configurations.
  */
 export interface SheetTableProps<T extends object> extends FooterProps {
+  id?: string;
   /**
    * Column definitions for the table.
    */
@@ -354,6 +353,7 @@ function SheetTable<
     rowActions,
     handleAddRowFunction,
     handleRemoveRowFunction,
+    id,
   } = props;
 
   const t = useTranslations();
@@ -999,7 +999,7 @@ function SheetTable<
 
   return (
     <div className="p-0">
-      <Table>
+      <Table id={id}>
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         {/* Primary header */}
         {showHeader && (
