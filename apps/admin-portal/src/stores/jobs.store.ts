@@ -2,25 +2,52 @@ import { create } from "zustand";
 
 import { Job } from "@/types/job.type";
 
-interface JobsState {
+import { createClient } from "@/utils/supabase/component";
+
+type JobStates = {
   jobs: Job[];
-  setJobs: (jobs: Job[]) => void;
-  updateJob: (id: string, data: Partial<Job>) => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
   selectedRows: string[];
+};
+
+type JobActions = {
+  fetchJobs: () => Promise<void>;
+  updateJob: (id: string, data: Partial<Job>) => Promise<void>;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
-}
+};
 
-export const useJobsStore = create<JobsState>((set) => ({
+export const useJobsStore = create<JobStates & JobActions>((set) => ({
   jobs: [],
-  setJobs: (jobs) => set({ jobs }),
-  updateJob: async (id, data) => {
-    // TODO: Implement API call to update job
-    set((state) => ({
-      jobs: state.jobs.map((job) => (job.id === id ? { ...job, ...data } : job)),
-    }));
-  },
+  isLoading: false,
+  error: null,
   selectedRows: [],
+  fetchJobs: async () => {
+    const supabase = createClient();
+    set({ isLoading: true, error: null });
+    try {
+      const { data, error } = await supabase.from("jobs").select("*");
+      if (error) throw error;
+      set({ jobs: data as Job[], isLoading: false });
+    } catch (error) {
+      set({ error: (error as Error).message, isLoading: false });
+    }
+  },
+  updateJob: async (id: string, updates: Partial<Job>) => {
+    const supabase = createClient();
+    try {
+      const { error } = await supabase.from("jobs").update(updates).eq("id", id);
+
+      if (error) throw error;
+
+      set((state) => ({
+        jobs: state.jobs.map((job) => (job.id === id ? { ...job, ...updates } : job)),
+      }));
+    } catch (error) {
+      set({ error: (error as Error).message });
+    }
+  },
 
   setSelectedRows: (ids: string[]) => {
     set((state) => {

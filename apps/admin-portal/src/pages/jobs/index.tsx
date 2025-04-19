@@ -30,7 +30,9 @@ export default function JobsPage() {
   const [nullsFirst, setNullsFirst] = useState(false);
 
   const { data: jobs, isLoading, error } = useJobs();
-  const { selectedRows, setSelectedRows, clearSelection } = useJobsStore();
+  const selectedRows = useJobsStore((state) => state.selectedRows);
+  const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
+  const clearSelection = useJobsStore((state) => state.clearSelection);
   const { mutate: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
 
   const filteredData =

@@ -9,7 +9,6 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { Job } from "@/types/job.type";
 
-import { jobs } from "@/db/schema";
 import { useJobsStore } from "@/stores/jobs.store";
 
 const titleSchema = z.string().min(1, "Required");
@@ -17,7 +16,6 @@ const typeSchema = z.string().min(1, "Required");
 const departmentSchema = z.string().min(1, "Required");
 const locationSchema = z.string().min(1, "Required");
 const salarySchema = z.number().min(0, "Salary must be positive");
-const descriptionSchema = z.string().optional();
 const is_activeSchema = z.boolean();
 
 interface JobTableProps {
@@ -29,7 +27,9 @@ interface JobTableProps {
 
 const JobTable = ({ data, isLoading, error, onSelectedRowsChange }: JobTableProps) => {
   const t = useTranslations();
-  const { updateJob, setSelectedRows, selectedRows } = useJobsStore();
+  const updateJob = useJobsStore((state) => state.updateJob);
+  const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
+  const selectedRows = useJobsStore((state) => state.selectedRows);
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
