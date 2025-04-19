@@ -29,10 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       // First check if the job listing belongs to the user
-      const existingListing = await db
-        .select()
-        .from(jobListings)
-        .where(eq(jobListings.id, id));
+      const existingListing = await db.select().from(jobListings).where(eq(jobListings.id, id));
 
       if (!existingListing.length) {
         return res.status(404).json({ error: "Job listing not found" });
@@ -45,10 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const result = await db
         .update(jobListings)
-        .set({
-          ...req.body,
-          updated_at: new Date().toISOString(),
-        })
+        .set(req.body)
         .where(eq(jobListings.id, id))
         .returning();
 
@@ -60,4 +54,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   return res.status(405).json({ error: "Method not allowed" });
-} 
+}
