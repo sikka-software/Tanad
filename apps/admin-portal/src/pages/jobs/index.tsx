@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -12,7 +13,6 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/components/app/job/job.op
 import JobTable from "@/components/app/job/job.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { applyFilters } from "@/lib/filter-utils";
 import { sortFactory } from "@/lib/sort-utils";
 
 import { Job } from "@/types/job.type";
@@ -26,32 +26,30 @@ export default function JobsPage() {
   const viewMode = useJobsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useJobsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useJobsStore((state) => state.setIsDeleteDialogOpen);
-  const searchQuery = useJobsStore((state) => state.searchQuery);
   const selectedRows = useJobsStore((state) => state.selectedRows);
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const clearSelection = useJobsStore((state) => state.clearSelection);
   const sortRules = useJobsStore((state) => state.sortRules);
   const sortCaseSensitive = useJobsStore((state) => state.sortCaseSensitive);
   const sortNullsFirst = useJobsStore((state) => state.sortNullsFirst);
+  const getFilteredJobs = useJobsStore((state) => state.getFilteredJobs);
+  const searchQuery = useJobsStore((state) => state.searchQuery);
   const filterConditions = useJobsStore((state) => state.filterConditions);
   const filterCaseSensitive = useJobsStore((state) => state.filterCaseSensitive);
 
   const { data: jobs, isLoading, error } = useJobs();
   const { mutate: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
 
-  // Apply search and filters
-  const filteredData = jobs
-    ? applyFilters(
-        jobs.filter((job) => job.title.toLowerCase().includes(searchQuery.toLowerCase())),
-        filterConditions,
-        filterCaseSensitive,
-      )
-    : [];
+  const filteredJobs = useMemo(() => {
+    return getFilteredJobs(jobs || []);
+  }, [jobs, getFilteredJobs, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const sortedJobs = sortFactory("jobs", filteredData || [], sortRules, {
-    caseSensitive: sortCaseSensitive,
-    nullsFirst: sortNullsFirst,
-  });
+  const sortedJobs = useMemo(() => {
+    return sortFactory("jobs", filteredJobs, sortRules, {
+      caseSensitive: sortCaseSensitive,
+      nullsFirst: sortNullsFirst,
+    });
+  }, [filteredJobs, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleRowSelectionChange = (rows: Job[]) => {
     const newSelectedIds = rows.map((row) => row.id!);

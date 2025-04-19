@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+import { applyFilters } from "@/lib/filter-utils";
+
 import { FilterCondition } from "@/types/common.type";
 import { Job } from "@/types/job.type";
 
@@ -34,9 +36,10 @@ type JobActions = {
   setSortRules: (sortRules: { field: string; direction: string }[]) => void;
   setSortCaseSensitive: (sortCaseSensitive: boolean) => void;
   setSortNullsFirst: (sortNullsFirst: boolean) => void;
+  getFilteredJobs: (data: Job[]) => Job[];
 };
 
-export const useJobsStore = create<JobStates & JobActions>((set) => ({
+export const useJobsStore = create<JobStates & JobActions>((set, get) => ({
   jobs: [],
   isLoading: false,
   error: null,
@@ -50,6 +53,30 @@ export const useJobsStore = create<JobStates & JobActions>((set) => ({
   sortRules: [],
   sortCaseSensitive: false,
   sortNullsFirst: false,
+
+  getFilteredJobs: (data: Job[]) => {
+    const { searchQuery, filterConditions, filterCaseSensitive } = get();
+
+    // If no data, return empty array
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    // First apply search if there is a search query
+    let filtered = data;
+    if (searchQuery) {
+      filtered = filtered.filter((job) =>
+        job.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
+    // Then apply other filters if there are any
+    if (filterConditions.length > 0) {
+      filtered = applyFilters(filtered, filterConditions, filterCaseSensitive);
+    }
+
+    return filtered;
+  },
 
   setSortRules: (sortRules: { field: string; direction: string }[]) => {
     set({ sortRules });
