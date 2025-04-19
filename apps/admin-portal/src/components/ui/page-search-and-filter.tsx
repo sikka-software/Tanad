@@ -14,6 +14,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "./button";
+import FilterPopover from "./filter-popover";
 import IconButton from "./icon-button";
 import { Input } from "./input";
 import SortPopover from "./sort-popover";
@@ -96,14 +97,9 @@ const PageSearchAndFilter = ({
           />
         )}
 
-        <IconButton
-          icon={<Filter className="h-4 w-4" />}
-          label={t("General.filter")}
-          onClick={() => {}}
-        />
-
-        <SortPopover 
-          sortRules={sortRules} 
+        <FilterPopover />
+        <SortPopover
+          sortRules={sortRules}
           onSortRulesChange={onSortRulesChange}
           columns={sortableColumns}
           caseSensitive={caseSensitive}
