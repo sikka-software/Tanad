@@ -6,7 +6,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useBranchesStore } from "@/modules/branch/branch.store";
+import { useBranchStore } from "@/modules/branch/branch.store";
 import { Branch } from "@/modules/branch/branch.type";
 
 const nameSchema = z.string().min(1, "Required");
@@ -28,9 +28,9 @@ interface BranchesTableProps {
 
 const BranchesTable = ({ data, isLoading, error }: BranchesTableProps) => {
   const t = useTranslations();
-  const updateBranch = useBranchesStore((state) => state.updateBranch);
-  const selectedRows = useBranchesStore((state) => state.selectedRows);
-  const setSelectedRows = useBranchesStore((state) => state.setSelectedRows);
+  const updateBranch = useBranchStore((state) => state.updateBranch);
+  const selectedRows = useBranchStore((state) => state.selectedRows);
+  const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));

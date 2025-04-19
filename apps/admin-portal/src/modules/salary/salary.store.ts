@@ -41,7 +41,7 @@ type SalaryActions = {
   getSortedSalaries: (data: Salary[]) => Salary[];
 };
 
-export const useSalariesStore = create<SalaryStates & SalaryActions>((set, get) => ({
+export const useSalaryStore = create<SalaryStates & SalaryActions>((set, get) => ({
   salaries: [],
   isLoading: false,
   error: null,

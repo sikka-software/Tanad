@@ -14,25 +14,25 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import ProductCard from "@/modules/product/product.card";
 import { useProducts, useBulkDeleteProducts } from "@/modules/product/product.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/product/product.options";
-import { useProductsStore } from "@/modules/product/product.store";
+import { useProductStore } from "@/modules/product/product.store";
 import ProductsTable from "@/modules/product/product.table";
 
 export default function ProductsPage() {
   const t = useTranslations();
 
-  const viewMode = useProductsStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useProductsStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useProductsStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useProductsStore((state) => state.selectedRows);
-  const clearSelection = useProductsStore((state) => state.clearSelection);
-  const sortRules = useProductsStore((state) => state.sortRules);
-  const sortCaseSensitive = useProductsStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useProductsStore((state) => state.sortNullsFirst);
-  const searchQuery = useProductsStore((state) => state.searchQuery);
-  const filterConditions = useProductsStore((state) => state.filterConditions);
-  const filterCaseSensitive = useProductsStore((state) => state.filterCaseSensitive);
-  const getFilteredProducts = useProductsStore((state) => state.getFilteredProducts);
-  const getSortedProducts = useProductsStore((state) => state.getSortedProducts);
+  const viewMode = useProductStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useProductStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useProductStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useProductStore((state) => state.selectedRows);
+  const clearSelection = useProductStore((state) => state.clearSelection);
+  const sortRules = useProductStore((state) => state.sortRules);
+  const sortCaseSensitive = useProductStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useProductStore((state) => state.sortNullsFirst);
+  const searchQuery = useProductStore((state) => state.searchQuery);
+  const filterConditions = useProductStore((state) => state.filterConditions);
+  const filterCaseSensitive = useProductStore((state) => state.filterCaseSensitive);
+  const getFilteredProducts = useProductStore((state) => state.getFilteredProducts);
+  const getSortedProducts = useProductStore((state) => state.getSortedProducts);
 
   const { data: products, isLoading, error } = useProducts();
   const { mutate: deleteProducts, isPending: isDeleting } = useBulkDeleteProducts();
@@ -90,7 +90,7 @@ export default function ProductsPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useProductsStore}
+            store={useProductStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Products.title")}

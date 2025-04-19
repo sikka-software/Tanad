@@ -40,7 +40,7 @@ type ProductActions = {
   getSortedProducts: (data: Product[]) => Product[];
 };
 
-export const useProductsStore = create<ProductStates & ProductActions>((set, get) => ({
+export const useProductStore = create<ProductStates & ProductActions>((set, get) => ({
   products: [],
   isLoading: false,
   error: null,

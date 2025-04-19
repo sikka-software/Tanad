@@ -6,7 +6,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useSalariesStore } from "@/modules/salary/salary.store";
+import { useSalaryStore } from "@/modules/salary/salary.store";
 import { Salary } from "@/modules/salary/salary.type";
 
 const employeeNameSchema = z.string().min(1, "Required");
@@ -25,9 +25,9 @@ interface SalariesTableProps {
 
 const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
   const t = useTranslations();
-  const updateSalary = useSalariesStore((state) => state.updateSalary);
-  const selectedRows = useSalariesStore((state) => state.selectedRows);
-  const setSelectedRows = useSalariesStore((state) => state.setSelectedRows);
+  const updateSalary = useSalaryStore((state) => state.updateSalary);
+  const selectedRows = useSalaryStore((state) => state.selectedRows);
+  const setSelectedRows = useSalaryStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 

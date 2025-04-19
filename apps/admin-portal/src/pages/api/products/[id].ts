@@ -1,7 +1,7 @@
 // TODO: Fix this don't use zustand here
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { useProductsStore } from "@/modules/product/product.store";
+import { useProductStore } from "@/modules/product/product.store";
 import { Product } from "@/modules/product/product.type";
 
 export default async function handler(
@@ -15,7 +15,7 @@ export default async function handler(
   }
 
   try {
-    const productsStore = useProductsStore.getState();
+    const productsStore = useProductStore.getState();
     const products = productsStore.products;
 
     if (!products) {

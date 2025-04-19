@@ -6,7 +6,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useClientsStore } from "@/modules/client/client.store";
+import { useClientStore } from "@/modules/client/client.store";
 import { Client } from "@/modules/client/client.type";
 
 const nameSchema = z.string().min(1, "Required");
@@ -26,9 +26,9 @@ interface ClientsTableProps {
 
 const ClientsTable = ({ data: unsortedData, isLoading, error }: ClientsTableProps) => {
   const t = useTranslations("Clients");
-  const updateClient = useClientsStore((state) => state.updateClient);
-  const selectedRows = useClientsStore((state) => state.selectedRows);
-  const setSelectedRows = useClientsStore((state) => state.setSelectedRows);
+  const updateClient = useClientStore((state) => state.updateClient);
+  const selectedRows = useClientStore((state) => state.selectedRows);
+  const setSelectedRows = useClientStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 

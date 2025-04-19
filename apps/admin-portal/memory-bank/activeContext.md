@@ -16,7 +16,7 @@ Implementing bulk delete functionality across all data models (quotes, offices, 
 ### Current Implementation Standards
 
 - Store naming convention: Use plural form for collection stores (e.g., `warehouses.store.ts`, not `warehouse.store.ts`)
-- Store imports should match the file name exactly (e.g., `import useWarehousesStore from "@/stores/warehouses.store"`)
+- Store imports should match the file name exactly (e.g., `import useWarehouseStore from "@/stores/warehouses.store"`)
 - Components should use the store's interface as defined in the store file
 
 ### Data Mutation Implementation

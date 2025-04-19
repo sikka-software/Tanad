@@ -1111,7 +1111,7 @@ When implementing stores for collections of data (e.g., warehouses, offices, emp
 
    ```typescript
    // Correct
-   const useWarehousesStore = create<WarehousesStore>((set) => ({
+   const useWarehouseStore = create<WarehousesStore>((set) => ({
      // store implementation
    }));
 
@@ -1127,7 +1127,7 @@ When implementing stores for collections of data (e.g., warehouses, offices, emp
    // Correct
    // Incorrect
    import { useWarehouseStore } from "@/stores/warehouse.store";
-   import useWarehousesStore from "@/stores/warehouses.store";
+   import useWarehouseStore from "@/stores/warehouses.store";
    ```
 
 4. **Interface Naming**

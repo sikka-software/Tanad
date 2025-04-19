@@ -13,26 +13,26 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import WarehouseCard from "@/modules/warehouse/warehouse.card";
 import { useBulkDeleteWarehouses, useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/warehouse/warehouse.options";
-import { useWarehousesStore } from "@/modules/warehouse/warehouse.store";
+import { useWarehouseStore } from "@/modules/warehouse/warehouse.store";
 import WarehouseTable from "@/modules/warehouse/warehouse.table";
 
 export default function WarehousesPage() {
   const t = useTranslations();
 
-  const viewMode = useWarehousesStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useWarehousesStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useWarehousesStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useWarehousesStore((state) => state.selectedRows);
-  const setSelectedRows = useWarehousesStore((state) => state.setSelectedRows);
-  const clearSelection = useWarehousesStore((state) => state.clearSelection);
-  const sortRules = useWarehousesStore((state) => state.sortRules);
-  const sortCaseSensitive = useWarehousesStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useWarehousesStore((state) => state.sortNullsFirst);
-  const searchQuery = useWarehousesStore((state) => state.searchQuery);
-  const filterConditions = useWarehousesStore((state) => state.filterConditions);
-  const filterCaseSensitive = useWarehousesStore((state) => state.filterCaseSensitive);
-  const getFilteredWarehouses = useWarehousesStore((state) => state.getFilteredWarehouses);
-  const getSortedWarehouses = useWarehousesStore((state) => state.getSortedWarehouses);
+  const viewMode = useWarehouseStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useWarehouseStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useWarehouseStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useWarehouseStore((state) => state.selectedRows);
+  const setSelectedRows = useWarehouseStore((state) => state.setSelectedRows);
+  const clearSelection = useWarehouseStore((state) => state.clearSelection);
+  const sortRules = useWarehouseStore((state) => state.sortRules);
+  const sortCaseSensitive = useWarehouseStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useWarehouseStore((state) => state.sortNullsFirst);
+  const searchQuery = useWarehouseStore((state) => state.searchQuery);
+  const filterConditions = useWarehouseStore((state) => state.filterConditions);
+  const filterCaseSensitive = useWarehouseStore((state) => state.filterCaseSensitive);
+  const getFilteredWarehouses = useWarehouseStore((state) => state.getFilteredWarehouses);
+  const getSortedWarehouses = useWarehouseStore((state) => state.getSortedWarehouses);
 
   const { data: warehouses, isLoading, error } = useWarehouses();
   const { mutate: deleteItems, isPending: isDeleting } = useBulkDeleteWarehouses();
@@ -69,7 +69,7 @@ export default function WarehousesPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useWarehousesStore}
+            store={useWarehouseStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Warehouses.title")}

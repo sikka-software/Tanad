@@ -14,25 +14,25 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import SalaryCard from "@/modules/salary/salary.card";
 import { useSalaries, useBulkDeleteSalaries } from "@/modules/salary/salary.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/salary/salary.options";
-import { useSalariesStore } from "@/modules/salary/salary.store";
+import { useSalaryStore } from "@/modules/salary/salary.store";
 import SalariesTable from "@/modules/salary/salary.table";
 
 export default function SalariesPage() {
   const t = useTranslations();
 
-  const viewMode = useSalariesStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useSalariesStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useSalariesStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useSalariesStore((state) => state.selectedRows);
-  const clearSelection = useSalariesStore((state) => state.clearSelection);
-  const sortRules = useSalariesStore((state) => state.sortRules);
-  const sortCaseSensitive = useSalariesStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useSalariesStore((state) => state.sortNullsFirst);
-  const searchQuery = useSalariesStore((state) => state.searchQuery);
-  const filterConditions = useSalariesStore((state) => state.filterConditions);
-  const filterCaseSensitive = useSalariesStore((state) => state.filterCaseSensitive);
-  const getFilteredSalaries = useSalariesStore((state) => state.getFilteredSalaries);
-  const getSortedSalaries = useSalariesStore((state) => state.getSortedSalaries);
+  const viewMode = useSalaryStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useSalaryStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useSalaryStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useSalaryStore((state) => state.selectedRows);
+  const clearSelection = useSalaryStore((state) => state.clearSelection);
+  const sortRules = useSalaryStore((state) => state.sortRules);
+  const sortCaseSensitive = useSalaryStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useSalaryStore((state) => state.sortNullsFirst);
+  const searchQuery = useSalaryStore((state) => state.searchQuery);
+  const filterConditions = useSalaryStore((state) => state.filterConditions);
+  const filterCaseSensitive = useSalaryStore((state) => state.filterCaseSensitive);
+  const getFilteredSalaries = useSalaryStore((state) => state.getFilteredSalaries);
+  const getSortedSalaries = useSalaryStore((state) => state.getSortedSalaries);
 
   const { data: salaries, isLoading, error } = useSalaries();
   const { mutate: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
@@ -80,7 +80,7 @@ export default function SalariesPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useSalariesStore}
+            store={useSalaryStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Salaries.title")}

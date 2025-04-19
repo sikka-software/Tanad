@@ -14,26 +14,26 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import ClientCard from "@/modules/client/client.card";
 import { useClients, useBulkDeleteClients } from "@/modules/client/client.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/client/client.options";
-import { useClientsStore } from "@/modules/client/client.store";
+import { useClientStore } from "@/modules/client/client.store";
 import ClientsTable from "@/modules/client/client.table";
 
 export default function ClientsPage() {
   const t = useTranslations();
 
-  const viewMode = useClientsStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useClientsStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useClientsStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useClientsStore((state) => state.selectedRows);
-  const setSelectedRows = useClientsStore((state) => state.setSelectedRows);
-  const clearSelection = useClientsStore((state) => state.clearSelection);
-  const sortRules = useClientsStore((state) => state.sortRules);
-  const sortCaseSensitive = useClientsStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useClientsStore((state) => state.sortNullsFirst);
-  const searchQuery = useClientsStore((state) => state.searchQuery);
-  const filterConditions = useClientsStore((state) => state.filterConditions);
-  const filterCaseSensitive = useClientsStore((state) => state.filterCaseSensitive);
-  const getFilteredClients = useClientsStore((state) => state.getFilteredClients);
-  const getSortedClients = useClientsStore((state) => state.getSortedClients);
+  const viewMode = useClientStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useClientStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useClientStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useClientStore((state) => state.selectedRows);
+  const setSelectedRows = useClientStore((state) => state.setSelectedRows);
+  const clearSelection = useClientStore((state) => state.clearSelection);
+  const sortRules = useClientStore((state) => state.sortRules);
+  const sortCaseSensitive = useClientStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useClientStore((state) => state.sortNullsFirst);
+  const searchQuery = useClientStore((state) => state.searchQuery);
+  const filterConditions = useClientStore((state) => state.filterConditions);
+  const filterCaseSensitive = useClientStore((state) => state.filterCaseSensitive);
+  const getFilteredClients = useClientStore((state) => state.getFilteredClients);
+  const getSortedClients = useClientStore((state) => state.getSortedClients);
 
   const { data: clients, isLoading, error } = useClients();
   const { mutate: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
@@ -78,7 +78,7 @@ export default function ClientsPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useClientsStore}
+            store={useClientStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Clients.title")}

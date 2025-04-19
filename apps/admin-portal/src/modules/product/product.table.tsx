@@ -6,7 +6,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useProductsStore } from "@/modules/product/product.store";
+import { useProductStore } from "@/modules/product/product.store";
 import { Product } from "@/modules/product/product.type";
 
 const nameSchema = z.string().min(1, "Required");
@@ -23,9 +23,9 @@ interface ProductsTableProps {
 
 const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
   const t = useTranslations();
-  const updateProduct = useProductsStore((state) => state.updateProduct);
-  const selectedRows = useProductsStore((state) => state.selectedRows);
-  const setSelectedRows = useProductsStore((state) => state.setSelectedRows);
+  const updateProduct = useProductStore((state) => state.updateProduct);
+  const selectedRows = useProductStore((state) => state.selectedRows);
+  const setSelectedRows = useProductStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 

@@ -14,25 +14,25 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import BranchCard from "@/modules/branch/branch.card";
 import { useBranches, useBulkDeleteBranches } from "@/modules/branch/branch.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/branch/branch.options";
-import { useBranchesStore } from "@/modules/branch/branch.store";
+import { useBranchStore } from "@/modules/branch/branch.store";
 import BranchesTable from "@/modules/branch/branch.table";
 
 export default function BranchesPage() {
   const t = useTranslations();
 
-  const viewMode = useBranchesStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useBranchesStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useBranchesStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useBranchesStore((state) => state.selectedRows);
-  const clearSelection = useBranchesStore((state) => state.clearSelection);
-  const sortRules = useBranchesStore((state) => state.sortRules);
-  const sortCaseSensitive = useBranchesStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useBranchesStore((state) => state.sortNullsFirst);
-  const searchQuery = useBranchesStore((state) => state.searchQuery);
-  const filterConditions = useBranchesStore((state) => state.filterConditions);
-  const filterCaseSensitive = useBranchesStore((state) => state.filterCaseSensitive);
-  const getFilteredBranches = useBranchesStore((state) => state.getFilteredBranches);
-  const getSortedBranches = useBranchesStore((state) => state.getSortedBranches);
+  const viewMode = useBranchStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useBranchStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useBranchStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useBranchStore((state) => state.selectedRows);
+  const clearSelection = useBranchStore((state) => state.clearSelection);
+  const sortRules = useBranchStore((state) => state.sortRules);
+  const sortCaseSensitive = useBranchStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useBranchStore((state) => state.sortNullsFirst);
+  const searchQuery = useBranchStore((state) => state.searchQuery);
+  const filterConditions = useBranchStore((state) => state.filterConditions);
+  const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
+  const getFilteredBranches = useBranchStore((state) => state.getFilteredBranches);
+  const getSortedBranches = useBranchStore((state) => state.getSortedBranches);
 
   const { data: branches, isLoading, error } = useBranches();
   const { mutate: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
@@ -77,7 +77,7 @@ export default function BranchesPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useBranchesStore}
+            store={useBranchStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Branches.title")}

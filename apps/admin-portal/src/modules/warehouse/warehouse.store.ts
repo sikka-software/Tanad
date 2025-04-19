@@ -40,7 +40,7 @@ type WarehouseActions = {
   getSortedWarehouses: (data: Warehouse[]) => Warehouse[];
 };
 
-export const useWarehousesStore = create<WarehouseStates & WarehouseActions>((set, get) => ({
+export const useWarehouseStore = create<WarehouseStates & WarehouseActions>((set, get) => ({
   warehouses: [],
   isLoading: false,
   error: null,

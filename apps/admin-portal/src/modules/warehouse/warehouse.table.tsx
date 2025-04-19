@@ -6,7 +6,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useWarehousesStore } from "@/modules/warehouse/warehouse.store";
+import { useWarehouseStore } from "@/modules/warehouse/warehouse.store";
 import { Warehouse } from "@/modules/warehouse/warehouse.type";
 
 const nameSchema = z.string().min(1, "Required");
@@ -26,9 +26,9 @@ interface WarehouseTableProps {
 
 const WarehouseTable = ({ data, isLoading, error }: WarehouseTableProps) => {
   const t = useTranslations();
-  const updateWarehouse = useWarehousesStore((state) => state.updateWarehouse);
-  const selectedRows = useWarehousesStore((state) => state.selectedRows);
-  const setSelectedRows = useWarehousesStore((state) => state.setSelectedRows);
+  const updateWarehouse = useWarehouseStore((state) => state.updateWarehouse);
+  const selectedRows = useWarehouseStore((state) => state.selectedRows);
+  const setSelectedRows = useWarehouseStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 

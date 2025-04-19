@@ -39,7 +39,7 @@ type BranchActions = {
   getSortedBranches: (data: Branch[]) => Branch[];
 };
 
-export const useBranchesStore = create<BranchStates & BranchActions>((set, get) => ({
+export const useBranchStore = create<BranchStates & BranchActions>((set, get) => ({
   branches: [],
   isLoading: false,
   error: null,
