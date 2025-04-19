@@ -3,9 +3,9 @@ import { create } from "zustand";
 import { applyFilters } from "@/lib/filter-utils";
 import { applySort } from "@/lib/sort-utils";
 
-import { Client } from "@/types/client.type";
 import { FilterCondition } from "@/types/common.type";
 
+import { Client } from "@/modules/client/client.type";
 import { createClient } from "@/utils/supabase/component";
 
 type ClientStates = {
