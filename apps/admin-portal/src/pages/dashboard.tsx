@@ -16,7 +16,7 @@ import { useBranches } from "@/modules/branch/branch.hooks";
 import { useClients } from "@/modules/client/client.hooks";
 import { useCompanies } from "@/modules/company/company.hooks";
 import { useDepartments } from "@/modules/department/department.hooks";
-import { useEmployees } from "@/modules/employee.hooks";
+import { useEmployees } from "@/modules/employee/employee.hooks";
 import { useJobs } from "@/modules/job/job.hooks";
 import { useOffices } from "@/modules/office/office.hooks";
 import { useVendors } from "@/modules/vendor/vendor.hooks";

@@ -7,9 +7,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Job } from "@/modules/job/job.type";
-
 import { useJobsStore } from "@/modules/job/job.store";
+import { Job } from "@/modules/job/job.type";
 
 const titleSchema = z.string().min(1, "Required");
 const typeSchema = z.string().min(1, "Required");
@@ -31,7 +30,6 @@ const JobTable = ({ data, isLoading, error, onSelectedRowsChange }: JobTableProp
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const selectedRows = useJobsStore((state) => state.selectedRows);
 
-  // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Job>[] = [

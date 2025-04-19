@@ -1,20 +1,20 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import CompanyCard from "@/modules/company/company.card";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/company/company.options";
-import CompaniesTable from "@/modules/company/company.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import CompanyCard from "@/modules/company/company.card";
 import { useCompanies, useBulkDeleteCompanies } from "@/modules/company/company.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/company/company.options";
 import useCompanyStore from "@/modules/company/company.store";
+import CompaniesTable from "@/modules/company/company.table";
 
 export default function CompaniesPage() {
   const t = useTranslations();

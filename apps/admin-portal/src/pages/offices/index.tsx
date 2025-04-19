@@ -8,15 +8,14 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import OfficeCard from "@/modules/office/office.card";
-import OfficesTable from "@/modules/office/office.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Office } from "@/modules/office/office.type";
-
+import OfficeCard from "@/modules/office/office.card";
 import { useOffices, useBulkDeleteOffices } from "@/modules/office/office.hooks";
 import { useOfficesStore } from "@/modules/office/office.store";
+import OfficesTable from "@/modules/office/office.table";
+import { Office } from "@/modules/office/office.type";
 
 export default function OfficesPage() {
   const t = useTranslations();

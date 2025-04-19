@@ -8,16 +8,15 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import JobCard from "@/modules/job/job.card";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/job/job.options";
-import JobTable from "@/modules/job/job.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Job } from "@/modules/job/job.type";
-
+import JobCard from "@/modules/job/job.card";
 import { useJobs, useBulkDeleteJobs } from "@/modules/job/job.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/job/job.options";
 import { useJobsStore } from "@/modules/job/job.store";
+import JobTable from "@/modules/job/job.table";
+import { Job } from "@/modules/job/job.type";
 
 export default function JobsPage() {
   const t = useTranslations();

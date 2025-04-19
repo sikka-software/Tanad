@@ -1,54 +1,57 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import DepartmentCard from "@/modules/department/department.card";
-import DepartmentsTable from "@/modules/department/department.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Department } from "@/modules/department/department.type";
-
+import DepartmentCard from "@/modules/department/department.card";
 import { useDepartments } from "@/modules/department/department.hooks";
 import { useDeleteDepartments } from "@/modules/department/department.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/department/department.options";
 import { useDepartmentsStore } from "@/modules/department/department.store";
+import DepartmentsTable from "@/modules/department/department.table";
+import { Department } from "@/modules/department/department.type";
 
 export default function DepartmentsPage() {
   const t = useTranslations();
-  const { data: departments, isLoading, error } = useDepartments();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Get selection state and actions from the store
-  const { selectedRows, setSelectedRows, clearSelection } = useDepartmentsStore();
+  const viewMode = useDepartmentsStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useDepartmentsStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useDepartmentsStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useDepartmentsStore((state) => state.selectedRows);
+  const setSelectedRows = useDepartmentsStore((state) => state.setSelectedRows);
+  const clearSelection = useDepartmentsStore((state) => state.clearSelection);
+  const sortRules = useDepartmentsStore((state) => state.sortRules);
+  const sortCaseSensitive = useDepartmentsStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useDepartmentsStore((state) => state.sortNullsFirst);
+  const searchQuery = useDepartmentsStore((state) => state.searchQuery);
+  const filterConditions = useDepartmentsStore((state) => state.filterConditions);
+  const filterCaseSensitive = useDepartmentsStore((state) => state.filterCaseSensitive);
+  const getFilteredDepartments = useDepartmentsStore((state) => state.getFilteredDepartments);
+  const getSortedDepartments = useDepartmentsStore((state) => state.getSortedDepartments);
+
+  const { data: departments, isLoading, error } = useDepartments();
   const { mutate: deleteDepartments, isPending: isDeleting } = useDeleteDepartments();
 
-  const filteredDepartments = departments?.filter(
-    (department) =>
-      department.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      department.description?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredDepartments = useMemo(() => {
+    return getFilteredDepartments(departments || []);
+  }, [departments, getFilteredDepartments, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const selectedDepartments = selectedRows
-    .map((id) => departments?.find((dept) => dept.id === id))
-    .filter((dept): dept is Department => dept !== undefined);
+  const sortedDepartments = useMemo(() => {
+    return getSortedDepartments(filteredDepartments);
+  }, [filteredDepartments, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  const handleSelectedRowsChange = (rows: Department[]) => {
+  const handleRowSelectionChange = (rows: Department[]) => {
     const newSelectedIds = rows.map((row) => row.id!);
     if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
       setSelectedRows(newSelectedIds);
     }
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedRows.length === 0) return;
-    setIsDeleteDialogOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -75,13 +78,13 @@ export default function DepartmentsPage() {
           />
         ) : (
           <PageSearchAndFilter
+            store={useDepartmentsStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
             title={t("Departments.title")}
             createHref="/departments/add"
             createLabel={t("Departments.add_new")}
-            onSearch={setSearchQuery}
             searchPlaceholder={t("Departments.search_departments")}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
           />
         )}
         <div>
@@ -90,7 +93,7 @@ export default function DepartmentsPage() {
               data={filteredDepartments || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              onSelectedRowsChange={handleSelectedRowsChange}
+              onSelectedRowsChange={handleRowSelectionChange}
             />
           ) : (
             <div className="p-4">

@@ -3,9 +3,6 @@ import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
-import ClientCard from "@/modules/client/client.card";
-import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/client/client.options";
-import ClientsTable from "@/modules/client/client.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import ConfirmDelete from "@/components/ui/confirm-delete";
@@ -13,10 +10,12 @@ import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import SelectionMode from "@/components/ui/selection-mode";
 
-import { Client } from "@/types/client.type";
-
+import ClientCard from "@/modules/client/client.card";
 import { useClients, useBulkDeleteClients } from "@/modules/client/client.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/client/client.options";
 import { useClientsStore } from "@/modules/client/client.store";
+import ClientsTable from "@/modules/client/client.table";
+import { Client } from "@/modules/client/client.type";
 
 export default function ClientsPage() {
   const t = useTranslations();

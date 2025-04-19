@@ -95,10 +95,11 @@ const models = [
   "invoices",
   "products",
   "employees",
-  "employee_requests",
+  "employeeRequests",
   "salaries",
   "jobs",
   "companies",
+  "departments",
 ];
 
 // The sorting factory to handle any of our models accurately and correctly.
@@ -141,7 +142,9 @@ export const applySort = <T>(
   options: SortOptions = {},
 ): T[] => {
   if (!models.includes(model)) {
-    throw new Error(`Unsupported model: ${model}`);
+    throw new Error(
+      `Unsupported model: ${model}, please add it to the models array in src/lib/sort-utils.ts`,
+    );
   }
 
   return sortData<T>(items, sortRules, options);
