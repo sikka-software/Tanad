@@ -27,6 +27,8 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { FilterCondition } from "@/types/common.type";
+
 // Define filter operators for different field types
 const TEXT_OPERATORS = [
   { value: "equals", label: "Equals" },
@@ -61,15 +63,6 @@ const SAVED_FILTERS = [
   { id: 2, name: "Recent Customers", conditions: [] },
   { id: 3, name: "Inactive Customers", conditions: [] },
 ];
-
-interface FilterCondition {
-  id: number;
-  field: string;
-  operator: string;
-  value: string;
-  type: "text" | "number" | "date";
-  conjunction: "and" | "or";
-}
 
 interface FilterPopoverProps {
   fields?: Array<{
@@ -437,8 +430,10 @@ export default function FilterPopover({
             </TabsContent>
 
             <TabsContent value="saved" className="relative space-y-4">
-              <div className="bg-background/80 absolute inset-0 z-10 h-full w-full flex items-center justify-center">
-                <div className="flex items-center  h-fit text-4xl p-4 bg-background rounded-md font-bold border  justify-between m-auto my-auto w-fit">{t("General.soon")}</div>
+              <div className="bg-background/80 absolute inset-0 z-10 flex h-full w-full items-center justify-center">
+                <div className="bg-background m-auto my-auto flex h-fit w-fit items-center justify-between rounded-md border p-4 text-4xl font-bold">
+                  {t("General.soon")}
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <h4 className="leading-none font-medium">{t("General.saved_filters")}</h4>

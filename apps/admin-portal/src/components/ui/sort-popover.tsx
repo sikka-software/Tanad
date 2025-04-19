@@ -18,13 +18,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 
+import { SortableColumn } from "@/types/common.type";
+
 import IconButton from "./icon-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
-
-interface SortableColumn {
-  value: string;
-  translationKey: string;
-}
 
 interface SortPopoverProps {
   sortRules: { field: string; direction: string }[];

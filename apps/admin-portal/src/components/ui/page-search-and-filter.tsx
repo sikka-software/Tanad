@@ -13,31 +13,13 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+import { FilterableField, SortableColumn, FilterCondition } from "@/types/common.type";
+
 import { Button } from "./button";
 import FilterPopover from "./filter-popover";
 import IconButton from "./icon-button";
 import { Input } from "./input";
 import SortPopover from "./sort-popover";
-
-interface SortableColumn {
-  value: string;
-  translationKey: string;
-}
-
-export interface FilterCondition {
-  id: number;
-  field: string;
-  operator: string;
-  value: string;
-  type: "text" | "number" | "date";
-  conjunction: "and" | "or";
-}
-
-export interface FilterableField {
-  id: string;
-  type: "text" | "number" | "date";
-  translationKey: string;
-}
 
 export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivElement> {
   onSearch?: (value: string) => void;

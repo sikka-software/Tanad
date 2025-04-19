@@ -17,3 +17,23 @@ export type inlineCardProps = {
   id: string;
   brand: string;
 };
+
+export interface FilterCondition {
+  id: number;
+  field: string;
+  operator: string;
+  value: string;
+  type: "text" | "number" | "date";
+  conjunction: "and" | "or";
+}
+
+export interface SortableColumn {
+  value: string;
+  translationKey: string;
+}
+
+export interface FilterableField {
+  id: string;
+  type: "text" | "number" | "date";
+  translationKey: string;
+}

@@ -1,16 +1,18 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
 import { toast } from "sonner";
 
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
+
 import JobCard from "@/components/app/job/job.card";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/components/app/job/job.options";
 import JobTable from "@/components/app/job/job.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter, { FilterCondition } from "@/components/ui/page-search-and-filter";
-import SelectionMode from "@/components/ui/selection-mode";
 
+import { applyFilters } from "@/lib/filter-utils";
 import { sortFactory } from "@/lib/sort-utils";
 
 import { Job } from "@/types/job.type";
@@ -18,143 +20,44 @@ import { Job } from "@/types/job.type";
 import { useJobs, useBulkDeleteJobs } from "@/hooks/models/useJobs";
 import { useJobsStore } from "@/stores/jobs.store";
 
-// Define the filterable fields for jobs
-const FILTERABLE_FIELDS = [
-  { id: "title", translationKey: "Jobs.form.title.label", type: "text" as const },
-  { id: "description", translationKey: "Jobs.form.description.label", type: "text" as const },
-  { id: "salary", translationKey: "Jobs.form.salary.label", type: "text" as const },
-  { id: "created_at", translationKey: "Jobs.form.created_at.label", type: "date" as const },
-  { id: "updated_at", translationKey: "Jobs.form.updated_at.label", type: "date" as const },
-];
-
-// Define the sortable columns
-const SORTABLE_COLUMNS = [
-  { value: "created_at", translationKey: "Jobs.form.created_at.label" },
-  { value: "title", translationKey: "Jobs.form.title.label" },
-  { value: "description", translationKey: "Jobs.form.description.label" },
-  { value: "requirements", translationKey: "Jobs.form.requirements.label" },
-  { value: "location", translationKey: "Jobs.form.location.label" },
-  { value: "department", translationKey: "Jobs.form.department.label" },
-  { value: "type", translationKey: "Jobs.form.type.label" },
-  { value: "salary", translationKey: "Jobs.form.salary.label" },
-  { value: "is_active", translationKey: "Jobs.form.is_active.label" },
-  { value: "start_date", translationKey: "Jobs.form.start_date.label" },
-  { value: "end_date", translationKey: "Jobs.form.end_date.label" },
-];
-
-// const sortableColumns = [
-// ];
-
 export default function JobsPage() {
   const t = useTranslations();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [sortRules, setSortRules] = useState<{ field: string; direction: string }[]>([
-    { field: "created_at", direction: "desc" },
-  ]);
-  const [caseSensitive, setCaseSensitive] = useState(false);
-  const [nullsFirst, setNullsFirst] = useState(false);
 
-  // Filter state
-  const [filterConditions, setFilterConditions] = useState<FilterCondition[]>([]);
-  const [filterCaseSensitive, setFilterCaseSensitive] = useState(false);
-
-  const { data: jobs, isLoading, error } = useJobs();
+  const isDeleteDialogOpen = useJobsStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useJobsStore((state) => state.setIsDeleteDialogOpen);
+  const searchQuery = useJobsStore((state) => state.searchQuery);
+  const setSearchQuery = useJobsStore((state) => state.setSearchQuery);
+  const viewMode = useJobsStore((state) => state.viewMode);
+  const setViewMode = useJobsStore((state) => state.setViewMode);
   const selectedRows = useJobsStore((state) => state.selectedRows);
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const clearSelection = useJobsStore((state) => state.clearSelection);
+  const sortRules = useJobsStore((state) => state.sortRules);
+  const setSortRules = useJobsStore((state) => state.setSortRules);
+  const sortCaseSensitive = useJobsStore((state) => state.sortCaseSensitive);
+  const setSortCaseSensitive = useJobsStore((state) => state.setSortCaseSensitive);
+  const sortNullsFirst = useJobsStore((state) => state.sortNullsFirst);
+  const setSortNullsFirst = useJobsStore((state) => state.setSortNullsFirst);
+  const filterConditions = useJobsStore((state) => state.filterConditions);
+  const setFilterConditions = useJobsStore((state) => state.setFilterConditions);
+  const filterCaseSensitive = useJobsStore((state) => state.filterCaseSensitive);
+  const setFilterCaseSensitive = useJobsStore((state) => state.setFilterCaseSensitive);
+
+  const { data: jobs, isLoading, error } = useJobs();
   const { mutate: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
-
-  // Apply filters to the data
-  const applyFilters = (data: Job[]) => {
-    if (!filterConditions.length) return data;
-
-    return data.filter((job) => {
-      return filterConditions.reduce((pass, condition, index) => {
-        let matches = false;
-        const value = job[condition.field as keyof Job];
-        const filterValue = condition.value;
-
-        if (condition.operator === "isEmpty") {
-          matches = !value;
-        } else if (condition.operator === "isNotEmpty") {
-          matches = Boolean(value);
-        } else if (typeof value === "string") {
-          const stringValue = String(value);
-          const compareValue = filterCaseSensitive ? stringValue : stringValue.toLowerCase();
-          const compareFilter = filterCaseSensitive ? filterValue : filterValue.toLowerCase();
-
-          switch (condition.operator) {
-            case "equals":
-              matches = compareValue === compareFilter;
-              break;
-            case "contains":
-              matches = compareValue.includes(compareFilter);
-              break;
-            case "startsWith":
-              matches = compareValue.startsWith(compareFilter);
-              break;
-            case "endsWith":
-              matches = compareValue.endsWith(compareFilter);
-              break;
-          }
-        } else if (typeof value === "number") {
-          const numValue = Number(filterValue);
-          switch (condition.operator) {
-            case "equals":
-              matches = value === numValue;
-              break;
-            case "greaterThan":
-              matches = value > numValue;
-              break;
-            case "lessThan":
-              matches = value < numValue;
-              break;
-            case "between":
-              const [min, max] = filterValue.split(",").map(Number);
-              matches = value >= min && value <= max;
-              break;
-          }
-        } else if (value && typeof value === "object" && "getTime" in value) {
-          const dateValue = new Date(value);
-          const filterDate = new Date(filterValue);
-          switch (condition.operator) {
-            case "equals":
-              matches = dateValue.getTime() === filterDate.getTime();
-              break;
-            case "before":
-              matches = dateValue < filterDate;
-              break;
-            case "after":
-              matches = dateValue > filterDate;
-              break;
-            case "between":
-              const [start, end] = filterValue.split(",").map((d) => new Date(d.trim()));
-              matches = dateValue >= start && dateValue <= end;
-              break;
-          }
-        }
-
-        return index === 0
-          ? matches
-          : condition.conjunction === "and"
-            ? pass && matches
-            : pass || matches;
-      }, true);
-    });
-  };
 
   // Apply search and filters
   const filteredData = jobs
     ? applyFilters(
         jobs.filter((job) => job.title.toLowerCase().includes(searchQuery.toLowerCase())),
+        filterConditions,
+        filterCaseSensitive,
       )
     : [];
 
   const sortedJobs = sortFactory("jobs", filteredData || [], sortRules, {
-    caseSensitive,
-    nullsFirst,
+    caseSensitive: sortCaseSensitive,
+    nullsFirst: sortNullsFirst,
   });
 
   const handleRowSelectionChange = (rows: Job[]) => {
@@ -204,10 +107,10 @@ export default function JobsPage() {
           sortRules={sortRules}
           onSortRulesChange={setSortRules}
           sortableColumns={SORTABLE_COLUMNS}
-          caseSensitive={caseSensitive}
-          onCaseSensitiveChange={setCaseSensitive}
-          nullsFirst={nullsFirst}
-          onNullsFirstChange={setNullsFirst}
+          caseSensitive={sortCaseSensitive}
+          onCaseSensitiveChange={setSortCaseSensitive}
+          nullsFirst={sortNullsFirst}
+          onNullsFirstChange={setSortNullsFirst}
           filterableFields={FILTERABLE_FIELDS}
           filterConditions={filterConditions}
           onFilterConditionsChange={setFilterConditions}
