@@ -58,6 +58,10 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
       is_active: true,
     },
   });
+  // Expose form methods for external use (like dummy data)
+  if (typeof window !== "undefined") {
+    (window as any).jobForm = form;
+  }
 
   return (
     <Form {...form}>

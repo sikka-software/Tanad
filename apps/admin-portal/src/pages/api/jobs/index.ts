@@ -30,8 +30,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === "POST") {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     try {
-      const result = await db.insert(jobs).values(req.body).returning();
+      const result = await db
+        .insert(jobs)
+        .values({ ...req.body, user_id: user?.id })
+        .returning();
       return res.status(201).json(result[0]);
     } catch (error) {
       console.error("Error creating job:", error);

@@ -1860,7 +1860,8 @@
       "created": "Job created successfully",
       "updated": "Job updated successfully",
       "deleted": "Job deleted successfully",
-      "error": "An error occurred while processing your request"
+      "error": "An error occurred while processing your request",
+      "job_created": "Job created successfully"
     },
     "form": {
       "title": {
@@ -1905,6 +1906,9 @@
       },
       "is_active": {
         "label": "Is this job active?"
+      },
+      "created_at": {
+        "label": "Created Date"
       }
     }
   },

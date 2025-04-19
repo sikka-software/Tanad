@@ -12,7 +12,7 @@ import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import SelectionMode from "@/components/ui/selection-mode";
 
-import { sortClients } from "@/lib/sort-utils";
+import { sortFactory } from "@/lib/sort-utils";
 
 import { Client } from "@/types/client.type";
 
@@ -30,6 +30,22 @@ export default function ClientsPage() {
   const [caseSensitive, setCaseSensitive] = useState(false);
   const [nullsFirst, setNullsFirst] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { selectedRows, setSelectedRows, clearSelection } = useClientsStore();
+  const { mutate: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
+
+  const filteredClients = clients?.filter(
+    (client) =>
+      client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (client.company_details?.name || "Unknown Company")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      client.email.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const sortedClients = sortFactory("clients", filteredClients || [], sortRules, {
+    caseSensitive,
+    nullsFirst,
+  });
 
   const sortableColumns = [
     { value: "created_at", label: t("General.created_at") },
@@ -43,35 +59,6 @@ export default function ClientsPage() {
     { value: "state", label: t("Clients.form.state.label") },
     { value: "zip_code", label: t("Clients.form.zip_code.label") },
   ];
-
-  const handleSortRulesChange = (newSortRules: { field: string; direction: string }[]) => {
-    setSortRules(newSortRules);
-  };
-
-  const handleCaseSensitiveChange = (value: boolean) => {
-    setCaseSensitive(value);
-  };
-
-  const handleNullsFirstChange = (value: boolean) => {
-    setNullsFirst(value);
-  };
-
-  const { selectedRows, setSelectedRows, clearSelection } = useClientsStore();
-  const { mutate: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
-
-  const filteredClients = clients?.filter(
-    (client) =>
-      client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (client.company_details?.name || "Unknown Company")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  const sortedClients = sortClients(filteredClients || [], sortRules, {
-    caseSensitive,
-    nullsFirst,
-  });
 
   const handleRowSelectionChange = (rows: Client[]) => {
     const newSelectedIds = rows.map((row) => row.id!);
@@ -120,12 +107,12 @@ export default function ClientsPage() {
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             sortRules={sortRules}
-            onSortRulesChange={handleSortRulesChange}
+            onSortRulesChange={(value) => setSortRules(value)}
             sortableColumns={sortableColumns}
             caseSensitive={caseSensitive}
-            onCaseSensitiveChange={handleCaseSensitiveChange}
+            onCaseSensitiveChange={(value) => setCaseSensitive(value)}
             nullsFirst={nullsFirst}
-            onNullsFirstChange={handleNullsFirstChange}
+            onNullsFirstChange={(value) => setNullsFirst(value)}
           />
         )}
         <div>

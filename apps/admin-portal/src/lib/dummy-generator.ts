@@ -30,7 +30,47 @@ export const generateDummyData = () => {
   ];
   const fakeLocations = ["Office", "Branch", "Warehouse"];
 
+  const fakeJobTitles = [
+    "Software Engineer",
+    "Product Manager",
+    "Sales Manager",
+    "Marketing Manager",
+    "HR Manager",
+  ];
+  const fakeJobDescriptions = [
+    "Description 1",
+    "Description 2",
+    "Description 3",
+    "Description 4",
+    "Description 5",
+  ];
+  const fakeJobRequirements = [
+    "Requirement 1",
+    "Requirement 2",
+    "Requirement 3",
+    "Requirement 4",
+    "Requirement 5",
+  ];
+
+  const fakeJobLocations = ["Office", "Branch", "Warehouse"];
+  const fakeJobDepartments = ["Sales", "Marketing", "HR", "IT", "Finance"];
+  const fakeJobTypes = ["Full-Time", "Part-Time", "Contract", "Temporary"];
+  const fakeJobSalaries = ["100000", "50000", "75000", "120000", "80000"];
+  const fakeJobIsActive = [true, false];
+  const fakeJobStartDate = ["2021-01-01", "2021-02-01", "2021-03-01", "2021-04-01", "2021-05-01"];
+  const fakeJobEndDate = ["2021-01-01", "2021-02-01", "2021-03-01", "2021-04-01", "2021-05-01"];
+
   return {
+    job_location: fakeJobLocations[Math.floor(Math.random() * fakeJobLocations.length)],
+    job_department: fakeJobDepartments[Math.floor(Math.random() * fakeJobDepartments.length)],
+    job_type: fakeJobTypes[Math.floor(Math.random() * fakeJobTypes.length)],
+    job_salary: fakeJobSalaries[Math.floor(Math.random() * fakeJobSalaries.length)],
+    job_is_active: fakeJobIsActive[Math.floor(Math.random() * fakeJobIsActive.length)],
+    job_start_date: fakeJobStartDate[Math.floor(Math.random() * fakeJobStartDate.length)],
+    job_end_date: fakeJobEndDate[Math.floor(Math.random() * fakeJobEndDate.length)],
+    job_title: fakeJobTitles[Math.floor(Math.random() * fakeJobTitles.length)],
+    job_description: fakeJobDescriptions[Math.floor(Math.random() * fakeJobDescriptions.length)],
+    requirements: fakeJobRequirements[Math.floor(Math.random() * fakeJobRequirements.length)],
     name: fakeNames[Math.floor(Math.random() * fakeNames.length)],
     description: fakeDescriptions[Math.floor(Math.random() * fakeDescriptions.length)],
     email: fakeEmails[Math.floor(Math.random() * fakeEmails.length)],

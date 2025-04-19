@@ -36,14 +36,14 @@ interface SortPopoverProps {
   onNullsFirstChange?: (value: boolean) => void;
 }
 
-function SortPopover({ 
-  sortRules, 
+function SortPopover({
+  sortRules,
   onSortRulesChange,
   columns,
   caseSensitive = false,
   onCaseSensitiveChange,
   nullsFirst = false,
-  onNullsFirstChange
+  onNullsFirstChange,
 }: SortPopoverProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -69,7 +69,7 @@ function SortPopover({
   };
 
   const resetSort = () => {
-    onSortRulesChange([{ field: "name", direction: "asc" }]);
+    onSortRulesChange([{ field: columns[0].value, direction: "asc" }]);
   };
 
   return (
@@ -105,7 +105,9 @@ function SortPopover({
                 </div>
                 <div className="grid grid-cols-[1fr_auto] gap-2">
                   <Select
+                    dir={locale === "ar" ? "rtl" : "ltr"}
                     value={rule.field}
+                    defaultValue={rule.field}
                     onValueChange={(value) => updateSortRule(index, "field", value)}
                   >
                     <SelectTrigger>
@@ -171,13 +173,13 @@ function SortPopover({
             className="text-muted-foreground mt-1 justify-start text-sm"
             onClick={addSortRule}
           >
-            <Plus className="mr-1 h-3.5 w-3.5" />
+            <Plus className="me-1 h-3.5 w-3.5" />
             {t("General.add_another_rule")}
           </Button>
 
           <div className="flex items-center space-x-2">
-            <Switch 
-              id="case-sensitive" 
+            <Switch
+              id="case-sensitive"
               checked={caseSensitive}
               onCheckedChange={onCaseSensitiveChange}
             />
@@ -185,11 +187,7 @@ function SortPopover({
           </div>
 
           <div className="flex items-center space-x-2">
-            <Switch 
-              id="null-first" 
-              checked={nullsFirst}
-              onCheckedChange={onNullsFirstChange}
-            />
+            <Switch id="null-first" checked={nullsFirst} onCheckedChange={onNullsFirstChange} />
             <Label htmlFor="null-first">{t("General.show_empty_values_first")}</Label>
           </div>
 
@@ -207,7 +205,7 @@ function SortPopover({
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="mr-2 h-4 w-4"
+                className="me-2 h-4 w-4"
               >
                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                 <path d="M3 3v5h5" />
