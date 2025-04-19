@@ -6,6 +6,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { useUpdateJobListing } from "./job-listing.hooks";
 import { useJobListingsStore } from "./job-listing.store";
 import { JobListing } from "./job-listing.type";
 
@@ -22,7 +23,7 @@ interface JobListingsTableProps {
 
 const JobListingsTable = ({ data, isLoading, error }: JobListingsTableProps) => {
   const t = useTranslations();
-  const updateJobListing = useJobListingsStore((state) => state.updateJobListing);
+  const { mutate: updateJobListing } = useUpdateJobListing();
   const selectedRows = useJobListingsStore((state) => state.selectedRows);
   const setSelectedRows = useJobListingsStore((state) => state.setSelectedRows);
 
@@ -50,7 +51,7 @@ const JobListingsTable = ({ data, isLoading, error }: JobListingsTableProps) => 
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "job_listing_id") return;
-    await updateJobListing(rowId, { [columnId]: value });
+    await updateJobListing({ id: rowId, jobListing: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

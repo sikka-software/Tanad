@@ -82,14 +82,14 @@ export default function JobListingsPage() {
       <div>
         {viewMode === "table" ? (
           <JobListingsTable
-            data={filteredListings}
+            data={sortedListings}
             isLoading={isLoading}
             error={error instanceof Error ? error : null}
           />
         ) : (
           <div className="p-4">
             <DataModelList
-              data={filteredListings}
+              data={sortedListings}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
               emptyMessage={t("JobListings.no_listings_found")}

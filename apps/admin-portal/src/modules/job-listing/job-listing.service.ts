@@ -1,5 +1,4 @@
-import { JobListing } from "@/types/job-listing.type";
-
+import { JobListing } from "@/modules/job-listing/job-listing.type";
 import useUserStore from "@/stores/use-user-store";
 
 export async function fetchJobListings(): Promise<JobListing[]> {
@@ -52,7 +51,12 @@ export async function bulkDeleteJobListings(ids: string[]): Promise<void> {
   }
 }
 
-export async function createJobListing(data: Pick<JobListing, 'title' | 'user_id'> & { description?: string | undefined; jobs?: string[] }): Promise<JobListing> {
+export async function createJobListing(
+  data: Pick<JobListing, "title" | "user_id"> & {
+    description?: string | undefined;
+    jobs?: string[];
+  },
+): Promise<JobListing> {
   try {
     const user = useUserStore.getState().user;
     if (!user?.id) {
@@ -67,7 +71,7 @@ export async function createJobListing(data: Pick<JobListing, 'title' | 'user_id
       },
       body: JSON.stringify({
         ...data,
-        description: data.description ?? null
+        description: data.description ?? null,
       }),
     });
 
@@ -78,6 +82,27 @@ export async function createJobListing(data: Pick<JobListing, 'title' | 'user_id
     return response.json();
   } catch (error) {
     console.error("Error creating job listing:", error);
+    throw error;
+  }
+}
+
+export async function updateJobListing(id: string, jobListing: Partial<JobListing>) {
+  try {
+    const response = await fetch(`/api/job-listings/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(jobListing),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update job listing with id ${id}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error updating job listing:", error);
     throw error;
   }
 }
