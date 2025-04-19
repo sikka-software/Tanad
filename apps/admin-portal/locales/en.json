@@ -54,6 +54,13 @@
     "show_empty_values_first": "Show Empty Values First",
     "ascending": "Ascending",
     "descending": "Descending",
+    "primary_sort": "Primary Sort",
+    "secondary_sort": "Secondary Sort",
+    "tertiary_sort": "Tertiary Sort",
+    "sort_priority_hint": "Higher rules take priority",
+    "remove_sort_rule": "Remove Sort Rule",
+    "case_sensitive_hint": "Match exact letter case when sorting",
+    "empty_values_hint": "Show null and empty values at the beginning",
     "calendars": {
       "gregorian": "Gregorian",
       "hijri": "Hijri"
