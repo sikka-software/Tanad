@@ -8,18 +8,15 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import VendorCard from "@/modules/vendor/vendor.card";
-import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/vendor/vendor.options";
-import VendorsTable from "@/modules/vendor/vendor.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { Vendor } from "@/modules/vendor/vendor.type";
-
+import VendorCard from "@/modules/vendor/vendor.card";
 import { useVendors, useBulkDeleteVendors } from "@/modules/vendor/vendor.hooks";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/vendor/vendor.options";
 import { useVendorsStore } from "@/modules/vendor/vendor.store";
+import VendorsTable from "@/modules/vendor/vendor.table";
 
-// Assuming a useVendors hook exists or will be created
 export default function VendorsPage() {
   const t = useTranslations();
 
@@ -27,7 +24,6 @@ export default function VendorsPage() {
   const isDeleteDialogOpen = useVendorsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useVendorsStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useVendorsStore((state) => state.selectedRows);
-  const setSelectedRows = useVendorsStore((state) => state.setSelectedRows);
   const clearSelection = useVendorsStore((state) => state.clearSelection);
   const sortRules = useVendorsStore((state) => state.sortRules);
   const sortCaseSensitive = useVendorsStore((state) => state.sortCaseSensitive);
@@ -48,13 +44,6 @@ export default function VendorsPage() {
   const sortedVendors = useMemo(() => {
     return getSortedVendors(filteredVendors);
   }, [filteredVendors, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleRowSelectionChange = (rows: Vendor[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -105,7 +94,6 @@ export default function VendorsPage() {
             data={sortedVendors || []}
             isLoading={isLoading}
             error={error instanceof Error ? error : null}
-            onSelectedRowsChange={handleRowSelectionChange}
           />
         ) : (
           <div className="p-4">
@@ -114,7 +102,7 @@ export default function VendorsPage() {
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
               emptyMessage={t("Vendors.no_vendors")}
-              renderItem={(vendor: Vendor) => <VendorCard key={vendor.id} vendor={vendor} />}
+              renderItem={(vendor) => <VendorCard key={vendor.id} vendor={vendor} />}
               gridCols="3"
             />
           </div>

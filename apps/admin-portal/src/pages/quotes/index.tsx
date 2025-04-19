@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -12,59 +13,37 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import QuoteCard from "@/modules/quote/quote.card";
 import { useQuotes, useBulkDeleteQuotes } from "@/modules/quote/quote.hooks";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/quote/quote.options";
 import { useQuotesStore } from "@/modules/quote/quote.store";
 import QuotesTable from "@/modules/quote/quote.table";
-import { Quote } from "@/modules/quote/quote.type";
 
 export default function QuotesPage() {
   const t = useTranslations();
 
+  const viewMode = useQuotesStore((state) => state.viewMode);
   const isDeleteDialogOpen = useQuotesStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useQuotesStore((state) => state.setIsDeleteDialogOpen);
-  const searchQuery = useQuotesStore((state) => state.searchQuery);
-  const setSearchQuery = useQuotesStore((state) => state.setSearchQuery);
-  const viewMode = useQuotesStore((state) => state.viewMode);
-  const setViewMode = useQuotesStore((state) => state.setViewMode);
   const selectedRows = useQuotesStore((state) => state.selectedRows);
-  const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
   const clearSelection = useQuotesStore((state) => state.clearSelection);
   const sortRules = useQuotesStore((state) => state.sortRules);
-  const setSortRules = useQuotesStore((state) => state.setSortRules);
   const sortCaseSensitive = useQuotesStore((state) => state.sortCaseSensitive);
-  const setSortCaseSensitive = useQuotesStore((state) => state.setSortCaseSensitive);
   const sortNullsFirst = useQuotesStore((state) => state.sortNullsFirst);
-  const setSortNullsFirst = useQuotesStore((state) => state.setSortNullsFirst);
+  const searchQuery = useQuotesStore((state) => state.searchQuery);
   const filterConditions = useQuotesStore((state) => state.filterConditions);
-  const setFilterConditions = useQuotesStore((state) => state.setFilterConditions);
   const filterCaseSensitive = useQuotesStore((state) => state.filterCaseSensitive);
-  const setFilterCaseSensitive = useQuotesStore((state) => state.setFilterCaseSensitive);
+  const getFilteredQuotes = useQuotesStore((state) => state.getFilteredQuotes);
+  const getSortedQuotes = useQuotesStore((state) => state.getSortedQuotes);
 
   const { data: quotes, isLoading, error } = useQuotes();
-
-  // Get selection state and actions from the store
   const { mutate: deleteQuotes, isPending: isDeleting } = useBulkDeleteQuotes();
 
-  const filteredQuotes = Array.isArray(quotes)
-    ? quotes.filter(
-        (quote: Quote) =>
-          quote.quote_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          quote.clients?.company?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
-          quote.clients?.name?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
-          quote.clients?.email?.toLowerCase()?.includes(searchQuery.toLowerCase()),
-      )
-    : [];
+  const filteredQuotes = useMemo(() => {
+    return getFilteredQuotes(quotes || []);
+  }, [quotes, getFilteredQuotes, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const handleRowSelectionChange = (rows: Quote[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedRows.length === 0) return;
-    setIsDeleteDialogOpen(true);
-  };
+  const sortedQuotes = useMemo(() => {
+    return getSortedQuotes(filteredQuotes);
+  }, [filteredQuotes, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
     try {
@@ -98,33 +77,28 @@ export default function QuotesPage() {
           />
         ) : (
           <PageSearchAndFilter
+            store={useQuotesStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
             title={t("Quotes.title")}
             createHref="/quotes/add"
             createLabel={t("Quotes.add_new")}
-            onSearch={setSearchQuery}
             searchPlaceholder={t("Quotes.search_quotes")}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
           />
         )}
 
         <div>
           {viewMode === "table" ? (
-            <QuotesTable
-              data={filteredQuotes}
-              isLoading={isLoading}
-              error={error as Error | null}
-              onSelectedRowsChange={handleRowSelectionChange}
-            />
+            <QuotesTable data={sortedQuotes} isLoading={isLoading} error={error as Error | null} />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={filteredQuotes}
+                data={sortedQuotes}
                 isLoading={isLoading}
                 error={error as Error | null}
                 emptyMessage={t("Quotes.no_quotes")}
                 addFirstItemMessage={t("Quotes.add_first_quote")}
-                renderItem={(quote: Quote) => <QuoteCard key={quote.id} quote={quote} />}
+                renderItem={(quote) => <QuoteCard key={quote.id} quote={quote} />}
                 gridCols="2"
               />
             </div>

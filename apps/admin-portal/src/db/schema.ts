@@ -330,6 +330,10 @@ export const vendors = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
     name: text().notNull(),
     email: text().notNull(),
     phone: text().notNull(),

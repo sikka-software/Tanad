@@ -6,9 +6,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { useProductsStore } from "@/modules/product/product.store";
 import { Product } from "@/modules/product/product.type";
-
-import useProductsStore from "@/modules/product/product.store";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().optional();
@@ -20,37 +19,15 @@ interface ProductsTableProps {
   data: Product[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (selectedRows: Product[]) => void;
 }
 
-const ProductsTable = ({ data, isLoading, error, onSelectedRowsChange }: ProductsTableProps) => {
-  const { updateProduct } = useProductsStore();
-  const { selectedRows, setSelectedRows } = useProductsStore();
+const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
   const t = useTranslations();
+  const updateProduct = useProductsStore((state) => state.updateProduct);
+  const selectedRows = useProductsStore((state) => state.selectedRows);
+  const setSelectedRows = useProductsStore((state) => state.setSelectedRows);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateProduct(rowId, { [columnId]: value });
-  };
-
-  const handleRowSelectionChange = useCallback(
-    (rows: Product[]) => {
-      const newSelectedIds = rows.map((row) => row.id!);
-      // Only update if the selection has actually changed
-      const currentSelection = new Set(selectedRows);
-      const newSelection = new Set(newSelectedIds);
-
-      if (
-        newSelection.size !== currentSelection.size ||
-        !Array.from(newSelection).every((id) => currentSelection.has(id))
-      ) {
-        setSelectedRows(newSelectedIds);
-        if (onSelectedRowsChange) {
-          onSelectedRowsChange(rows);
-        }
-      }
-    },
-    [selectedRows, setSelectedRows, onSelectedRowsChange],
-  );
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Product>[] = [
     { accessorKey: "name", header: t("Products.form.name.label"), validationSchema: nameSchema },
@@ -68,6 +45,27 @@ const ProductsTable = ({ data, isLoading, error, onSelectedRowsChange }: Product
     },
   ];
 
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await updateProduct(rowId, { [columnId]: value });
+  };
+
+  const handleRowSelectionChange = useCallback(
+    (rows: Product[]) => {
+      const newSelectedIds = rows.map((row) => row.id!);
+      // Only update if the selection has actually changed
+      const currentSelection = new Set(selectedRows);
+      const newSelection = new Set(newSelectedIds);
+
+      if (
+        newSelection.size !== currentSelection.size ||
+        !Array.from(newSelection).every((id) => currentSelection.has(id))
+      ) {
+        setSelectedRows(newSelectedIds);
+      }
+    },
+    [selectedRows, setSelectedRows],
+  );
+
   if (isLoading) {
     return (
       <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
@@ -78,8 +76,19 @@ const ProductsTable = ({ data, isLoading, error, onSelectedRowsChange }: Product
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  // Create a selection state object for the table
-  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+  const productTableOptions = {
+    state: {
+      rowSelection,
+    },
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
+    getRowId: (row: Product) => row.id!,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
+  };
 
   return (
     <SheetTable
@@ -89,19 +98,7 @@ const ProductsTable = ({ data, isLoading, error, onSelectedRowsChange }: Product
       showHeader={true}
       enableRowSelection={true}
       onRowSelectionChange={handleRowSelectionChange}
-      tableOptions={{
-        state: {
-          rowSelection,
-        },
-        enableRowSelection: true,
-        enableMultiRowSelection: true,
-        getRowId: (row) => row.id!,
-        onRowSelectionChange: (updater) => {
-          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-          const selectedRows = data.filter((row) => newSelection[row.id!]);
-          handleRowSelectionChange(selectedRows);
-        },
-      }}
+      tableOptions={productTableOptions}
     />
   );
 };

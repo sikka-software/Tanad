@@ -1,9 +1,7 @@
-import React, { useCallback } from "react";
-
-import { useTranslations } from "next-intl";
-
 import { Row } from "@tanstack/react-table";
 import { X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import React, { useCallback } from "react";
 import { z } from "zod";
 
 import { Button } from "@/ui/button";
@@ -17,13 +15,12 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Department } from "@/modules/department/department.type";
-
 import { useBranches } from "@/modules/branch/branch.hooks";
 import { useUpdateDepartment } from "@/modules/department/department.hooks";
+import { useDepartmentsStore } from "@/modules/department/department.store";
+import { Department } from "@/modules/department/department.type";
 import { useOffices } from "@/modules/office/office.hooks";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
-import { useDepartmentsStore } from "@/modules/department/department.store";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().min(1, "Required");
@@ -35,15 +32,9 @@ interface DepartmentsTableProps {
   data: Department[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (selectedRows: Department[]) => void;
 }
 
-const DepartmentsTable = ({
-  data,
-  isLoading,
-  error,
-  onSelectedRowsChange,
-}: DepartmentsTableProps) => {
+const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => {
   const t = useTranslations("Departments");
   const { mutateAsync: updateDepartment } = useUpdateDepartment();
   const { data: offices } = useOffices();
@@ -67,12 +58,9 @@ const DepartmentsTable = ({
         !Array.from(newSelection).every((id) => currentSelection.has(id))
       ) {
         setSelectedRows(newSelectedIds);
-        if (onSelectedRowsChange) {
-          onSelectedRowsChange(rows);
-        }
       }
     },
-    [selectedRows, setSelectedRows, onSelectedRowsChange],
+    [selectedRows, setSelectedRows],
   );
 
   const getLocationName = (locationId: string) => {
@@ -193,8 +181,8 @@ const DepartmentsTable = ({
         enableMultiRowSelection: true,
         getRowId: (row) => row.id!,
         onRowSelectionChange: (updater) => {
-          const newSelection = typeof updater === 'function' ? updater(rowSelection) : updater;
-          const selectedRows = data.filter(row => newSelection[row.id!]);
+          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+          const selectedRows = data.filter((row) => newSelection[row.id!]);
           handleRowSelectionChange(selectedRows);
         },
       }}

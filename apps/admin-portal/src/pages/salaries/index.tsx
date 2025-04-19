@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -8,30 +8,42 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import SalaryCard from "@/modules/salary/salary.card";
-import SalariesTable from "@/modules/salary/salary.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import type { Salary } from "@/modules/salary/salary.type";
-
+import SalaryCard from "@/modules/salary/salary.card";
 import { useSalaries, useBulkDeleteSalaries } from "@/modules/salary/salary.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/salary/salary.options";
 import { useSalariesStore } from "@/modules/salary/salary.store";
+import SalariesTable from "@/modules/salary/salary.table";
 
 export default function SalariesPage() {
   const t = useTranslations();
+
+  const viewMode = useSalariesStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useSalariesStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useSalariesStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useSalariesStore((state) => state.selectedRows);
+  const clearSelection = useSalariesStore((state) => state.clearSelection);
+  const sortRules = useSalariesStore((state) => state.sortRules);
+  const sortCaseSensitive = useSalariesStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useSalariesStore((state) => state.sortNullsFirst);
+  const searchQuery = useSalariesStore((state) => state.searchQuery);
+  const filterConditions = useSalariesStore((state) => state.filterConditions);
+  const filterCaseSensitive = useSalariesStore((state) => state.filterCaseSensitive);
+  const getFilteredSalaries = useSalariesStore((state) => state.getFilteredSalaries);
+  const getSortedSalaries = useSalariesStore((state) => state.getSortedSalaries);
+
   const { data: salaries, isLoading, error } = useSalaries();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { selectedRows, clearSelection } = useSalariesStore();
   const { mutate: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
 
-  const filteredSalaries = salaries?.filter(
-    (salary) =>
-      salary.employee_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (salary.notes || "").toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredSalaries = useMemo(() => {
+    return getFilteredSalaries(salaries || []);
+  }, [salaries, getFilteredSalaries, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedSalaries = useMemo(() => {
+    return getSortedSalaries(filteredSalaries);
+  }, [filteredSalaries, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
     try {
@@ -68,30 +80,30 @@ export default function SalariesPage() {
           />
         ) : (
           <PageSearchAndFilter
+            store={useSalariesStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
             title={t("Salaries.title")}
             createHref="/salaries/add"
             createLabel={t("Salaries.create_salary")}
-            onSearch={setSearchQuery}
             searchPlaceholder={t("Salaries.search_salaries")}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
           />
         )}
         <div>
           {viewMode === "table" ? (
             <SalariesTable
-              data={filteredSalaries || []}
+              data={sortedSalaries}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={filteredSalaries || []}
+                data={sortedSalaries}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Salaries.no_salaries_found")}
-                renderItem={(salary: Salary) => <SalaryCard key={salary.id} salary={salary} />}
+                renderItem={(salary) => <SalaryCard key={salary.id} salary={salary} />}
                 gridCols="3"
               />
             </div>

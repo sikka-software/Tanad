@@ -3,19 +3,19 @@ import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import SelectionMode from "@/components/ui/selection-mode";
 
 import ClientCard from "@/modules/client/client.card";
 import { useClients, useBulkDeleteClients } from "@/modules/client/client.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/client/client.options";
 import { useClientsStore } from "@/modules/client/client.store";
 import ClientsTable from "@/modules/client/client.table";
-import { Client } from "@/modules/client/client.type";
 
 export default function ClientsPage() {
   const t = useTranslations();
@@ -45,13 +45,6 @@ export default function ClientsPage() {
   const sortedClients = useMemo(() => {
     return getSortedClients(filteredClients);
   }, [filteredClients, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleRowSelectionChange = (rows: Client[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -101,7 +94,6 @@ export default function ClientsPage() {
               data={sortedClients || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              onSelectedRowsChange={handleRowSelectionChange}
             />
           ) : (
             <div className="p-4">

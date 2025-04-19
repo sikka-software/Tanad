@@ -43,7 +43,7 @@ type InvoiceActions = {
   getSortedInvoices: (data: Invoice[]) => Invoice[];
 };
 
-export const useInvoicesStore = create<InvoiceStates & InvoiceActions>((set, get) => ({
+export const useInvoiceStore = create<InvoiceStates & InvoiceActions>((set, get) => ({
   invoices: [],
   isLoading: false,
   error: null,

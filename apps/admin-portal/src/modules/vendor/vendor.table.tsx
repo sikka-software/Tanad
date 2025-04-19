@@ -6,9 +6,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Vendor } from "@/modules/vendor/vendor.type";
-
 import { useVendorsStore } from "@/modules/vendor/vendor.store";
+import { Vendor } from "@/modules/vendor/vendor.type";
 
 const nameSchema = z.string().min(1, "Required");
 const companySchema = z.string().optional();
@@ -25,32 +24,15 @@ interface VendorsTableProps {
   data: Vendor[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (rows: Vendor[]) => void;
 }
 
-const VendorsTable = ({ data, isLoading, error, onSelectedRowsChange }: VendorsTableProps) => {
+const VendorsTable = ({ data, isLoading, error }: VendorsTableProps) => {
   const t = useTranslations("Vendors");
-  const { updateVendor, selectedRows, setSelectedRows } = useVendorsStore();
+  const updateVendor = useVendorsStore((state) => state.updateVendor);
+  const selectedRows = useVendorsStore((state) => state.selectedRows);
+  const setSelectedRows = useVendorsStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateVendor(rowId, { [columnId]: value });
-  };
-
-  const handleRowSelectionChange = useCallback(
-    (rows: Vendor[]) => {
-      const newSelectedIds = rows.map((row) => row.id!);
-      // Only update if the selection has actually changed
-      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-        setSelectedRows(newSelectedIds);
-        if (onSelectedRowsChange) {
-          onSelectedRowsChange(rows);
-        }
-      }
-    },
-    [selectedRows, setSelectedRows, onSelectedRowsChange],
-  );
 
   const columns: ExtendedColumnDef<Vendor>[] = [
     { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
@@ -64,6 +46,21 @@ const VendorsTable = ({ data, isLoading, error, onSelectedRowsChange }: VendorsT
     { accessorKey: "products", header: t("form.products.label"), validationSchema: productsSchema },
     { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
   ];
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await updateVendor(rowId, { [columnId]: value });
+  };
+
+  const handleRowSelectionChange = useCallback(
+    (rows: Vendor[]) => {
+      const newSelectedIds = rows.map((row) => row.id!);
+      // Only update if the selection has actually changed
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(newSelectedIds);
+      }
+    },
+    [selectedRows, setSelectedRows],
+  );
 
   if (isLoading) {
     return (

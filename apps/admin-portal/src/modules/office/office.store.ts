@@ -40,7 +40,7 @@ type OfficeActions = {
   getSortedOffices: (data: Office[]) => Office[];
 };
 
-export const useOfficesStore = create<OfficeStates & OfficeActions>((set, get) => ({
+export const useOfficeStore = create<OfficeStates & OfficeActions>((set, get) => ({
   offices: [],
   isLoading: false,
   error: null,

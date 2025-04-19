@@ -448,7 +448,7 @@ The SheetTable Pattern is a standardized approach for implementing editable, sel
 
 4. **Implementation Pattern**
 
-   - Uses store for state management (e.g., `useOfficesStore`, `useQuotesStore`)
+   - Uses store for state management (e.g., `useOfficeStore`, `useQuotesStore`)
    - Implements `handleEdit` for cell updates
    - Implements `handleRowSelectionChange` for selection management
    - Configures table options with consistent settings

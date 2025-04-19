@@ -1,10 +1,9 @@
 import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Vendor } from "@/modules/vendor/vendor.type";
-
 import { db } from "@/db/drizzle";
 import { vendors } from "@/db/schema";
+import { Vendor } from "@/modules/vendor/vendor.type";
 
 // Helper to convert Drizzle vendor to our Vendor type
 function convertDrizzleVendor(data: typeof vendors.$inferSelect): Vendor {
@@ -20,6 +19,7 @@ function convertDrizzleVendor(data: typeof vendors.$inferSelect): Vendor {
     zip_code: data.zip_code,
     notes: data.notes,
     created_at: data.created_at?.toString() || "",
+    updated_at: data.updated_at?.toString() || "",
     user_id: data.user_id,
   };
 }

@@ -1,8 +1,11 @@
 import { create } from "zustand";
 
-import { FilterCondition } from "@/types/common.type";
-import { Quote } from "@/modules/quote/quote.type";
+import { applyFilters } from "@/lib/filter-utils";
+import { applySort } from "@/lib/sort-utils";
 
+import { FilterCondition } from "@/types/common.type";
+
+import { Quote } from "@/modules/quote/quote.type";
 import { createClient } from "@/utils/supabase/component";
 
 type QuoteStates = {
@@ -34,9 +37,11 @@ type QuoteActions = {
   setSortRules: (sortRules: { field: string; direction: string }[]) => void;
   setSortCaseSensitive: (sortCaseSensitive: boolean) => void;
   setSortNullsFirst: (sortNullsFirst: boolean) => void;
+  getFilteredQuotes: (data: Quote[]) => Quote[];
+  getSortedQuotes: (data: Quote[]) => Quote[];
 };
 
-export const useQuotesStore = create<QuoteStates & QuoteActions>((set) => ({
+export const useQuotesStore = create<QuoteStates & QuoteActions>((set, get) => ({
   quotes: [],
   isLoading: false,
   error: null,
@@ -49,6 +54,42 @@ export const useQuotesStore = create<QuoteStates & QuoteActions>((set) => ({
   sortRules: [],
   sortCaseSensitive: false,
   sortNullsFirst: false,
+
+  getFilteredQuotes: (data: Quote[]) => {
+    const { searchQuery, filterConditions, filterCaseSensitive } = get();
+
+    // If no data, return empty array
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    // First apply search if there is a search query
+    let filtered = data;
+    if (searchQuery) {
+      filtered = filtered.filter((quote) =>
+        // make it search in any column (except id)
+        Object.values(quote).some((value) =>
+          value.toString().toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
+      );
+    }
+
+    // Then apply other filters if there are any
+    if (filterConditions.length > 0) {
+      filtered = applyFilters(filtered, filterConditions, filterCaseSensitive);
+    }
+
+    return filtered;
+  },
+
+  getSortedQuotes: (data: Quote[]) => {
+    const { sortRules, sortCaseSensitive, sortNullsFirst } = get();
+
+    return applySort("quotes", data, sortRules, {
+      caseSensitive: sortCaseSensitive,
+      nullsFirst: sortNullsFirst,
+    });
+  },
 
   setSortRules: (sortRules: { field: string; direction: string }[]) => {
     set({ sortRules });

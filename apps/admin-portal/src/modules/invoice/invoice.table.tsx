@@ -1,9 +1,7 @@
-import React from "react";
-
+import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-
-import { format } from "date-fns";
+import React from "react";
 import { z } from "zod";
 
 import { Button } from "@/ui/button";
@@ -11,9 +9,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { useInvoiceStore } from "@/modules/invoice/invoice.store";
 import { Invoice } from "@/modules/invoice/invoice.type";
-
-import { useInvoicesStore } from "@/modules/invoice/invoice.store";
 
 const invoiceNumberSchema = z.string().min(1, "Required");
 const issueDateSchema = z.date();
@@ -29,15 +26,11 @@ interface InvoicesTableProps {
 
 const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
   const t = useTranslations("Invoices");
-  const { updateInvoice } = useInvoicesStore();
+  const { updateInvoice } = useInvoiceStore();
+  const selectedRows = useInvoiceStore((state) => state.selectedRows);
+  const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    let processedValue = value;
-    if (columnId === "issueDate" || columnId === "dueDate") {
-      processedValue = new Date(value as string).toISOString();
-    }
-    await updateInvoice(rowId, { [columnId]: processedValue });
-  };
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Invoice>[] = [
     {
@@ -90,6 +83,28 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
     },
   ];
 
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    let processedValue = value;
+    if (columnId === "issueDate" || columnId === "dueDate") {
+      processedValue = new Date(value as string).toISOString();
+    }
+    await updateInvoice(rowId, { [columnId]: processedValue });
+  };
+
+  const handleRowSelectionChange = (rows: Invoice[]) => {
+    const newSelectedIds = rows.map((row) => row.id!);
+    // Only update if the selection has actually changed
+    const currentSelection = new Set(selectedRows);
+    const newSelection = new Set(newSelectedIds);
+
+    if (
+      newSelection.size !== currentSelection.size ||
+      !Array.from(newSelection).every((id) => currentSelection.has(id))
+    ) {
+      setSelectedRows(newSelectedIds);
+    }
+  };
+
   if (isLoading) {
     return (
       <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
@@ -100,7 +115,29 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  return <SheetTable columns={columns} data={data} onEdit={handleEdit} showHeader={true} />;
+  const invoiceTableOptions = {
+    state: {
+      rowSelection,
+    },
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
+    getRowId: (row: Invoice) => row.id!,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
+  };
+
+  return (
+    <SheetTable
+      columns={columns}
+      data={data}
+      onEdit={handleEdit}
+      showHeader={true}
+      tableOptions={invoiceTableOptions}
+    />
+  );
 };
 
 export default InvoicesTable;

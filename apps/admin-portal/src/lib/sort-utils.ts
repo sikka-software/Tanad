@@ -1,3 +1,20 @@
+const models = [
+  "clients",
+  "vendors",
+  "offices",
+  "warehouses",
+  "branches",
+  "invoices",
+  "products",
+  "employees",
+  "employeeRequests",
+  "salaries",
+  "jobs",
+  "companies",
+  "departments",
+  "jobListings",
+];
+
 interface SortOptions {
   caseSensitive?: boolean;
   nullsFirst?: boolean;
@@ -85,22 +102,6 @@ function sortData<T>(
     return 0;
   });
 }
-
-const models = [
-  "clients",
-  "vendors",
-  "offices",
-  "warehouses",
-  "branches",
-  "invoices",
-  "products",
-  "employees",
-  "employeeRequests",
-  "salaries",
-  "jobs",
-  "companies",
-  "departments",
-];
 
 // The sorting factory to handle any of our models accurately and correctly.
 /**

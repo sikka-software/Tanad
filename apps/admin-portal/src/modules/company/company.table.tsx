@@ -6,9 +6,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Company } from "@/modules/company/company.type";
-
 import useCompanyStore from "@/modules/company/company.store";
+import { Company } from "@/modules/company/company.type";
 
 const nameSchema = z.string().min(1, "Required");
 const industrySchema = z.string().optional();
@@ -30,56 +29,81 @@ interface CompaniesTableProps {
 }
 
 const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
-  const t = useTranslations("Companies");
-  const { updateCompany, selectedRows, setSelectedRows } = useCompanyStore();
+  const t = useTranslations();
+  const updateCompany = useCompanyStore((state) => state.updateCompany);
+  const selectedRows = useCompanyStore((state) => state.selectedRows);
+  const setSelectedRows = useCompanyStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+
+  const columns: ExtendedColumnDef<Company>[] = [
+    { accessorKey: "name", header: t("Companies.form.name.label"), validationSchema: nameSchema },
+    {
+      accessorKey: "industry",
+      header: t("Companies.form.industry.label"),
+      validationSchema: industrySchema,
+    },
+    {
+      accessorKey: "email",
+      header: t("Companies.form.email.label"),
+      validationSchema: emailSchema,
+    },
+    {
+      accessorKey: "phone",
+      header: t("Companies.form.phone.label"),
+      validationSchema: phoneSchema,
+    },
+    {
+      accessorKey: "website",
+      header: t("Companies.form.website.label"),
+      validationSchema: websiteSchema,
+    },
+    {
+      accessorKey: "address",
+      header: t("Companies.form.address.label"),
+      validationSchema: addressSchema,
+    },
+    { accessorKey: "city", header: t("Companies.form.city.label"), validationSchema: citySchema },
+    {
+      accessorKey: "state",
+      header: t("Companies.form.state.label"),
+      validationSchema: stateSchema,
+    },
+    {
+      accessorKey: "zip_code",
+      header: t("Companies.form.zip_code.label"),
+      validationSchema: zipCodeSchema,
+    },
+    { accessorKey: "size", header: t("Companies.form.size.label"), validationSchema: sizeSchema },
+    {
+      accessorKey: "is_active",
+      header: t("Companies.form.is_active.label"),
+      validationSchema: is_activeSchema,
+    },
+    {
+      accessorKey: "notes",
+      header: t("Companies.form.notes.label"),
+      validationSchema: notesSchema,
+    },
+  ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateCompany(rowId, { [columnId]: value });
   };
 
-  const handleRowSelectionChange = useCallback(
-    (selectedRows: Company[]) => {
-      const selectedIds = selectedRows.map((row) => row.id!);
-      if (JSON.stringify(selectedIds) !== JSON.stringify(selectedRows)) {
-        setSelectedRows(selectedIds);
-      }
-    },
-    [selectedRows, setSelectedRows],
-  );
+  const handleRowSelectionChange = (rows: Company[]) => {
+    const newSelectedIds = rows.map((row) => row.id!);
+    // Only update if the selection has actually changed
+    const currentSelection = new Set(selectedRows);
+    const newSelection = new Set(newSelectedIds);
 
-  const handleRowSelectionUpdater = useCallback(
-    (
-      updater:
-        | ((old: Record<string, boolean>) => Record<string, boolean>)
-        | Record<string, boolean>,
-    ) => {
-      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-      const selectedRows = data.filter((row) => newSelection[row.id!]);
-      handleRowSelectionChange(selectedRows);
-    },
-    [data, rowSelection, handleRowSelectionChange],
-  );
-
-  const columns: ExtendedColumnDef<Company>[] = [
-    { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "industry", header: t("form.industry.label"), validationSchema: industrySchema },
-    { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "phone", header: t("form.phone.label"), validationSchema: phoneSchema },
-    { accessorKey: "website", header: t("form.website.label"), validationSchema: websiteSchema },
-    { accessorKey: "address", header: t("form.address.label"), validationSchema: addressSchema },
-    { accessorKey: "city", header: t("form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
-    { accessorKey: "zip_code", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
-    { accessorKey: "size", header: t("form.size.label"), validationSchema: sizeSchema },
-    {
-      accessorKey: "is_active",
-      header: t("form.is_active.label"),
-      validationSchema: is_activeSchema,
-    },
-    { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
-  ];
+    if (
+      newSelection.size !== currentSelection.size ||
+      !Array.from(newSelection).every((id) => currentSelection.has(id))
+    ) {
+      setSelectedRows(newSelectedIds);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -98,7 +122,11 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
     enableRowSelection: true,
     enableMultiRowSelection: true,
     getRowId: (row: Company) => row.id!,
-    onRowSelectionChange: handleRowSelectionUpdater,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
   };
 
   return (

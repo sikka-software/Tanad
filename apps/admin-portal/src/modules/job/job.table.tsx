@@ -21,10 +21,9 @@ interface JobTableProps {
   data: Job[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (rows: Job[]) => void;
 }
 
-const JobTable = ({ data, isLoading, error, onSelectedRowsChange }: JobTableProps) => {
+const JobTable = ({ data, isLoading, error }: JobTableProps) => {
   const t = useTranslations();
   const updateJob = useJobsStore((state) => state.updateJob);
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
@@ -83,9 +82,6 @@ const JobTable = ({ data, isLoading, error, onSelectedRowsChange }: JobTableProp
       !Array.from(newSelection).every((id) => currentSelection.has(id))
     ) {
       setSelectedRows(newSelectedIds);
-      if (onSelectedRowsChange) {
-        onSelectedRowsChange(rows);
-      }
     }
   };
 

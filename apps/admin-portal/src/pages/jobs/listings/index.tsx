@@ -1,45 +1,47 @@
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
-import JobListingCard from "@/modules/job-listing/job-listing.card";
-import JobListingsTable from "@/modules/job-listing/job-listing.table";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import ConfirmDelete from "@/components/ui/confirm-delete";
 import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import SelectionMode from "@/components/ui/selection-mode";
 
-import { JobListing } from "@/types/job-listing.type";
-
-import useUserStore from "@/stores/use-user-store";
+import JobListingCard from "@/modules/job-listing/job-listing.card";
 import { useJobListings, useBulkDeleteJobListings } from "@/modules/job-listing/job-listing.hooks";
-import useJobListingsStore from "@/modules/job-listing/job-listing.store";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/job-listing/job-listing.options";
+import { useJobListingsStore } from "@/modules/job-listing/job-listing.store";
+import JobListingsTable from "@/modules/job-listing/job-listing.table";
+import { JobListing } from "@/modules/job-listing/job-listing.type";
 
 export default function JobListingsPage() {
   const t = useTranslations();
-  const router = useRouter();
-  const user = useUserStore((state) => state.user);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { data: jobListings = [], isLoading, error } = useJobListings();
 
-  // Get selection state and actions from the store
-  const { selectedRows, setSelectedRows, clearSelection } = useJobListingsStore();
+  const viewMode = useJobListingsStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useJobListingsStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useJobListingsStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useJobListingsStore((state) => state.selectedRows);
+  const clearSelection = useJobListingsStore((state) => state.clearSelection);
+  const sortRules = useJobListingsStore((state) => state.sortRules);
+  const sortCaseSensitive = useJobListingsStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useJobListingsStore((state) => state.sortNullsFirst);
+  const searchQuery = useJobListingsStore((state) => state.searchQuery);
+  const filterConditions = useJobListingsStore((state) => state.filterConditions);
+  const filterCaseSensitive = useJobListingsStore((state) => state.filterCaseSensitive);
+  const getFilteredJobListings = useJobListingsStore((state) => state.getFilteredJobListings);
+  const getSortedJobListings = useJobListingsStore((state) => state.getSortedJobListings);
+
+  const { data: jobListings = [], isLoading, error } = useJobListings();
   const { mutate: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
 
-  const filteredListings = jobListings.filter(
-    (listing: JobListing) =>
-      listing.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (listing.description?.toLowerCase() || "").includes(searchQuery.toLowerCase()),
-  );
+  const filteredListings = useMemo(() => {
+    return getFilteredJobListings(jobListings || []);
+  }, [jobListings, getFilteredJobListings, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const handleRowSelectionChange = (rows: JobListing[]) => {
-    const newSelectedIds = rows.map((row) => row.id);
-    setSelectedRows(newSelectedIds);
-  };
+  const sortedListings = useMemo(() => {
+    return getSortedJobListings(filteredListings);
+  }, [filteredListings, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
     try {
@@ -67,13 +69,13 @@ export default function JobListingsPage() {
         />
       ) : (
         <PageSearchAndFilter
+          store={useJobListingsStore}
+          sortableColumns={SORTABLE_COLUMNS}
+          filterableFields={FILTERABLE_FIELDS}
           title={t("JobListings.title")}
           createHref="/jobs/listings/add"
           createLabel={t("JobListings.create_listing")}
-          onSearch={setSearchQuery}
           searchPlaceholder={t("JobListings.search_listings")}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
         />
       )}
 
@@ -83,7 +85,6 @@ export default function JobListingsPage() {
             data={filteredListings}
             isLoading={isLoading}
             error={error instanceof Error ? error : null}
-            onSelectedRowsChange={handleRowSelectionChange}
           />
         ) : (
           <div className="p-4">

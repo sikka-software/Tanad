@@ -16,7 +16,6 @@ import { useJobs, useBulkDeleteJobs } from "@/modules/job/job.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/job/job.options";
 import { useJobsStore } from "@/modules/job/job.store";
 import JobTable from "@/modules/job/job.table";
-import { Job } from "@/modules/job/job.type";
 
 export default function JobsPage() {
   const t = useTranslations();
@@ -25,7 +24,6 @@ export default function JobsPage() {
   const isDeleteDialogOpen = useJobsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useJobsStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useJobsStore((state) => state.selectedRows);
-  const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const clearSelection = useJobsStore((state) => state.clearSelection);
   const sortRules = useJobsStore((state) => state.sortRules);
   const sortCaseSensitive = useJobsStore((state) => state.sortCaseSensitive);
@@ -46,13 +44,6 @@ export default function JobsPage() {
   const sortedJobs = useMemo(() => {
     return getSortedJobs(filteredJobs);
   }, [filteredJobs, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleRowSelectionChange = (rows: Job[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -98,12 +89,7 @@ export default function JobsPage() {
 
         <div className="flex-1 overflow-hidden">
           {viewMode === "table" ? (
-            <JobTable
-              data={sortedJobs}
-              isLoading={isLoading}
-              error={error}
-              onSelectedRowsChange={handleRowSelectionChange}
-            />
+            <JobTable data={sortedJobs} isLoading={isLoading} error={error} />
           ) : (
             <div className="p-4">
               <DataModelList

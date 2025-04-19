@@ -6,9 +6,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { useWarehousesStore } from "@/modules/warehouse/warehouse.store";
 import { Warehouse } from "@/modules/warehouse/warehouse.type";
-
-import useWarehousesStore from "@/modules/warehouse/warehouse.store";
 
 const nameSchema = z.string().min(1, "Required");
 const codeSchema = z.string().min(1, "Required");
@@ -27,36 +26,11 @@ interface WarehouseTableProps {
 
 const WarehouseTable = ({ data, isLoading, error }: WarehouseTableProps) => {
   const t = useTranslations();
-  const { selectedRows, setSelectedRows, updateWarehouse } = useWarehousesStore();
+  const updateWarehouse = useWarehousesStore((state) => state.updateWarehouse);
+  const selectedRows = useWarehousesStore((state) => state.selectedRows);
+  const setSelectedRows = useWarehousesStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateWarehouse(rowId, { [columnId]: value });
-  };
-
-  const handleRowSelectionChange = useCallback(
-    (selectedRows: Warehouse[]) => {
-      const selectedIds = selectedRows.map((row) => row.id!);
-      if (JSON.stringify(selectedIds) !== JSON.stringify(selectedRows)) {
-        setSelectedRows(selectedIds);
-      }
-    },
-    [selectedRows, setSelectedRows],
-  );
-
-  const handleRowSelectionUpdater = useCallback(
-    (
-      updater:
-        | ((old: Record<string, boolean>) => Record<string, boolean>)
-        | Record<string, boolean>,
-    ) => {
-      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-      const selectedRows = data.filter((row) => newSelection[row.id!]);
-      handleRowSelectionChange(selectedRows);
-    },
-    [data, rowSelection, handleRowSelectionChange],
-  );
 
   const columns: ExtendedColumnDef<Warehouse>[] = [
     { accessorKey: "name", header: t("Warehouses.form.name.label"), validationSchema: nameSchema },
@@ -89,6 +63,23 @@ const WarehouseTable = ({ data, isLoading, error }: WarehouseTableProps) => {
     },
   ];
 
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await updateWarehouse(rowId, { [columnId]: value });
+  };
+
+  const handleRowSelectionChange = (rows: Warehouse[]) => {
+    const newSelectedIds = rows.map((row) => row.id!);
+    // Only update if the selection has actually changed
+    const currentSelection = new Set(selectedRows);
+    const newSelection = new Set(newSelectedIds);
+
+    if (
+      newSelection.size !== currentSelection.size ||
+      !Array.from(newSelection).every((id) => currentSelection.has(id))
+    ) {
+      setSelectedRows(newSelectedIds);
+    }
+  };
   if (isLoading) {
     return (
       <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
@@ -106,7 +97,11 @@ const WarehouseTable = ({ data, isLoading, error }: WarehouseTableProps) => {
     enableRowSelection: true,
     enableMultiRowSelection: true,
     getRowId: (row: Warehouse) => row.id!,
-    onRowSelectionChange: handleRowSelectionUpdater,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
   };
 
   return (

@@ -8,9 +8,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Quote } from "@/modules/quote/quote.type";
-
 import { useQuotesStore } from "@/modules/quote/quote.store";
+import { Quote } from "@/modules/quote/quote.type";
 
 const quoteNumberSchema = z.string().min(1, "Required");
 const statusSchema = z.enum(["draft", "sent", "accepted", "rejected", "expired"]);
@@ -21,14 +20,14 @@ interface QuotesTableProps {
   data: Quote[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (rows: Quote[]) => void;
 }
 
-const QuotesTable = ({ data, isLoading, error, onSelectedRowsChange }: QuotesTableProps) => {
+const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
   const t = useTranslations();
-  const { updateQuote, setSelectedRows, selectedRows } = useQuotesStore();
+  const updateQuote = useQuotesStore((state) => state.updateQuote);
+  const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
+  const selectedRows = useQuotesStore((state) => state.selectedRows);
 
-  // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Quote>[] = [
@@ -100,9 +99,6 @@ const QuotesTable = ({ data, isLoading, error, onSelectedRowsChange }: QuotesTab
       !Array.from(newSelection).every((id) => currentSelection.has(id))
     ) {
       setSelectedRows(newSelectedIds);
-      if (onSelectedRowsChange) {
-        onSelectedRowsChange(rows);
-      }
     }
   };
 

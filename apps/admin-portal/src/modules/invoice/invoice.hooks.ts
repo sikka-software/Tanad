@@ -1,19 +1,21 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Invoice, InvoiceCreateData } from '@/modules/invoice/invoice.type';
-import { 
-  createInvoice, 
-  deleteInvoice, 
-  fetchInvoiceById, 
-  fetchInvoices, 
-  updateInvoice 
-} from '@/modules/invoice/invoice.service';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import {
+  bulkDeleteInvoices,
+  createInvoice,
+  deleteInvoice,
+  fetchInvoiceById,
+  fetchInvoices,
+  updateInvoice,
+} from "@/modules/invoice/invoice.service";
+import { Invoice, InvoiceCreateData } from "@/modules/invoice/invoice.type";
 
 // Query keys
 export const invoiceKeys = {
-  all: ['invoices'] as const,
-  lists: () => [...invoiceKeys.all, 'list'] as const,
+  all: ["invoices"] as const,
+  lists: () => [...invoiceKeys.all, "list"] as const,
   list: (filters: any) => [...invoiceKeys.lists(), { filters }] as const,
-  details: () => [...invoiceKeys.all, 'detail'] as const,
+  details: () => [...invoiceKeys.all, "detail"] as const,
   detail: (id: string) => [...invoiceKeys.details(), id] as const,
 };
 
@@ -35,7 +37,7 @@ export function useInvoice(id: string) {
 
 export function useCreateInvoice() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: createInvoice,
     onSuccess: () => {
@@ -46,9 +48,9 @@ export function useCreateInvoice() {
 
 export function useUpdateInvoice() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, invoice }: { id: string; invoice: Partial<Invoice> }) => 
+    mutationFn: ({ id, invoice }: { id: string; invoice: Partial<Invoice> }) =>
       updateInvoice(id, invoice),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(data.id) });
@@ -59,7 +61,7 @@ export function useUpdateInvoice() {
 
 export function useDeleteInvoice() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: deleteInvoice,
     onSuccess: (_, variables) => {
@@ -67,4 +69,14 @@ export function useDeleteInvoice() {
       queryClient.removeQueries({ queryKey: invoiceKeys.detail(variables) });
     },
   });
-} 
+}
+
+export function useBulkDeleteInvoices() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkDeleteInvoices,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
+    },
+  });
+}

@@ -6,9 +6,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { useOfficeStore } from "@/modules/office/office.store";
 import { Office } from "@/modules/office/office.type";
-
-import { useOfficesStore } from "@/modules/office/office.store";
 
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");
@@ -23,34 +22,16 @@ interface OfficesTableProps {
   data: Office[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (rows: Office[]) => void;
 }
 
-const OfficesTable = ({ data, isLoading, error, onSelectedRowsChange }: OfficesTableProps) => {
+const OfficesTable = ({ data, isLoading, error }: OfficesTableProps) => {
   const t = useTranslations();
-  const { updateOffice, selectedRows, setSelectedRows } = useOfficesStore();
+  const updateOffice = useOfficeStore((state) => state.updateOffice);
+  const selectedRows = useOfficeStore((state) => state.selectedRows);
+  const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "office_id") return;
-    await updateOffice(rowId, { [columnId]: value });
-  };
-
-  const handleRowSelectionChange = useCallback(
-    (rows: Office[]) => {
-      const newSelectedIds = rows.map((row) => row.id!);
-      // Only update if the selection has actually changed
-      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-        setSelectedRows(newSelectedIds);
-        if (onSelectedRowsChange) {
-          onSelectedRowsChange(rows);
-        }
-      }
-    },
-    [selectedRows, setSelectedRows, onSelectedRowsChange],
-  );
 
   const columns: ExtendedColumnDef<Office>[] = [
     { accessorKey: "name", header: t("Offices.form.name.label"), validationSchema: nameSchema },
@@ -70,6 +51,22 @@ const OfficesTable = ({ data, isLoading, error, onSelectedRowsChange }: OfficesT
     },
     { accessorKey: "notes", header: t("Offices.form.notes.label"), validationSchema: notesSchema },
   ];
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    if (columnId === "office_id") return;
+    await updateOffice(rowId, { [columnId]: value });
+  };
+
+  const handleRowSelectionChange = useCallback(
+    (rows: Office[]) => {
+      const newSelectedIds = rows.map((row) => row.id!);
+      // Only update if the selection has actually changed
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(newSelectedIds);
+      }
+    },
+    [selectedRows, setSelectedRows],
+  );
 
   if (isLoading) {
     return (

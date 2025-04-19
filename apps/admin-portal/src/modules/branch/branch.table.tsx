@@ -6,11 +6,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { useBranchesStore } from "@/modules/branch/branch.store";
 import { Branch } from "@/modules/branch/branch.type";
 
-import { useBranchesStore } from "@/modules/branch/branch.store";
-
-// Validation schemas
 const nameSchema = z.string().min(1, "Required");
 const codeSchema = z.string().min(1, "Required");
 const addressSchema = z.string().min(1, "Required");
@@ -26,12 +24,13 @@ interface BranchesTableProps {
   data: Branch[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (rows: Branch[]) => void;
 }
 
-const BranchesTable = ({ data, isLoading, error, onSelectedRowsChange }: BranchesTableProps) => {
+const BranchesTable = ({ data, isLoading, error }: BranchesTableProps) => {
   const t = useTranslations();
-  const { updateBranch, selectedRows, setSelectedRows } = useBranchesStore();
+  const updateBranch = useBranchesStore((state) => state.updateBranch);
+  const selectedRows = useBranchesStore((state) => state.selectedRows);
+  const setSelectedRows = useBranchesStore((state) => state.setSelectedRows);
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
@@ -39,18 +38,30 @@ const BranchesTable = ({ data, isLoading, error, onSelectedRowsChange }: Branche
   const columns: ExtendedColumnDef<Branch>[] = [
     { accessorKey: "name", header: t("Branches.form.name.label"), validationSchema: nameSchema },
     { accessorKey: "code", header: t("Branches.form.code.label"), validationSchema: codeSchema },
-    { accessorKey: "address", header: t("Branches.form.address.label"), validationSchema: addressSchema },
+    {
+      accessorKey: "address",
+      header: t("Branches.form.address.label"),
+      validationSchema: addressSchema,
+    },
     { accessorKey: "city", header: t("Branches.form.city.label"), validationSchema: citySchema },
     { accessorKey: "state", header: t("Branches.form.state.label"), validationSchema: stateSchema },
-    { accessorKey: "zip_code", header: t("Branches.form.zip_code.label"), validationSchema: zipCodeSchema },
+    {
+      accessorKey: "zip_code",
+      header: t("Branches.form.zip_code.label"),
+      validationSchema: zipCodeSchema,
+    },
     { accessorKey: "phone", header: t("Branches.form.phone.label"), validationSchema: phoneSchema },
     { accessorKey: "email", header: t("Branches.form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "manager", header: t("Branches.form.manager.label"), validationSchema: managerSchema },
-    { 
-      accessorKey: "is_active", 
-      header: t("Branches.form.is_active.label"), 
-      cell: ({ row }) => row.getValue("is_active") ? t("active") : t("inactive"),
-      validationSchema: isActiveSchema 
+    {
+      accessorKey: "manager",
+      header: t("Branches.form.manager.label"),
+      validationSchema: managerSchema,
+    },
+    {
+      accessorKey: "is_active",
+      header: t("Branches.form.is_active.label"),
+      cell: ({ row }) => (row.getValue("is_active") ? t("active") : t("inactive")),
+      validationSchema: isActiveSchema,
     },
   ];
 
@@ -65,12 +76,9 @@ const BranchesTable = ({ data, isLoading, error, onSelectedRowsChange }: Branche
       // Only update if the selection has actually changed
       if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
         setSelectedRows(newSelectedIds);
-        if (onSelectedRowsChange) {
-          onSelectedRowsChange(rows);
-        }
       }
     },
-    [selectedRows, setSelectedRows, onSelectedRowsChange],
+    [selectedRows, setSelectedRows],
   );
 
   if (isLoading) {

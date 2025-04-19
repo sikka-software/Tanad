@@ -1,10 +1,9 @@
 import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Client } from "@/types/client.type";
-
 import { db } from "@/db/drizzle";
 import { clients } from "@/db/schema";
+import { Client } from "@/modules/client/client.type";
 
 // Helper to convert Drizzle client to our Client type
 function convertDrizzleClient(data: typeof clients.$inferSelect): Client {

@@ -1,8 +1,8 @@
+// TODO: Fix this don't use zustand here
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { useProductsStore } from "@/modules/product/product.store";
 import { Product } from "@/modules/product/product.type";
-
-import useProductsStore from "@/modules/product/product.store";
 
 export default async function handler(
   req: NextApiRequest,

@@ -19,15 +19,9 @@ interface EmployeeRequestsTableProps {
   data: EmployeeRequest[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (rows: EmployeeRequest[]) => void;
 }
 
-const EmployeeRequestsTable = ({
-  data,
-  isLoading,
-  error,
-  onSelectedRowsChange,
-}: EmployeeRequestsTableProps) => {
+const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTableProps) => {
   const t = useTranslations();
   const updateEmployeeRequest = useEmployeeRequestsStore((state) => state.updateEmployeeRequest);
   const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
@@ -112,9 +106,6 @@ const EmployeeRequestsTable = ({
       !Array.from(newSelection).every((id) => currentSelection.has(id))
     ) {
       setSelectedRows(newSelectedIds);
-      if (onSelectedRowsChange) {
-        onSelectedRowsChange(rows);
-      }
     }
   };
 

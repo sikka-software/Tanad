@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -16,7 +16,6 @@ import { useBranches, useBulkDeleteBranches } from "@/modules/branch/branch.hook
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/branch/branch.options";
 import { useBranchesStore } from "@/modules/branch/branch.store";
 import BranchesTable from "@/modules/branch/branch.table";
-import { Branch } from "@/modules/branch/branch.type";
 
 export default function BranchesPage() {
   const t = useTranslations();
@@ -25,7 +24,6 @@ export default function BranchesPage() {
   const isDeleteDialogOpen = useBranchesStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useBranchesStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useBranchesStore((state) => state.selectedRows);
-  const setSelectedRows = useBranchesStore((state) => state.setSelectedRows);
   const clearSelection = useBranchesStore((state) => state.clearSelection);
   const sortRules = useBranchesStore((state) => state.sortRules);
   const sortCaseSensitive = useBranchesStore((state) => state.sortCaseSensitive);
@@ -46,13 +44,6 @@ export default function BranchesPage() {
   const sortedBranches = useMemo(() => {
     return getSortedBranches(filteredBranches);
   }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleRowSelectionChange = (rows: Branch[]) => {
-    const newSelectedIds = rows.map((row) => row.id);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -102,7 +93,6 @@ export default function BranchesPage() {
               data={sortedBranches}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              onSelectedRowsChange={handleRowSelectionChange}
             />
           ) : (
             <div className="p-4">
@@ -111,7 +101,7 @@ export default function BranchesPage() {
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Branches.no_branches_found")}
-                renderItem={(branch: Branch) => <BranchCard branch={branch} />}
+                renderItem={(branch) => <BranchCard branch={branch} />}
                 gridCols="3"
               />
             </div>

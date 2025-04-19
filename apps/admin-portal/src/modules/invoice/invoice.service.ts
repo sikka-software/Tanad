@@ -52,3 +52,19 @@ export async function deleteInvoice(id: string): Promise<void> {
     throw new Error("Failed to delete invoice");
   }
 }
+
+export async function bulkDeleteInvoices(ids: string[]): Promise<void> {
+  try {
+    const response = await fetch("/api/invoices/bulk-delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete invoices");
+    }
+  } catch (error) {
+    console.error("Error deleting invoices:", error);
+    throw new Error("Failed to delete invoices");
+  }
+}

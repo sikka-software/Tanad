@@ -16,7 +16,6 @@ import { useDeleteDepartments } from "@/modules/department/department.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/department/department.options";
 import { useDepartmentsStore } from "@/modules/department/department.store";
 import DepartmentsTable from "@/modules/department/department.table";
-import { Department } from "@/modules/department/department.type";
 
 export default function DepartmentsPage() {
   const t = useTranslations();
@@ -46,13 +45,6 @@ export default function DepartmentsPage() {
   const sortedDepartments = useMemo(() => {
     return getSortedDepartments(filteredDepartments);
   }, [filteredDepartments, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleRowSelectionChange = (rows: Department[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -90,19 +82,18 @@ export default function DepartmentsPage() {
         <div>
           {viewMode === "table" ? (
             <DepartmentsTable
-              data={filteredDepartments || []}
+              data={sortedDepartments}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
-              onSelectedRowsChange={handleRowSelectionChange}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={filteredDepartments || []}
+                data={sortedDepartments}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Departments.no_departments_found")}
-                renderItem={(department: Department) => <DepartmentCard department={department} />}
+                renderItem={(department) => <DepartmentCard department={department} />}
                 gridCols="3"
               />
             </div>

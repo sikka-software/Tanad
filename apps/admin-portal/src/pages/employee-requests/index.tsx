@@ -22,7 +22,6 @@ import {
 } from "@/modules/employee-request/employee-request.options";
 import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
 import EmployeeRequestsTable from "@/modules/employee-request/employee-request.table";
-import { EmployeeRequest } from "@/modules/employee-request/employee-request.type";
 
 export default function EmployeeRequestsPage() {
   const t = useTranslations();
@@ -31,7 +30,6 @@ export default function EmployeeRequestsPage() {
   const isDeleteDialogOpen = useEmployeeRequestsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useEmployeeRequestsStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
-  const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
   const clearSelection = useEmployeeRequestsStore((state) => state.clearSelection);
   const sortRules = useEmployeeRequestsStore((state) => state.sortRules);
   const sortCaseSensitive = useEmployeeRequestsStore((state) => state.sortCaseSensitive);
@@ -56,13 +54,6 @@ export default function EmployeeRequestsPage() {
   const sortedEmployeeRequests = useMemo(() => {
     return getSortedEmployeeRequests(filteredEmployeeRequests);
   }, [filteredEmployeeRequests, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleRowSelectionChange = (rows: EmployeeRequest[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
 
   const handleConfirmDelete = async () => {
     try {
@@ -114,7 +105,6 @@ export default function EmployeeRequestsPage() {
               data={sortedEmployeeRequests}
               isLoading={isLoading}
               error={error as Error | null}
-              onSelectedRowsChange={handleRowSelectionChange}
             />
           ) : (
             <div className="p-4">

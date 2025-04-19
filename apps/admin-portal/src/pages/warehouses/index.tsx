@@ -1,36 +1,49 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import WarehouseCard from "@/modules/warehouse/warehouse.card";
-import WarehouseTable from "@/modules/warehouse/warehouse.table";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import WarehouseCard from "@/modules/warehouse/warehouse.card";
 import { useBulkDeleteWarehouses, useWarehouses } from "@/modules/warehouse/warehouse.hooks";
-import useWarehousesStore from "@/modules/warehouse/warehouse.store";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/warehouse/warehouse.options";
+import { useWarehousesStore } from "@/modules/warehouse/warehouse.store";
+import WarehouseTable from "@/modules/warehouse/warehouse.table";
 
 export default function WarehousesPage() {
   const t = useTranslations();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { data: warehouses, isLoading, error } = useWarehouses();
 
-  const { selectedRows, clearSelection } = useWarehousesStore();
+  const viewMode = useWarehousesStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useWarehousesStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useWarehousesStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useWarehousesStore((state) => state.selectedRows);
+  const setSelectedRows = useWarehousesStore((state) => state.setSelectedRows);
+  const clearSelection = useWarehousesStore((state) => state.clearSelection);
+  const sortRules = useWarehousesStore((state) => state.sortRules);
+  const sortCaseSensitive = useWarehousesStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useWarehousesStore((state) => state.sortNullsFirst);
+  const searchQuery = useWarehousesStore((state) => state.searchQuery);
+  const filterConditions = useWarehousesStore((state) => state.filterConditions);
+  const filterCaseSensitive = useWarehousesStore((state) => state.filterCaseSensitive);
+  const getFilteredWarehouses = useWarehousesStore((state) => state.getFilteredWarehouses);
+  const getSortedWarehouses = useWarehousesStore((state) => state.getSortedWarehouses);
+
+  const { data: warehouses, isLoading, error } = useWarehouses();
   const { mutate: deleteItems, isPending: isDeleting } = useBulkDeleteWarehouses();
 
-  const filteredWarehouses = warehouses?.filter(
-    (warehouse) =>
-      warehouse.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      warehouse.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      warehouse.address.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredWarehouses = useMemo(() => {
+    return getFilteredWarehouses(warehouses || []);
+  }, [warehouses, getFilteredWarehouses, searchQuery, filterConditions, filterCaseSensitive]);
+
+  const sortedWarehouses = useMemo(() => {
+    return getSortedWarehouses(filteredWarehouses);
+  }, [filteredWarehouses, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
     try {
@@ -56,27 +69,27 @@ export default function WarehousesPage() {
           />
         ) : (
           <PageSearchAndFilter
+            store={useWarehousesStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
             title={t("Warehouses.title")}
             createHref="/warehouses/add"
             createLabel={t("Warehouses.create_warehouse")}
-            onSearch={setSearchQuery}
             searchPlaceholder={t("Warehouses.search_warehouses")}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
           />
         )}
 
         <div>
           {viewMode === "table" ? (
             <WarehouseTable
-              data={filteredWarehouses || []}
+              data={sortedWarehouses}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={filteredWarehouses || []}
+                data={sortedWarehouses}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Warehouses.no_warehouses_found")}

@@ -1,10 +1,9 @@
 import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Client } from "@/types/client.type";
-
 import { db } from "@/db/drizzle";
 import { clients } from "@/db/schema";
+import { Client } from "@/modules/client/client.type";
 import { createClient } from "@/utils/supabase/server-props";
 
 // Helper to convert Drizzle client to our Client type

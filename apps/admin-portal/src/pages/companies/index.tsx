@@ -23,7 +23,6 @@ export default function CompaniesPage() {
   const isDeleteDialogOpen = useCompanyStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useCompanyStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useCompanyStore((state) => state.selectedRows);
-  const setSelectedRows = useCompanyStore((state) => state.setSelectedRows);
   const clearSelection = useCompanyStore((state) => state.clearSelection);
   const sortRules = useCompanyStore((state) => state.sortRules);
   const sortCaseSensitive = useCompanyStore((state) => state.sortCaseSensitive);
@@ -70,12 +69,12 @@ export default function CompaniesPage() {
         ) : (
           <PageSearchAndFilter
             store={useCompanyStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
             title={t("Companies.title")}
             createHref="/companies/add"
             createLabel={t("Companies.create_company")}
             searchPlaceholder={t("Companies.search_companies")}
-            sortableColumns={SORTABLE_COLUMNS}
-            filterableFields={FILTERABLE_FIELDS}
           />
         )}
 

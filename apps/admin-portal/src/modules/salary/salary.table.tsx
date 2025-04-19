@@ -6,9 +6,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { Salary } from "@/modules/salary/salary.type";
-
 import { useSalariesStore } from "@/modules/salary/salary.store";
+import { Salary } from "@/modules/salary/salary.type";
 
 const employeeNameSchema = z.string().min(1, "Required");
 const grossAmountSchema = z.number().min(0, "Must be positive");
@@ -22,31 +21,15 @@ interface SalariesTableProps {
   data: Salary[];
   isLoading?: boolean;
   error?: Error | null;
-  onSelectedRowsChange?: (rows: Salary[]) => void;
 }
 
-const SalariesTable = ({ data, isLoading, error, onSelectedRowsChange }: SalariesTableProps) => {
+const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
   const t = useTranslations();
-  const { updateSalary, selectedRows, setSelectedRows } = useSalariesStore();
+  const updateSalary = useSalariesStore((state) => state.updateSalary);
+  const selectedRows = useSalariesStore((state) => state.selectedRows);
+  const setSelectedRows = useSalariesStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateSalary(rowId, { [columnId]: value });
-  };
-
-  const handleRowSelectionChange = (selectedRows: Salary[]) => {
-    setSelectedRows(selectedRows.map((row) => row.id));
-    onSelectedRowsChange?.(selectedRows);
-  };
 
   const columns: ExtendedColumnDef<Salary>[] = [
     {
@@ -90,6 +73,32 @@ const SalariesTable = ({ data, isLoading, error, onSelectedRowsChange }: Salarie
       validationSchema: notesSchema,
     },
   ];
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await updateSalary(rowId, { [columnId]: value });
+  };
+
+  const handleRowSelectionChange = (rows: Salary[]) => {
+    const newSelectedIds = rows.map((row) => row.id!);
+    // Only update if the selection has actually changed
+    const currentSelection = new Set(selectedRows);
+    const newSelection = new Set(newSelectedIds);
+
+    if (
+      newSelection.size !== currentSelection.size ||
+      !Array.from(newSelection).every((id) => currentSelection.has(id))
+    ) {
+      setSelectedRows(newSelectedIds);
+    }
+  };
 
   if (isLoading) {
     return (
