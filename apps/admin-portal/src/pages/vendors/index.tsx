@@ -12,7 +12,8 @@ import DataModelList from "@/components/ui/data-model-list";
 import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
 import SelectionMode from "@/components/ui/selection-mode";
 
-import { sortVendors } from "@/lib/sort-utils";
+import { sortFactory } from "@/lib/sort-utils";
+
 import { Vendor } from "@/types/vendor.type";
 
 import { useVendors, useBulkDeleteVendors } from "@/hooks/models/useVendors";
@@ -65,7 +66,7 @@ export default function VendorsPage() {
       vendor.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const sortedVendors = sortVendors(filteredVendors || [], sortRules, {
+  const sortedVendors = sortFactory("vendors", filteredVendors || [], sortRules, {
     caseSensitive,
     nullsFirst,
   });

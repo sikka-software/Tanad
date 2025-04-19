@@ -52,33 +52,6 @@ function sortData<T>(
   });
 }
 
-// Sorting Clients
-export const sortClients = (
-  clients: Client[],
-  sortRules: { field: string; direction: string }[],
-  options: SortOptions = {},
-): Client[] => {
-  return sortData<Client>(clients, sortRules, options);
-};
-
-// Sorting Vendors
-export const sortVendors = (
-  vendors: Vendor[],
-  sortRules: { field: string; direction: string }[],
-  options: SortOptions = {},
-): Vendor[] => {
-  return sortData<Vendor>(vendors, sortRules, options);
-};
-
-// Sorting Offices
-export const sortOffices = (
-  offices: Office[],
-  sortRules: { field: string; direction: string }[],
-  options: SortOptions = {},
-): Office[] => {
-  return sortData<Office>(offices, sortRules, options);
-};
-
 const models = [
   "clients",
   "vendors",
@@ -138,4 +111,3 @@ export const sortFactory = <T>(
 
   return sortData<T>(items, sortRules, options);
 };
-
