@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
@@ -47,6 +47,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error("Error creating branch:", error);
       return res.status(500).json({ message: "Error creating branch" });
+    }
+  }
+
+  if (req.method === "DELETE") {
+    try {
+      const { ids } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ message: "Invalid request body" });
+      }
+
+      // Delete all branches with the given IDs
+      await db.delete(branches).where(eq(branches.id, ids[0]));
+
+      // If there are more IDs, delete them one by one
+      await db.delete(branches).where(inArray(branches.id, ids));
+
+      return res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting branches:", error);
+      return res.status(500).json({ message: "Error deleting branches" });
     }
   }
 

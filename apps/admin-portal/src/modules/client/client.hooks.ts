@@ -81,8 +81,8 @@ export function useBulkDeleteClients() {
 
   return useMutation({
     mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/clients/bulk-delete", {
-        method: "POST",
+      const response = await fetch("/api/clients", {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },

@@ -8,16 +8,14 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createCompany } from "@/modules/company/company.service";
-
-import { Company, CompanyCreateData } from "@/modules/company/company.type";
-
+import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
 import { companyKeys } from "@/modules/company/company.hooks";
+import { createCompany } from "@/modules/company/company.service";
+import { Company, CompanyCreateData } from "@/modules/company/company.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddCompanyPage() {
@@ -54,7 +52,7 @@ export default function AddCompanyPage() {
       result = await createCompany(companyCreateData as CompanyCreateData);
 
       toast.success(t("General.successful_operation"), {
-        description: t("Companies.messages.success_created"),
+        description: t("Companies.success.created"),
       });
 
       const previousCompanies = queryClient.getQueryData(companyKeys.lists()) || [];
@@ -67,7 +65,7 @@ export default function AddCompanyPage() {
     } catch (error) {
       console.error("Failed to save company:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Companies.messages.error_save"),
+        description: error instanceof Error ? error.message : t("Companies.error.creating"),
       });
       setLoading(false);
     }

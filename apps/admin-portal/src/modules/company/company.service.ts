@@ -17,7 +17,7 @@ export async function fetchCompanyById(id: string): Promise<Company> {
 }
 
 export async function createCompany(company: Omit<Company, "id" | "created_at">): Promise<Company> {
-  const response = await fetch("/api/companies/create", {
+  const response = await fetch("/api/companies", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -54,11 +54,9 @@ export async function deleteCompany(id: string): Promise<void> {
 }
 
 export async function bulkDeleteCompanies(ids: string[]): Promise<void> {
-  const response = await fetch("/api/companies/bulk-delete", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+  const response = await fetch("/api/companies", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ids }),
   });
   if (!response.ok) {

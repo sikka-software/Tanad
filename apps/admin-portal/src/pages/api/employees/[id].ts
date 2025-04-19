@@ -1,6 +1,21 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
+/**
+ * @openapi
+ * /api/employees/{id}:
+ *   get:
+ *     tags: [Employees]
+ *     summary: Get an employee by ID
+ *     parameters:
+ *       - $ref: '#/components/parameters/employeeId'
+ *     responses:
+ *       200:
+ *         description: Employee found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Employee'
+ */
 import { sql } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { employees } from "@/db/schema";

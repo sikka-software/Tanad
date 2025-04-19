@@ -90,8 +90,8 @@ export async function deleteBranch(id: string): Promise<void> {
 }
 
 export async function bulkDeleteBranches(ids: string[]): Promise<void> {
-  const response = await fetch("/api/branches/bulk-delete", {
-    method: "POST",
+  const response = await fetch("/api/branches", {
+    method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
