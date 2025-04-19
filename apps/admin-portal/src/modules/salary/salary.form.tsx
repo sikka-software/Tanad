@@ -15,13 +15,10 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
-
 import { generateDummyEmployee } from "@/lib/dummy-factory";
 
-import type { Salary } from "@/modules/salary/salary.type";
-
-import { employeeKeys, useEmployees } from "@/modules/employee.hooks";
+import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
+import { employeeKeys, useEmployees } from "@/modules/employee/employee.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 const createSalarySchema = (t: (key: string) => string) =>

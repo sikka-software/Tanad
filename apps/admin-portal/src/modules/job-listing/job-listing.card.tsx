@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-import { JobListing } from "@/types/job-listing.type";
+import { JobListing } from "@/modules/job-listing/job-listing.type";
 
 const JobListingCard = ({ jobListing }: { jobListing: JobListing }) => {
   return (

@@ -1,4 +1,4 @@
-import { Job } from "./job.type";
+import { Job } from "@/modules/job/job.type";
 
 export interface JobListing {
   id: string;
@@ -25,4 +25,4 @@ export interface JobListingFormValues {
   description?: string;
   jobs?: string[];
   user_id?: string;
-} 
+}
