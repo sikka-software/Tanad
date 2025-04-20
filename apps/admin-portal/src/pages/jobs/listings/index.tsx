@@ -49,11 +49,13 @@ export default function JobListingsPage() {
     try {
       await deleteJobListings(selectedRows);
       clearSelection();
-      toast.success(t("JobListings.messages.items_deleted"));
+      toast.success(t("General.successful_operation"), {
+        description: t("JobListings.messages.items_deleted"),
+      });
     } catch (err: unknown) {
       console.error("Error deleting job listings:", err);
-      toast.error(t("JobListings.messages.delete_error"), {
-        description: String(err),
+      toast.error(t("General.error_operation"), {
+        description: t("JobListings.messages.delete_error"),
       });
     } finally {
       setIsDeleteDialogOpen(false);

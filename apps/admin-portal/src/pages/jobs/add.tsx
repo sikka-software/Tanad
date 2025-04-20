@@ -82,12 +82,12 @@ export default function AddJobPage() {
     <div>
       <CustomPageMeta title={t("Jobs.add_new")} />
       <PageTitle
-        title={t("Jobs.add_new")}
         formButtons
         formId="job-form"
         loading={loading}
         onCancel={() => router.push("/jobs")}
         texts={{
+          title: t("Jobs.add_new"),
           submit_form: t("Jobs.add_new"),
           cancel: t("General.cancel"),
         }}

@@ -29,8 +29,8 @@ export default function CompaniesPage() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableCompany, setActionableCompany] = useState<CompanyUpdateData | null>(null);
 
-  const isLoading = useCompanyStore((state) => state.isLoading);
-  const setIsLoading = useCompanyStore((state) => state.setIsLoading);
+  const loadingSaveCompany = useCompanyStore((state) => state.isLoading);
+  const setLoadingSaveCompany = useCompanyStore((state) => state.setIsLoading);
   const viewMode = useCompanyStore((state) => state.viewMode);
   const isDeleteDialogOpen = useCompanyStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useCompanyStore((state) => state.setIsDeleteDialogOpen);
@@ -47,7 +47,7 @@ export default function CompaniesPage() {
   const getSortedCompanies = useCompanyStore((state) => state.getSortedCompanies);
 
   const { data: companies, isLoading: loadingFetchCompanies, error } = useCompanies();
-  const { mutate: duplicateCompany, isPending: isDuplicating } = useDuplicateCompany();
+  const { mutate: duplicateCompany } = useDuplicateCompany();
   const { mutate: deleteCompanies, isPending: isDeleting } = useBulkDeleteCompanies();
 
   const filteredCompanies = useMemo(() => {
@@ -59,17 +59,29 @@ export default function CompaniesPage() {
   }, [filteredCompanies, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
-    try {
-      await deleteCompanies(selectedRows);
-      clearSelection();
-    } catch (error) {
-      console.error("Error deleting companies:", error);
-    } finally {
-      setIsDeleteDialogOpen(false);
-    }
+    const toastId = toast.loading(t("General.loading_operation"), {
+      description: t("Companies.loading.deleting"),
+    });
+
+    await deleteCompanies(selectedRows, {
+      onSuccess: () => {
+        clearSelection();
+        toast.success(t("General.successful_operation"), {
+          description: t("Companies.success.deleted"),
+        });
+        toast.dismiss(toastId);
+        setIsDeleteDialogOpen(false);
+      },
+      onError: () => {
+        toast.error(t("General.error_operation"), {
+          description: t("Companies.error.deleting"),
+        });
+        toast.dismiss(toastId);
+      },
+    });
   };
 
-  const onActionClicked = (action: string, rowId: string) => {
+  const onActionClicked = async (action: string, rowId: string) => {
     console.log(action, rowId);
     if (action === "edit") {
       setIsFormDialogOpen(true);
@@ -82,9 +94,21 @@ export default function CompaniesPage() {
     }
 
     if (action === "duplicate") {
-      duplicateCompany(rowId, {
+      const toastId = toast.loading(t("General.loading_operation"), {
+        description: t("Companies.loading.duplicating"),
+      });
+      await duplicateCompany(rowId, {
         onSuccess: () => {
-          toast.success(t("General.success"), { description: t("Companies.success.duplicated") });
+          toast.success(t("General.successful_operation"), {
+            description: t("Companies.success.duplicated"),
+          });
+          toast.dismiss(toastId);
+        },
+        onError: () => {
+          toast.error(t("General.error_operation"), {
+            description: t("Companies.error.duplicating"),
+          });
+          toast.dismiss(toastId);
         },
       });
     }
@@ -140,15 +164,17 @@ export default function CompaniesPage() {
           onOpenChange={setIsFormDialogOpen}
           title={t("Companies.add_new")}
           formId="company-form"
-          loadingSave={isLoading}
+          loadingSave={loadingSaveCompany}
         >
           <CompanyForm
             id={"company-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableCompany(null);
-              setIsLoading(false);
-              toast.success(t("General.success"), { description: t("Companies.success.updated") });
+              setLoadingSaveCompany(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("Companies.success.updated"),
+              });
             }}
             defaultValues={actionableCompany}
             editMode={true}

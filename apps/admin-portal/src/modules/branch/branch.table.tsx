@@ -69,7 +69,7 @@ const BranchesTable = ({ data, isLoading, error }: BranchesTableProps) => {
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "branch_id") return;
-    await updateBranch({ id: rowId, branch: { [columnId]: value } });
+    await updateBranch({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

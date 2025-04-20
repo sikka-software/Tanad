@@ -1,9 +1,9 @@
 import { createApiHandler } from "@/lib/api-handler";
 
 import { db } from "@/db/drizzle";
-import { branches } from "@/db/schema";
+import { jobs } from "@/db/schema";
 
 export default createApiHandler({
-  table: branches,
-  query: db.query.branches,
+  table: jobs,
+  query: db.query.jobs,
 });

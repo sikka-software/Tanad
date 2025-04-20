@@ -9,6 +9,8 @@ import TableSkeleton from "@/ui/table-skeleton";
 import useCompanyStore from "@/modules/company/company.store";
 import { Company } from "@/modules/company/company.type";
 
+import { useUpdateCompany } from "./company.hooks";
+
 const nameSchema = z.string().min(1, "Required");
 const industrySchema = z.string().optional();
 const emailSchema = z.string().email("Invalid email").min(1, "Required");
@@ -31,7 +33,7 @@ interface CompaniesTableProps {
 
 const CompaniesTable = ({ data, isLoading, error, onActionClicked }: CompaniesTableProps) => {
   const t = useTranslations();
-  const updateCompany = useCompanyStore((state) => state.updateCompany);
+  const { mutate: updateCompany } = useUpdateCompany();
   const selectedRows = useCompanyStore((state) => state.selectedRows);
   const setSelectedRows = useCompanyStore((state) => state.setSelectedRows);
 
@@ -89,22 +91,19 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: CompaniesTa
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateCompany(rowId, { [columnId]: value });
+    await updateCompany({ id: rowId, data: { [columnId]: value } });
   };
 
-  const handleRowSelectionChange = (rows: Company[]) => {
-    const newSelectedIds = rows.map((row) => row.id!);
-    // Only update if the selection has actually changed
-    const currentSelection = new Set(selectedRows);
-    const newSelection = new Set(newSelectedIds);
-
-    if (
-      newSelection.size !== currentSelection.size ||
-      !Array.from(newSelection).every((id) => currentSelection.has(id))
-    ) {
-      setSelectedRows(newSelectedIds);
-    }
-  };
+  const handleRowSelectionChange = useCallback(
+    (rows: Company[]) => {
+      const newSelectedIds = rows.map((row) => row.id);
+      // Only update if the selection has actually changed
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(newSelectedIds);
+      }
+    },
+    [selectedRows, setSelectedRows],
+  );
 
   if (isLoading) {
     return (

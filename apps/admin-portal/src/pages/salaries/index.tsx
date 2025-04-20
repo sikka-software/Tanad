@@ -51,12 +51,12 @@ export default function SalariesPage() {
         onSuccess: () => {
           clearSelection();
           setIsDeleteDialogOpen(false);
-          toast.success(t("Salaries.success.title"), {
+          toast.success(t("General.successful_operation"), {
             description: t("Salaries.messages.success_deleted"),
           });
         },
         onError: () => {
-          toast.error(t("Salaries.error.title"), {
+          toast.error(t("General.error_operation"), {
             description: t("Salaries.messages.error_delete"),
           });
         },

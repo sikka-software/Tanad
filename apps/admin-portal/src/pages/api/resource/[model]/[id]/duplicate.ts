@@ -1,0 +1,89 @@
+import { eq } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
+
+import { db } from "@/db/drizzle";
+import * as schema from "@/db/schema";
+import { createClient } from "@/utils/supabase/server-props";
+
+type ModelConfig = {
+  table: any;
+  query: {
+    findFirst: (config: { where: any }) => Promise<any>;
+  };
+  idField: string;
+};
+
+const modelMap: Record<string, ModelConfig> = {
+  branches: {
+    table: schema.branches,
+    query: db.query.branches,
+    idField: "id",
+  },
+  companies: {
+    table: schema.companies,
+    query: db.query.companies,
+    idField: "id",
+  },
+  jobs: {
+    table: schema.jobs,
+    query: db.query.jobs,
+    idField: "id",
+  },
+  // Add more models here
+};
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
+
+  const { model, id } = req.query;
+
+  if (typeof model !== "string" || !(model in modelMap)) {
+    return res.status(404).json({ message: "Model not found" });
+  }
+
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({ error: "Invalid ID" });
+  }
+
+  const { table, query, idField } = modelMap[model];
+
+  const supabase = createClient({
+    req,
+    res,
+    query: {},
+    resolvedUrl: "",
+  });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const record = await query.findFirst({
+      where: eq(table[idField], id),
+    });
+
+    if (!record) {
+      return res.status(404).json({ message: `${model} not found` });
+    }
+
+    if ("user_id" in record && record.user_id !== user.id) {
+      return res.status(403).json({ error: `Not authorized to duplicate this ${model}` });
+    }
+
+    const { [idField]: _, ...rest } = record;
+
+    const [duplicated] = (await db.insert(table).values(rest).returning()) as unknown as any[];
+
+    return res.status(201).json(duplicated);
+  } catch (error) {
+    console.error(`Error duplicating ${model}:`, error);
+    return res.status(500).json({ message: `Error duplicating ${model}` });
+  }
+}

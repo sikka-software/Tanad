@@ -1,7 +1,7 @@
 import { Company } from "@/modules/company/company.type";
 
 export async function fetchCompanies(): Promise<Company[]> {
-  const response = await fetch("/api/companies");
+  const response = await fetch("/api/resource/companies");
   if (!response.ok) {
     throw new Error("Failed to fetch companies");
   }
@@ -9,7 +9,7 @@ export async function fetchCompanies(): Promise<Company[]> {
 }
 
 export async function fetchCompanyById(id: string): Promise<Company> {
-  const response = await fetch(`/api/companies/${id}`);
+  const response = await fetch(`/api/resource/companies/${id}`);
   if (!response.ok) {
     throw new Error(`Company with id ${id} not found`);
   }
@@ -17,7 +17,7 @@ export async function fetchCompanyById(id: string): Promise<Company> {
 }
 
 export async function createCompany(company: Omit<Company, "id" | "created_at">): Promise<Company> {
-  const response = await fetch("/api/companies", {
+  const response = await fetch("/api/resource/companies", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export async function createCompany(company: Omit<Company, "id" | "created_at">)
 }
 
 export async function updateCompany(id: string, updates: Partial<Company>): Promise<Company> {
-  const response = await fetch(`/api/companies/${id}`, {
+  const response = await fetch(`/api/resource/companies/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export async function updateCompany(id: string, updates: Partial<Company>): Prom
 }
 
 export async function duplicateCompany(id: string): Promise<Company> {
-  const response = await fetch(`/api/companies/${id}/duplicate`, {
+  const response = await fetch(`/api/resource/companies/${id}/duplicate`, {
     method: "POST",
   });
   if (!response.ok) {
@@ -54,7 +54,7 @@ export async function duplicateCompany(id: string): Promise<Company> {
   return response.json();
 }
 export async function deleteCompany(id: string): Promise<void> {
-  const response = await fetch(`/api/companies/${id}`, {
+  const response = await fetch(`/api/resource/companies/${id}`, {
     method: "DELETE",
   });
   if (!response.ok) {
@@ -63,7 +63,7 @@ export async function deleteCompany(id: string): Promise<void> {
 }
 
 export async function bulkDeleteCompanies(ids: string[]): Promise<void> {
-  const response = await fetch("/api/companies", {
+  const response = await fetch("/api/resource/companies", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ids }),

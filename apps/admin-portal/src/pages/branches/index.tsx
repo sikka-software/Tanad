@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -16,9 +16,12 @@ import { useBranches, useBulkDeleteBranches } from "@/modules/branch/branch.hook
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/branch/branch.options";
 import { useBranchStore } from "@/modules/branch/branch.store";
 import BranchesTable from "@/modules/branch/branch.table";
+import { BranchUpdateData } from "@/modules/branch/branch.type";
 
 export default function BranchesPage() {
   const t = useTranslations();
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
 
   const viewMode = useBranchStore((state) => state.viewMode);
   const isDeleteDialogOpen = useBranchStore((state) => state.isDeleteDialogOpen);
