@@ -59,6 +59,15 @@ export async function updateJob(id: string, updates: Partial<Job>): Promise<Job>
     throw new Error(`Failed to update job with id ${id}`);
   }
 }
+export async function duplicateJob(id: string): Promise<Job> {
+  const response = await fetch(`/api/resource/jobs/${id}/duplicate`, {
+    method: "POST",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to duplicate job with id ${id}`);
+  }
+  return response.json();
+}
 
 export async function deleteJob(id: string): Promise<void> {
   try {

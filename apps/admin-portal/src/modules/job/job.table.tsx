@@ -23,9 +23,10 @@ interface JobTableProps {
   data: Job[];
   isLoading?: boolean;
   error?: Error | null;
+  onActionClicked: (action: string, rowId: string) => void;
 }
 
-const JobTable = ({ data, isLoading, error }: JobTableProps) => {
+const JobTable = ({ data, isLoading, error, onActionClicked }: JobTableProps) => {
   const t = useTranslations();
   const { mutateAsync: updateJob } = useUpdateJob();
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
@@ -119,6 +120,8 @@ const JobTable = ({ data, isLoading, error }: JobTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      onActionClicked={onActionClicked}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={jobTableOptions}
     />

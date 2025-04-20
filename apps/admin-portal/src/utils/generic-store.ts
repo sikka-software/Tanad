@@ -35,6 +35,8 @@ export function createGenericStore<T extends { id: string }>(
     sortRules: [],
     sortCaseSensitive: false,
     sortNullsFirst: false,
+    isFormDialogOpen: false,
+    actionableItem: null,
     ...initialState,
 
     setIsLoading: (isLoading) => set({ isLoading }),
@@ -75,6 +77,8 @@ export function createGenericStore<T extends { id: string }>(
     setSearchQuery: (searchQuery) => set({ searchQuery }),
     setViewMode: (viewMode) => set({ viewMode }),
     setIsDeleteDialogOpen: (isDeleteDialogOpen) => set({ isDeleteDialogOpen }),
+    setIsFormDialogOpen: (isFormDialogOpen) => set({ isFormDialogOpen }),
+    setActionableItem: (actionableItem) => set({ actionableItem }),
 
     setSelectedRows: (ids) => {
       set((state) => {

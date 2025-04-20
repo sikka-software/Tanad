@@ -22,45 +22,6 @@ export default function AddJobPage() {
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
 
-  const handleSubmit = async (data: JobFormValues) => {
-    setLoading(true);
-    try {
-      // Use the jobService function that handles the user ID properly
-      const newJob = await createJob({
-        title: data.title.trim(),
-        description: data.description?.trim() || null,
-        requirements: data.requirements?.trim() || null,
-        location: data.location?.trim() || null,
-        department: data.department?.trim() || null,
-        type: data.type.trim(),
-        salary: data.salary ? parseFloat(data.salary) : null,
-        is_active: data.is_active,
-        start_date: data.start_date?.toISOString() || null,
-        end_date: data.end_date?.toISOString() || null,
-      });
-
-      // Update the jobs cache to include the new job
-      const previousJobs = queryClient.getQueryData(jobKeys.lists()) || [];
-      queryClient.setQueryData(jobKeys.lists(), [
-        ...(Array.isArray(previousJobs) ? previousJobs : []),
-        newJob,
-      ]);
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Jobs.messages.job_created"),
-      });
-      // Now we can navigate without the refresh parameter
-      router.push("/jobs");
-    } catch (error: any) {
-      console.error("Error creating job:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Jobs.messages.error"),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDummyData = () => {
     const dummyData = generateDummyData();
     const form = (window as any).jobForm;
@@ -101,7 +62,7 @@ export default function AddJobPage() {
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <JobForm id="job-form" onSubmit={handleSubmit} loading={loading} />
+        <JobForm id="job-form" />
       </div>
     </div>
   );

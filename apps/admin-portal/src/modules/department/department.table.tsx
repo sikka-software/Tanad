@@ -166,6 +166,20 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
+  const departmentTableOptions = {
+    state: {
+      rowSelection,
+    },
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
+    getRowId: (row: Department) => row.id!,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
+  };
+
   return (
     <SheetTable
       columns={columns}
@@ -174,18 +188,14 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
       enableRowSelection={true}
       onEdit={handleEdit}
       onRowSelectionChange={handleRowSelectionChange}
-      tableOptions={{
-        state: {
-          rowSelection,
-        },
-        enableRowSelection: true,
-        enableMultiRowSelection: true,
-        getRowId: (row) => row.id!,
-        onRowSelectionChange: (updater) => {
-          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-          const selectedRows = data.filter((row) => newSelection[row.id!]);
-          handleRowSelectionChange(selectedRows);
-        },
+      tableOptions={departmentTableOptions}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
       }}
     />
   );

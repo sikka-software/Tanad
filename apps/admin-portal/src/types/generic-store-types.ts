@@ -21,6 +21,8 @@ export type BaseStates<T> = {
   sortRules: SortRule[];
   sortCaseSensitive: boolean;
   sortNullsFirst: boolean;
+  isFormDialogOpen: boolean;
+  actionableItem: T | null;
 };
 
 export type BaseActions<T> = {
@@ -37,6 +39,8 @@ export type BaseActions<T> = {
   setSortRules: (sortRules: SortRule[]) => void;
   setSortCaseSensitive: (sortCaseSensitive: boolean) => void;
   setSortNullsFirst: (sortNullsFirst: boolean) => void;
+  setIsFormDialogOpen: (isFormDialogOpen: boolean) => void;
+  setActionableItem: (actionableItem: T | null) => void;
   getFilteredData: (data: T[]) => T[];
   getSortedData: (data: T[]) => T[];
 };
