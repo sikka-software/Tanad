@@ -14,7 +14,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import OfficeCard from "@/modules/office/office.card";
 import { useOffices, useBulkDeleteOffices } from "@/modules/office/office.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/office/office.options";
-import { useOfficeStore } from "@/modules/office/office.store";
+import useOfficeStore from "@/modules/office/office.store";
 import OfficesTable from "@/modules/office/office.table";
 
 export default function OfficesPage() {
@@ -31,8 +31,8 @@ export default function OfficesPage() {
   const searchQuery = useOfficeStore((state) => state.searchQuery);
   const filterConditions = useOfficeStore((state) => state.filterConditions);
   const filterCaseSensitive = useOfficeStore((state) => state.filterCaseSensitive);
-  const getFilteredOffices = useOfficeStore((state) => state.getFilteredOffices);
-  const getSortedOffices = useOfficeStore((state) => state.getSortedOffices);
+  const getFilteredOffices = useOfficeStore((state) => state.getFilteredData);
+  const getSortedOffices = useOfficeStore((state) => state.getSortedData);
 
   const { data: offices, isLoading, error } = useOffices();
   const { mutate: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();

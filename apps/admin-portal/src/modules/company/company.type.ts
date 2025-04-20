@@ -17,4 +17,4 @@ export interface Company {
 }
 
 export type CompanyCreateData = Omit<Company, "id" | "created_at"> & { user_id: string };
-export type CompanyUpdateData = Omit<Company, "created_at" | "user_id">;
+export type CompanyUpdateData = Partial<Company>;
