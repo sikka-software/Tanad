@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -9,7 +10,9 @@ import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
 import { DocumentList } from "@/components/ui/documents-list";
-import { DocumentUploader } from "@/components/ui/documents-uploader";
+import { DocumentFile, DocumentUploader } from "@/components/ui/documents-uploader";
+
+import { uploadDocument } from "@/services/documents";
 
 import useCompanyStore from "@/modules/company/company.store";
 import useUserStore from "@/stores/use-user-store";
@@ -47,6 +50,7 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
   const companySchema = createCompanySchema(t);
   const { user } = useUserStore();
   const { mutate: createCompany } = useCreateCompany();
+  const [pendingDocuments, setPendingDocuments] = useState<DocumentFile[]>([]);
 
   const isLoading = useCompanyStore((state) => state.isLoading);
   const setIsLoading = useCompanyStore((state) => state.setIsLoading);
@@ -69,6 +73,38 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
     },
   });
 
+  const uploadDocuments = async (companyId: string) => {
+    if (!pendingDocuments.length) return;
+
+    const toastId = toast.loading(t("Documents.uploading"), {
+      description: `0/${pendingDocuments.length} ${t("Documents.files_uploaded")}`,
+    });
+
+    try {
+      let uploadedCount = 0;
+      for (const doc of pendingDocuments) {
+        await uploadDocument({
+          ...doc,
+          entity_id: companyId,
+          entity_type: "company",
+        });
+        uploadedCount++;
+        toast.loading(t("Documents.uploading"), {
+          id: toastId,
+          description: `${uploadedCount}/${pendingDocuments.length} ${t("Documents.files_uploaded")}`,
+        });
+      }
+      toast.success(t("Documents.upload_complete"), { id: toastId });
+      setPendingDocuments([]);
+    } catch (error) {
+      console.error("Error uploading documents:", error);
+      toast.error(t("Documents.upload_error"), {
+        id: toastId,
+        description: error instanceof Error ? error.message : undefined,
+      });
+    }
+  };
+
   const handleSubmit = async (data: CompanyFormValues) => {
     setIsLoading(true);
     if (!user?.id) {
@@ -77,6 +113,7 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
       });
       return;
     }
+
     try {
       await createCompany(
         {
@@ -95,7 +132,11 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
           user_id: user?.id,
         },
         {
-          onSuccess: () => {
+          onSuccess: async (response) => {
+            // Upload documents after company is created
+            if (response?.id) {
+              await uploadDocuments(response.id);
+            }
             if (onSuccess) {
               onSuccess();
             }
@@ -110,44 +151,6 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
       });
     }
   };
-
-  // const handleSubmit = async (data: ExpenseFormValues) => {
-  //   setIsLoading(true);
-  //   if (!user?.id) {
-  //     toast.error(t("General.unauthorized"), {
-  //       description: t("General.must_be_logged_in"),
-  //     });
-  //     return;
-  //   }
-
-  //   try {
-  //     await createExpense(
-  //       {
-  //         expense_number: data.expense_number.trim(),
-  //         issue_date: data.issue_date,
-  //         due_date: data.due_date,
-  //         amount: data.amount,
-  //         category: data.category.trim(),
-  //         ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
-  //         status: data.status || "pending",
-  //         notes: data.notes?.trim(),
-  //         user_id: user?.id,
-  //       },
-  //       {
-  //         onSuccess: () => {
-  //           if (onSuccess) {
-  //             onSuccess();
-  //           }
-  //         },
-  //       },
-  //     );
-  //   } catch (error) {
-  //     setIsLoading(false);
-  //     toast.error(t("General.error_operation"), {
-  //       description: error instanceof Error ? error.message : t("Expenses.error.creating"),
-  //     });
-  //   }
-  // };
 
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
@@ -347,24 +350,20 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
             </FormItem>
           )}
         />
-        {id && (
-          <div className="space-y-4">
-            <DocumentUploader
-              entityId={id}
-              entityType="company"
-              disabled={isLoading}
-              onDocumentsChange={(docs) => {
-                // Documents are handled by the uploader component itself
-                console.log("Documents updated:", docs);
-              }}
-            />
+        <div className="space-y-4">
+          <DocumentUploader
+            entityType="company"
+            disabled={isLoading}
+            onDocumentsChange={setPendingDocuments}
+          />
 
+          {id && (
             <div className="mt-4">
               <h3 className="mb-2 text-sm font-medium">{t("Documents.attached_documents")}</h3>
               <DocumentList entityId={id} entityType="company" />
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </form>
     </Form>
   );
