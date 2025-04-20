@@ -7,12 +7,12 @@ import { FilterCondition } from "@/types/common.type";
 
 import { Expense } from "@/modules/expense/expense.type";
 
-type ExpenseStates = {
+type ExpensesStates = {
   expenses: Expense[];
   isLoading: boolean;
-  setIsLoading: (isLoading: boolean) => void;
   error: string | null;
   selectedRows: string[];
+
   filterConditions: FilterCondition[];
   filterCaseSensitive: boolean;
   searchQuery: string;
@@ -23,7 +23,8 @@ type ExpenseStates = {
   sortNullsFirst: boolean;
 };
 
-type ExpenseActions = {
+type ExpensesActions = {
+  setIsLoading: (isLoading: boolean) => void;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
   setFilterConditions: (filterConditions: FilterCondition[]) => void;
@@ -38,7 +39,7 @@ type ExpenseActions = {
   getSortedExpenses: (data: Expense[]) => Expense[];
 };
 
-const useExpenseStore = create<ExpenseStates & ExpenseActions>((set, get) => ({
+const useExpenseStore = create<ExpensesStates & ExpensesActions>((set, get) => ({
   expenses: [],
   isLoading: false,
   error: null,
@@ -122,6 +123,7 @@ const useExpenseStore = create<ExpenseStates & ExpenseActions>((set, get) => ({
   },
   setSelectedRows: (ids: string[]) => {
     set((state) => {
+      // Only update if the selection has actually changed
       if (JSON.stringify(state.selectedRows) === JSON.stringify(ids)) {
         return state;
       }
@@ -131,6 +133,7 @@ const useExpenseStore = create<ExpenseStates & ExpenseActions>((set, get) => ({
 
   clearSelection: () => {
     set((state) => {
+      // Only update if there are actually selected rows
       if (state.selectedRows.length === 0) {
         return state;
       }

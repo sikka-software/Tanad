@@ -6,8 +6,10 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useOfficeStore } from "@/modules/office/office.store";
+import useOfficeStore from "@/modules/office/office.store";
 import { Office } from "@/modules/office/office.type";
+
+import { useUpdateOffice } from "./office.hooks";
 
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");
@@ -26,7 +28,8 @@ interface OfficesTableProps {
 
 const OfficesTable = ({ data, isLoading, error }: OfficesTableProps) => {
   const t = useTranslations();
-  const updateOffice = useOfficeStore((state) => state.updateOffice);
+  const { mutate: updateOffice } = useUpdateOffice();
+
   const selectedRows = useOfficeStore((state) => state.selectedRows);
   const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
 
@@ -54,7 +57,7 @@ const OfficesTable = ({ data, isLoading, error }: OfficesTableProps) => {
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "office_id") return;
-    await updateOffice(rowId, { [columnId]: value });
+    await updateOffice({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

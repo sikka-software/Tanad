@@ -5,14 +5,14 @@ import { applySort } from "@/lib/sort-utils";
 
 import { FilterCondition } from "@/types/common.type";
 
-import { Office } from "@/modules/office/office.type";
-import { createClient } from "@/utils/supabase/component";
+import { Office } from "./office.type";
 
 type OfficeStates = {
   offices: Office[];
   isLoading: boolean;
   error: string | null;
   selectedRows: string[];
+
   filterConditions: FilterCondition[];
   filterCaseSensitive: boolean;
   searchQuery: string;
@@ -23,9 +23,8 @@ type OfficeStates = {
   sortNullsFirst: boolean;
 };
 
-type OfficeActions = {
-  fetchOffices: () => Promise<void>;
-  updateOffice: (id: string, data: Partial<Office>) => Promise<void>;
+type OfficesActions = {
+  setIsLoading: (isLoading: boolean) => void;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
   setFilterConditions: (filterConditions: FilterCondition[]) => void;
@@ -40,7 +39,7 @@ type OfficeActions = {
   getSortedOffices: (data: Office[]) => Office[];
 };
 
-export const useOfficeStore = create<OfficeStates & OfficeActions>((set, get) => ({
+const useOfficeStore = create<OfficeStates & OfficesActions>((set, get) => ({
   offices: [],
   isLoading: false,
   error: null,
@@ -55,6 +54,10 @@ export const useOfficeStore = create<OfficeStates & OfficeActions>((set, get) =>
   sortCaseSensitive: false,
   sortNullsFirst: false,
 
+  setIsLoading: (isLoading: boolean) => {
+    set({ isLoading });
+  },
+
   getFilteredOffices: (data: Office[]) => {
     const { searchQuery, filterConditions, filterCaseSensitive } = get();
 
@@ -66,8 +69,8 @@ export const useOfficeStore = create<OfficeStates & OfficeActions>((set, get) =>
     // First apply search if there is a search query
     let filtered = data;
     if (searchQuery) {
-      filtered = filtered.filter((office) =>
-        office.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      filtered = filtered.filter((company) =>
+        company.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
@@ -120,6 +123,7 @@ export const useOfficeStore = create<OfficeStates & OfficeActions>((set, get) =>
   },
   setSelectedRows: (ids: string[]) => {
     set((state) => {
+      // Only update if the selection has actually changed
       if (JSON.stringify(state.selectedRows) === JSON.stringify(ids)) {
         return state;
       }
@@ -129,39 +133,13 @@ export const useOfficeStore = create<OfficeStates & OfficeActions>((set, get) =>
 
   clearSelection: () => {
     set((state) => {
+      // Only update if there are actually selected rows
       if (state.selectedRows.length === 0) {
         return state;
       }
       return { ...state, selectedRows: [] };
     });
   },
-
-  fetchOffices: async () => {
-    const supabase = createClient();
-    set({ isLoading: true, error: null });
-    try {
-      const { data, error } = await supabase.from("offices").select("*");
-      if (error) throw error;
-      set({ offices: data as Office[], isLoading: false });
-    } catch (error) {
-      set({ error: (error as Error).message, isLoading: false });
-    }
-  },
-
-  updateOffice: async (id: string, updates: Partial<Office>) => {
-    const supabase = createClient();
-    try {
-      const { error } = await supabase.from("offices").update(updates).eq("id", id);
-
-      if (error) throw error;
-
-      set((state) => ({
-        offices: state.offices.map((office) =>
-          office.id === id ? { ...office, ...updates } : office,
-        ),
-      }));
-    } catch (error) {
-      set({ error: (error as Error).message });
-    }
-  },
 }));
+
+export default useOfficeStore;

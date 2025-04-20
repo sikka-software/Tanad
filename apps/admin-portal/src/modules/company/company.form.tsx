@@ -50,8 +50,7 @@ interface CompanyFormProps {
 
 export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: CompanyFormProps) {
   const t = useTranslations();
-  const companySchema = createCompanySchema(t);
-  const { user } = useUserStore();
+  const user = useUserStore((state) => state.user);
   const { mutate: createCompany } = useCreateCompany();
   const { mutate: updateCompany } = useUpdateCompany();
   const [pendingDocuments, setPendingDocuments] = useState<DocumentFile[]>([]);
@@ -60,7 +59,7 @@ export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: 
   const setIsLoading = useCompanyStore((state) => state.setIsLoading);
 
   const form = useForm<CompanyFormValues>({
-    resolver: zodResolver(companySchema),
+    resolver: zodResolver(createCompanySchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
       email: defaultValues?.email || "",

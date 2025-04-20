@@ -34,6 +34,7 @@ interface CompaniesTableProps {
 const CompaniesTable = ({ data, isLoading, error, onActionClicked }: CompaniesTableProps) => {
   const t = useTranslations();
   const { mutate: updateCompany } = useUpdateCompany();
+
   const selectedRows = useCompanyStore((state) => state.selectedRows);
   const setSelectedRows = useCompanyStore((state) => state.setSelectedRows);
 

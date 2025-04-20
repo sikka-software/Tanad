@@ -14,3 +14,4 @@ export interface Expense {
 
 // Define an explicit type for branch creation data
 export type ExpenseCreateData = Omit<Expense, "id" | "created_at"> & { user_id: string };
+export type ExpenseUpdateData = Omit<Expense, "created_at" | "user_id">;

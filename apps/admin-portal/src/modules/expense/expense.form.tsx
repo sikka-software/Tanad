@@ -12,8 +12,9 @@ import { Textarea } from "@/ui/textarea";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateExpense } from "./expense.hooks";
+import { useCreateExpense, useUpdateExpense, useDuplicateExpense } from "./expense.hooks";
 import useExpenseStore from "./expense.store";
+import { ExpenseUpdateData } from "./expense.type";
 
 export const createExpenseSchema = (t: (key: string) => string) =>
   z.object({
@@ -31,27 +32,31 @@ export type ExpenseFormValues = z.input<ReturnType<typeof createExpenseSchema>>;
 
 export interface ExpenseFormProps {
   id?: string;
-  onSuccess: () => void;
+  onSuccess?: () => void;
+  defaultValues?: ExpenseUpdateData | null;
+  editMode?: boolean;
 }
 
-export function ExpenseForm({ id, onSuccess }: ExpenseFormProps) {
+export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: ExpenseFormProps) {
   const t = useTranslations();
+  const user = useUserStore((state) => state.user);
+  const { mutate: createExpense } = useCreateExpense();
+  const { mutate: updateExpense } = useUpdateExpense();
+
   const isLoading = useExpenseStore((state) => state.isLoading);
   const setIsLoading = useExpenseStore((state) => state.setIsLoading);
-  const { mutate: createExpense, isPending, isSuccess } = useCreateExpense();
-  const user = useUserStore((state) => state.user);
 
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(createExpenseSchema(t)),
     defaultValues: {
-      expense_number: "",
-      issue_date: undefined,
-      due_date: undefined,
-      status: "pending",
-      amount: 0,
-      category: "",
-      notes: "",
-      client_id: "",
+      expense_number: defaultValues?.expense_number || "",
+      issue_date: defaultValues?.issue_date || undefined,
+      due_date: defaultValues?.due_date || undefined,
+      status: defaultValues?.status || "pending",
+      amount: defaultValues?.amount || 0,
+      category: defaultValues?.category || "",
+      notes: defaultValues?.notes || "",
+      client_id: defaultValues?.client_id || "",
     },
   });
 
@@ -65,26 +70,33 @@ export function ExpenseForm({ id, onSuccess }: ExpenseFormProps) {
     }
 
     try {
-      await createExpense(
-        {
-          expense_number: data.expense_number.trim(),
-          issue_date: data.issue_date,
-          due_date: data.due_date,
-          amount: data.amount,
-          category: data.category.trim(),
-          ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
-          status: data.status || "pending",
-          notes: data.notes?.trim(),
-          user_id: user?.id,
-        },
-        {
-          onSuccess: () => {
-            if (onSuccess) {
-              onSuccess();
-            }
+      if (editMode) {
+        await updateExpense({
+          id: defaultValues?.id || "",
+          data: data,
+        });
+      } else {
+        await createExpense(
+          {
+            expense_number: data.expense_number.trim(),
+            issue_date: data.issue_date,
+            due_date: data.due_date,
+            amount: data.amount,
+            category: data.category.trim(),
+            ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
+            status: data.status || "pending",
+            notes: data.notes?.trim(),
+            user_id: user?.id,
           },
-        },
-      );
+          {
+            onSuccess: () => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      }
     } catch (error) {
       setIsLoading(false);
       toast.error(t("General.error_operation"), {
@@ -93,7 +105,6 @@ export function ExpenseForm({ id, onSuccess }: ExpenseFormProps) {
     }
   };
 
-  // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
     (window as any).expenseForm = form;
   }

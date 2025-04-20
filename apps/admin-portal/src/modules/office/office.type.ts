@@ -12,6 +12,8 @@ export interface Office {
   updated_at: string;
 }
 
-export type OfficeCreateData = Omit<Office, "id" | "created_at" | "updated_at"> & {
+export type OfficeCreateData = Omit<Office, "id" | "created_at"> & {
   user_id?: string;
 };
+
+export type OfficeUpdateData = Omit<Office, "created_at" | "user_id">;

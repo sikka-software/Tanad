@@ -3,10 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createExpense,
   deleteExpense,
+  bulkDeleteExpenses,
   fetchExpenseById,
   fetchExpenses,
   updateExpense,
-  bulkDeleteExpenses,
+  duplicateExpense,
 } from "@/modules/expense/expense.service";
 import type { Expense, ExpenseCreateData } from "@/modules/expense/expense.type";
 
@@ -27,21 +28,21 @@ export function useExpenses() {
   });
 }
 
-// Hook to fetch a single expense by ID
+// Hook to fetch a single expense
 export function useExpense(id: string) {
   return useQuery({
     queryKey: expenseKeys.detail(id),
     queryFn: () => fetchExpenseById(id),
-    enabled: !!id, // Only run query if id is truthy
+    enabled: !!id,
   });
 }
 
-// Hook for creating a new expense
+// Hook to create a expense
 export function useCreateExpense() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (expense: ExpenseCreateData) => createExpense(expense),
-    onSuccess: (newExpense) => {
+    onSuccess: (newExpense: Expense) => {
       const previousExpenses = queryClient.getQueryData(expenseKeys.lists()) || [];
       queryClient.setQueryData(expenseKeys.lists(), [
         ...(Array.isArray(previousExpenses) ? previousExpenses : []),
@@ -50,48 +51,49 @@ export function useCreateExpense() {
     },
   });
 }
-// Hook for updating an existing expense
+
+// Hook to update a expense
 export function useUpdateExpense() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: ({
-      id,
-      expense,
-    }: {
-      id: string;
-      expense: Partial<Omit<Expense, "id" | "created_at">>;
-    }) => updateExpense(id, expense),
-    onSuccess: (data: Expense) => {
-      // Invalidate both the specific detail and the list queries
+    mutationFn: ({ id, data }: { id: string; data: Partial<Expense> }) => updateExpense(id, data),
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
     },
   });
 }
 
-// Hook for deleting an expense
+// Hook to duplicate a expense
+export function useDuplicateExpense() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateExpense(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: expenseKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
+    },
+  });
+}
+
+// Hook to delete a expense
 export function useDeleteExpense() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (id: string) => deleteExpense(id),
+    mutationFn: deleteExpense,
     onSuccess: (_, variables) => {
-      // Invalidate the list and remove the specific detail query from cache
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
       queryClient.removeQueries({ queryKey: expenseKeys.detail(variables) });
     },
   });
 }
 
-// Hook for bulk deleting expenses
+// Hook to bulk delete expenses
 export function useBulkDeleteExpenses() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: bulkDeleteExpenses,
     onSuccess: () => {
-      // Invalidate the list query
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
     },
   });

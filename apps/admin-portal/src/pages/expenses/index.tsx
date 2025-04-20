@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -10,20 +10,32 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormDialog } from "@/components/ui/form-dialog";
 
 import ExpenseCard from "@/modules/expense/expense.card";
-import { useExpenses, useBulkDeleteExpenses } from "@/modules/expense/expense.hooks";
+import { ExpenseForm } from "@/modules/expense/expense.form";
+import {
+  useExpenses,
+  useBulkDeleteExpenses,
+  useDuplicateExpense,
+} from "@/modules/expense/expense.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/expense/expense.options";
-import { useExpenseStore } from "@/modules/expense/expense.store";
+import useExpenseStore from "@/modules/expense/expense.store";
 import ExpensesTable from "@/modules/expense/expense.table";
+import { ExpenseUpdateData } from "@/modules/expense/expense.type";
 
 export default function ExpensesPage() {
   const t = useTranslations();
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableExpense, setActionableExpense] = useState<ExpenseUpdateData | null>(null);
 
+  const loadingSaveExpense = useExpenseStore((state) => state.isLoading);
+  const setLoadingSaveExpense = useExpenseStore((state) => state.setIsLoading);
   const viewMode = useExpenseStore((state) => state.viewMode);
   const isDeleteDialogOpen = useExpenseStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useExpenseStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useExpenseStore((state) => state.selectedRows);
+  const setSelectedRows = useExpenseStore((state) => state.setSelectedRows);
   const clearSelection = useExpenseStore((state) => state.clearSelection);
   const sortRules = useExpenseStore((state) => state.sortRules);
   const sortCaseSensitive = useExpenseStore((state) => state.sortCaseSensitive);
@@ -34,8 +46,9 @@ export default function ExpensesPage() {
   const getFilteredExpenses = useExpenseStore((state) => state.getFilteredExpenses);
   const getSortedExpenses = useExpenseStore((state) => state.getSortedExpenses);
 
-  const { data: expenses, isLoading, error } = useExpenses();
+  const { data: expenses, isLoading: loadingFetchExpenses, error } = useExpenses();
   const { mutate: deleteExpenses, isPending: isDeleting } = useBulkDeleteExpenses();
+  const { mutate: duplicateExpense } = useDuplicateExpense();
 
   const filteredExpenses = useMemo(() => {
     return getFilteredExpenses(expenses || []);
@@ -46,21 +59,58 @@ export default function ExpensesPage() {
   }, [filteredExpenses, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
-    try {
-      await deleteExpenses(selectedRows, {
+    const toastId = toast.loading(t("General.loading_operation"), {
+      description: t("Expenses.loading.deleting"),
+    });
+
+    await deleteExpenses(selectedRows, {
+      onSuccess: () => {
+        clearSelection();
+        toast.success(t("General.successful_operation"), {
+          description: t("Expenses.success.deleted"),
+        });
+        toast.dismiss(toastId);
+        setIsDeleteDialogOpen(false);
+      },
+      onError: () => {
+        toast.error(t("General.error_operation"), {
+          description: t("Expenses.error.bulk_delete"),
+        });
+        toast.dismiss(toastId);
+      },
+    });
+  };
+
+  const onActionClicked = async (action: string, rowId: string) => {
+    console.log(action, rowId);
+    if (action === "edit") {
+      setIsFormDialogOpen(true);
+      setActionableExpense(expenses?.find((expense) => expense.id === rowId) || null);
+    }
+
+    if (action === "delete") {
+      setSelectedRows([rowId]);
+      setIsDeleteDialogOpen(true);
+    }
+
+    if (action === "duplicate") {
+      const toastId = toast.loading(t("General.loading_operation"), {
+        description: t("Expenses.loading.duplicating"),
+      });
+      await duplicateExpense(rowId, {
         onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
+          toast.success(t("General.successful_operation"), {
+            description: t("Expenses.success.duplicated"),
+          });
+          toast.dismiss(toastId);
         },
-        onError: (error: any) => {
-          console.error("Failed to delete expenses:", error);
-          toast.error(t("Expenses.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
+        onError: () => {
+          toast.error(t("General.error_operation"), {
+            description: t("Expenses.error.duplicating"),
+          });
+          toast.dismiss(toastId);
         },
       });
-    } catch (error) {
-      console.error("Failed to delete expenses:", error);
-      setIsDeleteDialogOpen(false);
     }
   };
 
@@ -91,14 +141,15 @@ export default function ExpensesPage() {
           {viewMode === "table" ? (
             <ExpensesTable
               data={sortedExpenses}
-              isLoading={isLoading}
+              isLoading={loadingFetchExpenses}
               error={error instanceof Error ? error : null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
                 data={sortedExpenses}
-                isLoading={isLoading}
+                isLoading={loadingFetchExpenses}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Expenses.no_expenses_found")}
                 renderItem={(expense) => <ExpenseCard expense={expense} />}
@@ -107,6 +158,28 @@ export default function ExpensesPage() {
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Expenses.add_new")}
+          formId="expense-form"
+          loadingSave={loadingSaveExpense}
+        >
+          <ExpenseForm
+            id={"expense-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableExpense(null);
+              setLoadingSaveExpense(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("Expenses.success.updated"),
+              });
+            }}
+            defaultValues={actionableExpense}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

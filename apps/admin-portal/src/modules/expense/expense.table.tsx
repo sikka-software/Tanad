@@ -6,7 +6,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useExpenseStore } from "@/modules/expense/expense.store";
+import useExpenseStore from "@/modules/expense/expense.store";
 import { Expense } from "@/modules/expense/expense.type";
 
 import { useUpdateExpense } from "./expense.hooks";
@@ -24,9 +24,10 @@ interface ExpensesTableProps {
   data: Expense[];
   isLoading?: boolean;
   error?: Error | null;
+  onActionClicked: (action: string, rowId: string) => void;
 }
 
-const ExpensesTable = ({ data, isLoading, error }: ExpensesTableProps) => {
+const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ExpensesTableProps) => {
   const t = useTranslations();
   const { mutate: updateExpense } = useUpdateExpense();
   const selectedRows = useExpenseStore((state) => state.selectedRows);
@@ -88,7 +89,7 @@ const ExpensesTable = ({ data, isLoading, error }: ExpensesTableProps) => {
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "expense_id") return;
-    await updateExpense({ id: rowId, expense: { [columnId]: value } });
+    await updateExpense({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(
@@ -133,8 +134,10 @@ const ExpensesTable = ({ data, isLoading, error }: ExpensesTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={expenseTableOptions}
+      onActionClicked={onActionClicked}
     />
   );
 };

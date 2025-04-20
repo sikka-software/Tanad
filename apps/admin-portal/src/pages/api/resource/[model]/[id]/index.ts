@@ -15,27 +15,19 @@ type ModelConfig = {
 };
 
 const modelMap: Record<string, ModelConfig> = {
-  branches: {
-    table: schema.branches,
-    query: db.query.branches,
-    idField: "id",
-  },
-  companies: {
-    table: schema.companies,
-    query: db.query.companies,
-    idField: "id",
-  },
-  jobs: {
-    table: schema.jobs,
-    query: db.query.jobs,
-    idField: "id",
-  },
-  clients: {
-    table: schema.clients,
-    query: db.query.clients,
-    idField: "id",
-  },
-  // add more models here
+  branches: { table: schema.branches, query: db.query.branches, idField: "id" },
+  companies: { table: schema.companies, query: db.query.companies, idField: "id" },
+  jobs: { table: schema.jobs, query: db.query.jobs, idField: "id" },
+  clients: { table: schema.clients, query: db.query.clients, idField: "id" },
+  expenses: { table: schema.expenses, query: db.query.expenses, idField: "id" },
+  departments: { table: schema.departments, query: db.query.departments, idField: "id" },
+  offices: { table: schema.offices, query: db.query.offices, idField: "id" },
+  warehouses: { table: schema.warehouses, query: db.query.warehouses, idField: "id" },
+  employees: { table: schema.employees, query: db.query.employees, idField: "id" },
+  products: { table: schema.products, query: db.query.products, idField: "id" },
+  invoices: { table: schema.invoices, query: db.query.invoices, idField: "id" },
+  quotes: { table: schema.quotes, query: db.query.quotes, idField: "id" },
+  vendors: { table: schema.vendors, query: db.query.vendors, idField: "id" },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
