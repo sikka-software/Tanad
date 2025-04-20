@@ -1,16 +1,16 @@
 export interface Branch {
   id: string;
   name: string;
-  code: string;
+  code?: string;
   address: string;
   city: string;
   state: string;
   zip_code: string;
-  phone: string | null;
-  email: string | null;
-  manager: string | null;
+  phone?: string | null;
+  email?: string | null;
+  manager?: string | null;
   is_active: boolean;
-  notes: string | null;
+  notes?: string | null;
   created_at: string;
   // user_id field exists in the schema but might not be needed in the interface
   // unless specifically used in the frontend logic beyond RLS.

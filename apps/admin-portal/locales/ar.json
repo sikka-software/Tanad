@@ -2064,11 +2064,21 @@
       "update_button": "تحديث الفرع",
       "create_button": "إنشاء فرع"
     },
-    "messages": {
-      "error_fetch": "فشل في جلب الفرع",
-      "error_save": "فشل في حفظ الفرع",
-      "success_updated": "تم تحديث الفرع بنجاح",
-      "success_created": "تم إنشاء الفرع بنجاح"
+    "success": {
+      "created": "تم إنشاء الفرع بنجاح",
+      "updated": "تم تحديث الفرع بنجاح",
+      "deleted": "تم حذف الفرع بنجاح",
+      "duplicated": "تم تكرار الفرع بنجاح"
+    },
+    "loading": {
+      "duplicating": "جاري تكرار الفرع...",
+      "deleting": "جاري حذف الفرع..."
+    },
+    "error": {
+      "creating": "حدث خطأ أثناء إنشاء الفرع",
+      "updating": "حدث خطأ أثناء تحديث الفرع",
+      "deleting": "حدث خطأ أثناء حذف الفرع",
+      "duplicating": "حدث خطأ أثناء تكرار الفرع"
     }
   },
   "Vendors": {

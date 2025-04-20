@@ -10,8 +10,6 @@ import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
-import { DocumentFile } from "@/components/ui/documents-uploader";
-
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateBranch, useUpdateBranch } from "./branch.hooks";
@@ -78,7 +76,6 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
       return;
     }
 
-    console.log("default values ", defaultValues);
     try {
       if (editMode) {
         await updateBranch(
@@ -86,7 +83,7 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
             id: defaultValues?.id || "",
             data: {
               name: data.name.trim(),
-              code: data.code.trim(),
+              code: data.code?.trim() || "",
               address: data.address?.trim() || "",
               city: data.city?.trim() || "",
               state: data.state?.trim() || "",

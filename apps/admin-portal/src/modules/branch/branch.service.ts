@@ -64,6 +64,10 @@ export async function duplicateBranch(id: string): Promise<Branch> {
     },
   });
 
+  if (!response.ok) {
+    throw new Error("Failed to duplicate branch");
+  }
+
   return response.json();
 }
 

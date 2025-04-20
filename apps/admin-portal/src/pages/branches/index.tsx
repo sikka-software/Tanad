@@ -97,6 +97,7 @@ export default function BranchesPage() {
       const toastId = toast.loading(t("General.loading_operation"), {
         description: t("Branches.loading.duplicating"),
       });
+
       await duplicateBranch(rowId, {
         onSuccess: () => {
           toast.success(t("General.successful_operation"), {

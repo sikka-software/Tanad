@@ -118,7 +118,6 @@ export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: 
       return;
     }
 
-    console.log("default values ", defaultValues);
     try {
       if (editMode) {
         await updateCompany(

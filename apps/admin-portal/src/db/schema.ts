@@ -425,7 +425,7 @@ export const branches = pgTable(
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
     name: text().notNull(),
-    code: text().notNull(),
+    code: text(),
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
