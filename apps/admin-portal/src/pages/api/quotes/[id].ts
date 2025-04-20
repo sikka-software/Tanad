@@ -14,10 +14,10 @@ function convertDrizzleQuote(data: any): any {
     id: data.id,
     created_at: data.created_at.toString(),
     quote_number: data.quoteNumber,
-    issue_date: data.issueDate,
+    issue_date: data.issue_date,
     expiry_date: data.expiryDate,
     subtotal: Number(data.subtotal),
-    tax_rate: Number(data.taxRate),
+    tax_rate: Number(data.tax_rate),
     tax_amount: Number(data.taxAmount),
     total: Number(data.total),
     status: data.status,
@@ -74,11 +74,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .update(quotes)
           .set({
             quoteNumber: quote_number,
-            issueDate: issue_date,
+            issue_date: issue_date,
             expiryDate: expiry_date,
             status,
             subtotal: subtotal?.toString(),
-            taxRate: tax_rate?.toString(),
+            tax_rate: tax_rate?.toString(),
             notes,
           })
           .where(eq(quotes.id, id))

@@ -140,7 +140,7 @@ const NonCollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][numb
   return (
     <SidebarMenuItem>
       <Link href={item.url}>
-        <SidebarMenuButton tooltip={t(item.translationKey)} className="text-sidebar-foreground/70">
+        <SidebarMenuButton tooltip={t(item.translationKey)}>
           {item.icon && <item.icon />}
           <span>{t(item.translationKey)}</span>
         </SidebarMenuButton>

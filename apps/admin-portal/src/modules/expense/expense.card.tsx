@@ -43,14 +43,14 @@ const ExpenseCard = ({ expense }: { expense: Expense }) => {
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Calendar className="h-4 w-4" />
             <span>
-              {t("Expenses.form.issueDate.label")}:{" "}
-              {new Date(expense.issueDate).toLocaleDateString()}
+              {t("Expenses.form.issue_date.label")}:{" "}
+              {new Date(expense.issue_date).toLocaleDateString()}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Calendar className="h-4 w-4" />
             <span>
-              {t("Expenses.form.dueDate.label")}: {new Date(expense.dueDate).toLocaleDateString()}
+              {t("Expenses.form.due_date.label")}: {new Date(expense.due_date).toLocaleDateString()}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">

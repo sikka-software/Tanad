@@ -1,125 +1,211 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
-import PageTitle from "@/ui/page-title";
-
-import { BranchForm, type BranchFormValues } from "@/modules/branch/branch.form";
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-
-import { generateDummyData } from "@/lib/dummy-generator";
-
-import { branchKeys } from "@/modules/branch/branch.hooks";
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
+import { generateId } from "@/lib/utils";
 
-export default function AddBranchPage() {
-  const supabase = createClient();
-  const router = useRouter();
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import DataPageLayout from "@/components/layouts/data-page-layout";
+
+import { useCreateExpense } from "@/modules/expense/expense.hooks";
+import { Expense } from "@/modules/expense/expense.type";
+
+export default function AddExpensePage() {
   const t = useTranslations();
-  const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
+  const router = useRouter();
+  const user = useUserStore((state) => state.user);
+  const { mutate: createExpense, isPending } = useCreateExpense();
 
-  const handleSubmit = async (data: BranchFormValues) => {
-    setLoading(true);
+  const [expenseNumber, setExpenseNumber] = useState("");
+  const [issue_date, setissue_date] = useState<Date>();
+  const [due_date, setdue_date] = useState<Date>();
+  const [amount, setAmount] = useState("");
+  const [category, setCategory] = useState("");
+  const [notes, setNotes] = useState("");
+  const [clientId, setClientId] = useState("");
+  const [status, setStatus] = useState<Expense["status"]>("pending");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!user?.id) {
+      toast.error(t("Auth.error.not_authenticated"));
+      return;
+    }
+
+    if (!issue_date || !due_date) {
+      toast.error(t("Expenses.error.dates_required"));
+      return;
+    }
+
     try {
-      // Check if user ID is available
-      if (!user?.id) {
-        throw new Error(t("Branches.error.not_authenticated"));
-      }
-
-      const { data: newBranch, error } = await supabase
-        .from("branches")
-        .insert([
-          {
-            name: data.name.trim(),
-            code: data.code.trim(),
-            address: data.address.trim(),
-            city: data.city.trim(),
-            state: data.state.trim(),
-            zip_code: data.zip_code.trim(),
-            phone: data.phone?.trim() || null,
-            email: data.email?.trim() || null,
-            manager: data.manager?.trim() || null,
-            is_active: data.is_active,
-            notes: data.notes?.trim() || null,
-            user_id: user.id,
+      await createExpense(
+        {
+          expenseNumber,
+          issue_date: issue_date.toISOString().split("T")[0],
+          due_date: due_date.toISOString().split("T")[0],
+          amount: parseFloat(amount),
+          category,
+          notes,
+          client_id: clientId,
+          status,
+          user_id: user.id,
+        },
+        {
+          onSuccess: () => {
+            toast.success(t("Expenses.success.created"));
+            router.push("/expenses");
           },
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Update the branches cache to include the new branch
-      const previousBranches = queryClient.getQueryData(branchKeys.lists()) || [];
-      queryClient.setQueryData(branchKeys.lists(), [
-        ...(Array.isArray(previousBranches) ? previousBranches : []),
-        newBranch,
-      ]);
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Branches.messages.success_created"),
-      });
-
-      router.push("/branches");
+          onError: (error: any) => {
+            console.error("Failed to create expense:", error);
+            toast.error(t("Expenses.error.create"));
+          },
+        }
+      );
     } catch (error) {
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Branches.messages.error_save"),
-      });
-    } finally {
-      setLoading(false);
+      console.error("Failed to create expense:", error);
+      toast.error(t("Expenses.error.create"));
     }
   };
 
-  const handleDummyData = () => {
-    const dummyData = generateDummyData();
-    const form = (window as any).branchForm;
-    if (form) {
-      form.setValue("name", dummyData.full_name);
-      form.setValue("code", "BR-" + Math.random().toString(36).substr(2, 6));
-      form.setValue("email", dummyData.email);
-      form.setValue("phone", dummyData.phone);
-      form.setValue("address", dummyData.address);
-      form.setValue("city", dummyData.city);
-      form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zip_code);
-      form.setValue("manager", dummyData.full_name);
-      form.setValue("is_active", true);
-      form.setValue("notes", "Test branch notes");
-    }
+  const generateDummyData = () => {
+    setExpenseNumber(generateId());
+    setissue_date(new Date());
+    setdue_date(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
+    setAmount("1000");
+    setCategory("Office Supplies");
+    setNotes("Monthly office supplies expense");
+    setClientId(generateId());
+    setStatus("pending");
   };
 
   return (
     <div>
-      <CustomPageMeta title={t("Branches.add_new")} />
-      <PageTitle
-        title={t("Branches.add_new")}
-        formButtons
-        formId="branch-form"
-        loading={loading}
-        onCancel={() => router.push("/branches")}
-        texts={{
-          submit_form: t("Branches.add_new"),
-          cancel: t("General.cancel"),
-        }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
-      />
+      <CustomPageMeta title={t("Expenses.add_new")} description={t("Expenses.add_description")} />
+      <DataPageLayout>
+        <div className="mx-auto max-w-2xl">
+          <Card className="p-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <FormItem>
+                <FormLabel>{t("Expenses.expense_number")}</FormLabel>
+                <FormControl>
+                  <Input
+                    value={expenseNumber}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setExpenseNumber(e.target.value)}
+                    required
+                  />
+                </FormControl>
+              </FormItem>
 
-      <div className="mx-auto max-w-2xl p-4">
-        <BranchForm id="branch-form" onSubmit={handleSubmit} loading={loading} />
-      </div>
+              <FormItem>
+                <FormLabel>{t("Expenses.issue_date")}</FormLabel>
+                <FormControl>
+                  <DatePicker
+                    date={issue_date}
+                    onSelect={setissue_date}
+                    placeholder={t("Expenses.select_issue_date")}
+                  />
+                </FormControl>
+              </FormItem>
+
+              <FormItem>
+                <FormLabel>{t("Expenses.due_date")}</FormLabel>
+                <FormControl>
+                  <DatePicker
+                    date={due_date}
+                    onSelect={setdue_date}
+                    placeholder={t("Expenses.select_due_date")}
+                  />
+                </FormControl>
+              </FormItem>
+
+              <FormItem>
+                <FormLabel>{t("Expenses.amount")}</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    value={amount}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
+                    required
+                  />
+                </FormControl>
+              </FormItem>
+
+              <FormItem>
+                <FormLabel>{t("Expenses.category")}</FormLabel>
+                <FormControl>
+                  <Input
+                    value={category}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCategory(e.target.value)}
+                    required
+                  />
+                </FormControl>
+              </FormItem>
+
+              <FormItem>
+                <FormLabel>{t("Expenses.notes")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    value={notes}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNotes(e.target.value)}
+                  />
+                </FormControl>
+              </FormItem>
+
+              <FormItem>
+                <FormLabel>{t("Expenses.client_id")}</FormLabel>
+                <FormControl>
+                  <Input
+                    value={clientId}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setClientId(e.target.value)}
+                    required
+                  />
+                </FormControl>
+              </FormItem>
+
+              <FormItem>
+                <FormLabel>{t("Expenses.status")}</FormLabel>
+                <Select value={status} onValueChange={(value: string) => setStatus(value as Expense["status"])}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("Expenses.select_status")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">{t("Expenses.status_pending")}</SelectItem>
+                    <SelectItem value="paid">{t("Expenses.status_paid")}</SelectItem>
+                    <SelectItem value="overdue">{t("Expenses.status_overdue")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+
+              <div className="flex justify-between">
+                <Button type="button" variant="secondary" onClick={generateDummyData}>
+                  {t("Common.generate_dummy_data")}
+                </Button>
+                <Button type="submit" disabled={isPending}>
+                  {t("Common.create")}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      </DataPageLayout>
     </div>
   );
 }

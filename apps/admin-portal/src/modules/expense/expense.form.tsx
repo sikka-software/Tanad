@@ -12,8 +12,8 @@ import { Textarea } from "@/ui/textarea";
 export const createExpenseSchema = (t: (key: string) => string) =>
   z.object({
     expenseNumber: z.string().min(1, t("Expenses.form.expenseNumber.required")),
-    issueDate: z.string().min(1, t("Expenses.form.issueDate.required")),
-    dueDate: z.string().min(1, t("Expenses.form.dueDate.required")),
+    issue_date: z.string().min(1, t("Expenses.form.issue_date.required")),
+    due_date: z.string().min(1, t("Expenses.form.due_date.required")),
     status: z.enum(["pending", "paid", "overdue"]).default("pending"),
     amount: z.number().min(0, t("Expenses.form.amount.required")),
     category: z.string().min(1, t("Expenses.form.category.required")),
@@ -36,8 +36,8 @@ export function ExpenseForm({ id, onSubmit, loading, initialData }: ExpenseFormP
     resolver: zodResolver(createExpenseSchema(t)),
     defaultValues: initialData || {
       expenseNumber: "",
-      issueDate: "",
-      dueDate: "",
+      issue_date: "",
+      due_date: "",
       status: "pending",
       amount: 0,
       category: "",
@@ -95,10 +95,10 @@ export function ExpenseForm({ id, onSubmit, loading, initialData }: ExpenseFormP
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="issueDate"
+            name="issue_date"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Expenses.form.issueDate.label")} *</FormLabel>
+                <FormLabel>{t("Expenses.form.issue_date.label")} *</FormLabel>
                 <FormControl>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
@@ -112,10 +112,10 @@ export function ExpenseForm({ id, onSubmit, loading, initialData }: ExpenseFormP
 
           <FormField
             control={form.control}
-            name="dueDate"
+            name="due_date"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Expenses.form.dueDate.label")} *</FormLabel>
+                <FormLabel>{t("Expenses.form.due_date.label")} *</FormLabel>
                 <FormControl>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}

@@ -2,7 +2,7 @@ import { desc, eq, inArray } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
-import { branches } from "@/db/schema";
+import { expenses } from "@/db/schema";
 import { createClient } from "@/utils/supabase/server-props";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -23,31 +23,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "GET") {
     try {
-      const branchesList = await db.query.branches.findMany({
-        where: eq(branches.user_id, user?.id),
-        orderBy: desc(branches.created_at),
+      const expensesList = await db.query.expenses.findMany({
+        where: eq(expenses.user_id, user?.id),
+        orderBy: desc(expenses.created_at),
       });
-      return res.status(200).json(branchesList);
+      return res.status(200).json(expensesList);
     } catch (error) {
-      console.error("Error fetching branches:", error);
-      return res.status(500).json({ message: "Error fetching branches" });
+      console.error("Error fetching expenses:", error);
+      return res.status(500).json({ message: "Error fetching expenses" });
     }
   }
 
   if (req.method === "POST") {
     try {
-      // Map branch data to match Drizzle schema
-      const dbBranch = {
+      // Map expense data to match Drizzle schema
+      const dbExpense = {
         ...req.body,
-        zip_code: req.body.zip_code,
-        is_active: req.body.is_active,
+        amount: req.body.amount,
+        status: req.body.status || "pending",
       };
 
-      const [branch] = await db.insert(branches).values(dbBranch).returning();
-      return res.status(201).json(branch);
+      const [expense] = await db.insert(expenses).values(dbExpense).returning();
+      return res.status(201).json(expense);
     } catch (error) {
-      console.error("Error creating branch:", error);
-      return res.status(500).json({ message: "Error creating branch" });
+      console.error("Error creating expense:", error);
+      return res.status(500).json({ message: "Error creating expense" });
     }
   }
 
@@ -59,16 +59,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ message: "Invalid request body" });
       }
 
-      // Delete all branches with the given IDs
-      await db.delete(branches).where(eq(branches.id, ids[0]));
+      // Delete all expenses with the given IDs
+      await db.delete(expenses).where(eq(expenses.id, ids[0]));
 
       // If there are more IDs, delete them one by one
-      await db.delete(branches).where(inArray(branches.id, ids));
+      await db.delete(expenses).where(inArray(expenses.id, ids));
 
       return res.status(204).end();
     } catch (error) {
-      console.error("Error deleting branches:", error);
-      return res.status(500).json({ message: "Error deleting branches" });
+      console.error("Error deleting expenses:", error);
+      return res.status(500).json({ message: "Error deleting expenses" });
     }
   }
 

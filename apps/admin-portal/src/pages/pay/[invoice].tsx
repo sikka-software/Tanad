@@ -17,11 +17,11 @@ export default function InvoicePreviewPage({ invoice }: Props) {
     <div className="mx-auto max-w-4xl p-8">
       <div className="mb-8 flex items-start justify-between">
         <h1 className="text-2xl font-bold">
-          {t("invoice_number", { number: invoice.invoiceNumber })}
+          {t("invoice_number", { number: invoice.invoice_number })}
         </h1>
         <div className="text-right">
           <p className="text-sm text-gray-500">{t("issue_date")}</p>
-          <p>{format(new Date(invoice.issueDate), "MMM dd, yyyy")}</p>
+          <p>{format(new Date(invoice.issue_date), "MMM dd, yyyy")}</p>
         </div>
       </div>
 

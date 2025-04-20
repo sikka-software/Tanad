@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
-import { branches } from "@/db/schema";
+import { expenses } from "@/db/schema";
 import { createClient } from "@/utils/supabase/server-props";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   });
 
   if (!id || typeof id !== "string") {
-    return res.status(400).json({ error: "Invalid job listing ID" });
+    return res.status(400).json({ error: "Invalid expense ID" });
   }
 
   const {
@@ -28,64 +28,64 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   if (req.method === "GET") {
     try {
-      const branch = await db.query.branches.findFirst({
-        where: eq(branches.id, id as string),
+      const expense = await db.query.expenses.findFirst({
+        where: eq(expenses.id, id as string),
       });
 
-      if (!branch) {
-        return res.status(404).json({ message: "Branch not found" });
+      if (!expense) {
+        return res.status(404).json({ message: "Expense not found" });
       }
-      return res.status(200).json(branch);
+      return res.status(200).json(expense);
     } catch (error) {
-      console.error("Error fetching branch:", error);
-      return res.status(500).json({ message: "Error fetching branch" });
+      console.error("Error fetching expense:", error);
+      return res.status(500).json({ message: "Error fetching expense" });
     }
   }
 
   if (req.method === "PUT") {
     try {
-      const existingBranch = await db.query.branches.findFirst({
-        where: eq(branches.id, id as string),
+      const existingExpense = await db.query.expenses.findFirst({
+        where: eq(expenses.id, id as string),
       });
 
-      if (!existingBranch) {
-        return res.status(404).json({ message: "Branch not found" });
+      if (!existingExpense) {
+        return res.status(404).json({ message: "Expense not found" });
       }
 
-      if (existingBranch.user_id !== user.id) {
-        return res.status(403).json({ error: "Not authorized to update this branch" });
+      if (existingExpense.user_id !== user.id) {
+        return res.status(403).json({ error: "Not authorized to update this expense" });
       }
 
-      const dbBranch = {
+      const dbExpense = {
         ...req.body,
-        zip_code: req.body.zip_code,
-        is_active: req.body.is_active,
+        amount: req.body.amount,
+        status: req.body.status || existingExpense.status,
       };
 
-      const [branch] = await db
-        .update(branches)
-        .set(dbBranch)
-        .where(eq(branches.id, id as string))
+      const [expense] = await db
+        .update(expenses)
+        .set(dbExpense)
+        .where(eq(expenses.id, id as string))
         .returning();
 
-      if (!branch) {
-        return res.status(404).json({ message: "Branch not found" });
+      if (!expense) {
+        return res.status(404).json({ message: "Expense not found" });
       }
 
-      return res.status(200).json(branch);
+      return res.status(200).json(expense);
     } catch (error) {
-      console.error("Error updating branch:", error);
-      return res.status(500).json({ message: "Error updating branch" });
+      console.error("Error updating expense:", error);
+      return res.status(500).json({ message: "Error updating expense" });
     }
   }
 
   if (req.method === "DELETE") {
     try {
-      await db.delete(branches).where(eq(branches.id, id as string));
+      await db.delete(expenses).where(eq(expenses.id, id as string));
       return res.status(204).end();
     } catch (error) {
-      console.error("Error deleting branch:", error);
-      return res.status(500).json({ message: "Error deleting branch" });
+      console.error("Error deleting expense:", error);
+      return res.status(500).json({ message: "Error deleting expense" });
     }
   }
 

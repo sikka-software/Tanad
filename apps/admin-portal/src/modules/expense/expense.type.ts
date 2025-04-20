@@ -2,8 +2,8 @@ export interface Expense {
   id: string;
   created_at: string;
   expenseNumber: string;
-  issueDate: string;
-  dueDate: string;
+  issue_date: string;
+  due_date: string;
   status: "pending" | "paid" | "overdue";
   amount: number;
   category: string;

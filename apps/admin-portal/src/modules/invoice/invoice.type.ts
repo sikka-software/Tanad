@@ -3,12 +3,12 @@ import { Client } from "@/modules/client/client.type";
 export type Invoice = {
   id: string;
   user_id: string;
-  invoiceNumber: string;
-  issueDate: Date;
-  dueDate: Date;
+  invoice_number: string;
+  issue_date: Date;
+  due_date: Date;
   status: "paid" | "pending" | "overdue";
   subtotal: number;
-  taxRate?: number;
+  tax_rate?: number;
   total: number;
   notes?: string;
   client_id?: string;

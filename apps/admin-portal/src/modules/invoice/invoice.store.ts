@@ -70,7 +70,7 @@ export const useInvoiceStore = create<InvoiceStates & InvoiceActions>((set, get)
     let filtered = data;
     if (searchQuery) {
       filtered = filtered.filter((invoice) =>
-        invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()),
+        invoice.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 

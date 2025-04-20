@@ -174,7 +174,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
 
   // Watch items and tax_rate for changes to update totals
   const items = form.watch("items");
-  const taxRate = form.watch("tax_rate");
+  const tax_rate = form.watch("tax_rate");
 
   useEffect(() => {
     const subtotal = calculateSubtotal(items);

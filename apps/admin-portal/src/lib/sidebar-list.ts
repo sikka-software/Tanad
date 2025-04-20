@@ -53,6 +53,40 @@ type Group = {
   menus: Menu[];
 };
 
+let simplifiedMenu = {
+  group: "Administration",
+  items: [
+    { title: "Dashboard" },
+    { title: "Analytics" },
+    {
+      title: "Contacts",
+      items: [
+        { title: "All Contacts" },
+        { title: "Companies" },
+        { title: "Clients" },
+        { title: "Vendors" },
+      ],
+    },
+    {
+      title: "Locations",
+      items: [{ title: "Offices" }, { title: "Warehouses" }, { title: "Branches" }],
+    },
+    {
+      title: "Sales",
+      items: [{ title: "Products" }, { title: "Invoices" }, { title: "Quotes" }],
+    },
+    {
+      title: "Human Resources",
+      items: [{ title: "Employees" }, { title: "Departments" }, { title: "Salaries" }],
+    },
+    {
+      title: "Settings",
+      items: [{ title: "Users" }, { title: "Billing" }, { title: "Settings" }],
+    },
+  ],
+};
+
+
 // Main menu items
 function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [

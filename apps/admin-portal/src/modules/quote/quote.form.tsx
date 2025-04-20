@@ -128,7 +128,7 @@ export function QuoteForm({
   });
 
   const items = form.watch("items") || [];
-  const taxRate = form.watch("tax_rate") || 0;
+  const tax_rate = form.watch("tax_rate") || 0;
 
   const subtotal = items.reduce((acc: number, item: QuoteItem) => {
     const quantity = parseFloat(item.quantity || "0");
@@ -136,7 +136,7 @@ export function QuoteForm({
     return acc + quantity * unitPrice;
   }, 0);
 
-  const tax = (subtotal * taxRate) / 100;
+  const tax = (subtotal * tax_rate) / 100;
   const total = subtotal + tax;
 
   useEffect(() => {
