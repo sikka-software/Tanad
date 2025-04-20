@@ -8,7 +8,6 @@ import {
   updateSalary,
   bulkDeleteSalaries,
 } from "@/modules/salary/salary.service";
-
 import type { Salary } from "@/modules/salary/salary.type";
 
 export const salaryKeys = {
@@ -53,13 +52,8 @@ export function useUpdateSalary() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      salary,
-    }: {
-      id: string;
-      salary: Partial<Omit<Salary, "id" | "created_at">>;
-    }) => updateSalary(id, salary),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Salary, "id" | "created_at">> }) =>
+      updateSalary(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: salaryKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });

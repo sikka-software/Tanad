@@ -14,7 +14,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import ProductCard from "@/modules/product/product.card";
 import { useProducts, useBulkDeleteProducts } from "@/modules/product/product.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/product/product.options";
-import { useProductStore } from "@/modules/product/product.store";
+import useProductStore from "@/modules/product/product.store";
 import ProductsTable from "@/modules/product/product.table";
 
 export default function ProductsPage() {
@@ -31,8 +31,8 @@ export default function ProductsPage() {
   const searchQuery = useProductStore((state) => state.searchQuery);
   const filterConditions = useProductStore((state) => state.filterConditions);
   const filterCaseSensitive = useProductStore((state) => state.filterCaseSensitive);
-  const getFilteredProducts = useProductStore((state) => state.getFilteredProducts);
-  const getSortedProducts = useProductStore((state) => state.getSortedProducts);
+  const getFilteredProducts = useProductStore((state) => state.getFilteredData);
+  const getSortedProducts = useProductStore((state) => state.getSortedData);
 
   const { data: products, isLoading, error } = useProducts();
   const { mutate: deleteProducts, isPending: isDeleting } = useBulkDeleteProducts();

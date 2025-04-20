@@ -7,7 +7,6 @@ import {
   fetchVendors,
   updateVendor,
 } from "@/modules/vendor/vendor.service";
-
 import type { Vendor, VendorCreateData } from "@/modules/vendor/vendor.type";
 
 // Query keys for vendors
@@ -60,13 +59,8 @@ export function useUpdateVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      vendor,
-    }: {
-      id: string;
-      vendor: Partial<Omit<Vendor, "id" | "created_at">>;
-    }) => updateVendor(id, vendor),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Vendor, "id" | "created_at">> }) =>
+      updateVendor(id, data),
     onSuccess: (data) => {
       // Invalidate both the specific detail and the list queries
       queryClient.invalidateQueries({ queryKey: vendorKeys.detail(data.id) });

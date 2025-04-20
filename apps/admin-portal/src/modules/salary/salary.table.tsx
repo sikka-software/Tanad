@@ -6,8 +6,10 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useSalaryStore } from "@/modules/salary/salary.store";
+import useSalaryStore from "@/modules/salary/salary.store";
 import { Salary } from "@/modules/salary/salary.type";
+
+import { useUpdateSalary } from "./salary.hooks";
 
 const employeeNameSchema = z.string().min(1, "Required");
 const grossAmountSchema = z.number().min(0, "Must be positive");
@@ -25,7 +27,7 @@ interface SalariesTableProps {
 
 const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
   const t = useTranslations();
-  const updateSalary = useSalaryStore((state) => state.updateSalary);
+  const { mutateAsync: updateSalary } = useUpdateSalary();
   const selectedRows = useSalaryStore((state) => state.selectedRows);
   const setSelectedRows = useSalaryStore((state) => state.setSelectedRows);
 
@@ -83,7 +85,7 @@ const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
   };
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateSalary(rowId, { [columnId]: value });
+    await updateSalary({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = (rows: Salary[]) => {

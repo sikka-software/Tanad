@@ -6,8 +6,10 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useProductStore } from "@/modules/product/product.store";
+import useProductStore from "@/modules/product/product.store";
 import { Product } from "@/modules/product/product.type";
+
+import { useUpdateProduct } from "./product.hooks";
 
 const nameSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().optional();
@@ -23,9 +25,9 @@ interface ProductsTableProps {
 
 const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
   const t = useTranslations();
-  const updateProduct = useProductStore((state) => state.updateProduct);
   const selectedRows = useProductStore((state) => state.selectedRows);
   const setSelectedRows = useProductStore((state) => state.setSelectedRows);
+  const { mutateAsync: updateProduct } = useUpdateProduct();
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
@@ -46,7 +48,7 @@ const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateProduct(rowId, { [columnId]: value });
+    await updateProduct({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

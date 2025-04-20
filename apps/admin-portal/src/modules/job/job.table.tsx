@@ -7,7 +7,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useJobsStore } from "@/modules/job/job.store";
+import useJobsStore from "@/modules/job/job.store";
 import { Job } from "@/modules/job/job.type";
 
 import { useUpdateJob } from "./job.hooks";

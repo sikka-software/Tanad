@@ -7,7 +7,6 @@ import {
   fetchProducts,
   updateProduct,
 } from "@/modules/product/product.service";
-
 import type { Product } from "@/modules/product/product.type";
 
 // Query keys for products
@@ -56,15 +55,9 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      product,
-    }: {
-      id: string;
-      product: Partial<Omit<Product, "id" | "created_at">>;
-    }) => updateProduct(id, product),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Product, "id" | "created_at">> }) =>
+      updateProduct(id, data),
     onSuccess: (data: Product) => {
-      // Invalidate both the specific detail and the list queries
       queryClient.invalidateQueries({ queryKey: productKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
     },

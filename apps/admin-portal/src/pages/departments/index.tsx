@@ -14,7 +14,7 @@ import DepartmentCard from "@/modules/department/department.card";
 import { useDepartments } from "@/modules/department/department.hooks";
 import { useDeleteDepartments } from "@/modules/department/department.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/department/department.options";
-import { useDepartmentsStore } from "@/modules/department/department.store";
+import useDepartmentsStore from "@/modules/department/department.store";
 import DepartmentsTable from "@/modules/department/department.table";
 
 export default function DepartmentsPage() {
@@ -32,8 +32,8 @@ export default function DepartmentsPage() {
   const searchQuery = useDepartmentsStore((state) => state.searchQuery);
   const filterConditions = useDepartmentsStore((state) => state.filterConditions);
   const filterCaseSensitive = useDepartmentsStore((state) => state.filterCaseSensitive);
-  const getFilteredDepartments = useDepartmentsStore((state) => state.getFilteredDepartments);
-  const getSortedDepartments = useDepartmentsStore((state) => state.getSortedDepartments);
+  const getFilteredDepartments = useDepartmentsStore((state) => state.getFilteredData);
+  const getSortedDepartments = useDepartmentsStore((state) => state.getSortedData);
 
   const { data: departments, isLoading, error } = useDepartments();
   const { mutate: deleteDepartments, isPending: isDeleting } = useDeleteDepartments();

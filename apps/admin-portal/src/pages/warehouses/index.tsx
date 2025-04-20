@@ -13,7 +13,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import WarehouseCard from "@/modules/warehouse/warehouse.card";
 import { useBulkDeleteWarehouses, useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/warehouse/warehouse.options";
-import { useWarehouseStore } from "@/modules/warehouse/warehouse.store";
+import useWarehouseStore from "@/modules/warehouse/warehouse.store";
 import WarehouseTable from "@/modules/warehouse/warehouse.table";
 
 export default function WarehousesPage() {
@@ -31,8 +31,8 @@ export default function WarehousesPage() {
   const searchQuery = useWarehouseStore((state) => state.searchQuery);
   const filterConditions = useWarehouseStore((state) => state.filterConditions);
   const filterCaseSensitive = useWarehouseStore((state) => state.filterCaseSensitive);
-  const getFilteredWarehouses = useWarehouseStore((state) => state.getFilteredWarehouses);
-  const getSortedWarehouses = useWarehouseStore((state) => state.getSortedWarehouses);
+  const getFilteredWarehouses = useWarehouseStore((state) => state.getFilteredData);
+  const getSortedWarehouses = useWarehouseStore((state) => state.getSortedData);
 
   const { data: warehouses, isLoading, error } = useWarehouses();
   const { mutate: deleteItems, isPending: isDeleting } = useBulkDeleteWarehouses();

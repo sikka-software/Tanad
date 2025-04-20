@@ -20,7 +20,7 @@ import {
   FILTERABLE_FIELDS,
   SORTABLE_COLUMNS,
 } from "@/modules/employee-request/employee-request.options";
-import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
+import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
 import EmployeeRequestsTable from "@/modules/employee-request/employee-request.table";
 
 export default function EmployeeRequestsPage() {
@@ -37,12 +37,8 @@ export default function EmployeeRequestsPage() {
   const searchQuery = useEmployeeRequestsStore((state) => state.searchQuery);
   const filterConditions = useEmployeeRequestsStore((state) => state.filterConditions);
   const filterCaseSensitive = useEmployeeRequestsStore((state) => state.filterCaseSensitive);
-  const getFilteredEmployeeRequests = useEmployeeRequestsStore(
-    (state) => state.getFilteredEmployeeRequests,
-  );
-  const getSortedEmployeeRequests = useEmployeeRequestsStore(
-    (state) => state.getSortedEmployeeRequests,
-  );
+  const getFilteredEmployeeRequests = useEmployeeRequestsStore((state) => state.getFilteredData);
+  const getSortedEmployeeRequests = useEmployeeRequestsStore((state) => state.getSortedData);
 
   const { data: requests, isLoading, error } = useEmployeeRequests();
   const { mutate: deleteEmployeeRequests, isPending: isDeleting } = useBulkDeleteEmployeeRequests();

@@ -14,7 +14,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import EmployeeCard from "@/modules/employee/employee.card";
 import { useEmployees, useBulkDeleteEmployees } from "@/modules/employee/employee.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/employee/employee.options";
-import { useEmployeesStore } from "@/modules/employee/employee.store";
+import useEmployeesStore from "@/modules/employee/employee.store";
 import EmployeesTable from "@/modules/employee/employee.table";
 import { Employee } from "@/modules/employee/employee.types";
 
@@ -32,8 +32,8 @@ export default function EmployeesPage() {
   const searchQuery = useEmployeesStore((state) => state.searchQuery);
   const filterConditions = useEmployeesStore((state) => state.filterConditions);
   const filterCaseSensitive = useEmployeesStore((state) => state.filterCaseSensitive);
-  const getFilteredEmployees = useEmployeesStore((state) => state.getFilteredEmployees);
-  const getSortedEmployees = useEmployeesStore((state) => state.getSortedEmployees);
+  const getFilteredEmployees = useEmployeesStore((state) => state.getFilteredData);
+  const getSortedEmployees = useEmployeesStore((state) => state.getSortedData);
 
   const { data: employees, isLoading, error } = useEmployees();
   const { mutate: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();

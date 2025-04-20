@@ -9,8 +9,10 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useInvoiceStore } from "@/modules/invoice/invoice.store";
+import useInvoiceStore from "@/modules/invoice/invoice.store";
 import { Invoice } from "@/modules/invoice/invoice.type";
+
+import { useUpdateInvoice } from "./invoice.hooks";
 
 const invoice_numberSchema = z.string().min(1, "Required");
 const issue_dateSchema = z.date();
@@ -26,7 +28,7 @@ interface InvoicesTableProps {
 
 const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
   const t = useTranslations("Invoices");
-  const { updateInvoice } = useInvoiceStore();
+  const { mutateAsync: updateInvoice } = useUpdateInvoice();
   const selectedRows = useInvoiceStore((state) => state.selectedRows);
   const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
 
@@ -88,7 +90,7 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
     if (columnId === "issue_date" || columnId === "due_date") {
       processedValue = new Date(value as string).toISOString();
     }
-    await updateInvoice(rowId, { [columnId]: processedValue });
+    await updateInvoice({ id: rowId, data: { [columnId]: processedValue } });
   };
 
   const handleRowSelectionChange = (rows: Invoice[]) => {

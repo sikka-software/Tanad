@@ -14,7 +14,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import InvoiceCard from "@/modules/invoice/invoice.card";
 import { useInvoices, useBulkDeleteInvoices } from "@/modules/invoice/invoice.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/invoice/invoice.options";
-import { useInvoiceStore } from "@/modules/invoice/invoice.store";
+import useInvoiceStore from "@/modules/invoice/invoice.store";
 import InvoicesTable from "@/modules/invoice/invoice.table";
 
 export default function InvoicesPage() {
@@ -32,8 +32,8 @@ export default function InvoicesPage() {
   const searchQuery = useInvoiceStore((state) => state.searchQuery);
   const filterConditions = useInvoiceStore((state) => state.filterConditions);
   const filterCaseSensitive = useInvoiceStore((state) => state.filterCaseSensitive);
-  const getFilteredInvoices = useInvoiceStore((state) => state.getFilteredInvoices);
-  const getSortedInvoices = useInvoiceStore((state) => state.getSortedInvoices);
+  const getFilteredInvoices = useInvoiceStore((state) => state.getFilteredData);
+  const getSortedInvoices = useInvoiceStore((state) => state.getSortedData);
 
   const { data: invoices, isLoading, error } = useInvoices();
   const { mutate: deleteInvoices, isPending: isDeleting } = useBulkDeleteInvoices();

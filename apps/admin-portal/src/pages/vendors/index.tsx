@@ -14,7 +14,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import VendorCard from "@/modules/vendor/vendor.card";
 import { useVendors, useBulkDeleteVendors } from "@/modules/vendor/vendor.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/vendor/vendor.options";
-import { useVendorsStore } from "@/modules/vendor/vendor.store";
+import useVendorsStore from "@/modules/vendor/vendor.store";
 import VendorsTable from "@/modules/vendor/vendor.table";
 
 export default function VendorsPage() {
@@ -31,8 +31,8 @@ export default function VendorsPage() {
   const searchQuery = useVendorsStore((state) => state.searchQuery);
   const filterConditions = useVendorsStore((state) => state.filterConditions);
   const filterCaseSensitive = useVendorsStore((state) => state.filterCaseSensitive);
-  const getFilteredVendors = useVendorsStore((state) => state.getFilteredVendors);
-  const getSortedVendors = useVendorsStore((state) => state.getSortedVendors);
+  const getFilteredVendors = useVendorsStore((state) => state.getFilteredData);
+  const getSortedVendors = useVendorsStore((state) => state.getSortedData);
 
   const { data: vendors, isLoading, error } = useVendors();
   const { mutate: deleteVendors, isPending: isDeleting } = useBulkDeleteVendors();

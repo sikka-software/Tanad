@@ -13,7 +13,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import JobListingCard from "@/modules/job-listing/job-listing.card";
 import { useJobListings, useBulkDeleteJobListings } from "@/modules/job-listing/job-listing.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/job-listing/job-listing.options";
-import { useJobListingsStore } from "@/modules/job-listing/job-listing.store";
+import useJobListingsStore from "@/modules/job-listing/job-listing.store";
 import JobListingsTable from "@/modules/job-listing/job-listing.table";
 import { JobListing } from "@/modules/job-listing/job-listing.type";
 
@@ -31,8 +31,8 @@ export default function JobListingsPage() {
   const searchQuery = useJobListingsStore((state) => state.searchQuery);
   const filterConditions = useJobListingsStore((state) => state.filterConditions);
   const filterCaseSensitive = useJobListingsStore((state) => state.filterCaseSensitive);
-  const getFilteredJobListings = useJobListingsStore((state) => state.getFilteredJobListings);
-  const getSortedJobListings = useJobListingsStore((state) => state.getSortedJobListings);
+  const getFilteredJobListings = useJobListingsStore((state) => state.getFilteredData);
+  const getSortedJobListings = useJobListingsStore((state) => state.getSortedData);
 
   const { data: jobListings = [], isLoading, error } = useJobListings();
   const { mutate: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();

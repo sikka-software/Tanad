@@ -14,7 +14,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import QuoteCard from "@/modules/quote/quote.card";
 import { useQuotes, useBulkDeleteQuotes } from "@/modules/quote/quote.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/quote/quote.options";
-import { useQuotesStore } from "@/modules/quote/quote.store";
+import useQuotesStore from "@/modules/quote/quote.store";
 import QuotesTable from "@/modules/quote/quote.table";
 
 export default function QuotesPage() {
@@ -31,8 +31,8 @@ export default function QuotesPage() {
   const searchQuery = useQuotesStore((state) => state.searchQuery);
   const filterConditions = useQuotesStore((state) => state.filterConditions);
   const filterCaseSensitive = useQuotesStore((state) => state.filterCaseSensitive);
-  const getFilteredQuotes = useQuotesStore((state) => state.getFilteredQuotes);
-  const getSortedQuotes = useQuotesStore((state) => state.getSortedQuotes);
+  const getFilteredQuotes = useQuotesStore((state) => state.getFilteredData);
+  const getSortedQuotes = useQuotesStore((state) => state.getSortedData);
 
   const { data: quotes, isLoading, error } = useQuotes();
   const { mutate: deleteQuotes, isPending: isDeleting } = useBulkDeleteQuotes();

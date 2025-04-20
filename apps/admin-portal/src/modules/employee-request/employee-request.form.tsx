@@ -22,10 +22,10 @@ import { Textarea } from "@/ui/textarea";
 
 import { cn } from "@/lib/utils";
 
-import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
+import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
 import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
 import { employeeKeys, useEmployees } from "@/modules/employee/employee.hooks";
-import { useEmployeesStore } from "@/modules/employee/employee.store";
+import useEmployeeStore from "@/modules/employee/employee.store";
 import useUserStore from "@/stores/use-user-store";
 
 const createRequestSchema = (t: (key: string) => string) =>
@@ -60,12 +60,12 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
   const locale = useLocale();
 
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
-  const { setLoadingSave: setIsEmployeeSaving, loadingSave: isEmployeeSaving } =
-    useEmployeesStore();
+  const { setIsLoading: setIsEmployeeSaving, isLoading: isEmployeeSaving } = useEmployeeStore();
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useUserStore();
-  const { setLoadingSave, loadingSave } = useEmployeeRequestsStore();
+  const isLoadingSave = useEmployeeRequestsStore((state) => state.isLoading);
+  const setIsLoadingSave = useEmployeeRequestsStore((state) => state.setIsLoading);
   const router = useRouter();
 
   const form = useForm<EmployeeRequestFormValues>({
@@ -160,15 +160,15 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
     console.log("errors are ", form.formState.errors);
     console.log("form values are ", form.getValues("employee_id"));
     try {
-      setLoadingSave(true);
+      setIsLoadingSave(true);
       const isValid = await form.trigger();
       if (!isValid) {
-        setLoadingSave(false);
+        setIsLoadingSave(false);
         return;
       }
       await form.handleSubmit(onSubmit)();
     } catch (error) {
-      setLoadingSave(false);
+      setIsLoadingSave(false);
       console.error("Error submitting form:", error);
     }
   };
@@ -212,7 +212,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                   <ComboboxAdd
                     direction={locale === "ar" ? "rtl" : "ltr"}
                     data={employeeOptions}
-                    disabled={loadingSave}
+                    disabled={isLoadingSave}
                     isLoading={employeesLoading}
                     defaultValue={field.value}
                     valueKey={"id"}
@@ -250,7 +250,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                 <FormLabel>{t("EmployeeRequests.form.type.label")}</FormLabel>
                 <FormControl>
                   <Select
-                    disabled={loadingSave}
+                    disabled={isLoadingSave}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
@@ -281,7 +281,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                   <Input
                     {...field}
                     placeholder={t("EmployeeRequests.form.title.placeholder")}
-                    disabled={loadingSave}
+                    disabled={isLoadingSave}
                   />
                 </FormControl>
                 <FormMessage />
@@ -299,7 +299,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                   <Textarea
                     {...field}
                     placeholder={t("EmployeeRequests.form.description.placeholder")}
-                    disabled={loadingSave}
+                    disabled={isLoadingSave}
                   />
                 </FormControl>
                 <FormMessage />
@@ -323,7 +323,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                             "w-full justify-start text-left font-normal",
                             !field.value && "text-muted-foreground",
                           )}
-                          disabled={loadingSave}
+                          disabled={isLoadingSave}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {field.value ? format(field.value, "PPP") : t("General.pick_date")}
@@ -359,7 +359,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                             "w-full justify-start text-left font-normal",
                             !field.value && "text-muted-foreground",
                           )}
-                          disabled={loadingSave}
+                          disabled={isLoadingSave}
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {field.value ? format(field.value, "PPP") : t("General.pick_date")}
@@ -394,7 +394,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                     {...field}
                     onChange={(e) => field.onChange(e.target.valueAsNumber)}
                     placeholder={t("EmployeeRequests.form.amount.placeholder")}
-                    disabled={loadingSave}
+                    disabled={isLoadingSave}
                   />
                 </FormControl>
                 <FormMessage />
@@ -412,7 +412,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                   <Textarea
                     {...field}
                     placeholder={t("EmployeeRequests.form.notes.placeholder")}
-                    disabled={loadingSave}
+                    disabled={isLoadingSave}
                   />
                 </FormControl>
                 <FormMessage />

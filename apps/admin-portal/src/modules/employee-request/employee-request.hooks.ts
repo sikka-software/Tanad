@@ -44,7 +44,7 @@ export function useCreateEmployeeRequest() {
   });
 }
 
-export function useUpdateJob() {
+export function useUpdateEmployeeRequest() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<EmployeeRequest> }) =>

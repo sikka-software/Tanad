@@ -14,7 +14,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import SalaryCard from "@/modules/salary/salary.card";
 import { useSalaries, useBulkDeleteSalaries } from "@/modules/salary/salary.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/salary/salary.options";
-import { useSalaryStore } from "@/modules/salary/salary.store";
+import useSalaryStore from "@/modules/salary/salary.store";
 import SalariesTable from "@/modules/salary/salary.table";
 
 export default function SalariesPage() {
@@ -31,8 +31,8 @@ export default function SalariesPage() {
   const searchQuery = useSalaryStore((state) => state.searchQuery);
   const filterConditions = useSalaryStore((state) => state.filterConditions);
   const filterCaseSensitive = useSalaryStore((state) => state.filterCaseSensitive);
-  const getFilteredSalaries = useSalaryStore((state) => state.getFilteredSalaries);
-  const getSortedSalaries = useSalaryStore((state) => state.getSortedSalaries);
+  const getFilteredSalaries = useSalaryStore((state) => state.getFilteredData);
+  const getSortedSalaries = useSalaryStore((state) => state.getSortedData);
 
   const { data: salaries, isLoading, error } = useSalaries();
   const { mutate: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();

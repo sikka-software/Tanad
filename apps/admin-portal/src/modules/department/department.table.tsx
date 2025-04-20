@@ -17,7 +17,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { useBranches } from "@/modules/branch/branch.hooks";
 import { useUpdateDepartment } from "@/modules/department/department.hooks";
-import { useDepartmentsStore } from "@/modules/department/department.store";
+import useDepartmentStore from "@/modules/department/department.store";
 import { Department } from "@/modules/department/department.type";
 import { useOffices } from "@/modules/office/office.hooks";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
@@ -40,7 +40,8 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
-  const { selectedRows, setSelectedRows } = useDepartmentsStore();
+  const selectedRows = useDepartmentStore((state) => state.selectedRows);
+  const setSelectedRows = useDepartmentStore((state) => state.setSelectedRows);
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateDepartment({ id: rowId, updates: { [columnId]: value } });

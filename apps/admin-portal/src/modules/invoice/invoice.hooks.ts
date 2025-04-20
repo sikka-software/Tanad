@@ -50,8 +50,7 @@ export function useUpdateInvoice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, invoice }: { id: string; invoice: Partial<Invoice> }) =>
-      updateInvoice(id, invoice),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Invoice> }) => updateInvoice(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });

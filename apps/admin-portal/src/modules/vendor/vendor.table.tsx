@@ -6,8 +6,10 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useVendorsStore } from "@/modules/vendor/vendor.store";
+import useVendorsStore from "@/modules/vendor/vendor.store";
 import { Vendor } from "@/modules/vendor/vendor.type";
+
+import { useUpdateVendor } from "./vendor.hooks";
 
 const nameSchema = z.string().min(1, "Required");
 const companySchema = z.string().optional();
@@ -28,7 +30,7 @@ interface VendorsTableProps {
 
 const VendorsTable = ({ data, isLoading, error }: VendorsTableProps) => {
   const t = useTranslations("Vendors");
-  const updateVendor = useVendorsStore((state) => state.updateVendor);
+  const { mutateAsync: updateVendor } = useUpdateVendor();
   const selectedRows = useVendorsStore((state) => state.selectedRows);
   const setSelectedRows = useVendorsStore((state) => state.setSelectedRows);
 
@@ -48,7 +50,7 @@ const VendorsTable = ({ data, isLoading, error }: VendorsTableProps) => {
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateVendor(rowId, { [columnId]: value });
+    await updateVendor({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(
