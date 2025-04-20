@@ -67,6 +67,7 @@ import { cn } from "@/lib/utils";
 
 import { Button } from "./button";
 import IconButton from "./icon-button";
+import RowActions from "./row-actions";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   ColumnDef<TData, TValue>,
@@ -338,92 +339,6 @@ export function isRowDisabled(
   }
   return rows[groupKey]?.includes(rowIndex) ?? false;
 }
-
-interface RowActionsProps {
-  onEdit?: () => void;
-  onDuplicate?: () => void;
-  onView?: () => void;
-  onArchive?: () => void;
-  onDelete?: () => void;
-  texts?: {
-    edit?: string;
-    duplicate?: string;
-    view?: string;
-    archive?: string;
-    delete?: string;
-  };
-}
-const RowActions = ({
-  onEdit,
-  onDuplicate,
-  onView,
-  onArchive,
-  onDelete,
-  texts,
-}: RowActionsProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <motion.div
-      className="relative flex items-center justify-end"
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-    >
-      <AnimatePresence>
-        {isHovered ? (
-          <motion.div
-            initial={{ width: 32, opacity: 0 }}
-            animate={{ width: 180, opacity: 1 }}
-            exit={{ width: 32, opacity: 0 }}
-            className="bg-background flex items-center justify-between gap-1 overflow-clip rounded-md p-1 shadow-sm"
-          >
-            <IconButton
-              icon={<Trash2 className="size-4" />}
-              label={texts?.delete || "delete"}
-              className="h-7 w-7"
-              onClick={onDelete}
-            />
-            <IconButton
-              icon={<Edit className="size-4" />}
-              label={texts?.edit || "edit"}
-              className="h-7 w-7"
-              onClick={onEdit}
-            />
-            <IconButton
-              icon={<Copy className="size-4" />}
-              label={texts?.duplicate || "duplicate"}
-              className="h-7 w-7"
-              onClick={onDuplicate}
-            />
-            <IconButton
-              icon={<Eye className="size-4" />}
-              label={texts?.view || "view"}
-              className="h-7 w-7"
-              onClick={onView}
-            />
-            <IconButton
-              icon={<Archive className="size-4" />}
-              label={texts?.archive || "archive"}
-              className="h-7 w-7"
-              onClick={onArchive}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ width: 32, opacity: 1 }}
-            animate={{ width: 32, opacity: 1 }}
-            exit={{ width: 32, opacity: 0 }}
-            className="bg-background mt-0.5 flex items-center justify-between gap-1 overflow-clip p-1"
-          >
-            <Button variant="ghost" size="icon" className="h-6 w-6">
-              <MoreHorizontal className="size-4" />
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
 
 /**
  * The main SheetTable component, now with optional column sizing support,

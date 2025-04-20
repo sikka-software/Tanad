@@ -14,7 +14,11 @@ import { FormDialog } from "@/components/ui/form-dialog";
 
 import CompanyCard from "@/modules/company/company.card";
 import { CompanyForm } from "@/modules/company/company.form";
-import { useCompanies, useBulkDeleteCompanies } from "@/modules/company/company.hooks";
+import {
+  useCompanies,
+  useBulkDeleteCompanies,
+  useDuplicateCompany,
+} from "@/modules/company/company.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/company/company.options";
 import useCompanyStore from "@/modules/company/company.store";
 import CompaniesTable from "@/modules/company/company.table";
@@ -43,6 +47,7 @@ export default function CompaniesPage() {
   const getSortedCompanies = useCompanyStore((state) => state.getSortedCompanies);
 
   const { data: companies, isLoading: loadingFetchCompanies, error } = useCompanies();
+  const { mutate: duplicateCompany, isPending: isDuplicating } = useDuplicateCompany();
   const { mutate: deleteCompanies, isPending: isDeleting } = useBulkDeleteCompanies();
 
   const filteredCompanies = useMemo(() => {
@@ -74,6 +79,14 @@ export default function CompaniesPage() {
     if (action === "delete") {
       setSelectedRows([rowId]);
       setIsDeleteDialogOpen(true);
+    }
+
+    if (action === "duplicate") {
+      duplicateCompany(rowId, {
+        onSuccess: () => {
+          toast.success(t("General.success"), { description: t("Companies.success.duplicated") });
+        },
+      });
     }
   };
 
