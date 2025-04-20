@@ -61,32 +61,35 @@ export function ExpenseForm({ id, onSuccess }: ExpenseFormProps) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
-      setIsLoading(false);
       return;
     }
-    try {
-      const result = await createExpense({
-        expense_number: data.expense_number.trim(),
-        issue_date: data.issue_date,
-        due_date: data.due_date,
-        amount: data.amount,
-        category: data.category.trim(),
-        ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
-        status: data.status || "pending",
-        notes: data.notes?.trim(),
-        user_id: user?.id,
-      });
 
-      console.log("result", result);
-      console.log("isSuccess", isSuccess);
-      if (onSuccess && isSuccess) {
-        onSuccess();
-      }
+    try {
+      await createExpense(
+        {
+          expense_number: data.expense_number.trim(),
+          issue_date: data.issue_date,
+          due_date: data.due_date,
+          amount: data.amount,
+          category: data.category.trim(),
+          ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
+          status: data.status || "pending",
+          notes: data.notes?.trim(),
+          user_id: user?.id,
+        },
+        {
+          onSuccess: () => {
+            if (onSuccess) {
+              onSuccess();
+            }
+          },
+        },
+      );
     } catch (error) {
+      setIsLoading(false);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Expenses.error.creating"),
       });
-      setIsLoading(false);
     }
   };
 
@@ -214,13 +217,9 @@ export function ExpenseForm({ id, onSuccess }: ExpenseFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="pending">
-                      {t("Expenses.form.status.options.pending")}
-                    </SelectItem>
-                    <SelectItem value="paid">{t("Expenses.form.status.options.paid")}</SelectItem>
-                    <SelectItem value="overdue">
-                      {t("Expenses.form.status.options.overdue")}
-                    </SelectItem>
+                    <SelectItem value="pending">{t("Expenses.form.status.pending")}</SelectItem>
+                    <SelectItem value="paid">{t("Expenses.form.status.paid")}</SelectItem>
+                    <SelectItem value="overdue">{t("Expenses.form.status.overdue")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

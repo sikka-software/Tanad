@@ -55,7 +55,7 @@ const ExpensesTable = ({ data, isLoading, error }: ExpensesTableProps) => {
       accessorKey: "status",
       header: t("Expenses.form.status.label"),
       validationSchema: statusSchema,
-      cell: ({ row }) => t(`Expenses.form.status.options.${row.getValue("status")}`),
+      cell: ({ row }) => t(`Expenses.form.status.${row.getValue("status")}`),
     },
     {
       accessorKey: "amount",

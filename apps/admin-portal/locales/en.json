@@ -2022,23 +2022,28 @@
     "form": {
       "expense_number": {
         "label": "Expense Number",
-        "placeholder": "Enter expense number"
+        "placeholder": "Enter expense number",
+        "required": "Expense number is required"
       },
       "issue_date": {
         "label": "Issue Date",
-        "placeholder": "Select issue date"
+        "placeholder": "Select issue date",
+        "required": "Issue date is required"
       },
       "due_date": {
         "label": "Due Date",
-        "placeholder": "Select due date"
+        "placeholder": "Select due date",
+        "required": "Due date is required"
       },
       "amount": {
         "label": "Amount",
-        "placeholder": "Enter amount"
+        "placeholder": "Enter amount",
+        "required": "Amount is required"
       },
       "category": {
         "label": "Category",
-        "placeholder": "Select category"
+        "placeholder": "Select category",
+        "required": "Category is required"
       },
       "client": {
         "label": "Client",

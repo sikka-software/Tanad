@@ -2482,23 +2482,28 @@
     "form": {
       "expense_number": {
         "label": "رقم المصروف",
-        "placeholder": "أدخل رقم المصروف"
+        "placeholder": "أدخل رقم المصروف",
+        "required": "رقم المصروف مطلوب"
       },
       "issue_date": {
         "label": "تاريخ الإصدار",
-        "placeholder": "اختر تاريخ الإصدار"
+        "placeholder": "اختر تاريخ الإصدار",
+        "required": "تاريخ الإصدار مطلوب"
       },
       "due_date": {
         "label": "تاريخ الاستحقاق",
-        "placeholder": "اختر تاريخ الاستحقاق"
+        "placeholder": "اختر تاريخ الاستحقاق",
+        "required": "تاريخ الاستحقاق مطلوب"
       },
       "amount": {
         "label": "المبلغ",
-        "placeholder": "أدخل المبلغ"
+        "placeholder": "أدخل المبلغ",
+        "required": "المبلغ مطلوب"
       },
       "category": {
         "label": "الفئة",
-        "placeholder": "اختر الفئة"
+        "placeholder": "اختر الفئة",
+        "required": "الفئة مطلوبة"
       },
       "client": {
         "label": "العميل",

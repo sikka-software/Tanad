@@ -25,7 +25,7 @@ const ExpenseCard = ({ expense }: { expense: Expense }) => {
                   : "secondary"
             }
           >
-            {t(`Expenses.status.${expense.status}`)}
+            {t(`Expenses.form.status.${expense.status}`)}
           </Badge>
         </div>
       </CardHeader>
