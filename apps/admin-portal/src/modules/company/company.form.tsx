@@ -8,6 +8,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import { DocumentList } from "@/components/ui/documents-list";
+import { DocumentUploader } from "@/components/ui/documents-uploader";
+
 import useCompanyStore from "@/modules/company/company.store";
 import useUserStore from "@/stores/use-user-store";
 
@@ -344,6 +347,23 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
             </FormItem>
           )}
         />
+        {id && (
+          <div className="space-y-4">
+            <DocumentUploader
+              entityId={id}
+              entityType="expense"
+              disabled={isLoading}
+              onDocumentsChange={(docs) => {
+                // Documents will be handled separately after expense creation/update
+              }}
+            />
+
+            <div className="mt-4">
+              <h3 className="mb-2 text-sm font-medium">{t("Documents.attached_documents")}</h3>
+              <DocumentList entityId={id} entityType="expense" />
+            </div>
+          </div>
+        )}{" "}
       </form>
     </Form>
   );
