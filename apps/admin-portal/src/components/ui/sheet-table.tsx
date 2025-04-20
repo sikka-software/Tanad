@@ -26,7 +26,8 @@ import {
   ColumnSizingState,
 } from "@tanstack/react-table";
 // ** import icons
-import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
@@ -52,6 +53,8 @@ import {
 
 // ** import lib
 import { cn } from "@/lib/utils";
+
+import { Button } from "./button";
 
 // ** import utils
 // import {
@@ -140,6 +143,11 @@ export interface SheetTableProps<T extends object> extends FooterProps {
    * Whether row selection is enabled.
    */
   enableRowSelection?: boolean;
+
+  /**
+   * Whether row actions are enabled.
+   */
+  enableRowActions?: boolean;
 
   /**
    * Callback for when row selection changes.
@@ -338,6 +346,7 @@ function SheetTable<
     showSecondHeader = false,
     secondHeaderTitle = "",
     enableRowSelection = false,
+    enableRowActions = false,
     onRowSelectionChange,
     // Footer props
     totalRowValues,
@@ -672,7 +681,7 @@ function SheetTable<
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </div>
-              <div className="bg-border absolute top-0 left-0 h-full w-[0.5px]" />
+              <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
             </TableCell>
           )}
 
@@ -910,6 +919,20 @@ function SheetTable<
               )}
             </TableCell>
           )}
+
+          {/* Selection checkbox */}
+          {enableRowActions && (
+            <TableCell className="sticky end-0 z-2 bg-background align-middle">
+              <Button
+                size="sm"
+                className="h-auto rounded-none p-0"
+                // variant="ghost"
+              >
+                <MoreHorizontal className="size-4" />
+              </Button>
+              <div className="bg-border absolute start-0 top-0 h-full w-[0.5px]" />
+            </TableCell>
+          )}
         </TableRow>
 
         {/* If expanded, render each subRows recursively */}
@@ -1014,7 +1037,7 @@ function SheetTable<
                       title={t("General.select_all")}
                     />
                   </div>
-                  <div className="bg-border absolute top-0 left-0 h-full w-[0.5px]" />
+                  <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
                 </TableHead>
               )}
 
@@ -1053,6 +1076,21 @@ function SheetTable<
 
               {removePos === "right" && (
                 <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
+              )}
+
+              {enableRowActions && (
+                <TableHead className="bg-muted sticky end-0 z-2 w-[30px] border-y p-0">
+                  <div className="flex h-full items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={table.getIsAllPageRowsSelected()}
+                      onChange={table.getToggleAllPageRowsSelectedHandler()}
+                      className="h-4 w-4 rounded border-gray-300"
+                      title={t("General.select_all")}
+                    />
+                  </div>
+                  <div className="bg-border absolute start-0 top-0 h-full w-[0.5px]" />
+                </TableHead>
               )}
             </TableRow>
           </TableHeader>

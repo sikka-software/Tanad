@@ -136,6 +136,7 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={companyTableOptions}
     />
