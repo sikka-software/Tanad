@@ -228,7 +228,7 @@ export function AppSidebar() {
   }, []);
 
   return (
-    <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"}>
+    <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"} className="z-50">
       {state === "expanded" && (
         <SidebarHeader className="px-2 py-2">
           <div className="relative flex items-center gap-2 px-1.5">

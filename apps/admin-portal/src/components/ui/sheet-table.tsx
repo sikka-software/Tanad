@@ -66,17 +66,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import { Button } from "./button";
-
-// ** import utils
-// import {
-//   ExtendedColumnDef,
-//   SheetTableProps,
-//   parseAndValidate,
-//   getColumnKey,
-//   handleKeyDown,
-//   handlePaste,
-//   isRowDisabled,
-// } from "./utils";
+import IconButton from "./icon-button";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   ColumnDef<TData, TValue>,
@@ -222,6 +212,20 @@ export interface SheetTableProps<T extends object> extends FooterProps {
    * including all of its sub-rows.
    */
   handleRemoveRowFunction?: (rowId: string) => void;
+
+  /**
+   * Texts for the table.
+   */
+  texts?: {
+    actions?: string;
+    edit?: string;
+    duplicate?: string;
+    view?: string;
+    archive?: string;
+    delete?: string;
+  };
+
+  onActionClicked?: (action: string, rowId: string) => void;
 }
 
 /**
@@ -341,14 +345,27 @@ interface RowActionsProps {
   onView?: () => void;
   onArchive?: () => void;
   onDelete?: () => void;
+  texts?: {
+    edit?: string;
+    duplicate?: string;
+    view?: string;
+    archive?: string;
+    delete?: string;
+  };
 }
-
-const RowActions = ({ onEdit, onDuplicate, onView, onArchive, onDelete }: RowActionsProps) => {
+const RowActions = ({
+  onEdit,
+  onDuplicate,
+  onView,
+  onArchive,
+  onDelete,
+  texts,
+}: RowActionsProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div
-      className="relative flex items-center justify-center"
+      className="relative flex items-center justify-end"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
     >
@@ -356,33 +373,49 @@ const RowActions = ({ onEdit, onDuplicate, onView, onArchive, onDelete }: RowAct
         {isHovered ? (
           <motion.div
             initial={{ width: 32, opacity: 0 }}
-            animate={{ width: 200, opacity: 1 }}
+            animate={{ width: 180, opacity: 1 }}
             exit={{ width: 32, opacity: 0 }}
-            className="bg-background flex items-center justify-between gap-1 rounded-md p-1 shadow-sm"
+            className="bg-background flex items-center justify-between gap-1 overflow-clip rounded-md p-1 shadow-sm"
           >
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onEdit}>
-              <Edit className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDuplicate}>
-              <Copy className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onView}>
-              <Eye className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onArchive}>
-              <Archive className="size-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDelete}>
-              <Trash2 className="size-4" />
-            </Button>
+            <IconButton
+              icon={<Trash2 className="size-4" />}
+              label={texts?.delete || "delete"}
+              className="h-7 w-7"
+              onClick={onDelete}
+            />
+            <IconButton
+              icon={<Edit className="size-4" />}
+              label={texts?.edit || "edit"}
+              className="h-7 w-7"
+              onClick={onEdit}
+            />
+            <IconButton
+              icon={<Copy className="size-4" />}
+              label={texts?.duplicate || "duplicate"}
+              className="h-7 w-7"
+              onClick={onDuplicate}
+            />
+            <IconButton
+              icon={<Eye className="size-4" />}
+              label={texts?.view || "view"}
+              className="h-7 w-7"
+              onClick={onView}
+            />
+            <IconButton
+              icon={<Archive className="size-4" />}
+              label={texts?.archive || "archive"}
+              className="h-7 w-7"
+              onClick={onArchive}
+            />
           </motion.div>
         ) : (
           <motion.div
             initial={{ width: 32, opacity: 1 }}
             animate={{ width: 32, opacity: 1 }}
             exit={{ width: 32, opacity: 0 }}
+            className="bg-background mt-0.5 flex items-center justify-between gap-1 overflow-clip p-1"
           >
-            <Button variant="ghost" size="icon" className="h-7 w-7">
+            <Button variant="ghost" size="icon" className="h-6 w-6">
               <MoreHorizontal className="size-4" />
             </Button>
           </motion.div>
@@ -405,6 +438,8 @@ function SheetTable<
   },
 >(props: SheetTableProps<T>) {
   const {
+    texts,
+    onActionClicked,
     columns,
     data,
     onEdit,
@@ -740,7 +775,7 @@ function SheetTable<
         >
           {/* Selection checkbox */}
           {enableRowSelection && (
-            <TableCell className="bg-background sticky start-0 z-2">
+            <TableCell className="bg-background sticky start-0 z-2 border-y">
               <div className="flex h-auto items-center justify-center">
                 <input
                   type="checkbox"
@@ -990,13 +1025,14 @@ function SheetTable<
 
           {/* Selection checkbox */}
           {enableRowActions && (
-            <div className="align-midle sticky end-0 z-2">
+            <div className="sticky end-0 z-2">
               <RowActions
-                onEdit={() => console.log("Edit")}
-                onDuplicate={() => console.log("Duplicate")}
-                onView={() => console.log("View")}
-                onArchive={() => console.log("Archive")}
-                onDelete={() => console.log("Delete")}
+                texts={texts}
+                onEdit={() => onActionClicked?.(texts?.edit || "edit", rowId)}
+                onDuplicate={() => onActionClicked?.(texts?.duplicate || "duplicate", rowId)}
+                onView={() => onActionClicked?.(texts?.view || "view", rowId)}
+                onArchive={() => onActionClicked?.(texts?.archive || "archive", rowId)}
+                onDelete={() => onActionClicked?.(texts?.delete || "delete", rowId)}
               />
             </div>
           )}
@@ -1145,7 +1181,9 @@ function SheetTable<
                 <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
               )}
 
-              {enableRowActions && <TableHead></TableHead>}
+              {enableRowActions && (
+                <TableHead className="border">{props.texts?.actions || "Actions"}</TableHead>
+              )}
             </TableRow>
           </TableHeader>
         )}

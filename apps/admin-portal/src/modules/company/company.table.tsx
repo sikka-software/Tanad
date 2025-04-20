@@ -129,6 +129,10 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
     },
   };
 
+  const handleActionClicked = (action: string, rowId: string) => {
+    console.log(action, rowId);
+  };
+
   return (
     <SheetTable
       columns={columns}
@@ -139,6 +143,15 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
       enableRowActions={true}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={companyTableOptions}
+      onActionClicked={handleActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };
