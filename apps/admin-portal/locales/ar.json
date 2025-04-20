@@ -2465,7 +2465,57 @@
     }
   },
   "Expenses": {
-    "title": "المصروفات"
+    "title": "المصروفات",
+    "description": "إدارة وتتبع المصروفات",
+    "add_new": "إضافة مصروف جديد",
+    "search_expenses": "البحث في المصروفات",
+    "no_expenses_found": "لم يتم العثور على مصروفات",
+    "confirm_delete_title": "تأكيد حذف المصروفات",
+    "confirm_delete": "هل أنت متأكد من حذف {count} مصروف؟",
+    "success": {
+      "created": "تم إنشاء المصروف بنجاح"
+    },
+    "error": {
+      "creating": "حدث خطأ أثناء إنشاء المصروف",
+      "bulk_delete": "حدث خطأ أثناء حذف المصروفات"
+    },
+    "form": {
+      "expense_number": {
+        "label": "رقم المصروف",
+        "placeholder": "أدخل رقم المصروف"
+      },
+      "issue_date": {
+        "label": "تاريخ الإصدار",
+        "placeholder": "اختر تاريخ الإصدار"
+      },
+      "due_date": {
+        "label": "تاريخ الاستحقاق",
+        "placeholder": "اختر تاريخ الاستحقاق"
+      },
+      "amount": {
+        "label": "المبلغ",
+        "placeholder": "أدخل المبلغ"
+      },
+      "category": {
+        "label": "الفئة",
+        "placeholder": "اختر الفئة"
+      },
+      "client": {
+        "label": "العميل",
+        "placeholder": "اختر العميل"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "pending": "معلق",
+        "paid": "مدفوع",
+        "overdue": "متأخر"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظات إضافية"
+      }
+    }
   },
   "Applicants": {
     "title": "المتقدمين",
