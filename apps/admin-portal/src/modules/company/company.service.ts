@@ -44,6 +44,15 @@ export async function updateCompany(id: string, updates: Partial<Company>): Prom
   return response.json();
 }
 
+export async function duplicateCompany(id: string): Promise<Company> {
+  const response = await fetch(`/api/companies/${id}/duplicate`, {
+    method: "POST",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to duplicate company with id ${id}`);
+  }
+  return response.json();
+}
 export async function deleteCompany(id: string): Promise<void> {
   const response = await fetch(`/api/companies/${id}`, {
     method: "DELETE",

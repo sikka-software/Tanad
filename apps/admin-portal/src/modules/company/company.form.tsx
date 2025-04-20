@@ -17,7 +17,8 @@ import { uploadDocument } from "@/services/documents";
 import useCompanyStore from "@/modules/company/company.store";
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateCompany } from "./company.hooks";
+import { useCreateCompany, useUpdateCompany } from "./company.hooks";
+import { CompanyUpdateData } from "./company.type";
 
 export const createCompanySchema = (t: (key: string) => string) =>
   z.object({
@@ -42,14 +43,17 @@ export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
 
 interface CompanyFormProps {
   id?: string;
-  onSuccess: () => void;
+  onSuccess?: () => void;
+  defaultValues: CompanyUpdateData | null;
+  editMode?: boolean;
 }
 
-export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
+export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: CompanyFormProps) {
   const t = useTranslations();
   const companySchema = createCompanySchema(t);
   const { user } = useUserStore();
   const { mutate: createCompany } = useCreateCompany();
+  const { mutate: updateCompany } = useUpdateCompany();
   const [pendingDocuments, setPendingDocuments] = useState<DocumentFile[]>([]);
 
   const isLoading = useCompanyStore((state) => state.isLoading);
@@ -58,18 +62,18 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companySchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      website: "",
-      address: "",
-      city: "",
-      state: "",
-      zip_code: "",
-      industry: "",
-      size: "",
-      notes: "",
-      is_active: true,
+      name: defaultValues?.name || "",
+      email: defaultValues?.email || "",
+      phone: defaultValues?.phone || "",
+      website: defaultValues?.website || "",
+      address: defaultValues?.address || "",
+      city: defaultValues?.city || "",
+      state: defaultValues?.state || "",
+      zip_code: defaultValues?.zip_code || "",
+      industry: defaultValues?.industry || "",
+      size: defaultValues?.size || "",
+      notes: defaultValues?.notes || "",
+      is_active: defaultValues?.is_active || true,
     },
   });
 
@@ -114,35 +118,69 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
       return;
     }
 
+    console.log("default values ", defaultValues);
     try {
-      await createCompany(
-        {
-          name: data.name.trim(),
-          email: data.email.trim(),
-          phone: data.phone?.trim() || undefined,
-          website: data.website?.trim() || undefined,
-          address: data.address?.trim() || undefined,
-          city: data.city?.trim() || undefined,
-          state: data.state?.trim() || undefined,
-          zip_code: data.zip_code?.trim() || undefined,
-          industry: data.industry?.trim() || undefined,
-          size: data.size?.trim() || undefined,
-          notes: data.notes?.trim() || undefined,
-          is_active: data.is_active || true,
-          user_id: user?.id,
-        },
-        {
-          onSuccess: async (response) => {
-            // Upload documents after company is created
-            if (response?.id) {
-              await uploadDocuments(response.id);
-            }
-            if (onSuccess) {
-              onSuccess();
-            }
+      if (editMode) {
+        await updateCompany(
+          {
+            id: defaultValues?.id || "",
+            data: {
+              name: data.name.trim(),
+              email: data.email.trim(),
+              phone: data.phone?.trim() || undefined,
+              website: data.website?.trim() || undefined,
+              address: data.address?.trim() || undefined,
+              city: data.city?.trim() || undefined,
+              state: data.state?.trim() || undefined,
+              zip_code: data.zip_code?.trim() || undefined,
+              industry: data.industry?.trim() || undefined,
+              size: data.size?.trim() || undefined,
+              notes: data.notes?.trim() || undefined,
+              is_active: data.is_active || true,
+            },
           },
-        },
-      );
+          {
+            onSuccess: async (response) => {
+              // Upload documents after company is created
+              if (response?.id) {
+                await uploadDocuments(response.id);
+              }
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      } else {
+        await createCompany(
+          {
+            name: data.name.trim(),
+            email: data.email.trim(),
+            phone: data.phone?.trim() || undefined,
+            website: data.website?.trim() || undefined,
+            address: data.address?.trim() || undefined,
+            city: data.city?.trim() || undefined,
+            state: data.state?.trim() || undefined,
+            zip_code: data.zip_code?.trim() || undefined,
+            industry: data.industry?.trim() || undefined,
+            size: data.size?.trim() || undefined,
+            notes: data.notes?.trim() || undefined,
+            is_active: data.is_active || true,
+            user_id: user?.id,
+          },
+          {
+            onSuccess: async (response) => {
+              // Upload documents after company is created
+              if (response?.id) {
+                await uploadDocuments(response.id);
+              }
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      }
     } catch (error) {
       setIsLoading(false);
       console.error("Failed to save company:", error);
@@ -350,6 +388,7 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
             </FormItem>
           )}
         />
+
         <div className="space-y-4">
           <DocumentUploader
             entityType="company"

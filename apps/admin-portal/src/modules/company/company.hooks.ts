@@ -7,6 +7,7 @@ import {
   fetchCompanyById,
   fetchCompanies,
   updateCompany,
+  duplicateCompany,
 } from "@/modules/company/company.service";
 import type { Company, CompanyCreateData } from "@/modules/company/company.type";
 
@@ -56,6 +57,18 @@ export function useUpdateCompany() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Company> }) => updateCompany(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: companyKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
+    },
+  });
+}
+
+// Hook to duplicate a company
+export function useDuplicateCompany() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateCompany(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: companyKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: companyKeys.lists() });

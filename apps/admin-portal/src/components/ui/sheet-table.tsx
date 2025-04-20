@@ -1028,11 +1028,11 @@ function SheetTable<
             <div className="sticky end-0 z-2">
               <RowActions
                 texts={texts}
-                onEdit={() => onActionClicked?.(texts?.edit || "edit", rowId)}
-                onDuplicate={() => onActionClicked?.(texts?.duplicate || "duplicate", rowId)}
-                onView={() => onActionClicked?.(texts?.view || "view", rowId)}
-                onArchive={() => onActionClicked?.(texts?.archive || "archive", rowId)}
-                onDelete={() => onActionClicked?.(texts?.delete || "delete", rowId)}
+                onEdit={() => onActionClicked?.("edit", rowId)}
+                onDuplicate={() => onActionClicked?.("duplicate", rowId)}
+                onView={() => onActionClicked?.("view", rowId)}
+                onArchive={() => onActionClicked?.("archive", rowId)}
+                onDelete={() => onActionClicked?.("delete", rowId)}
               />
             </div>
           )}

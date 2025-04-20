@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -9,20 +10,28 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormDialog } from "@/components/ui/form-dialog";
 
 import CompanyCard from "@/modules/company/company.card";
+import { CompanyForm } from "@/modules/company/company.form";
 import { useCompanies, useBulkDeleteCompanies } from "@/modules/company/company.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/company/company.options";
 import useCompanyStore from "@/modules/company/company.store";
 import CompaniesTable from "@/modules/company/company.table";
+import { CompanyUpdateData } from "@/modules/company/company.type";
 
 export default function CompaniesPage() {
   const t = useTranslations();
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableCompany, setActionableCompany] = useState<CompanyUpdateData | null>(null);
 
+  const isLoading = useCompanyStore((state) => state.isLoading);
+  const setIsLoading = useCompanyStore((state) => state.setIsLoading);
   const viewMode = useCompanyStore((state) => state.viewMode);
   const isDeleteDialogOpen = useCompanyStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useCompanyStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useCompanyStore((state) => state.selectedRows);
+  const setSelectedRows = useCompanyStore((state) => state.setSelectedRows);
   const clearSelection = useCompanyStore((state) => state.clearSelection);
   const sortRules = useCompanyStore((state) => state.sortRules);
   const sortCaseSensitive = useCompanyStore((state) => state.sortCaseSensitive);
@@ -33,7 +42,7 @@ export default function CompaniesPage() {
   const getFilteredCompanies = useCompanyStore((state) => state.getFilteredCompanies);
   const getSortedCompanies = useCompanyStore((state) => state.getSortedCompanies);
 
-  const { data: companies, isLoading, error } = useCompanies();
+  const { data: companies, isLoading: loadingFetchCompanies, error } = useCompanies();
   const { mutate: deleteCompanies, isPending: isDeleting } = useBulkDeleteCompanies();
 
   const filteredCompanies = useMemo(() => {
@@ -52,6 +61,19 @@ export default function CompaniesPage() {
       console.error("Error deleting companies:", error);
     } finally {
       setIsDeleteDialogOpen(false);
+    }
+  };
+
+  const onActionClicked = (action: string, rowId: string) => {
+    console.log(action, rowId);
+    if (action === "edit") {
+      setIsFormDialogOpen(true);
+      setActionableCompany(companies?.find((company) => company.id === rowId) || null);
+    }
+
+    if (action === "delete") {
+      setSelectedRows([rowId]);
+      setIsDeleteDialogOpen(true);
     }
   };
 
@@ -82,14 +104,15 @@ export default function CompaniesPage() {
           {viewMode === "table" ? (
             <CompaniesTable
               data={sortedCompanies}
-              isLoading={isLoading}
+              isLoading={loadingFetchCompanies}
               error={error as Error | null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
                 data={sortedCompanies}
-                isLoading={isLoading}
+                isLoading={loadingFetchCompanies}
                 error={error as Error | null}
                 emptyMessage={t("Companies.no_companies_found")}
                 renderItem={(company) => <CompanyCard key={company.id} company={company} />}
@@ -98,6 +121,26 @@ export default function CompaniesPage() {
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Companies.add_new")}
+          formId="company-form"
+          loadingSave={isLoading}
+        >
+          <CompanyForm
+            id={"company-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableCompany(null);
+              setIsLoading(false);
+              toast.success(t("General.success"), { description: t("Companies.success.updated") });
+            }}
+            defaultValues={actionableCompany}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

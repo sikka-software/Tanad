@@ -26,9 +26,10 @@ interface CompaniesTableProps {
   data: Company[];
   isLoading?: boolean;
   error?: Error | null;
+  onActionClicked: (action: string, rowId: string) => void;
 }
 
-const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
+const CompaniesTable = ({ data, isLoading, error, onActionClicked }: CompaniesTableProps) => {
   const t = useTranslations();
   const updateCompany = useCompanyStore((state) => state.updateCompany);
   const selectedRows = useCompanyStore((state) => state.selectedRows);
@@ -129,10 +130,6 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
     },
   };
 
-  const handleActionClicked = (action: string, rowId: string) => {
-    console.log(action, rowId);
-  };
-
   return (
     <SheetTable
       columns={columns}
@@ -143,7 +140,7 @@ const CompaniesTable = ({ data, isLoading, error }: CompaniesTableProps) => {
       enableRowActions={true}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={companyTableOptions}
-      onActionClicked={handleActionClicked}
+      onActionClicked={onActionClicked}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),
