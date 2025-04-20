@@ -1,29 +1,22 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { ClientForm, type ClientFormValues } from "@/modules/client/client.form";
-import { clientKeys } from "@/modules/client/client.hooks";
-import { createClient } from "@/modules/client/client.service";
-import { Client, ClientCreateData } from "@/modules/client/client.type";
-import useUserStore from "@/stores/use-user-store";
+import { ClientForm } from "@/modules/client/client.form";
+import useClientStore from "@/modules/client/client.store";
 
 export default function AddClientPage() {
   const router = useRouter();
   const t = useTranslations();
-  const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
+  const setIsLoading = useClientStore((state) => state.setIsLoading);
+  const isLoading = useClientStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -39,24 +32,32 @@ export default function AddClientPage() {
     }
   };
 
+  const onAddSuccess = () => {
+    toast.success(t("General.successful_operation"), {
+      description: t("Clients.success.created"),
+    });
+    router.push("/clients");
+    setIsLoading(false);
+  };
+
   return (
     <div>
       <CustomPageMeta title={t("Clients.add_new")} />
       <PageTitle
         formButtons
         formId="client-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/clients")}
+        dummyButton={handleDummyData}
         texts={{
           title: t("Clients.add_new"),
           submit_form: t("Clients.add_new"),
           cancel: t("General.cancel"),
         }}
-        dummyButton={handleDummyData}
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <ClientForm id="client-form" loading={loading} />
+        <ClientForm id="client-form" loading={isLoading} onSuccess={onAddSuccess} />
       </div>
     </div>
   );

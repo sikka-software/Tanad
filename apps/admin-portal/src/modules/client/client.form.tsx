@@ -19,7 +19,7 @@ import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
 import { useCreateClient, useUpdateClient } from "./client.hooks";
-import { useClientStore } from "./client.store";
+import useClientStore from "./client.store";
 
 export const createClientSchema = (t: (key: string) => string) =>
   z.object({
@@ -29,7 +29,7 @@ export const createClientSchema = (t: (key: string) => string) =>
       .min(1, t("Clients.form.validation.email_required"))
       .email(t("Clients.form.validation.email_invalid")),
     phone: z.string().min(1, t("Clients.form.validation.phone_required")),
-    company: z.string().nullable(),
+    company: z.string().nullish(),
     address: z.string().min(1, t("Clients.form.validation.address_required")),
     city: z.string().min(1, t("Clients.form.validation.city_required")),
     state: z.string().min(1, t("Clients.form.validation.state_required")),
@@ -71,7 +71,7 @@ export function ClientForm({
       name: defaultValues?.name || "",
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
-      company: defaultValues?.company || null,
+      company: defaultValues?.company || undefined,
       address: defaultValues?.address || "",
       city: defaultValues?.city || "",
       state: defaultValues?.state || "",
@@ -209,7 +209,11 @@ export function ClientForm({
   return (
     <>
       <Form {...form}>
-        <form id={id || "client-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          id={id || "client-form"}
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
             <FormField
               control={form.control}

@@ -38,7 +38,7 @@ type ClientActions = {
   getSortedClients: (data: Client[]) => Client[];
 };
 
-export const useClientStore = create<ClientStates & ClientActions>((set, get) => ({
+const useClientStore = create<ClientStates & ClientActions>((set, get) => ({
   isLoading: false,
   error: null,
   selectedRows: [],
@@ -136,3 +136,5 @@ export const useClientStore = create<ClientStates & ClientActions>((set, get) =>
     });
   },
 }));
+
+export default useClientStore;

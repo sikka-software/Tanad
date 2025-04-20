@@ -20,7 +20,7 @@ import {
   useDuplicateClient,
 } from "@/modules/client/client.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/client/client.options";
-import { useClientStore } from "@/modules/client/client.store";
+import useClientStore from "@/modules/client/client.store";
 import ClientsTable from "@/modules/client/client.table";
 import { ClientUpdateData } from "@/modules/client/client.type";
 

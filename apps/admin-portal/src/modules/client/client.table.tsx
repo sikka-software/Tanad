@@ -6,7 +6,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useClientStore } from "@/modules/client/client.store";
+import useClientStore from "@/modules/client/client.store";
 import { Client } from "@/modules/client/client.type";
 
 import { useUpdateClient } from "./client.hooks";
@@ -33,7 +33,7 @@ const ClientsTable = ({
   error,
   onActionClicked,
 }: ClientsTableProps) => {
-  const t = useTranslations("Clients");
+  const t = useTranslations();
   const { mutate: updateClient } = useUpdateClient();
   const selectedRows = useClientStore((state) => state.selectedRows);
   const setSelectedRows = useClientStore((state) => state.setSelectedRows);
@@ -41,14 +41,22 @@ const ClientsTable = ({
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Client>[] = [
-    { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "phone", header: t("form.phone.label"), validationSchema: phoneSchema },
-    { accessorKey: "address", header: t("form.address.label"), validationSchema: addressSchema },
-    { accessorKey: "city", header: t("form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
-    { accessorKey: "zip_code", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
-    { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
+    { accessorKey: "name", header: t("Clients.form.name.label"), validationSchema: nameSchema },
+    { accessorKey: "email", header: t("Clients.form.email.label"), validationSchema: emailSchema },
+    { accessorKey: "phone", header: t("Clients.form.phone.label"), validationSchema: phoneSchema },
+    {
+      accessorKey: "address",
+      header: t("Clients.form.address.label"),
+      validationSchema: addressSchema,
+    },
+    { accessorKey: "city", header: t("Clients.form.city.label"), validationSchema: citySchema },
+    { accessorKey: "state", header: t("Clients.form.state.label"), validationSchema: stateSchema },
+    {
+      accessorKey: "zip_code",
+      header: t("Clients.form.zip_code.label"),
+      validationSchema: zipCodeSchema,
+    },
+    { accessorKey: "notes", header: t("Clients.form.notes.label"), validationSchema: notesSchema },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
