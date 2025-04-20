@@ -12,10 +12,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { supabase } from "@/lib/supabase";
-
 import { useSubscription } from "@/hooks/use-subscription";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 // Load Stripe with publishable key
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
@@ -255,6 +254,7 @@ export function PaymentDialog({
 
   // Fetch client secret for setup intent
   const fetchSetupIntent = async () => {
+    const supabase = createClient();
     if (!selectedPlan || !user || !open) return;
 
     setLoading(true);

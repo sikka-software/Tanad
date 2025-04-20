@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
 
 import { usePricing } from "@/hooks/use-pricing";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 
 interface SubscriptionData {
   id: string | null;

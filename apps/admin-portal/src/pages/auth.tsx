@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
-
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
-
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -15,10 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
-import useUserStore from "@/hooks/use-user-store";
+
 import { FREE_PLAN_ID } from "@/lib/constants";
 import { createStripeCustomer } from "@/lib/stripe";
-import { supabase } from "@/lib/supabase";
+
+// Store
+import useUserStore from "@/stores/use-user-store";
+// Utils
+import { createClient } from "@/utils/supabase/component";
 
 export default function Auth() {
   const t = useTranslations();
@@ -34,6 +36,7 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const { isAuthenticated, loading: storeLoading } = useUserStore();
+  const supabase = createClient();
 
   useEffect(() => {
     if (isAuthenticated && !storeLoading) {

@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { createClient } from "@/utils/supabase/component";
-
 import { ExtendedUser } from "@/types";
+import { createClient } from "@/utils/supabase/component";
 
 // Define strong types for our user data
 export interface Profile {

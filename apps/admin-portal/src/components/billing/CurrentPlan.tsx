@@ -17,11 +17,11 @@ import {
 } from "@/components/ui/table";
 
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
-import { supabase } from "@/lib/supabase";
 
 import { usePricing } from "@/hooks/use-pricing";
 import { useSubscription } from "@/hooks/use-subscription";
-import useUserStore from "@/hooks/use-user-store";
+import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 // Create a pub/sub event for subscription updates
 export const SUBSCRIPTION_UPDATED_EVENT = "subscription_updated";
@@ -100,6 +100,7 @@ function BillingHistoryDialog({ open, onOpenChange, user }: BillingHistoryDialog
       // If still no customer ID, try to fetch it from Supabase
       if (!stripeCustomerId && user.id) {
         console.log("Attempting to get customer ID from database for user:", user.id);
+        const supabase = createClient();
         const { data: profile } = await supabase
           .from("profiles")
           .select("stripe_customer_id")
