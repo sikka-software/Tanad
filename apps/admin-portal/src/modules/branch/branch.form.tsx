@@ -36,7 +36,7 @@ export type BranchFormValues = z.input<ReturnType<typeof createBranchSchema>>;
 export interface BranchFormProps {
   id?: string;
   onSuccess?: () => void;
-  defaultValues: BranchUpdateData | null;
+  defaultValues?: BranchUpdateData | null;
   editMode?: boolean;
 }
 

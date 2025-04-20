@@ -691,7 +691,7 @@ export function QuoteForm({
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
-        <ClientForm id="client-form" onSubmit={handleClientAdded} user_id={user_id} />
+        <ClientForm id="client-form" />
       </FormDialog>
     </>
   );

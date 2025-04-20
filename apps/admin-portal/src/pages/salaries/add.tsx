@@ -5,17 +5,15 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { SalaryForm, SalaryFormValues } from "@/modules/salary/salary.form";
 import { Button } from "@/components/ui/button";
 import PageTitle from "@/components/ui/page-title";
 
 import { generateDummySalary } from "@/lib/dummy-factory";
 
-import { createSalary } from "@/modules/salary/salary.service";
-
-import { Salary, SalaryCreateData } from "@/modules/salary/salary.type";
-
+import { SalaryForm, SalaryFormValues } from "@/modules/salary/salary.form";
 import { salaryKeys } from "@/modules/salary/salary.hooks";
+import { createSalary } from "@/modules/salary/salary.service";
+import { Salary, SalaryCreateData } from "@/modules/salary/salary.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddSalaryPage() {
@@ -82,12 +80,12 @@ export default function AddSalaryPage() {
   return (
     <div>
       <PageTitle
-        title={t("Salaries.add_new")}
         formButtons
         formId="salary-form"
         loading={loading}
         onCancel={() => router.push("/salaries")}
         texts={{
+          title: t("Salaries.add_new"),
           submit_form: t("Salaries.add_new"),
           cancel: t("General.cancel"),
         }}

@@ -28,7 +28,11 @@ export default function ContactsPage() {
     <div>
       <CustomPageMeta title={t("Contacts.title")} description={t("Contacts.description")} />
       <PageTitle
-        title={t("Contacts.title")}
+        texts={{
+          title: t("Contacts.title"),
+          submit_form: t("Contacts.add_client"),
+          cancel: t("General.cancel"),
+        }}
         customButton={
           <div className="flex gap-3">
             <Link href="/clients/add" className={buttonVariants({ variant: "outline" })}>

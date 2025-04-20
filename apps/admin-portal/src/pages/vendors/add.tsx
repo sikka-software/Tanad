@@ -8,16 +8,14 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { VendorForm, type VendorFormValues } from "@/modules/vendor/vendor.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { createVendor } from "@/modules/vendor/vendor.service";
-
-import { Vendor, VendorCreateData } from "@/modules/vendor/vendor.type";
-
+import { VendorForm, type VendorFormValues } from "@/modules/vendor/vendor.form";
 import { vendorKeys } from "@/modules/vendor/vendor.hooks";
+import { createVendor } from "@/modules/vendor/vendor.service";
+import { Vendor, VendorCreateData } from "@/modules/vendor/vendor.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddVendorPage() {
@@ -85,12 +83,12 @@ export default function AddVendorPage() {
     <div>
       <CustomPageMeta title={t("Vendors.add_new")} />
       <PageTitle
-        title={t("Vendors.add_new")}
         formButtons
         formId="vendor-form"
         loading={loading}
         onCancel={() => router.push("/vendors")}
         texts={{
+          title: t("Vendors.add_new"),
           submit_form: t("Vendors.add_new"),
           cancel: t("General.cancel"),
         }}

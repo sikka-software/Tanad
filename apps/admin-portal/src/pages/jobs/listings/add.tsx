@@ -3,15 +3,12 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import {
-  JobListingForm,
-  type JobListingFormValues,
-} from "@/modules/job-listing/job-listing.form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
 
-import useUserStore from "@/stores/use-user-store";
+import { JobListingForm, type JobListingFormValues } from "@/modules/job-listing/job-listing.form";
 import { useJobListings } from "@/modules/job-listing/job-listing.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 export default function AddJobListingPage() {
   const t = useTranslations();
@@ -50,12 +47,12 @@ export default function AddJobListingPage() {
   return (
     <div>
       <PageTitle
-        title={t("JobListings.add_new_listing")}
         formButtons
         formId="job-listing-form"
         loading={loading}
         onCancel={() => router.push("/jobs/listings")}
         texts={{
+          title: t("JobListings.add_new_listing"),
           submit_form: t("JobListings.add_new_listing"),
           cancel: t("General.cancel"),
         }}

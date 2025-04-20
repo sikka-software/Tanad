@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import { QuoteForm, type QuoteFormValues } from "@/modules/quote/quote.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { QuoteForm, type QuoteFormValues } from "@/modules/quote/quote.form";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -85,12 +85,12 @@ export default function AddQuotePage() {
     <div>
       <CustomPageMeta title={t("Quotes.add_new")} />
       <PageTitle
-        title={t("Quotes.add_new")}
         formButtons
         formId="quote-form"
         loading={loading}
         onCancel={() => router.push("/quotes")}
         texts={{
+          title: t("Quotes.add_new"),
           submit_form: t("Quotes.add_new"),
           cancel: t("General.cancel"),
         }}

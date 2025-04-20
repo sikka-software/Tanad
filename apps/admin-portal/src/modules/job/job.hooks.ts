@@ -9,7 +9,7 @@ import {
   bulkDeleteJobs,
   duplicateJob,
 } from "@/modules/job/job.service";
-import { Job } from "@/modules/job/job.type";
+import { Job, JobCreateData } from "@/modules/job/job.type";
 
 export const jobKeys = {
   all: ["jobs"] as const,
@@ -37,7 +37,7 @@ export function useJob(id: string) {
 export function useCreateJob() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (job: Job) => createJob(job),
+    mutationFn: (job: JobCreateData) => createJob(job),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
     },

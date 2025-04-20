@@ -8,14 +8,12 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { ProductForm, ProductFormValues } from "@/modules/product/product.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { createProduct } from "@/modules/product/product.service";
-
-import type { Product, ProductCreateData } from "@/modules/product/product.type";
-
+import { ProductForm, ProductFormValues } from "@/modules/product/product.form";
 import { productKeys } from "@/modules/product/product.hooks";
+import { createProduct } from "@/modules/product/product.service";
+import type { Product, ProductCreateData } from "@/modules/product/product.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddProductPage() {
@@ -79,12 +77,12 @@ export default function AddProductPage() {
     <div>
       <CustomPageMeta title={t("Products.add_new")} />
       <PageTitle
-        title={t("Products.add_new")}
         formButtons
         formId="product-form"
         loading={loading}
         onCancel={() => router.push("/products")}
         texts={{
+          title: t("Products.add_new"),
           submit_form: t("Products.add_new"),
           cancel: t("General.cancel"),
         }}
