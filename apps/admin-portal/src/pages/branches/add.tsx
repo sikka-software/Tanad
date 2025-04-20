@@ -8,11 +8,11 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { BranchForm, type BranchFormValues } from "@/modules/branch/branch.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
+import { BranchForm, type BranchFormValues } from "@/modules/branch/branch.form";
 import { branchKeys } from "@/modules/branch/branch.hooks";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
@@ -99,12 +99,12 @@ export default function AddBranchPage() {
     <div>
       <CustomPageMeta title={t("Branches.add_new")} />
       <PageTitle
-        title={t("Branches.add_new")}
         formButtons
         formId="branch-form"
         loading={loading}
         onCancel={() => router.push("/branches")}
         texts={{
+          title: t("Branches.add_new"),
           submit_form: t("Branches.add_new"),
           cancel: t("General.cancel"),
         }}

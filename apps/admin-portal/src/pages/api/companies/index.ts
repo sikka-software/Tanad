@@ -12,15 +12,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     query: {},
     resolvedUrl: "",
   });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   if (req.method === "GET") {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user?.id) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
       const companiesList = await db.query.companies.findMany({
         where: eq(companies.user_id, user?.id),
         orderBy: desc(companies.created_at),
@@ -34,14 +36,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "POST") {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user?.id) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
-      // Map client data to match Drizzle schema
       const dbCompany = {
         ...req.body,
         user_id: user?.id,
@@ -57,13 +51,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "DELETE") {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user?.id) {
-        return res.status(401).json({ message: "Unauthorized" });
-      }
       const { ids } = req.body;
 
       if (!Array.isArray(ids) || ids.length === 0) {
@@ -77,4 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(500).json({ message: "Error bulk deleting companies" });
     }
   }
+  return res
+    .status(405)
+    .json({ message: "Method not allowed, only GET, PUT and DELETE are allowed" });
 }
