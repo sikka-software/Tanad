@@ -53,7 +53,17 @@ type Group = {
   menus: Menu[];
 };
 
-let simplifiedMenu = {
+type SimplifiedMenuItem = {
+  title: string;
+  items?: SimplifiedMenuItem[];
+};
+
+type SimplifiedMenu = {
+  group: string;
+  items: SimplifiedMenuItem[];
+};
+
+let simplifiedMenu: SimplifiedMenu = {
   group: "Administration",
   items: [
     { title: "Dashboard" },
@@ -388,3 +398,58 @@ export function applyCustomMenuOrder(
 
   return resultMenu;
 }
+
+// Mapper function to convert simplified menu to the existing format
+function mapSimplifiedMenuToSidebarMenu(
+  menu: SimplifiedMenu,
+  pathname: string = "",
+): Record<string, SidebarMenuGroupProps["items"]> {
+  const getIcon = (title: string): LucideIcon => {
+    const iconMap: Record<string, LucideIcon> = {
+      Dashboard: LayoutDashboard,
+      Analytics: BarChart,
+      Contacts: Users,
+      Locations: MapPin,
+      Sales: Package,
+      "Human Resources": Users,
+      Settings: Settings,
+      Billing: CreditCard,
+    };
+    return iconMap[title] || Users; // Default to Users icon if not found
+  };
+
+  const mapMenuItem = (item: SimplifiedMenuItem, parentUrl: string = ""): SidebarMenuGroupProps["items"][0] => {
+    const baseUrl = parentUrl || `/${item.title.toLowerCase().replace(/\s+/g, "-")}`;
+    const mappedItem = {
+      title: item.title,
+      translationKey: `${item.title.replace(/\s+/g, "")}.title`,
+      url: baseUrl,
+      icon: getIcon(item.title),
+      is_active: pathname.startsWith(baseUrl),
+    };
+
+    if (item.items) {
+      return {
+        ...mappedItem,
+        items: item.items.map((subItem) => ({
+          title: subItem.title,
+          translationKey: `${subItem.title.replace(/\s+/g, "")}.title`,
+          url: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`,
+          action: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}/add`,
+          is_active: pathname.startsWith(`${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`),
+        })),
+      };
+    }
+
+    return mappedItem;
+  };
+
+  const result: Record<string, SidebarMenuGroupProps["items"]> = {
+    [menu.group]: menu.items.map((item) => mapMenuItem(item)),
+  };
+
+  return result;
+}
+
+// Example usage:
+// const mappedMenu = mapSimplifiedMenuToSidebarMenu(simplifiedMenu);
