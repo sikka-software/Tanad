@@ -351,19 +351,20 @@ export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
           <div className="space-y-4">
             <DocumentUploader
               entityId={id}
-              entityType="expense"
+              entityType="company"
               disabled={isLoading}
               onDocumentsChange={(docs) => {
-                // Documents will be handled separately after expense creation/update
+                // Documents are handled by the uploader component itself
+                console.log("Documents updated:", docs);
               }}
             />
 
             <div className="mt-4">
               <h3 className="mb-2 text-sm font-medium">{t("Documents.attached_documents")}</h3>
-              <DocumentList entityId={id} entityType="expense" />
+              <DocumentList entityId={id} entityType="company" />
             </div>
           </div>
-        )}{" "}
+        )}
       </form>
     </Form>
   );

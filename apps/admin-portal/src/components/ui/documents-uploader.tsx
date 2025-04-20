@@ -11,6 +11,8 @@ import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
 import { ScrollArea } from "@/ui/scroll-area";
 
+import { uploadDocument } from "@/services/documents";
+
 export interface DocumentFile {
   id?: string;
   name: string;
@@ -40,6 +42,7 @@ export function DocumentUploader({
 }: DocumentUploaderProps) {
   const t = useTranslations();
   const [documents, setDocuments] = useState<DocumentFile[]>(existingDocuments);
+  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
@@ -76,6 +79,37 @@ export function DocumentUploader({
     onDocumentsChange(updatedDocuments);
   };
 
+  const handleUpload = async (document: DocumentFile) => {
+    if (!entityId) {
+      toast.error(t("Documents.error_no_entity"));
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const uploadedDoc = await uploadDocument({
+        ...document,
+        entity_id: entityId,
+        entity_type: entityType,
+      });
+
+      // Update the document in the list with the uploaded info
+      const updatedDocuments = documents.map((doc) =>
+        doc === document
+          ? { ...doc, id: uploadedDoc.id, uploaded: true, url: uploadedDoc.url }
+          : doc,
+      );
+      setDocuments(updatedDocuments);
+      onDocumentsChange(updatedDocuments);
+      toast.success(t("Documents.upload_success"));
+    } catch (error) {
+      toast.error(t("Documents.upload_error"));
+      console.error("Error uploading document:", error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -86,14 +120,14 @@ export function DocumentUploader({
             multiple
             onChange={handleFileChange}
             className="absolute inset-0 cursor-pointer opacity-0"
-            disabled={disabled || documents.length >= maxFiles}
+            disabled={disabled || documents.length >= maxFiles || uploading}
             accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
           />
           <Button
             type="button"
             variant="outline"
             size="sm"
-            disabled={disabled || documents.length >= maxFiles}
+            disabled={disabled || documents.length >= maxFiles || uploading}
           >
             <Plus className="mr-2 h-4 w-4" />
             {t("Documents.add_document")}
@@ -114,15 +148,27 @@ export function DocumentUploader({
                       onChange={(e) => handleNameChange(index, e.target.value)}
                       className="h-8 flex-1"
                       placeholder={t("Documents.document_name")}
-                      disabled={disabled || doc.uploaded}
+                      disabled={disabled || doc.uploaded || uploading}
                     />
+                    {!doc.uploaded && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUpload(doc)}
+                        disabled={disabled || uploading}
+                      >
+                        <Upload className="mr-2 h-4 w-4" />
+                        {t("Documents.upload")}
+                      </Button>
+                    )}
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 flex-shrink-0"
                       onClick={() => handleRemoveFile(index)}
-                      disabled={disabled || doc.uploaded}
+                      disabled={disabled || doc.uploaded || uploading}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

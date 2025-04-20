@@ -20,6 +20,8 @@ import { Button } from "@/ui/button";
 import { Card, CardContent } from "@/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
+import { deleteDocument, getDocumentsByEntity } from "@/services/documents";
+
 interface DocumentListProps {
   entityId?: string;
   entityType: "company" | "expense";
@@ -45,9 +47,7 @@ export function DocumentList({ entityId, entityType }: DocumentListProps) {
 
     try {
       setLoading(true);
-      // const docs = await getDocumentsByEntity(entityId, entityType);
-      // this is a placeholder
-      let docs = [];
+      const docs = await getDocumentsByEntity(entityId, entityType);
       setDocuments(docs);
     } catch (error) {
       toast.error(t("Documents.error_fetching"));
@@ -66,7 +66,7 @@ export function DocumentList({ entityId, entityType }: DocumentListProps) {
     if (!documentToDelete) return;
 
     try {
-      // await deleteDocument(documentToDelete);
+      await deleteDocument(documentToDelete);
       setDocuments(documents.filter((doc) => doc.id !== documentToDelete));
       toast.success(t("Documents.delete_success"));
     } catch (error) {

@@ -673,3 +673,42 @@ export const departmentLocations = pgTable(
     ),
   ],
 ).enableRLS();
+
+export const documents = pgTable(
+  "documents",
+  {
+    id: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text("name").notNull(),
+    url: text("url").notNull(),
+    file_path: text("file_path").notNull(),
+    entity_id: uuid("entity_id").notNull(),
+    entity_type: text("entity_type").$type<"company" | "expense">().notNull(),
+    user_id: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("documents_entity_id_idx").using(
+      "btree",
+      table.entity_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("documents_entity_type_idx").using(
+      "btree",
+      table.entity_type.asc().nullsLast().op("text_ops"),
+    ),
+    index("documents_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    check(
+      "documents_entity_type_check",
+      sql`entity_type = ANY (ARRAY['company'::text, 'expense'::text])`,
+    ),
+  ],
+).enableRLS();

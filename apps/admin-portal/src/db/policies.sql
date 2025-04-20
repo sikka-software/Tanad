@@ -704,3 +704,36 @@ CREATE POLICY "USERS CAN DELETE DEPARTMENT LOCATIONS THROUGH DEPARTMENTS"
       AND departments.user_id = auth.uid()
     )
   );
+
+-- STORAGE POLICIES FOR ENTERPRISE-DOCUMENTS BUCKET
+CREATE POLICY "Users can view their own documents"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'enterprise-documents' AND
+  (auth.uid() = owner OR owner IS NULL)
+);
+
+CREATE POLICY "Users can upload their own documents"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'enterprise-documents' AND
+  auth.uid() = owner
+);
+
+CREATE POLICY "Users can update their own documents"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'enterprise-documents' AND
+  auth.uid() = owner
+);
+
+CREATE POLICY "Users can delete their own documents"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'enterprise-documents' AND
+  auth.uid() = owner
+);
