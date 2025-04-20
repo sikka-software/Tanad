@@ -693,7 +693,21 @@ export const documents = pgTable(
     url: text("url").notNull(),
     file_path: text("file_path").notNull(),
     entity_id: uuid("entity_id").notNull(),
-    entity_type: text("entity_type").$type<"company" | "expense">().notNull(),
+    entity_type: text("entity_type")
+      .$type<
+        | "company"
+        | "expense"
+        | "salary"
+        | "employee"
+        | "invoice"
+        | "quote"
+        | "vendor"
+        | "warehouse"
+        | "branch"
+        | "office"
+        | "department"
+      >()
+      .notNull(),
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
@@ -708,7 +722,19 @@ export const documents = pgTable(
     index("documents_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     check(
       "documents_entity_type_check",
-      sql`entity_type = ANY (ARRAY['company'::text, 'expense'::text])`,
+      sql`entity_type = ANY (ARRAY[
+        'company'::text,
+        'expense'::text,
+        'salary'::text,
+        'employee'::text,
+        'invoice'::text,
+        'quote'::text,
+        'vendor'::text,
+        'warehouse'::text,
+        'branch'::text,
+        'office'::text,
+        'department'::text
+      ])`,
     ),
   ],
 ).enableRLS();

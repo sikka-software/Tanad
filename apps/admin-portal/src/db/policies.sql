@@ -21,6 +21,7 @@ ALTER TABLE offices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_listings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_listing_jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 
 
 -- Drop existing policies before recreating
@@ -125,6 +126,12 @@ DROP POLICY IF EXISTS "Users can read their own employee requests" ON employee_r
 DROP POLICY IF EXISTS "Users can insert their own employee requests" ON employee_requests;
 DROP POLICY IF EXISTS "Users can update their own employee requests" ON employee_requests;
 DROP POLICY IF EXISTS "Users can delete their own employee requests" ON employee_requests;
+
+-- DOCUMENTS POLICIES
+DROP POLICY IF EXISTS "Users can view their own documents and documents of their entities" ON documents;
+DROP POLICY IF EXISTS "Users can create documents for their entities" ON documents;
+DROP POLICY IF EXISTS "Users can update their own documents" ON documents;
+DROP POLICY IF EXISTS "Users can delete their own documents" ON documents;
 
 -- TEMPLATES POLICIES
 CREATE POLICY "USERS CAN VIEW THEIR OWN TEMPLATES"
@@ -737,3 +744,104 @@ USING (
   bucket_id = 'enterprise-documents' AND
   auth.uid() = owner
 );
+
+CREATE POLICY "Users can view their own documents and documents of their entities"
+  ON documents FOR SELECT
+  TO authenticated
+  USING (
+    auth.uid() = user_id OR
+    (
+      CASE documents.entity_type
+        WHEN 'company' THEN EXISTS (
+          SELECT 1 FROM companies WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'expense' THEN EXISTS (
+          SELECT 1 FROM expenses WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'salary' THEN EXISTS (
+          SELECT 1 FROM salaries WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'employee' THEN EXISTS (
+          SELECT 1 FROM employees WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'invoice' THEN EXISTS (
+          SELECT 1 FROM invoices WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'quote' THEN EXISTS (
+          SELECT 1 FROM quotes WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'vendor' THEN EXISTS (
+          SELECT 1 FROM vendors WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'warehouse' THEN EXISTS (
+          SELECT 1 FROM warehouses WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'branch' THEN EXISTS (
+          SELECT 1 FROM branches WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'office' THEN EXISTS (
+          SELECT 1 FROM offices WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        WHEN 'department' THEN EXISTS (
+          SELECT 1 FROM departments WHERE id = documents.entity_id AND user_id = auth.uid()
+        )
+        ELSE false
+      END
+    )
+  );
+
+CREATE POLICY "Users can create documents for their entities"
+  ON documents FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    auth.uid() = user_id AND
+    (
+      CASE entity_type
+        WHEN 'company' THEN EXISTS (
+          SELECT 1 FROM companies WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'expense' THEN EXISTS (
+          SELECT 1 FROM expenses WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'salary' THEN EXISTS (
+          SELECT 1 FROM salaries WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'employee' THEN EXISTS (
+          SELECT 1 FROM employees WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'invoice' THEN EXISTS (
+          SELECT 1 FROM invoices WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'quote' THEN EXISTS (
+          SELECT 1 FROM quotes WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'vendor' THEN EXISTS (
+          SELECT 1 FROM vendors WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'warehouse' THEN EXISTS (
+          SELECT 1 FROM warehouses WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'branch' THEN EXISTS (
+          SELECT 1 FROM branches WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'office' THEN EXISTS (
+          SELECT 1 FROM offices WHERE id = entity_id AND user_id = auth.uid()
+        )
+        WHEN 'department' THEN EXISTS (
+          SELECT 1 FROM departments WHERE id = entity_id AND user_id = auth.uid()
+        )
+        ELSE false
+      END
+    )
+  );
+
+CREATE POLICY "Users can update their own documents"
+  ON documents FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own documents"
+  ON documents FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);

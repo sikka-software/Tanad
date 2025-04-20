@@ -50,7 +50,7 @@ export function DocumentList({ entityId, entityType }: DocumentListProps) {
       const docs = await getDocumentsByEntity(entityId, entityType);
       setDocuments(docs);
     } catch (error) {
-      toast.error(t("Documents.error_fetching"));
+      // TODO: only when editing a entity that has documents
       console.error("Error fetching documents:", error);
     } finally {
       setLoading(false);

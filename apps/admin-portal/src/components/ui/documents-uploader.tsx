@@ -19,13 +19,35 @@ export interface DocumentFile {
   file: File;
   url?: string;
   entity_id?: string;
-  entity_type?: "company" | "expense";
+  entity_type?:
+    | "company"
+    | "expense"
+    | "salary"
+    | "employee"
+    | "invoice"
+    | "quote"
+    | "vendor"
+    | "warehouse"
+    | "branch"
+    | "office"
+    | "department";
   uploaded?: boolean;
 }
 
 interface DocumentUploaderProps {
   entityId?: string;
-  entityType: "company" | "expense";
+  entityType:
+    | "company"
+    | "expense"
+    | "salary"
+    | "employee"
+    | "invoice"
+    | "quote"
+    | "vendor"
+    | "warehouse"
+    | "branch"
+    | "office"
+    | "department";
   existingDocuments?: DocumentFile[];
   onDocumentsChange: (documents: DocumentFile[]) => void;
   disabled?: boolean;

@@ -5,6 +5,13 @@ import { createClient } from "@/utils/supabase/component";
 const supabase = createClient();
 
 export async function uploadDocument(document: DocumentFile) {
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !userData?.user?.id) {
+    throw userError || new Error("Could not get user");
+  }
+
+  const userId = userData.user.id;
   if (!document.file || !document.entity_id || !document.entity_type) {
     throw new Error("Missing required document information");
   }
@@ -35,6 +42,7 @@ export async function uploadDocument(document: DocumentFile) {
       entity_id: document.entity_id,
       entity_type: document.entity_type,
       file_path: fileName,
+      user_id: userId,
     })
     .select()
     .single();
