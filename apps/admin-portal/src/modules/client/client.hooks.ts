@@ -6,6 +6,8 @@ import {
   fetchClientById,
   fetchClients,
   updateClient,
+  bulkDeleteClients,
+  duplicateClient,
 } from "@/modules/client/client.service";
 
 import { Client, ClientCreateData } from "./client.type";
@@ -64,6 +66,17 @@ export function useUpdateClient() {
   });
 }
 
+export function useDuplicateClient() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateClient(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: clientKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
+    },
+  });
+}
+
 export function useDeleteClient() {
   const queryClient = useQueryClient();
 
@@ -75,26 +88,14 @@ export function useDeleteClient() {
     },
   });
 }
-
+// Hook for bulk deleting clients
 export function useBulkDeleteClients() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/clients", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete clients");
-      }
-    },
+    mutationFn: bulkDeleteClients,
     onSuccess: () => {
+      // Invalidate the list query
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
     },
   });

@@ -25,50 +25,6 @@ export default function AddClientPage() {
   const queryClient = useQueryClient();
   const { user } = useUserStore();
 
-  const handleSubmit = async (data: ClientFormValues) => {
-    setLoading(true);
-    try {
-      const clientData = {
-        name: data.name.trim(),
-        email: data.email.trim(),
-        phone: data.phone.trim(),
-        company: data.company || null,
-        address: data.address.trim(),
-        city: data.city.trim(),
-        state: data.state.trim(),
-        zip_code: data.zip_code.trim(),
-        notes: data.notes?.trim() || null,
-      };
-
-      let result: Client;
-
-      const clientCreateData = {
-        ...clientData,
-        user_id: user?.id,
-      };
-
-      result = await createClient(clientCreateData as ClientCreateData);
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Clients.success.created"),
-      });
-
-      const previousClients = queryClient.getQueryData(clientKeys.lists()) || [];
-      queryClient.setQueryData(clientKeys.lists(), [
-        ...(Array.isArray(previousClients) ? previousClients : []),
-        result,
-      ]);
-
-      router.push("/clients");
-    } catch (error) {
-      console.error("Failed to save client:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Clients.error.create"),
-      });
-      setLoading(false);
-    }
-  };
-
   const handleDummyData = () => {
     const dummyData = generateDummyData();
     const form = (window as any).clientForm;
@@ -87,26 +43,20 @@ export default function AddClientPage() {
     <div>
       <CustomPageMeta title={t("Clients.add_new")} />
       <PageTitle
-        title={t("Clients.add_new")}
         formButtons
         formId="client-form"
         loading={loading}
         onCancel={() => router.push("/clients")}
         texts={{
+          title: t("Clients.add_new"),
           submit_form: t("Clients.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
+        dummyButton={handleDummyData}
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <ClientForm id="client-form" user_id={user?.id} onSubmit={handleSubmit} loading={loading} />
+        <ClientForm id="client-form" loading={loading} />
       </div>
     </div>
   );

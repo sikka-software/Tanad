@@ -42,7 +42,6 @@ export interface BranchFormProps {
 
 export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: BranchFormProps) {
   const t = useTranslations();
-  const branchSchema = createBranchSchema(t);
   const { user } = useUserStore();
   const { mutate: createBranch } = useCreateBranch();
   const { mutate: updateBranch } = useUpdateBranch();
@@ -51,7 +50,7 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
   const setIsLoading = useBranchStore((state) => state.setIsLoading);
 
   const form = useForm<BranchFormValues>({
-    resolver: zodResolver(branchSchema),
+    resolver: zodResolver(createBranchSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
       code: defaultValues?.code || "",

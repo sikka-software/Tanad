@@ -9,7 +9,7 @@ const modelMap = {
   branches: { table: schema.branches, query: db.query.branches },
   companies: { table: schema.companies, query: db.query.companies },
   jobs: { table: schema.jobs, query: db.query.jobs },
-  // add more here
+  clients: { table: schema.clients, query: db.query.clients },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

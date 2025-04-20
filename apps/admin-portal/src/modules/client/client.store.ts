@@ -9,11 +9,9 @@ import { Client } from "@/modules/client/client.type";
 import { createClient } from "@/utils/supabase/component";
 
 type ClientStates = {
-  clients: Client[];
   isLoading: boolean;
   error: string | null;
   selectedRows: string[];
-
   filterConditions: FilterCondition[];
   filterCaseSensitive: boolean;
   searchQuery: string;
@@ -25,8 +23,7 @@ type ClientStates = {
 };
 
 type ClientActions = {
-  fetchClients: () => Promise<void>;
-  updateClient: (id: string, data: Partial<Client>) => Promise<void>;
+  setIsLoading: (isLoading: boolean) => void;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
   setFilterConditions: (filterConditions: FilterCondition[]) => void;
@@ -42,7 +39,6 @@ type ClientActions = {
 };
 
 export const useClientStore = create<ClientStates & ClientActions>((set, get) => ({
-  clients: [],
   isLoading: false,
   error: null,
   selectedRows: [],
@@ -55,6 +51,10 @@ export const useClientStore = create<ClientStates & ClientActions>((set, get) =>
   sortRules: [],
   sortCaseSensitive: false,
   sortNullsFirst: false,
+
+  setIsLoading: (isLoading: boolean) => {
+    set({ isLoading });
+  },
 
   getFilteredClients: (data: Client[]) => {
     const { searchQuery, filterConditions, filterCaseSensitive } = get();
@@ -127,7 +127,6 @@ export const useClientStore = create<ClientStates & ClientActions>((set, get) =>
       return { ...state, selectedRows: ids };
     });
   },
-
   clearSelection: () => {
     set((state) => {
       if (state.selectedRows.length === 0) {
@@ -135,33 +134,5 @@ export const useClientStore = create<ClientStates & ClientActions>((set, get) =>
       }
       return { ...state, selectedRows: [] };
     });
-  },
-  fetchClients: async () => {
-    const supabase = createClient();
-    set({ isLoading: true, error: null });
-    try {
-      const { data, error } = await supabase.from("clients").select("*");
-      if (error) throw error;
-      set({ clients: data as Client[], isLoading: false });
-    } catch (error) {
-      set({ error: (error as Error).message, isLoading: false });
-    }
-  },
-
-  updateClient: async (id: string, updates: Partial<Client>) => {
-    const supabase = createClient();
-    try {
-      const { error } = await supabase.from("clients").update(updates).eq("id", id);
-
-      if (error) throw error;
-
-      set((state) => ({
-        clients: state.clients.map((client) =>
-          client.id === id ? { ...client, ...updates } : client,
-        ),
-      }));
-    } catch (error) {
-      set({ error: (error as Error).message });
-    }
   },
 }));

@@ -9,6 +9,8 @@ import TableSkeleton from "@/ui/table-skeleton";
 import { useClientStore } from "@/modules/client/client.store";
 import { Client } from "@/modules/client/client.type";
 
+import { useUpdateClient } from "./client.hooks";
+
 const nameSchema = z.string().min(1, "Required");
 const emailSchema = z.string().email("Invalid email");
 const phoneSchema = z.string().min(1, "Required");
@@ -22,48 +24,23 @@ interface ClientsTableProps {
   data: Client[];
   isLoading?: boolean;
   error?: Error | null;
+  onActionClicked: (action: string, rowId: string) => void;
 }
 
-const ClientsTable = ({ data: unsortedData, isLoading, error }: ClientsTableProps) => {
+const ClientsTable = ({
+  data: unsortedData,
+  isLoading,
+  error,
+  onActionClicked,
+}: ClientsTableProps) => {
   const t = useTranslations("Clients");
-  const updateClient = useClientStore((state) => state.updateClient);
+  const { mutate: updateClient } = useUpdateClient();
   const selectedRows = useClientStore((state) => state.selectedRows);
   const setSelectedRows = useClientStore((state) => state.setSelectedRows);
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Client>[] = [
-    // Actions
-    // {
-    //   id: "actions",
-    //   enableHiding: false,
-    //   maxSize: 50,
-    //   minSize: 50,
-    //   size: 50,
-    //   cell: ({ row }) => {
-    //     const payment = row.original;
-
-    //     return (
-    //       <DropdownMenu>
-    //         <DropdownMenuTrigger asChild>
-    //           <Button variant="ghost" className="h-8 w-8 p-0">
-    //             <span className="sr-only">Open menu</span>
-    //             <MoreHorizontal />
-    //           </Button>
-    //         </DropdownMenuTrigger>
-    //         <DropdownMenuContent align="end">
-    //           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-    //           <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
-    //             Copy payment ID
-    //           </DropdownMenuItem>
-    //           <DropdownMenuSeparator />
-    //           <DropdownMenuItem>View customer</DropdownMenuItem>
-    //           <DropdownMenuItem>View payment details</DropdownMenuItem>
-    //         </DropdownMenuContent>
-    //       </DropdownMenu>
-    //     );
-    //   },
-    // },
     { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
     { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
     { accessorKey: "phone", header: t("form.phone.label"), validationSchema: phoneSchema },
@@ -75,13 +52,13 @@ const ClientsTable = ({ data: unsortedData, isLoading, error }: ClientsTableProp
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateClient(rowId, { [columnId]: value });
+    if (columnId === "client_id") return;
+    await updateClient({ id: rowId, client: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(
     (rows: Client[]) => {
       const newSelectedIds = rows.map((row: Client) => row.id!);
-      // Only update if the selection has actually changed
       if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
         setSelectedRows(newSelectedIds);
       }
@@ -120,8 +97,18 @@ const ClientsTable = ({ data: unsortedData, isLoading, error }: ClientsTableProp
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      onActionClicked={onActionClicked}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={clientTableOptions}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

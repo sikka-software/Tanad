@@ -30,6 +30,11 @@ const modelMap: Record<string, ModelConfig> = {
     query: db.query.jobs,
     idField: "id",
   },
+  clients: {
+    table: schema.clients,
+    query: db.query.clients,
+    idField: "id",
+  },
   // add more models here
 };
 

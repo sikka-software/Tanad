@@ -33,6 +33,11 @@ const modelMap: Record<string, ModelConfig> = {
     idField: "id",
     excludeFromDuplicate: ["reference_number"], // Example: exclude reference_number for jobs
   },
+  clients: {
+    table: schema.clients,
+    query: db.query.clients,
+    idField: "id",
+  },
   // Add more models here
 };
 

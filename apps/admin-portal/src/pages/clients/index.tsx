@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -10,16 +10,27 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormDialog } from "@/components/ui/form-dialog";
 
 import ClientCard from "@/modules/client/client.card";
-import { useClients, useBulkDeleteClients } from "@/modules/client/client.hooks";
+import { ClientForm } from "@/modules/client/client.form";
+import {
+  useClients,
+  useBulkDeleteClients,
+  useDuplicateClient,
+} from "@/modules/client/client.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/client/client.options";
 import { useClientStore } from "@/modules/client/client.store";
 import ClientsTable from "@/modules/client/client.table";
+import { ClientUpdateData } from "@/modules/client/client.type";
 
 export default function ClientsPage() {
   const t = useTranslations();
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableClient, setActionableClient] = useState<ClientUpdateData | null>(null);
 
+  const loadingSaveClient = useClientStore((state) => state.isLoading);
+  const setLoadingSaveClient = useClientStore((state) => state.setIsLoading);
   const viewMode = useClientStore((state) => state.viewMode);
   const isDeleteDialogOpen = useClientStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useClientStore((state) => state.setIsDeleteDialogOpen);
@@ -36,6 +47,7 @@ export default function ClientsPage() {
   const getSortedClients = useClientStore((state) => state.getSortedClients);
 
   const { data: clients, isLoading, error } = useClients();
+  const { mutate: duplicateClient } = useDuplicateClient();
   const { mutate: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
 
   const filteredClients = useMemo(() => {
@@ -47,21 +59,59 @@ export default function ClientsPage() {
   }, [filteredClients, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleConfirmDelete = async () => {
-    try {
-      await deleteClients(selectedRows, {
+    const toastId = toast.loading(t("General.loading_operation"), {
+      description: t("Clients.loading.deleting"),
+    });
+
+    await deleteClients(selectedRows, {
+      onSuccess: () => {
+        clearSelection();
+        toast.success(t("General.successful_operation"), {
+          description: t("Clients.success.deleted"),
+        });
+        toast.dismiss(toastId);
+        setIsDeleteDialogOpen(false);
+      },
+      onError: (error: any) => {
+        console.error("Failed to delete clients:", error);
+        toast.error(t("Clients.error.bulk_delete"));
+        toast.dismiss(toastId);
+        setIsDeleteDialogOpen(false);
+      },
+    });
+  };
+
+  const onActionClicked = async (action: string, rowId: string) => {
+    console.log(action, rowId);
+    if (action === "edit") {
+      setIsFormDialogOpen(true);
+      setActionableClient(clients?.find((client) => client.id === rowId) || null);
+    }
+
+    if (action === "delete") {
+      setSelectedRows([rowId]);
+      setIsDeleteDialogOpen(true);
+    }
+
+    if (action === "duplicate") {
+      const toastId = toast.loading(t("General.loading_operation"), {
+        description: t("Clients.loading.duplicating"),
+      });
+
+      await duplicateClient(rowId, {
         onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
+          toast.success(t("General.successful_operation"), {
+            description: t("Clients.success.duplicated"),
+          });
+          toast.dismiss(toastId);
         },
-        onError: (error: any) => {
-          console.error("Failed to delete clients:", error);
-          toast.error(t("Clients.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
+        onError: () => {
+          toast.error(t("General.error_operation"), {
+            description: t("Clients.error.duplicating"),
+          });
+          toast.dismiss(toastId);
         },
       });
-    } catch (error) {
-      console.error("Failed to delete clients:", error);
-      setIsDeleteDialogOpen(false);
     }
   };
 
@@ -94,6 +144,7 @@ export default function ClientsPage() {
               data={sortedClients || []}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
@@ -108,6 +159,28 @@ export default function ClientsPage() {
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Clients.add_new")}
+          formId="client-form"
+          loadingSave={loadingSaveClient}
+        >
+          <ClientForm
+            id={"client-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableClient(null);
+              setLoadingSaveClient(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("Clients.success.updated"),
+              });
+            }}
+            defaultValues={actionableClient}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

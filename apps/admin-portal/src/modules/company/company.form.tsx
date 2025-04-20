@@ -44,7 +44,7 @@ export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
 interface CompanyFormProps {
   id?: string;
   onSuccess?: () => void;
-  defaultValues: CompanyUpdateData | null;
+  defaultValues?: CompanyUpdateData | null;
   editMode?: boolean;
 }
 

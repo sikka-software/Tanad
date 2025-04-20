@@ -76,7 +76,6 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: BranchesTabl
   const handleRowSelectionChange = useCallback(
     (rows: Branch[]) => {
       const newSelectedIds = rows.map((row) => row.id);
-      // Only update if the selection has actually changed
       if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
         setSelectedRows(newSelectedIds);
       }
