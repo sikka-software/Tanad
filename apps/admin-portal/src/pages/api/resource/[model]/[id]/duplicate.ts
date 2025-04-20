@@ -11,6 +11,7 @@ type ModelConfig = {
     findFirst: (config: { where: any }) => Promise<any>;
   };
   idField: string;
+  excludeFromDuplicate?: string[]; // New property to specify excluded fields
 };
 
 const modelMap: Record<string, ModelConfig> = {
@@ -18,16 +19,19 @@ const modelMap: Record<string, ModelConfig> = {
     table: schema.branches,
     query: db.query.branches,
     idField: "id",
+    excludeFromDuplicate: ["code"], // Exclude the 'code' field when duplicating branches
   },
   companies: {
     table: schema.companies,
     query: db.query.companies,
     idField: "id",
+    // No fields to exclude for companies
   },
   jobs: {
     table: schema.jobs,
     query: db.query.jobs,
     idField: "id",
+    excludeFromDuplicate: ["reference_number"], // Example: exclude reference_number for jobs
   },
   // Add more models here
 };
@@ -47,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid ID" });
   }
 
-  const { table, query, idField } = modelMap[model];
+  const { table, query, idField, excludeFromDuplicate = [] } = modelMap[model];
 
   const supabase = createClient({
     req,
@@ -77,9 +81,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ error: `Not authorized to duplicate this ${model}` });
     }
 
-    const { [idField]: _, ...rest } = record;
+    // Create a copy of the record without the excluded fields
+    const dataToDuplicate = Object.keys(record).reduce(
+      (acc, key) => {
+        if (key !== idField && !excludeFromDuplicate.includes(key)) {
+          acc[key] = record[key];
+        }
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
 
-    const [duplicated] = (await db.insert(table).values(rest).returning()) as unknown as any[];
+    const [duplicated] = (await db
+      .insert(table)
+      .values(dataToDuplicate)
+      .returning()) as unknown as any[];
 
     return res.status(201).json(duplicated);
   } catch (error) {

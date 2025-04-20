@@ -1,12 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
+
+import { DocumentFile } from "@/components/ui/documents-uploader";
+
+import useUserStore from "@/stores/use-user-store";
+
+import { useCreateBranch, useUpdateBranch } from "./branch.hooks";
+import useBranchStore from "./branch.store";
+import { BranchUpdateData } from "./branch.type";
 
 export const createBranchSchema = (t: (key: string) => string) =>
   z.object({
@@ -27,29 +37,108 @@ export type BranchFormValues = z.input<ReturnType<typeof createBranchSchema>>;
 
 export interface BranchFormProps {
   id?: string;
-  onSubmit: (data: BranchFormValues) => void;
-  loading?: boolean;
-  initialData?: BranchFormValues;
+  onSuccess?: () => void;
+  defaultValues: BranchUpdateData | null;
+  editMode?: boolean;
 }
 
-export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormProps) {
+export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: BranchFormProps) {
   const t = useTranslations();
+  const branchSchema = createBranchSchema(t);
+  const { user } = useUserStore();
+  const { mutate: createBranch } = useCreateBranch();
+  const { mutate: updateBranch } = useUpdateBranch();
+
+  const isLoading = useBranchStore((state) => state.isLoading);
+  const setIsLoading = useBranchStore((state) => state.setIsLoading);
+
   const form = useForm<BranchFormValues>({
-    resolver: zodResolver(createBranchSchema(t)),
-    defaultValues: initialData || {
-      name: "",
-      code: "",
-      address: "",
-      city: "",
-      state: "",
-      zip_code: "",
-      phone: "",
-      email: "",
-      manager: "",
-      is_active: true,
-      notes: "",
+    resolver: zodResolver(branchSchema),
+    defaultValues: {
+      name: defaultValues?.name || "",
+      code: defaultValues?.code || "",
+      address: defaultValues?.address || "",
+      city: defaultValues?.city || "",
+      state: defaultValues?.state || "",
+      zip_code: defaultValues?.zip_code || "",
+      phone: defaultValues?.phone || "",
+      email: defaultValues?.email || "",
+      manager: defaultValues?.manager || "",
+      is_active: defaultValues?.is_active || true,
+      notes: defaultValues?.notes || "",
     },
   });
+
+  const handleSubmit = async (data: BranchFormValues) => {
+    setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
+
+    console.log("default values ", defaultValues);
+    try {
+      if (editMode) {
+        await updateBranch(
+          {
+            id: defaultValues?.id || "",
+            data: {
+              name: data.name.trim(),
+              code: data.code.trim(),
+              address: data.address?.trim() || "",
+              city: data.city?.trim() || "",
+              state: data.state?.trim() || "",
+              zip_code: data.zip_code?.trim() || "",
+              phone: data.phone?.trim() || null,
+              email: data.email?.trim() || null,
+              manager: data.manager?.trim() || null,
+              notes: data.notes?.trim() || null,
+              is_active: data.is_active || true,
+            },
+          },
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      } else {
+        await createBranch(
+          {
+            name: data.name.trim(),
+            code: data.code.trim(),
+            address: data.address?.trim() || "",
+            city: data.city?.trim() || "",
+            state: data.state?.trim() || "",
+            zip_code: data.zip_code?.trim() || "",
+            phone: data.phone?.trim() || null,
+            email: data.email?.trim() || null,
+            manager: data.manager?.trim() || null,
+            notes: data.notes?.trim() || null,
+            is_active: data.is_active || true,
+            user_id: user?.id,
+          },
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Failed to save company:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Companies.error.creating"),
+      });
+    }
+  };
 
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
@@ -58,7 +147,11 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
 
   return (
     <Form {...form}>
-      <form id={id || "branch-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        id={id || "branch-form"}
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-4"
+      >
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -70,7 +163,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                   <Input
                     placeholder={t("Branches.form.name.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -88,7 +181,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                   <Input
                     placeholder={t("Branches.form.code.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -107,7 +200,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                 <Input
                   placeholder={t("Branches.form.address.placeholder")}
                   {...field}
-                  disabled={loading}
+                  disabled={isLoading}
                 />
               </FormControl>
               <FormMessage />
@@ -126,7 +219,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                   <Input
                     placeholder={t("Branches.form.city.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -144,7 +237,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                   <Input
                     placeholder={t("Branches.form.state.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -162,7 +255,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                   <Input
                     placeholder={t("Branches.form.zip_code.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -183,7 +276,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                     type="tel"
                     placeholder={t("Branches.form.phone.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -202,7 +295,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                     type="email"
                     placeholder={t("Branches.form.email.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -220,7 +313,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                   <Input
                     placeholder={t("Branches.form.manager.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -238,7 +331,11 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                 <FormLabel className="text-base">{t("Branches.form.is_active.label")}</FormLabel>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} disabled={loading} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={isLoading}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -255,7 +352,7 @@ export function BranchForm({ id, onSubmit, loading, initialData }: BranchFormPro
                   placeholder={t("Branches.form.notes.placeholder")}
                   className="min-h-[120px]"
                   {...field}
-                  disabled={loading}
+                  disabled={isLoading}
                 />
               </FormControl>
               <FormMessage />

@@ -6,7 +6,7 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useBranchStore } from "@/modules/branch/branch.store";
+import useBranchStore from "@/modules/branch/branch.store";
 import { Branch } from "@/modules/branch/branch.type";
 
 import { useUpdateBranch } from "./branch.hooks";
@@ -26,9 +26,10 @@ interface BranchesTableProps {
   data: Branch[];
   isLoading?: boolean;
   error?: Error | null;
+  onActionClicked: (action: string, rowId: string) => void;
 }
 
-const BranchesTable = ({ data, isLoading, error }: BranchesTableProps) => {
+const BranchesTable = ({ data, isLoading, error, onActionClicked }: BranchesTableProps) => {
   const t = useTranslations();
   const { mutate: updateBranch } = useUpdateBranch();
   const selectedRows = useBranchStore((state) => state.selectedRows);
@@ -114,8 +115,18 @@ const BranchesTable = ({ data, isLoading, error }: BranchesTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={branchTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

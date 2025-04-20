@@ -59,6 +59,9 @@ export async function updateBranch(
 export async function duplicateBranch(id: string): Promise<Branch> {
   const response = await fetch(`/api/resource/branches/${id}/duplicate`, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
   return response.json();

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import {
   createBranch,
@@ -7,6 +8,7 @@ import {
   fetchBranches,
   updateBranch,
   bulkDeleteBranches,
+  duplicateBranch,
 } from "@/modules/branch/branch.service";
 import type { Branch, BranchCreateData } from "@/modules/branch/branch.type";
 
@@ -62,6 +64,18 @@ export function useUpdateBranch() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Branch> }) => updateBranch(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+    },
+  });
+}
+
+// Hook for duplicating a branch
+export function useDuplicateBranch() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateBranch(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });

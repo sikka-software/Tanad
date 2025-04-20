@@ -19,4 +19,4 @@ export interface Branch {
 // Define an explicit type for branch creation data
 export type BranchCreateData = Omit<Branch, "id" | "created_at"> & { user_id: string };
 
-export type BranchUpdateData = Partial<Omit<Branch, "id" | "created_at">>;
+export type BranchUpdateData = Omit<Branch, "created_at" | "user_id">;

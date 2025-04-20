@@ -23,6 +23,7 @@ type BranchStates = {
 };
 
 type BranchActions = {
+  setIsLoading: (isLoading: boolean) => void;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
   setFilterConditions: (filterConditions: FilterCondition[]) => void;
@@ -37,7 +38,7 @@ type BranchActions = {
   getSortedBranches: (data: Branch[]) => Branch[];
 };
 
-export const useBranchStore = create<BranchStates & BranchActions>((set, get) => ({
+const useBranchStore = create<BranchStates & BranchActions>((set, get) => ({
   branches: [],
   isLoading: false,
   error: null,
@@ -51,6 +52,9 @@ export const useBranchStore = create<BranchStates & BranchActions>((set, get) =>
   sortRules: [],
   sortCaseSensitive: false,
   sortNullsFirst: false,
+  setIsLoading: (isLoading: boolean) => {
+    set({ isLoading });
+  },
 
   getFilteredBranches: (data: Branch[]) => {
     const { searchQuery, filterConditions, filterCaseSensitive } = get();
@@ -133,3 +137,5 @@ export const useBranchStore = create<BranchStates & BranchActions>((set, get) =>
     });
   },
 }));
+
+export default useBranchStore;
