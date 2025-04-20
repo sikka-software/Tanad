@@ -370,11 +370,6 @@ function SheetTable<
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   /**
-   * Row selection state
-   */
-  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
-
-  /**
    * Track errors/original content keyed by (groupKey, rowId) for editing.
    */
   const [cellErrors, setCellErrors] = useState<
@@ -652,11 +647,12 @@ function SheetTable<
     // Determine if we show the rowAction icons on hover
     const showRowActions = hoveredRowId === rowId; // only for hovered row
 
+    const stickyColumnId = "checkbox";
     return (
       <React.Fragment key={rowId}>
         <TableRow
           className={cn(
-            "border-none", // it's will remove border for icons cells
+            "relative", // it's will remove border for icons cells
             disabled ? "bg-muted" : "",
             row.getIsSelected() ? "bg-muted/50" : "",
           )}
@@ -667,8 +663,8 @@ function SheetTable<
         >
           {/* Selection checkbox */}
           {enableRowSelection && (
-            <TableCell className="w-[30px] border-y p-0 px-2">
-              <div className="flex h-full items-center justify-center">
+            <TableCell className="bg-background sticky start-0 z-2 border-2">
+              <div className="flex h-auto items-center justify-center">
                 <input
                   type="checkbox"
                   checked={row.getIsSelected()}
@@ -998,7 +994,7 @@ function SheetTable<
   }
 
   return (
-    <div className="p-0">
+    <div className="overflow-x-auto p-0 pb-2">
       <Table id={id}>
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         {/* Primary header */}
@@ -1007,7 +1003,7 @@ function SheetTable<
             <TableRow className="border-none">
               {/* Selection checkbox header */}
               {enableRowSelection && (
-                <TableHead className="w-[30px] border-y p-0">
+                <TableHead className="bg-muted sticky start-0 z-2 w-[30px] border-y p-0">
                   <div className="flex h-full items-center justify-center">
                     <input
                       type="checkbox"
