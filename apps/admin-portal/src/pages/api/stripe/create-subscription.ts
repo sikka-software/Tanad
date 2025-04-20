@@ -3,7 +3,8 @@ import Stripe from "stripe";
 
 import { getPlanIdForPriceId } from "@/lib/stripe";
 import { getStripeInstance } from "@/lib/stripe-admin";
-import { supabase } from "@/lib/supabase";
+
+import { createClient } from "@/utils/supabase/component";
 
 /**
  * API endpoint to create or update a subscription
@@ -26,6 +27,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  const supabase = createClient();
 
   try {
     const stripe = getStripeInstance();

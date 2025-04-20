@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-
 import Stripe from "stripe";
 
 import { sendEmailViaWebhook } from "@/lib/email";
 import { getStripeInstance } from "@/lib/stripe-admin";
-import { supabase } from "@/lib/supabase";
+
+import { createClient } from "@/utils/supabase/component";
 
 export const config = {
   api: {
@@ -30,7 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
-
+  const supabase = createClient();
   const buf = await buffer(req);
   const sig = req.headers["stripe-signature"]!;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;

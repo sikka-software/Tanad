@@ -1,13 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { getStripeInstance } from "@/lib/stripe-admin";
-import { supabase } from "@/lib/supabase";
+
+import { createClient } from "@/utils/supabase/component";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
-
+  const supabase = createClient();
   try {
     const stripe = getStripeInstance();
     const { subscriptionId, userId, cancelAtPeriodEnd = true } = req.body;
