@@ -127,11 +127,21 @@ DROP POLICY IF EXISTS "Users can insert their own employee requests" ON employee
 DROP POLICY IF EXISTS "Users can update their own employee requests" ON employee_requests;
 DROP POLICY IF EXISTS "Users can delete their own employee requests" ON employee_requests;
 
--- DOCUMENTS POLICIES
+DROP POLICY IF EXISTS "Users can view their own documents" ON documents;
+DROP POLICY IF EXISTS "Users can upload their own documents" ON documents;
+DROP POLICY IF EXISTS "Users can update their own documents" ON documents;
+DROP POLICY IF EXISTS "Users can delete their own documents" ON documents;
+
 DROP POLICY IF EXISTS "Users can view their own documents and documents of their entities" ON documents;
 DROP POLICY IF EXISTS "Users can create documents for their entities" ON documents;
 DROP POLICY IF EXISTS "Users can update their own documents" ON documents;
 DROP POLICY IF EXISTS "Users can delete their own documents" ON documents;
+
+-- documents object bucket drop policy
+DROP POLICY IF EXISTS "Users can view their own documents" ON storage.objects;
+DROP POLICY IF EXISTS "Users can upload their own documents" ON storage.objects;
+DROP POLICY IF EXISTS "Users can update their own documents" ON storage.objects;
+DROP POLICY IF EXISTS "Users can delete their own documents" ON storage.objects;
 
 -- TEMPLATES POLICIES
 CREATE POLICY "USERS CAN VIEW THEIR OWN TEMPLATES"
