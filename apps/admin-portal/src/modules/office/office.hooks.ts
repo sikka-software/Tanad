@@ -3,12 +3,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createOffice,
   deleteOffice,
+  bulkDeleteOffices,
   fetchOfficeById,
   fetchOffices,
   updateOffice,
+  duplicateOffice,
 } from "@/modules/office/office.service";
-import type { Office, OfficeCreateData } from "@/modules/office/office.type";
+import type { Office, OfficeCreateData, OfficeUpdateData } from "@/modules/office/office.type";
 
+// Query keys for offices
 export const officeKeys = {
   all: ["offices"] as const,
   lists: () => [...officeKeys.all, "list"] as const,
@@ -17,7 +20,7 @@ export const officeKeys = {
   detail: (id: string) => [...officeKeys.details(), id] as const,
 };
 
-// Hooks
+// Hook to fetch all offices
 export function useOffices() {
   return useQuery({
     queryKey: officeKeys.lists(),
@@ -25,6 +28,7 @@ export function useOffices() {
   });
 }
 
+// Hook to fetch a single office
 export function useOffice(id: string) {
   return useQuery({
     queryKey: officeKeys.detail(id),
@@ -33,11 +37,12 @@ export function useOffice(id: string) {
   });
 }
 
+// Hook to create a office
 export function useCreateOffice() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (office: OfficeCreateData) => createOffice(office),
-    onSuccess: (newOffice) => {
+    onSuccess: (newOffice: Office) => {
       const previousOffices = queryClient.getQueryData(officeKeys.lists()) || [];
       queryClient.setQueryData(officeKeys.lists(), [
         ...(Array.isArray(previousOffices) ? previousOffices : []),
@@ -47,17 +52,11 @@ export function useCreateOffice() {
   });
 }
 
+// Hook to update a office
 export function useUpdateOffice() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: ({
-      id,
-      office,
-    }: {
-      id: string;
-      office: Partial<Omit<Office, "id" | "created_at">>;
-    }) => updateOffice(id, office),
+    mutationFn: ({ id, data }: { id: string; data: OfficeUpdateData }) => updateOffice(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
@@ -65,9 +64,21 @@ export function useUpdateOffice() {
   });
 }
 
+// Hook to duplicate a office
+export function useDuplicateOffice() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateOffice(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
+    },
+  });
+}
+
+// Hook to delete a office
 export function useDeleteOffice() {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: deleteOffice,
     onSuccess: (_, variables) => {
@@ -77,24 +88,11 @@ export function useDeleteOffice() {
   });
 }
 
+// Hook to bulk delete offices
 export function useBulkDeleteOffices() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/offices/bulk-delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete offices");
-      }
-    },
+    mutationFn: bulkDeleteOffices,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
     },

@@ -2,17 +2,19 @@ import { useTranslations } from "next-intl";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ConfirmDelete from "@/components/ui/confirm-delete";
-import DataModelList from "@/components/ui/data-model-list";
-import PageSearchAndFilter from "@/components/ui/page-search-and-filter";
-import SelectionMode from "@/components/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import JobListingCard from "@/modules/job-listing/job-listing.card";
 import { useJobListings, useBulkDeleteJobListings } from "@/modules/job-listing/job-listing.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/job-listing/job-listing.options";
-import { useJobListingsStore } from "@/modules/job-listing/job-listing.store";
+import useJobListingsStore from "@/modules/job-listing/job-listing.store";
 import JobListingsTable from "@/modules/job-listing/job-listing.table";
 import { JobListing } from "@/modules/job-listing/job-listing.type";
 
@@ -30,11 +32,22 @@ export default function JobListingsPage() {
   const searchQuery = useJobListingsStore((state) => state.searchQuery);
   const filterConditions = useJobListingsStore((state) => state.filterConditions);
   const filterCaseSensitive = useJobListingsStore((state) => state.filterCaseSensitive);
-  const getFilteredJobListings = useJobListingsStore((state) => state.getFilteredJobListings);
-  const getSortedJobListings = useJobListingsStore((state) => state.getSortedJobListings);
+  const getFilteredJobListings = useJobListingsStore((state) => state.getFilteredData);
+  const getSortedJobListings = useJobListingsStore((state) => state.getSortedData);
 
   const { data: jobListings = [], isLoading, error } = useJobListings();
-  const { mutate: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
+  const { mutateAsync: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteJobListings, {
+    loading: "JobListings.loading.deleting",
+    success: "JobListings.success.deleted",
+    error: "JobListings.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredListings = useMemo(() => {
     return getFilteredJobListings(jobListings || []);
@@ -43,21 +56,6 @@ export default function JobListingsPage() {
   const sortedListings = useMemo(() => {
     return getSortedJobListings(filteredListings);
   }, [filteredListings, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteJobListings(selectedRows);
-      clearSelection();
-      toast.success(t("JobListings.messages.items_deleted"));
-    } catch (err: unknown) {
-      console.error("Error deleting job listings:", err);
-      toast.error(t("JobListings.messages.delete_error"), {
-        description: String(err),
-      });
-    } finally {
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -109,7 +107,7 @@ export default function JobListingsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("JobListings.confirm_delete")}
           description={t("JobListings.delete_description", { count: selectedRows.length })}
         />

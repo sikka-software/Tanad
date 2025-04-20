@@ -10,20 +10,34 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormDialog } from "@/components/ui/form-dialog";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+import { CompanyForm } from "@/modules/company/company.form";
 import JobCard from "@/modules/job/job.card";
-import { useJobs, useBulkDeleteJobs } from "@/modules/job/job.hooks";
+import { JobForm } from "@/modules/job/job.form";
+import { useJobs, useBulkDeleteJobs, useDuplicateJob } from "@/modules/job/job.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/job/job.options";
-import { useJobsStore } from "@/modules/job/job.store";
+import useJobsStore from "@/modules/job/job.store";
 import JobTable from "@/modules/job/job.table";
+import { JobUpdateData } from "@/modules/job/job.type";
+import { createActions, withMutation } from "@/utils/action-utils";
 
 export default function JobsPage() {
   const t = useTranslations();
 
+  const isLoading = useJobsStore((state) => state.isLoading);
+  const setIsLoading = useJobsStore((state) => state.setIsLoading);
+
+  const isFormDialogOpen = useJobsStore((state) => state.isFormDialogOpen);
+  const setIsFormDialogOpen = useJobsStore((state) => state.setIsFormDialogOpen);
+  const actionableItem = useJobsStore((state) => state.actionableItem);
+  const setActionableItem = useJobsStore((state) => state.setActionableItem);
   const viewMode = useJobsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useJobsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useJobsStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useJobsStore((state) => state.selectedRows);
+  const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const clearSelection = useJobsStore((state) => state.clearSelection);
   const sortRules = useJobsStore((state) => state.sortRules);
   const sortCaseSensitive = useJobsStore((state) => state.sortCaseSensitive);
@@ -31,11 +45,48 @@ export default function JobsPage() {
   const searchQuery = useJobsStore((state) => state.searchQuery);
   const filterConditions = useJobsStore((state) => state.filterConditions);
   const filterCaseSensitive = useJobsStore((state) => state.filterCaseSensitive);
-  const getFilteredJobs = useJobsStore((state) => state.getFilteredJobs);
-  const getSortedJobs = useJobsStore((state) => state.getSortedJobs);
+  const getFilteredJobs = useJobsStore((state) => state.getFilteredData);
+  const getSortedJobs = useJobsStore((state) => state.getSortedData);
 
-  const { data: jobs, isLoading, error } = useJobs();
-  const { mutate: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
+  const { data: jobs, isLoading: loadingFetchJobs, error } = useJobs();
+  const { mutateAsync: duplicateJob } = useDuplicateJob();
+  const { mutateAsync: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteJobs, {
+    loading: "Jobs.loading.deleting",
+    success: "Jobs.success.deleted",
+    error: "Jobs.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
+
+  // Define actions once (can be moved to separate file)
+  const jobActions = createActions<JobUpdateData & { id: string }>({
+    edit: ({ id, data }) => {
+      setIsFormDialogOpen(true);
+      setActionableItem(jobs?.find((c) => c.id === id) || null);
+    },
+    delete: ({ id }) => {
+      setSelectedRows([id]);
+      setIsDeleteDialogOpen(true);
+    },
+    duplicate: withMutation(
+      { mutateAsync: duplicateJob },
+      {
+        loading: "Jobs.loading.duplicating",
+        success: "Jobs.success.duplicated",
+        error: "Jobs.error.duplicating",
+      },
+    ),
+  });
+
+  // In your component
+  const onActionClicked = (action: string, id: string) => {
+    jobActions(action, id, { t, data: jobs });
+  };
 
   const filteredJobs = useMemo(() => {
     return getFilteredJobs(jobs || []);
@@ -44,25 +95,6 @@ export default function JobsPage() {
   const sortedJobs = useMemo(() => {
     return getSortedJobs(filteredJobs);
   }, [filteredJobs, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteJobs(selectedRows, {
-        onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
-        },
-        onError: (error: any) => {
-          console.error("Failed to delete jobs:", error);
-          toast.error(t("Jobs.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
-        },
-      });
-    } catch (error) {
-      console.error("Failed to delete jobs:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -89,12 +121,17 @@ export default function JobsPage() {
 
         <div className="flex-1 overflow-hidden">
           {viewMode === "table" ? (
-            <JobTable data={sortedJobs} isLoading={isLoading} error={error} />
+            <JobTable
+              data={sortedJobs}
+              isLoading={loadingFetchJobs}
+              error={error}
+              onActionClicked={onActionClicked}
+            />
           ) : (
             <div className="p-4">
               <DataModelList
                 data={sortedJobs}
-                isLoading={isLoading}
+                isLoading={loadingFetchJobs}
                 error={error}
                 emptyMessage={t("Jobs.no_jobs_found")}
                 renderItem={(job) => <JobCard job={job} />}
@@ -104,11 +141,33 @@ export default function JobsPage() {
           )}
         </div>
 
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Jobs.add_new")}
+          formId="job-form"
+          loadingSave={isLoading}
+        >
+          <JobForm
+            id={"job-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableItem(null);
+              setIsLoading(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("Jobs.success.updated"),
+              });
+            }}
+            defaultValues={actionableItem}
+            editMode={true}
+          />
+        </FormDialog>
+
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Jobs.delete.title")}
           description={t("Jobs.delete.description", { count: selectedRows.length })}
         />

@@ -8,7 +8,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { useDepartments } from "@/modules/department/department.hooks";
 import { useUpdateEmployee } from "@/modules/employee/employee.hooks";
-import { useEmployeesStore } from "@/modules/employee/employee.store";
+import useEmployeeStore from "@/modules/employee/employee.store";
 import { Employee } from "@/modules/employee/employee.types";
 
 const nameSchema = z.string().min(1, "Required");
@@ -29,8 +29,8 @@ const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: Employ
   const t = useTranslations();
   const { data: departments } = useDepartments();
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
-  const selectedRows = useEmployeesStore((state) => state.selectedRows);
-  const setSelectedRows = useEmployeesStore((state) => state.setSelectedRows);
+  const selectedRows = useEmployeeStore((state) => state.selectedRows);
+  const setSelectedRows = useEmployeeStore((state) => state.setSelectedRows);
   const [currentData, setCurrentData] = useState<Employee[]>(data);
   const [pendingUpdates, setPendingUpdates] = useState<Record<string, Partial<Employee>>>({});
 

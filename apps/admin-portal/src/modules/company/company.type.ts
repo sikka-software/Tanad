@@ -1,6 +1,5 @@
 export interface Company {
   id: string;
-  created_at: string;
   name: string;
   email: string;
   phone?: string;
@@ -13,7 +12,10 @@ export interface Company {
   size?: string;
   notes?: string;
   is_active: boolean;
+
+  created_at: string;
   user_id: string;
 }
 
 export type CompanyCreateData = Omit<Company, "id" | "created_at"> & { user_id: string };
+export type CompanyUpdateData = Partial<Company>;

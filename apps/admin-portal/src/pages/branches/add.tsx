@@ -8,11 +8,11 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { BranchForm, type BranchFormValues } from "@/modules/branch/branch.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
+import { BranchForm, type BranchFormValues } from "@/modules/branch/branch.form";
 import { branchKeys } from "@/modules/branch/branch.hooks";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
@@ -24,58 +24,6 @@ export default function AddBranchPage() {
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useUserStore();
-
-  const handleSubmit = async (data: BranchFormValues) => {
-    setLoading(true);
-    try {
-      // Check if user ID is available
-      if (!user?.id) {
-        throw new Error(t("Branches.error.not_authenticated"));
-      }
-
-      const { data: newBranch, error } = await supabase
-        .from("branches")
-        .insert([
-          {
-            name: data.name.trim(),
-            code: data.code.trim(),
-            address: data.address.trim(),
-            city: data.city.trim(),
-            state: data.state.trim(),
-            zip_code: data.zip_code.trim(),
-            phone: data.phone?.trim() || null,
-            email: data.email?.trim() || null,
-            manager: data.manager?.trim() || null,
-            is_active: data.is_active,
-            notes: data.notes?.trim() || null,
-            user_id: user.id,
-          },
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Update the branches cache to include the new branch
-      const previousBranches = queryClient.getQueryData(branchKeys.lists()) || [];
-      queryClient.setQueryData(branchKeys.lists(), [
-        ...(Array.isArray(previousBranches) ? previousBranches : []),
-        newBranch,
-      ]);
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Branches.messages.success_created"),
-      });
-
-      router.push("/branches");
-    } catch (error) {
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Branches.messages.error_save"),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -99,12 +47,12 @@ export default function AddBranchPage() {
     <div>
       <CustomPageMeta title={t("Branches.add_new")} />
       <PageTitle
-        title={t("Branches.add_new")}
         formButtons
         formId="branch-form"
         loading={loading}
         onCancel={() => router.push("/branches")}
         texts={{
+          title: t("Branches.add_new"),
           submit_form: t("Branches.add_new"),
           cancel: t("General.cancel"),
         }}
@@ -118,7 +66,7 @@ export default function AddBranchPage() {
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <BranchForm id="branch-form" onSubmit={handleSubmit} loading={loading} />
+        <BranchForm id="branch-form" />
       </div>
     </div>
   );

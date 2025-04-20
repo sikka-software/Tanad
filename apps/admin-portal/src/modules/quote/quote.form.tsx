@@ -128,15 +128,15 @@ export function QuoteForm({
   });
 
   const items = form.watch("items") || [];
-  const taxRate = form.watch("tax_rate") || 0;
+  const tax_rate = form.watch("tax_rate") || 0;
 
   const subtotal = items.reduce((acc: number, item: QuoteItem) => {
     const quantity = parseFloat(item.quantity || "0");
-    const unitPrice = parseFloat(item.unit_price || "0");
-    return acc + quantity * unitPrice;
+    const unit_price = parseFloat(item.unit_price || "0");
+    return acc + quantity * unit_price;
   }, 0);
 
-  const tax = (subtotal * taxRate) / 100;
+  const tax = (subtotal * tax_rate) / 100;
   const total = subtotal + tax;
 
   useEffect(() => {
@@ -196,8 +196,8 @@ export function QuoteForm({
     const calculateSubtotal = () => {
       const subtotal = items.reduce((acc: number, item: QuoteItem) => {
         const quantity = parseFloat(item.quantity || "0");
-        const unitPrice = parseFloat(item.unit_price || "0");
-        return acc + quantity * unitPrice;
+        const unit_price = parseFloat(item.unit_price || "0");
+        return acc + quantity * unit_price;
       }, 0);
     };
 
@@ -259,8 +259,8 @@ export function QuoteForm({
   const calculateSubtotal = (items: QuoteItem[]) => {
     return items.reduce((acc: number, item: QuoteItem) => {
       const quantity = parseFloat(item.quantity) || 0;
-      const unitPrice = parseFloat(item.unit_price) || 0;
-      return acc + quantity * unitPrice;
+      const unit_price = parseFloat(item.unit_price) || 0;
+      return acc + quantity * unit_price;
     }, 0);
   };
 
@@ -325,7 +325,7 @@ export function QuoteForm({
         },
       },
       {
-        id: "unitPrice",
+        id: "unit_price",
         header: t("Quotes.products.unit_price"),
         cell: ({ row }: any) => {
           const index = row.index;
@@ -691,7 +691,7 @@ export function QuoteForm({
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
-        <ClientForm id="client-form" onSubmit={handleClientAdded} user_id={user_id} />
+        <ClientForm id="client-form" />
       </FormDialog>
     </>
   );

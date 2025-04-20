@@ -7,7 +7,6 @@ import {
   fetchWarehouses,
   updateWarehouse,
 } from "@/modules/warehouse/warehouse.service";
-
 import type { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
 
 // Query keys for warehouses
@@ -62,11 +61,11 @@ export function useUpdateWarehouse() {
   return useMutation({
     mutationFn: ({
       id,
-      warehouse,
+      data,
     }: {
       id: string;
-      warehouse: Partial<Omit<Warehouse, "id" | "created_at">>;
-    }) => updateWarehouse(id, warehouse),
+      data: Partial<Omit<Warehouse, "id" | "created_at">>;
+    }) => updateWarehouse(id, data),
     onSuccess: (data) => {
       // Invalidate both the specific detail and the list queries
       queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(data.id) });

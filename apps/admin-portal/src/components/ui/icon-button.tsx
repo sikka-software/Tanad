@@ -11,7 +11,7 @@ interface IconButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
 
 const IconButton = ({ icon, label, badge, ...props }: IconButtonProps) => {
   return (
-    <Tooltip>
+    <Tooltip delayDuration={400}>
       <TooltipTrigger>
         <Button
           variant="outline"

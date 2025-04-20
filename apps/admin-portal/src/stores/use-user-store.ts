@@ -137,6 +137,7 @@ const useUserStore = create<UserState>()(
                 loading: false,
                 initialized: true,
               });
+
             } catch (error) {
               console.error("[UserStore] Error fetching profile:", error);
               set({ loading: false, initialized: true });

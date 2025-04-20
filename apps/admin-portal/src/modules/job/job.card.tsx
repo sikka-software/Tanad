@@ -37,10 +37,10 @@ const JobCard = ({ job }: { job: Job }) => {
               <span>{job.location}</span>
             </div>
           )}
-          {job.startDate && (
+          {job.start_date && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <Calendar className="h-4 w-4" />
-              <span>Starts {format(new Date(job.startDate), "MMM dd, yyyy")}</span>
+              <span>Starts {format(new Date(job.start_date), "MMM dd, yyyy")}</span>
             </div>
           )}
           {job.salary && (

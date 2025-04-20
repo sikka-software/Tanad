@@ -12,18 +12,14 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import { Client, ClientCreateData, ClientUpdateData } from "@/modules/client/client.type";
 import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
-
 import { useCompanies } from "@/modules/company/company.hooks";
+import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
-interface ClientFormProps {
-  id?: string;
-  onSubmit: (data: ClientFormValues) => Promise<void>;
-  loading?: boolean;
-  user_id: string | undefined;
-  defaultValues?: Partial<ClientFormValues>;
-}
+import { useCreateClient, useUpdateClient } from "./client.hooks";
+import useClientStore from "./client.store";
 
 export const createClientSchema = (t: (key: string) => string) =>
   z.object({
@@ -33,7 +29,7 @@ export const createClientSchema = (t: (key: string) => string) =>
       .min(1, t("Clients.form.validation.email_required"))
       .email(t("Clients.form.validation.email_invalid")),
     phone: z.string().min(1, t("Clients.form.validation.phone_required")),
-    company: z.string().nullable(),
+    company: z.string().nullish(),
     address: z.string().min(1, t("Clients.form.validation.address_required")),
     city: z.string().min(1, t("Clients.form.validation.city_required")),
     state: z.string().min(1, t("Clients.form.validation.state_required")),
@@ -43,32 +39,44 @@ export const createClientSchema = (t: (key: string) => string) =>
 
 export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
 
+interface ClientFormProps {
+  id?: string;
+  onSuccess?: () => void;
+  loading?: boolean;
+  defaultValues?: ClientUpdateData | null;
+  editMode?: boolean;
+}
+
 export function ClientForm({
   id,
-  onSubmit,
+  onSuccess,
   loading = false,
-  user_id,
   defaultValues,
+  editMode = false,
 }: ClientFormProps) {
-  const supabase = createClient();
   const t = useTranslations();
   const { locale } = useRouter();
+  const { user } = useUserStore();
   const { data: companies, isLoading: companiesLoading } = useCompanies();
+  const { mutate: createClient } = useCreateClient();
+  const { mutate: updateClient } = useUpdateClient();
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
+
+  const isLoading = useClientStore((state) => state.isLoading);
+  const setIsLoading = useClientStore((state) => state.setIsLoading);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(createClientSchema(t)),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      company: null,
-      address: "",
-      city: "",
-      state: "",
-      zip_code: "",
-      notes: "",
-      ...defaultValues,
+      name: defaultValues?.name || "",
+      email: defaultValues?.email || "",
+      phone: defaultValues?.phone || "",
+      company: defaultValues?.company || undefined,
+      address: defaultValues?.address || "",
+      city: defaultValues?.city || "",
+      state: defaultValues?.state || "",
+      zip_code: defaultValues?.zip_code || "",
+      notes: defaultValues?.notes || "",
     },
   });
 
@@ -84,51 +92,116 @@ export function ClientForm({
       value: company.id,
     })) || [];
 
-  const handleCompanySubmit = async (data: CompanyFormValues) => {
-    try {
-      // Check if user ID is available
-      if (!user_id) {
-        throw new Error(t("error.not_authenticated"));
-      }
+  // const handleCompanySubmit = async (data: CompanyFormValues) => {
+  //   try {
+  //     // Check if user ID is available
+  //     if (!user_id) {
+  //       throw new Error(t("error.not_authenticated"));
+  //     }
 
-      const { data: newCompany, error } = await supabase
-        .from("companies")
-        .insert([
+  //     const { data: newCompany, error } = await supabase
+  //       .from("companies")
+  //       .insert([
+  //         {
+  //           name: data.name.trim(),
+  //           email: data.email.trim(),
+  //           phone: data.phone?.trim() || null,
+  //           website: data.website?.trim() || null,
+  //           address: data.address?.trim() || null,
+  //           city: data.city?.trim() || null,
+  //           state: data.state?.trim() || null,
+  //           zip_code: data.zip_code?.trim() || null,
+  //           industry: data.industry?.trim() || null,
+  //           size: data.size?.trim() || null,
+  //           notes: data.notes?.trim() || null,
+  //           is_active: data.is_active,
+  //           user_id: user_id,
+  //         },
+  //       ])
+  //       .select()
+  //       .single();
+
+  //     if (error) throw error;
+
+  //     // Set the new company as the selected company
+  //     form.setValue("company", newCompany.name);
+
+  //     // Close the dialog
+  //     setIsCompanyDialogOpen(false);
+
+  //     // Show success message
+  //     toast.success(t("General.successful_operation"), {
+  //       description: t("Companies.success.created"),
+  //     });
+  //   } catch (error) {
+  //     console.error("Error creating company:", error);
+  //     toast.error(t("General.error_operation"), {
+  //       description: error instanceof Error ? error.message : t("Companies.error.create"),
+  //     });
+  //   }
+  // };
+
+  const handleSubmit = async (data: ClientFormValues) => {
+    setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
+
+    try {
+      if (editMode) {
+        await updateClient(
+          {
+            id: defaultValues?.id || "",
+            client: {
+              name: data.name.trim(),
+              email: data.email.trim(),
+              phone: data.phone.trim(),
+              company: data.company || undefined,
+              address: data.address.trim(),
+              city: data.city.trim(),
+              state: data.state.trim(),
+              zip_code: data.zip_code.trim(),
+              notes: data.notes?.trim() || null,
+            },
+          },
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      } else {
+        await createClient(
           {
             name: data.name.trim(),
             email: data.email.trim(),
-            phone: data.phone?.trim() || null,
-            website: data.website?.trim() || null,
-            address: data.address?.trim() || null,
-            city: data.city?.trim() || null,
-            state: data.state?.trim() || null,
-            zip_code: data.zip_code?.trim() || null,
-            industry: data.industry?.trim() || null,
-            size: data.size?.trim() || null,
+            phone: data.phone.trim(),
+            company: data.company || undefined,
+            address: data.address.trim(),
+            city: data.city.trim(),
+            state: data.state.trim(),
+            zip_code: data.zip_code.trim(),
             notes: data.notes?.trim() || null,
-            is_active: data.is_active,
-            user_id: user_id,
           },
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Set the new company as the selected company
-      form.setValue("company", newCompany.name);
-
-      // Close the dialog
-      setIsCompanyDialogOpen(false);
-
-      // Show success message
-      toast.success(t("General.successful_operation"), {
-        description: t("Companies.success.created"),
-      });
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      }
     } catch (error) {
-      console.error("Error creating company:", error);
+      setIsLoading(false);
+      console.error("Failed to save company:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Companies.error.create"),
+        description: error instanceof Error ? error.message : t("Companies.error.creating"),
       });
     }
   };
@@ -136,7 +209,11 @@ export function ClientForm({
   return (
     <>
       <Form {...form}>
-        <form id={id || "client-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          id={id || "client-form"}
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
             <FormField
               control={form.control}
@@ -302,7 +379,7 @@ export function ClientForm({
         title={t("Companies.add_new")}
         formId="company-form"
       >
-        <CompanyForm id="company-form" onSubmit={handleCompanySubmit} />
+        <CompanyForm id="company-form" onSuccess={() => setIsCompanyDialogOpen(false)} />
       </FormDialog>
     </>
   );

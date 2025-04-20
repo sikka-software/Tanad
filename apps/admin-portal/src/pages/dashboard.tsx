@@ -197,7 +197,13 @@ export default function Dashboard() {
     return (
       <div>
         <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
-        <PageTitle title={t("Dashboard.title")} />
+        <PageTitle
+          texts={{
+            title: t("Dashboard.title"),
+            submit_form: t("Dashboard.title"),
+            cancel: t("General.cancel"),
+          }}
+        />
         <div className="p-4">
           <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
         </div>
@@ -209,7 +215,11 @@ export default function Dashboard() {
     <div>
       <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
       <PageTitle
-        title={t("Dashboard.title")}
+        texts={{
+          title: t("Dashboard.title"),
+          submit_form: t("Dashboard.title"),
+          cancel: t("General.cancel"),
+        }}
         customButton={
           <div className="flex items-center">
             <Combobox

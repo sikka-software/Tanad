@@ -7,8 +7,10 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useJobsStore } from "@/modules/job/job.store";
+import useJobsStore from "@/modules/job/job.store";
 import { Job } from "@/modules/job/job.type";
+
+import { useUpdateJob } from "./job.hooks";
 
 const titleSchema = z.string().min(1, "Required");
 const typeSchema = z.string().min(1, "Required");
@@ -21,11 +23,12 @@ interface JobTableProps {
   data: Job[];
   isLoading?: boolean;
   error?: Error | null;
+  onActionClicked: (action: string, rowId: string) => void;
 }
 
-const JobTable = ({ data, isLoading, error }: JobTableProps) => {
+const JobTable = ({ data, isLoading, error, onActionClicked }: JobTableProps) => {
   const t = useTranslations();
-  const updateJob = useJobsStore((state) => state.updateJob);
+  const { mutateAsync: updateJob } = useUpdateJob();
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const selectedRows = useJobsStore((state) => state.selectedRows);
 
@@ -68,7 +71,7 @@ const JobTable = ({ data, isLoading, error }: JobTableProps) => {
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateJob(rowId, { [columnId]: value });
+    await updateJob({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = (rows: Job[]) => {
@@ -117,6 +120,8 @@ const JobTable = ({ data, isLoading, error }: JobTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      onActionClicked={onActionClicked}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={jobTableOptions}
     />

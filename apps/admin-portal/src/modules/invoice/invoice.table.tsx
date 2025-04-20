@@ -9,12 +9,14 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useInvoiceStore } from "@/modules/invoice/invoice.store";
+import useInvoiceStore from "@/modules/invoice/invoice.store";
 import { Invoice } from "@/modules/invoice/invoice.type";
 
-const invoiceNumberSchema = z.string().min(1, "Required");
-const issueDateSchema = z.date();
-const dueDateSchema = z.date();
+import { useUpdateInvoice } from "./invoice.hooks";
+
+const invoice_numberSchema = z.string().min(1, "Required");
+const issue_dateSchema = z.date();
+const due_dateSchema = z.date();
 const totalSchema = z.number().min(0, "Must be >= 0");
 const statusSchema = z.enum(["paid", "pending", "overdue"]);
 
@@ -26,7 +28,7 @@ interface InvoicesTableProps {
 
 const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
   const t = useTranslations("Invoices");
-  const { updateInvoice } = useInvoiceStore();
+  const { mutateAsync: updateInvoice } = useUpdateInvoice();
   const selectedRows = useInvoiceStore((state) => state.selectedRows);
   const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
 
@@ -34,9 +36,9 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
 
   const columns: ExtendedColumnDef<Invoice>[] = [
     {
-      accessorKey: "invoiceNumber",
+      accessorKey: "invoice_number",
       header: t("form.invoice_number.label"),
-      validationSchema: invoiceNumberSchema,
+      validationSchema: invoice_numberSchema,
     },
     {
       accessorKey: "client.company",
@@ -44,16 +46,16 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
       cell: ({ row }) => row.original.client?.company || "N/A",
     },
     {
-      accessorKey: "issueDate",
+      accessorKey: "issue_date",
       header: t("form.issue_date.label"),
-      validationSchema: issueDateSchema,
-      cell: ({ row }) => format(new Date(row.original.issueDate), "MMM dd, yyyy"),
+      validationSchema: issue_dateSchema,
+      cell: ({ row }) => format(new Date(row.original.issue_date), "MMM dd, yyyy"),
     },
     {
-      accessorKey: "dueDate",
+      accessorKey: "due_date",
       header: t("form.due_date.label"),
-      validationSchema: dueDateSchema,
-      cell: ({ row }) => format(new Date(row.original.dueDate), "MMM dd, yyyy"),
+      validationSchema: due_dateSchema,
+      cell: ({ row }) => format(new Date(row.original.due_date), "MMM dd, yyyy"),
     },
     {
       accessorKey: "total",
@@ -85,10 +87,10 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     let processedValue = value;
-    if (columnId === "issueDate" || columnId === "dueDate") {
+    if (columnId === "issue_date" || columnId === "due_date") {
       processedValue = new Date(value as string).toISOString();
     }
-    await updateInvoice(rowId, { [columnId]: processedValue });
+    await updateInvoice({ id: rowId, data: { [columnId]: processedValue } });
   };
 
   const handleRowSelectionChange = (rows: Invoice[]) => {

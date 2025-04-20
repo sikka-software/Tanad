@@ -5,8 +5,8 @@ export interface EmployeeRequest {
   status: "pending" | "approved" | "rejected";
   title: string;
   description?: string;
-  startDate?: string;
-  endDate?: string;
+  start_date?: string;
+  end_date?: string;
   amount?: number;
   attachments?: string[];
   notes?: string;

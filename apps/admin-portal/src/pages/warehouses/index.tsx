@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
+import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -10,10 +11,11 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import WarehouseCard from "@/modules/warehouse/warehouse.card";
 import { useBulkDeleteWarehouses, useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/warehouse/warehouse.options";
-import { useWarehouseStore } from "@/modules/warehouse/warehouse.store";
+import useWarehouseStore from "@/modules/warehouse/warehouse.store";
 import WarehouseTable from "@/modules/warehouse/warehouse.table";
 
 export default function WarehousesPage() {
@@ -31,11 +33,22 @@ export default function WarehousesPage() {
   const searchQuery = useWarehouseStore((state) => state.searchQuery);
   const filterConditions = useWarehouseStore((state) => state.filterConditions);
   const filterCaseSensitive = useWarehouseStore((state) => state.filterCaseSensitive);
-  const getFilteredWarehouses = useWarehouseStore((state) => state.getFilteredWarehouses);
-  const getSortedWarehouses = useWarehouseStore((state) => state.getSortedWarehouses);
+  const getFilteredWarehouses = useWarehouseStore((state) => state.getFilteredData);
+  const getSortedWarehouses = useWarehouseStore((state) => state.getSortedData);
 
   const { data: warehouses, isLoading, error } = useWarehouses();
-  const { mutate: deleteItems, isPending: isDeleting } = useBulkDeleteWarehouses();
+  const { mutateAsync: deleteWarehouses, isPending: isDeleting } = useBulkDeleteWarehouses();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteWarehouses, {
+    loading: "Warehouses.loading.deleting",
+    success: "Warehouses.success.deleted",
+    error: "Warehouses.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredWarehouses = useMemo(() => {
     return getFilteredWarehouses(warehouses || []);
@@ -44,17 +57,6 @@ export default function WarehousesPage() {
   const sortedWarehouses = useMemo(() => {
     return getSortedWarehouses(filteredWarehouses);
   }, [filteredWarehouses, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteItems(selectedRows);
-      clearSelection();
-    } catch (error) {
-      console.error("Error deleting warehouses:", error);
-    } finally {
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -104,7 +106,7 @@ export default function WarehousesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Warehouses.confirm_delete")}
           description={t("Warehouses.delete_description", { count: selectedRows.length })}
         />

@@ -11,7 +11,7 @@ function convertInvoice(invoice: typeof invoices.$inferSelect) {
     ...invoice,
     subtotal: Number(invoice.subtotal),
     total: Number(invoice.total),
-    taxRate: invoice.taxRate ? Number(invoice.taxRate) : null,
+    tax_rate: invoice.tax_rate ? Number(invoice.tax_rate) : null,
   };
 }
 

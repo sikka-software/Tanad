@@ -7,6 +7,8 @@
     "share": "Share",
     "save": "Save",
     "add": "Add",
+    "unauthorized": "Unauthorized",
+    "must_be_logged_in": "You must be logged in to perform this action",
     "sidebar_search": "Search for a page",
     "saving": "Saving...",
     "saved": "Saved",
@@ -2174,7 +2176,62 @@
     }
   },
   "Expenses": {
-    "title": "Expenses"
+    "title": "Expenses",
+    "description": "Manage and track expenses",
+    "add_new": "Add New Expense",
+    "search_expenses": "Search expenses",
+    "no_expenses_found": "No expenses found",
+    "confirm_delete_title": "Confirm Delete Expenses",
+    "confirm_delete": "Are you sure you want to delete {count} expense(s)?",
+    "success": {
+      "created": "Expense created successfully"
+    },
+    "error": {
+      "creating": "Error creating expense",
+      "bulk_delete": "Error deleting expenses"
+    },
+    "form": {
+      "expense_number": {
+        "label": "Expense Number",
+        "placeholder": "Enter expense number",
+        "required": "Expense number is required"
+      },
+      "issue_date": {
+        "label": "Issue Date",
+        "placeholder": "Select issue date",
+        "required": "Issue date is required"
+      },
+      "due_date": {
+        "label": "Due Date",
+        "placeholder": "Select due date",
+        "required": "Due date is required"
+      },
+      "amount": {
+        "label": "Amount",
+        "placeholder": "Enter amount",
+        "required": "Amount is required"
+      },
+      "category": {
+        "label": "Category",
+        "placeholder": "Select category",
+        "required": "Category is required"
+      },
+      "client": {
+        "label": "Client",
+        "placeholder": "Select client"
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Select status",
+        "pending": "Pending",
+        "paid": "Paid",
+        "overdue": "Overdue"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter additional notes"
+      }
+    }
   },
   "Leave": {
     "title": "Leave"

@@ -13,10 +13,8 @@ import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
 import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
-
-import { fetchVendorById } from "@/modules/vendor/vendor.service";
-
 import { useCompanies } from "@/modules/company/company.hooks";
+import { fetchVendorById } from "@/modules/vendor/vendor.service";
 import { createClient } from "@/utils/supabase/component";
 
 export const createVendorSchema = (t: (key: string) => string) =>
@@ -363,7 +361,7 @@ export function VendorForm({
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
-        <CompanyForm id="company-form" onSubmit={handleCompanySubmit} loading={loading} />
+        <CompanyForm id="company-form" />
       </FormDialog>
     </>
   );

@@ -1,73 +1,22 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { ClientForm, type ClientFormValues } from "@/modules/client/client.form";
-import { clientKeys } from "@/modules/client/client.hooks";
-import { createClient } from "@/modules/client/client.service";
-import { Client, ClientCreateData } from "@/modules/client/client.type";
-import useUserStore from "@/stores/use-user-store";
+import { ClientForm } from "@/modules/client/client.form";
+import useClientStore from "@/modules/client/client.store";
 
 export default function AddClientPage() {
   const router = useRouter();
   const t = useTranslations();
-  const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
-
-  const handleSubmit = async (data: ClientFormValues) => {
-    setLoading(true);
-    try {
-      const clientData = {
-        name: data.name.trim(),
-        email: data.email.trim(),
-        phone: data.phone.trim(),
-        company: data.company || null,
-        address: data.address.trim(),
-        city: data.city.trim(),
-        state: data.state.trim(),
-        zip_code: data.zip_code.trim(),
-        notes: data.notes?.trim() || null,
-      };
-
-      let result: Client;
-
-      const clientCreateData = {
-        ...clientData,
-        user_id: user?.id,
-      };
-
-      result = await createClient(clientCreateData as ClientCreateData);
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Clients.success.created"),
-      });
-
-      const previousClients = queryClient.getQueryData(clientKeys.lists()) || [];
-      queryClient.setQueryData(clientKeys.lists(), [
-        ...(Array.isArray(previousClients) ? previousClients : []),
-        result,
-      ]);
-
-      router.push("/clients");
-    } catch (error) {
-      console.error("Failed to save client:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Clients.error.create"),
-      });
-      setLoading(false);
-    }
-  };
+  const setIsLoading = useClientStore((state) => state.setIsLoading);
+  const isLoading = useClientStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -83,30 +32,32 @@ export default function AddClientPage() {
     }
   };
 
+  const onAddSuccess = () => {
+    toast.success(t("General.successful_operation"), {
+      description: t("Clients.success.created"),
+    });
+    router.push("/clients");
+    setIsLoading(false);
+  };
+
   return (
     <div>
       <CustomPageMeta title={t("Clients.add_new")} />
       <PageTitle
-        title={t("Clients.add_new")}
         formButtons
         formId="client-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/clients")}
+        dummyButton={handleDummyData}
         texts={{
+          title: t("Clients.add_new"),
           submit_form: t("Clients.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <ClientForm id="client-form" user_id={user?.id} onSubmit={handleSubmit} loading={loading} />
+        <ClientForm id="client-form" loading={isLoading} onSuccess={onAddSuccess} />
       </div>
     </div>
   );

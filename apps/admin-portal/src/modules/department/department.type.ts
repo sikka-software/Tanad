@@ -10,8 +10,8 @@ export type Department = {
 export type DepartmentLocation = {
   id: string;
   department_id: string;
-  locationType: "office" | "branch" | "warehouse";
-  locationId: string;
+  location_type: "office" | "branch" | "warehouse";
+  location_id: string;
   created_at: string;
 };
 

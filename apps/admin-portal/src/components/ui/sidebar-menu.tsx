@@ -1,19 +1,17 @@
 "use client";
 
-import React from "react";
-
+import { ChevronRight, Plus } from "lucide-react";
+import { motion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
-import { ChevronRight, Plus } from "lucide-react";
-import { motion } from "motion/react";
+import React from "react";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/animate-ui/radix-collapsible";
+} from "@/components/ui/radix-collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -26,6 +24,7 @@ import {
   SidebarMenuAction,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+
 import { SidebarMenuGroupProps } from "@/lib/sidebar-list";
 import { cn } from "@/lib/utils";
 
@@ -141,7 +140,7 @@ const NonCollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][numb
   return (
     <SidebarMenuItem>
       <Link href={item.url}>
-        <SidebarMenuButton tooltip={t(item.translationKey)} className="text-sidebar-foreground/70">
+        <SidebarMenuButton tooltip={t(item.translationKey)}>
           {item.icon && <item.icon />}
           <span>{t(item.translationKey)}</span>
         </SidebarMenuButton>

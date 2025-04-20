@@ -11,10 +11,11 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import InvoiceCard from "@/modules/invoice/invoice.card";
 import { useInvoices, useBulkDeleteInvoices } from "@/modules/invoice/invoice.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/invoice/invoice.options";
-import { useInvoiceStore } from "@/modules/invoice/invoice.store";
+import useInvoiceStore from "@/modules/invoice/invoice.store";
 import InvoicesTable from "@/modules/invoice/invoice.table";
 
 export default function InvoicesPage() {
@@ -32,11 +33,22 @@ export default function InvoicesPage() {
   const searchQuery = useInvoiceStore((state) => state.searchQuery);
   const filterConditions = useInvoiceStore((state) => state.filterConditions);
   const filterCaseSensitive = useInvoiceStore((state) => state.filterCaseSensitive);
-  const getFilteredInvoices = useInvoiceStore((state) => state.getFilteredInvoices);
-  const getSortedInvoices = useInvoiceStore((state) => state.getSortedInvoices);
+  const getFilteredInvoices = useInvoiceStore((state) => state.getFilteredData);
+  const getSortedInvoices = useInvoiceStore((state) => state.getSortedData);
 
   const { data: invoices, isLoading, error } = useInvoices();
-  const { mutate: deleteInvoices, isPending: isDeleting } = useBulkDeleteInvoices();
+  const { mutateAsync: deleteInvoices, isPending: isDeleting } = useBulkDeleteInvoices();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteInvoices, {
+    loading: "Invoices.loading.deleting",
+    success: "Invoices.success.deleted",
+    error: "Invoices.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredInvoices = useMemo(() => {
     return getFilteredInvoices(invoices || []);
@@ -45,25 +57,6 @@ export default function InvoicesPage() {
   const sortedInvoices = useMemo(() => {
     return getSortedInvoices(filteredInvoices);
   }, [filteredInvoices, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteInvoices(selectedRows, {
-        onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
-        },
-        onError: (error: any) => {
-          console.error("Failed to delete invoices:", error);
-          toast.error(t("Invoices.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
-        },
-      });
-    } catch (error) {
-      console.error("Failed to delete invoices:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -114,7 +107,7 @@ export default function InvoicesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Invoices.delete.title")}
           description={t("Invoices.delete.description", { count: selectedRows.length })}
         />

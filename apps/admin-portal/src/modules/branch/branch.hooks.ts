@@ -7,8 +7,8 @@ import {
   fetchBranches,
   updateBranch,
   bulkDeleteBranches,
+  duplicateBranch,
 } from "@/modules/branch/branch.service";
-
 import type { Branch, BranchCreateData } from "@/modules/branch/branch.type";
 
 // Query keys for branches
@@ -61,17 +61,21 @@ export function useCreateBranch() {
 // Hook for updating an existing branch
 export function useUpdateBranch() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: ({
-      id,
-      branch,
-    }: {
-      id: string;
-      branch: Partial<Omit<Branch, "id" | "created_at">>;
-    }) => updateBranch(id, branch),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Branch> }) => updateBranch(id, data),
     onSuccess: (data) => {
-      // Invalidate both the specific detail and the list queries
+      queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+    },
+  });
+}
+
+// Hook for duplicating a branch
+export function useDuplicateBranch() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateBranch(id),
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
     },

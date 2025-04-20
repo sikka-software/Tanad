@@ -1,9 +1,13 @@
+import { cva } from "class-variance-authority";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { cva } from "class-variance-authority";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+export function generateId() {
+  return Math.random().toString(36).substring(2, 15);
 }
 
 export const navigationMenuTriggerStyle = cva(

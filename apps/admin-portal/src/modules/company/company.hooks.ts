@@ -7,9 +7,9 @@ import {
   fetchCompanyById,
   fetchCompanies,
   updateCompany,
+  duplicateCompany,
 } from "@/modules/company/company.service";
-
-import type { Company, CompanyCreateData } from "@/modules/company/company.type";
+import type { Company, CompanyCreateData, CompanyUpdateData } from "@/modules/company/company.type";
 
 // Query keys for companies
 export const companyKeys = {
@@ -41,16 +41,13 @@ export function useCompany(id: string) {
 export function useCreateCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newCompany: Omit<Company, "id" | "created_at"> & { user_id: string }) => {
-      const { user_id, ...rest } = newCompany;
-      const companyData: CompanyCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createCompany(companyData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
+    mutationFn: (company: CompanyCreateData) => createCompany(company),
+    onSuccess: (newCompany: Company) => {
+      const previousCompanies = queryClient.getQueryData(companyKeys.lists()) || [];
+      queryClient.setQueryData(companyKeys.lists(), [
+        ...(Array.isArray(previousCompanies) ? previousCompanies : []),
+        newCompany,
+      ]);
     },
   });
 }
@@ -59,7 +56,19 @@ export function useCreateCompany() {
 export function useUpdateCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Company> }) => updateCompany(id, data),
+    mutationFn: ({ id, data }: { id: string; data: CompanyUpdateData }) => updateCompany(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: companyKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
+    },
+  });
+}
+
+// Hook to duplicate a company
+export function useDuplicateCompany() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateCompany(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: companyKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: companyKeys.lists() });

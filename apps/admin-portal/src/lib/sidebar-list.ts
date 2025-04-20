@@ -8,6 +8,7 @@ import {
   CreditCard,
   Briefcase,
   MapPin,
+  SaudiRiyal,
 } from "lucide-react";
 
 export type SidebarMenuGroupProps = {
@@ -51,6 +52,49 @@ type Group = {
   groupLabelTranslationKey?: string;
   icon: LucideIcon;
   menus: Menu[];
+};
+
+type SimplifiedMenuItem = {
+  title: string;
+  items?: SimplifiedMenuItem[];
+};
+
+type SimplifiedMenu = {
+  group: string;
+  items: SimplifiedMenuItem[];
+};
+
+let simplifiedMenu: SimplifiedMenu = {
+  group: "Administration",
+  items: [
+    { title: "Dashboard" },
+    { title: "Analytics" },
+    {
+      title: "Contacts",
+      items: [
+        { title: "All Contacts" },
+        { title: "Companies" },
+        { title: "Clients" },
+        { title: "Vendors" },
+      ],
+    },
+    {
+      title: "Locations",
+      items: [{ title: "Offices" }, { title: "Warehouses" }, { title: "Branches" }],
+    },
+    {
+      title: "Sales",
+      items: [{ title: "Products" }, { title: "Invoices" }, { title: "Quotes" }],
+    },
+    {
+      title: "Human Resources",
+      items: [{ title: "Employees" }, { title: "Departments" }, { title: "Salaries" }],
+    },
+    {
+      title: "Settings",
+      items: [{ title: "Users" }, { title: "Billing" }, { title: "Settings" }],
+    },
+  ],
 };
 
 // Main menu items
@@ -147,16 +191,9 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
       title: "Sales",
       translationKey: "Sales.title",
       url: "",
-      icon: Package,
+      icon: SaudiRiyal,
       is_active: pathname.startsWith("/products"),
       items: [
-        {
-          title: "Products",
-          translationKey: "Products.title",
-          is_active: pathname.startsWith("/products"),
-          url: "/products",
-          action: "/products/add",
-        },
         {
           title: "Invoices",
           translationKey: "Invoices.title",
@@ -170,6 +207,43 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
           is_active: pathname.startsWith("/quotes"),
           url: "/quotes",
           action: "/quotes/add",
+        },
+        {
+          title: "Expenses",
+          translationKey: "Expenses.title",
+          is_active: pathname.startsWith("/expenses"),
+          url: "/expenses",
+          action: "/expenses/add",
+        },
+      ],
+    },
+    {
+      title: "Storage",
+      translationKey: "Storage.title",
+      url: "",
+      icon: Package,
+      is_active: pathname.startsWith("/products"),
+      items: [
+        {
+          title: "Purchases",
+          translationKey: "Purchases.title",
+          is_active: pathname.startsWith("/purchases"),
+          url: "/purchases",
+          action: "/purchases/add",
+        },
+        {
+          title: "Products",
+          translationKey: "Products.title",
+          is_active: pathname.startsWith("/products"),
+          url: "/products",
+          action: "/products/add",
+        },
+        {
+          title: "Warehouses",
+          translationKey: "Warehouses.title",
+          is_active: pathname.startsWith("/warehouses"),
+          url: "/warehouses",
+          action: "/warehouses/add",
         },
       ],
     },
@@ -354,3 +428,63 @@ export function applyCustomMenuOrder(
 
   return resultMenu;
 }
+
+// Mapper function to convert simplified menu to the existing format
+function mapSimplifiedMenuToSidebarMenu(
+  menu: SimplifiedMenu,
+  pathname: string = "",
+): Record<string, SidebarMenuGroupProps["items"]> {
+  const getIcon = (title: string): LucideIcon => {
+    const iconMap: Record<string, LucideIcon> = {
+      Dashboard: LayoutDashboard,
+      Analytics: BarChart,
+      Contacts: Users,
+      Locations: MapPin,
+      Sales: Package,
+      "Human Resources": Users,
+      Settings: Settings,
+      Billing: CreditCard,
+    };
+    return iconMap[title] || Users; // Default to Users icon if not found
+  };
+
+  const mapMenuItem = (
+    item: SimplifiedMenuItem,
+    parentUrl: string = "",
+  ): SidebarMenuGroupProps["items"][0] => {
+    const baseUrl = parentUrl || `/${item.title.toLowerCase().replace(/\s+/g, "-")}`;
+    const mappedItem = {
+      title: item.title,
+      translationKey: `${item.title.replace(/\s+/g, "")}.title`,
+      url: baseUrl,
+      icon: getIcon(item.title),
+      is_active: pathname.startsWith(baseUrl),
+    };
+
+    if (item.items) {
+      return {
+        ...mappedItem,
+        items: item.items.map((subItem) => ({
+          title: subItem.title,
+          translationKey: `${subItem.title.replace(/\s+/g, "")}.title`,
+          url: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`,
+          action: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}/add`,
+          is_active: pathname.startsWith(
+            `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`,
+          ),
+        })),
+      };
+    }
+
+    return mappedItem;
+  };
+
+  const result: Record<string, SidebarMenuGroupProps["items"]> = {
+    [menu.group]: menu.items.map((item) => mapMenuItem(item)),
+  };
+
+  return result;
+}
+
+// Example usage:
+// const mappedMenu = mapSimplifiedMenuToSidebarMenu(simplifiedMenu);

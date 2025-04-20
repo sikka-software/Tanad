@@ -87,13 +87,13 @@ export const invoices = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
-    invoiceNumber: text("invoice_number").notNull(),
-    issueDate: date("issue_date").notNull(),
-    dueDate: date("due_date").notNull(),
+    invoice_number: text("invoice_number").notNull(),
+    issue_date: date("issue_date").notNull(),
+    due_date: date("due_date").notNull(),
     status: text("status").$type<"paid" | "pending" | "overdue">().notNull(),
     subtotal: numeric("subtotal", { precision: 10, scale: 2 }).default("0").notNull(),
-    taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
-    taxAmount: numeric("tax_amount", {
+    tax_rate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
+    tax_amount: numeric("tax_amount", {
       precision: 10,
       scale: 2,
     }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
@@ -137,7 +137,7 @@ export const invoiceItems = pgTable(
     }).default(sql`timezone('utc'::text, now())`),
     description: text().notNull(),
     quantity: numeric({ precision: 10, scale: 2 }).default("1").notNull(),
-    unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
+    unit_price: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
     amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
     invoice_id: uuid("invoice_id").notNull(),
     product_id: uuid("product_id"),
@@ -166,13 +166,13 @@ export const quotes = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
-    quoteNumber: text("quote_number").notNull(),
-    issueDate: date("issue_date").notNull(),
-    expiryDate: date("expiry_date").notNull(),
+    quote_number: text("quote_number").notNull(),
+    issue_date: date("issue_date").notNull(),
+    expiry_date: date("expiry_date").notNull(),
     status: text().default("draft").notNull(),
     subtotal: numeric("subtotal", { precision: 10, scale: 2 }).default("0").notNull(),
-    taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
-    taxAmount: numeric("tax_amount", {
+    tax_rate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
+    tax_amount: numeric("tax_amount", {
       precision: 10,
       scale: 2,
     }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
@@ -213,18 +213,18 @@ export const quoteItems = pgTable(
     }).default(sql`timezone('utc'::text, now())`),
     description: text().notNull(),
     quantity: numeric({ precision: 10, scale: 2 }).default("1").notNull(),
-    unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
+    unit_price: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
     amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
-    quoteId: uuid("quote_id").notNull(),
+    quote_id: uuid("quote_id").notNull(),
     product_id: uuid("product_id"),
   },
   (table) => [
     index("quote_items_quote_id_idx").using(
       "btree",
-      table.quoteId.asc().nullsLast().op("uuid_ops"),
+      table.quote_id.asc().nullsLast().op("uuid_ops"),
     ),
     foreignKey({
-      columns: [table.quoteId],
+      columns: [table.quote_id],
       foreignColumns: [quotes.id],
       name: "quote_items_quote_id_fkey",
     }).onDelete("cascade"),
@@ -289,14 +289,14 @@ export const expenses = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
-    expenseNumber: text("expense_number").notNull(),
-    issueDate: date("issue_date").notNull(),
-    dueDate: date("due_date").notNull(),
+    expense_number: text("expense_number").notNull(),
+    issue_date: date("issue_date").notNull(),
+    due_date: date("due_date").notNull(),
     status: text().default("pending").notNull(),
     amount: numeric({ precision: 10, scale: 2 }).notNull(),
     category: text("category").notNull(),
     notes: text(),
-    client_id: uuid("client_id").notNull(),
+    client_id: uuid("client_id"),
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
@@ -363,21 +363,21 @@ export const salaries = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
-    payPeriodStart: date("pay_period_start").notNull(),
-    payPeriodEnd: date("pay_period_end").notNull(),
-    paymentDate: date("payment_date").notNull(),
-    grossAmount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
-    netAmount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
+    pay_period_start: date("pay_period_start").notNull(),
+    pay_period_end: date("pay_period_end").notNull(),
+    payment_date: date("payment_date").notNull(),
+    gross_amount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
+    net_amount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
     deductions: jsonb("deductions"),
     notes: text(),
-    employeeName: text("employee_name").notNull(),
+    employee_name: text("employee_name").notNull(),
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    index("salaries_payment_date_idx").using("btree", table.paymentDate.asc().nullsLast()),
+    index("salaries_payment_date_idx").using("btree", table.payment_date.asc().nullsLast()),
     index("salaries_employee_name_idx").using(
       "btree",
-      table.employeeName.asc().nullsLast().op("text_ops"),
+      table.employee_name.asc().nullsLast().op("text_ops"),
     ),
     index("salaries_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
   ],
@@ -425,7 +425,7 @@ export const branches = pgTable(
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
     name: text().notNull(),
-    code: text().notNull(),
+    code: text(),
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
@@ -457,8 +457,8 @@ export const jobs = pgTable(
     type: varchar("type", { length: 50 }).notNull(), // Full-time, Part-time, Contract, etc.
     salary: numeric("salary", { precision: 10, scale: 2 }),
     is_active: boolean("is_active").default(true).notNull(),
-    startDate: date("start_date"),
-    endDate: date("end_date"),
+    start_date: date("start_date"),
+    end_date: date("end_date"),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
@@ -484,7 +484,7 @@ export const templates = pgTable(
     name: text().notNull(),
     type: text("type").$type<"invoice" | "quote">().notNull(),
     content: jsonb("content").notNull(), // Store the template content as JSON
-    isDefault: boolean("is_default").default(false).notNull(),
+    is_default: boolean("is_default").default(false).notNull(),
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
@@ -532,8 +532,8 @@ export const employeeRequests = pgTable(
       .default("pending"),
     title: text("title").notNull(),
     description: text("description"),
-    startDate: date("start_date"),
-    endDate: date("end_date"),
+    start_date: date("start_date"),
+    end_date: date("end_date"),
     amount: numeric("amount", { precision: 10, scale: 2 }),
     attachments: jsonb("attachments").default([]),
     notes: text("notes"),
@@ -654,8 +654,8 @@ export const departmentLocations = pgTable(
     department_id: uuid("department_id")
       .notNull()
       .references(() => departments.id, { onDelete: "cascade" }),
-    locationType: text("location_type").$type<"office" | "branch" | "warehouse">().notNull(),
-    locationId: uuid("location_id").notNull(),
+    location_type: text("location_type").$type<"office" | "branch" | "warehouse">().notNull(),
+    location_id: uuid("location_id").notNull(),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
@@ -665,11 +665,76 @@ export const departmentLocations = pgTable(
     ),
     index("department_locations_location_id_idx").using(
       "btree",
-      table.locationId.asc().nullsLast().op("uuid_ops"),
+      table.location_id.asc().nullsLast().op("uuid_ops"),
     ),
     check(
       "department_locations_type_check",
       sql`location_type = ANY (ARRAY['office'::text, 'branch'::text, 'warehouse'::text])`,
+    ),
+  ],
+).enableRLS();
+
+export const documents = pgTable(
+  "documents",
+  {
+    id: uuid()
+      .default(sql`gen_random_uuid()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text("name").notNull(),
+    url: text("url").notNull(),
+    file_path: text("file_path").notNull(),
+    entity_id: uuid("entity_id").notNull(),
+    entity_type: text("entity_type")
+      .$type<
+        | "company"
+        | "expense"
+        | "salary"
+        | "employee"
+        | "invoice"
+        | "quote"
+        | "vendor"
+        | "warehouse"
+        | "branch"
+        | "office"
+        | "department"
+      >()
+      .notNull(),
+    user_id: uuid("user_id").notNull(),
+  },
+  (table) => [
+    index("documents_entity_id_idx").using(
+      "btree",
+      table.entity_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("documents_entity_type_idx").using(
+      "btree",
+      table.entity_type.asc().nullsLast().op("text_ops"),
+    ),
+    index("documents_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    check(
+      "documents_entity_type_check",
+      sql`entity_type = ANY (ARRAY[
+        'company'::text,
+        'expense'::text,
+        'salary'::text,
+        'employee'::text,
+        'invoice'::text,
+        'quote'::text,
+        'vendor'::text,
+        'warehouse'::text,
+        'branch'::text,
+        'office'::text,
+        'department'::text
+      ])`,
     ),
   ],
 ).enableRLS();

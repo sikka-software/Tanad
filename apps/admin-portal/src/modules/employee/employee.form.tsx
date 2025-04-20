@@ -16,7 +16,7 @@ import { Textarea } from "@/ui/textarea";
 
 import DepartmentForm, { DepartmentFormValues } from "@/modules/department/department.form";
 import { useDepartments, departmentKeys } from "@/modules/department/department.hooks";
-import { useEmployeesStore } from "@/modules/employee/employee.store";
+import useEmployeeStore from "@/modules/employee/employee.store";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -73,7 +73,8 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
   const { user } = useUserStore();
   const locale = useLocale();
   const queryClient = useQueryClient();
-  const { setLoadingSave, loadingSave } = useEmployeesStore();
+  const setLoadingSave = useEmployeeStore((state) => state.setIsLoading);
+  const loadingSave = useEmployeeStore((state) => state.isLoading);
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(createEmployeeFormSchema(t)),
@@ -122,9 +123,9 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
 
       // Then create the department locations
       if (data.locations && data.locations.length > 0) {
-        const locationInserts = data.locations.map((locationId) => ({
+        const locationInserts = data.locations.map((location_id) => ({
           department_id: newDepartment.id,
-          location_id: locationId,
+          location_id: location_id,
           location_type: "office", // Default to office type
         }));
 
@@ -200,7 +201,11 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                 <FormItem>
                   <FormLabel>{t("Employees.form.first_name.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("Employees.form.first_name.placeholder")} {...field} />
+                    <Input
+                      placeholder={t("Employees.form.first_name.placeholder")}
+                      disabled={loadingSave}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -214,7 +219,11 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                 <FormItem>
                   <FormLabel>{t("Employees.form.last_name.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("Employees.form.last_name.placeholder")} {...field} />
+                    <Input
+                      placeholder={t("Employees.form.last_name.placeholder")}
+                      disabled={loadingSave}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -233,6 +242,7 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                     <Input
                       type="email"
                       placeholder={t("Employees.form.email.placeholder")}
+                      disabled={loadingSave}
                       {...field}
                     />
                   </FormControl>
@@ -251,6 +261,7 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                     <Input
                       type="tel"
                       placeholder={t("Employees.form.phone.placeholder")}
+                      disabled={loadingSave}
                       {...field}
                     />
                   </FormControl>
@@ -268,7 +279,11 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                 <FormItem>
                   <FormLabel>{t("Employees.form.position.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("Employees.form.position.placeholder")} {...field} />
+                    <Input
+                      placeholder={t("Employees.form.position.placeholder")}
+                      disabled={loadingSave}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -315,6 +330,7 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                       date={field.value}
                       onSelect={field.onChange}
                       placeholder={t("Employees.form.hire_date.placeholder")}
+                      disabled={loadingSave}
                     />
                   </FormControl>
                   <FormMessage />
@@ -334,6 +350,7 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                       step="0.01"
                       min="0"
                       placeholder={t("Employees.form.salary.placeholder")}
+                      disabled={loadingSave}
                       {...field}
                     />
                   </FormControl>
@@ -349,7 +366,11 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>{t("Employees.form.status.label")}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={loadingSave}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder={t("Employees.form.status.placeholder")} />
@@ -379,6 +400,7 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                   <Textarea
                     placeholder={t("Employees.form.notes.placeholder")}
                     className="min-h-[100px]"
+                    disabled={loadingSave}
                     {...field}
                   />
                 </FormControl>

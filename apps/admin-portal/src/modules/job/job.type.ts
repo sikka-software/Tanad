@@ -8,8 +8,9 @@ export interface Job {
   type: string;
   salary: number | null;
   is_active: boolean;
-  startDate: string | null;
-  endDate: string | null;
+  start_date: string | null;
+  end_date: string | null;
+
   created_at: string;
   updated_at: string;
   user_id: string;
@@ -18,3 +19,5 @@ export interface Job {
 export type JobCreateData = Omit<Job, "id" | "created_at" | "updated_at" | "user_id"> & {
   user_id?: string;
 };
+
+export type JobUpdateData = Partial<Job>;

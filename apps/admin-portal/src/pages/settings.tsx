@@ -130,7 +130,11 @@ const SettingsPage = () => {
   return (
     <div>
       <PageTitle
-        title={t("Settings.title")}
+        texts={{
+          title: t("Settings.title"),
+          submit_form: t("Settings.title"),
+          cancel: t("General.cancel"),
+        }}
         customButton={
           <div className="container mx-auto flex max-w-7xl justify-end">
             <Button

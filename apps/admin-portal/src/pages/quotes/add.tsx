@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import { QuoteForm, type QuoteFormValues } from "@/modules/quote/quote.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { QuoteForm, type QuoteFormValues } from "@/modules/quote/quote.form";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -26,12 +26,12 @@ export default function AddQuotePage() {
       // Calculate final amounts
       const subtotal = data.items.reduce((acc, item) => {
         const quantity = parseFloat(item.quantity) || 0;
-        const unitPrice = parseFloat(item.unit_price) || 0;
-        return acc + quantity * unitPrice;
+        const unit_price = parseFloat(item.unit_price) || 0;
+        return acc + quantity * unit_price;
       }, 0);
 
-      const taxAmount = (subtotal * data.tax_rate) / 100;
-      const total = subtotal + taxAmount;
+      const tax_amount = (subtotal * data.tax_rate) / 100;
+      const total = subtotal + tax_amount;
 
       // First create the quote
       const { data: quote, error: quoteError } = await supabase
@@ -85,12 +85,12 @@ export default function AddQuotePage() {
     <div>
       <CustomPageMeta title={t("Quotes.add_new")} />
       <PageTitle
-        title={t("Quotes.add_new")}
         formButtons
         formId="quote-form"
         loading={loading}
         onCancel={() => router.push("/quotes")}
         texts={{
+          title: t("Quotes.add_new"),
           submit_form: t("Quotes.add_new"),
           cancel: t("General.cancel"),
         }}

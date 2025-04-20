@@ -15,7 +15,7 @@ import EmployeeRequestForm, {
   type EmployeeRequestFormValues,
 } from "@/modules/employee-request/employee-request.form";
 import { createEmployeeRequest } from "@/modules/employee-request/employee-request.service";
-import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
+import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
 import { employeeKeys } from "@/modules/employee/employee.hooks";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
@@ -25,7 +25,8 @@ export default function AddEmployeeRequestPage() {
   const router = useRouter();
   const t = useTranslations();
 
-  const { setLoadingSave, loadingSave } = useEmployeeRequestsStore();
+  const setLoadingSave = useEmployeeRequestsStore((state) => state.setIsLoading);
+  const loadingSave = useEmployeeRequestsStore((state) => state.isLoading);
   const queryClient = useQueryClient();
   const { user } = useUserStore();
 
@@ -60,8 +61,8 @@ export default function AddEmployeeRequestPage() {
         description: data.description?.trim() || undefined,
         notes: data.notes?.trim() || undefined,
         type: data.type as "leave" | "expense" | "document" | "other",
-        startDate: data.startDate?.toISOString() || undefined,
-        endDate: data.endDate?.toISOString() || undefined,
+        start_date: data.start_date?.toISOString() || undefined,
+        end_date: data.end_date?.toISOString() || undefined,
         amount: data.amount || undefined,
         employee_id: data.employee_id,
         status: data.status || "pending",
@@ -92,12 +93,12 @@ export default function AddEmployeeRequestPage() {
     <div>
       <CustomPageMeta title={t("EmployeeRequests.add_new")} />
       <PageTitle
-        title={t("EmployeeRequests.add_new")}
         formButtons
         formId="employee-request-form"
         loading={loadingSave}
         onCancel={() => router.push("/employee-requests")}
         texts={{
+          title: t("EmployeeRequests.add_new"),
           submit_form: t("EmployeeRequests.add_new"),
           cancel: t("General.cancel"),
         }}

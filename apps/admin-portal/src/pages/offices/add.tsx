@@ -32,6 +32,7 @@ export default function AddOfficePage() {
         state: data.state.trim(),
         zip_code: data.zip_code.trim(),
         is_active: true,
+        updated_at: new Date().toISOString(),
       });
 
       toast.success(t("General.successful_operation"), {
@@ -65,12 +66,12 @@ export default function AddOfficePage() {
     <div>
       <CustomPageMeta title={t("Offices.add_new")} />
       <PageTitle
-        title={t("Offices.add_new")}
         formButtons
         formId="office-form"
         loading={loading}
         onCancel={() => router.push("/offices")}
         texts={{
+          title: t("Offices.add_new"),
           submit_form: t("Offices.add_new"),
           cancel: t("General.cancel"),
         }}

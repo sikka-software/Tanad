@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import { InvoiceForm, type InvoiceFormValues } from "@/modules/invoice/invoice.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { InvoiceForm, type InvoiceFormValues } from "@/modules/invoice/invoice.form";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -29,8 +29,8 @@ export default function AddInvoicePage() {
 
       // Calculate final amounts
       const subtotal = data.subtotal;
-      const taxAmount = (subtotal * data.tax_rate) / 100;
-      const total = subtotal + taxAmount;
+      const tax_amount = (subtotal * data.tax_rate) / 100;
+      const total = subtotal + tax_amount;
 
       // First create the invoice
       const { data: invoice, error: invoiceError } = await supabase
@@ -85,12 +85,12 @@ export default function AddInvoicePage() {
     <div>
       <CustomPageMeta title={t("Invoices.add_new")} />
       <PageTitle
-        title={t("Invoices.add_new")}
         formButtons
         formId="invoice-form"
         loading={loading}
         onCancel={() => router.push("/invoices")}
         texts={{
+          title: t("Invoices.add_new"),
           submit_form: t("Invoices.add_new"),
           cancel: t("General.cancel"),
         }}

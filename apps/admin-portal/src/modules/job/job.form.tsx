@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { DatePicker } from "@/ui/date-picker";
@@ -11,11 +12,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
+import { JobUpdateData } from "@/modules/job/job.type";
+import useUserStore from "@/stores/use-user-store";
+
+import { CompanyFormValues } from "../company/company.form";
+import { useCreateJob, useUpdateJob } from "./job.hooks";
+import useJobStore from "./job.store";
+
 interface JobFormProps {
   id?: string;
   onSuccess?: () => void;
-  onSubmit: (data: JobFormValues) => Promise<void>;
   loading?: boolean;
+  defaultValues?: JobUpdateData | null;
+  editMode?: boolean;
 }
 
 const createJobFormSchema = (t: (key: string) => string) =>
@@ -33,31 +42,107 @@ const createJobFormSchema = (t: (key: string) => string) =>
         (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
         t("Jobs.form.salary.invalid"),
       ),
-    startDate: z.date().optional(),
-    endDate: z.date().optional(),
+    start_date: z.date().optional(),
+    end_date: z.date().optional(),
     is_active: z.boolean(),
   });
 
 export type JobFormValues = z.infer<ReturnType<typeof createJobFormSchema>>;
 
-export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormProps) {
+export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobFormProps) {
   const t = useTranslations();
+  const user = useUserStore((state) => state.user);
+
+  const { mutate: createJob } = useCreateJob();
+  const { mutate: updateJob } = useUpdateJob();
+
+  const isLoading = useJobStore((state) => state.isLoading);
+  const setIsLoading = useJobStore((state) => state.setIsLoading);
 
   const form = useForm<JobFormValues>({
     resolver: zodResolver(createJobFormSchema(t)),
     defaultValues: {
-      title: "",
-      description: "",
-      requirements: "",
-      location: "",
-      department: "",
-      type: "Full-time",
-      salary: "",
-      startDate: undefined,
-      endDate: undefined,
-      is_active: true,
+      title: defaultValues?.title || "",
+      description: defaultValues?.description || "",
+      requirements: defaultValues?.requirements || "",
+      location: defaultValues?.location || "",
+      department: defaultValues?.department || "",
+      type: defaultValues?.type || "Full-time",
+      salary: String(defaultValues?.salary) || undefined,
+      start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
+      end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
+      is_active: defaultValues?.is_active || true,
     },
   });
+
+  const handleSubmit = async (data: JobFormValues) => {
+    setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
+
+    try {
+      if (editMode) {
+        await updateJob(
+          {
+            id: defaultValues?.id || "",
+            data: {
+              title: data.title.trim(),
+              description: data.description?.trim() || null,
+              requirements: data.requirements?.trim() || null,
+              location: data.location?.trim() || null,
+              department: data.department?.trim() || null,
+              type: data.type.trim(),
+              salary: data.salary ? parseFloat(data.salary) : null,
+              is_active: data.is_active,
+              start_date: data.start_date?.toISOString() || null,
+              end_date: data.end_date?.toISOString() || null,
+            },
+          },
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      } else {
+        await createJob(
+          {
+            title: data.title.trim(),
+            description: data.description?.trim() || null,
+            requirements: data.requirements?.trim() || null,
+            location: data.location?.trim() || null,
+            department: data.department?.trim() || null,
+            type: data.type.trim(),
+            salary: data.salary ? parseFloat(data.salary) : null,
+            is_active: data.is_active,
+            start_date: data.start_date?.toISOString() || null,
+            end_date: data.end_date?.toISOString() || null,
+            user_id: user?.id,
+          },
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Failed to save company:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Companies.error.creating"),
+      });
+    }
+  };
+
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
     (window as any).jobForm = form;
@@ -65,7 +150,7 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -144,7 +229,7 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="startDate"
+            name="start_date"
             render={({ field: { value, onChange, ...field } }) => (
               <FormItem>
                 <FormLabel>{t("Jobs.form.start_date.label")}</FormLabel>
@@ -162,7 +247,7 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
 
           <FormField
             control={form.control}
-            name="endDate"
+            name="end_date"
             render={({ field: { value, onChange, ...field } }) => (
               <FormItem>
                 <FormLabel>{t("Jobs.form.end_date.label")}</FormLabel>

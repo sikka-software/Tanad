@@ -11,12 +11,13 @@ import { generateDummyData } from "@/lib/dummy-generator";
 
 import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
 import { useCreateEmployee } from "@/modules/employee/employee.hooks";
-import { useEmployeesStore } from "@/modules/employee/employee.store";
+import useEmployeesStore from "@/modules/employee/employee.store";
 
 export default function AddEmployeePage() {
   const t = useTranslations();
   const router = useRouter();
-  const { loadingSave, setLoadingSave } = useEmployeesStore();
+  const setLoadingSave = useEmployeesStore((state) => state.setIsLoading);
+  const loadingSave = useEmployeesStore((state) => state.isLoading);
   const { mutate: createEmployee } = useCreateEmployee();
 
   const handleSubmit = async (data: EmployeeFormValues) => {
@@ -70,12 +71,12 @@ export default function AddEmployeePage() {
     <div>
       <CustomPageMeta title={t("Employees.add_new")} />
       <PageTitle
-        title={t("Employees.add_new")}
         formButtons
         formId="employee-form"
         loading={loadingSave}
         onCancel={() => router.push("/employees")}
         texts={{
+          title: t("Employees.add_new"),
           submit_form: t("Employees.add_new"),
           cancel: t("General.cancel"),
         }}

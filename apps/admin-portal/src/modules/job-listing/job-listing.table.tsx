@@ -7,7 +7,7 @@ import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { useUpdateJobListing } from "./job-listing.hooks";
-import { useJobListingsStore } from "./job-listing.store";
+import useJobListingsStore from "./job-listing.store";
 import { JobListing } from "./job-listing.type";
 
 const titleSchema = z.string().min(1, "Required");

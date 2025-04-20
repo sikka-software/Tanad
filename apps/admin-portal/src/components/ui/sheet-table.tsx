@@ -26,7 +26,19 @@ import {
   ColumnSizingState,
 } from "@tanstack/react-table";
 // ** import icons
-import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  MoreHorizontal,
+  Plus,
+  Trash2,
+  Edit,
+  Copy,
+  Eye,
+  Archive,
+} from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
@@ -53,16 +65,9 @@ import {
 // ** import lib
 import { cn } from "@/lib/utils";
 
-// ** import utils
-// import {
-//   ExtendedColumnDef,
-//   SheetTableProps,
-//   parseAndValidate,
-//   getColumnKey,
-//   handleKeyDown,
-//   handlePaste,
-//   isRowDisabled,
-// } from "./utils";
+import { Button } from "./button";
+import IconButton from "./icon-button";
+import RowActions from "./row-actions";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   ColumnDef<TData, TValue>,
@@ -142,6 +147,11 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   enableRowSelection?: boolean;
 
   /**
+   * Whether row actions are enabled.
+   */
+  enableRowActions?: boolean;
+
+  /**
    * Callback for when row selection changes.
    */
   onRowSelectionChange?: (selectedRows: T[]) => void;
@@ -203,6 +213,20 @@ export interface SheetTableProps<T extends object> extends FooterProps {
    * including all of its sub-rows.
    */
   handleRemoveRowFunction?: (rowId: string) => void;
+
+  /**
+   * Texts for the table.
+   */
+  texts?: {
+    actions?: string;
+    edit?: string;
+    duplicate?: string;
+    view?: string;
+    archive?: string;
+    delete?: string;
+  };
+
+  onActionClicked?: (action: string, rowId: string) => void;
 }
 
 /**
@@ -329,6 +353,8 @@ function SheetTable<
   },
 >(props: SheetTableProps<T>) {
   const {
+    texts,
+    onActionClicked,
     columns,
     data,
     onEdit,
@@ -338,6 +364,7 @@ function SheetTable<
     showSecondHeader = false,
     secondHeaderTitle = "",
     enableRowSelection = false,
+    enableRowActions = false,
     onRowSelectionChange,
     // Footer props
     totalRowValues,
@@ -368,11 +395,6 @@ function SheetTable<
    * Expanded state for sub-rows. Keyed by row.id in TanStack Table.
    */
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-
-  /**
-   * Row selection state
-   */
-  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
   /**
    * Track errors/original content keyed by (groupKey, rowId) for editing.
@@ -652,11 +674,12 @@ function SheetTable<
     // Determine if we show the rowAction icons on hover
     const showRowActions = hoveredRowId === rowId; // only for hovered row
 
+    const stickyColumnId = "checkbox";
     return (
       <React.Fragment key={rowId}>
         <TableRow
           className={cn(
-            "border-none", // it's will remove border for icons cells
+            "relative", // it's will remove border for icons cells
             disabled ? "bg-muted" : "",
             row.getIsSelected() ? "bg-muted/50" : "",
           )}
@@ -667,8 +690,8 @@ function SheetTable<
         >
           {/* Selection checkbox */}
           {enableRowSelection && (
-            <TableCell className="w-[30px] border-y p-0 px-2">
-              <div className="flex h-full items-center justify-center">
+            <TableCell className="bg-background sticky start-0 z-2 border-y">
+              <div className="flex h-auto items-center justify-center">
                 <input
                   type="checkbox"
                   checked={row.getIsSelected()}
@@ -676,6 +699,7 @@ function SheetTable<
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </div>
+              <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
             </TableCell>
           )}
 
@@ -913,6 +937,20 @@ function SheetTable<
               )}
             </TableCell>
           )}
+
+          {/* Selection checkbox */}
+          {enableRowActions && (
+            <div className="sticky end-0 z-2">
+              <RowActions
+                texts={texts}
+                onEdit={() => onActionClicked?.("edit", rowId)}
+                onDuplicate={() => onActionClicked?.("duplicate", rowId)}
+                onView={() => onActionClicked?.("view", rowId)}
+                onArchive={() => onActionClicked?.("archive", rowId)}
+                onDelete={() => onActionClicked?.("delete", rowId)}
+              />
+            </div>
+          )}
         </TableRow>
 
         {/* If expanded, render each subRows recursively */}
@@ -998,16 +1036,16 @@ function SheetTable<
   }
 
   return (
-    <div className="p-0">
+    <div className="overflow-x-auto p-0 pb-2">
       <Table id={id}>
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         {/* Primary header */}
         {showHeader && (
-          <TableHeader>
+          <TableHeader className="relative">
             <TableRow className="border-none">
               {/* Selection checkbox header */}
               {enableRowSelection && (
-                <TableHead className="w-[30px] border-y p-0">
+                <TableHead className="bg-muted sticky start-0 z-2 w-[30px] border-y p-0">
                   <div className="flex h-full items-center justify-center">
                     <input
                       type="checkbox"
@@ -1017,6 +1055,7 @@ function SheetTable<
                       title={t("General.select_all")}
                     />
                   </div>
+                  <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
                 </TableHead>
               )}
 
@@ -1055,6 +1094,10 @@ function SheetTable<
 
               {removePos === "right" && (
                 <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
+              )}
+
+              {enableRowActions && (
+                <TableHead className="border">{props.texts?.actions || "Actions"}</TableHead>
               )}
             </TableRow>
           </TableHeader>

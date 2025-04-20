@@ -8,14 +8,12 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import { WarehouseForm, type WarehouseFormValues } from "@/modules/warehouse/warehouse.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { createWarehouse } from "@/modules/warehouse/warehouse.service";
-
-import type { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
-
+import { WarehouseForm, type WarehouseFormValues } from "@/modules/warehouse/warehouse.form";
 import { warehouseKeys } from "@/modules/warehouse/warehouse.hooks";
+import { createWarehouse } from "@/modules/warehouse/warehouse.service";
+import type { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddWarehousePage() {
@@ -88,12 +86,12 @@ export default function AddWarehousePage() {
     <div>
       <CustomPageMeta title={t("Warehouses.add_new")} />
       <PageTitle
-        title={t("Warehouses.add_new")}
         formButtons
         formId="warehouse-form"
         loading={loading}
         onCancel={() => router.push("/warehouses")}
         texts={{
+          title: t("Warehouses.add_new"),
           submit_form: t("Warehouses.add_new"),
           cancel: t("General.cancel"),
         }}

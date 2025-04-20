@@ -8,8 +8,10 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useEmployeeRequestsStore } from "@/modules/employee-request/employee-request.store";
+import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
 import { EmployeeRequest } from "@/modules/employee-request/employee-request.type";
+
+import { useUpdateEmployeeRequest } from "./employee-request.hooks";
 
 const titleSchema = z.string().min(1, "Required");
 const descriptionSchema = z.string().optional();
@@ -23,7 +25,7 @@ interface EmployeeRequestsTableProps {
 
 const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTableProps) => {
   const t = useTranslations();
-  const updateEmployeeRequest = useEmployeeRequestsStore((state) => state.updateEmployeeRequest);
+  const { mutate: updateEmployeeRequest } = useUpdateEmployeeRequest();
   const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
   const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
 
@@ -62,16 +64,16 @@ const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTable
       },
     },
     {
-      accessorKey: "startDate",
+      accessorKey: "start_date",
       header: t("EmployeeRequests.form.date_range.start"),
       cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.startDate ? format(new Date(row.original.startDate), "PP") : "-",
+        row.original.start_date ? format(new Date(row.original.start_date), "PP") : "-",
     },
     {
-      accessorKey: "endDate",
+      accessorKey: "end_date",
       header: t("EmployeeRequests.form.date_range.end"),
       cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.endDate ? format(new Date(row.original.endDate), "PP") : "-",
+        row.original.end_date ? format(new Date(row.original.end_date), "PP") : "-",
     },
     {
       accessorKey: "amount",
@@ -92,7 +94,7 @@ const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTable
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateEmployeeRequest(rowId, { [columnId]: value });
+    await updateEmployeeRequest({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = (rows: EmployeeRequest[]) => {

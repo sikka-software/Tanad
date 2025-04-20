@@ -11,10 +11,11 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import VendorCard from "@/modules/vendor/vendor.card";
 import { useVendors, useBulkDeleteVendors } from "@/modules/vendor/vendor.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/vendor/vendor.options";
-import { useVendorsStore } from "@/modules/vendor/vendor.store";
+import useVendorsStore from "@/modules/vendor/vendor.store";
 import VendorsTable from "@/modules/vendor/vendor.table";
 
 export default function VendorsPage() {
@@ -31,11 +32,23 @@ export default function VendorsPage() {
   const searchQuery = useVendorsStore((state) => state.searchQuery);
   const filterConditions = useVendorsStore((state) => state.filterConditions);
   const filterCaseSensitive = useVendorsStore((state) => state.filterCaseSensitive);
-  const getFilteredVendors = useVendorsStore((state) => state.getFilteredVendors);
-  const getSortedVendors = useVendorsStore((state) => state.getSortedVendors);
+  const getFilteredVendors = useVendorsStore((state) => state.getFilteredData);
+  const getSortedVendors = useVendorsStore((state) => state.getSortedData);
 
   const { data: vendors, isLoading, error } = useVendors();
-  const { mutate: deleteVendors, isPending: isDeleting } = useBulkDeleteVendors();
+  const { mutateAsync: deleteVendors, isPending: isDeleting } = useBulkDeleteVendors();
+
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteVendors, {
+    loading: "Vendors.loading.deleting",
+    success: "Vendors.success.deleted",
+    error: "Vendors.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredVendors = useMemo(() => {
     return getFilteredVendors(vendors || []);
@@ -44,25 +57,6 @@ export default function VendorsPage() {
   const sortedVendors = useMemo(() => {
     return getSortedVendors(filteredVendors);
   }, [filteredVendors, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteVendors(selectedRows, {
-        onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
-        },
-        onError: (error: any) => {
-          console.error("Failed to delete vendors:", error);
-          toast.error(t("Vendors.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
-        },
-      });
-    } catch (error) {
-      console.error("Failed to delete vendors:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -112,7 +106,7 @@ export default function VendorsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Vendors.confirm_delete_title")}
           description={t("Vendors.confirm_delete", { count: selectedRows.length })}
         />

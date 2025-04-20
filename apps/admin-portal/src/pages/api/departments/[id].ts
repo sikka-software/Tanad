@@ -16,7 +16,7 @@ function convertDrizzleDepartment(
     id: data.id,
     name: data.name,
     description: data.description || "",
-    locations: data.locations?.map((l) => l.locationId) || [],
+    locations: data.locations?.map((l) => l.location_id) || [],
     created_at: data.created_at?.toString() || "",
     user_id: data.user_id,
   };
@@ -83,10 +83,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Insert new locations if any
         if (locations && locations.length > 0) {
           await db.insert(departmentLocations).values(
-            locations.map((locationId: string) => ({
+            locations.map((location_id: string) => ({
               department_id: id as string,
-              locationId,
-              locationType: "office", // Default to office type
+              location_id,
+              location_type: "office", // Default to office type
             })),
           );
         }

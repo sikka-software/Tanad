@@ -7,8 +7,9 @@ import {
   updateJob,
   deleteJob,
   bulkDeleteJobs,
+  duplicateJob,
 } from "@/modules/job/job.service";
-import { Job } from "@/modules/job/job.type";
+import { Job, JobCreateData } from "@/modules/job/job.type";
 
 export const jobKeys = {
   all: ["jobs"] as const,
@@ -36,7 +37,7 @@ export function useJob(id: string) {
 export function useCreateJob() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (job: Job) => createJob(job),
+    mutationFn: (job: JobCreateData) => createJob(job),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
     },
@@ -47,6 +48,18 @@ export function useUpdateJob() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Job> }) => updateJob(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: jobKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
+    },
+  });
+}
+
+// Hook to duplicate a job
+export function useDuplicateJob() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateJob(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: jobKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });

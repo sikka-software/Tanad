@@ -3,10 +3,11 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import { SalaryForm } from "@/modules/salary/salary.form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+
+import { SalaryForm } from "@/modules/salary/salary.form";
 
 export default function EditSalaryPage() {
   const router = useRouter();
@@ -29,7 +30,11 @@ export default function EditSalaryPage() {
   return (
     <div>
       <PageTitle
-        title={t("Salaries.edit_salary")}
+        texts={{
+          title: t("Salaries.edit_salary"),
+          submit_form: t("Salaries.edit_salary"),
+          cancel: t("General.cancel"),
+        }}
         customButton={
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => router.push("/salaries")}>

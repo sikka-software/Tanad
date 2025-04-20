@@ -8,13 +8,15 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useQuotesStore } from "@/modules/quote/quote.store";
+import useQuotesStore from "@/modules/quote/quote.store";
 import { Quote } from "@/modules/quote/quote.type";
+
+import { useUpdateQuote } from "./quote.hooks";
 
 const quoteNumberSchema = z.string().min(1, "Required");
 const statusSchema = z.enum(["draft", "sent", "accepted", "rejected", "expired"]);
 const subtotalSchema = z.number().min(0, "Must be >= 0");
-const taxRateSchema = z.number().min(0, "Must be >= 0").max(100, "Must be <= 100");
+const tax_rateSchema = z.number().min(0, "Must be >= 0").max(100, "Must be <= 100");
 
 interface QuotesTableProps {
   data: Quote[];
@@ -24,7 +26,7 @@ interface QuotesTableProps {
 
 const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
   const t = useTranslations();
-  const updateQuote = useQuotesStore((state) => state.updateQuote);
+  const { mutateAsync: updateQuote } = useUpdateQuote();
   const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
   const selectedRows = useQuotesStore((state) => state.selectedRows);
 
@@ -78,14 +80,14 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
     {
       accessorKey: "tax_rate",
       header: t("Quotes.tax_rate"),
-      validationSchema: taxRateSchema,
+      validationSchema: tax_rateSchema,
       cell: (props: CellContext<Quote, unknown>) => `${props.row.original.tax_rate || 0}%`,
     },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "client_id") return;
-    await updateQuote(rowId, { [columnId]: value });
+    await updateQuote({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = (rows: Quote[]) => {

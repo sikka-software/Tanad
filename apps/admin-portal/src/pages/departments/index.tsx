@@ -14,8 +14,9 @@ import DepartmentCard from "@/modules/department/department.card";
 import { useDepartments } from "@/modules/department/department.hooks";
 import { useDeleteDepartments } from "@/modules/department/department.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/department/department.options";
-import { useDepartmentsStore } from "@/modules/department/department.store";
+import useDepartmentsStore from "@/modules/department/department.store";
 import DepartmentsTable from "@/modules/department/department.table";
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 export default function DepartmentsPage() {
   const t = useTranslations();
@@ -32,11 +33,22 @@ export default function DepartmentsPage() {
   const searchQuery = useDepartmentsStore((state) => state.searchQuery);
   const filterConditions = useDepartmentsStore((state) => state.filterConditions);
   const filterCaseSensitive = useDepartmentsStore((state) => state.filterCaseSensitive);
-  const getFilteredDepartments = useDepartmentsStore((state) => state.getFilteredDepartments);
-  const getSortedDepartments = useDepartmentsStore((state) => state.getSortedDepartments);
+  const getFilteredDepartments = useDepartmentsStore((state) => state.getFilteredData);
+  const getSortedDepartments = useDepartmentsStore((state) => state.getSortedData);
 
   const { data: departments, isLoading, error } = useDepartments();
-  const { mutate: deleteDepartments, isPending: isDeleting } = useDeleteDepartments();
+  const { mutateAsync: deleteDepartments, isPending: isDeleting } = useDeleteDepartments();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteDepartments, {
+    loading: "Departments.loading.deleting",
+    success: "Departments.success.deleted",
+    error: "Departments.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredDepartments = useMemo(() => {
     return getFilteredDepartments(departments || []);
@@ -46,16 +58,7 @@ export default function DepartmentsPage() {
     return getSortedDepartments(filteredDepartments);
   }, [filteredDepartments, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteDepartments(selectedRows);
-      clearSelection();
-      setIsDeleteDialogOpen(false);
-    } catch (error) {
-      console.error("Failed to delete departments:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
+  
 
   return (
     <div>
@@ -104,7 +107,7 @@ export default function DepartmentsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Departments.confirm_delete_title")}
           description={t("Departments.confirm_delete", { count: selectedRows.length })}
         />

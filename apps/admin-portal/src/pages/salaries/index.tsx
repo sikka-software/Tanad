@@ -1,7 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -11,10 +10,11 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import SalaryCard from "@/modules/salary/salary.card";
 import { useSalaries, useBulkDeleteSalaries } from "@/modules/salary/salary.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/salary/salary.options";
-import { useSalaryStore } from "@/modules/salary/salary.store";
+import useSalaryStore from "@/modules/salary/salary.store";
 import SalariesTable from "@/modules/salary/salary.table";
 
 export default function SalariesPage() {
@@ -31,11 +31,22 @@ export default function SalariesPage() {
   const searchQuery = useSalaryStore((state) => state.searchQuery);
   const filterConditions = useSalaryStore((state) => state.filterConditions);
   const filterCaseSensitive = useSalaryStore((state) => state.filterCaseSensitive);
-  const getFilteredSalaries = useSalaryStore((state) => state.getFilteredSalaries);
-  const getSortedSalaries = useSalaryStore((state) => state.getSortedSalaries);
+  const getFilteredSalaries = useSalaryStore((state) => state.getFilteredData);
+  const getSortedSalaries = useSalaryStore((state) => state.getSortedData);
 
   const { data: salaries, isLoading, error } = useSalaries();
-  const { mutate: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
+  const { mutateAsync: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteSalaries, {
+    loading: "Salaries.loading.deleting",
+    success: "Salaries.success.deleted",
+    error: "Salaries.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredSalaries = useMemo(() => {
     return getFilteredSalaries(salaries || []);
@@ -44,28 +55,6 @@ export default function SalariesPage() {
   const sortedSalaries = useMemo(() => {
     return getSortedSalaries(filteredSalaries);
   }, [filteredSalaries, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteSalaries(selectedRows, {
-        onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
-          toast.success(t("Salaries.success.title"), {
-            description: t("Salaries.messages.success_deleted"),
-          });
-        },
-        onError: () => {
-          toast.error(t("Salaries.error.title"), {
-            description: t("Salaries.messages.error_delete"),
-          });
-        },
-      });
-    } catch (error) {
-      console.error("Failed to delete salaries:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -114,7 +103,7 @@ export default function SalariesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Salaries.delete_salary")}
           description={t("Salaries.confirm_delete")}
         />

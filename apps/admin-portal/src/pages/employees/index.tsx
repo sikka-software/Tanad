@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -11,10 +11,11 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import EmployeeCard from "@/modules/employee/employee.card";
 import { useEmployees, useBulkDeleteEmployees } from "@/modules/employee/employee.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/employee/employee.options";
-import { useEmployeesStore } from "@/modules/employee/employee.store";
+import useEmployeesStore from "@/modules/employee/employee.store";
 import EmployeesTable from "@/modules/employee/employee.table";
 import { Employee } from "@/modules/employee/employee.types";
 
@@ -32,11 +33,22 @@ export default function EmployeesPage() {
   const searchQuery = useEmployeesStore((state) => state.searchQuery);
   const filterConditions = useEmployeesStore((state) => state.filterConditions);
   const filterCaseSensitive = useEmployeesStore((state) => state.filterCaseSensitive);
-  const getFilteredEmployees = useEmployeesStore((state) => state.getFilteredEmployees);
-  const getSortedEmployees = useEmployeesStore((state) => state.getSortedEmployees);
+  const getFilteredEmployees = useEmployeesStore((state) => state.getFilteredData);
+  const getSortedEmployees = useEmployeesStore((state) => state.getSortedData);
 
   const { data: employees, isLoading, error } = useEmployees();
-  const { mutate: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
+  const { mutateAsync: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteEmployees, {
+    loading: "Employees.loading.deleting",
+    success: "Employees.success.deleted",
+    error: "Employees.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredEmployees = useMemo(() => {
     return getFilteredEmployees(employees || []);
@@ -45,27 +57,6 @@ export default function EmployeesPage() {
   const sortedEmployees = useMemo(() => {
     return getSortedEmployees(filteredEmployees);
   }, [filteredEmployees, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteEmployees(selectedRows, {
-        onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
-        },
-        onError: (error: any) => {
-          console.error("Failed to delete employees:", error);
-          toast.error(t("Employees.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
-        },
-      });
-    } catch (error) {
-      console.error("Failed to delete employees:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
-
-  const renderEmployee = (employee: Employee) => <EmployeeCard employee={employee} />;
 
   return (
     <div>
@@ -103,7 +94,7 @@ export default function EmployeesPage() {
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Employees.no_employees_found")}
-                renderItem={renderEmployee}
+                renderItem={(employee) => <EmployeeCard employee={employee} />}
                 gridCols="3"
               />
             </div>
@@ -114,7 +105,7 @@ export default function EmployeesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Employees.confirm_delete_title")}
           description={t("Employees.confirm_delete", { count: selectedRows.length })}
         />

@@ -20,7 +20,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/ui/textarea";
 
 import { ClientForm } from "@/modules/client/client.form";
-
 import { createClient } from "@/utils/supabase/component";
 
 const createInvoiceSchema = (t: (key: string) => string) =>
@@ -174,36 +173,36 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
 
   // Watch items and tax_rate for changes to update totals
   const items = form.watch("items");
-  const taxRate = form.watch("tax_rate");
+  const tax_rate = form.watch("tax_rate");
 
   useEffect(() => {
     const subtotal = calculateSubtotal(items);
     form.setValue("subtotal", subtotal);
   }, [items, form]);
 
-  const handleClientAdded = async () => {
-    // Close the dialog
-    setIsDialogOpen(false);
+  // const handleClientAdded = async () => {
+  //   // Close the dialog
+  //   setIsDialogOpen(false);
 
-    // Refresh the clients list
-    try {
-      const { data, error } = await supabase
-        .from("clients")
-        .select("id, name, company")
-        .order("name");
+  //   // Refresh the clients list
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from("clients")
+  //       .select("id, name, company")
+  //       .order("name");
 
-      if (error) throw error;
+  //     if (error) throw error;
 
-      setClients(data || []);
+  //     setClients(data || []);
 
-      // Show success message
-      toast.success(t("General.successful_operation"), {
-        description: t("client_added"),
-      });
-    } catch (error) {
-      console.error("Error refreshing clients:", error);
-    }
-  };
+  //     // Show success message
+  //     toast.success(t("General.successful_operation"), {
+  //       description: t("client_added"),
+  //     });
+  //   } catch (error) {
+  //     console.error("Error refreshing clients:", error);
+  //   }
+  // };
 
   const handleProductSelection = (index: number, product_id: string) => {
     const selectedProduct = products.find((product) => product.id === product_id);
@@ -286,7 +285,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
         },
       },
       {
-        id: "unitPrice",
+        id: "unit_price",
         header: t("products.unit_price"),
         cell: ({ row }: any) => {
           const index = row.index;
@@ -633,7 +632,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
         cancelText={t("cancel")}
         submitText={t("save")}
       >
-        <ClientForm id="client-form" onSubmit={handleClientAdded} user_id={user_id} />
+        <ClientForm id="client-form" />
       </FormDialog>
 
       <Dialog open={isNewProductDialogOpen} onOpenChange={setIsNewProductDialogOpen}>

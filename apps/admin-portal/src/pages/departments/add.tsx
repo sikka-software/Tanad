@@ -8,13 +8,11 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
-import DepartmentForm, {
-  type DepartmentFormValues,
-} from "@/modules/department/department.form";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
+import DepartmentForm, { type DepartmentFormValues } from "@/modules/department/department.form";
 import { departmentKeys } from "@/modules/department/department.hooks";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
@@ -52,9 +50,9 @@ export default function AddDepartmentPage() {
 
       // Then create the department locations
       if (data.locations && data.locations.length > 0) {
-        const locationInserts = data.locations.map((locationId) => ({
+        const locationInserts = data.locations.map((location_id) => ({
           department_id: newDepartment.id,
-          location_id: locationId,
+          location_id: location_id,
           location_type: "office", // Default to office type
         }));
 
@@ -105,12 +103,12 @@ export default function AddDepartmentPage() {
     <div>
       <CustomPageMeta title={t("Departments.add_new")} />
       <PageTitle
-        title={t("Departments.add_new")}
         formButtons
         formId="department-form"
         loading={loading}
         onCancel={() => router.push("/departments")}
         texts={{
+          title: t("Departments.add_new"),
           submit_form: t("Departments.add_new"),
           cancel: t("General.cancel"),
         }}

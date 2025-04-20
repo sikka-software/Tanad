@@ -77,7 +77,7 @@ interface Template {
   name: string;
   type: "invoice" | "quote";
   content: unknown;
-  isDefault: boolean;
+  is_default: boolean;
   created_at: string | null;
   user_id: string;
 }
@@ -88,7 +88,7 @@ const formSchema = z.object({
     required_error: "Please select a template type",
   }),
   content: z.string().min(1, "Template content is required"),
-  isDefault: z.boolean().default(false),
+  is_default: z.boolean().default(false),
 });
 
 type FormValues = z.input<typeof formSchema>;
@@ -107,7 +107,7 @@ export default function TemplatesPage() {
       name: "",
       type: "invoice",
       content: JSON.stringify(defaultTemplate, null, 2),
-      isDefault: false,
+      is_default: false,
     },
   });
 
@@ -164,7 +164,7 @@ export default function TemplatesPage() {
           name: values.name,
           type: values.type,
           content: parsedContent,
-          isDefault: values.isDefault,
+          is_default: values.is_default,
           user_id: user.id,
         }),
       });
@@ -184,7 +184,7 @@ export default function TemplatesPage() {
         name: "",
         type: "invoice",
         content: JSON.stringify(defaultTemplate, null, 2),
-        isDefault: false,
+        is_default: false,
       });
       fetchTemplates();
     } catch (error) {
@@ -294,7 +294,7 @@ export default function TemplatesPage() {
                   />
                   <FormField
                     control={form.control}
-                    name="isDefault"
+                    name="is_default"
                     render={({ field }) => (
                       <FormItem className="flex items-center justify-between">
                         <FormLabel>Set as Default</FormLabel>
@@ -329,7 +329,7 @@ export default function TemplatesPage() {
                 <TableRow key={template.id}>
                   <TableCell>{template.name}</TableCell>
                   <TableCell>{template.type}</TableCell>
-                  <TableCell>{template.isDefault ? "Yes" : "No"}</TableCell>
+                  <TableCell>{template.is_default ? "Yes" : "No"}</TableCell>
                   <TableCell>
                     {template.created_at ? new Date(template.created_at).toLocaleDateString() : "-"}
                   </TableCell>

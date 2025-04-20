@@ -5,7 +5,7 @@ export interface Client {
   name: string;
   email: string;
   phone: string;
-  company: string;
+  company?: string;
   company_details?: Company;
   address: string;
   city: string;
@@ -16,5 +16,7 @@ export interface Client {
 }
 
 export type ClientCreateData = Omit<Client, "id" | "created_at" | "company_details"> & {
-  user_id?: string;
+  user_id: string;
 };
+
+export type ClientUpdateData = Omit<Client, "created_at" | "user_id">;

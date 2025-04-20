@@ -17,7 +17,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { useBranches } from "@/modules/branch/branch.hooks";
 import { useUpdateDepartment } from "@/modules/department/department.hooks";
-import { useDepartmentsStore } from "@/modules/department/department.store";
+import useDepartmentStore from "@/modules/department/department.store";
 import { Department } from "@/modules/department/department.type";
 import { useOffices } from "@/modules/office/office.hooks";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
@@ -40,7 +40,8 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
-  const { selectedRows, setSelectedRows } = useDepartmentsStore();
+  const selectedRows = useDepartmentStore((state) => state.selectedRows);
+  const setSelectedRows = useDepartmentStore((state) => state.setSelectedRows);
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     await updateDepartment({ id: rowId, updates: { [columnId]: value } });
@@ -63,22 +64,22 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
     [selectedRows, setSelectedRows],
   );
 
-  const getLocationName = (locationId: string) => {
-    const office = offices?.find((o) => o.id === locationId);
+  const getLocationName = (location_id: string) => {
+    const office = offices?.find((o) => o.id === location_id);
     if (office) return office.name;
 
-    const branch = branches?.find((b) => b.id === locationId);
+    const branch = branches?.find((b) => b.id === location_id);
     if (branch) return branch.name;
 
-    const warehouse = warehouses?.find((w) => w.id === locationId);
+    const warehouse = warehouses?.find((w) => w.id === location_id);
     if (warehouse) return warehouse.name;
 
-    return locationId;
+    return location_id;
   };
 
-  const handleRemoveLocation = async (row: Row<Department>, locationId: string) => {
+  const handleRemoveLocation = async (row: Row<Department>, location_id: string) => {
     const locationIds = row.original.locations || [];
-    const updatedLocations = locationIds.filter((id: string) => id !== locationId);
+    const updatedLocations = locationIds.filter((id: string) => id !== location_id);
     await updateDepartment({ id: row.original.id, updates: { locations: updatedLocations } });
   };
 
@@ -116,16 +117,16 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                {locationIds.map((locationId) => (
-                  <DropdownMenuItem key={locationId} className="flex justify-between">
-                    <span>{getLocationName(locationId)}</span>
+                {locationIds.map((location_id) => (
+                  <DropdownMenuItem key={location_id} className="flex justify-between">
+                    <span>{getLocationName(location_id)}</span>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-4 w-4 p-0"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRemoveLocation(row, locationId);
+                        handleRemoveLocation(row, location_id);
                       }}
                     >
                       <X className="h-3 w-3" />
@@ -165,6 +166,20 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
+  const departmentTableOptions = {
+    state: {
+      rowSelection,
+    },
+    enableRowSelection: true,
+    enableMultiRowSelection: true,
+    getRowId: (row: Department) => row.id!,
+    onRowSelectionChange: (updater: any) => {
+      const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
+      handleRowSelectionChange(selectedRows);
+    },
+  };
+
   return (
     <SheetTable
       columns={columns}
@@ -173,18 +188,14 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
       enableRowSelection={true}
       onEdit={handleEdit}
       onRowSelectionChange={handleRowSelectionChange}
-      tableOptions={{
-        state: {
-          rowSelection,
-        },
-        enableRowSelection: true,
-        enableMultiRowSelection: true,
-        getRowId: (row) => row.id!,
-        onRowSelectionChange: (updater) => {
-          const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-          const selectedRows = data.filter((row) => newSelection[row.id!]);
-          handleRowSelectionChange(selectedRows);
-        },
+      tableOptions={departmentTableOptions}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
       }}
     />
   );

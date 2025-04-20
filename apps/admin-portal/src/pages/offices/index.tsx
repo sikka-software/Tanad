@@ -11,10 +11,11 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import OfficeCard from "@/modules/office/office.card";
 import { useOffices, useBulkDeleteOffices } from "@/modules/office/office.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/office/office.options";
-import { useOfficeStore } from "@/modules/office/office.store";
+import useOfficeStore from "@/modules/office/office.store";
 import OfficesTable from "@/modules/office/office.table";
 
 export default function OfficesPage() {
@@ -31,11 +32,22 @@ export default function OfficesPage() {
   const searchQuery = useOfficeStore((state) => state.searchQuery);
   const filterConditions = useOfficeStore((state) => state.filterConditions);
   const filterCaseSensitive = useOfficeStore((state) => state.filterCaseSensitive);
-  const getFilteredOffices = useOfficeStore((state) => state.getFilteredOffices);
-  const getSortedOffices = useOfficeStore((state) => state.getSortedOffices);
+  const getFilteredOffices = useOfficeStore((state) => state.getFilteredData);
+  const getSortedOffices = useOfficeStore((state) => state.getSortedData);
 
   const { data: offices, isLoading, error } = useOffices();
-  const { mutate: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
+  const { mutateAsync: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteOffices, {
+    loading: "Offices.loading.deleting",
+    success: "Offices.success.deleted",
+    error: "Offices.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredOffices = useMemo(() => {
     return getFilteredOffices(offices || []);
@@ -44,25 +56,6 @@ export default function OfficesPage() {
   const sortedOffices = useMemo(() => {
     return getSortedOffices(filteredOffices);
   }, [filteredOffices, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteOffices(selectedRows, {
-        onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
-        },
-        onError: (error: any) => {
-          console.error("Failed to delete offices:", error);
-          toast.error(t("Offices.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
-        },
-      });
-    } catch (error) {
-      console.error("Failed to delete offices:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -112,7 +105,7 @@ export default function OfficesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Offices.confirm_delete_title")}
           description={t("Offices.confirm_delete", { count: selectedRows.length })}
         />

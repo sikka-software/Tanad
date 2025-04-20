@@ -13,6 +13,9 @@ const models = [
   "companies",
   "departments",
   "jobListings",
+  "expenses",
+  "purchases",
+  "quotes", 
 ];
 
 interface SortOptions {

@@ -12,14 +12,14 @@ function convertDrizzleSalary(data: typeof salaries.$inferSelect) {
   return {
     id: data.id,
     created_at: data.created_at?.toString() || "",
-    pay_period_start: data.payPeriodStart,
-    pay_period_end: data.payPeriodEnd,
-    payment_date: data.paymentDate,
-    gross_amount: Number(data.grossAmount),
-    net_amount: Number(data.netAmount),
+    pay_period_start: data.pay_period_start,
+    pay_period_end: data.pay_period_end,
+    payment_date: data.payment_date,
+    gross_amount: Number(data.gross_amount),
+    net_amount: Number(data.net_amount),
     deductions: data.deductions as Record<string, number> | null,
     notes: data.notes || undefined,
-    employee_name: data.employeeName,
+    employee_name: data.employee_name,
   };
 }
 
@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         const data = await db.query.salaries.findMany({
           where: eq(salaries.user_id, user?.id),
-          orderBy: desc(salaries.paymentDate),
+          orderBy: desc(salaries.payment_date),
         });
         return res.status(200).json(data.map(convertDrizzleSalary));
       }
@@ -58,14 +58,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         // Map salary data to match Drizzle schema
         const dbSalary = {
-          payPeriodStart: salary.pay_period_start,
-          payPeriodEnd: salary.pay_period_end,
-          paymentDate: salary.payment_date,
-          grossAmount: salary.gross_amount.toString(),
-          netAmount: salary.net_amount.toString(),
+          pay_period_start: salary.pay_period_start,
+          pay_period_end: salary.pay_period_end,
+          payment_date: salary.payment_date,
+          gross_amount: salary.gross_amount.toString(),
+          net_amount: salary.net_amount.toString(),
           deductions: salary.deductions,
           notes: salary.notes,
-          employeeName: salary.employee_name,
+          employee_name: salary.employee_name,
           user_id: user?.id,
         };
 

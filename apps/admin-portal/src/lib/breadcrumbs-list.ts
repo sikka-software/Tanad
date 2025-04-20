@@ -27,6 +27,7 @@ export const routeMap: RouteMap = {
   "/branches": { label: "Branches", translationKey: "Branches.title" },
   "/departments": { label: "Departments", translationKey: "Departments.title" },
   "/offices": { label: "Offices", translationKey: "Offices.title" },
+  "/expenses": { label: "Expenses", translationKey: "Expenses.title" },
 };
 
 // Dynamic route patterns and their handling
@@ -245,6 +246,22 @@ export const dynamicRoutePatterns = [
       { path: "/dashboard", labelKey: "Dashboard.title" },
       { path: "/offices", labelKey: "Offices.title" },
       { path: "", labelKey: "Offices.edit", is_active: true },
+    ],
+  },
+  {
+    pattern: /^\/expenses\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/expenses", labelKey: "Expenses.title" },
+      { path: "/expenses/add", labelKey: "Expenses.add_new", is_active: true },
+    ],
+  },
+  {
+    pattern: /^\/expenses\/edit\/(.+)$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/expenses", labelKey: "Expenses.title" },
+      { path: "", labelKey: "Expenses.edit", is_active: true },
     ],
   },
 ];

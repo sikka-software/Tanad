@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 import NoPuklaFound from "@/components/app/NoPuklaFound";
-import { PuklaView } from "@/components/app/PuklaView";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { createClient as createClientComponent } from "@/utils/supabase/component";
@@ -57,7 +56,7 @@ export default function RedirectPage({ pukla }: { pukla: any }) {
   return (
     <>
       <CustomPageMeta title={pukla.title} description={pukla.bio} />
-      <PuklaView pukla={pukla} />
+      <div>No code found</div>
     </>
   );
 }
