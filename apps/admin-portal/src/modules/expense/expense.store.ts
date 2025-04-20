@@ -10,6 +10,7 @@ import { Expense } from "@/modules/expense/expense.type";
 type ExpenseStates = {
   expenses: Expense[];
   isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
   error: string | null;
   selectedRows: string[];
   filterConditions: FilterCondition[];
@@ -51,6 +52,10 @@ export const useExpenseStore = create<ExpenseStates & ExpenseActions>((set, get)
   sortRules: [],
   sortCaseSensitive: false,
   sortNullsFirst: false,
+
+  setIsLoading: (isLoading: boolean) => {
+    set({ isLoading });
+  },
 
   getFilteredExpenses: (data: Expense[]) => {
     const { searchQuery, filterConditions, filterCaseSensitive } = get();

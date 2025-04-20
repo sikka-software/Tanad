@@ -1,7 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
@@ -11,51 +10,14 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { ExpenseForm, type ExpenseFormValues } from "@/modules/expense/expense.form";
-import { useCreateExpense } from "@/modules/expense/expense.hooks";
-import useUserStore from "@/stores/use-user-store";
+import { ExpenseForm } from "@/modules/expense/expense.form";
+import { useExpenseStore } from "@/modules/expense/expense.store";
 
 export default function AddExpensePage() {
   const t = useTranslations();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const { mutate: createExpense, isPending } = useCreateExpense();
-  const { user } = useUserStore();
-
-  const handleSubmit = async (data: ExpenseFormValues) => {
-    setLoading(true);
-    if (!user?.id) {
-      toast.error(t("General.unauthorized"), {
-        description: t("General.must_be_logged_in"),
-      });
-      setLoading(false);
-      return;
-    }
-    try {
-      await createExpense({
-        expense_number: data.expense_number.trim(),
-        issue_date: data.issue_date,
-        due_date: data.due_date,
-        amount: data.amount,
-        category: data.category.trim(),
-        client_id: data.client_id?.trim(),
-        status: data.status || "pending",
-        notes: data.notes?.trim(),
-        user_id: user?.id,
-      });
-
-      router.push("/expenses");
-      toast.success(t("General.successful_operation"), {
-        description: t("Expenses.success.created"),
-      });
-      setLoading(false);
-    } catch (error) {
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Expenses.error.creating"),
-      });
-      setLoading(false);
-    }
-  };
+  const isLoading = useExpenseStore((state) => state.isLoading);
+  const setIsLoading = useExpenseStore((state) => state.setIsLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -71,6 +33,14 @@ export default function AddExpensePage() {
     }
   };
 
+  const onAddSuccess = () => {
+    toast.success(t("General.successful_operation"), {
+      description: t("Expenses.success.created"),
+    });
+    router.push("/expenses");
+    setIsLoading(false);
+  };
+
   return (
     <div>
       <CustomPageMeta title={t("Expenses.add_new")} />
@@ -78,7 +48,7 @@ export default function AddExpensePage() {
         title={t("Expenses.add_new")}
         formButtons
         formId="expense-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/expenses")}
         texts={{
           submit_form: t("Expenses.add_new"),
@@ -94,7 +64,7 @@ export default function AddExpensePage() {
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <ExpenseForm id="expense-form" onSubmit={handleSubmit} loading={isPending} />
+        <ExpenseForm id="expense-form" onSuccess={onAddSuccess} />
       </div>
     </div>
   );

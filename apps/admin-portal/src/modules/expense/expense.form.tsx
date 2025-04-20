@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { DatePicker } from "@/ui/date-picker";
@@ -8,6 +9,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
+
+import useUserStore from "@/stores/use-user-store";
+
+import { useCreateExpense } from "./expense.hooks";
+import { useExpenseStore } from "./expense.store";
 
 export const createExpenseSchema = (t: (key: string) => string) =>
   z.object({
@@ -25,12 +31,16 @@ export type ExpenseFormValues = z.input<ReturnType<typeof createExpenseSchema>>;
 
 export interface ExpenseFormProps {
   id?: string;
-  onSubmit: (data: ExpenseFormValues) => void;
-  loading?: boolean;
+  onSuccess: () => void;
 }
 
-export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
+export function ExpenseForm({ id, onSuccess }: ExpenseFormProps) {
   const t = useTranslations();
+  const isLoading = useExpenseStore((state) => state.isLoading);
+  const setIsLoading = useExpenseStore((state) => state.setIsLoading);
+  const { mutate: createExpense, isPending, isSuccess } = useCreateExpense();
+  const user = useUserStore((state) => state.user);
+
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(createExpenseSchema(t)),
     defaultValues: {
@@ -45,6 +55,41 @@ export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
     },
   });
 
+  const handleSubmit = async (data: ExpenseFormValues) => {
+    setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      setIsLoading(false);
+      return;
+    }
+    try {
+      const result = await createExpense({
+        expense_number: data.expense_number.trim(),
+        issue_date: data.issue_date,
+        due_date: data.due_date,
+        amount: data.amount,
+        category: data.category.trim(),
+        ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
+        status: data.status || "pending",
+        notes: data.notes?.trim(),
+        user_id: user?.id,
+      });
+
+      console.log("result", result);
+      console.log("isSuccess", isSuccess);
+      if (onSuccess && isSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Expenses.error.creating"),
+      });
+      setIsLoading(false);
+    }
+  };
+
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
     (window as any).expenseForm = form;
@@ -52,7 +97,11 @@ export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
 
   return (
     <Form {...form}>
-      <form id={id || "expense-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        id={id || "expense-form"}
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-4"
+      >
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -64,7 +113,7 @@ export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
                   <Input
                     placeholder={t("Expenses.form.expense_number.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -82,7 +131,7 @@ export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
                   <Input
                     placeholder={t("Expenses.form.category.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -140,7 +189,7 @@ export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
                     placeholder={t("Expenses.form.amount.placeholder")}
                     {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -157,7 +206,7 @@ export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  disabled={loading}
+                  disabled={isLoading}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -190,7 +239,7 @@ export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
                 <Input
                   placeholder={t("Expenses.form.client_id.placeholder")}
                   {...field}
-                  disabled={loading}
+                  disabled={isLoading}
                 />
               </FormControl>
               <FormMessage />
@@ -208,7 +257,7 @@ export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
                 <Textarea
                   placeholder={t("Expenses.form.notes.placeholder")}
                   {...field}
-                  disabled={loading}
+                  disabled={isLoading}
                 />
               </FormControl>
               <FormMessage />
