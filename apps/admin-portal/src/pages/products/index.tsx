@@ -11,6 +11,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import ProductCard from "@/modules/product/product.card";
 import { useProducts, useBulkDeleteProducts } from "@/modules/product/product.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/product/product.options";
@@ -35,7 +36,18 @@ export default function ProductsPage() {
   const getSortedProducts = useProductStore((state) => state.getSortedData);
 
   const { data: products, isLoading, error } = useProducts();
-  const { mutate: deleteProducts, isPending: isDeleting } = useBulkDeleteProducts();
+  const { mutateAsync: deleteProducts, isPending: isDeleting } = useBulkDeleteProducts();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteProducts, {
+    loading: "Products.loading.deleting",
+    success: "Products.success.deleted",
+    error: "Products.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredProducts = useMemo(() => {
     return getFilteredProducts(products || []);
@@ -44,38 +56,6 @@ export default function ProductsPage() {
   const sortedProducts = useMemo(() => {
     return getSortedProducts(filteredProducts);
   }, [filteredProducts, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = () => {
-    if (selectedRows.length === 0) return;
-    deleteProducts(selectedRows, {
-      onSuccess: () => {
-        clearSelection();
-        setIsDeleteDialogOpen(false);
-      },
-      onError: (error: any) => {
-        console.log("error is ", error);
-        if (error?.error === "cant_delete_products_referenced") {
-          const referencedIds = error.details.referencedProductIds;
-          const referencedProducts =
-            products
-              ?.filter((p) => referencedIds.includes(p.id))
-              .map((p) => p.name)
-              .join(", ") || "";
-
-          toast.error(t("Products.error.delete_referenced"), {
-            description: t("Products.error.delete_referenced_description", {
-              products: referencedProducts || t("General.unknown"),
-            }),
-          });
-        } else {
-          toast.error(t("Products.error.delete"), {
-            description: t(`Products.error.${error.message}`),
-          });
-        }
-        setIsDeleteDialogOpen(false);
-      },
-    });
-  };
 
   return (
     <div>
@@ -126,7 +106,7 @@ export default function ProductsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Products.confirm_delete_title")}
           description={t("Products.confirm_delete", { count: selectedRows.length })}
         />

@@ -22,6 +22,7 @@ import {
 } from "@/modules/employee-request/employee-request.options";
 import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
 import EmployeeRequestsTable from "@/modules/employee-request/employee-request.table";
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 export default function EmployeeRequestsPage() {
   const t = useTranslations();
@@ -41,7 +42,18 @@ export default function EmployeeRequestsPage() {
   const getSortedEmployeeRequests = useEmployeeRequestsStore((state) => state.getSortedData);
 
   const { data: requests, isLoading, error } = useEmployeeRequests();
-  const { mutate: deleteEmployeeRequests, isPending: isDeleting } = useBulkDeleteEmployeeRequests();
+  const { mutateAsync: deleteEmployeeRequests, isPending: isDeleting } = useBulkDeleteEmployeeRequests();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteEmployeeRequests, {
+    loading: "EmployeeRequests.loading.deleting",
+    success: "EmployeeRequests.success.deleted",
+    error: "EmployeeRequests.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredEmployeeRequests = useMemo(() => {
     return getFilteredEmployeeRequests(requests || []);
@@ -50,25 +62,7 @@ export default function EmployeeRequestsPage() {
   const sortedEmployeeRequests = useMemo(() => {
     return getSortedEmployeeRequests(filteredEmployeeRequests);
   }, [filteredEmployeeRequests, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteEmployeeRequests(selectedRows, {
-        onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
-        },
-        onError: (error: any) => {
-          console.error("Failed to delete employee requests:", error);
-          toast.error(t("EmployeeRequests.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
-        },
-      });
-    } catch (error) {
-      console.error("Failed to delete employee requests:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
+  
 
   return (
     <div>
@@ -120,7 +114,7 @@ export default function EmployeeRequestsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("EmployeeRequests.delete.title")}
           description={t("EmployeeRequests.delete.description", { count: selectedRows.length })}
         />

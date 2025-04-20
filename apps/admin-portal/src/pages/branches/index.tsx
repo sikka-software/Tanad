@@ -23,6 +23,7 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/branch/branch.opt
 import useBranchStore from "@/modules/branch/branch.store";
 import BranchesTable from "@/modules/branch/branch.table";
 import { BranchUpdateData } from "@/modules/branch/branch.type";
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 export default function BranchesPage() {
   const t = useTranslations();
@@ -43,12 +44,23 @@ export default function BranchesPage() {
   const searchQuery = useBranchStore((state) => state.searchQuery);
   const filterConditions = useBranchStore((state) => state.filterConditions);
   const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
-  const getFilteredBranches = useBranchStore((state) => state.getFilteredBranches);
-  const getSortedBranches = useBranchStore((state) => state.getSortedBranches);
+  const getFilteredBranches = useBranchStore((state) => state.getFilteredData);
+  const getSortedBranches = useBranchStore((state) => state.getSortedData);
 
   const { data: branches, isLoading: loadingFetchBranches, error } = useBranches();
   const { mutate: duplicateBranch } = useDuplicateBranch();
-  const { mutate: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
+  const { mutateAsync: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteBranches, {
+    loading: "Branches.loading.deleting",
+    success: "Branches.success.deleted",
+    error: "Branches.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredBranches = useMemo(() => {
     return getFilteredBranches(branches || []);
@@ -57,30 +69,7 @@ export default function BranchesPage() {
   const sortedBranches = useMemo(() => {
     return getSortedBranches(filteredBranches);
   }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    const toastId = toast.loading(t("General.loading_operation"), {
-      description: t("Branches.loading.deleting"),
-    });
-
-    await deleteBranches(selectedRows, {
-      onSuccess: () => {
-        clearSelection();
-        toast.success(t("General.successful_operation"), {
-          description: t("Branches.success.deleted"),
-        });
-        toast.dismiss(toastId);
-        setIsDeleteDialogOpen(false);
-      },
-      onError: () => {
-        toast.error(t("General.error_operation"), {
-          description: t("Branches.error.deleting"),
-        });
-        toast.dismiss(toastId);
-      },
-    });
-  };
-
+ 
   const onActionClicked = async (action: string, rowId: string) => {
     console.log(action, rowId);
     if (action === "edit") {
@@ -186,7 +175,7 @@ export default function BranchesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Branches.confirm_delete")}
           description={t("Branches.delete_description", { count: selectedRows.length })}
         />

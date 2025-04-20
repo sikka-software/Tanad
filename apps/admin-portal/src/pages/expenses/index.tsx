@@ -12,6 +12,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import ExpenseCard from "@/modules/expense/expense.card";
 import { ExpenseForm } from "@/modules/expense/expense.form";
 import {
@@ -43,12 +44,23 @@ export default function ExpensesPage() {
   const searchQuery = useExpenseStore((state) => state.searchQuery);
   const filterConditions = useExpenseStore((state) => state.filterConditions);
   const filterCaseSensitive = useExpenseStore((state) => state.filterCaseSensitive);
-  const getFilteredExpenses = useExpenseStore((state) => state.getFilteredExpenses);
-  const getSortedExpenses = useExpenseStore((state) => state.getSortedExpenses);
+  const getFilteredExpenses = useExpenseStore((state) => state.getFilteredData);
+  const getSortedExpenses = useExpenseStore((state) => state.getSortedData);
 
   const { data: expenses, isLoading: loadingFetchExpenses, error } = useExpenses();
-  const { mutate: deleteExpenses, isPending: isDeleting } = useBulkDeleteExpenses();
+  const { mutateAsync: deleteExpenses, isPending: isDeleting } = useBulkDeleteExpenses();
   const { mutate: duplicateExpense } = useDuplicateExpense();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteExpenses, {
+    loading: "Expenses.loading.deleting",
+    success: "Expenses.success.deleted",
+    error: "Expenses.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredExpenses = useMemo(() => {
     return getFilteredExpenses(expenses || []);
@@ -57,29 +69,6 @@ export default function ExpensesPage() {
   const sortedExpenses = useMemo(() => {
     return getSortedExpenses(filteredExpenses);
   }, [filteredExpenses, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    const toastId = toast.loading(t("General.loading_operation"), {
-      description: t("Expenses.loading.deleting"),
-    });
-
-    await deleteExpenses(selectedRows, {
-      onSuccess: () => {
-        clearSelection();
-        toast.success(t("General.successful_operation"), {
-          description: t("Expenses.success.deleted"),
-        });
-        toast.dismiss(toastId);
-        setIsDeleteDialogOpen(false);
-      },
-      onError: () => {
-        toast.error(t("General.error_operation"), {
-          description: t("Expenses.error.bulk_delete"),
-        });
-        toast.dismiss(toastId);
-      },
-    });
-  };
 
   const onActionClicked = async (action: string, rowId: string) => {
     console.log(action, rowId);
@@ -185,7 +174,7 @@ export default function ExpensesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Expenses.confirm_delete_title")}
           description={t("Expenses.confirm_delete", { count: selectedRows.length })}
         />

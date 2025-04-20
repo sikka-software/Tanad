@@ -10,6 +10,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import JobListingCard from "@/modules/job-listing/job-listing.card";
 import { useJobListings, useBulkDeleteJobListings } from "@/modules/job-listing/job-listing.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/job-listing/job-listing.options";
@@ -35,7 +36,18 @@ export default function JobListingsPage() {
   const getSortedJobListings = useJobListingsStore((state) => state.getSortedData);
 
   const { data: jobListings = [], isLoading, error } = useJobListings();
-  const { mutate: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
+  const { mutateAsync: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteJobListings, {
+    loading: "JobListings.loading.deleting",
+    success: "JobListings.success.deleted",
+    error: "JobListings.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredListings = useMemo(() => {
     return getFilteredJobListings(jobListings || []);
@@ -44,23 +56,6 @@ export default function JobListingsPage() {
   const sortedListings = useMemo(() => {
     return getSortedJobListings(filteredListings);
   }, [filteredListings, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteJobListings(selectedRows);
-      clearSelection();
-      toast.success(t("General.successful_operation"), {
-        description: t("JobListings.messages.items_deleted"),
-      });
-    } catch (err: unknown) {
-      console.error("Error deleting job listings:", err);
-      toast.error(t("General.error_operation"), {
-        description: t("JobListings.messages.delete_error"),
-      });
-    } finally {
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -112,7 +107,7 @@ export default function JobListingsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("JobListings.confirm_delete")}
           description={t("JobListings.delete_description", { count: selectedRows.length })}
         />

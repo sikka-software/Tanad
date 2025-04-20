@@ -11,6 +11,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import JobCard from "@/modules/job/job.card";
 import { useJobs, useBulkDeleteJobs } from "@/modules/job/job.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/job/job.options";
@@ -35,7 +36,18 @@ export default function JobsPage() {
   const getSortedJobs = useJobsStore((state) => state.getSortedData);
 
   const { data: jobs, isLoading, error } = useJobs();
-  const { mutate: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
+  const { mutateAsync: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteJobs, {
+    loading: "Jobs.loading.deleting",
+    success: "Jobs.success.deleted",
+    error: "Jobs.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredJobs = useMemo(() => {
     return getFilteredJobs(jobs || []);
@@ -44,25 +56,6 @@ export default function JobsPage() {
   const sortedJobs = useMemo(() => {
     return getSortedJobs(filteredJobs);
   }, [filteredJobs, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteJobs(selectedRows, {
-        onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
-        },
-        onError: (error: any) => {
-          console.error("Failed to delete jobs:", error);
-          toast.error(t("Jobs.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
-        },
-      });
-    } catch (error) {
-      console.error("Failed to delete jobs:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -108,7 +101,7 @@ export default function JobsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Jobs.delete.title")}
           description={t("Jobs.delete.description", { count: selectedRows.length })}
         />

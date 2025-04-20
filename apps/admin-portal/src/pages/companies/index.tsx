@@ -12,6 +12,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CompanyCard from "@/modules/company/company.card";
 import { CompanyForm } from "@/modules/company/company.form";
 import {
@@ -43,12 +44,23 @@ export default function CompaniesPage() {
   const searchQuery = useCompanyStore((state) => state.searchQuery);
   const filterConditions = useCompanyStore((state) => state.filterConditions);
   const filterCaseSensitive = useCompanyStore((state) => state.filterCaseSensitive);
-  const getFilteredCompanies = useCompanyStore((state) => state.getFilteredCompanies);
-  const getSortedCompanies = useCompanyStore((state) => state.getSortedCompanies);
+  const getFilteredCompanies = useCompanyStore((state) => state.getFilteredData);
+  const getSortedCompanies = useCompanyStore((state) => state.getSortedData);
 
   const { data: companies, isLoading: loadingFetchCompanies, error } = useCompanies();
   const { mutate: duplicateCompany } = useDuplicateCompany();
-  const { mutate: deleteCompanies, isPending: isDeleting } = useBulkDeleteCompanies();
+  const { mutateAsync: deleteCompanies, isPending: isDeleting } = useBulkDeleteCompanies();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteCompanies, {
+    loading: "Companies.loading.deleting",
+    success: "Companies.success.deleted",
+    error: "Companies.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredCompanies = useMemo(() => {
     return getFilteredCompanies(companies || []);
@@ -57,29 +69,6 @@ export default function CompaniesPage() {
   const sortedCompanies = useMemo(() => {
     return getSortedCompanies(filteredCompanies);
   }, [filteredCompanies, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    const toastId = toast.loading(t("General.loading_operation"), {
-      description: t("Companies.loading.deleting"),
-    });
-
-    await deleteCompanies(selectedRows, {
-      onSuccess: () => {
-        clearSelection();
-        toast.success(t("General.successful_operation"), {
-          description: t("Companies.success.deleted"),
-        });
-        toast.dismiss(toastId);
-        setIsDeleteDialogOpen(false);
-      },
-      onError: () => {
-        toast.error(t("General.error_operation"), {
-          description: t("Companies.error.deleting"),
-        });
-        toast.dismiss(toastId);
-      },
-    });
-  };
 
   const onActionClicked = async (action: string, rowId: string) => {
     console.log(action, rowId);
@@ -185,7 +174,7 @@ export default function CompaniesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Companies.confirm_delete")}
           description={t("Companies.delete_description", { count: selectedRows.length })}
         />

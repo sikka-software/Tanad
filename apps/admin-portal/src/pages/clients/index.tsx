@@ -12,6 +12,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import ClientCard from "@/modules/client/client.card";
 import { ClientForm } from "@/modules/client/client.form";
 import {
@@ -43,12 +44,23 @@ export default function ClientsPage() {
   const searchQuery = useClientStore((state) => state.searchQuery);
   const filterConditions = useClientStore((state) => state.filterConditions);
   const filterCaseSensitive = useClientStore((state) => state.filterCaseSensitive);
-  const getFilteredClients = useClientStore((state) => state.getFilteredClients);
-  const getSortedClients = useClientStore((state) => state.getSortedClients);
+  const getFilteredClients = useClientStore((state) => state.getFilteredData);
+  const getSortedClients = useClientStore((state) => state.getSortedData);
 
   const { data: clients, isLoading, error } = useClients();
   const { mutate: duplicateClient } = useDuplicateClient();
-  const { mutate: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
+  const { mutateAsync: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteClients, {
+    loading: "Clients.loading.deleting",
+    success: "Clients.success.deleted",
+    error: "Clients.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredClients = useMemo(() => {
     return getFilteredClients(clients || []);
@@ -57,29 +69,6 @@ export default function ClientsPage() {
   const sortedClients = useMemo(() => {
     return getSortedClients(filteredClients);
   }, [filteredClients, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    const toastId = toast.loading(t("General.loading_operation"), {
-      description: t("Clients.loading.deleting"),
-    });
-
-    await deleteClients(selectedRows, {
-      onSuccess: () => {
-        clearSelection();
-        toast.success(t("General.successful_operation"), {
-          description: t("Clients.success.deleted"),
-        });
-        toast.dismiss(toastId);
-        setIsDeleteDialogOpen(false);
-      },
-      onError: (error: any) => {
-        console.error("Failed to delete clients:", error);
-        toast.error(t("Clients.error.bulk_delete"));
-        toast.dismiss(toastId);
-        setIsDeleteDialogOpen(false);
-      },
-    });
-  };
 
   const onActionClicked = async (action: string, rowId: string) => {
     console.log(action, rowId);
@@ -186,7 +175,7 @@ export default function ClientsPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Clients.confirm_delete_title")}
           description={t("Clients.confirm_delete", { count: selectedRows.length })}
         />

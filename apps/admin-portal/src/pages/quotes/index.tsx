@@ -11,6 +11,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import QuoteCard from "@/modules/quote/quote.card";
 import { useQuotes, useBulkDeleteQuotes } from "@/modules/quote/quote.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/quote/quote.options";
@@ -35,7 +36,18 @@ export default function QuotesPage() {
   const getSortedQuotes = useQuotesStore((state) => state.getSortedData);
 
   const { data: quotes, isLoading, error } = useQuotes();
-  const { mutate: deleteQuotes, isPending: isDeleting } = useBulkDeleteQuotes();
+  const { mutateAsync: deleteQuotes, isPending: isDeleting } = useBulkDeleteQuotes();
+  const { createDeleteHandler } = useDeleteHandler();
+
+  const handleConfirmDelete = createDeleteHandler(deleteQuotes, {
+    loading: "Quotes.loading.deleting",
+    success: "Quotes.success.deleted",
+    error: "Quotes.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
   const filteredQuotes = useMemo(() => {
     return getFilteredQuotes(quotes || []);
@@ -44,25 +56,6 @@ export default function QuotesPage() {
   const sortedQuotes = useMemo(() => {
     return getSortedQuotes(filteredQuotes);
   }, [filteredQuotes, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const handleConfirmDelete = async () => {
-    try {
-      await deleteQuotes(selectedRows, {
-        onSuccess: () => {
-          clearSelection();
-          setIsDeleteDialogOpen(false);
-        },
-        onError: (error: any) => {
-          console.error("Failed to delete quotes:", error);
-          toast.error(t("Quotes.error.bulk_delete"));
-          setIsDeleteDialogOpen(false);
-        },
-      });
-    } catch (error) {
-      console.error("Failed to delete quotes:", error);
-      setIsDeleteDialogOpen(false);
-    }
-  };
 
   return (
     <div>
@@ -109,7 +102,7 @@ export default function QuotesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={handleConfirmDelete}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Quotes.confirm_delete_title")}
           description={t("Quotes.confirm_delete", { count: selectedRows.length })}
         />
