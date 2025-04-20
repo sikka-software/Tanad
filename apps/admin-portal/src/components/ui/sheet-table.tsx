@@ -663,7 +663,7 @@ function SheetTable<
         >
           {/* Selection checkbox */}
           {enableRowSelection && (
-            <TableCell className="bg-background sticky start-0 z-2 border-2">
+            <TableCell className="bg-background sticky start-0 z-2">
               <div className="flex h-auto items-center justify-center">
                 <input
                   type="checkbox"
@@ -672,6 +672,7 @@ function SheetTable<
                   className="h-4 w-4 rounded border-gray-300"
                 />
               </div>
+              <div className="bg-border absolute top-0 left-0 h-full w-[0.5px]" />
             </TableCell>
           )}
 
@@ -999,7 +1000,7 @@ function SheetTable<
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         {/* Primary header */}
         {showHeader && (
-          <TableHeader>
+          <TableHeader className="relative">
             <TableRow className="border-none">
               {/* Selection checkbox header */}
               {enableRowSelection && (
@@ -1013,6 +1014,7 @@ function SheetTable<
                       title={t("General.select_all")}
                     />
                   </div>
+                  <div className="bg-border absolute top-0 left-0 h-full w-[0.5px]" />
                 </TableHead>
               )}
 
