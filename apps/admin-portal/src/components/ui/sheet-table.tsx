@@ -26,8 +26,19 @@ import {
   ColumnSizingState,
 } from "@tanstack/react-table";
 // ** import icons
-import { ChevronDown, ChevronRight, MoreHorizontal, Plus, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  MoreHorizontal,
+  Plus,
+  Trash2,
+  Edit,
+  Copy,
+  Eye,
+  Archive,
+} from "lucide-react";
 import { EllipsisVertical } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
@@ -323,6 +334,63 @@ export function isRowDisabled(
   }
   return rows[groupKey]?.includes(rowIndex) ?? false;
 }
+
+interface RowActionsProps {
+  onEdit?: () => void;
+  onDuplicate?: () => void;
+  onView?: () => void;
+  onArchive?: () => void;
+  onDelete?: () => void;
+}
+
+const RowActions = ({ onEdit, onDuplicate, onView, onArchive, onDelete }: RowActionsProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div
+      className="relative flex items-center justify-center"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+    >
+      <AnimatePresence>
+        {isHovered ? (
+          <motion.div
+            initial={{ width: 32, opacity: 0 }}
+            animate={{ width: 200, opacity: 1 }}
+            exit={{ width: 32, opacity: 0 }}
+            className="bg-background flex items-center justify-between gap-1 rounded-md p-1 shadow-sm"
+          >
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onEdit}>
+              <Edit className="size-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDuplicate}>
+              <Copy className="size-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onView}>
+              <Eye className="size-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onArchive}>
+              <Archive className="size-4" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onDelete}>
+              <Trash2 className="size-4" />
+            </Button>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ width: 32, opacity: 1 }}
+            animate={{ width: 32, opacity: 1 }}
+            exit={{ width: 32, opacity: 0 }}
+          >
+            <Button variant="ghost" size="icon" className="h-7 w-7">
+              <MoreHorizontal className="size-4" />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
 
 /**
  * The main SheetTable component, now with optional column sizing support,
@@ -922,16 +990,15 @@ function SheetTable<
 
           {/* Selection checkbox */}
           {enableRowActions && (
-            <TableCell className="sticky end-0 z-2 bg-background align-middle">
-              <Button
-                size="sm"
-                className="h-auto rounded-none p-0"
-                // variant="ghost"
-              >
-                <MoreHorizontal className="size-4" />
-              </Button>
-              <div className="bg-border absolute start-0 top-0 h-full w-[0.5px]" />
-            </TableCell>
+            <div className="align-midle sticky end-0 z-2">
+              <RowActions
+                onEdit={() => console.log("Edit")}
+                onDuplicate={() => console.log("Duplicate")}
+                onView={() => console.log("View")}
+                onArchive={() => console.log("Archive")}
+                onDelete={() => console.log("Delete")}
+              />
+            </div>
           )}
         </TableRow>
 
@@ -1078,20 +1145,7 @@ function SheetTable<
                 <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
               )}
 
-              {enableRowActions && (
-                <TableHead className="bg-muted sticky end-0 z-2 w-[30px] border-y p-0">
-                  <div className="flex h-full items-center justify-center">
-                    <input
-                      type="checkbox"
-                      checked={table.getIsAllPageRowsSelected()}
-                      onChange={table.getToggleAllPageRowsSelectedHandler()}
-                      className="h-4 w-4 rounded border-gray-300"
-                      title={t("General.select_all")}
-                    />
-                  </div>
-                  <div className="bg-border absolute start-0 top-0 h-full w-[0.5px]" />
-                </TableHead>
-              )}
+              {enableRowActions && <TableHead></TableHead>}
             </TableRow>
           </TableHeader>
         )}
