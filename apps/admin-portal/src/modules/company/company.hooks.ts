@@ -8,7 +8,6 @@ import {
   fetchCompanies,
   updateCompany,
 } from "@/modules/company/company.service";
-
 import type { Company, CompanyCreateData } from "@/modules/company/company.type";
 
 // Query keys for companies
@@ -41,16 +40,13 @@ export function useCompany(id: string) {
 export function useCreateCompany() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newCompany: Omit<Company, "id" | "created_at"> & { user_id: string }) => {
-      const { user_id, ...rest } = newCompany;
-      const companyData: CompanyCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createCompany(companyData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
+    mutationFn: (company: CompanyCreateData) => createCompany(company),
+    onSuccess: (newCompany: Company) => {
+      const previousCompanies = queryClient.getQueryData(companyKeys.lists()) || [];
+      queryClient.setQueryData(companyKeys.lists(), [
+        ...(Array.isArray(previousCompanies) ? previousCompanies : []),
+        newCompany,
+      ]);
     },
   });
 }

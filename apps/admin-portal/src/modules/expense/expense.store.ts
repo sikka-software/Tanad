@@ -38,7 +38,7 @@ type ExpenseActions = {
   getSortedExpenses: (data: Expense[]) => Expense[];
 };
 
-export const useExpenseStore = create<ExpenseStates & ExpenseActions>((set, get) => ({
+const useExpenseStore = create<ExpenseStates & ExpenseActions>((set, get) => ({
   expenses: [],
   isLoading: false,
   error: null,
@@ -138,3 +138,5 @@ export const useExpenseStore = create<ExpenseStates & ExpenseActions>((set, get)
     });
   },
 }));
+
+export default useExpenseStore;

@@ -4,11 +4,11 @@ import Link from "next/link";
 import { Button } from "./button";
 
 const PageTitle = ({
-  title,
   createButtonLink,
   createButtonText,
   createButtonDisabled,
   customButton,
+  dummyButton,
   loading,
   formButtons,
   texts,
@@ -16,7 +16,7 @@ const PageTitle = ({
   formId,
 }: {
   onCancel?: () => void;
-  title: string;
+  dummyButton?: () => void;
   createButtonLink?: string;
   createButtonText?: string;
   createButtonDisabled?: boolean;
@@ -25,15 +25,21 @@ const PageTitle = ({
   formId?: string;
   loading?: boolean;
   texts?: {
+    title: string;
     submit_form: string;
     cancel: string;
   };
 }) => {
   return (
     <div className="bg-background bg-background sticky top-0 flex !min-h-12 items-center justify-between border-b p-2 py-0">
-      <h2 className="ms-2 text-xl font-bold">{title}</h2>
+      {texts?.title && <h2 className="ms-2 text-xl font-bold">{texts?.title}</h2>}
       {formButtons && (
         <div className="flex gap-2 p-0">
+          {dummyButton && (
+            <Button variant="outline" size="sm" onClick={dummyButton}>
+              Dummy Data
+            </Button>
+          )}
           {customButton
             ? customButton
             : createButtonLink && (

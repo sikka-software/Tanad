@@ -4,6 +4,7 @@ import { applyFilters } from "@/lib/filter-utils";
 import { applySort } from "@/lib/sort-utils";
 
 import { FilterCondition } from "@/types/common.type";
+
 import { Company } from "@/modules/company/company.type";
 
 type CompaniesStates = {
@@ -23,6 +24,7 @@ type CompaniesStates = {
 };
 
 type CompaniesActions = {
+  setIsLoading: (isLoading: boolean) => void;
   updateCompany: (id: string, updates: Partial<Company>) => Promise<void>;
   setSelectedRows: (ids: string[]) => void;
   clearSelection: () => void;
@@ -52,6 +54,10 @@ const useCompanyStore = create<CompaniesStates & CompaniesActions>((set, get) =>
   sortRules: [],
   sortCaseSensitive: false,
   sortNullsFirst: false,
+
+  setIsLoading: (isLoading: boolean) => {
+    set({ isLoading });
+  },
 
   getFilteredCompanies: (data: Company[]) => {
     const { searchQuery, filterConditions, filterCaseSensitive } = get();

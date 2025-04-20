@@ -13,7 +13,7 @@ import { Textarea } from "@/ui/textarea";
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateExpense } from "./expense.hooks";
-import { useExpenseStore } from "./expense.store";
+import useExpenseStore from "./expense.store";
 
 export const createExpenseSchema = (t: (key: string) => string) =>
   z.object({

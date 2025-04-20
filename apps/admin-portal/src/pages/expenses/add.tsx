@@ -3,7 +3,6 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -11,7 +10,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { generateDummyData } from "@/lib/dummy-generator";
 
 import { ExpenseForm } from "@/modules/expense/expense.form";
-import { useExpenseStore } from "@/modules/expense/expense.store";
+import useExpenseStore from "@/modules/expense/expense.store";
 
 export default function AddExpensePage() {
   const t = useTranslations();
@@ -45,22 +44,16 @@ export default function AddExpensePage() {
     <div>
       <CustomPageMeta title={t("Expenses.add_new")} />
       <PageTitle
-        title={t("Expenses.add_new")}
         formButtons
         formId="expense-form"
         loading={isLoading}
         onCancel={() => router.push("/expenses")}
         texts={{
+          title: t("Expenses.add_new"),
           submit_form: t("Expenses.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
+        dummyButton={handleDummyData}
       />
 
       <div className="mx-auto max-w-2xl p-4">

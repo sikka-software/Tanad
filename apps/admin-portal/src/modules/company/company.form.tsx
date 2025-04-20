@@ -1,14 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
-// Create schema factory to handle translations
+import useCompanyStore from "@/modules/company/company.store";
+import useUserStore from "@/stores/use-user-store";
+
+import { useCreateCompany } from "./company.hooks";
+
 export const createCompanySchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Companies.form.validation.name_required")),
@@ -32,14 +36,17 @@ export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
 
 interface CompanyFormProps {
   id?: string;
-  onSubmit: (data: CompanyFormValues) => void;
-  loading?: boolean;
-  defaultValues?: Partial<CompanyFormValues>;
+  onSuccess: () => void;
 }
 
-export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFormProps) {
+export function CompanyForm({ id, onSuccess }: CompanyFormProps) {
   const t = useTranslations();
   const companySchema = createCompanySchema(t);
+  const { user } = useUserStore();
+  const { mutate: createCompany } = useCreateCompany();
+
+  const isLoading = useCompanyStore((state) => state.isLoading);
+  const setIsLoading = useCompanyStore((state) => state.setIsLoading);
 
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companySchema),
@@ -56,9 +63,88 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
       size: "",
       notes: "",
       is_active: true,
-      ...defaultValues,
     },
   });
+
+  const handleSubmit = async (data: CompanyFormValues) => {
+    setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
+    try {
+      await createCompany(
+        {
+          name: data.name.trim(),
+          email: data.email.trim(),
+          phone: data.phone?.trim() || undefined,
+          website: data.website?.trim() || undefined,
+          address: data.address?.trim() || undefined,
+          city: data.city?.trim() || undefined,
+          state: data.state?.trim() || undefined,
+          zip_code: data.zip_code?.trim() || undefined,
+          industry: data.industry?.trim() || undefined,
+          size: data.size?.trim() || undefined,
+          notes: data.notes?.trim() || undefined,
+          is_active: data.is_active || true,
+          user_id: user?.id,
+        },
+        {
+          onSuccess: () => {
+            if (onSuccess) {
+              onSuccess();
+            }
+          },
+        },
+      );
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Failed to save company:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Companies.error.creating"),
+      });
+    }
+  };
+
+  // const handleSubmit = async (data: ExpenseFormValues) => {
+  //   setIsLoading(true);
+  //   if (!user?.id) {
+  //     toast.error(t("General.unauthorized"), {
+  //       description: t("General.must_be_logged_in"),
+  //     });
+  //     return;
+  //   }
+
+  //   try {
+  //     await createExpense(
+  //       {
+  //         expense_number: data.expense_number.trim(),
+  //         issue_date: data.issue_date,
+  //         due_date: data.due_date,
+  //         amount: data.amount,
+  //         category: data.category.trim(),
+  //         ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
+  //         status: data.status || "pending",
+  //         notes: data.notes?.trim(),
+  //         user_id: user?.id,
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           if (onSuccess) {
+  //             onSuccess();
+  //           }
+  //         },
+  //       },
+  //     );
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     toast.error(t("General.error_operation"), {
+  //       description: error instanceof Error ? error.message : t("Expenses.error.creating"),
+  //     });
+  //   }
+  // };
 
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
@@ -67,7 +153,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
@@ -77,7 +163,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormLabel>{t("Companies.form.name.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.name.placeholder")}
                     {...field}
                   />
@@ -95,7 +181,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormControl>
                   <Input
                     type="email"
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.email.placeholder")}
                     {...field}
                   />
@@ -112,7 +198,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormLabel>{t("Companies.form.phone.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.phone.placeholder")}
                     {...field}
                   />
@@ -129,7 +215,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormLabel>{t("Companies.form.website.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.website.placeholder")}
                     {...field}
                   />
@@ -146,7 +232,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormLabel>{t("Companies.form.address.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.address.placeholder")}
                     {...field}
                   />
@@ -163,7 +249,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormLabel>{t("Companies.form.city.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.city.placeholder")}
                     {...field}
                   />
@@ -180,7 +266,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormLabel>{t("Companies.form.state.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.state.placeholder")}
                     {...field}
                   />
@@ -197,7 +283,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormLabel>{t("Companies.form.zip_code.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.zip_code.placeholder")}
                     {...field}
                   />
@@ -214,7 +300,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormLabel>{t("Companies.form.industry.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.industry.placeholder")}
                     {...field}
                   />
@@ -231,7 +317,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
                 <FormLabel>{t("Companies.form.size.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={loading}
+                    disabled={isLoading}
                     placeholder={t("Companies.form.size.placeholder")}
                     {...field}
                   />
@@ -249,7 +335,7 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
               <FormLabel>{t("Companies.form.notes.label")}</FormLabel>
               <FormControl>
                 <Textarea
-                  disabled={loading}
+                  disabled={isLoading}
                   placeholder={t("Companies.form.notes.placeholder")}
                   {...field}
                 />
@@ -258,20 +344,6 @@ export function CompanyForm({ id, onSubmit, loading, defaultValues }: CompanyFor
             </FormItem>
           )}
         />
-        {/* <FormField
-          control={form.control}
-          name="is_active"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">{t("Companies.form.is_active.label")}</FormLabel>
-              </div>
-              <FormControl>
-                <Switch disabled={loading} checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
-            </FormItem>
-          )}
-        /> */}
       </form>
     </Form>
   );
