@@ -62,16 +62,16 @@ const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTable
       },
     },
     {
-      accessorKey: "startDate",
+      accessorKey: "start_date",
       header: t("EmployeeRequests.form.date_range.start"),
       cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.startDate ? format(new Date(row.original.startDate), "PP") : "-",
+        row.original.start_date ? format(new Date(row.original.start_date), "PP") : "-",
     },
     {
-      accessorKey: "endDate",
+      accessorKey: "end_date",
       header: t("EmployeeRequests.form.date_range.end"),
       cell: ({ row }: { row: { original: EmployeeRequest } }) =>
-        row.original.endDate ? format(new Date(row.original.endDate), "PP") : "-",
+        row.original.end_date ? format(new Date(row.original.end_date), "PP") : "-",
     },
     {
       accessorKey: "amount",

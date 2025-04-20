@@ -33,8 +33,8 @@ const createJobFormSchema = (t: (key: string) => string) =>
         (val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0),
         t("Jobs.form.salary.invalid"),
       ),
-    startDate: z.date().optional(),
-    endDate: z.date().optional(),
+    start_date: z.date().optional(),
+    end_date: z.date().optional(),
     is_active: z.boolean(),
   });
 
@@ -53,8 +53,8 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
       department: "",
       type: "Full-time",
       salary: "",
-      startDate: undefined,
-      endDate: undefined,
+      start_date: undefined,
+      end_date: undefined,
       is_active: true,
     },
   });
@@ -144,7 +144,7 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="startDate"
+            name="start_date"
             render={({ field: { value, onChange, ...field } }) => (
               <FormItem>
                 <FormLabel>{t("Jobs.form.start_date.label")}</FormLabel>
@@ -162,7 +162,7 @@ export function JobForm({ id, onSuccess, onSubmit, loading = false }: JobFormPro
 
           <FormField
             control={form.control}
-            name="endDate"
+            name="end_date"
             render={({ field: { value, onChange, ...field } }) => (
               <FormItem>
                 <FormLabel>{t("Jobs.form.end_date.label")}</FormLabel>

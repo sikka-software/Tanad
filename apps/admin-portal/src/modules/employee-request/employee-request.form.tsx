@@ -39,8 +39,8 @@ const createRequestSchema = (t: (key: string) => string) =>
     status: z.enum(["pending", "approved", "rejected"]).default("pending"),
     title: z.string({ message: t("EmployeeRequests.form.title.required") }).min(1),
     description: z.string().optional(),
-    startDate: z.date().optional(),
-    endDate: z.date().optional(),
+    start_date: z.date().optional(),
+    end_date: z.date().optional(),
     amount: z.number().optional(),
     // attachments: z.array(z.any()).default([]),
     notes: z.string().optional(),
@@ -77,8 +77,8 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
       status: "pending",
       title: "",
       description: "",
-      startDate: undefined,
-      endDate: undefined,
+      start_date: undefined,
+      end_date: undefined,
       amount: undefined,
       // attachments: [],
       notes: "",
@@ -310,7 +310,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="startDate"
+              name="start_date"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("EmployeeRequests.form.date_range.start")}</FormLabel>
@@ -346,7 +346,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
 
             <FormField
               control={form.control}
-              name="endDate"
+              name="end_date"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("EmployeeRequests.form.date_range.end")}</FormLabel>

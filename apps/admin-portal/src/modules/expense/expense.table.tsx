@@ -11,7 +11,7 @@ import { Expense } from "@/modules/expense/expense.type";
 
 import { useUpdateExpense } from "./expense.hooks";
 
-const expenseNumberSchema = z.string().min(1, "Required");
+const expense_numberSchema = z.string().min(1, "Required");
 const issue_dateSchema = z.string().min(1, "Required");
 const due_dateSchema = z.string().min(1, "Required");
 const statusSchema = z.enum(["pending", "paid", "overdue"]);
@@ -37,9 +37,9 @@ const ExpensesTable = ({ data, isLoading, error }: ExpensesTableProps) => {
 
   const columns: ExtendedColumnDef<Expense>[] = [
     {
-      accessorKey: "expenseNumber",
-      header: t("Expenses.form.expenseNumber.label"),
-      validationSchema: expenseNumberSchema,
+      accessorKey: "expense_number",
+      header: t("Expenses.form.expense_number.label"),
+      validationSchema: expense_numberSchema,
     },
     {
       accessorKey: "issue_date",

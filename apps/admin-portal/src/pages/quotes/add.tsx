@@ -26,12 +26,12 @@ export default function AddQuotePage() {
       // Calculate final amounts
       const subtotal = data.items.reduce((acc, item) => {
         const quantity = parseFloat(item.quantity) || 0;
-        const unitPrice = parseFloat(item.unit_price) || 0;
-        return acc + quantity * unitPrice;
+        const unit_price = parseFloat(item.unit_price) || 0;
+        return acc + quantity * unit_price;
       }, 0);
 
-      const taxAmount = (subtotal * data.tax_rate) / 100;
-      const total = subtotal + taxAmount;
+      const tax_amount = (subtotal * data.tax_rate) / 100;
+      const total = subtotal + tax_amount;
 
       // First create the quote
       const { data: quote, error: quoteError } = await supabase

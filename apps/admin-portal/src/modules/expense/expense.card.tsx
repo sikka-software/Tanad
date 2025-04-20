@@ -13,7 +13,7 @@ const ExpenseCard = ({ expense }: { expense: Expense }) => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold">{expense.expenseNumber}</h3>
+            <h3 className="text-lg font-semibold">{expense.expense_number}</h3>
             <p className="text-sm text-gray-500">{expense.category}</p>
           </div>
           <Badge

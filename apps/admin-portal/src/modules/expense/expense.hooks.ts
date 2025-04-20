@@ -39,24 +39,17 @@ export function useExpense(id: string) {
 // Hook for creating a new expense
 export function useCreateExpense() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (newExpense: Omit<Expense, "id" | "created_at"> & { user_id: string }) => {
-      // Map user_id to user_id for the service function
-      const { user_id, ...rest } = newExpense;
-      const expenseData: ExpenseCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createExpense(expenseData);
-    },
-    onSuccess: () => {
-      // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
+    mutationFn: (expense: ExpenseCreateData) => createExpense(expense),
+    onSuccess: (newExpense) => {
+      const previousExpenses = queryClient.getQueryData(expenseKeys.lists()) || [];
+      queryClient.setQueryData(expenseKeys.lists(), [
+        ...(Array.isArray(previousExpenses) ? previousExpenses : []),
+        newExpense,
+      ]);
     },
   });
 }
-
 // Hook for updating an existing expense
 export function useUpdateExpense() {
   const queryClient = useQueryClient();

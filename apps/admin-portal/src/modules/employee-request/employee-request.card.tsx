@@ -31,13 +31,13 @@ const EmployeeRequestCard = ({ employeeRequest }: { employeeRequest: EmployeeReq
         </p>
         <div className="text-sm text-gray-500">
           <p>Employee name here</p>
-          {/* <p>{t("employee_label", { name: employeeRequest.employeeName })}</p> */}
-          {employeeRequest.startDate && (
+          {/* <p>{t("employee_label", { name: employeeRequest.employee_name })}</p> */}
+          {employeeRequest.start_date && (
             <p>
               {t("date_range", {
-                start: new Date(employeeRequest.startDate).toLocaleDateString(),
-                end: employeeRequest.endDate
-                  ? new Date(employeeRequest.endDate).toLocaleDateString()
+                start: new Date(employeeRequest.start_date).toLocaleDateString(),
+                end: employeeRequest.end_date
+                  ? new Date(employeeRequest.end_date).toLocaleDateString()
                   : t("not_specified"),
               })}
             </p>

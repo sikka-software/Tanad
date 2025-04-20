@@ -29,14 +29,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "POST") {
     try {
-      const { name, type, content, isDefault, user_id } = req.body;
+      const { name, type, content, is_default, user_id } = req.body;
 
       // Log request body for debugging
       console.log("Template creation request:", {
         name,
         type,
         contentType: typeof content,
-        isDefault,
+        is_default,
         user_id
       });
 
@@ -72,10 +72,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       // If setting as default, update existing default templates
-      if (isDefault) {
+      if (is_default) {
         await db
           .update(templates)
-          .set({ isDefault: false })
+          .set({ is_default: false })
           .where(eq(templates.user_id, user_id));
       }
 
@@ -84,7 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         name,
         type,
         content: parsedContent,
-        isDefault: isDefault || false,
+        is_default: is_default || false,
         user_id: user_id,
       });
 

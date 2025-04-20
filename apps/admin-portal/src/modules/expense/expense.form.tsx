@@ -11,14 +11,14 @@ import { Textarea } from "@/ui/textarea";
 
 export const createExpenseSchema = (t: (key: string) => string) =>
   z.object({
-    expenseNumber: z.string().min(1, t("Expenses.form.expenseNumber.required")),
-    issue_date: z.string().min(1, t("Expenses.form.issue_date.required")),
-    due_date: z.string().min(1, t("Expenses.form.due_date.required")),
+    expense_number: z.string().min(1, t("Expenses.form.expense_number.required")),
+    issue_date: z.date({ required_error: t("Expenses.form.issue_date.required") }),
+    due_date: z.date({ required_error: t("Expenses.form.due_date.required") }),
     status: z.enum(["pending", "paid", "overdue"]).default("pending"),
     amount: z.number().min(0, t("Expenses.form.amount.required")),
     category: z.string().min(1, t("Expenses.form.category.required")),
     notes: z.string().optional().or(z.literal("")),
-    client_id: z.string().min(1, t("Expenses.form.client_id.required")),
+    client_id: z.string().optional(),
   });
 
 export type ExpenseFormValues = z.input<ReturnType<typeof createExpenseSchema>>;
@@ -27,17 +27,16 @@ export interface ExpenseFormProps {
   id?: string;
   onSubmit: (data: ExpenseFormValues) => void;
   loading?: boolean;
-  initialData?: ExpenseFormValues;
 }
 
-export function ExpenseForm({ id, onSubmit, loading, initialData }: ExpenseFormProps) {
+export function ExpenseForm({ id, onSubmit, loading }: ExpenseFormProps) {
   const t = useTranslations();
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(createExpenseSchema(t)),
-    defaultValues: initialData || {
-      expenseNumber: "",
-      issue_date: "",
-      due_date: "",
+    defaultValues: {
+      expense_number: "",
+      issue_date: undefined,
+      due_date: undefined,
       status: "pending",
       amount: 0,
       category: "",
@@ -57,13 +56,13 @@ export function ExpenseForm({ id, onSubmit, loading, initialData }: ExpenseFormP
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FormField
             control={form.control}
-            name="expenseNumber"
+            name="expense_number"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Expenses.form.expenseNumber.label")} *</FormLabel>
+                <FormLabel>{t("Expenses.form.expense_number.label")} *</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={t("Expenses.form.expenseNumber.placeholder")}
+                    placeholder={t("Expenses.form.expense_number.placeholder")}
                     {...field}
                     disabled={loading}
                   />

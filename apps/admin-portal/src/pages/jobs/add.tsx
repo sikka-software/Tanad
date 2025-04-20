@@ -35,8 +35,8 @@ export default function AddJobPage() {
         type: data.type.trim(),
         salary: data.salary ? parseFloat(data.salary) : null,
         is_active: data.is_active,
-        startDate: data.startDate?.toISOString() || null,
-        endDate: data.endDate?.toISOString() || null,
+        start_date: data.start_date?.toISOString() || null,
+        end_date: data.end_date?.toISOString() || null,
       });
 
       // Update the jobs cache to include the new job
@@ -73,8 +73,8 @@ export default function AddJobPage() {
       form.setValue("type", dummyData.job_type);
       form.setValue("salary", dummyData.job_salary);
       form.setValue("is_active", dummyData.job_is_active);
-      form.setValue("startDate", dummyData.job_start_date);
-      form.setValue("endDate", dummyData.job_end_date);
+      form.setValue("start_date", dummyData.job_start_date);
+      form.setValue("end_date", dummyData.job_end_date);
     }
   };
 

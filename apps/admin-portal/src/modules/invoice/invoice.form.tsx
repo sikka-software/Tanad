@@ -286,7 +286,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
         },
       },
       {
-        id: "unitPrice",
+        id: "unit_price",
         header: t("products.unit_price"),
         cell: ({ row }: any) => {
           const index = row.index;

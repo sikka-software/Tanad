@@ -1,14 +1,14 @@
 export interface Expense {
   id: string;
   created_at: string;
-  expenseNumber: string;
-  issue_date: string;
-  due_date: string;
+  expense_number: string;
+  issue_date: Date;
+  due_date: Date;
   status: "pending" | "paid" | "overdue";
   amount: number;
   category: string;
   notes?: string;
-  client_id: string;
+  client_id?: string;
   user_id: string;
 }
 

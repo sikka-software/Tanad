@@ -100,10 +100,10 @@ export async function bulkDeleteQuotes(ids: string[]): Promise<void> {
 export async function createQuoteItem(quoteItem: QuoteItemCreateData) {
   try {
     const dbQuoteItem = {
-      quoteId: quoteItem.quote_id,
+      quote_id: quoteItem.quote_id,
       description: quoteItem.description,
       quantity: quoteItem.quantity.toString(),
-      unitPrice: quoteItem.unit_price.toString(),
+      unit_price: quoteItem.unit_price.toString(),
     };
 
     const response = await fetch("/api/quote-items", {
@@ -128,10 +128,10 @@ export async function createQuoteItem(quoteItem: QuoteItemCreateData) {
 export async function updateQuoteItem(id: string, quoteItem: Partial<QuoteItem>) {
   try {
     const dbQuoteItem = {
-      ...(quoteItem.quote_id && { quoteId: quoteItem.quote_id }),
+      ...(quoteItem.quote_id && { quote_id: quoteItem.quote_id }),
       ...(quoteItem.description && { description: quoteItem.description }),
       ...(quoteItem.quantity && { quantity: quoteItem.quantity.toString() }),
-      ...(quoteItem.unit_price && { unitPrice: quoteItem.unit_price.toString() }),
+      ...(quoteItem.unit_price && { unit_price: quoteItem.unit_price.toString() }),
     };
 
     const response = await fetch(`/api/quote-items/${id}`, {

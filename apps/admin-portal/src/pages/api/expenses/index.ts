@@ -41,6 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         ...req.body,
         amount: req.body.amount,
         status: req.body.status || "pending",
+        user_id: user?.id,
       };
 
       const [expense] = await db.insert(expenses).values(dbExpense).returning();

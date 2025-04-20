@@ -72,7 +72,7 @@ export const quotesRelations = relations(quotes, ({ many, one }) => ({
 
 export const quoteItemsRelations = relations(quoteItems, ({ one }) => ({
   quote: one(quotes, {
-    fields: [quoteItems.quoteId],
+    fields: [quoteItems.quote_id],
     references: [quotes.id],
   }),
   product: one(products, {

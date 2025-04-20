@@ -29,8 +29,8 @@ export default function AddInvoicePage() {
 
       // Calculate final amounts
       const subtotal = data.subtotal;
-      const taxAmount = (subtotal * data.tax_rate) / 100;
-      const total = subtotal + taxAmount;
+      const tax_amount = (subtotal * data.tax_rate) / 100;
+      const total = subtotal + tax_amount;
 
       // First create the invoice
       const { data: invoice, error: invoiceError } = await supabase

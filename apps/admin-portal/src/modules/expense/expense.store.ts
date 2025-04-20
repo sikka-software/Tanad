@@ -64,7 +64,7 @@ export const useExpenseStore = create<ExpenseStates & ExpenseActions>((set, get)
     let filtered = data;
     if (searchQuery) {
       filtered = filtered.filter((expense) =>
-        expense.expenseNumber.toLowerCase().includes(searchQuery.toLowerCase()),
+        expense.expense_number.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 

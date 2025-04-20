@@ -13,12 +13,12 @@ function convertDrizzleQuote(data: any): any {
   return {
     id: data.id,
     created_at: data.created_at.toString(),
-    quote_number: data.quoteNumber,
+    quote_number: data.quote_number,
     issue_date: data.issue_date,
-    expiry_date: data.expiryDate,
+    expiry_date: data.expiry_date,
     subtotal: Number(data.subtotal),
     tax_rate: Number(data.tax_rate),
-    tax_amount: Number(data.taxAmount),
+    tax_amount: Number(data.tax_amount),
     total: Number(data.total),
     status: data.status,
     notes: data.notes || undefined,
@@ -73,9 +73,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const [updatedQuote] = await db
           .update(quotes)
           .set({
-            quoteNumber: quote_number,
+            quote_number: quote_number,
             issue_date: issue_date,
-            expiryDate: expiry_date,
+            expiry_date: expiry_date,
             status,
             subtotal: subtotal?.toString(),
             tax_rate: tax_rate?.toString(),

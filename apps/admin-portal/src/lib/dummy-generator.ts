@@ -94,15 +94,24 @@ export const generateDummyData = () => {
   const fakeEmployeeSalaries = ["100000", "50000", "75000", "120000", "80000"];
   const fakeEmployeeNotes = ["Note 1", "Note 2", "Note 3", "Note 4", "Note 5"];
 
+  const fakeExpenseCategories = ["Office Supplies", "Marketing", "HR", "IT", "Finance"];
   const generateRandomDate = () => {
-    const startDate = new Date("2021-01-01");
-    const endDate = new Date();
+    const start_date = new Date("2021-01-01");
+    const end_date = new Date();
     return new Date(
-      startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()),
+      start_date.getTime() + Math.random() * (end_date.getTime() - start_date.getTime()),
     );
   };
 
   return {
+    pick: (array: any[]) => array[Math.floor(Math.random() * array.length)],
+    stringNumber: String(Math.random().toString(36).substring(2, 15)),
+    expense_category:
+      fakeExpenseCategories[Math.floor(Math.random() * fakeExpenseCategories.length)],
+    randomString: Math.random().toString(36).substring(2, 15),
+
+    randomNumber: Math.floor(Math.random() * 1000000),
+    randomDate: generateRandomDate(),
     employee_status: fakeEmployeeStatus[Math.floor(Math.random() * fakeEmployeeStatus.length)],
     employee_department:
       fakeEmployeeDepartments[Math.floor(Math.random() * fakeEmployeeDepartments.length)],

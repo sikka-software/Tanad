@@ -10,14 +10,14 @@ function convertDrizzleSalary(data: typeof salaries.$inferSelect) {
   return {
     id: data.id,
     created_at: data.created_at?.toString() || "",
-    pay_period_start: data.payPeriodStart,
-    pay_period_end: data.payPeriodEnd,
-    payment_date: data.paymentDate,
-    gross_amount: Number(data.grossAmount),
-    net_amount: Number(data.netAmount),
+    pay_period_start: data.pay_period_start,
+    pay_period_end: data.pay_period_end,
+    payment_date: data.payment_date,
+    gross_amount: Number(data.gross_amount),
+    net_amount: Number(data.net_amount),
     deductions: data.deductions as Record<string, number> | null,
     notes: data.notes || undefined,
-    employee_name: data.employeeName,
+    employee_name: data.employee_name,
   };
 }
 
@@ -49,14 +49,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         
         // Map salary data to match Drizzle schema
         const dbSalary = {
-          ...(salary.pay_period_start && { payPeriodStart: salary.pay_period_start }),
-          ...(salary.pay_period_end && { payPeriodEnd: salary.pay_period_end }),
-          ...(salary.payment_date && { paymentDate: salary.payment_date }),
-          ...(salary.gross_amount && { grossAmount: salary.gross_amount.toString() }),
-          ...(salary.net_amount && { netAmount: salary.net_amount.toString() }),
+          ...(salary.pay_period_start && { pay_period_start: salary.pay_period_start }),
+          ...(salary.pay_period_end && { pay_period_end: salary.pay_period_end }),
+          ...(salary.payment_date && { payment_date: salary.payment_date }),
+          ...(salary.gross_amount && { gross_amount: salary.gross_amount.toString() }),
+          ...(salary.net_amount && { net_amount: salary.net_amount.toString() }),
           ...(salary.deductions && { deductions: salary.deductions }),
           ...(salary.notes !== undefined && { notes: salary.notes }),
-          ...(salary.employee_name && { employeeName: salary.employee_name }),
+          ...(salary.employee_name && { employee_name: salary.employee_name }),
         };
 
         const [data] = await db.update(salaries)

@@ -11,6 +11,8 @@
     "inactive": "غير نشط",
     "successful_operation": "تمت العملية بنجاح",
     "error_operation": "حدث خطأ أثناء العملية",
+    "unauthorized": "غير مصرح",
+    "must_be_logged_in": "يجب عليك تسجيل الدخول لتنفيذ هذه العملية",
     "clear": "مسح",
     "close": "اغلاق",
     "no_results_found": "لا توجد نتائج",

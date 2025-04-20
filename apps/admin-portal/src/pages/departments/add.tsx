@@ -52,9 +52,9 @@ export default function AddDepartmentPage() {
 
       // Then create the department locations
       if (data.locations && data.locations.length > 0) {
-        const locationInserts = data.locations.map((locationId) => ({
+        const locationInserts = data.locations.map((location_id) => ({
           department_id: newDepartment.id,
-          location_id: locationId,
+          location_id: location_id,
           location_type: "office", // Default to office type
         }));
 

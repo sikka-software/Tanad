@@ -8,6 +8,7 @@ import {
   CreditCard,
   Briefcase,
   MapPin,
+  SaudiRiyal,
 } from "lucide-react";
 
 export type SidebarMenuGroupProps = {
@@ -95,7 +96,6 @@ let simplifiedMenu: SimplifiedMenu = {
     },
   ],
 };
-
 
 // Main menu items
 function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"] {
@@ -191,16 +191,9 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
       title: "Sales",
       translationKey: "Sales.title",
       url: "",
-      icon: Package,
+      icon: SaudiRiyal,
       is_active: pathname.startsWith("/products"),
       items: [
-        {
-          title: "Products",
-          translationKey: "Products.title",
-          is_active: pathname.startsWith("/products"),
-          url: "/products",
-          action: "/products/add",
-        },
         {
           title: "Invoices",
           translationKey: "Invoices.title",
@@ -214,6 +207,43 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
           is_active: pathname.startsWith("/quotes"),
           url: "/quotes",
           action: "/quotes/add",
+        },
+        {
+          title: "Expenses",
+          translationKey: "Expenses.title",
+          is_active: pathname.startsWith("/expenses"),
+          url: "/expenses",
+          action: "/expenses/add",
+        },
+      ],
+    },
+    {
+      title: "Storage",
+      translationKey: "Storage.title",
+      url: "",
+      icon: Package,
+      is_active: pathname.startsWith("/products"),
+      items: [
+        {
+          title: "Purchases",
+          translationKey: "Purchases.title",
+          is_active: pathname.startsWith("/purchases"),
+          url: "/purchases",
+          action: "/purchases/add",
+        },
+        {
+          title: "Products",
+          translationKey: "Products.title",
+          is_active: pathname.startsWith("/products"),
+          url: "/products",
+          action: "/products/add",
+        },
+        {
+          title: "Warehouses",
+          translationKey: "Warehouses.title",
+          is_active: pathname.startsWith("/warehouses"),
+          url: "/warehouses",
+          action: "/warehouses/add",
         },
       ],
     },
@@ -418,7 +448,10 @@ function mapSimplifiedMenuToSidebarMenu(
     return iconMap[title] || Users; // Default to Users icon if not found
   };
 
-  const mapMenuItem = (item: SimplifiedMenuItem, parentUrl: string = ""): SidebarMenuGroupProps["items"][0] => {
+  const mapMenuItem = (
+    item: SimplifiedMenuItem,
+    parentUrl: string = "",
+  ): SidebarMenuGroupProps["items"][0] => {
     const baseUrl = parentUrl || `/${item.title.toLowerCase().replace(/\s+/g, "-")}`;
     const mappedItem = {
       title: item.title,
@@ -436,7 +469,9 @@ function mapSimplifiedMenuToSidebarMenu(
           translationKey: `${subItem.title.replace(/\s+/g, "")}.title`,
           url: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`,
           action: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}/add`,
-          is_active: pathname.startsWith(`${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`),
+          is_active: pathname.startsWith(
+            `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`,
+          ),
         })),
       };
     }

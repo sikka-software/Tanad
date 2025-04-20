@@ -125,7 +125,7 @@ const useUserStore = create<UserState>()(
               }
 
               // console.log("[UserStore] Profile fetched successfully:", profile?.id);
-              set({ profile, loading: false, initialized: true });
+              set({ profile, user: session.user, loading: false, initialized: true });
             } catch (error) {
               console.error("[UserStore] Error fetching profile:", error);
               set({ loading: false, initialized: true });

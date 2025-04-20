@@ -63,22 +63,22 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
     [selectedRows, setSelectedRows],
   );
 
-  const getLocationName = (locationId: string) => {
-    const office = offices?.find((o) => o.id === locationId);
+  const getLocationName = (location_id: string) => {
+    const office = offices?.find((o) => o.id === location_id);
     if (office) return office.name;
 
-    const branch = branches?.find((b) => b.id === locationId);
+    const branch = branches?.find((b) => b.id === location_id);
     if (branch) return branch.name;
 
-    const warehouse = warehouses?.find((w) => w.id === locationId);
+    const warehouse = warehouses?.find((w) => w.id === location_id);
     if (warehouse) return warehouse.name;
 
-    return locationId;
+    return location_id;
   };
 
-  const handleRemoveLocation = async (row: Row<Department>, locationId: string) => {
+  const handleRemoveLocation = async (row: Row<Department>, location_id: string) => {
     const locationIds = row.original.locations || [];
-    const updatedLocations = locationIds.filter((id: string) => id !== locationId);
+    const updatedLocations = locationIds.filter((id: string) => id !== location_id);
     await updateDepartment({ id: row.original.id, updates: { locations: updatedLocations } });
   };
 
@@ -116,16 +116,16 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                {locationIds.map((locationId) => (
-                  <DropdownMenuItem key={locationId} className="flex justify-between">
-                    <span>{getLocationName(locationId)}</span>
+                {locationIds.map((location_id) => (
+                  <DropdownMenuItem key={location_id} className="flex justify-between">
+                    <span>{getLocationName(location_id)}</span>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-4 w-4 p-0"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRemoveLocation(row, locationId);
+                        handleRemoveLocation(row, location_id);
                       }}
                     >
                       <X className="h-3 w-3" />

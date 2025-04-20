@@ -1,6 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
+// this was the old src/pages/api/templates.ts
 import { eq, desc } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { templates } from "@/db/schema";
@@ -27,13 +27,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "POST") {
     try {
-      const { name, type, content, isDefault, user_id } = req.body;
+      const { name, type, content, is_default, user_id } = req.body;
 
       const result = await db.insert(templates).values({
         name,
         type,
         content: JSON.parse(content),
-        isDefault,
+        is_default,
         user_id,
       });
 
