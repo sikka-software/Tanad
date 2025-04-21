@@ -29,6 +29,10 @@ ALTER TABLE enterprises ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users can view their own user data" ON auth.users;
 DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
 DROP POLICY IF EXISTS "Superadmins can insert users" ON auth.users;
+DROP POLICY IF EXISTS "Users can manage their own roles" ON auth.users;
+DROP POLICY IF EXISTS "Superadmins can manage all users" ON auth.users;
+DROP POLICY IF EXISTS "Users can create enterprises" ON enterprises;
+DROP POLICY IF EXISTS "Users can view enterprises" ON enterprises;
 DROP POLICY IF EXISTS "Users can read their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can insert their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can update their own branches" ON branches;
@@ -889,6 +893,37 @@ CREATE POLICY "Superadmins can manage all users"
     EXISTS (
       SELECT 1 FROM user_roles ur
       WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  );
+
+-- ENTERPRISES POLICIES
+CREATE POLICY "Users can create enterprises"
+  ON enterprises FOR INSERT
+  TO authenticated
+  WITH CHECK (true);
+
+CREATE POLICY "Users can view enterprises"
+  ON enterprises FOR SELECT
+  TO authenticated
+  USING (true);
+
+CREATE POLICY "Users can update enterprises"
+  ON enterprises FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.enterprise_id = enterprises.id
+      AND ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.enterprise_id = enterprises.id
+      AND ur.user_id = auth.uid()
       AND ur.role = 'superadmin'
     )
   );
