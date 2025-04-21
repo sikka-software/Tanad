@@ -120,3 +120,21 @@ BEGIN
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create function to handle new user role creation
+CREATE OR REPLACE FUNCTION handle_new_user_role()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Create a superadmin role for the new user
+  INSERT INTO user_roles (user_id, role, enterprise_id)
+  VALUES (NEW.id, 'superadmin', NULL);
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create trigger for new user role creation
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION handle_new_user_role();

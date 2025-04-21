@@ -33,6 +33,7 @@ DROP POLICY IF EXISTS "Users can manage their own roles" ON auth.users;
 DROP POLICY IF EXISTS "Superadmins can manage all users" ON auth.users;
 DROP POLICY IF EXISTS "Users can create enterprises" ON enterprises;
 DROP POLICY IF EXISTS "Users can view enterprises" ON enterprises;
+DROP POLICY IF EXISTS "Users can create initial role" ON user_roles;
 DROP POLICY IF EXISTS "Users can read their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can insert their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can update their own branches" ON branches;
@@ -881,6 +882,35 @@ CREATE POLICY "Superadmins can view all users"
 
 CREATE POLICY "Superadmins can manage all users"
   ON auth.users FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  );
+
+-- USER ROLES POLICIES
+CREATE POLICY "Users can create initial role"
+  ON user_roles FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can view their roles"
+  ON user_roles FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Superadmins can manage all roles"
+  ON user_roles FOR ALL
   TO authenticated
   USING (
     EXISTS (
