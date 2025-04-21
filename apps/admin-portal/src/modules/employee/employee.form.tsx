@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -16,8 +15,8 @@ import { Textarea } from "@/ui/textarea";
 
 import { CurrencyInput } from "@/components/ui/currency-input";
 
-import DepartmentForm, { DepartmentFormValues } from "@/modules/department/department.form";
-import { useDepartments, departmentKeys } from "@/modules/department/department.hooks";
+import DepartmentForm from "@/modules/department/department.form";
+import { useDepartments } from "@/modules/department/department.hooks";
 import useEmployeeStore from "@/modules/employee/employee.store";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";

@@ -13,69 +13,16 @@ import { generateDummySalary } from "@/lib/dummy-factory";
 import { SalaryForm, SalaryFormValues } from "@/modules/salary/salary.form";
 import { salaryKeys } from "@/modules/salary/salary.hooks";
 import { createSalary } from "@/modules/salary/salary.service";
+import useSalaryStore from "@/modules/salary/salary.store";
 import { Salary, SalaryCreateData } from "@/modules/salary/salary.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddSalaryPage() {
   const router = useRouter();
   const t = useTranslations();
-  const queryClient = useQueryClient();
-  const [loading, setLoading] = useState(false);
-  const { user } = useUserStore();
 
-  const handleSuccess = (salary: any) => {
-    setLoading(false);
-    // Update the salaries cache to include the new salary
-    const previousSalaries = queryClient.getQueryData(salaryKeys.lists()) || [];
-    queryClient.setQueryData(salaryKeys.lists(), [
-      ...(Array.isArray(previousSalaries) ? previousSalaries : []),
-      salary,
-    ]);
-
-    // Navigate to salaries list
-    router.push("/salaries");
-  };
-
-  // Data is SalaryFormValues (numbers for amounts)
-  const handleSubmit = async (data: SalaryFormValues) => {
-    setLoading?.(true);
-    try {
-      const salaryData = {
-        ...data,
-        deductions: data.deductions ? JSON.parse(data.deductions) : null,
-        notes: data.notes?.trim() || null,
-        user_id: user?.id,
-      };
-
-      let result: Salary;
-
-      result = await createSalary(salaryData as SalaryCreateData);
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Salaries.messages.success_created"),
-      });
-
-      const previousSalaries = queryClient.getQueryData(salaryKeys.lists()) || [];
-      queryClient.setQueryData(salaryKeys.lists(), [
-        ...(Array.isArray(previousSalaries) ? previousSalaries : []),
-        result,
-      ]);
-
-      router.push("/salaries");
-    } catch (error) {
-      console.error("Failed to save salary:", error);
-      const description =
-        error instanceof SyntaxError
-          ? t("Salaries.form.deductions.invalid_json")
-          : error instanceof Error
-            ? error.message
-            : t("Salaries.messages.error_save");
-      toast.error(t("Salaries.error.title"), {
-        description,
-      });
-      setLoading(false);
-    }
-  };
+  const setLoading = useSalaryStore((state) => state.setIsLoading);
+  const loading = useSalaryStore((state) => state.isLoading);
 
   return (
     <div>
@@ -99,7 +46,14 @@ export default function AddSalaryPage() {
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <SalaryForm id="salary-form" onSubmit={handleSubmit} loading={loading} />
+        <SalaryForm
+          id="salary-form"
+          onSuccess={() =>
+            router.push("/salaries").then(() => {
+              setLoading(false);
+            })
+          }
+        />
       </div>
     </div>
   );

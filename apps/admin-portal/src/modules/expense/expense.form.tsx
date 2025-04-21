@@ -10,6 +10,8 @@ import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
+import { CurrencyInput } from "@/components/ui/currency-input";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateExpense, useUpdateExpense, useDuplicateExpense } from "./expense.hooks";
@@ -165,6 +167,7 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
                     onSelect={field.onChange}
+                    placeholder={t("Expenses.form.issue_date.placeholder")}
                   />
                 </FormControl>
                 <FormMessage />
@@ -182,6 +185,7 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
                     onSelect={field.onChange}
+                    placeholder={t("Expenses.form.due_date.placeholder")}
                   />
                 </FormControl>
                 <FormMessage />
@@ -198,11 +202,11 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
               <FormItem>
                 <FormLabel>{t("Expenses.form.amount.label")} *</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
+                  <CurrencyInput
+                    showCommas={true}
+                    value={field.value ? parseFloat(String(field.value)) : undefined}
+                    onChange={(value) => field.onChange(value?.toString() || "")}
                     placeholder={t("Expenses.form.amount.placeholder")}
-                    {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value))}
                     disabled={isLoading}
                   />
                 </FormControl>
@@ -239,7 +243,7 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
           />
         </div>
 
-        <FormField
+        {/* <FormField
           control={form.control}
           name="client_id"
           render={({ field }) => (
@@ -255,7 +259,7 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
 
         <FormField
           control={form.control}

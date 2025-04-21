@@ -169,7 +169,7 @@ export function WarehouseForm({ id, onSubmit, loading }: WarehouseFormProps) {
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
           <FormField
             control={form.control}
             name="capacity"
@@ -190,7 +190,7 @@ export function WarehouseForm({ id, onSubmit, loading }: WarehouseFormProps) {
             )}
           />
 
-          <FormField
+          {/* <FormField
             control={form.control}
             name="is_active"
             render={({ field }) => (
@@ -209,7 +209,7 @@ export function WarehouseForm({ id, onSubmit, loading }: WarehouseFormProps) {
                 </FormControl>
               </FormItem>
             )}
-          />
+          /> */}
         </div>
 
         <FormField

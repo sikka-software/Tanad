@@ -96,21 +96,14 @@ export default function AddQuotePage() {
         }}
       />
 
-      <div className="p-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("Quotes.quote_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <QuoteForm
-              id="quote-form"
-              user_id={user?.id}
-              onSubmit={handleSubmit}
-              loading={loading}
-              hideFormButtons
-            />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <QuoteForm
+          id="quote-form"
+          user_id={user?.id}
+          onSubmit={handleSubmit}
+          loading={loading}
+          hideFormButtons
+        />
       </div>
     </div>
   );

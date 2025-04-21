@@ -54,6 +54,11 @@ export function CurrencyInput({
       return;
     }
 
+    // Only allow numbers, periods, and commas
+    if (!/^[0-9٠-٩.,]*$/.test(newValue)) {
+      return;
+    }
+
     // Convert to English numerals first
     const converted = convertArabicToEnglishNumerals(newValue);
 
