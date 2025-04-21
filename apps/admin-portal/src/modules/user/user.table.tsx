@@ -50,15 +50,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { createClient } from "@/utils/supabase/component";
+import { useCreateUser, useDeleteUser, useUpdateUser, useUsers } from "./user.hooks";
 
 // Define user types
-type AuthUser = {
-  email: string;
-  created_at: string;
-  last_sign_in_at: string | null;
-};
-
 export type UserType = {
   id: string;
   email: string;
@@ -68,11 +62,8 @@ export type UserType = {
 };
 
 interface UsersTableProps {
-  initialUsers: UserType[];
   enterprises: Array<{ id: string; name: string }>;
   currentUser: UserType;
-  onCreateUser: (email: string, password: string, role: string, enterpriseId: string) => Promise<void>;
-  onUpdateUser: (userId: string, role: string, enterpriseId: string) => Promise<void>;
 }
 
 type NewUserType = {
@@ -82,23 +73,16 @@ type NewUserType = {
   enterpriseId: string;
 };
 
-export default function UsersTable({
-  initialUsers,
-  enterprises,
-  currentUser,
-  onCreateUser,
-  onUpdateUser,
-}: UsersTableProps) {
-  const [users, setUsers] = useState<UserType[]>(initialUsers);
+export default function UsersTable({ enterprises, currentUser }: UsersTableProps) {
+  const { data: users = [], isLoading } = useUsers();
+  const createUser = useCreateUser();
+  const updateUser = useUpdateUser();
+  const deleteUser = useDeleteUser();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [editForm, setEditForm] = useState({
-    full_name: "",
-    role: "",
-    is_active: true,
-  });
   const [isCreating, setIsCreating] = useState(false);
   const [newUser, setNewUser] = useState<NewUserType>({
     email: "",
@@ -107,7 +91,6 @@ export default function UsersTable({
     enterpriseId: "",
   });
 
-  const supabase = createClient();
   // Filter users based on search query
   const filteredUsers = users.filter(
     (user) =>
@@ -118,11 +101,6 @@ export default function UsersTable({
   // Handle opening edit dialog
   const handleEditUser = (user: UserType) => {
     setSelectedUser(user);
-    setEditForm({
-      full_name: user.email,
-      role: user.role,
-      is_active: true,
-    });
     setIsEditDialogOpen(true);
   };
 
@@ -137,30 +115,13 @@ export default function UsersTable({
     if (!selectedUser) return;
 
     try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          full_name: editForm.full_name,
-          role: editForm.role,
-          is_active: editForm.is_active,
-        })
-        .eq("id", selectedUser.id);
-
-      if (error) throw error;
-
-      // Update local state
-      setUsers(
-        users.map((user) =>
-          user.id === selectedUser.id
-            ? {
-                ...user,
-                email: editForm.full_name,
-                role: editForm.role,
-                is_active: editForm.is_active,
-              }
-            : user,
-        ),
-      );
+      await updateUser.mutateAsync({
+        id: selectedUser.id,
+        data: {
+          role: selectedUser.role,
+          enterprise_id: selectedUser.enterprise_id,
+        },
+      });
 
       toast.success("User updated", {
         description: "User information has been updated successfully.",
@@ -176,16 +137,11 @@ export default function UsersTable({
   };
 
   // Delete user
-  const deleteUser = async () => {
+  const handleDelete = async () => {
     if (!selectedUser) return;
 
     try {
-      const { error } = await supabase.from("profiles").delete().eq("id", selectedUser.id);
-
-      if (error) throw error;
-
-      // Update local state
-      setUsers(users.filter((user) => user.id !== selectedUser.id));
+      await deleteUser.mutateAsync(selectedUser.id);
 
       toast.success("User deleted", {
         description: "User has been deleted successfully.",
@@ -196,32 +152,6 @@ export default function UsersTable({
       console.error("Error deleting user:", error);
       toast.error("Failed to delete user.", {
         description: "Failed to delete user.",
-      });
-    }
-  };
-
-  // Toggle user active status
-  const toggleUserStatus = async (user: UserType) => {
-    try {
-      const newStatus = !user.is_active;
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({ is_active: newStatus })
-        .eq("id", user.id);
-
-      if (error) throw error;
-
-      // Update local state
-      setUsers(users.map((u) => (u.id === user.id ? { ...u, is_active: newStatus } : u)));
-
-      toast.success(newStatus ? "User activated" : "User deactivated", {
-        description: `User has been ${newStatus ? "activated" : "deactivated"} successfully.`,
-      });
-    } catch (error) {
-      console.error("Error toggling user status:", error);
-      toast.error("Failed to update user status.", {
-        description: "Failed to update user status.",
       });
     }
   };
@@ -250,25 +180,32 @@ export default function UsersTable({
 
   const handleCreate = async () => {
     if (!newUser.email || !newUser.password || !newUser.enterpriseId) return;
-    
-    await onCreateUser(
-      newUser.email,
-      newUser.password,
-      newUser.role,
-      newUser.enterpriseId
-    );
-    
-    setIsCreating(false);
-    setNewUser({
-      email: "",
-      password: "",
-      role: "accounting",
-      enterpriseId: "",
-    });
-  };
 
-  const handleUpdate = async (userId: string, role: string, enterpriseId: string) => {
-    await onUpdateUser(userId, role, enterpriseId);
+    try {
+      await createUser.mutateAsync({
+        email: newUser.email,
+        password: newUser.password,
+        role: newUser.role,
+        enterprise_id: newUser.enterpriseId,
+      });
+
+      setIsCreating(false);
+      setNewUser({
+        email: "",
+        password: "",
+        role: "accounting",
+        enterpriseId: "",
+      });
+
+      toast.success("User created", {
+        description: "User has been created successfully.",
+      });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      toast.error("Failed to create user.", {
+        description: "Failed to create user.",
+      });
+    }
   };
 
   return (
@@ -286,14 +223,14 @@ export default function UsersTable({
         </div>
       </div>
 
-      <div className="mb-4 flex justify-between items-center">
+      <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold">Users</h2>
         <Button onClick={() => setIsCreating(true)}>Add User</Button>
       </div>
 
       {isCreating && (
-        <div className="mb-4 p-4 border rounded-lg">
-          <h3 className="text-lg font-medium mb-4">Create New User</h3>
+        <div className="mb-4 rounded-lg border p-4">
+          <h3 className="mb-4 text-lg font-medium">Create New User</h3>
           <div className="grid gap-4">
             <div>
               <Label htmlFor="email">Email</Label>
@@ -316,7 +253,9 @@ export default function UsersTable({
               <Label htmlFor="role">Role</Label>
               <Select
                 value={newUser.role}
-                onValueChange={(value) => setNewUser({ ...newUser, role: value as "accounting" | "hr" })}
+                onValueChange={(value) =>
+                  setNewUser({ ...newUser, role: value as "accounting" | "hr" })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select role" />
@@ -367,9 +306,15 @@ export default function UsersTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.length === 0 ? (
+            {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-muted-foreground h-24 text-center">
+                <TableCell colSpan={5} className="text-muted-foreground h-24 text-center">
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : filteredUsers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-muted-foreground h-24 text-center">
                   No users found.
                 </TableCell>
               </TableRow>
@@ -397,7 +342,10 @@ export default function UsersTable({
                         <DropdownMenuItem
                           onClick={() => {
                             const newRole = user.role === "accounting" ? "hr" : "accounting";
-                            handleUpdate(user.id, newRole, user.enterprise_id);
+                            updateUser.mutate({
+                              id: user.id,
+                              data: { role: newRole, enterprise_id: user.enterprise_id },
+                            });
                           }}
                         >
                           Change Role
@@ -406,11 +354,21 @@ export default function UsersTable({
                           onClick={() => {
                             const newEnterpriseId = prompt("Enter new enterprise ID");
                             if (newEnterpriseId) {
-                              handleUpdate(user.id, user.role, newEnterpriseId);
+                              updateUser.mutate({
+                                id: user.id,
+                                data: { role: user.role, enterprise_id: newEnterpriseId },
+                              });
                             }
                           }}
                         >
                           Change Enterprise
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => handleDeleteUser(user)}
+                        >
+                          Delete User
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -431,50 +389,52 @@ export default function UsersTable({
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
+              <Label htmlFor="email" className="text-right">
+                Email
               </Label>
-              <Input
-                id="name"
-                value={editForm.full_name}
-                onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                className="col-span-3"
-              />
+              <Input id="email" value={selectedUser?.email} disabled className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">
                 Role
               </Label>
               <Select
-                value={editForm.role}
-                onValueChange={(value) => setEditForm({ ...editForm, role: value })}
+                value={selectedUser?.role}
+                onValueChange={(value) =>
+                  setSelectedUser((prev) =>
+                    prev ? { ...prev, role: value as UserType["role"] } : null,
+                  )
+                }
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
                   <SelectItem value="superadmin">Superadmin</SelectItem>
+                  <SelectItem value="accounting">Accounting</SelectItem>
+                  <SelectItem value="hr">HR</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="status" className="text-right">
-                Status
+              <Label htmlFor="enterprise" className="text-right">
+                Enterprise
               </Label>
               <Select
-                value={editForm.is_active ? "active" : "inactive"}
+                value={selectedUser?.enterprise_id}
                 onValueChange={(value) =>
-                  setEditForm({ ...editForm, is_active: value === "active" })
+                  setSelectedUser((prev) => (prev ? { ...prev, enterprise_id: value } : null))
                 }
               >
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select status" />
+                  <SelectValue placeholder="Select enterprise" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
+                  {enterprises.map((enterprise) => (
+                    <SelectItem key={enterprise.id} value={enterprise.id}>
+                      {enterprise.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -509,7 +469,7 @@ export default function UsersTable({
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={deleteUser}>
+            <Button variant="destructive" onClick={handleDelete}>
               Delete
             </Button>
           </DialogFooter>

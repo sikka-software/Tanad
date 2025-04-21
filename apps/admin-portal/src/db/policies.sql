@@ -411,17 +411,14 @@ CREATE POLICY "USERS CAN DELETE THEIR OWN PRODUCTS"
   USING (auth.uid() = user_id);
 
 -- PROFILES POLICIES
+DROP POLICY IF EXISTS "SUPERADMINS CAN MANAGE PROFILES" ON profiles;
+DROP POLICY IF EXISTS "USERS CAN VIEW THEIR OWN PROFILE" ON profiles;
+DROP POLICY IF EXISTS "USERS CAN UPDATE THEIR OWN PROFILE" ON profiles;
+
 CREATE POLICY "SUPERADMINS CAN MANAGE PROFILES"
   ON profiles FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles p
-      WHERE p.id = auth.uid()
-      AND p.role = 'superadmin'
-      AND p.enterprise_id = profiles.enterprise_id
-    )
-  );
+  USING (authorize('profiles.manage'::app_permission));
 
 CREATE POLICY "USERS CAN VIEW THEIR OWN PROFILE"
   ON profiles FOR SELECT
@@ -854,99 +851,155 @@ CREATE POLICY "Users can delete their own documents"
   USING (auth.uid() = user_id);
 
 -- ENTERPRISES POLICIES
+DROP POLICY IF EXISTS "SUPERADMINS CAN MANAGE ENTERPRISES" ON enterprises;
+
 CREATE POLICY "SUPERADMINS CAN MANAGE ENTERPRISES"
   ON enterprises FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles p
-      WHERE p.id = auth.uid()
-      AND p.role = 'superadmin'
-      AND p.enterprise_id = enterprises.id
-    )
-  );
+  USING (authorize('enterprises.manage'::app_permission));
 
 -- INVOICES POLICIES
 CREATE POLICY "ACCOUNTING CAN MANAGE INVOICES"
   ON invoices FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      JOIN roles r ON ur.role_id = r.id
-      JOIN role_permissions rp ON r.id = rp.role_id
-      JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = invoices.enterprise_id
-      AND r.name = 'accounting'
-      AND p.name = 'manage_invoices'
-    )
-  );
+  USING (authorize('invoices.manage'::app_permission, enterprise_id));
+
+CREATE POLICY "ACCOUNTING CAN DELETE INVOICES"
+  ON invoices FOR DELETE
+  TO authenticated
+  USING (authorize('invoices.delete'::app_permission, enterprise_id));
 
 -- PRODUCTS POLICIES
 CREATE POLICY "ACCOUNTING CAN MANAGE PRODUCTS"
   ON products FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      JOIN roles r ON ur.role_id = r.id
-      JOIN role_permissions rp ON r.id = rp.role_id
-      JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = products.enterprise_id
-      AND r.name = 'accounting'
-      AND p.name = 'manage_products'
-    )
-  );
+  USING (authorize('products.manage'::app_permission, enterprise_id));
+
+CREATE POLICY "ACCOUNTING CAN DELETE PRODUCTS"
+  ON products FOR DELETE
+  TO authenticated
+  USING (authorize('products.delete'::app_permission, enterprise_id));
 
 -- QUOTES POLICIES
 CREATE POLICY "ACCOUNTING CAN MANAGE QUOTES"
   ON quotes FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      JOIN roles r ON ur.role_id = r.id
-      JOIN role_permissions rp ON r.id = rp.role_id
-      JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = quotes.enterprise_id
-      AND r.name = 'accounting'
-      AND p.name = 'manage_quotes'
-    )
-  );
+  USING (authorize('quotes.manage'::app_permission, enterprise_id));
+
+CREATE POLICY "ACCOUNTING CAN DELETE QUOTES"
+  ON quotes FOR DELETE
+  TO authenticated
+  USING (authorize('quotes.delete'::app_permission, enterprise_id));
 
 -- EMPLOYEES POLICIES
 CREATE POLICY "HR CAN MANAGE EMPLOYEES"
   ON employees FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      JOIN roles r ON ur.role_id = r.id
-      JOIN role_permissions rp ON r.id = rp.role_id
-      JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = employees.enterprise_id
-      AND r.name = 'hr'
-      AND p.name = 'manage_employees'
-    )
-  );
+  USING (authorize('employees.manage'::app_permission, enterprise_id));
+
+CREATE POLICY "HR CAN DELETE EMPLOYEES"
+  ON employees FOR DELETE
+  TO authenticated
+  USING (authorize('employees.delete'::app_permission, enterprise_id));
 
 -- SALARIES POLICIES
 CREATE POLICY "HR CAN MANAGE SALARIES"
   ON salaries FOR ALL
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      JOIN roles r ON ur.role_id = r.id
-      JOIN role_permissions rp ON r.id = rp.role_id
-      JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = salaries.enterprise_id
-      AND r.name = 'hr'
-      AND p.name = 'manage_salaries'
-    )
-  );
+  USING (authorize('salaries.manage'::app_permission, enterprise_id));
+
+CREATE POLICY "HR CAN DELETE SALARIES"
+  ON salaries FOR DELETE
+  TO authenticated
+  USING (authorize('salaries.delete'::app_permission, enterprise_id));
+
+-- Create custom types for roles and permissions
+CREATE TYPE public.app_role AS ENUM ('superadmin', 'admin', 'accounting', 'hr');
+CREATE TYPE public.app_permission AS ENUM (
+  'profiles.manage',
+  'enterprises.manage',
+  'invoices.manage',
+  'invoices.delete',
+  'products.manage',
+  'products.delete',
+  'quotes.manage',
+  'quotes.delete',
+  'employees.manage',
+  'employees.delete',
+  'salaries.manage',
+  'salaries.delete'
+);
+
+-- Create user_roles table
+CREATE TABLE IF NOT EXISTS public.user_roles (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+  role app_role NOT NULL,
+  enterprise_id UUID REFERENCES enterprises(id) ON DELETE CASCADE,
+  UNIQUE (user_id, role, enterprise_id)
+);
+
+-- Create role_permissions table
+CREATE TABLE IF NOT EXISTS public.role_permissions (
+  id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+  role app_role NOT NULL,
+  permission app_permission NOT NULL,
+  UNIQUE (role, permission)
+);
+
+-- Insert role permissions
+INSERT INTO public.role_permissions (role, permission)
+VALUES
+  ('superadmin', 'profiles.manage'),
+  ('superadmin', 'enterprises.manage'),
+  ('superadmin', 'invoices.manage'),
+  ('superadmin', 'invoices.delete'),
+  ('superadmin', 'products.manage'),
+  ('superadmin', 'products.delete'),
+  ('superadmin', 'quotes.manage'),
+  ('superadmin', 'quotes.delete'),
+  ('superadmin', 'employees.manage'),
+  ('superadmin', 'employees.delete'),
+  ('superadmin', 'salaries.manage'),
+  ('superadmin', 'salaries.delete'),
+  ('admin', 'invoices.manage'),
+  ('admin', 'invoices.delete'),
+  ('admin', 'products.manage'),
+  ('admin', 'products.delete'),
+  ('admin', 'quotes.manage'),
+  ('admin', 'quotes.delete'),
+  ('accounting', 'invoices.manage'),
+  ('accounting', 'invoices.delete'),
+  ('accounting', 'products.manage'),
+  ('accounting', 'products.delete'),
+  ('accounting', 'quotes.manage'),
+  ('accounting', 'quotes.delete'),
+  ('hr', 'employees.manage'),
+  ('hr', 'employees.delete'),
+  ('hr', 'salaries.manage'),
+  ('hr', 'salaries.delete');
+
+-- Create authorization function
+CREATE OR REPLACE FUNCTION public.authorize(
+  requested_permission app_permission,
+  enterprise_id UUID DEFAULT NULL
+)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  bind_permissions int;
+BEGIN
+  SELECT COUNT(*)
+  INTO bind_permissions
+  FROM public.user_roles ur
+  JOIN public.role_permissions rp ON ur.role = rp.role
+  WHERE ur.user_id = auth.uid()
+    AND rp.permission = requested_permission
+    AND (enterprise_id IS NULL OR ur.enterprise_id = enterprise_id);
+
+  RETURN bind_permissions > 0;
+END;
+$$;

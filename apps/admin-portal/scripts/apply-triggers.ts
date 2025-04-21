@@ -66,7 +66,7 @@ async function applyTriggers() {
         await sql.unsafe(statement);
         console.log(`✅ Trigger statement executed ${i + 1}/${statements.length}`);
       } catch (error) {
-        console.error(`❌ Error executing statement ${i + 1}:`);
+        console.error(`Error executing statement ${i + 1}:`);
         console.error(statement);
         console.error(error);
         // Continue with next statement despite errors

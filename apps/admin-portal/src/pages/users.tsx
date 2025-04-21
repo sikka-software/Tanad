@@ -1,22 +1,22 @@
-import { User } from "@supabase/supabase-js";
 import { GetStaticProps } from "next";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-import UsersTable, { UserType } from "@/modules/user/user.table";
+import UsersTable from "@/modules/user/user.table";
 import { createClient } from "@/utils/supabase/component";
 
 export default function UsersPage() {
   const supabase = createClient();
   const router = useRouter();
 
-  const [users, setUsers] = useState<UserType[]>([]);
   const [enterprises, setEnterprises] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
+  const [users, setUsers] = useState<any[]>([]);
+
   useEffect(() => {
-    const getUsersAndProfiles = async () => {
+    const getCurrentUserAndEnterprises = async () => {
       // Check if user is authenticated and has superadmin role
       const {
         data: { user },
@@ -34,33 +34,28 @@ export default function UsersPage() {
         .eq("id", user.id)
         .single();
 
-      if (!profile || profile.role !== "superadmin") {
-        router.push("/");
-        return;
-      }
+      // if (!profile || profile.role !== "superadmin") {
+      //   router.push("/");
+      //   return;
+      // }
 
       setCurrentUser(profile);
 
       // Fetch all enterprises
-      const { data: enterprisesData } = await supabase
-        .from("enterprises")
-        .select("*");
+      const { data: enterprisesData } = await supabase.from("enterprises").select("*");
 
       setEnterprises(enterprisesData || []);
-
-      // Fetch all users with their profiles
-      const { data: users } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      setUsers(users || []);
     };
 
-    getUsersAndProfiles();
+    getCurrentUserAndEnterprises();
   }, []);
 
-  const handleCreateUser = async (email: string, password: string, role: string, enterpriseId: string) => {
+  const handleCreateUser = async (
+    email: string,
+    password: string,
+    role: string,
+    enterpriseId: string,
+  ) => {
     try {
       // Create the user in auth
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -72,14 +67,12 @@ export default function UsersPage() {
       if (authError) throw authError;
 
       // Create the profile
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({
-          id: authData.user.id,
-          email,
-          role,
-          enterprise_id: enterpriseId,
-        });
+      const { error: profileError } = await supabase.from("profiles").insert({
+        id: authData.user.id,
+        email,
+        role,
+        enterprise_id: enterpriseId,
+      });
 
       if (profileError) throw profileError;
 
@@ -124,12 +117,12 @@ export default function UsersPage() {
         roles, and control account access.
       </p>
 
-      <UsersTable 
-        initialUsers={users} 
+      <UsersTable
         enterprises={enterprises}
         currentUser={currentUser}
-        onCreateUser={handleCreateUser}
-        onUpdateUser={handleUpdateUser}
+        // users={users}
+        // setUsers={setUsers}
+        // onUpdateUser={handleUpdateUser}
       />
     </div>
   );
