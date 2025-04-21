@@ -361,6 +361,13 @@ function getSettingsMenus(pathname: string): SidebarMenuGroupProps["items"] {
       is_active: pathname === "/users",
     },
     {
+      title: "Roles",
+      translationKey: "Roles.title",
+      icon: Users,
+      url: "/roles",
+      is_active: pathname === "/roles",
+    },
+    {
       title: "Billing",
       translationKey: "Billing.title",
       icon: CreditCard,
