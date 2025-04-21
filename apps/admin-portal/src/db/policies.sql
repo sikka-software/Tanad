@@ -855,6 +855,8 @@ CREATE POLICY "Users can delete their own documents"
 DROP POLICY IF EXISTS "Users can view their own user data" ON auth.users;
 DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
 DROP POLICY IF EXISTS "Superadmins can insert users" ON auth.users;
+DROP POLICY IF EXISTS "Users can manage their own roles" ON auth.users;
+DROP POLICY IF EXISTS "Superadmins can manage all users" ON auth.users;
 
 -- Create new policies
 CREATE POLICY "Users can view their own user data"
@@ -873,9 +875,16 @@ CREATE POLICY "Superadmins can view all users"
     )
   );
 
-CREATE POLICY "Superadmins can insert users"
-  ON auth.users FOR INSERT
+CREATE POLICY "Superadmins can manage all users"
+  ON auth.users FOR ALL
   TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  )
   WITH CHECK (
     EXISTS (
       SELECT 1 FROM user_roles ur

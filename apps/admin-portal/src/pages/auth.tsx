@@ -98,6 +98,32 @@ export default function Auth() {
 
           if (profileError) throw profileError;
 
+          // Create a new enterprise for the user
+          const { data: enterpriseData, error: enterpriseError } = await supabase
+            .from("enterprises")
+            .insert([
+              {
+                name: "My Enterprise",
+                email: data.user.email,
+                is_active: true,
+              },
+            ])
+            .select()
+            .single();
+
+          if (enterpriseError) throw enterpriseError;
+
+          // Add superadmin role to user_roles table with enterprise_id
+          const { error: roleError } = await supabase.from("user_roles").insert([
+            {
+              user_id: data.user.id,
+              role: "superadmin",
+              enterprise_id: enterpriseData.id
+            }
+          ]);
+
+          if (roleError) throw roleError;
+
           // After successful signup and profile creation, let the store handle the session
           await useUserStore.getState().fetchUserAndProfile();
         } catch (profileError: any) {
