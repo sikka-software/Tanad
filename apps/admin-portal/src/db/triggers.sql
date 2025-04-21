@@ -2,6 +2,20 @@
 DROP TRIGGER IF EXISTS validate_department_location_trigger ON department_locations;
 DROP FUNCTION IF EXISTS validate_department_location();
 
+-- Drop policies that depend on user_roles
+DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
+DROP POLICY IF EXISTS "Superadmins can manage all users" ON auth.users;
+DROP POLICY IF EXISTS "Users can update enterprises" ON enterprises;
+DROP POLICY IF EXISTS "Users can create initial role" ON user_roles;
+DROP POLICY IF EXISTS "Users can view their roles" ON user_roles;
+
+-- Drop existing RBAC triggers and functions if they exist
+DROP TRIGGER IF EXISTS validate_user_role_trigger ON user_roles;
+DROP TRIGGER IF EXISTS validate_role_permission_trigger ON role_permissions;
+DROP FUNCTION IF EXISTS validate_user_role();
+DROP FUNCTION IF EXISTS validate_role_permission();
+DROP FUNCTION IF EXISTS has_permission(text, uuid);
+
 -- Create the trigger function
 CREATE OR REPLACE FUNCTION validate_department_location()
 RETURNS TRIGGER AS $$
@@ -22,13 +36,6 @@ CREATE TRIGGER validate_department_location_trigger
 BEFORE INSERT OR UPDATE ON department_locations
 FOR EACH ROW
 EXECUTE FUNCTION validate_department_location();
-
--- Drop existing RBAC triggers and functions if they exist
-DROP TRIGGER IF EXISTS validate_user_role_trigger ON user_roles;
-DROP TRIGGER IF EXISTS validate_role_permission_trigger ON role_permissions;
-DROP FUNCTION IF EXISTS validate_user_role();
-DROP FUNCTION IF EXISTS validate_role_permission();
-DROP FUNCTION IF EXISTS has_permission(text, uuid);
 
 -- Create function to validate user role assignments
 CREATE OR REPLACE FUNCTION validate_user_role()
@@ -111,12 +118,10 @@ BEGIN
   RETURN EXISTS (
     SELECT 1
     FROM user_roles ur
-    JOIN roles r ON ur.role_id = r.id
-    JOIN role_permissions rp ON r.id = rp.role_id
-    JOIN permissions p ON rp.permission_id = p.id
-    WHERE ur.profile_id = auth.uid()
+    JOIN role_permissions rp ON ur.role = rp.role
+    WHERE ur.user_id = auth.uid()
     AND ur.enterprise_id = has_permission.enterprise_id
-    AND p.name = permission_name
+    AND rp.permission = permission_name::app_permission
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

@@ -26,6 +26,21 @@ ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE enterprises ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies before recreating
+DROP POLICY IF EXISTS "Users can view their own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can view their own enterprise" ON enterprises;
+DROP POLICY IF EXISTS "Users can update their own enterprise" ON enterprises;
+DROP POLICY IF EXISTS "Users can view their own invoices" ON invoices;
+DROP POLICY IF EXISTS "Users can update their own invoices" ON invoices;
+DROP POLICY IF EXISTS "Users can view their own products" ON products;
+DROP POLICY IF EXISTS "Users can update their own products" ON products;
+DROP POLICY IF EXISTS "Users can view their own quotes" ON quotes;
+DROP POLICY IF EXISTS "Users can update their own quotes" ON quotes;
+DROP POLICY IF EXISTS "Users can view their own employees" ON employees;
+DROP POLICY IF EXISTS "Users can update their own employees" ON employees;
+DROP POLICY IF EXISTS "Users can view their own salaries" ON salaries;
+DROP POLICY IF EXISTS "Users can update their own salaries" ON salaries;
+
 DROP POLICY IF EXISTS "Users can view their own user data" ON auth.users;
 DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
 DROP POLICY IF EXISTS "Superadmins can insert users" ON auth.users;
@@ -76,9 +91,7 @@ DROP POLICY IF EXISTS "Users can delete their own products" ON products;
 
 DROP POLICY IF EXISTS "Admin full access" ON profiles;
 DROP POLICY IF EXISTS "Public profiles are viewable" ON profiles;
-DROP POLICY IF EXISTS "Users can view their own profile" ON profiles;
 DROP POLICY IF EXISTS "Users can create their own profile" ON profiles;
-DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
 DROP POLICY IF EXISTS "Users can delete their own profile" ON profiles;
 
 DROP POLICY IF EXISTS "Users can read their own quotes" ON quotes;
@@ -420,21 +433,21 @@ DROP POLICY IF EXISTS "USERS CAN VIEW THEIR OWN PROFILE" ON profiles;
 DROP POLICY IF EXISTS "USERS CAN UPDATE THEIR OWN PROFILE" ON profiles;
 DROP POLICY IF EXISTS "USERS CAN CREATE THEIR OWN PROFILE" ON profiles;
 
-CREATE POLICY "USERS CAN VIEW THEIR OWN PROFILE"
+CREATE POLICY "Users can view their own profile"
   ON profiles FOR SELECT
   TO authenticated
-  USING (auth.uid() = id);
+  USING (auth.uid() = user_id);
 
-CREATE POLICY "USERS CAN UPDATE THEIR OWN PROFILE"
+CREATE POLICY "Users can update their own profile"
   ON profiles FOR UPDATE
   TO authenticated
-  USING (auth.uid() = id)
-  WITH CHECK (auth.uid() = id);
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "USERS CAN CREATE THEIR OWN PROFILE"
+CREATE POLICY "Users can create their own profile"
   ON profiles FOR INSERT
   TO authenticated
-  WITH CHECK (auth.uid() = id);
+  WITH CHECK (auth.uid() = user_id);
 
 -- QUOTES POLICIES
 CREATE POLICY "USERS CAN READ THEIR OWN QUOTES"
@@ -955,5 +968,262 @@ CREATE POLICY "Users can update enterprises"
       WHERE ur.enterprise_id = enterprises.id
       AND ur.user_id = auth.uid()
       AND ur.role = 'superadmin'
+    )
+  );
+
+-- Create policies for enterprises
+CREATE POLICY "Users can view their own enterprise"
+  ON enterprises FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = enterprises.id
+    )
+  );
+
+CREATE POLICY "Users can update their own enterprise"
+  ON enterprises FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = enterprises.id
+      AND (ur.role = 'superadmin' OR ur.role = 'admin')
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = enterprises.id
+      AND (ur.role = 'superadmin' OR ur.role = 'admin')
+    )
+  );
+
+-- Create policies for invoices
+CREATE POLICY "Users can view their own invoices"
+  ON invoices FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = invoices.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'accounting'
+      )
+    )
+  );
+
+CREATE POLICY "Users can update their own invoices"
+  ON invoices FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = invoices.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'accounting'
+      )
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = invoices.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'accounting'
+      )
+    )
+  );
+
+-- Create policies for products
+CREATE POLICY "Users can view their own products"
+  ON products FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = products.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'accounting'
+      )
+    )
+  );
+
+CREATE POLICY "Users can update their own products"
+  ON products FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = products.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'accounting'
+      )
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = products.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'accounting'
+      )
+    )
+  );
+
+-- Create policies for quotes
+CREATE POLICY "Users can view their own quotes"
+  ON quotes FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = quotes.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'accounting'
+      )
+    )
+  );
+
+CREATE POLICY "Users can update their own quotes"
+  ON quotes FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = quotes.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'accounting'
+      )
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = quotes.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'accounting'
+      )
+    )
+  );
+
+-- Create policies for employees
+CREATE POLICY "Users can view their own employees"
+  ON employees FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = employees.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'hr'
+      )
+    )
+  );
+
+CREATE POLICY "Users can update their own employees"
+  ON employees FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = employees.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'hr'
+      )
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = employees.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'hr'
+      )
+    )
+  );
+
+-- Create policies for salaries
+CREATE POLICY "Users can view their own salaries"
+  ON salaries FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = salaries.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'hr'
+      )
+    )
+  );
+
+CREATE POLICY "Users can update their own salaries"
+  ON salaries FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = salaries.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'hr'
+      )
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.enterprise_id = salaries.enterprise_id
+      AND (
+        ur.role = 'superadmin' OR 
+        ur.role = 'admin' OR 
+        ur.role = 'hr'
+      )
     )
   );

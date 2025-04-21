@@ -7,6 +7,15 @@ DROP POLICY IF EXISTS "ACCOUNTING CAN MANAGE QUOTES" ON quotes;
 DROP POLICY IF EXISTS "HR CAN MANAGE EMPLOYEES" ON employees;
 DROP POLICY IF EXISTS "HR CAN MANAGE SALARIES" ON salaries;
 
+-- Drop policies that depend on user_roles
+DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
+DROP POLICY IF EXISTS "Superadmins can manage all users" ON auth.users;
+DROP POLICY IF EXISTS "Users can update enterprises" ON enterprises;
+DROP POLICY IF EXISTS "Users can create initial role" ON user_roles;
+DROP POLICY IF EXISTS "Users can view their roles" ON user_roles;
+DROP POLICY IF EXISTS "Only superadmins can manage roles" ON user_roles;
+DROP POLICY IF EXISTS "Only superadmins can manage role permissions" ON role_permissions;
+
 DROP TABLE IF EXISTS public.role_permissions;
 DROP TABLE IF EXISTS public.user_roles;
 
