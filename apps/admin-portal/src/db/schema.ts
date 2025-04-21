@@ -17,6 +17,219 @@ import {
   pgEnum,
 } from "drizzle-orm/pg-core";
 
+// Define enums first
+export const appRole = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
+export const appPermission = pgEnum("app_permission", [
+  "profiles.create",
+  "profiles.read",
+  "profiles.update",
+  "profiles.delete",
+  "profiles.export",
+  "enterprises.create",
+  "enterprises.read",
+  "enterprises.update",
+  "enterprises.delete",
+  "enterprises.export",
+  "invoices.create",
+  "invoices.read",
+  "invoices.update",
+  "invoices.delete",
+  "invoices.export",
+  "invoices.duplicate",
+  "products.create",
+  "products.read",
+  "products.update",
+  "products.delete",
+  "products.export",
+  "quotes.create",
+  "quotes.read",
+  "quotes.update",
+  "quotes.delete",
+  "quotes.export",
+  "quotes.duplicate",
+  "employees.create",
+  "employees.read",
+  "employees.update",
+  "employees.delete",
+  "employees.export",
+  "salaries.create",
+  "salaries.read",
+  "salaries.update",
+  "salaries.delete",
+  "salaries.export",
+  "documents.create",
+  "documents.read",
+  "documents.update",
+  "documents.delete",
+  "documents.export",
+  "templates.create",
+  "templates.read",
+  "templates.update",
+  "templates.delete",
+  "templates.export",
+  "templates.duplicate",
+  "employee_requests.create",
+  "employee_requests.read",
+  "employee_requests.update",
+  "employee_requests.delete",
+  "employee_requests.export",
+  "job_listings.create",
+  "job_listings.read",
+  "job_listings.update",
+  "job_listings.delete",
+  "job_listings.export",
+  "offices.create",
+  "offices.read",
+  "offices.update",
+  "offices.delete",
+  "offices.export",
+  "expenses.create",
+  "expenses.read",
+  "expenses.update",
+  "expenses.delete",
+  "expenses.export",
+  "expenses.duplicate",
+  "departments.create",
+  "departments.read",
+  "departments.update",
+  "departments.delete",
+  "departments.export",
+  "warehouses.create",
+  "warehouses.read",
+  "warehouses.update",
+  "warehouses.delete",
+  "warehouses.export",
+  "vendors.create",
+  "vendors.read",
+  "vendors.update",
+  "vendors.delete",
+  "vendors.export",
+  "clients.create",
+  "clients.read",
+  "clients.update",
+  "clients.delete",
+  "clients.export",
+  "companies.create",
+  "companies.read",
+  "companies.update",
+  "companies.delete",
+  "companies.export",
+  "branches.create",
+  "branches.read",
+  "branches.update",
+  "branches.delete",
+  "branches.export"
+]);
+
+// Define enterprises first since it's referenced by other tables
+export const enterprises = pgTable(
+  "enterprises",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text().notNull(),
+    email: text().notNull(),
+    phone: text(),
+    website: text(),
+    address: text(),
+    city: text(),
+    state: text(),
+    zip_code: text("zip_code"),
+    industry: text(),
+    size: text(),
+    notes: text(),
+    is_active: boolean().default(true).notNull(),
+  },
+  (table) => [
+    index("enterprises_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("enterprises_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+  ],
+).enableRLS();
+
+// Define user_roles and role_permissions next
+export const userRoles = pgTable(
+  "user_roles",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    user_id: uuid("user_id")
+      .references(() => "auth.users.id" as any, { onDelete: "cascade" })
+      .notNull(),
+    role: appRole("role").notNull(),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id, { onDelete: "cascade" }),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+  },
+  (table) => [
+    unique("user_roles_user_id_role_enterprise_id_key").on(
+      table.user_id,
+      table.role,
+      table.enterprise_id,
+    ),
+  ],
+).enableRLS();
+
+export const rolePermissions = pgTable(
+  "role_permissions",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    role: appRole("role").notNull(),
+    permission: appPermission("permission").notNull(),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+  },
+  (table) => [
+    unique("role_permissions_role_permission_key").on(table.role, table.permission),
+  ],
+).enableRLS();
+
+// Define profiles table
+export const profiles = pgTable(
+  "profiles",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    first_name: text("first_name").notNull(),
+    last_name: text("last_name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone"),
+    address: text("address"),
+    city: text("city"),
+    state: text("state"),
+    zip_code: text("zip_code"),
+    country: text("country"),
+    user_id: uuid("user_id")
+      .references(() => "auth.users.id" as any, { onDelete: "cascade" })
+      .notNull(),
+  },
+  (table) => [
+    index("profiles_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+  ],
+).enableRLS();
+
+// Define companies table
 export const companies = pgTable(
   "companies",
   {
@@ -41,6 +254,9 @@ export const companies = pgTable(
     notes: text(),
     is_active: boolean().default(true).notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("companies_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
@@ -49,6 +265,39 @@ export const companies = pgTable(
   ],
 ).enableRLS();
 
+// Define products table
+export const products = pgTable(
+  "products",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text().notNull(),
+    description: text(),
+    sku: text(),
+    price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+    cost: numeric("cost", { precision: 10, scale: 2 }),
+    quantity: numeric("quantity", { precision: 10, scale: 2 }).default("0").notNull(),
+    unit: text(),
+    is_active: boolean().default(true).notNull(),
+    user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
+  },
+  (table) => [
+    index("products_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("products_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("products_sku_idx").using("btree", table.sku.asc().nullsLast().op("text_ops")),
+  ],
+).enableRLS();
+
+// Define clients table
 export const clients = pgTable(
   "clients",
   {
@@ -67,6 +316,9 @@ export const clients = pgTable(
     zip_code: text("zip_code").notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("clients_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
@@ -80,6 +332,7 @@ export const clients = pgTable(
   ],
 ).enableRLS();
 
+// Define invoices table
 export const invoices = pgTable(
   "invoices",
   {
@@ -120,7 +373,6 @@ export const invoices = pgTable(
       foreignColumns: [clients.id],
       name: "invoices_client_id_fkey",
     }).onDelete("cascade"),
-
     check(
       "invoices_status_check",
       sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`,
@@ -128,6 +380,7 @@ export const invoices = pgTable(
   ],
 ).enableRLS();
 
+// Define invoice items table
 export const invoiceItems = pgTable(
   "invoice_items",
   {
@@ -156,9 +409,15 @@ export const invoiceItems = pgTable(
       foreignColumns: [invoices.id],
       name: "invoice_items_invoice_id_fkey",
     }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.product_id],
+      foreignColumns: [products.id],
+      name: "invoice_items_product_id_fkey",
+    }),
   ],
 ).enableRLS();
 
+// Define quotes table
 export const quotes = pgTable(
   "quotes",
   {
@@ -199,7 +458,6 @@ export const quotes = pgTable(
       foreignColumns: [clients.id],
       name: "quotes_client_id_fkey",
     }).onDelete("cascade"),
-
     check(
       "quotes_status_check",
       sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`,
@@ -207,6 +465,7 @@ export const quotes = pgTable(
   ],
 ).enableRLS();
 
+// Define quote items table
 export const quoteItems = pgTable(
   "quote_items",
   {
@@ -243,8 +502,9 @@ export const quoteItems = pgTable(
   ],
 ).enableRLS();
 
-export const enterprises = pgTable(
-  "enterprises",
+// Define employees table
+export const employees = pgTable(
+  "employees",
   {
     id: uuid()
       .default(sql`uuid_generate_v4()`)
@@ -254,239 +514,68 @@ export const enterprises = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
-    name: text().notNull(),
-    email: text().notNull(),
-    phone: text(),
-    address: text(),
-    city: text(),
-    state: text(),
+    first_name: text("first_name").notNull(),
+    last_name: text("last_name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone"),
+    address: text("address"),
+    city: text("city"),
+    state: text("state"),
     zip_code: text("zip_code"),
+    country: text("country"),
+    hire_date: date("hire_date"),
+    termination_date: date("termination_date"),
     is_active: boolean().default(true).notNull(),
-  },
-  (table) => [
-    index("enterprises_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("enterprises_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-  ],
-).enableRLS();
-
-export const app_permission = pgEnum("app_permission", [
-  // Profiles
-  "profiles.create",
-  "profiles.read",
-  "profiles.update",
-  "profiles.delete",
-  "profiles.export",
-
-  // Enterprises
-  "enterprises.create",
-  "enterprises.read",
-  "enterprises.update",
-  "enterprises.delete",
-  "enterprises.export",
-
-  // Invoices
-  "invoices.create",
-  "invoices.read",
-  "invoices.update",
-  "invoices.delete",
-  "invoices.export",
-  "invoices.duplicate",
-
-  // Products
-  "products.create",
-  "products.read",
-  "products.update",
-  "products.delete",
-  "products.export",
-
-  // Quotes
-  "quotes.create",
-  "quotes.read",
-  "quotes.update",
-  "quotes.delete",
-  "quotes.export",
-  "quotes.duplicate",
-
-  // Employees
-  "employees.create",
-  "employees.read",
-  "employees.update",
-  "employees.delete",
-  "employees.export",
-
-  // Salaries
-  "salaries.create",
-  "salaries.read",
-  "salaries.update",
-  "salaries.delete",
-  "salaries.export",
-
-  // Documents
-  "documents.create",
-  "documents.read",
-  "documents.update",
-  "documents.delete",
-  "documents.export",
-
-  // Templates
-  "templates.create",
-  "templates.read",
-  "templates.update",
-  "templates.delete",
-  "templates.export",
-  "templates.duplicate",
-
-  // Employee Requests
-  "employee_requests.create",
-  "employee_requests.read",
-  "employee_requests.update",
-  "employee_requests.delete",
-  "employee_requests.export",
-
-  // Job Listings
-  "job_listings.create",
-  "job_listings.read",
-  "job_listings.update",
-  "job_listings.delete",
-  "job_listings.export",
-
-  // Offices
-  "offices.create",
-  "offices.read",
-  "offices.update",
-  "offices.delete",
-  "offices.export",
-
-  // Expenses
-  "expenses.create",
-  "expenses.read",
-  "expenses.update",
-  "expenses.delete",
-  "expenses.export",
-  "expenses.duplicate",
-
-  // Departments
-  "departments.create",
-  "departments.read",
-  "departments.update",
-  "departments.delete",
-  "departments.export",
-
-  // Warehouses
-  "warehouses.create",
-  "warehouses.read",
-  "warehouses.update",
-  "warehouses.delete",
-  "warehouses.export",
-
-  // Vendors
-  "vendors.create",
-  "vendors.read",
-  "vendors.update",
-  "vendors.delete",
-  "vendors.export",
-
-  // Clients
-  "clients.create",
-  "clients.read",
-  "clients.update",
-  "clients.delete",
-  "clients.export",
-
-  // Companies
-  "companies.create",
-  "companies.read",
-  "companies.update",
-  "companies.delete",
-  "companies.export",
-
-  // Branches
-  "branches.create",
-  "branches.read",
-  "branches.update",
-  "branches.delete",
-  "branches.export"
-]);
-
-export const user_roles = pgTable(
-  "user_roles",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    user_id: uuid("user_id").notNull().references(() => "auth.users.id" as any, { onDelete: "cascade" }),
-    role: text("role").notNull(),
-    enterprise_id: uuid("enterprise_id").references(() => enterprises.id, { onDelete: "cascade" }),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
-  },
-  (table) => ({
-    uniq: unique().on(table.user_id, table.role, table.enterprise_id),
-  }),
-).enableRLS();
-
-export const role_permissions = pgTable(
-  "role_permissions",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    role: text("role").notNull(),
-    permission: app_permission("permission").notNull(),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
-  },
-  (table) => ({
-    uniq: unique().on(table.role, table.permission),
-  }),
-).enableRLS();
-
-export const profiles = pgTable(
-  "profiles",
-  {
-    id: uuid("id").primaryKey().notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    full_name: text("full_name"),
-    email: text("email"),
-    role: text("role").$type<"superadmin" | "accounting" | "hr">().notNull(),
-    enterprise_id: uuid("enterprise_id").references(() => enterprises.id),
-    user_settings: jsonb("user_settings").default({}),
-    stripe_customer_id: text("stripe_customer_id"),
-    avatar_url: text("avatar_url"),
-    username: text("username"),
-    subscribed_to: text("subscribed_to"),
-    price_id: text("price_id"),
-  },
-  (table) => [
-    index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-  ],
-).enableRLS();
-
-export const products = pgTable(
-  "products",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    name: varchar({ length: 255 }).notNull(),
-    description: text(),
-    price: numeric({ precision: 10, scale: 2 }).notNull(),
-    sku: varchar({ length: 50 }),
-    stockQuantity: integer("stock_quantity").default(0),
     user_id: uuid("user_id").notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    updated_at: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
     enterprise_id: uuid("enterprise_id")
       .references(() => enterprises.id)
       .notNull(),
   },
   (table) => [
-    unique("products_sku_key").on(table.sku),
-    index("products_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("employees_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
   ],
 ).enableRLS();
 
+// Define salaries table
+export const salaries = pgTable(
+  "salaries",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    employee_id: uuid("employee_id").notNull(),
+    amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+    currency: text("currency").default("USD").notNull(),
+    payment_frequency: text("payment_frequency").default("monthly").notNull(),
+    start_date: date("start_date").notNull(),
+    end_date: date("end_date"),
+    notes: text(),
+    user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
+  },
+  (table) => [
+    index("salaries_employee_id_idx").using(
+      "btree",
+      table.employee_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("salaries_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.employee_id],
+      foreignColumns: [employees.id],
+      name: "salaries_employee_id_fkey",
+    }).onDelete("cascade"),
+  ],
+).enableRLS();
+
+// Define expenses table
 export const expenses = pgTable(
   "expenses",
   {
@@ -507,6 +596,9 @@ export const expenses = pgTable(
     notes: text(),
     client_id: uuid("client_id"),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("expenses_client_id_idx").using(
@@ -520,7 +612,6 @@ export const expenses = pgTable(
       foreignColumns: [clients.id],
       name: "expenses_client_id_fkey",
     }).onDelete("cascade"),
-
     check(
       "expenses_status_check",
       sql`status = ANY (ARRAY['pending'::text, 'paid'::text, 'overdue'::text])`,
@@ -528,6 +619,7 @@ export const expenses = pgTable(
   ],
 ).enableRLS();
 
+// Define vendors table
 export const vendors = pgTable(
   "vendors",
   {
@@ -553,6 +645,9 @@ export const vendors = pgTable(
     zip_code: text("zip_code").notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("vendors_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
@@ -561,40 +656,7 @@ export const vendors = pgTable(
   ],
 ).enableRLS();
 
-export const salaries = pgTable(
-  "salaries",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    pay_period_start: date("pay_period_start").notNull(),
-    pay_period_end: date("pay_period_end").notNull(),
-    payment_date: date("payment_date").notNull(),
-    gross_amount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
-    net_amount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
-    deductions: jsonb("deductions"),
-    notes: text(),
-    employee_name: text("employee_name").notNull(),
-    user_id: uuid("user_id").notNull(),
-    enterprise_id: uuid("enterprise_id")
-      .references(() => enterprises.id)
-      .notNull(),
-  },
-  (table) => [
-    index("salaries_payment_date_idx").using("btree", table.payment_date.asc().nullsLast()),
-    index("salaries_employee_name_idx").using(
-      "btree",
-      table.employee_name.asc().nullsLast().op("text_ops"),
-    ),
-    index("salaries_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-  ],
-).enableRLS();
-
+// Define warehouses table
 export const warehouses = pgTable(
   "warehouses",
   {
@@ -616,6 +678,9 @@ export const warehouses = pgTable(
     is_active: boolean("is_active").default(true).notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("warehouses_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
@@ -625,6 +690,7 @@ export const warehouses = pgTable(
   ],
 ).enableRLS();
 
+// Define branches table
 export const branches = pgTable(
   "branches",
   {
@@ -648,6 +714,9 @@ export const branches = pgTable(
     is_active: boolean("is_active").default(true).notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("branches_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
@@ -657,6 +726,7 @@ export const branches = pgTable(
   ],
 ).enableRLS();
 
+// Define jobs table
 export const jobs = pgTable(
   "jobs",
   {
@@ -674,6 +744,9 @@ export const jobs = pgTable(
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
@@ -682,6 +755,7 @@ export const jobs = pgTable(
   ],
 ).enableRLS();
 
+// Define templates table
 export const templates = pgTable(
   "templates",
   {
@@ -698,6 +772,9 @@ export const templates = pgTable(
     content: jsonb("content").notNull(), // Store the template content as JSON
     is_default: boolean("is_default").default(false).notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("templates_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
@@ -707,33 +784,7 @@ export const templates = pgTable(
   ],
 ).enableRLS();
 
-export const employees = pgTable(
-  "employees",
-  {
-    id: uuid().primaryKey().defaultRandom(),
-    first_name: varchar("first_name", { length: 255 }).notNull(),
-    last_name: varchar("last_name", { length: 255 }).notNull(),
-    email: varchar("email", { length: 255 }).notNull(),
-    phone: varchar("phone", { length: 50 }),
-    position: varchar("position", { length: 255 }).notNull(),
-    department_id: uuid("department_id").references(() => departments.id),
-    hire_date: date("hire_date").notNull(),
-    salary: numeric("salary", { precision: 10, scale: 2 }),
-    status: text("status").$type<"active" | "inactive" | "on_leave">().default("active").notNull(),
-    notes: text("notes"),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-    user_id: uuid("user_id").notNull(),
-    enterprise_id: uuid("enterprise_id")
-      .references(() => enterprises.id)
-      .notNull(),
-  },
-  (table) => [
-    index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    unique("employees_email_user_id_unique").on(table.email, table.user_id),
-  ],
-).enableRLS();
-
+// Define employee requests table
 export const employeeRequests = pgTable(
   "employee_requests",
   {
@@ -755,6 +806,9 @@ export const employeeRequests = pgTable(
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("employee_requests_user_id_idx").using(
@@ -768,6 +822,7 @@ export const employeeRequests = pgTable(
   ],
 ).enableRLS();
 
+// Define job listings table
 export const jobListings = pgTable(
   "job_listings",
   {
@@ -779,6 +834,9 @@ export const jobListings = pgTable(
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("job_listings_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
@@ -790,6 +848,7 @@ export const jobListings = pgTable(
   ],
 ).enableRLS();
 
+// Define job listing jobs table
 export const jobListingJobs = pgTable(
   "job_listing_jobs",
   {
@@ -801,6 +860,10 @@ export const jobListingJobs = pgTable(
       .notNull()
       .references(() => jobs.id, { onDelete: "cascade" }),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("job_listing_jobs_job_listing_id_idx").using(
@@ -814,6 +877,7 @@ export const jobListingJobs = pgTable(
   ],
 ).enableRLS();
 
+// Define offices table
 export const offices = pgTable(
   "offices",
   {
@@ -834,6 +898,9 @@ export const offices = pgTable(
     email: text(),
     is_active: boolean().default(true).notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("offices_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
@@ -841,6 +908,7 @@ export const offices = pgTable(
   ],
 ).enableRLS();
 
+// Define departments table
 export const departments = pgTable(
   "departments",
   {
@@ -860,6 +928,9 @@ export const departments = pgTable(
     description: text(),
     is_active: boolean("is_active").default(true).notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("departments_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
@@ -867,6 +938,7 @@ export const departments = pgTable(
   ],
 ).enableRLS();
 
+// Define department locations table
 export const departmentLocations = pgTable(
   "department_locations",
   {
@@ -880,6 +952,9 @@ export const departmentLocations = pgTable(
     location_id: uuid("location_id").notNull(),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     unique("unique_department_location").on(
@@ -894,6 +969,7 @@ export const departmentLocations = pgTable(
   ],
 ).enableRLS();
 
+// Define documents table
 export const documents = pgTable(
   "documents",
   {
@@ -929,6 +1005,9 @@ export const documents = pgTable(
       >()
       .notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("documents_entity_id_idx").using(
