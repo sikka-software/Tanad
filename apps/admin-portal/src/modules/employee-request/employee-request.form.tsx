@@ -60,13 +60,12 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
   const locale = useLocale();
 
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
-  const { setIsLoading: setIsEmployeeSaving, isLoading: isEmployeeSaving } = useEmployeeStore();
+  const setIsLoadingCreateEmployee = useEmployeeStore((state) => state.setIsLoading);
+  const isLoadingCreateEmployee = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
+
   const isLoadingSave = useEmployeeRequestsStore((state) => state.isLoading);
   const setIsLoadingSave = useEmployeeRequestsStore((state) => state.setIsLoading);
-  const router = useRouter();
 
   const form = useForm<EmployeeRequestFormValues>({
     resolver: zodResolver(createRequestSchema(t)),
@@ -93,66 +92,6 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
       id: emp.id,
     };
   });
-
-  const handleEmployeeSubmit = async (data: EmployeeFormValues) => {
-    setIsEmployeeSaving(true);
-    try {
-      if (!user?.id) {
-        throw new Error(t("error.not_authenticated"));
-      }
-
-      const response = await fetch("/api/employees/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.id}`,
-        },
-        body: JSON.stringify({
-          first_name: data.first_name.trim(),
-          last_name: data.last_name.trim(),
-          email: data.email.trim(),
-          phone: data.phone?.trim() || null,
-          position: data.position.trim(),
-          department_id: data.department || null,
-          hire_date: data.hire_date,
-          salary: data.salary ? parseFloat(data.salary) : null,
-          status: data.status,
-          notes: data.notes?.trim() || null,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t("Employees.messages.error"));
-      }
-
-      // Get the new employee data
-      const newEmployee = await response.json();
-
-      // Update the employees cache to include the new employee
-      const previousEmployees = queryClient.getQueryData(employeeKeys.lists()) || [];
-      queryClient.setQueryData(employeeKeys.lists(), [
-        ...(Array.isArray(previousEmployees) ? previousEmployees : []),
-        newEmployee,
-      ]);
-
-      // Set the new employee as the selected employee
-      form.setValue("employee_id", newEmployee.id);
-
-      // Close the dialog
-      setIsEmployeeDialogOpen(false);
-
-      // Show success message
-      toast.success(t("General.successful_operation"), {
-        description: t("Employees.success.created"),
-      });
-    } catch (error) {
-      console.error("Error creating employee:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Employees.error.create"),
-      });
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -427,9 +366,15 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
         onOpenChange={setIsEmployeeDialogOpen}
         title={t("Employees.add_new")}
         formId="employee-form"
-        loadingSave={isEmployeeSaving}
+        loadingSave={isLoadingCreateEmployee}
       >
-        <EmployeeForm id="employee-form" onSubmit={handleEmployeeSubmit} />
+        <EmployeeForm
+          id="employee-form"
+          onSuccess={() => {
+            setIsEmployeeDialogOpen(false);
+            setIsLoadingCreateEmployee(false);
+          }}
+        />
       </FormDialog>
     </>
   );
