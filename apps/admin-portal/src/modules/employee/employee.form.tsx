@@ -280,10 +280,8 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                   <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
                   <FormControl>
                     <CurrencyInput
-                      showComas
-                      value={
-                        field.value ? parseFloat(field.value.toLocaleString("en-US")) : undefined
-                      }
+                      showCommas={true}
+                      value={field.value ? parseFloat(field.value) : undefined}
                       onChange={(value) => field.onChange(value?.toString() || "")}
                       placeholder={t("Employees.form.salary.placeholder")}
                       disabled={loadingSave}

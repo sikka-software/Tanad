@@ -21,6 +21,7 @@ interface CurrencyInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "value"> {
   value?: number;
   onChange?: (value: number | undefined) => void;
+  showCommas?: boolean;
   showCurrencySymbol?: boolean;
 }
 
@@ -28,6 +29,7 @@ export function CurrencyInput({
   value,
   onChange,
   showCurrencySymbol = true,
+  showCommas = false,
   ...props
 }: CurrencyInputProps) {
   const [inputText, setInputText] = useState(value?.toFixed(2) || "");
@@ -52,8 +54,11 @@ export function CurrencyInput({
       return;
     }
 
+    // Remove all commas for validation
+    const valueWithoutCommas = newValue.replace(/,/g, '');
+
     // Split by decimal point to check decimal places
-    const parts = newValue.split(".");
+    const parts = valueWithoutCommas.split(".");
 
     // If we have decimal places, ensure no more than 2
     if (parts.length === 2 && parts[1].length > 2) {
@@ -61,13 +66,26 @@ export function CurrencyInput({
     }
 
     // Allow empty or valid number format
-    if (!/^[0-9٠-٩]*\.?[0-9٠-٩]*$/.test(newValue)) {
+    if (!/^[0-9٠-٩]*\.?[0-9٠-٩]*$/.test(valueWithoutCommas)) {
       return;
     }
 
     // Convert to English numerals for display
-    const converted = convertArabicToEnglishNumerals(newValue);
-    setInputText(converted);
+    const converted = convertArabicToEnglishNumerals(valueWithoutCommas);
+    
+    // Format with commas if showCommas is true
+    if (showCommas && converted) {
+      const num = Number(converted);
+      if (!isNaN(num)) {
+        const [whole, decimal] = converted.split('.');
+        const formattedWhole = Number(whole).toLocaleString();
+        setInputText(decimal ? `${formattedWhole}.${decimal}` : formattedWhole);
+      } else {
+        setInputText(converted);
+      }
+    } else {
+      setInputText(converted);
+    }
 
     const num = converted ? Number(converted) : undefined;
     if (!isNaN(num as number)) {
@@ -81,7 +99,15 @@ export function CurrencyInput({
       const num = Number(inputText);
       if (!isNaN(num)) {
         isUserInput.current = true;
-        setInputText(num.toFixed(2));
+        if (showCommas) {
+          const formatted = num.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+          setInputText(formatted);
+        } else {
+          setInputText(num.toFixed(2));
+        }
       }
     }
   };
