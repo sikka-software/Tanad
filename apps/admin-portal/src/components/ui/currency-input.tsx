@@ -54,40 +54,33 @@ export function CurrencyInput({
       return;
     }
 
-    // Remove all commas for validation
-    const valueWithoutCommas = newValue.replace(/,/g, '');
+    // Convert to English numerals first
+    const converted = convertArabicToEnglishNumerals(newValue);
 
-    // Split by decimal point to check decimal places
-    const parts = valueWithoutCommas.split(".");
+    // Split by decimal point
+    const [wholePart, decimalPart] = converted.split(".");
 
-    // If we have decimal places, ensure no more than 2
-    if (parts.length === 2 && parts[1].length > 2) {
-      return;
-    }
+    // Remove any existing commas from whole part
+    const cleanWholePart = wholePart.replace(/,/g, '');
 
-    // Allow empty or valid number format
-    if (!/^[0-9٠-٩]*\.?[0-9٠-٩]*$/.test(valueWithoutCommas)) {
-      return;
-    }
-
-    // Convert to English numerals for display
-    const converted = convertArabicToEnglishNumerals(valueWithoutCommas);
-    
-    // Format with commas if showCommas is true
-    if (showCommas && converted) {
-      const num = Number(converted);
+    // Format the whole part with commas if showCommas is true
+    let formattedValue = cleanWholePart;
+    if (showCommas && cleanWholePart) {
+      const num = Number(cleanWholePart);
       if (!isNaN(num)) {
-        const [whole, decimal] = converted.split('.');
-        const formattedWhole = Number(whole).toLocaleString();
-        setInputText(decimal ? `${formattedWhole}.${decimal}` : formattedWhole);
-      } else {
-        setInputText(converted);
+        formattedValue = num.toLocaleString();
       }
-    } else {
-      setInputText(converted);
     }
 
-    const num = converted ? Number(converted) : undefined;
+    // Add back the decimal part if it exists
+    if (decimalPart !== undefined) {
+      formattedValue += `.${decimalPart}`;
+    }
+
+    setInputText(formattedValue);
+
+    // Update the numeric value
+    const num = cleanWholePart ? Number(cleanWholePart + (decimalPart ? `.${decimalPart}` : '')) : undefined;
     if (!isNaN(num as number)) {
       onChange?.(num);
     }
