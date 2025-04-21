@@ -85,12 +85,13 @@ export default function Auth() {
               id: data.user.id,
               email: data.user.email,
               full_name: "Default Full Name",
+              role: "accounting",
               stripe_customer_id: null,
               avatar_url: null,
-              address: null,
+
               user_settings: { currency: "SAR", calendar_type: "gregorian" },
               username: null,
-              subscribed_to: "pukla_free",
+              subscribed_to: "tanad_free",
               price_id: FREE_PLAN_ID,
             },
           ]);

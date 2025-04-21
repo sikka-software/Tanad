@@ -333,6 +333,11 @@ export const profiles = pgTable(
     role: text("role").$type<"superadmin" | "accounting" | "hr">().notNull(),
     enterprise_id: uuid("enterprise_id").references(() => enterprises.id),
     user_settings: jsonb("user_settings").default({}),
+    stripe_customer_id: text("stripe_customer_id"),
+    avatar_url: text("avatar_url"),
+    username: text("username"),
+    subscribed_to: text("subscribed_to"),
+    price_id: text("price_id"),
   },
   (table) => [
     index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
