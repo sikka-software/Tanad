@@ -1,27 +1,10 @@
 import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { Department } from "@/modules/department/department.type";
-
 import { db } from "@/db/drizzle";
 import { departmentLocations, departments } from "@/db/schema";
+import { Department } from "@/modules/department/department.type";
 import { createClient } from "@/utils/supabase/server-props";
-
-// Helper to convert Drizzle department to our Department type
-function convertDrizzleDepartment(
-  data: typeof departments.$inferSelect & {
-    locations?: (typeof departmentLocations.$inferSelect)[];
-  },
-): Department {
-  return {
-    id: data.id,
-    name: data.name,
-    description: data.description || "",
-    locations: data.locations?.map((l) => l.location_id) || [],
-    created_at: data.created_at?.toString() || "",
-    user_id: data.user_id,
-  };
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createClient({
@@ -46,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           locations: true,
         },
       });
-      return res.status(200).json(departmentsList.map(convertDrizzleDepartment));
+      return res.status(200).json(departmentsList);
     } catch (error) {
       console.error("Error fetching departments:", error);
       return res.status(500).json({ message: "Error fetching departments" });
@@ -55,14 +38,41 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "POST") {
     try {
-      // Map client data to match Drizzle schema
-      const dbDepartment = {
-        ...req.body,
-        locations: req.body.locations,
-      };
+      const { locations, ...departmentData } = req.body;
 
-      const [department] = await db.insert(departments).values(dbDepartment).returning();
-      return res.status(201).json(convertDrizzleDepartment(department));
+      // Create the department first, ensuring is_active is set
+      const [department] = await db
+        .insert(departments)
+        .values({
+          ...departmentData,
+          is_active: true, // Set default value for is_active
+        })
+        .returning();
+
+      // Insert locations if provided
+      if (locations && locations.length > 0) {
+        await db.insert(departmentLocations).values(
+          locations.map((location_id: string) => ({
+            department_id: department.id,
+            location_id,
+            location_type: "office", // Default to office type
+          })),
+        );
+      }
+
+      // Fetch the created department with its locations
+      const createdDepartment = await db.query.departments.findFirst({
+        where: eq(departments.id, department.id),
+        with: {
+          locations: true,
+        },
+      });
+
+      if (!createdDepartment) {
+        return res.status(404).json({ message: "Department not found after creation" });
+      }
+
+      return res.status(201).json(createdDepartment);
     } catch (error) {
       console.error("Error creating department:", error);
       return res.status(500).json({ message: "Error creating department" });

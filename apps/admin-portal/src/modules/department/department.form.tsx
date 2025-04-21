@@ -169,30 +169,7 @@ export default function DepartmentForm({
             locations: data.locations || [],
           };
 
-          const newDepartment = await createDepartment(createData);
-
-          if (data.locations && data.locations.length > 0) {
-            const locationInserts = data.locations.map((location_id) => ({
-              department_id: newDepartment.id,
-              location_id: location_id,
-              location_type: "office" as const,
-            }));
-
-            const { error: locationError } = await supabase
-              .from("department_locations")
-              .insert(locationInserts);
-
-            if (locationError) throw locationError;
-            newDepartment.locations = data.locations;
-          }
-
-          // Update cache
-          const previousDepartments =
-            queryClient.getQueryData<Department[]>(departmentKeys.lists()) || [];
-          queryClient.setQueryData(departmentKeys.lists(), [...previousDepartments, newDepartment]);
-
-          // Set individual department data
-          queryClient.setQueryData(["departments", newDepartment.id], newDepartment);
+          await createDepartment(createData);
 
           toast.success(t("General.successful_operation"), {
             description: t("Departments.success.created"),
