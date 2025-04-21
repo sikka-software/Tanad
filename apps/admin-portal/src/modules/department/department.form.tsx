@@ -14,22 +14,40 @@ import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
 import { useBranches } from "@/modules/branch/branch.hooks";
+import { Branch } from "@/modules/branch/branch.type";
 import { useOffices } from "@/modules/office/office.hooks";
+import { Office } from "@/modules/office/office.type";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
+import { Warehouse } from "@/modules/warehouse/warehouse.type";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
-import { departmentKeys } from "./department.hooks";
 import { useCreateDepartment, useUpdateDepartment } from "./department.hooks";
 import useDepartmentStore from "./department.store";
-import type { Department, DepartmentCreateData } from "./department.type";
+import type { DepartmentCreateData } from "./department.type";
 import { DepartmentUpdateData } from "./department.type";
+
+type LocationValue = {
+  id: string;
+  type: "office" | "branch" | "warehouse";
+};
+
+type LocationOption = MultiSelectOption<LocationValue> & {
+  metadata: { type: LocationValue["type"] };
+};
 
 export const createDepartmentSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Departments.form.validation.name_required")),
     description: z.string().optional(),
-    locations: z.array(z.string()).min(1, t("Departments.form.validation.locations_required")),
+    locations: z
+      .array(
+        z.object({
+          id: z.string(),
+          type: z.enum(["office", "branch", "warehouse"]),
+        }),
+      )
+      .min(1, t("Departments.form.validation.locations_required")),
   });
 
 export type DepartmentFormValues = z.input<ReturnType<typeof createDepartmentSchema>>;
@@ -37,7 +55,6 @@ export type DepartmentFormValues = z.input<ReturnType<typeof createDepartmentSch
 interface DepartmentFormProps {
   id?: string;
   onSuccess?: () => void;
-  loading?: boolean;
   defaultValues?: DepartmentUpdateData | null;
   editMode?: boolean;
 }
@@ -45,7 +62,6 @@ interface DepartmentFormProps {
 export default function DepartmentForm({
   id,
   onSuccess,
-  loading = false,
   defaultValues,
   editMode = false,
 }: DepartmentFormProps) {
@@ -59,11 +75,11 @@ export default function DepartmentForm({
   const isLoading = useDepartmentStore((state) => state.isLoading);
   const setIsLoading = useDepartmentStore((state) => state.setIsLoading);
 
-  const { data: offices } = useOffices();
-  const { data: branches } = useBranches();
-  const { data: warehouses } = useWarehouses();
+  const { data: offices, isLoading: isOfficesLoading } = useOffices();
+  const { data: branches, isLoading: isBranchesLoading } = useBranches();
+  const { data: warehouses, isLoading: isWarehousesLoading } = useWarehouses();
   const locale = useLocale();
-  const [locationOptions, setLocationOptions] = useState<MultiSelectOption[]>([]);
+  const [locationOptions, setLocationOptions] = useState<LocationOption[]>([]);
 
   const form = useForm<DepartmentFormValues>({
     resolver: zodResolver(createDepartmentSchema(t)),
@@ -75,34 +91,31 @@ export default function DepartmentForm({
   });
 
   useEffect(() => {
-    const options: MultiSelectOption[] = [
+    const options: LocationOption[] = [
       ...(offices?.map((office) => ({
         id: office.id,
-        type: "office" as const,
         label: office.name,
-        value: office.id,
-        metadata: { type: "office" },
+        value: { id: office.id, type: "office" as const },
+        metadata: { type: "office" as const },
       })) || []),
       ...(branches?.map((branch) => ({
         id: branch.id,
-        type: "branch" as const,
         label: branch.name,
-        value: branch.id,
-        metadata: { type: "branch" },
+        value: { id: branch.id, type: "branch" as const },
+        metadata: { type: "branch" as const },
       })) || []),
       ...(warehouses?.map((warehouse) => ({
         id: warehouse.id,
-        type: "warehouse" as const,
         label: warehouse.name,
-        value: warehouse.id,
-        metadata: { type: "warehouse" },
+        value: { id: warehouse.id, type: "warehouse" as const },
+        metadata: { type: "warehouse" as const },
       })) || []),
     ];
     setLocationOptions(options);
   }, [offices, branches, warehouses]);
 
-  const renderLocationOption = (option: MultiSelectOption) => {
-    const type = option.metadata?.type;
+  const renderLocationOption = (option: MultiSelectOption<LocationValue>) => {
+    const type = (option as LocationOption).metadata?.type;
     const typeLabel = type ? t(`Locations.types.${type}`) : "";
     let typeIcon;
     switch (type) {
@@ -138,6 +151,21 @@ export default function DepartmentForm({
     try {
       if (editMode) {
         try {
+          const locations = data.locations
+            .map((location) => {
+              switch (location.type) {
+                case "office":
+                  return offices?.find((o) => o.id === location.id);
+                case "branch":
+                  return branches?.find((b) => b.id === location.id);
+                case "warehouse":
+                  return warehouses?.find((w) => w.id === location.id);
+                default:
+                  return null;
+              }
+            })
+            .filter(Boolean);
+
           await updateDepartment({
             id: id!,
             data: {
@@ -145,7 +173,7 @@ export default function DepartmentForm({
               description: data.description || null,
               user_id: user.id,
               is_active: true,
-              locations: data.locations || [],
+              locations: locations as (Office | Branch | Warehouse)[],
             },
           });
 
@@ -161,12 +189,27 @@ export default function DepartmentForm({
         }
       } else {
         try {
+          const locations = data.locations
+            .map((location) => {
+              switch (location.type) {
+                case "office":
+                  return offices?.find((o) => o.id === location.id);
+                case "branch":
+                  return branches?.find((b) => b.id === location.id);
+                case "warehouse":
+                  return warehouses?.find((w) => w.id === location.id);
+                default:
+                  return null;
+              }
+            })
+            .filter(Boolean);
+
           const createData: DepartmentCreateData = {
             name: data.name,
             description: data.description || null,
             user_id: user.id,
             is_active: true,
-            locations: data.locations || [],
+            locations: locations as (Office | Branch | Warehouse)[],
           };
 
           await createDepartment(createData);
@@ -174,6 +217,9 @@ export default function DepartmentForm({
           toast.success(t("General.successful_operation"), {
             description: t("Departments.success.created"),
           });
+          if (onSuccess) {
+            onSuccess();
+          }
 
           router.push("/departments");
         } catch (error) {
@@ -234,16 +280,22 @@ export default function DepartmentForm({
             <FormItem>
               <FormLabel>{t("Departments.form.locations.label")}</FormLabel>
               <FormControl>
-                <MultiSelect
+                <MultiSelect<LocationValue>
+                  loading={isOfficesLoading || isBranchesLoading || isWarehousesLoading}
                   dir={locale === "ar" ? "rtl" : "ltr"}
                   options={locationOptions}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value?.map((location) => location) || []}
+                  onValueChange={(values) => {
+                    console.log("values", values);
+                    field.onChange(values);
+                  }}
+                  defaultValue={field.value}
                   placeholder={t("Departments.form.locations.placeholder")}
                   variant="inverted"
                   animation={2}
                   maxCount={3}
                   renderOption={renderLocationOption}
+                  getValueKey={(value) => value.id}
+                  isValueEqual={(a, b) => a.id === b.id && a.type === b.type}
                 />
               </FormControl>
               <FormMessage />
