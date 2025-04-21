@@ -25,7 +25,7 @@ ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE enterprises ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies before recreating
+-- Drop all existing policies
 DROP POLICY IF EXISTS "Users can view their own profile" ON profiles;
 DROP POLICY IF EXISTS "Users can update their own profile" ON profiles;
 DROP POLICY IF EXISTS "Users can view their own enterprise" ON enterprises;
@@ -40,7 +40,6 @@ DROP POLICY IF EXISTS "Users can view their own employees" ON employees;
 DROP POLICY IF EXISTS "Users can update their own employees" ON employees;
 DROP POLICY IF EXISTS "Users can view their own salaries" ON salaries;
 DROP POLICY IF EXISTS "Users can update their own salaries" ON salaries;
-
 DROP POLICY IF EXISTS "Users can view their own user data" ON auth.users;
 DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
 DROP POLICY IF EXISTS "Superadmins can insert users" ON auth.users;
@@ -53,830 +52,96 @@ DROP POLICY IF EXISTS "Users can read their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can insert their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can update their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can delete their own branches" ON branches;
-
 DROP POLICY IF EXISTS "Users can read their own clients" ON clients;
 DROP POLICY IF EXISTS "Users can insert their own clients" ON clients;
 DROP POLICY IF EXISTS "Users can update their own clients" ON clients;
 DROP POLICY IF EXISTS "Users can delete their own clients" ON clients;
-
 DROP POLICY IF EXISTS "Users can read their own companies" ON companies;
 DROP POLICY IF EXISTS "Users can insert their own companies" ON companies;
 DROP POLICY IF EXISTS "Users can update their own companies" ON companies;
 DROP POLICY IF EXISTS "Users can delete their own companies" ON companies;
-
 DROP POLICY IF EXISTS "Users can read their own expenses" ON expenses;
 DROP POLICY IF EXISTS "Users can insert their own expenses" ON expenses;
 DROP POLICY IF EXISTS "Users can update their own expenses" ON expenses;
 DROP POLICY IF EXISTS "Users can delete their own expenses" ON expenses;
-
 DROP POLICY IF EXISTS "Users can read their own invoices" ON invoices;
 DROP POLICY IF EXISTS "Users can insert their own invoices" ON invoices;
 DROP POLICY IF EXISTS "Users can update their own invoices" ON invoices;
 DROP POLICY IF EXISTS "Users can delete their own invoices" ON invoices;
-
 DROP POLICY IF EXISTS "Users can read invoice items through invoices" ON invoice_items;
 DROP POLICY IF EXISTS "Users can insert invoice items through invoices" ON invoice_items;
 DROP POLICY IF EXISTS "Users can update invoice items through invoices" ON invoice_items;
 DROP POLICY IF EXISTS "Users can delete invoice items through invoices" ON invoice_items;
-
 DROP POLICY IF EXISTS "Users can read their own jobs" ON jobs;
 DROP POLICY IF EXISTS "Users can insert their own jobs" ON jobs;
 DROP POLICY IF EXISTS "Users can update their own jobs" ON jobs;
 DROP POLICY IF EXISTS "Users can delete their own jobs" ON jobs;
-
 DROP POLICY IF EXISTS "Users can read their own products" ON products;
 DROP POLICY IF EXISTS "Users can insert their own products" ON products;
 DROP POLICY IF EXISTS "Users can update their own products" ON products;
 DROP POLICY IF EXISTS "Users can delete their own products" ON products;
-
 DROP POLICY IF EXISTS "Admin full access" ON profiles;
 DROP POLICY IF EXISTS "Public profiles are viewable" ON profiles;
 DROP POLICY IF EXISTS "Users can create their own profile" ON profiles;
 DROP POLICY IF EXISTS "Users can delete their own profile" ON profiles;
-
 DROP POLICY IF EXISTS "Users can read their own quotes" ON quotes;
 DROP POLICY IF EXISTS "Users can insert their own quotes" ON quotes;
 DROP POLICY IF EXISTS "Users can update their own quotes" ON quotes;
 DROP POLICY IF EXISTS "Users can delete their own quotes" ON quotes;
-
 DROP POLICY IF EXISTS "Users can read quote items through quotes" ON quote_items;
 DROP POLICY IF EXISTS "Users can insert quote items through quotes" ON quote_items;
 DROP POLICY IF EXISTS "Users can update quote items through quotes" ON quote_items;
 DROP POLICY IF EXISTS "Users can delete quote items through quotes" ON quote_items;
-
 DROP POLICY IF EXISTS "Users can read their own salary records" ON salaries;
 DROP POLICY IF EXISTS "Users can insert their own salary records" ON salaries;
 DROP POLICY IF EXISTS "Users can update their own salary records" ON salaries;
 DROP POLICY IF EXISTS "Users can delete their own salary records" ON salaries;
-
 DROP POLICY IF EXISTS "Users can read their own vendors" ON vendors;
 DROP POLICY IF EXISTS "Users can insert their own vendors" ON vendors;
 DROP POLICY IF EXISTS "Users can update their own vendors" ON vendors;
 DROP POLICY IF EXISTS "Users can delete their own vendors" ON vendors;
-
 DROP POLICY IF EXISTS "Users can read their own warehouses" ON warehouses;
 DROP POLICY IF EXISTS "Users can insert their own warehouses" ON warehouses;
 DROP POLICY IF EXISTS "Users can update their own warehouses" ON warehouses;
 DROP POLICY IF EXISTS "Users can delete their own warehouses" ON warehouses;
-
 DROP POLICY IF EXISTS "Users can view their own job listings and public ones" ON job_listings;
 DROP POLICY IF EXISTS "Users can create job listings" ON job_listings;
 DROP POLICY IF EXISTS "Users can update their own job listings" ON job_listings;
 DROP POLICY IF EXISTS "Users can delete their own job listings" ON job_listings;
-
 DROP POLICY IF EXISTS "Users can view job listing jobs for their listings" ON job_listing_jobs;
 DROP POLICY IF EXISTS "Users can add jobs to their listings" ON job_listing_jobs;
 DROP POLICY IF EXISTS "Users can update jobs in their listings" ON job_listing_jobs;
 DROP POLICY IF EXISTS "Users can remove jobs from their listings" ON job_listing_jobs;
-
 DROP POLICY IF EXISTS "Users can read their own offices" ON offices;
 DROP POLICY IF EXISTS "Users can insert their own offices" ON offices;
 DROP POLICY IF EXISTS "Users can update their own offices" ON offices;
 DROP POLICY IF EXISTS "Users can delete their own offices" ON offices;
-
 DROP POLICY IF EXISTS "Users can read their own departments" ON departments;
 DROP POLICY IF EXISTS "Users can insert their own departments" ON departments;
 DROP POLICY IF EXISTS "Users can update their own departments" ON departments;
 DROP POLICY IF EXISTS "Users can delete their own departments" ON departments;
-
 DROP POLICY IF EXISTS "Users can read department locations through departments" ON department_locations;
 DROP POLICY IF EXISTS "Users can insert department locations through departments" ON department_locations;
 DROP POLICY IF EXISTS "Users can update department locations through departments" ON department_locations;
 DROP POLICY IF EXISTS "Users can delete department locations through departments" ON department_locations;
-
 DROP POLICY IF EXISTS "Users can read their own employee requests" ON employee_requests;
 DROP POLICY IF EXISTS "Users can insert their own employee requests" ON employee_requests;
 DROP POLICY IF EXISTS "Users can update their own employee requests" ON employee_requests;
 DROP POLICY IF EXISTS "Users can delete their own employee requests" ON employee_requests;
-
 DROP POLICY IF EXISTS "Users can view their own documents" ON documents;
 DROP POLICY IF EXISTS "Users can upload their own documents" ON documents;
 DROP POLICY IF EXISTS "Users can update their own documents" ON documents;
 DROP POLICY IF EXISTS "Users can delete their own documents" ON documents;
-
 DROP POLICY IF EXISTS "Users can view their own documents and documents of their entities" ON documents;
 DROP POLICY IF EXISTS "Users can create documents for their entities" ON documents;
 DROP POLICY IF EXISTS "Users can update their own documents" ON documents;
 DROP POLICY IF EXISTS "Users can delete their own documents" ON documents;
-
--- documents object bucket drop policy
 DROP POLICY IF EXISTS "Users can view their own documents" ON storage.objects;
 DROP POLICY IF EXISTS "Users can upload their own documents" ON storage.objects;
 DROP POLICY IF EXISTS "Users can update their own documents" ON storage.objects;
 DROP POLICY IF EXISTS "Users can delete their own documents" ON storage.objects;
 
--- TEMPLATES POLICIES
-CREATE POLICY "USERS CAN VIEW THEIR OWN TEMPLATES"
-  ON templates FOR SELECT
-  TO authenticated
-  USING (
-    auth.uid() = user_id
-  );
-
-CREATE POLICY "USERS CAN CREATE THEIR OWN TEMPLATES"
-  ON templates FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    auth.uid() = user_id
-  );
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN TEMPLATES"
-  ON templates FOR UPDATE
-  TO authenticated
-  USING (
-    auth.uid() = user_id
-  )
-  WITH CHECK (
-    auth.uid() = user_id
-  );
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN TEMPLATES"
-  ON templates FOR DELETE
-  TO authenticated
-  USING (
-    auth.uid() = user_id
-  );
-
--- BRANCHES POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN BRANCHES"
-  ON branches FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN BRANCHES"
-  ON branches FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN BRANCHES"
-  ON branches FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN BRANCHES"
-  ON branches FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- CLIENTS POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN CLIENTS"
-  ON clients FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN CLIENTS"
-  ON clients FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN CLIENTS"
-  ON clients FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN CLIENTS"
-  ON clients FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- COMPANIES POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN COMPANIES"
-  ON companies FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN COMPANIES"
-  ON companies FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN COMPANIES"
-  ON companies FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN COMPANIES"
-  ON companies FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- EMPLOYEES POLICIES
-CREATE POLICY "USERS CAN READ EMPLOYEES"
-  ON employees FOR SELECT
-  TO authenticated
-  USING (true);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN EMPLOYEES"
-  ON employees FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN EMPLOYEES"
-  ON employees FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN EMPLOYEES"
-  ON employees FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- EMPLOYEE REQUESTS POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN EMPLOYEE REQUESTS"
-  ON employee_requests FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN EMPLOYEE REQUESTS"
-  ON employee_requests FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN EMPLOYEE REQUESTS"
-  ON employee_requests FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN EMPLOYEE REQUESTS"
-  ON employee_requests FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- EXPENSES POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN EXPENSES"
-  ON expenses FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN EXPENSES"
-  ON expenses FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN EXPENSES"
-  ON expenses FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN EXPENSES"
-  ON expenses FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- INVOICES POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN INVOICES"
-  ON invoices FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN INVOICES"
-  ON invoices FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN INVOICES"
-  ON invoices FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN INVOICES"
-  ON invoices FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- INVOICE ITEMS POLICIES
-CREATE POLICY "USERS CAN READ INVOICE ITEMS THROUGH INVOICES"
-  ON invoice_items FOR SELECT
-  TO authenticated
-  USING (
-    invoice_id IN (SELECT id FROM invoices WHERE user_id = auth.uid())
-  );
-
-CREATE POLICY "USERS CAN INSERT INVOICE ITEMS THROUGH INVOICES"
-  ON invoice_items FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    invoice_id IN (SELECT id FROM invoices WHERE user_id = auth.uid())
-  );
-
-CREATE POLICY "USERS CAN UPDATE INVOICE ITEMS THROUGH INVOICES"
-  ON invoice_items FOR UPDATE
-  TO authenticated
-  USING (
-    invoice_id IN (SELECT id FROM invoices WHERE user_id = auth.uid())
-  )
-  WITH CHECK (
-    invoice_id IN (SELECT id FROM invoices WHERE user_id = auth.uid())
-  );
-
-CREATE POLICY "USERS CAN DELETE INVOICE ITEMS THROUGH INVOICES"
-  ON invoice_items FOR DELETE
-  TO authenticated
-  USING (
-    invoice_id IN (SELECT id FROM invoices WHERE user_id = auth.uid())
-  );
-
--- JOBS POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN JOBS"
-  ON jobs FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN JOBS"
-  ON jobs FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN JOBS"
-  ON jobs FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN JOBS"
-  ON jobs FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- PRODUCTS POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN PRODUCTS"
-  ON products FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN PRODUCTS"
-  ON products FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN PRODUCTS"
-  ON products FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN PRODUCTS"
-  ON products FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- PROFILES POLICIES
-DROP POLICY IF EXISTS "SUPERADMINS CAN MANAGE PROFILES" ON profiles;
-DROP POLICY IF EXISTS "USERS CAN VIEW THEIR OWN PROFILE" ON profiles;
-DROP POLICY IF EXISTS "USERS CAN UPDATE THEIR OWN PROFILE" ON profiles;
-DROP POLICY IF EXISTS "USERS CAN CREATE THEIR OWN PROFILE" ON profiles;
-
-CREATE POLICY "Users can view their own profile"
-  ON profiles FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own profile"
-  ON profiles FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can create their own profile"
-  ON profiles FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
--- QUOTES POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN QUOTES"
-  ON quotes FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN QUOTES"
-  ON quotes FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN QUOTES"
-  ON quotes FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN QUOTES"
-  ON quotes FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- QUOTE ITEMS POLICIES
-CREATE POLICY "USERS CAN READ QUOTE ITEMS THROUGH QUOTES"
-  ON quote_items FOR SELECT
-  TO authenticated
-  USING (
-    quote_id IN (SELECT id FROM quotes WHERE user_id = auth.uid())
-  );
-
-CREATE POLICY "USERS CAN INSERT QUOTE ITEMS THROUGH QUOTES"
-  ON quote_items FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    quote_id IN (SELECT id FROM quotes WHERE user_id = auth.uid())
-  );
-
-CREATE POLICY "USERS CAN UPDATE QUOTE ITEMS THROUGH QUOTES"
-  ON quote_items FOR UPDATE
-  TO authenticated
-  USING (
-    quote_id IN (SELECT id FROM quotes WHERE user_id = auth.uid())
-  )
-  WITH CHECK (
-    quote_id IN (SELECT id FROM quotes WHERE user_id = auth.uid())
-  );
-
-CREATE POLICY "USERS CAN DELETE QUOTE ITEMS THROUGH QUOTES"
-  ON quote_items FOR DELETE
-  TO authenticated
-  USING (
-    quote_id IN (SELECT id FROM quotes WHERE user_id = auth.uid())
-  );
-
--- SALARIES POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN SALARY RECORDS"
-  ON salaries FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN SALARY RECORDS"
-  ON salaries FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN SALARY RECORDS"
-  ON salaries FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN SALARY RECORDS"
-  ON salaries FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- VENDORS POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN VENDORS"
-  ON vendors FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN VENDORS"
-  ON vendors FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN VENDORS"
-  ON vendors FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN VENDORS"
-  ON vendors FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- WAREHOUSES POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN WAREHOUSES"
-  ON warehouses FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN WAREHOUSES"
-  ON warehouses FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN WAREHOUSES"
-  ON warehouses FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN WAREHOUSES"
-  ON warehouses FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- JOB LISTINGS POLICIES
-CREATE POLICY "USERS CAN VIEW THEIR OWN JOB LISTINGS AND PUBLIC ONES"
-  ON job_listings FOR SELECT
-  TO authenticated
-  USING (
-    auth.uid() = user_id OR
-    is_active = true
-  );
-
-CREATE POLICY "USERS CAN CREATE JOB LISTINGS"
-  ON job_listings FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN JOB LISTINGS"
-  ON job_listings FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN JOB LISTINGS"
-  ON job_listings FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- JOB LISTING JOBS POLICIES
-CREATE POLICY "USERS CAN VIEW JOB LISTING JOBS FOR THEIR LISTINGS"
-  ON job_listing_jobs FOR SELECT
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM job_listings
-      WHERE job_listings.id = job_listing_jobs.job_listing_id
-      AND job_listings.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "USERS CAN ADD JOBS TO THEIR LISTINGS"
-  ON job_listing_jobs FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM job_listings
-      WHERE job_listings.id = job_listing_jobs.job_listing_id
-      AND job_listings.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "USERS CAN UPDATE JOBS IN THEIR LISTINGS"
-  ON job_listing_jobs FOR UPDATE
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM job_listings
-      WHERE job_listings.id = job_listing_jobs.job_listing_id
-      AND job_listings.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "USERS CAN REMOVE JOBS FROM THEIR LISTINGS"
-  ON job_listing_jobs FOR DELETE
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM job_listings
-      WHERE job_listings.id = job_listing_jobs.job_listing_id
-      AND job_listings.user_id = auth.uid()
-    )
-  );
-
--- OFFICES POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN OFFICES"
-  ON offices FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN OFFICES"
-  ON offices FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN OFFICES"
-  ON offices FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN OFFICES"
-  ON offices FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- DEPARTMENTS POLICIES
-CREATE POLICY "USERS CAN READ THEIR OWN DEPARTMENTS"
-  ON departments FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN INSERT THEIR OWN DEPARTMENTS"
-  ON departments FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN UPDATE THEIR OWN DEPARTMENTS"
-  ON departments FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN DEPARTMENTS"
-  ON departments FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- DEPARTMENT LOCATIONS POLICIES
-CREATE POLICY "USERS CAN READ DEPARTMENT LOCATIONS THROUGH DEPARTMENTS"
-  ON department_locations FOR SELECT
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM departments
-      WHERE departments.id = department_locations.department_id
-      AND departments.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "USERS CAN INSERT DEPARTMENT LOCATIONS THROUGH DEPARTMENTS"
-  ON department_locations FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM departments
-      WHERE departments.id = department_locations.department_id
-      AND departments.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "USERS CAN UPDATE DEPARTMENT LOCATIONS THROUGH DEPARTMENTS"
-  ON department_locations FOR UPDATE
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM departments
-      WHERE departments.id = department_locations.department_id
-      AND departments.user_id = auth.uid()
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM departments
-      WHERE departments.id = department_locations.department_id
-      AND departments.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "USERS CAN DELETE DEPARTMENT LOCATIONS THROUGH DEPARTMENTS"
-  ON department_locations FOR DELETE
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM departments
-      WHERE departments.id = department_locations.department_id
-      AND departments.user_id = auth.uid()
-    )
-  );
-
--- STORAGE POLICIES FOR ENTERPRISE-DOCUMENTS BUCKET
-CREATE POLICY "Users can view their own documents"
-ON storage.objects FOR SELECT
-TO authenticated
-USING (
-  bucket_id = 'enterprise-documents' AND
-  (auth.uid() = owner OR owner IS NULL)
-);
-
-CREATE POLICY "Users can upload their own documents"
-ON storage.objects FOR INSERT
-TO authenticated
-WITH CHECK (
-  bucket_id = 'enterprise-documents' AND
-  auth.uid() = owner
-);
-
-CREATE POLICY "Users can update their own documents"
-ON storage.objects FOR UPDATE
-TO authenticated
-USING (
-  bucket_id = 'enterprise-documents' AND
-  auth.uid() = owner
-);
-
-CREATE POLICY "Users can delete their own documents"
-ON storage.objects FOR DELETE
-TO authenticated
-USING (
-  bucket_id = 'enterprise-documents' AND
-  auth.uid() = owner
-);
-
-CREATE POLICY "Users can view their own documents and documents of their entities"
-  ON documents FOR SELECT
-  TO authenticated
-  USING (
-    auth.uid() = user_id OR
-    (
-      CASE documents.entity_type
-        WHEN 'company' THEN EXISTS (
-          SELECT 1 FROM companies WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'expense' THEN EXISTS (
-          SELECT 1 FROM expenses WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'salary' THEN EXISTS (
-          SELECT 1 FROM salaries WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'employee' THEN EXISTS (
-          SELECT 1 FROM employees WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'invoice' THEN EXISTS (
-          SELECT 1 FROM invoices WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'quote' THEN EXISTS (
-          SELECT 1 FROM quotes WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'vendor' THEN EXISTS (
-          SELECT 1 FROM vendors WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'warehouse' THEN EXISTS (
-          SELECT 1 FROM warehouses WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'branch' THEN EXISTS (
-          SELECT 1 FROM branches WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'office' THEN EXISTS (
-          SELECT 1 FROM offices WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        WHEN 'department' THEN EXISTS (
-          SELECT 1 FROM departments WHERE id = documents.entity_id AND user_id = auth.uid()
-        )
-        ELSE false
-      END
-    )
-  );
-
-CREATE POLICY "Users can create documents for their entities"
-  ON documents FOR INSERT
-  TO authenticated
-  WITH CHECK (
-    auth.uid() = user_id AND
-    (
-      CASE entity_type
-        WHEN 'company' THEN EXISTS (
-          SELECT 1 FROM companies WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'expense' THEN EXISTS (
-          SELECT 1 FROM expenses WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'salary' THEN EXISTS (
-          SELECT 1 FROM salaries WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'employee' THEN EXISTS (
-          SELECT 1 FROM employees WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'invoice' THEN EXISTS (
-          SELECT 1 FROM invoices WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'quote' THEN EXISTS (
-          SELECT 1 FROM quotes WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'vendor' THEN EXISTS (
-          SELECT 1 FROM vendors WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'warehouse' THEN EXISTS (
-          SELECT 1 FROM warehouses WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'branch' THEN EXISTS (
-          SELECT 1 FROM branches WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'office' THEN EXISTS (
-          SELECT 1 FROM offices WHERE id = entity_id AND user_id = auth.uid()
-        )
-        WHEN 'department' THEN EXISTS (
-          SELECT 1 FROM departments WHERE id = entity_id AND user_id = auth.uid()
-        )
-        ELSE false
-      END
-    )
-  );
-
-CREATE POLICY "Users can update their own documents"
-  ON documents FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own documents"
-  ON documents FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id);
-
--- AUTH USERS POLICIES
--- Drop existing policies first
-DROP POLICY IF EXISTS "Users can view their own user data" ON auth.users;
-DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
-DROP POLICY IF EXISTS "Superadmins can insert users" ON auth.users;
-DROP POLICY IF EXISTS "Users can manage their own roles" ON auth.users;
-DROP POLICY IF EXISTS "Superadmins can manage all users" ON auth.users;
-
--- Create new policies
+-- Create policies for auth.users
 CREATE POLICY "Users can view their own user data"
   ON auth.users FOR SELECT
   TO authenticated
@@ -902,27 +167,20 @@ CREATE POLICY "Superadmins can manage all users"
       WHERE ur.user_id = auth.uid()
       AND ur.role = 'superadmin'
     )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.role = 'superadmin'
-    )
   );
 
--- USER ROLES POLICIES
+-- Create policies for user_roles
+CREATE POLICY "Users can view their own roles"
+  ON user_roles FOR SELECT
+  TO authenticated
+  USING (user_id = auth.uid());
+
 CREATE POLICY "Users can create initial role"
   ON user_roles FOR INSERT
   TO authenticated
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (user_id = auth.uid());
 
-CREATE POLICY "Users can view their roles"
-  ON user_roles FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Superadmins can manage all roles"
+CREATE POLICY "Only superadmins can manage roles"
   ON user_roles FOR ALL
   TO authenticated
   USING (
@@ -940,7 +198,26 @@ CREATE POLICY "Superadmins can manage all roles"
     )
   );
 
--- ENTERPRISES POLICIES
+-- Create policies for role_permissions
+CREATE POLICY "Only superadmins can manage role permissions"
+  ON role_permissions FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  );
+
+-- Create policies for enterprises
 CREATE POLICY "Users can create enterprises"
   ON enterprises FOR INSERT
   TO authenticated
@@ -957,41 +234,8 @@ CREATE POLICY "Users can update enterprises"
   USING (
     EXISTS (
       SELECT 1 FROM user_roles ur
-      WHERE ur.enterprise_id = enterprises.id
-      AND ur.user_id = auth.uid()
-      AND ur.role = 'superadmin'
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.enterprise_id = enterprises.id
-      AND ur.user_id = auth.uid()
-      AND ur.role = 'superadmin'
-    )
-  );
-
--- Create policies for enterprises
-CREATE POLICY "Users can view their own enterprise"
-  ON enterprises FOR SELECT
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
       WHERE ur.user_id = auth.uid()
       AND ur.enterprise_id = enterprises.id
-    )
-  );
-
-CREATE POLICY "Users can update their own enterprise"
-  ON enterprises FOR UPDATE
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = enterprises.id
-      AND (ur.role = 'superadmin' OR ur.role = 'admin')
     )
   )
   WITH CHECK (
@@ -999,231 +243,609 @@ CREATE POLICY "Users can update their own enterprise"
       SELECT 1 FROM user_roles ur
       WHERE ur.user_id = auth.uid()
       AND ur.enterprise_id = enterprises.id
-      AND (ur.role = 'superadmin' OR ur.role = 'admin')
     )
   );
+
+-- Create policies for profiles
+CREATE POLICY "Users can view their own profile"
+  ON profiles FOR SELECT
+  TO authenticated
+  USING (id = auth.uid());
+
+CREATE POLICY "Users can update their own profile"
+  ON profiles FOR UPDATE
+  TO authenticated
+  USING (id = auth.uid())
+  WITH CHECK (id = auth.uid());
+
+CREATE POLICY "Users can create their own profile"
+  ON profiles FOR INSERT
+  TO authenticated
+  WITH CHECK (id = auth.uid());
+
+CREATE POLICY "Users can delete their own profile"
+  ON profiles FOR DELETE
+  TO authenticated
+  USING (id = auth.uid());
+
+-- Create policies for branches
+CREATE POLICY "Users can read their own branches"
+  ON branches FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own branches"
+  ON branches FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own branches"
+  ON branches FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own branches"
+  ON branches FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for clients
+CREATE POLICY "Users can read their own clients"
+  ON clients FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own clients"
+  ON clients FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own clients"
+  ON clients FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own clients"
+  ON clients FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for companies
+CREATE POLICY "Users can read their own companies"
+  ON companies FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own companies"
+  ON companies FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own companies"
+  ON companies FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own companies"
+  ON companies FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for expenses
+CREATE POLICY "Users can read their own expenses"
+  ON expenses FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own expenses"
+  ON expenses FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own expenses"
+  ON expenses FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own expenses"
+  ON expenses FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
 
 -- Create policies for invoices
-CREATE POLICY "Users can view their own invoices"
+CREATE POLICY "Users can read their own invoices"
   ON invoices FOR SELECT
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = invoices.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'accounting'
-      )
-    )
-  );
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own invoices"
+  ON invoices FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own invoices"
   ON invoices FOR UPDATE
   TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own invoices"
+  ON invoices FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for invoice_items
+CREATE POLICY "Users can read invoice items through invoices"
+  ON invoice_items FOR SELECT
+  TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = invoices.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'accounting'
-      )
+      SELECT 1 FROM invoices i
+      WHERE i.id = invoice_items.invoice_id
+      AND i.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can insert invoice items through invoices"
+  ON invoice_items FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM invoices i
+      WHERE i.id = invoice_items.invoice_id
+      AND i.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can update invoice items through invoices"
+  ON invoice_items FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM invoices i
+      WHERE i.id = invoice_items.invoice_id
+      AND i.user_id = auth.uid()
     )
   )
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = invoices.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'accounting'
-      )
+      SELECT 1 FROM invoices i
+      WHERE i.id = invoice_items.invoice_id
+      AND i.user_id = auth.uid()
     )
   );
 
--- Create policies for products
-CREATE POLICY "Users can view their own products"
-  ON products FOR SELECT
+CREATE POLICY "Users can delete invoice items through invoices"
+  ON invoice_items FOR DELETE
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = products.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'accounting'
-      )
+      SELECT 1 FROM invoices i
+      WHERE i.id = invoice_items.invoice_id
+      AND i.user_id = auth.uid()
     )
   );
+
+-- Create policies for jobs
+CREATE POLICY "Users can read their own jobs"
+  ON jobs FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own jobs"
+  ON jobs FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own jobs"
+  ON jobs FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own jobs"
+  ON jobs FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for products
+CREATE POLICY "Users can read their own products"
+  ON products FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own products"
+  ON products FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own products"
   ON products FOR UPDATE
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = products.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'accounting'
-      )
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = products.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'accounting'
-      )
-    )
-  );
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own products"
+  ON products FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
 
 -- Create policies for quotes
-CREATE POLICY "Users can view their own quotes"
+CREATE POLICY "Users can read their own quotes"
   ON quotes FOR SELECT
   TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = quotes.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'accounting'
-      )
-    )
-  );
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own quotes"
+  ON quotes FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can update their own quotes"
   ON quotes FOR UPDATE
   TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own quotes"
+  ON quotes FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for quote_items
+CREATE POLICY "Users can read quote items through quotes"
+  ON quote_items FOR SELECT
+  TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = quotes.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'accounting'
-      )
+      SELECT 1 FROM quotes q
+      WHERE q.id = quote_items.quote_id
+      AND q.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can insert quote items through quotes"
+  ON quote_items FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM quotes q
+      WHERE q.id = quote_items.quote_id
+      AND q.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can update quote items through quotes"
+  ON quote_items FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM quotes q
+      WHERE q.id = quote_items.quote_id
+      AND q.user_id = auth.uid()
     )
   )
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = quotes.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'accounting'
-      )
+      SELECT 1 FROM quotes q
+      WHERE q.id = quote_items.quote_id
+      AND q.user_id = auth.uid()
     )
   );
 
--- Create policies for employees
-CREATE POLICY "Users can view their own employees"
-  ON employees FOR SELECT
+CREATE POLICY "Users can delete quote items through quotes"
+  ON quote_items FOR DELETE
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = employees.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'hr'
-      )
-    )
-  );
-
-CREATE POLICY "Users can update their own employees"
-  ON employees FOR UPDATE
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = employees.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'hr'
-      )
-    )
-  )
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = employees.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'hr'
-      )
+      SELECT 1 FROM quotes q
+      WHERE q.id = quote_items.quote_id
+      AND q.user_id = auth.uid()
     )
   );
 
 -- Create policies for salaries
-CREATE POLICY "Users can view their own salaries"
+CREATE POLICY "Users can read their own salary records"
   ON salaries FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own salary records"
+  ON salaries FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own salary records"
+  ON salaries FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own salary records"
+  ON salaries FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for vendors
+CREATE POLICY "Users can read their own vendors"
+  ON vendors FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own vendors"
+  ON vendors FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own vendors"
+  ON vendors FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own vendors"
+  ON vendors FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for warehouses
+CREATE POLICY "Users can read their own warehouses"
+  ON warehouses FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own warehouses"
+  ON warehouses FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own warehouses"
+  ON warehouses FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own warehouses"
+  ON warehouses FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for job_listings
+CREATE POLICY "Users can view their own job listings and public ones"
+  ON job_listings FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id OR is_public = true);
+
+CREATE POLICY "Users can create job listings"
+  ON job_listings FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own job listings"
+  ON job_listings FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own job listings"
+  ON job_listings FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for job_listing_jobs
+CREATE POLICY "Users can view job listing jobs for their listings"
+  ON job_listing_jobs FOR SELECT
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = salaries.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'hr'
-      )
+      SELECT 1 FROM job_listings jl
+      WHERE jl.id = job_listing_jobs.job_listing_id
+      AND jl.user_id = auth.uid()
     )
   );
 
-CREATE POLICY "Users can update their own salaries"
-  ON salaries FOR UPDATE
+CREATE POLICY "Users can add jobs to their listings"
+  ON job_listing_jobs FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM job_listings jl
+      WHERE jl.id = job_listing_jobs.job_listing_id
+      AND jl.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can update jobs in their listings"
+  ON job_listing_jobs FOR UPDATE
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = salaries.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'hr'
-      )
+      SELECT 1 FROM job_listings jl
+      WHERE jl.id = job_listing_jobs.job_listing_id
+      AND jl.user_id = auth.uid()
     )
   )
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM user_roles ur
-      WHERE ur.user_id = auth.uid()
-      AND ur.enterprise_id = salaries.enterprise_id
-      AND (
-        ur.role = 'superadmin' OR 
-        ur.role = 'admin' OR 
-        ur.role = 'hr'
-      )
+      SELECT 1 FROM job_listings jl
+      WHERE jl.id = job_listing_jobs.job_listing_id
+      AND jl.user_id = auth.uid()
     )
   );
+
+CREATE POLICY "Users can remove jobs from their listings"
+  ON job_listing_jobs FOR DELETE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM job_listings jl
+      WHERE jl.id = job_listing_jobs.job_listing_id
+      AND jl.user_id = auth.uid()
+    )
+  );
+
+-- Create policies for offices
+CREATE POLICY "Users can read their own offices"
+  ON offices FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own offices"
+  ON offices FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own offices"
+  ON offices FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own offices"
+  ON offices FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for departments
+CREATE POLICY "Users can read their own departments"
+  ON departments FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own departments"
+  ON departments FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own departments"
+  ON departments FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own departments"
+  ON departments FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for department_locations
+CREATE POLICY "Users can read department locations through departments"
+  ON department_locations FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM departments d
+      WHERE d.id = department_locations.department_id
+      AND d.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can insert department locations through departments"
+  ON department_locations FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM departments d
+      WHERE d.id = department_locations.department_id
+      AND d.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can update department locations through departments"
+  ON department_locations FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM departments d
+      WHERE d.id = department_locations.department_id
+      AND d.user_id = auth.uid()
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM departments d
+      WHERE d.id = department_locations.department_id
+      AND d.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can delete department locations through departments"
+  ON department_locations FOR DELETE
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM departments d
+      WHERE d.id = department_locations.department_id
+      AND d.user_id = auth.uid()
+    )
+  );
+
+-- Create policies for employee_requests
+CREATE POLICY "Users can read their own employee requests"
+  ON employee_requests FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own employee requests"
+  ON employee_requests FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own employee requests"
+  ON employee_requests FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own employee requests"
+  ON employee_requests FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for documents
+CREATE POLICY "Users can view their own documents"
+  ON documents FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can upload their own documents"
+  ON documents FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own documents"
+  ON documents FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own documents"
+  ON documents FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Create policies for storage.objects
+CREATE POLICY "Users can view their own documents"
+  ON storage.objects FOR SELECT
+  TO authenticated
+  USING (bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+CREATE POLICY "Users can upload their own documents"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+CREATE POLICY "Users can update their own documents"
+  ON storage.objects FOR UPDATE
+  TO authenticated
+  USING (bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1])
+  WITH CHECK (bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+CREATE POLICY "Users can delete their own documents"
+  ON storage.objects FOR DELETE
+  TO authenticated
+  USING (bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]);

@@ -2,19 +2,14 @@
 DROP TRIGGER IF EXISTS validate_department_location_trigger ON department_locations;
 DROP FUNCTION IF EXISTS validate_department_location();
 
--- Drop policies that depend on user_roles
-DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
-DROP POLICY IF EXISTS "Superadmins can manage all users" ON auth.users;
-DROP POLICY IF EXISTS "Users can update enterprises" ON enterprises;
-DROP POLICY IF EXISTS "Users can create initial role" ON user_roles;
-DROP POLICY IF EXISTS "Users can view their roles" ON user_roles;
-
 -- Drop existing RBAC triggers and functions if they exist
 DROP TRIGGER IF EXISTS validate_user_role_trigger ON user_roles;
 DROP TRIGGER IF EXISTS validate_role_permission_trigger ON role_permissions;
 DROP FUNCTION IF EXISTS validate_user_role();
 DROP FUNCTION IF EXISTS validate_role_permission();
 DROP FUNCTION IF EXISTS has_permission(text, uuid);
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS handle_new_user_role();
 
 -- Create the trigger function
 CREATE OR REPLACE FUNCTION validate_department_location()

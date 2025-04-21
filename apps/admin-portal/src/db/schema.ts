@@ -160,9 +160,7 @@ export const userRoles = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    user_id: uuid("user_id")
-      .references(() => "auth.users.id" as any, { onDelete: "cascade" })
-      .notNull(),
+    user_id: uuid("user_id").notNull(),
     role: appRole("role").notNull(),
     enterprise_id: uuid("enterprise_id").references(() => enterprises.id, { onDelete: "cascade" }),
     created_at: timestamp("created_at", {
@@ -219,9 +217,7 @@ export const profiles = pgTable(
     state: text("state"),
     zip_code: text("zip_code"),
     country: text("country"),
-    user_id: uuid("user_id")
-      .references(() => "auth.users.id" as any, { onDelete: "cascade" })
-      .notNull(),
+    user_id: uuid("user_id").notNull(),
   },
   (table) => [
     index("profiles_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
@@ -252,14 +248,10 @@ export const companies = pgTable(
     industry: text(),
     size: text(),
     notes: text(),
-    is_active: boolean().default(true).notNull(),
     user_id: uuid("user_id").notNull(),
-    enterprise_id: uuid("enterprise_id")
-      .references(() => enterprises.id)
-      .notNull(),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id, { onDelete: "cascade" }).notNull(),
   },
   (table) => [
-    index("companies_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
   ],
