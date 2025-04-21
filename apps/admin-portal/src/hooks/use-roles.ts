@@ -123,10 +123,15 @@ export function useCreateRole() {
 
   return useMutation({
     mutationFn: async (role: Omit<Role, "id" | "createdAt" | "updatedAt">) => {
+      // Get the current user's ID
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       const { data, error } = await supabase
         .from("user_roles")
         .insert({
           role: role.name,
+          user_id: user.id,
           enterprise_id: null, // For now, we don't support enterprise-specific roles
         })
         .select()

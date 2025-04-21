@@ -91,12 +91,12 @@ const PermissionsSection = React.memo(function PermissionsSection({
   return (
     <Card>
       <CardContent className="p-4">
-        <ScrollArea className="h-[300px] pr-4">
+        <ScrollArea className="h-[300px] pe-4">
           <Accordion type="multiple" className="w-full">
             {Object.entries(permissionsByCategory).map(([category, categoryPermissions]) => (
               <AccordionItem key={category} value={category}>
                 <AccordionTrigger className="py-2">
-                  <div className="flex w-full items-center justify-between pr-4">
+                  <div className="flex w-full items-center justify-between pe-4">
                     <span>{category}</span>
                     <div className="flex items-center space-x-2">
                       <Checkbox
@@ -112,7 +112,7 @@ const PermissionsSection = React.memo(function PermissionsSection({
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-2 pt-2 pl-4">
+                  <div className="space-y-2 pt-2 ps-4">
                     {categoryPermissions.map((permission) => (
                       <div key={permission.id} className="flex items-start space-x-2">
                         <Checkbox
@@ -311,13 +311,13 @@ export default function RolesList() {
           <Input
             type="search"
             placeholder="Search roles..."
-            className="pl-8"
+            className="ps-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> Add Role
+          <Plus className="me-2 h-4 w-4" /> Add Role
         </Button>
       </div>
 
@@ -330,8 +330,8 @@ export default function RolesList() {
                   <CardTitle className="flex items-center">
                     {role.name}
                     {role.isSystem && (
-                      <Badge variant="secondary" className="ml-2 px-1.5">
-                        <Lock className="mr-1 h-3 w-3" />
+                      <Badge variant="secondary" className="ms-2 px-1.5">
+                        <Lock className="me-1 h-3 w-3" />
                         System
                       </Badge>
                     )}
@@ -349,7 +349,7 @@ export default function RolesList() {
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => handleEditRole(role)}>
-                      <Edit className="mr-2 h-4 w-4" />
+                      <Edit className="me-2 h-4 w-4" />
                       Edit Role
                     </DropdownMenuItem>
                     {!role.isSystem && (
@@ -357,7 +357,7 @@ export default function RolesList() {
                         onClick={() => openDeleteDialog(role)}
                         className="text-red-600 focus:text-red-600"
                       >
-                        <Trash className="mr-2 h-4 w-4" />
+                        <Trash className="me-2 h-4 w-4" />
                         Delete Role
                       </DropdownMenuItem>
                     )}
@@ -368,7 +368,7 @@ export default function RolesList() {
             <CardContent className="pb-2">
               <div className="space-y-2">
                 <div className="flex items-center text-sm">
-                  <Shield className="text-muted-foreground mr-2 h-4 w-4" />
+                  <Shield className="text-muted-foreground me-2 h-4 w-4" />
                   <span className="text-muted-foreground">
                     {role.permissions.length} permissions
                   </span>
@@ -437,7 +437,7 @@ export default function RolesList() {
                     placeholder="Or enter custom role name (lowercase, numbers, underscores only)"
                     value={newRole.name}
                     onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
-                    className="pl-2"
+                    className="ps-2"
                   />
                   {newRole.name && !/^[a-z0-9_]+$/.test(newRole.name) && (
                     <p className="text-xs text-red-500 mt-1">
@@ -586,7 +586,7 @@ export default function RolesList() {
           </p>
           {!searchQuery && (
             <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" /> Add Role
+              <Plus className="me-2 h-4 w-4" /> Add Role
             </Button>
           )}
         </div>
