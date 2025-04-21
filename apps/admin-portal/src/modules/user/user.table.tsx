@@ -61,14 +61,34 @@ type AuthUser = {
 
 export type UserType = {
   id: string;
-  full_name: string | null;
-  role: string;
-  is_active: boolean;
+  email: string;
+  role: "superadmin" | "accounting" | "hr";
+  enterprise_id: string;
   created_at: string;
-  auth_users?: AuthUser;
 };
 
-export default function UsersTable({ initialUsers }: { initialUsers: UserType[] }) {
+interface UsersTableProps {
+  initialUsers: UserType[];
+  enterprises: Array<{ id: string; name: string }>;
+  currentUser: UserType;
+  onCreateUser: (email: string, password: string, role: string, enterpriseId: string) => Promise<void>;
+  onUpdateUser: (userId: string, role: string, enterpriseId: string) => Promise<void>;
+}
+
+type NewUserType = {
+  email: string;
+  password: string;
+  role: "accounting" | "hr";
+  enterpriseId: string;
+};
+
+export default function UsersTable({
+  initialUsers,
+  enterprises,
+  currentUser,
+  onCreateUser,
+  onUpdateUser,
+}: UsersTableProps) {
   const [users, setUsers] = useState<UserType[]>(initialUsers);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
@@ -79,13 +99,19 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserType[] 
     role: "",
     is_active: true,
   });
+  const [isCreating, setIsCreating] = useState(false);
+  const [newUser, setNewUser] = useState<NewUserType>({
+    email: "",
+    password: "",
+    role: "accounting",
+    enterpriseId: "",
+  });
 
   const supabase = createClient();
   // Filter users based on search query
   const filteredUsers = users.filter(
     (user) =>
-      user.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.auth_users?.email.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.role.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
@@ -93,9 +119,9 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserType[] 
   const handleEditUser = (user: UserType) => {
     setSelectedUser(user);
     setEditForm({
-      full_name: user.full_name || "",
+      full_name: user.email,
       role: user.role,
-      is_active: user.is_active,
+      is_active: true,
     });
     setIsEditDialogOpen(true);
   };
@@ -128,7 +154,7 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserType[] 
           user.id === selectedUser.id
             ? {
                 ...user,
-                full_name: editForm.full_name,
+                email: editForm.full_name,
                 role: editForm.role,
                 is_active: editForm.is_active,
               }
@@ -222,6 +248,29 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserType[] 
     }
   };
 
+  const handleCreate = async () => {
+    if (!newUser.email || !newUser.password || !newUser.enterpriseId) return;
+    
+    await onCreateUser(
+      newUser.email,
+      newUser.password,
+      newUser.role,
+      newUser.enterpriseId
+    );
+    
+    setIsCreating(false);
+    setNewUser({
+      email: "",
+      password: "",
+      role: "accounting",
+      enterpriseId: "",
+    });
+  };
+
+  const handleUpdate = async (userId: string, role: string, enterpriseId: string) => {
+    await onUpdateUser(userId, role, enterpriseId);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -237,17 +286,84 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserType[] 
         </div>
       </div>
 
+      <div className="mb-4 flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Users</h2>
+        <Button onClick={() => setIsCreating(true)}>Add User</Button>
+      </div>
+
+      {isCreating && (
+        <div className="mb-4 p-4 border rounded-lg">
+          <h3 className="text-lg font-medium mb-4">Create New User</h3>
+          <div className="grid gap-4">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                value={newUser.email}
+                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={newUser.password}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="role">Role</Label>
+              <Select
+                value={newUser.role}
+                onValueChange={(value) => setNewUser({ ...newUser, role: value as "accounting" | "hr" })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="accounting">Accounting</SelectItem>
+                  <SelectItem value="hr">HR</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="enterprise">Enterprise</Label>
+              <Select
+                value={newUser.enterpriseId}
+                onValueChange={(value) => setNewUser({ ...newUser, enterpriseId: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select enterprise" />
+                </SelectTrigger>
+                <SelectContent>
+                  {enterprises.map((enterprise) => (
+                    <SelectItem key={enterprise.id} value={enterprise.id}>
+                      {enterprise.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsCreating(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreate}>Create</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Enterprise</TableHead>
               <TableHead>Created</TableHead>
-              <TableHead>Last Login</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+              <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -260,81 +376,41 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserType[] 
             ) : (
               filteredUsers.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.full_name || "Unnamed User"}</TableCell>
-                  <TableCell>{user.auth_users?.email || "No email"}</TableCell>
+                  <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <div className="flex items-center">
-                      <Badge
-                        variant={
-                          user.role === "superadmin"
-                            ? "destructive"
-                            : user.role === "admin"
-                              ? "default"
-                              : "secondary"
-                        }
-                        className="flex items-center"
-                      >
-                        {getRoleIcon(user.role)}
-                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                      </Badge>
-                    </div>
+                    <Badge variant={user.role === "superadmin" ? "default" : "secondary"}>
+                      {user.role}
+                    </Badge>
                   </TableCell>
                   <TableCell>
-                    {user.is_active ? (
-                      <Badge
-                        variant="outline"
-                        className="flex items-center border-green-200 bg-green-50 text-green-700"
-                      >
-                        <CheckCircle className="mr-1 h-3.5 w-3.5" />
-                        Active
-                      </Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="flex items-center border-red-200 bg-red-50 text-red-700"
-                      >
-                        <XCircle className="mr-1 h-3.5 w-3.5" />
-                        Inactive
-                      </Badge>
-                    )}
+                    {enterprises.find((e) => e.id === user.enterprise_id)?.name}
                   </TableCell>
                   <TableCell>{formatDate(user.created_at)}</TableCell>
-                  <TableCell>{formatDate(user.auth_users?.last_sign_in_at || null)}</TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" className="h-8 w-8 p-0">
                           <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleEditUser(user)}>
-                          <UserCog className="mr-2 h-4 w-4" />
-                          Edit user
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toggleUserStatus(user)}>
-                          {user.is_active ? (
-                            <>
-                              <UserX className="mr-2 h-4 w-4" />
-                              Deactivate
-                            </>
-                          ) : (
-                            <>
-                              <User className="mr-2 h-4 w-4" />
-                              Activate
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() => handleDeleteUser(user)}
-                          className="text-red-600 focus:text-red-600"
+                          onClick={() => {
+                            const newRole = user.role === "accounting" ? "hr" : "accounting";
+                            handleUpdate(user.id, newRole, user.enterprise_id);
+                          }}
                         >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          Change Role
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const newEnterpriseId = prompt("Enter new enterprise ID");
+                            if (newEnterpriseId) {
+                              handleUpdate(user.id, user.role, newEnterpriseId);
+                            }
+                          }}
+                        >
+                          Change Enterprise
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -425,7 +501,7 @@ export default function UsersTable({ initialUsers }: { initialUsers: UserType[] 
             <p className="text-muted-foreground">
               User:{" "}
               <span className="text-foreground font-medium">
-                {selectedUser?.auth_users?.email || "No email"}
+                {selectedUser?.email || "No email"}
               </span>
             </p>
           </div>

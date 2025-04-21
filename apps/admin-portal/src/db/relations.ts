@@ -19,6 +19,11 @@ import {
   departments,
   departmentLocations,
   offices,
+  enterprises,
+  roles,
+  permissions,
+  role_permissions,
+  user_roles,
 } from "./schema";
 
 export const clientsRelations = relations(clients, ({ many, one }) => ({
@@ -81,7 +86,7 @@ export const quoteItemsRelations = relations(quoteItems, ({ one }) => ({
   }),
 }));
 
-export const profilesRelations = relations(profiles, ({ many }) => ({
+export const profilesRelations = relations(profiles, ({ one, many }) => ({
   clients: many(clients),
   invoices: many(invoices),
   quotes: many(quotes),
@@ -92,6 +97,11 @@ export const profilesRelations = relations(profiles, ({ many }) => ({
   warehouses: many(warehouses),
   branches: many(branches),
   jobs: many(jobs),
+  enterprise: one(enterprises, {
+    fields: [profiles.enterprise_id],
+    references: [enterprises.id],
+  }),
+  userRoles: many(user_roles),
 }));
 
 export const productsRelations = relations(products, ({ one }) => ({
@@ -167,5 +177,45 @@ export const employeesRelations = relations(employees, ({ one }) => ({
   department: one(departments, {
     fields: [employees.department_id],
     references: [departments.id],
+  }),
+}));
+
+export const enterprisesRelations = relations(enterprises, ({ many }) => ({
+  profiles: many(profiles),
+  userRoles: many(user_roles),
+}));
+
+export const rolesRelations = relations(roles, ({ many }) => ({
+  rolePermissions: many(role_permissions),
+  userRoles: many(user_roles),
+}));
+
+export const permissionsRelations = relations(permissions, ({ many }) => ({
+  rolePermissions: many(role_permissions),
+}));
+
+export const rolePermissionsRelations = relations(role_permissions, ({ one }) => ({
+  role: one(roles, {
+    fields: [role_permissions.role_id],
+    references: [roles.id],
+  }),
+  permission: one(permissions, {
+    fields: [role_permissions.permission_id],
+    references: [permissions.id],
+  }),
+}));
+
+export const userRolesRelations = relations(user_roles, ({ one }) => ({
+  user: one(profiles, {
+    fields: [user_roles.user_id],
+    references: [profiles.id],
+  }),
+  role: one(roles, {
+    fields: [user_roles.role_id],
+    references: [roles.id],
+  }),
+  enterprise: one(enterprises, {
+    fields: [user_roles.enterprise_id],
+    references: [enterprises.id],
   }),
 }));

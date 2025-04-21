@@ -12,6 +12,8 @@ export default function UsersPage() {
   const router = useRouter();
 
   const [users, setUsers] = useState<UserType[]>([]);
+  const [enterprises, setEnterprises] = useState<any[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     const getUsersAndProfiles = async () => {
@@ -22,24 +24,97 @@ export default function UsersPage() {
 
       if (!user) {
         router.push("/login");
+        return;
       }
 
-      // Fetch the user's role from profiles table
+      // Fetch the current user's profile
       const { data: profile } = await supabase
         .from("profiles")
-        .select("role")
-        .eq("id", user?.id)
+        .select("*")
+        .eq("id", user.id)
         .single();
+
+      if (!profile || profile.role !== "superadmin") {
+        router.push("/");
+        return;
+      }
+
+      setCurrentUser(profile);
+
+      // Fetch all enterprises
+      const { data: enterprisesData } = await supabase
+        .from("enterprises")
+        .select("*");
+
+      setEnterprises(enterprisesData || []);
 
       // Fetch all users with their profiles
       const { data: users } = await supabase
         .from("profiles")
         .select("*")
         .order("created_at", { ascending: false });
+
+      setUsers(users || []);
     };
 
     getUsersAndProfiles();
   }, []);
+
+  const handleCreateUser = async (email: string, password: string, role: string, enterpriseId: string) => {
+    try {
+      // Create the user in auth
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+
+      if (authError) throw authError;
+
+      // Create the profile
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: authData.user.id,
+          email,
+          role,
+          enterprise_id: enterpriseId,
+        });
+
+      if (profileError) throw profileError;
+
+      // Refresh users list
+      const { data: users } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      setUsers(users || []);
+    } catch (error) {
+      console.error("Error creating user:", error);
+    }
+  };
+
+  const handleUpdateUser = async (userId: string, role: string, enterpriseId: string) => {
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ role, enterprise_id: enterpriseId })
+        .eq("id", userId);
+
+      if (error) throw error;
+
+      // Refresh users list
+      const { data: users } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      setUsers(users || []);
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -49,7 +124,13 @@ export default function UsersPage() {
         roles, and control account access.
       </p>
 
-      <UsersTable initialUsers={users as UserType[]} />
+      <UsersTable 
+        initialUsers={users} 
+        enterprises={enterprises}
+        currentUser={currentUser}
+        onCreateUser={handleCreateUser}
+        onUpdateUser={handleUpdateUser}
+      />
     </div>
   );
 }

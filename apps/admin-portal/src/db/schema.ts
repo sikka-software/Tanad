@@ -103,6 +103,7 @@ export const invoices = pgTable(
     notes: text("notes"),
     client_id: uuid("client_id").notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
   },
   (table) => [
     index("invoices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
@@ -182,6 +183,7 @@ export const quotes = pgTable(
     notes: text(),
     client_id: uuid("client_id").notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
   },
   (table) => [
     index("quotes_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
@@ -236,21 +238,144 @@ export const quoteItems = pgTable(
   ],
 ).enableRLS();
 
+export const enterprises = pgTable(
+  "enterprises",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    name: text().notNull(),
+    email: text().notNull(),
+    phone: text(),
+    address: text(),
+    city: text(),
+    state: text(),
+    zip_code: text("zip_code"),
+    is_active: boolean().default(true).notNull(),
+  },
+  (table) => [
+    index("enterprises_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("enterprises_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+  ],
+).enableRLS();
+
+export const roles = pgTable(
+  "roles",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+  },
+  (table) => [
+    unique("roles_name_key").on(table.name),
+  ],
+).enableRLS();
+
+export const permissions = pgTable(
+  "permissions",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+  },
+  (table) => [
+    unique("permissions_name_key").on(table.name),
+  ],
+).enableRLS();
+
+export const role_permissions = pgTable(
+  "role_permissions",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    role_id: uuid("role_id")
+      .notNull()
+      .references(() => roles.id, { onDelete: "cascade" }),
+    permission_id: uuid("permission_id")
+      .notNull()
+      .references(() => permissions.id, { onDelete: "cascade" }),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+  },
+  (table) => [
+    unique("role_permissions_unique").on(table.role_id, table.permission_id),
+  ],
+).enableRLS();
+
+export const user_roles = pgTable(
+  "user_roles",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    user_id: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    role_id: uuid("role_id")
+      .notNull()
+      .references(() => roles.id, { onDelete: "cascade" }),
+    enterprise_id: uuid("enterprise_id")
+      .notNull()
+      .references(() => enterprises.id, { onDelete: "cascade" }),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
+  },
+  (table) => [
+    unique("user_roles_unique").on(table.user_id, table.role_id, table.enterprise_id),
+  ],
+).enableRLS();
+
 export const profiles = pgTable(
   "profiles",
   {
-    id: uuid().primaryKey().notNull(),
+    id: uuid("id").primaryKey().notNull(),
+    created_at: timestamp("created_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
     full_name: text("full_name"),
-    stripe_customer_id: text("stripe_customer_id"),
-    avatar_url: text("avatar_url"),
-    address: text(),
-    email: varchar({ length: 255 }),
-    user_settings: jsonb("user_settings"),
-    username: text(),
-    subscribed_to: text("subscribed_to"),
-    price_id: text("price_id"),
+    email: text("email"),
+    role: text("role").$type<"superadmin" | "accounting" | "hr">().notNull(),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id),
+    user_settings: jsonb("user_settings").default({}),
   },
-  (table) => [unique("profiles_username_key").on(table.username)],
+  (table) => [
+    index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+  ],
 ).enableRLS();
 
 export const products = pgTable(
@@ -271,6 +396,7 @@ export const products = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
   },
   (table) => [
     unique("products_sku_key").on(table.sku),
@@ -372,6 +498,7 @@ export const salaries = pgTable(
     notes: text(),
     employee_name: text("employee_name").notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
   },
   (table) => [
     index("salaries_payment_date_idx").using("btree", table.payment_date.asc().nullsLast()),
@@ -512,6 +639,7 @@ export const employees = pgTable(
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
   },
   (table) => [
     index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),

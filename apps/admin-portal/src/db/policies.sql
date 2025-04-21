@@ -22,6 +22,11 @@ ALTER TABLE job_listings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE job_listing_jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE enterprises ENABLE ROW LEVEL SECURITY;
+ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE permissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE role_permissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
 
 
 -- Drop existing policies before recreating
@@ -406,36 +411,28 @@ CREATE POLICY "USERS CAN DELETE THEIR OWN PRODUCTS"
   USING (auth.uid() = user_id);
 
 -- PROFILES POLICIES
-CREATE POLICY "ADMIN FULL ACCESS"
+CREATE POLICY "SUPERADMINS CAN MANAGE PROFILES"
   ON profiles FOR ALL
-  TO service_role
-  USING (true);
-
-CREATE POLICY "PUBLIC PROFILES ARE VIEWABLE"
-  ON profiles FOR SELECT
   TO authenticated
-  USING (true);
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+      AND p.role = 'superadmin'
+      AND p.enterprise_id = profiles.enterprise_id
+    )
+  );
 
 CREATE POLICY "USERS CAN VIEW THEIR OWN PROFILE"
   ON profiles FOR SELECT
   TO authenticated
   USING (auth.uid() = id);
 
-CREATE POLICY "USERS CAN CREATE THEIR OWN PROFILE"
-  ON profiles FOR INSERT
-  TO authenticated
-  WITH CHECK (auth.uid() = id);
-
 CREATE POLICY "USERS CAN UPDATE THEIR OWN PROFILE"
   ON profiles FOR UPDATE
   TO authenticated
   USING (auth.uid() = id)
   WITH CHECK (auth.uid() = id);
-
-CREATE POLICY "USERS CAN DELETE THEIR OWN PROFILE"
-  ON profiles FOR DELETE
-  TO authenticated
-  USING (auth.uid() = id);
 
 -- QUOTES POLICIES
 CREATE POLICY "USERS CAN READ THEIR OWN QUOTES"
@@ -855,3 +852,101 @@ CREATE POLICY "Users can delete their own documents"
   ON documents FOR DELETE
   TO authenticated
   USING (auth.uid() = user_id);
+
+-- ENTERPRISES POLICIES
+CREATE POLICY "SUPERADMINS CAN MANAGE ENTERPRISES"
+  ON enterprises FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+      AND p.role = 'superadmin'
+      AND p.enterprise_id = enterprises.id
+    )
+  );
+
+-- INVOICES POLICIES
+CREATE POLICY "ACCOUNTING CAN MANAGE INVOICES"
+  ON invoices FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      JOIN roles r ON ur.role_id = r.id
+      JOIN role_permissions rp ON r.id = rp.role_id
+      JOIN permissions p ON rp.permission_id = p.id
+      WHERE ur.profile_id = auth.uid()
+      AND ur.enterprise_id = invoices.enterprise_id
+      AND r.name = 'accounting'
+      AND p.name = 'manage_invoices'
+    )
+  );
+
+-- PRODUCTS POLICIES
+CREATE POLICY "ACCOUNTING CAN MANAGE PRODUCTS"
+  ON products FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      JOIN roles r ON ur.role_id = r.id
+      JOIN role_permissions rp ON r.id = rp.role_id
+      JOIN permissions p ON rp.permission_id = p.id
+      WHERE ur.profile_id = auth.uid()
+      AND ur.enterprise_id = products.enterprise_id
+      AND r.name = 'accounting'
+      AND p.name = 'manage_products'
+    )
+  );
+
+-- QUOTES POLICIES
+CREATE POLICY "ACCOUNTING CAN MANAGE QUOTES"
+  ON quotes FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      JOIN roles r ON ur.role_id = r.id
+      JOIN role_permissions rp ON r.id = rp.role_id
+      JOIN permissions p ON rp.permission_id = p.id
+      WHERE ur.profile_id = auth.uid()
+      AND ur.enterprise_id = quotes.enterprise_id
+      AND r.name = 'accounting'
+      AND p.name = 'manage_quotes'
+    )
+  );
+
+-- EMPLOYEES POLICIES
+CREATE POLICY "HR CAN MANAGE EMPLOYEES"
+  ON employees FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      JOIN roles r ON ur.role_id = r.id
+      JOIN role_permissions rp ON r.id = rp.role_id
+      JOIN permissions p ON rp.permission_id = p.id
+      WHERE ur.profile_id = auth.uid()
+      AND ur.enterprise_id = employees.enterprise_id
+      AND r.name = 'hr'
+      AND p.name = 'manage_employees'
+    )
+  );
+
+-- SALARIES POLICIES
+CREATE POLICY "HR CAN MANAGE SALARIES"
+  ON salaries FOR ALL
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      JOIN roles r ON ur.role_id = r.id
+      JOIN role_permissions rp ON r.id = rp.role_id
+      JOIN permissions p ON rp.permission_id = p.id
+      WHERE ur.profile_id = auth.uid()
+      AND ur.enterprise_id = salaries.enterprise_id
+      AND r.name = 'hr'
+      AND p.name = 'manage_salaries'
+    )
+  );
