@@ -61,7 +61,7 @@ export function CurrencyInput({
     const [wholePart, decimalPart] = converted.split(".");
 
     // Remove any existing commas from whole part
-    const cleanWholePart = wholePart.replace(/,/g, '');
+    const cleanWholePart = wholePart.replace(/,/g, "");
 
     // Format the whole part with commas if showCommas is true
     let formattedValue = cleanWholePart;
@@ -72,15 +72,17 @@ export function CurrencyInput({
       }
     }
 
-    // Add back the decimal part if it exists
+    // Add back the decimal part if it exists, limiting to 2 digits
     if (decimalPart !== undefined) {
-      formattedValue += `.${decimalPart}`;
+      formattedValue += `.${decimalPart.slice(0, 2)}`;
     }
 
     setInputText(formattedValue);
 
     // Update the numeric value
-    const num = cleanWholePart ? Number(cleanWholePart + (decimalPart ? `.${decimalPart}` : '')) : undefined;
+    const num = cleanWholePart
+      ? Number(cleanWholePart + (decimalPart ? `.${decimalPart.slice(0, 2)}` : ""))
+      : undefined;
     if (!isNaN(num as number)) {
       onChange?.(num);
     }
@@ -95,7 +97,7 @@ export function CurrencyInput({
         if (showCommas) {
           const formatted = num.toLocaleString(undefined, {
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+            maximumFractionDigits: 2,
           });
           setInputText(formatted);
         } else {

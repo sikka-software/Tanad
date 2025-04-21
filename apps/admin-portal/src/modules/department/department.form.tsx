@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -64,7 +63,6 @@ export default function DepartmentForm({
   const user = useUserStore((state) => state.user);
   const { mutateAsync: createDepartment } = useCreateDepartment();
   const { mutate: updateDepartment } = useUpdateDepartment();
-  const router = useRouter();
   const setIsLoading = useDepartmentStore((state) => state.setIsLoading);
 
   const { data: offices, isLoading: isOfficesLoading } = useOffices();

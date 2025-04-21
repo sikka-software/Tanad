@@ -23,11 +23,7 @@ import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
 import useDepartmentStore from "../department/department.store";
-
-interface EmployeeFormProps {
-  id?: string;
-  onSubmit: (data: EmployeeFormValues) => Promise<void>;
-}
+import { useCreateEmployee, useUpdateEmployee } from "./employee.hooks";
 
 const createEmployeeFormSchema = (t: (key: string) => string) => {
   const supabase = createClient();
@@ -68,13 +64,22 @@ const createEmployeeFormSchema = (t: (key: string) => string) => {
 };
 export type EmployeeFormValues = z.infer<ReturnType<typeof createEmployeeFormSchema>>;
 
-export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
-  const supabase = createClient();
+interface EmployeeFormProps {
+  id?: string;
+  onSuccess?: () => void;
+  defaultValues?: EmployeeFormValues;
+  editMode?: boolean;
+}
+
+export function EmployeeForm({ id, onSuccess, defaultValues, editMode }: EmployeeFormProps) {
   const t = useTranslations();
-  const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
+  const user = useUserStore((state) => state.user);
+  const { mutate: createEmployee } = useCreateEmployee();
+  const { mutate: updateEmployee } = useUpdateEmployee();
+
   const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
   const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
-
+  const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
   const locale = useLocale();
   const setLoadingSave = useEmployeeStore((state) => state.setIsLoading);
@@ -83,16 +88,16 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(createEmployeeFormSchema(t)),
     defaultValues: {
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone: "",
-      position: "",
-      department: null,
-      hire_date: undefined,
-      salary: "",
-      status: "active",
-      notes: "",
+      first_name: defaultValues?.first_name || "",
+      last_name: defaultValues?.last_name || "",
+      email: defaultValues?.email || "",
+      phone: defaultValues?.phone || "",
+      position: defaultValues?.position || "",
+      department: defaultValues?.department || null,
+      hire_date: defaultValues?.hire_date || undefined,
+      salary: defaultValues?.salary || "",
+      status: defaultValues?.status || "active",
+      notes: defaultValues?.notes || "",
     },
   });
 
@@ -103,19 +108,57 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
       value: department.id,
     })) || [];
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (data: EmployeeFormValues) => {
+    setLoadingSave(true);
+
     try {
-      setLoadingSave(true);
-      const isValid = await form.trigger();
-      if (!isValid) {
-        setLoadingSave(false);
-        return;
+      if (editMode) {
+        await updateEmployee({
+          id: id!,
+          updates: {
+            first_name: data.first_name.trim(),
+            last_name: data.last_name.trim(),
+            email: data.email.trim(),
+            phone: data.phone?.trim() || undefined,
+            position: data.position.trim(),
+            hire_date: data.hire_date?.toISOString(),
+            salary: data.salary ? parseFloat(data.salary) : undefined,
+            status: data.status,
+            notes: data.notes?.trim() || undefined,
+            department_id: data.department || undefined,
+          },
+        });
+
+        toast.success(t("General.successful_operation"), {
+          description: t("Employees.success.updated"),
+        });
+        onSuccess?.();
+      } else {
+        await createEmployee({
+          first_name: data.first_name.trim(),
+          last_name: data.last_name.trim(),
+          email: data.email.trim(),
+          phone: data.phone?.trim() || undefined,
+          position: data.position.trim(),
+          hire_date: data.hire_date?.toISOString(),
+          salary: data.salary ? parseFloat(data.salary) : undefined,
+          status: data.status,
+          notes: data.notes?.trim() || undefined,
+          department_id: data.department || undefined,
+        });
+
+        toast.success(t("General.successful_operation"), {
+          description: t("Employees.success.created"),
+        });
+        onSuccess?.();
       }
-      await form.handleSubmit(onSubmit)();
     } catch (error) {
+      console.error(error);
       setLoadingSave(false);
-      console.error("Error submitting form:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Employees.error.create"),
+      });
+      throw error;
     }
   };
 
@@ -126,7 +169,20 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
   return (
     <>
       <Form {...form}>
-        <form id={id} onSubmit={handleSubmit} className="space-y-4">
+        <form
+          id={id}
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setLoadingSave(true);
+            const isValid = await form.trigger();
+            if (!isValid) {
+              setLoadingSave(false);
+              return;
+            }
+            form.handleSubmit(handleSubmit)(e);
+          }}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
