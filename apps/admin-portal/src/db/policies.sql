@@ -876,7 +876,7 @@ CREATE POLICY "ACCOUNTING CAN MANAGE INVOICES"
       JOIN roles r ON ur.role_id = r.id
       JOIN role_permissions rp ON r.id = rp.role_id
       JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.profile_id = auth.uid()
+      WHERE ur.user_id = auth.uid()
       AND ur.enterprise_id = invoices.enterprise_id
       AND r.name = 'accounting'
       AND p.name = 'manage_invoices'
@@ -893,7 +893,7 @@ CREATE POLICY "ACCOUNTING CAN MANAGE PRODUCTS"
       JOIN roles r ON ur.role_id = r.id
       JOIN role_permissions rp ON r.id = rp.role_id
       JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.profile_id = auth.uid()
+      WHERE ur.user_id = auth.uid()
       AND ur.enterprise_id = products.enterprise_id
       AND r.name = 'accounting'
       AND p.name = 'manage_products'
@@ -910,7 +910,7 @@ CREATE POLICY "ACCOUNTING CAN MANAGE QUOTES"
       JOIN roles r ON ur.role_id = r.id
       JOIN role_permissions rp ON r.id = rp.role_id
       JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.profile_id = auth.uid()
+      WHERE ur.user_id = auth.uid()
       AND ur.enterprise_id = quotes.enterprise_id
       AND r.name = 'accounting'
       AND p.name = 'manage_quotes'
@@ -927,7 +927,7 @@ CREATE POLICY "HR CAN MANAGE EMPLOYEES"
       JOIN roles r ON ur.role_id = r.id
       JOIN role_permissions rp ON r.id = rp.role_id
       JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.profile_id = auth.uid()
+      WHERE ur.user_id = auth.uid()
       AND ur.enterprise_id = employees.enterprise_id
       AND r.name = 'hr'
       AND p.name = 'manage_employees'
@@ -944,7 +944,7 @@ CREATE POLICY "HR CAN MANAGE SALARIES"
       JOIN roles r ON ur.role_id = r.id
       JOIN role_permissions rp ON r.id = rp.role_id
       JOIN permissions p ON rp.permission_id = p.id
-      WHERE ur.profile_id = auth.uid()
+      WHERE ur.user_id = auth.uid()
       AND ur.enterprise_id = salaries.enterprise_id
       AND r.name = 'hr'
       AND p.name = 'manage_salaries'
