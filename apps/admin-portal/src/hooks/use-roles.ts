@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { Role, Permission } from "@/types/rbac";
+import { app_permission } from "@/db/schema";
 
 import { createClient } from "@/utils/supabase/component";
 
@@ -20,6 +21,9 @@ export const permissionKeys = {
   all: ["permissions"] as const,
   lists: () => [...permissionKeys.all, "list"] as const,
 };
+
+// Available permissions from the enum
+const AVAILABLE_PERMISSIONS = app_permission.enumValues;
 
 // Fetch all roles
 export function useRoles() {
@@ -54,60 +58,8 @@ export function usePermissions() {
   return useQuery({
     queryKey: permissionKeys.lists(),
     queryFn: async () => {
-      console.log("Fetching permissions...");
-
-      // First, let's check if we can access the table at all
-      const { data: tableInfo, error: tableError } = await supabase
-        .from("role_permissions")
-        .select("id")
-        .limit(1);
-
-      if (tableError) {
-        console.error("Error accessing role_permissions table:", tableError);
-        throw tableError;
-      }
-
-      console.log("Table access check:", tableInfo);
-
-      // Now try to get all permissions
-      const { data, error } = await supabase.from("role_permissions").select(`
-          permission,
-          role
-        `);
-
-      if (error) {
-        console.error("Error fetching permissions:", error);
-        throw error;
-      }
-
-      console.log("Raw permissions data:", data);
-      console.log("Number of permissions found:", data.length);
-
-      if (data.length === 0) {
-        console.warn("No permissions found in the role_permissions table");
-        // Return a default set of permissions if none are found
-        return [
-          {
-            id: "profiles.manage",
-            name: "manage profiles",
-            description: "Permission to manage profiles",
-            category: "profiles",
-          },
-          {
-            id: "enterprises.manage",
-            name: "manage enterprises",
-            description: "Permission to manage enterprises",
-            category: "enterprises",
-          },
-        ] as Permission[];
-      }
-
-      // Get unique permissions
-      const uniquePermissions = new Set(data.map((p) => p.permission));
-      console.log("Unique permissions:", Array.from(uniquePermissions));
-
-      // Transform the data to match our Permission type
-      const transformedPermissions = Array.from(uniquePermissions).map((permission) => {
+      // Transform enum values into Permission objects
+      const permissions = AVAILABLE_PERMISSIONS.map((permission) => {
         const [category, action] = permission.split(".");
         return {
           id: permission,
@@ -117,8 +69,21 @@ export function usePermissions() {
         } as Permission;
       });
 
-      console.log("Transformed permissions:", transformedPermissions);
-      return transformedPermissions;
+      // Group permissions by category for better organization
+      const groupedPermissions = permissions.reduce((acc, permission) => {
+        if (!acc[permission.category]) {
+          acc[permission.category] = [];
+        }
+        acc[permission.category].push(permission);
+        return acc;
+      }, {} as Record<string, Permission[]>);
+
+      // Sort categories and permissions within each category
+      const sortedPermissions = Object.values(groupedPermissions)
+        .flat()
+        .sort((a, b) => a.category.localeCompare(b.category));
+
+      return sortedPermissions;
     },
   });
 }
