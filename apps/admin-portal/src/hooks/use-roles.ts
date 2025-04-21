@@ -2,8 +2,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { Role, Permission } from "@/types/rbac";
-import { app_permission } from "@/db/schema";
 
+import { app_permission } from "@/db/schema";
 import { createClient } from "@/utils/supabase/component";
 
 const supabase = createClient();
@@ -24,6 +24,16 @@ export const permissionKeys = {
 
 // Available permissions from the enum
 const AVAILABLE_PERMISSIONS = app_permission.enumValues;
+
+// Action display names
+const ACTION_DISPLAY_NAMES: Record<string, string> = {
+  create: "Create",
+  read: "View",
+  update: "Edit",
+  delete: "Delete",
+  export: "Export",
+  duplicate: "Duplicate",
+};
 
 // Fetch all roles
 export function useRoles() {
@@ -61,27 +71,46 @@ export function usePermissions() {
       // Transform enum values into Permission objects
       const permissions = AVAILABLE_PERMISSIONS.map((permission) => {
         const [category, action] = permission.split(".");
+        const displayName = ACTION_DISPLAY_NAMES[action] || action;
+        const formattedCategory = category
+          .split("_")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+
         return {
           id: permission,
-          name: `${action} ${category}`,
-          description: `Permission to ${action} ${category}`,
-          category,
+          name: `${displayName} ${formattedCategory}`,
+          description: `Permission to ${action} ${formattedCategory.toLowerCase()}`,
+          category: formattedCategory,
         } as Permission;
       });
 
       // Group permissions by category for better organization
-      const groupedPermissions = permissions.reduce((acc, permission) => {
-        if (!acc[permission.category]) {
-          acc[permission.category] = [];
-        }
-        acc[permission.category].push(permission);
-        return acc;
-      }, {} as Record<string, Permission[]>);
+      const groupedPermissions = permissions.reduce(
+        (acc, permission) => {
+          if (!acc[permission.category]) {
+            acc[permission.category] = [];
+          }
+          acc[permission.category].push(permission);
+          return acc;
+        },
+        {} as Record<string, Permission[]>,
+      );
 
       // Sort categories and permissions within each category
       const sortedPermissions = Object.values(groupedPermissions)
         .flat()
-        .sort((a, b) => a.category.localeCompare(b.category));
+        .sort((a, b) => {
+          // First sort by category
+          const categoryCompare = a.category.localeCompare(b.category);
+          if (categoryCompare !== 0) return categoryCompare;
+
+          // Then sort by action priority
+          const actionOrder = ["create", "read", "update", "delete", "export", "duplicate"];
+          const aAction = a.id.split(".")[1];
+          const bAction = b.id.split(".")[1];
+          return actionOrder.indexOf(aAction) - actionOrder.indexOf(bAction);
+        });
 
       return sortedPermissions;
     },
