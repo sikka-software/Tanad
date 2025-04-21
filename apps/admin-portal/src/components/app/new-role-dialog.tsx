@@ -52,8 +52,9 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 
+import { Role, Permission } from "@/types/rbac";
+
 import { createClient } from "@/utils/supabase/component";
-import type { Permission, Role } from "@/utils/supabase/types";
 
 export default function RolesList({
   initialRoles,
@@ -72,7 +73,7 @@ export default function RolesList({
     name: "",
     description: "",
     permissions: [],
-    is_system: false,
+    isSystem: false,
   });
 
   const supabase = createClient();
@@ -103,7 +104,6 @@ export default function RolesList({
       name: role.name,
       description: role.description,
       permissions: [...role.permissions],
-      is_system: role.is_system,
     });
     setIsEditDialogOpen(true);
   };
@@ -126,14 +126,14 @@ export default function RolesList({
         name: newRole.name,
         description: newRole.description || "",
         permissions: newRole.permissions || [],
-        is_system: false,
+        isSystem: false,
       });
 
       if (error) throw error;
 
       // Update local state
       if (data) {
-        setRoles([...roles, data[0] as Role]);
+        setRoles([...roles, data as Role]);
       }
 
       toast.success("New role has been created successfully");
@@ -143,7 +143,7 @@ export default function RolesList({
         name: "",
         description: "",
         permissions: [],
-        is_system: false,
+        isSystem: false,
       });
       setIsCreateDialogOpen(false);
     } catch (error) {
@@ -208,7 +208,7 @@ export default function RolesList({
       setIsDeleteDialogOpen(false);
     } catch (error: any) {
       console.error("Error deleting role:", error);
-      toast.error("Failed to delete role");
+      toast.error(error.message || "Failed to delete role");
     }
   };
 
@@ -277,7 +277,7 @@ export default function RolesList({
                 <div>
                   <CardTitle className="flex items-center">
                     {role.name}
-                    {role.is_system && (
+                    {role.isSystem && (
                       <Badge variant="secondary" className="ml-2 px-1.5">
                         <Lock className="mr-1 h-3 w-3" />
                         System
@@ -300,7 +300,7 @@ export default function RolesList({
                       <Edit className="mr-2 h-4 w-4" />
                       Edit Role
                     </DropdownMenuItem>
-                    {!role.is_system && (
+                    {!role.isSystem && (
                       <DropdownMenuItem
                         onClick={() => handleDeleteRole(role)}
                         className="text-red-600 focus:text-red-600"
@@ -487,9 +487,9 @@ export default function RolesList({
                 placeholder="e.g., Content Manager"
                 value={newRole.name}
                 onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
-                disabled={selectedRole?.is_system}
+                disabled={selectedRole?.isSystem}
               />
-              {selectedRole?.is_system && (
+              {selectedRole?.isSystem && (
                 <p className="text-muted-foreground text-xs">
                   System role names cannot be changed.
                 </p>
@@ -503,7 +503,7 @@ export default function RolesList({
                 placeholder="Describe what this role is for..."
                 value={newRole.description}
                 onChange={(e) => setNewRole({ ...newRole, description: e.target.value })}
-                disabled={selectedRole?.is_system}
+                disabled={selectedRole?.isSystem}
               />
             </div>
 

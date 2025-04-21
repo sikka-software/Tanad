@@ -1,75 +1,42 @@
-import { GetServerSideProps } from "next";
+import { ArrowLeft } from "lucide-react";
+import { Head } from "next/document";
+import Link from "next/link";
 
 import RolesList from "@/components/app/new-role-dialog";
+import { Button } from "@/components/ui/button";
 
-import { createClient } from "@/utils/supabase/server-props";
-import { Role, Permission } from "@/utils/supabase/types";
+export default function RolesPage() {
+  let roles: any[] = [];
 
-interface RolesPageProps {
-  roles: Role[];
-  permissions: Permission[];
-}
+  //   get the permission from src/hooks/permissions.hook.tsx
 
-export default function RolesPage({ roles, permissions }: RolesPageProps) {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="mb-6 text-3xl font-bold">Role Management</h1>
-      <p className="text-muted-foreground mb-8">
-        Define roles and their permissions to control what users can do in the system.
-      </p>
+    <>
+      <Head>
+        <title>Role Management | Enterprise App</title>
+        <meta
+          name="description"
+          content="Manage roles and permissions for your enterprise application"
+        />
+      </Head>
 
-      <RolesList initialRoles={roles} permissions={permissions} />
-    </div>
+      <div className="container mx-auto p-4">
+        <div className="mb-6 flex items-center gap-2">
+          <Link href="/users">
+            <Button variant="ghost" size="sm" className="h-8 gap-1">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Users
+            </Button>
+          </Link>
+        </div>
+
+        <h1 className="mb-6 text-3xl font-bold">Role Management</h1>
+        <p className="text-muted-foreground mb-8">
+          Define roles and their permissions to control what users can do in the system.
+        </p>
+
+        <RolesList initialRoles={roles} permissions={permissions} />
+      </div>
+    </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const supabase = createClient(context);
-
-  // Get the session from the cookie
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    return {
-      redirect: {
-        destination: "/auth",
-        permanent: false,
-      },
-    };
-  }
-
-  // Fetch the user's role from profiles table
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", session.user.id)
-    .single();
-
-  // Redirect if not a superadmin
-  //   if (!profile || profile.role !== "superadmin") {
-  //     return {
-  //       redirect: {
-  //         destination: "/",
-  //         permanent: false,
-  //       },
-  //     };
-  //   }
-
-  // Fetch all roles
-  const { data: roles } = await supabase.from("roles").select().order("name", { ascending: true });
-
-  // Fetch all permissions
-  const { data: permissions } = await supabase
-    .from("permissions")
-    .select()
-    .order("category", { ascending: true });
-
-  return {
-    props: {
-      roles: roles || [],
-      permissions: permissions || [],
-    },
-  };
-};
