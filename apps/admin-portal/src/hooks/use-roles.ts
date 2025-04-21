@@ -127,7 +127,8 @@ export function useCreateRole() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      const { data, error } = await supabase
+      // First create the role
+      const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
         .insert({
           role: role.name,
@@ -137,13 +138,36 @@ export function useCreateRole() {
         .select()
         .single();
 
-      if (error) throw error;
+      if (roleError) throw roleError;
+
+      // Then create the role permissions if any are selected
+      if (role.permissions && role.permissions.length > 0) {
+        // Validate that all permissions are valid enum values
+        const invalidPermissions = role.permissions.filter(
+          permission => !app_permission.enumValues.includes(permission as any)
+        );
+        
+        if (invalidPermissions.length > 0) {
+          throw new Error(`Invalid permissions: ${invalidPermissions.join(", ")}`);
+        }
+
+        const { error: permissionsError } = await supabase
+          .from("role_permissions")
+          .insert(
+            role.permissions.map((permission) => ({
+              role: role.name,
+              permission: permission as any, // Type assertion since we've validated the values
+            }))
+          );
+
+        if (permissionsError) throw permissionsError;
+      }
 
       return {
         ...role,
-        id: data.id,
-        createdAt: data.created_at,
-        updatedAt: data.created_at,
+        id: roleData.id,
+        createdAt: roleData.created_at,
+        updatedAt: roleData.created_at,
       } as Role;
     },
     onSuccess: () => {

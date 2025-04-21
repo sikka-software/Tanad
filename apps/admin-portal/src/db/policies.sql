@@ -1,4 +1,5 @@
 -- Enable Row-Level Security on all tables
+ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE branches ENABLE ROW LEVEL SECURITY;
@@ -25,6 +26,9 @@ ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE enterprises ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies before recreating
+DROP POLICY IF EXISTS "Users can view their own user data" ON auth.users;
+DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
+DROP POLICY IF EXISTS "Superadmins can insert users" ON auth.users;
 DROP POLICY IF EXISTS "Users can read their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can insert their own branches" ON branches;
 DROP POLICY IF EXISTS "Users can update their own branches" ON branches;
@@ -845,3 +849,37 @@ CREATE POLICY "Users can delete their own documents"
   ON documents FOR DELETE
   TO authenticated
   USING (auth.uid() = user_id);
+
+-- AUTH USERS POLICIES
+-- Drop existing policies first
+DROP POLICY IF EXISTS "Users can view their own user data" ON auth.users;
+DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
+DROP POLICY IF EXISTS "Superadmins can insert users" ON auth.users;
+
+-- Create new policies
+CREATE POLICY "Users can view their own user data"
+  ON auth.users FOR SELECT
+  TO authenticated
+  USING (auth.uid() = id);
+
+CREATE POLICY "Superadmins can view all users"
+  ON auth.users FOR SELECT
+  TO authenticated
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  );
+
+CREATE POLICY "Superadmins can insert users"
+  ON auth.users FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  );

@@ -270,19 +270,19 @@ export const enterprises = pgTable(
 ).enableRLS();
 
 export const app_permission = pgEnum("app_permission", [
-  // // Profiles
-  // "profiles.create",
-  // "profiles.read",
-  // "profiles.update",
-  // "profiles.delete",
-  // "profiles.export",
+  // Profiles
+  "profiles.create",
+  "profiles.read",
+  "profiles.update",
+  "profiles.delete",
+  "profiles.export",
 
-  // // Enterprises
-  // "enterprises.create",
-  // "enterprises.read",
-  // "enterprises.update",
-  // "enterprises.delete",
-  // "enterprises.export",
+  // Enterprises
+  "enterprises.create",
+  "enterprises.read",
+  "enterprises.update",
+  "enterprises.delete",
+  "enterprises.export",
 
   // Invoices
   "invoices.create",
@@ -405,7 +405,7 @@ export const app_permission = pgEnum("app_permission", [
   "branches.read",
   "branches.update",
   "branches.delete",
-  "branches.export",
+  "branches.export"
 ]);
 
 export const user_roles = pgTable(
