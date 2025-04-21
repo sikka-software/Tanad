@@ -14,6 +14,7 @@ import {
   numeric,
   date,
   integer,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 
 export const companies = pgTable(
@@ -103,7 +104,9 @@ export const invoices = pgTable(
     notes: text("notes"),
     client_id: uuid("client_id").notNull(),
     user_id: uuid("user_id").notNull(),
-    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("invoices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
@@ -183,7 +186,9 @@ export const quotes = pgTable(
     notes: text(),
     client_id: uuid("client_id").notNull(),
     user_id: uuid("user_id").notNull(),
-    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("quotes_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
@@ -264,99 +269,55 @@ export const enterprises = pgTable(
   ],
 ).enableRLS();
 
-export const roles = pgTable(
-  "roles",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    name: text("name").notNull(),
-    description: text("description"),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    updated_at: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-  },
-  (table) => [
-    unique("roles_name_key").on(table.name),
-  ],
-).enableRLS();
+export const app_permission = pgEnum("app_permission", [
+  "profiles.manage",
+  "enterprises.manage",
+  "invoices.manage",
+  "products.manage",
+  "quotes.manage",
+  "employees.manage",
+  "salaries.manage",
+  "documents.manage",
+  "templates.manage",
+  "employee_requests.manage",
+  "job_listings.manage",
+  "offices.manage",
+  "expenses.manage",
+  "departments.manage",
+  "warehouses.manage",
+  "vendors.manage",
+  "clients.manage",
+  "companies.manage",
+  "branches.manage",
+]);
 
-export const permissions = pgTable(
-  "permissions",
+export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
+
+export const user_roles = pgTable(
+  "user_roles",
   {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    name: text("name").notNull(),
-    description: text("description"),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    updated_at: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
+    id: uuid().defaultRandom().primaryKey(),
+    user_id: uuid("user_id").notNull(),
+    role: app_role("role").notNull(),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id, { onDelete: "cascade" }),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
-  (table) => [
-    unique("permissions_name_key").on(table.name),
-  ],
+  (table) => ({
+    uniq: unique().on(table.user_id, table.role, table.enterprise_id),
+  }),
 ).enableRLS();
 
 export const role_permissions = pgTable(
   "role_permissions",
   {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    role_id: uuid("role_id")
-      .notNull()
-      .references(() => roles.id, { onDelete: "cascade" }),
-    permission_id: uuid("permission_id")
-      .notNull()
-      .references(() => permissions.id, { onDelete: "cascade" }),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
+    id: uuid().defaultRandom().primaryKey(),
+    role: app_role("role").notNull(),
+    permission: app_permission("permission").notNull(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
-  (table) => [
-    unique("role_permissions_unique").on(table.role_id, table.permission_id),
-  ],
-).enableRLS();
-
-export const user_roles = pgTable(
-  "user_roles",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    user_id: uuid("user_id")
-      .notNull()
-      .references(() => profiles.id, { onDelete: "cascade" }),
-    role_id: uuid("role_id")
-      .notNull()
-      .references(() => roles.id, { onDelete: "cascade" }),
-    enterprise_id: uuid("enterprise_id")
-      .notNull()
-      .references(() => enterprises.id, { onDelete: "cascade" }),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-  },
-  (table) => [
-    unique("user_roles_unique").on(table.user_id, table.role_id, table.enterprise_id),
-  ],
+  (table) => ({
+    uniq: unique().on(table.role, table.permission),
+  }),
 ).enableRLS();
 
 export const profiles = pgTable(
@@ -396,7 +357,9 @@ export const products = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
-    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     unique("products_sku_key").on(table.sku),
@@ -498,7 +461,9 @@ export const salaries = pgTable(
     notes: text(),
     employee_name: text("employee_name").notNull(),
     user_id: uuid("user_id").notNull(),
-    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("salaries_payment_date_idx").using("btree", table.payment_date.asc().nullsLast()),
@@ -639,7 +604,9 @@ export const employees = pgTable(
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
     user_id: uuid("user_id").notNull(),
-    enterprise_id: uuid("enterprise_id").references(() => enterprises.id).notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id)
+      .notNull(),
   },
   (table) => [
     index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),

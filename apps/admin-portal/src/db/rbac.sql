@@ -1,4 +1,19 @@
--- First, create the custom types
+-- Drop existing objects first
+DROP POLICY IF EXISTS "SUPERADMINS CAN MANAGE PROFILES" ON profiles;
+DROP POLICY IF EXISTS "SUPERADMINS CAN MANAGE ENTERPRISES" ON enterprises;
+DROP POLICY IF EXISTS "ACCOUNTING CAN MANAGE INVOICES" ON invoices;
+DROP POLICY IF EXISTS "ACCOUNTING CAN MANAGE PRODUCTS" ON products;
+DROP POLICY IF EXISTS "ACCOUNTING CAN MANAGE QUOTES" ON quotes;
+DROP POLICY IF EXISTS "HR CAN MANAGE EMPLOYEES" ON employees;
+DROP POLICY IF EXISTS "HR CAN MANAGE SALARIES" ON salaries;
+
+DROP TABLE IF EXISTS public.role_permissions;
+DROP TABLE IF EXISTS public.user_roles;
+
+DROP TYPE IF EXISTS public.app_permission CASCADE;
+DROP TYPE IF EXISTS public.app_role CASCADE;
+
+-- Create enum types
 CREATE TYPE public.app_permission AS ENUM (
   'profiles.manage',
   'enterprises.manage',
