@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -9,18 +10,28 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormDialog } from "@/components/ui/form-dialog";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import DepartmentCard from "@/modules/department/department.card";
-import { useDepartments } from "@/modules/department/department.hooks";
-import { useDeleteDepartments } from "@/modules/department/department.hooks";
+import DepartmentForm from "@/modules/department/department.form";
+import {
+  useDepartments,
+  useDeleteDepartments,
+  useDuplicateDepartment,
+} from "@/modules/department/department.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/department/department.options";
 import useDepartmentsStore from "@/modules/department/department.store";
 import DepartmentsTable from "@/modules/department/department.table";
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
+import { Department } from "@/modules/department/department.type";
 
 export default function DepartmentsPage() {
   const t = useTranslations();
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableDepartment, setActionableDepartment] = useState<Department | null>(null);
 
+  const loadingSaveDepartment = useDepartmentsStore((state) => state.isLoading);
+  const setLoadingSaveDepartment = useDepartmentsStore((state) => state.setIsLoading);
   const viewMode = useDepartmentsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useDepartmentsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useDepartmentsStore((state) => state.setIsDeleteDialogOpen);
@@ -37,6 +48,7 @@ export default function DepartmentsPage() {
   const getSortedDepartments = useDepartmentsStore((state) => state.getSortedData);
 
   const { data: departments, isLoading, error } = useDepartments();
+  const { mutate: duplicateDepartment } = useDuplicateDepartment();
   const { mutateAsync: deleteDepartments, isPending: isDeleting } = useDeleteDepartments();
   const { createDeleteHandler } = useDeleteHandler();
 
@@ -58,7 +70,38 @@ export default function DepartmentsPage() {
     return getSortedDepartments(filteredDepartments);
   }, [filteredDepartments, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  
+  const onActionClicked = async (action: string, rowId: string) => {
+    if (action === "edit") {
+      setIsFormDialogOpen(true);
+      setActionableDepartment(departments?.find((department) => department.id === rowId) || null);
+    }
+
+    if (action === "delete") {
+      setSelectedRows([rowId]);
+      setIsDeleteDialogOpen(true);
+    }
+
+    if (action === "duplicate") {
+      const toastId = toast.loading(t("General.loading_operation"), {
+        description: t("Departments.loading.duplicating"),
+      });
+
+      await duplicateDepartment(rowId, {
+        onSuccess: () => {
+          toast.success(t("General.successful_operation"), {
+            description: t("Departments.success.duplicated"),
+          });
+          toast.dismiss(toastId);
+        },
+        onError: () => {
+          toast.error(t("General.error_operation"), {
+            description: t("Departments.error.duplicating"),
+          });
+          toast.dismiss(toastId);
+        },
+      });
+    }
+  };
 
   return (
     <div>
@@ -82,12 +125,14 @@ export default function DepartmentsPage() {
             searchPlaceholder={t("Departments.search_departments")}
           />
         )}
+
         <div>
           {viewMode === "table" ? (
             <DepartmentsTable
               data={sortedDepartments}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
@@ -96,12 +141,36 @@ export default function DepartmentsPage() {
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Departments.no_departments_found")}
-                renderItem={(department) => <DepartmentCard department={department} />}
+                renderItem={(department) => (
+                  <DepartmentCard key={department.id} department={department} />
+                )}
                 gridCols="3"
               />
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Departments.edit")}
+          formId="department-form"
+          loadingSave={loadingSaveDepartment}
+        >
+          <DepartmentForm
+            id="department-form"
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableDepartment(null);
+              setLoadingSaveDepartment(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("Departments.success.updated"),
+              });
+            }}
+            defaultValues={actionableDepartment}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

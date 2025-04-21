@@ -58,7 +58,7 @@ export default function AddDepartmentPage() {
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <DepartmentForm id="department-form"  />
+        <DepartmentForm id="department-form" onSuccess={() => router.push("/departments")} />
       </div>
     </div>
   );

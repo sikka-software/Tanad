@@ -32,56 +32,21 @@ interface DepartmentsTableProps {
   data: Department[];
   isLoading?: boolean;
   error?: Error | null;
+  onActionClicked: (action: string, rowId: string) => void;
 }
 
-const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => {
+const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: DepartmentsTableProps) => {
   const t = useTranslations("Departments");
   const { mutateAsync: updateDepartment } = useUpdateDepartment();
+
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
+
   const selectedRows = useDepartmentStore((state) => state.selectedRows);
   const setSelectedRows = useDepartmentStore((state) => state.setSelectedRows);
 
-  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateDepartment({ id: rowId, updates: { [columnId]: value } });
-  };
-
-  const handleRowSelectionChange = useCallback(
-    (rows: Department[]) => {
-      const newSelectedIds = rows.map((row) => row.id!);
-      // Only update if the selection has actually changed
-      const currentSelection = new Set(selectedRows);
-      const newSelection = new Set(newSelectedIds);
-
-      if (
-        newSelection.size !== currentSelection.size ||
-        !Array.from(newSelection).every((id) => currentSelection.has(id))
-      ) {
-        setSelectedRows(newSelectedIds);
-      }
-    },
-    [selectedRows, setSelectedRows],
-  );
-
-  const getLocationName = (location_id: string) => {
-    const office = offices?.find((o) => o.id === location_id);
-    if (office) return office.name;
-
-    const branch = branches?.find((b) => b.id === location_id);
-    if (branch) return branch.name;
-
-    const warehouse = warehouses?.find((w) => w.id === location_id);
-    if (warehouse) return warehouse.name;
-
-    return location_id;
-  };
-
-  const handleRemoveLocation = async (row: Row<Department>, location_id: string) => {
-    const locationIds = row.original.locations || [];
-    const updatedLocations = locationIds.filter((id: string) => id !== location_id);
-    await updateDepartment({ id: row.original.id, updates: { locations: updatedLocations } });
-  };
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Department>[] = [
     {
@@ -153,6 +118,46 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
     },
   ];
 
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await updateDepartment({ id: rowId, data: { [columnId]: value } });
+  };
+
+  const handleRowSelectionChange = useCallback(
+    (rows: Department[]) => {
+      const newSelectedIds = rows.map((row) => row.id!);
+      // Only update if the selection has actually changed
+      const currentSelection = new Set(selectedRows);
+      const newSelection = new Set(newSelectedIds);
+
+      if (
+        newSelection.size !== currentSelection.size ||
+        !Array.from(newSelection).every((id) => currentSelection.has(id))
+      ) {
+        setSelectedRows(newSelectedIds);
+      }
+    },
+    [selectedRows, setSelectedRows],
+  );
+
+  const getLocationName = (location_id: string) => {
+    const office = offices?.find((o) => o.id === location_id);
+    if (office) return office.name;
+
+    const branch = branches?.find((b) => b.id === location_id);
+    if (branch) return branch.name;
+
+    const warehouse = warehouses?.find((w) => w.id === location_id);
+    if (warehouse) return warehouse.name;
+
+    return location_id;
+  };
+
+  const handleRemoveLocation = async (row: Row<Department>, location_id: string) => {
+    const locationIds = row.original.locations || [];
+    const updatedLocations = locationIds.filter((id: string) => id !== location_id);
+    await updateDepartment({ id: row.original.id, data: { locations: updatedLocations } });
+  };
+
   if (isLoading) {
     return (
       <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
@@ -162,9 +167,6 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
   if (error) {
     return <ErrorComponent errorMessage={error.message} />;
   }
-
-  // Create a selection state object for the table
-  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const departmentTableOptions = {
     state: {
@@ -186,7 +188,9 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
       data={data}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
       onEdit={handleEdit}
+      onActionClicked={onActionClicked}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={departmentTableOptions}
       texts={{

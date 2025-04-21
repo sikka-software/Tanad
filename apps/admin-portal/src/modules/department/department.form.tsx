@@ -3,6 +3,7 @@ import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
@@ -15,6 +16,10 @@ import { useOffices } from "@/modules/office/office.hooks";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 
+import { useCreateDepartment, useUpdateDepartment } from "./department.hooks";
+import useDepartmentStore from "./department.store";
+import { DepartmentUpdateData } from "./department.type";
+
 export const createDepartmentSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Departments.form.validation.name_required")),
@@ -26,9 +31,10 @@ export type DepartmentFormValues = z.input<ReturnType<typeof createDepartmentSch
 
 interface DepartmentFormProps {
   id?: string;
-  onSuccess?: (data: DepartmentFormValues) => Promise<void>;
+  onSuccess?: () => void;
   loading?: boolean;
-  defaultValues?: Partial<DepartmentFormValues>;
+  defaultValues?: DepartmentUpdateData | null;
+  editMode?: boolean;
 }
 
 export default function DepartmentForm({
@@ -36,12 +42,19 @@ export default function DepartmentForm({
   onSuccess,
   loading = false,
   defaultValues,
+  editMode = false,
 }: DepartmentFormProps) {
   const t = useTranslations();
+  const user = useUserStore((state) => state.user);
+  const { mutate: createDepartment } = useCreateDepartment();
+  const { mutate: updateDepartment } = useUpdateDepartment();
+
+  const isLoading = useDepartmentStore((state) => state.isLoading);
+  const setIsLoading = useDepartmentStore((state) => state.setIsLoading);
+
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
-  const { user } = useUserStore();
   const locale = useLocale();
   const [locationOptions, setLocationOptions] = useState<MultiSelectOption[]>([]);
 
@@ -108,66 +121,48 @@ export default function DepartmentForm({
   };
 
   const handleSubmit = async (data: DepartmentFormValues) => {
-    setLoading(true);
-    try {
-      // Check if user ID is available
-      if (!user?.id) {
-        throw new Error(t("Departments.error.not_authenticated"));
-      }
-
-      // First create the department
-      const { data: newDepartment, error: departmentError } = await supabase
-        .from("departments")
-        .insert([
-          {
-            name: data.name.trim(),
-            description: data.description?.trim() || null,
-            user_id: user.id,
-          },
-        ])
-        .select()
-        .single();
-
-      if (departmentError) throw departmentError;
-
-      // Then create the department locations
-      if (data.locations && data.locations.length > 0) {
-        const locationInserts = data.locations.map((location_id) => ({
-          department_id: newDepartment.id,
-          location_id: location_id,
-          location_type: "office", // Default to office type
-        }));
-
-        const { error: locationError } = await supabase
-          .from("department_locations")
-          .insert(locationInserts);
-
-        if (locationError) throw locationError;
-
-        // Update the department object with locations before caching
-        newDepartment.locations = data.locations;
-      }
-
-      const previousDepartments = queryClient.getQueryData(departmentKeys.lists()) || [];
-      queryClient.setQueryData(departmentKeys.lists(), [
-        ...(Array.isArray(previousDepartments) ? previousDepartments : []),
-        newDepartment,
-      ]);
-
-      // Also set the individual department query data
-      queryClient.setQueryData(["departments", newDepartment.id], newDepartment);
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Departments.success.created"),
+    setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
       });
-
-      router.push("/departments");
+      return;
+    }
+    try {
+      if (editMode) {
+      } else {
+        // await createDepartment(data);
+        // if (data.locations && data.locations.length > 0) {
+        //   const locationInserts = data.locations.map((location_id) => ({
+        //     department_id: newDepartment.id,
+        //     location_id: location_id,
+        //     location_type: "office", // Default to office type
+        //   }));
+        //   const { error: locationError } = await supabase
+        //     .from("department_locations")
+        //     .insert(locationInserts);
+        //   if (locationError) throw locationError;
+        //   // Update the department object with locations before caching
+        //   newDepartment.locations = data.locations;
+        // }
+        // const previousDepartments = queryClient.getQueryData(departmentKeys.lists()) || [];
+        // queryClient.setQueryData(departmentKeys.lists(), [
+        //   ...(Array.isArray(previousDepartments) ? previousDepartments : []),
+        //   newDepartment,
+        // ]);
+        // // Also set the individual department query data
+        // queryClient.setQueryData(["departments", newDepartment.id], newDepartment);
+        // toast.success(t("General.successful_operation"), {
+        //   description: t("Departments.success.created"),
+        // });
+        // router.push("/departments");
+      }
     } catch (error) {
+      setIsLoading(false);
       console.error("Failed to save department:", error);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Departments.error.create"),
       });
-      setLoading(false);
     }
   };
 
