@@ -4,6 +4,7 @@ export interface Department {
   description: string | null;
   is_active: boolean;
   created_at: string;
+  updated_at: string;
   user_id: string;
   locations: string[];
 }
@@ -16,5 +17,7 @@ export type DepartmentLocation = {
   created_at: string;
 };
 
-export type DepartmentCreateData = Omit<Department, "id" | "created_at"> & { user_id: string };
+export type DepartmentCreateData = Omit<Department, "id" | "created_at" | "updated_at"> & {
+  user_id: string;
+};
 export type DepartmentUpdateData = Partial<Department>;

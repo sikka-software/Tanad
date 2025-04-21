@@ -69,7 +69,9 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
       cell: ({ row }) => {
         const locationIds = row.original.locations || [];
 
-        console.log("location is ", row.original);
+        console.log("Department data:", row.original);
+        console.log("Location IDs:", locationIds);
+        
         if (locationIds.length === 0) {
           return t("Departments.form.locations.noLocations");
         } else if (locationIds.length === 1) {
