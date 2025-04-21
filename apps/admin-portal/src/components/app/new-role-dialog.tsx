@@ -52,6 +52,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { Role, Permission } from "@/types/rbac";
 import {
@@ -294,6 +295,13 @@ export default function RolesList() {
     ).length;
   };
 
+  // Add this constant at the top of the component
+  const AVAILABLE_ROLES = [
+    { value: "admin", label: "Admin" },
+    { value: "accounting", label: "Accounting" },
+    { value: "hr", label: "HR" },
+  ];
+
   return (
     <div className="space-y-6">
        Permissions length: {permissions.length}
@@ -407,12 +415,37 @@ export default function RolesList() {
           <div className="grid gap-6 py-4">
             <div className="grid gap-3">
               <Label htmlFor="name">Role Name</Label>
-              <Input
-                id="name"
-                placeholder="e.g., Content Manager"
-                value={newRole.name}
-                onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
-              />
+              <div className="flex gap-2">
+                <Select
+                  value={newRole.name}
+                  onValueChange={(value) => setNewRole({ ...newRole, name: value })}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Select predefined role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {AVAILABLE_ROLES.map((role) => (
+                      <SelectItem key={role.value} value={role.value}>
+                        {role.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="relative flex-1">
+                  <Input
+                    id="name"
+                    placeholder="Or enter custom role name (lowercase, numbers, underscores only)"
+                    value={newRole.name}
+                    onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
+                    className="pl-2"
+                  />
+                  {newRole.name && !/^[a-z0-9_]+$/.test(newRole.name) && (
+                    <p className="text-xs text-red-500 mt-1">
+                      Role name must contain only lowercase letters, numbers, and underscores
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="grid gap-3">

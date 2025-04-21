@@ -408,14 +408,12 @@ export const app_permission = pgEnum("app_permission", [
   "branches.export",
 ]);
 
-export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
-
 export const user_roles = pgTable(
   "user_roles",
   {
     id: uuid().defaultRandom().primaryKey(),
     user_id: uuid("user_id").notNull(),
-    role: app_role("role").notNull(),
+    role: text("role").notNull(),
     enterprise_id: uuid("enterprise_id").references(() => enterprises.id, { onDelete: "cascade" }),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
@@ -428,7 +426,7 @@ export const role_permissions = pgTable(
   "role_permissions",
   {
     id: uuid().defaultRandom().primaryKey(),
-    role: app_role("role").notNull(),
+    role: text("role").notNull(),
     permission: app_permission("permission").notNull(),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },

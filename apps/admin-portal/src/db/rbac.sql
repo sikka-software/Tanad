@@ -36,22 +36,26 @@ CREATE TYPE public.app_permission AS ENUM (
   'branches.manage'
 );
 
-CREATE TYPE public.app_role AS ENUM ('superadmin', 'admin', 'accounting', 'hr');
-
--- Create user_roles table
+-- Create user_roles table with custom role names
 CREATE TABLE IF NOT EXISTS public.user_roles (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
-  role app_role NOT NULL,
+  role TEXT NOT NULL CHECK (
+    role IN ('superadmin', 'admin', 'accounting', 'hr') OR
+    role ~ '^[a-z0-9_]+$' -- Allow custom role names with lowercase letters, numbers, and underscores
+  ),
   enterprise_id UUID REFERENCES enterprises(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
   UNIQUE (user_id, role, enterprise_id)
 );
 
--- Create role_permissions table
+-- Create role_permissions table with custom role names
 CREATE TABLE IF NOT EXISTS public.role_permissions (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  role app_role NOT NULL,
+  role TEXT NOT NULL CHECK (
+    role IN ('superadmin', 'admin', 'accounting', 'hr') OR
+    role ~ '^[a-z0-9_]+$' -- Allow custom role names with lowercase letters, numbers, and underscores
+  ),
   permission app_permission NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
   UNIQUE (role, permission)
@@ -163,4 +167,26 @@ CREATE POLICY "HR CAN MANAGE EMPLOYEES"
 CREATE POLICY "HR CAN MANAGE SALARIES"
   ON salaries FOR ALL
   TO authenticated
-  USING (authorize('salaries.manage'::app_permission, enterprise_id)); 
+  USING (authorize('salaries.manage'::app_permission, enterprise_id));
+
+-- Create policies for user_roles table
+CREATE POLICY "Users can view their own roles"
+  ON user_roles FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can create their own roles"
+  ON user_roles FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own roles"
+  ON user_roles FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own roles"
+  ON user_roles FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id); 

@@ -85,7 +85,7 @@ export default function Auth() {
               id: data.user.id,
               email: data.user.email,
               full_name: "Default Full Name",
-              role: "accounting",
+              role: "superadmin",
               stripe_customer_id: null,
               avatar_url: null,
 
