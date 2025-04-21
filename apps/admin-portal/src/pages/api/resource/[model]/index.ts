@@ -12,6 +12,7 @@ const modelMap = {
   clients: { table: schema.clients, query: db.query.clients },
   expenses: { table: schema.expenses, query: db.query.expenses },
   departments: { table: schema.departments, query: db.query.departments },
+  departmentLocations: { table: schema.departmentLocations, query: db.query.departmentLocations },
   offices: { table: schema.offices, query: db.query.offices },
   warehouses: { table: schema.warehouses, query: db.query.warehouses },
   employees: { table: schema.employees, query: db.query.employees },

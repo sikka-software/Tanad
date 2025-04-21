@@ -62,6 +62,8 @@ export default function DepartmentsPage() {
     },
   });
 
+  console.log("departments", departments);
+
   const filteredDepartments = useMemo(() => {
     return getFilteredDepartments(departments || []);
   }, [departments, getFilteredDepartments, searchQuery, filterConditions, filterCaseSensitive]);

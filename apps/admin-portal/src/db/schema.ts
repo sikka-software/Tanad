@@ -652,6 +652,7 @@ export const departments = pgTable(
   ],
 ).enableRLS();
 
+// Update your departmentLocations table definition:
 export const departmentLocations = pgTable(
   "department_locations",
   {
@@ -659,22 +660,28 @@ export const departmentLocations = pgTable(
     department_id: uuid("department_id")
       .notNull()
       .references(() => departments.id, { onDelete: "cascade" }),
-    location_type: text("location_type").$type<"office" | "branch" | "warehouse">().notNull(),
+    location_type: text("location_type", {
+      enum: ["office", "branch", "warehouse"],
+    }).notNull(),
     location_id: uuid("location_id").notNull(),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    index("department_locations_department_id_idx").using(
-      "btree",
-      table.department_id.asc().nullsLast().op("uuid_ops"),
+    // Composite unique constraint to prevent duplicates
+    unique("unique_department_location").on(
+      table.department_id,
+      table.location_type,
+      table.location_id,
     ),
-    index("department_locations_location_id_idx").using(
-      "btree",
-      table.location_id.asc().nullsLast().op("uuid_ops"),
-    ),
+    // Add foreign key checks for each location type (optional)
     check(
-      "department_locations_type_check",
-      sql`location_type = ANY (ARRAY['office'::text, 'branch'::text, 'warehouse'::text])`,
+      "location_type_check",
+      sql`CASE
+        WHEN location_type = 'office' THEN location_id IN (SELECT id FROM offices)
+        WHEN location_type = 'branch' THEN location_id IN (SELECT id FROM branches)
+        WHEN location_type = 'warehouse' THEN location_id IN (SELECT id FROM warehouses)
+      END`,
     ),
   ],
 ).enableRLS();
