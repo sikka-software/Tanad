@@ -1,3 +1,8 @@
+-- Drop existing trigger and function if they exist
+DROP TRIGGER IF EXISTS validate_department_location_trigger ON department_locations;
+DROP FUNCTION IF EXISTS validate_department_location();
+
+-- Create the trigger function
 CREATE OR REPLACE FUNCTION validate_department_location()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -12,6 +17,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Create the trigger
 CREATE TRIGGER validate_department_location_trigger
 BEFORE INSERT OR UPDATE ON department_locations
 FOR EACH ROW
