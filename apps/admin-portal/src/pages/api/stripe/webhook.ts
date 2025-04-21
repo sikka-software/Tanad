@@ -5,6 +5,7 @@ import { sendEmailViaWebhook } from "@/lib/email";
 import { getStripeInstance } from "@/lib/stripe-admin";
 
 import { createClient } from "@/utils/supabase/component";
+import { generateZatcaQrCode, generateZatcaXML } from "@/utils/zatca";
 
 export const config = {
   api: {
@@ -24,6 +25,9 @@ const relevantEvents = new Set([
   "customer.subscription.created",
   "customer.subscription.updated",
   "customer.subscription.deleted",
+  "invoice.created",
+  "invoice.paid",
+  "invoice.finalized",
 ]);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -178,6 +182,76 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.error("❌ Failed to send expiration email:", error);
         }
 
+        break;
+
+      // apps/admin-portal/src/pages/api/stripe/webhook.ts
+      // Add this after the existing switch statement cases
+
+      case "invoice.paid":
+        // Handle paid invoice with ZATCA compliance
+        const paidInvoice = event.data.object as Stripe.Invoice;
+
+        // Look up the customer details for this invoice
+        const invoiceCustomer = await stripe.customers.retrieve(paidInvoice.customer as string);
+
+        // Calculate VAT (15% for Saudi Arabia)
+        const vatRate = 0.15;
+        const amount = paidInvoice.amount_paid / 100; // Convert from cents
+        const vatAmount = amount * vatRate;
+        const totalWithVAT = amount + vatAmount;
+
+        // Set up ZATCA data
+        const vatNumber = process.env.COMPANY_VAT_NUMBER || "123456789";
+        const sellerName = process.env.COMPANY_NAME || "Your Company Name";
+        const buyerName = invoiceCustomer.id || "Customer";
+
+        try {
+          // Generate ZATCA QR code (implementation needed)
+          const qrCode = await generateZatcaQrCode({
+            sellerName,
+            vatNumber,
+            timestamp: new Date(paidInvoice.created * 1000).toISOString(),
+            invoiceTotal: totalWithVAT.toFixed(2),
+            vatAmount: vatAmount.toFixed(2),
+          });
+
+          // Generate ZATCA XML (implementation needed)
+          const xmlData = await generateZatcaXML({
+            invoice: paidInvoice,
+            vatNumber,
+            sellerName,
+            buyerName,
+            vatAmount,
+            totalWithVAT,
+          });
+
+          // Save to zatca_invoices table
+          const { data: zatcaInvoice, error: zatcaError } = await supabase
+            .from("zatca_invoices")
+            .insert({
+              stripe_invoice_id: paidInvoice.id,
+              invoice_id: paidInvoice.id, // You might need a mapping if this isn't your actual invoice ID
+              vat_number: vatNumber,
+              seller_name: sellerName,
+              buyer_name: buyerName,
+              qr_code: qrCode,
+              xml_data: xmlData,
+              compliance_status: "pending", // You'll update this after submission to ZATCA
+              user_id: profile?.id, // Get the user ID from the profile you already looked up
+            })
+            .select()
+            .single();
+
+          if (zatcaError) {
+            console.error("❌ Error creating ZATCA invoice:", zatcaError);
+          } else {
+            console.log("✓ ZATCA invoice created successfully:", zatcaInvoice.id);
+
+            // Optionally submit to ZATCA API here or queue for later processing
+          }
+        } catch (zatcaError) {
+          console.error("❌ Error processing ZATCA data:", zatcaError);
+        }
         break;
     }
 
