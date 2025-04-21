@@ -1,8 +1,6 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
@@ -12,18 +10,15 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import DepartmentForm, { type DepartmentFormValues } from "@/modules/department/department.form";
-import { departmentKeys } from "@/modules/department/department.hooks";
-import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
+import DepartmentForm from "@/modules/department/department.form";
+import useDepartmentStore from "@/modules/department/department.store";
 
 export default function AddDepartmentPage() {
-  const supabase = createClient();
   const router = useRouter();
   const t = useTranslations();
-  const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
+
+  const setIsLoading = useDepartmentStore((state) => state.setIsLoading);
+  const isLoading = useDepartmentStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -31,8 +26,15 @@ export default function AddDepartmentPage() {
     if (form) {
       form.setValue("name", dummyData.full_name);
       form.setValue("description", dummyData.description);
-      // form.setValue("locations", dummyData.locations);
     }
+  };
+
+  const onAddSuccess = () => {
+    toast.success(t("General.successful_operation"), {
+      description: t("Departments.success.created"),
+    });
+    router.push("/departments");
+    setIsLoading(false);
   };
 
   return (
@@ -41,24 +43,18 @@ export default function AddDepartmentPage() {
       <PageTitle
         formButtons
         formId="department-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/departments")}
+        dummyButton={handleDummyData}
         texts={{
           title: t("Departments.add_new"),
           submit_form: t("Departments.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <DepartmentForm id="department-form" onSuccess={() => router.push("/departments")} />
+        <DepartmentForm id="department-form" onSuccess={onAddSuccess} />
       </div>
     </div>
   );

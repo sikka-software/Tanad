@@ -17,7 +17,7 @@ import DepartmentCard from "@/modules/department/department.card";
 import DepartmentForm from "@/modules/department/department.form";
 import {
   useDepartments,
-  useDeleteDepartments,
+  useBulkDeleteDepartments,
   useDuplicateDepartment,
 } from "@/modules/department/department.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/department/department.options";
@@ -49,7 +49,7 @@ export default function DepartmentsPage() {
 
   const { data: departments, isLoading, error } = useDepartments();
   const { mutate: duplicateDepartment } = useDuplicateDepartment();
-  const { mutateAsync: deleteDepartments, isPending: isDeleting } = useDeleteDepartments();
+  const { mutateAsync: deleteDepartments, isPending: isDeleting } = useBulkDeleteDepartments();
   const { createDeleteHandler } = useDeleteHandler();
 
   const handleConfirmDelete = createDeleteHandler(deleteDepartments, {

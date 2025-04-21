@@ -69,6 +69,7 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
       cell: ({ row }) => {
         const locationIds = row.original.locations || [];
 
+        console.log("location is ", row.original);
         if (locationIds.length === 0) {
           return t("Departments.form.locations.noLocations");
         } else if (locationIds.length === 1) {
@@ -125,7 +126,6 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
   const handleRowSelectionChange = useCallback(
     (rows: Department[]) => {
       const newSelectedIds = rows.map((row) => row.id);
-      // Only update if the selection has actually changed
       if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
         setSelectedRows(newSelectedIds);
       }

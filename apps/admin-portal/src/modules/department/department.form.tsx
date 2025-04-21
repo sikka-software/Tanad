@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -15,9 +17,12 @@ import { useBranches } from "@/modules/branch/branch.hooks";
 import { useOffices } from "@/modules/office/office.hooks";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
+import { departmentKeys } from "./department.hooks";
 import { useCreateDepartment, useUpdateDepartment } from "./department.hooks";
 import useDepartmentStore from "./department.store";
+import type { Department, DepartmentCreateData } from "./department.type";
 import { DepartmentUpdateData } from "./department.type";
 
 export const createDepartmentSchema = (t: (key: string) => string) =>
@@ -46,9 +51,11 @@ export default function DepartmentForm({
 }: DepartmentFormProps) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
-  const { mutate: createDepartment } = useCreateDepartment();
+  const { mutateAsync: createDepartment } = useCreateDepartment();
   const { mutate: updateDepartment } = useUpdateDepartment();
-
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const supabase = createClient();
   const isLoading = useDepartmentStore((state) => state.isLoading);
   const setIsLoading = useDepartmentStore((state) => state.setIsLoading);
 
@@ -130,31 +137,74 @@ export default function DepartmentForm({
     }
     try {
       if (editMode) {
+        try {
+          await updateDepartment({
+            id: id!,
+            data: {
+              name: data.name,
+              description: data.description || null,
+              user_id: user.id,
+              is_active: true,
+              locations: data.locations || [],
+            },
+          });
+
+          toast.success(t("General.successful_operation"), {
+            description: t("Departments.success.updated"),
+          });
+          router.push("/departments");
+        } catch (error) {
+          console.error("Error updating department:", error);
+          toast.error(t("General.error_occurred"), {
+            description: t("Departments.error.updating"),
+          });
+        }
       } else {
-        // if (data.locations && data.locations.length > 0) {
-        //   const locationInserts = data.locations.map((location_id) => ({
-        //     department_id: newDepartment.id,
-        //     location_id: location_id,
-        //     location_type: "office", // Default to office type
-        //   }));
-        //   const { error: locationError } = await supabase
-        //     .from("department_locations")
-        //     .insert(locationInserts);
-        //   if (locationError) throw locationError;
-        //   // Update the department object with locations before caching
-        //   newDepartment.locations = data.locations;
-        // }
-        // const previousDepartments = queryClient.getQueryData(departmentKeys.lists()) || [];
-        // queryClient.setQueryData(departmentKeys.lists(), [
-        //   ...(Array.isArray(previousDepartments) ? previousDepartments : []),
-        //   newDepartment,
-        // ]);
-        // // Also set the individual department query data
-        // queryClient.setQueryData(["departments", newDepartment.id], newDepartment);
-        // toast.success(t("General.successful_operation"), {
-        //   description: t("Departments.success.created"),
-        // });
-        // router.push("/departments");
+        try {
+          const createData: DepartmentCreateData = {
+            name: data.name,
+            description: data.description || null,
+            user_id: user.id,
+            is_active: true,
+            locations: data.locations || [],
+          };
+
+          const newDepartment = await createDepartment(createData);
+
+          if (data.locations && data.locations.length > 0) {
+            const locationInserts = data.locations.map((location_id) => ({
+              department_id: newDepartment.id,
+              location_id: location_id,
+              location_type: "office" as const,
+            }));
+
+            const { error: locationError } = await supabase
+              .from("department_locations")
+              .insert(locationInserts);
+
+            if (locationError) throw locationError;
+            newDepartment.locations = data.locations;
+          }
+
+          // Update cache
+          const previousDepartments =
+            queryClient.getQueryData<Department[]>(departmentKeys.lists()) || [];
+          queryClient.setQueryData(departmentKeys.lists(), [...previousDepartments, newDepartment]);
+
+          // Set individual department data
+          queryClient.setQueryData(["departments", newDepartment.id], newDepartment);
+
+          toast.success(t("General.successful_operation"), {
+            description: t("Departments.success.created"),
+          });
+
+          router.push("/departments");
+        } catch (error) {
+          console.error("Error creating department:", error);
+          toast.error(t("General.error_occurred"), {
+            description: t("Departments.error.creating"),
+          });
+        }
       }
     } catch (error) {
       setIsLoading(false);

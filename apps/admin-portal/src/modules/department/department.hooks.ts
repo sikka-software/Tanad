@@ -7,6 +7,7 @@ import {
   deleteDepartment,
   duplicateDepartment,
   bulkDeleteDepartments,
+  fetchDepartmentById,
 } from "./department.service";
 import type { Department, DepartmentCreateData } from "./department.type";
 
@@ -26,14 +27,26 @@ export const useDepartments = () => {
   });
 };
 
+// Hook to fetch a single department
+export const useDepartment = (id: string) => {
+  return useQuery({
+    queryKey: departmentKeys.detail(id),
+    queryFn: () => fetchDepartmentById(id),
+    enabled: !!id,
+  });
+};
 // Create Mutation Hook
 export const useCreateDepartment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: DepartmentCreateData) => createDepartment(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
+    onSuccess: (newDepartment: Department) => {
+      const previousDepartments = queryClient.getQueryData(departmentKeys.lists()) || [];
+      queryClient.setQueryData(departmentKeys.lists(), [
+        ...(Array.isArray(previousDepartments) ? previousDepartments : []),
+        newDepartment,
+      ]);
     },
   });
 };
@@ -45,31 +58,8 @@ export const useUpdateDepartment = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Department> }) =>
       updateDepartment(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
-    },
-  });
-};
-
-// Delete Mutation Hook
-export const useDeleteDepartment = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => deleteDepartment(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
-    },
-  });
-};
-
-// Bulk Delete Mutation Hook
-export const useDeleteDepartments = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (ids: string[]) => bulkDeleteDepartments(ids),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: departmentKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
   });
@@ -86,3 +76,27 @@ export const useDuplicateDepartment = () => {
     },
   });
 };
+
+// Delete Mutation Hook
+export const useDeleteDepartment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteDepartment(id),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
+      queryClient.removeQueries({ queryKey: departmentKeys.detail(variables) });
+    },
+  });
+};
+
+// Hook to bulk delete departments
+export function useBulkDeleteDepartments() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkDeleteDepartments,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
+    },
+  });
+}
