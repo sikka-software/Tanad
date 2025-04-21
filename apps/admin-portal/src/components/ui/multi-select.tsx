@@ -321,15 +321,19 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                   </div>
                   <span>{t("General.select_all")}</span>
                 </CommandItem>
-                {options.map((option) => {
+                {options.map((option, i) => {
                   const isSelected = selectedValues.some((value) =>
                     isValueEqual(value, option.value),
                   );
                   return (
                     <CommandItem
-                      key={getValueKey(option.value)}
+                      key={i}
                       onSelect={() => toggleOption(option.value)}
+                      value={String(i)}
                       className="cursor-pointer"
+                      onMouseEnter={() => {
+                        console.log("option", option);
+                      }}
                     >
                       <div
                         className={cn(
