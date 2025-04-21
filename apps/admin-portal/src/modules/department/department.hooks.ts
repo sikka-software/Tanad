@@ -41,12 +41,8 @@ export const useCreateDepartment = () => {
 
   return useMutation({
     mutationFn: (data: DepartmentCreateData) => createDepartment(data),
-    onSuccess: (newDepartment: Department) => {
-      const previousDepartments = queryClient.getQueryData(departmentKeys.lists()) || [];
-      queryClient.setQueryData(departmentKeys.lists(), [
-        ...(Array.isArray(previousDepartments) ? previousDepartments : []),
-        newDepartment,
-      ]);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
   });
 };
