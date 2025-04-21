@@ -34,26 +34,26 @@ DROP FUNCTION IF EXISTS has_permission(text, uuid);
 CREATE OR REPLACE FUNCTION validate_user_role()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Check if the user exists in profiles
-  IF NOT EXISTS (SELECT 1 FROM profiles WHERE id = NEW.profile_id) THEN
-    RAISE EXCEPTION 'Invalid profile_id';
+  -- Check if the user exists in auth.users
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE id = NEW.user_id) THEN
+    RAISE EXCEPTION 'Invalid user_id';
   END IF;
 
-  -- Check if the role exists
-  IF NOT EXISTS (SELECT 1 FROM roles WHERE id = NEW.role_id) THEN
-    RAISE EXCEPTION 'Invalid role_id';
+  -- Check if the role is valid
+  IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = NEW.role::text AND enumtypid = 'app_role'::regtype) THEN
+    RAISE EXCEPTION 'Invalid role';
   END IF;
 
   -- Check if the enterprise exists
-  IF NOT EXISTS (SELECT 1 FROM enterprises WHERE id = NEW.enterprise_id) THEN
+  IF NEW.enterprise_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM enterprises WHERE id = NEW.enterprise_id) THEN
     RAISE EXCEPTION 'Invalid enterprise_id';
   END IF;
 
   -- Check if the user is already assigned this role in this enterprise
   IF EXISTS (
     SELECT 1 FROM user_roles 
-    WHERE profile_id = NEW.profile_id 
-    AND role_id = NEW.role_id 
+    WHERE user_id = NEW.user_id 
+    AND role = NEW.role 
     AND enterprise_id = NEW.enterprise_id
     AND id != NEW.id
   ) THEN
@@ -74,21 +74,21 @@ EXECUTE FUNCTION validate_user_role();
 CREATE OR REPLACE FUNCTION validate_role_permission()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Check if the role exists
-  IF NOT EXISTS (SELECT 1 FROM roles WHERE id = NEW.role_id) THEN
-    RAISE EXCEPTION 'Invalid role_id';
+  -- Check if the role is valid
+  IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = NEW.role::text AND enumtypid = 'app_role'::regtype) THEN
+    RAISE EXCEPTION 'Invalid role';
   END IF;
 
-  -- Check if the permission exists
-  IF NOT EXISTS (SELECT 1 FROM permissions WHERE id = NEW.permission_id) THEN
-    RAISE EXCEPTION 'Invalid permission_id';
+  -- Check if the permission is valid
+  IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumlabel = NEW.permission::text AND enumtypid = 'app_permission'::regtype) THEN
+    RAISE EXCEPTION 'Invalid permission';
   END IF;
 
   -- Check if this role already has this permission
   IF EXISTS (
     SELECT 1 FROM role_permissions 
-    WHERE role_id = NEW.role_id 
-    AND permission_id = NEW.permission_id
+    WHERE role = NEW.role 
+    AND permission = NEW.permission
     AND id != NEW.id
   ) THEN
     RAISE EXCEPTION 'Role already has this permission';
