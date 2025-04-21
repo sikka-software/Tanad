@@ -53,17 +53,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 
 import { Role, Permission } from "@/types/rbac";
+import {
+  useRoles,
+  usePermissions,
+  useCreateRole,
+  useUpdateRole,
+  useDeleteRole,
+  useUpdateRolePermissions,
+} from "@/hooks/use-roles";
 
-import { createClient } from "@/utils/supabase/component";
-
-export default function RolesList({
-  initialRoles,
-  permissions,
-}: {
-  initialRoles: Role[];
-  permissions: Permission[];
-}) {
-  const [roles, setRoles] = useState<Role[]>(initialRoles);
+export default function RolesList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -76,7 +75,13 @@ export default function RolesList({
     isSystem: false,
   });
 
-  const supabase = createClient();
+  // Fetch data using hooks
+  const { data: roles = [], isLoading: isLoadingRoles } = useRoles();
+  const { data: permissions = [], isLoading: isLoadingPermissions } = usePermissions();
+  const createRole = useCreateRole();
+  const updateRole = useUpdateRole();
+  const deleteRole = useDeleteRole();
+  const updateRolePermissions = useUpdateRolePermissions();
 
   // Group permissions by category
   const permissionsByCategory = permissions.reduce(
@@ -109,34 +114,22 @@ export default function RolesList({
   };
 
   // Handle opening delete dialog
-  const handleDeleteRole = (role: Role) => {
+  const openDeleteDialog = (role: Role) => {
     setSelectedRole(role);
     setIsDeleteDialogOpen(true);
   };
 
   // Create new role
-  const createNewRole = async () => {
-    if (!newRole.name) {
-      toast.error("Role name is required");
-      return;
-    }
+  const handleCreateRole = async () => {
+    if (!newRole.name) return;
 
     try {
-      const { data, error } = await supabase.from("roles").insert({
+      await createRole.mutateAsync({
         name: newRole.name,
         description: newRole.description || "",
         permissions: newRole.permissions || [],
         isSystem: false,
       });
-
-      if (error) throw error;
-
-      // Update local state
-      if (data) {
-        setRoles([...roles, data as Role]);
-      }
-
-      toast.success("New role has been created successfully");
 
       // Reset form and close dialog
       setNewRole({
@@ -148,67 +141,45 @@ export default function RolesList({
       setIsCreateDialogOpen(false);
     } catch (error) {
       console.error("Error creating role:", error);
-      toast.error("Failed to create role");
     }
   };
 
   // Update role
-  const updateRole = async () => {
+  const handleUpdateRole = async () => {
     if (!selectedRole || !newRole.name) return;
 
     try {
-      const { data, error } = await supabase
-        .from("roles")
-        .update({
-          name: newRole.name,
-          description: newRole.description,
-          permissions: newRole.permissions,
-        })
-        .eq("id", selectedRole.id);
-
-      if (error) throw error;
-
-      // Update local state
-      setRoles(
-        roles.map((role) =>
-          role.id === selectedRole.id
-            ? {
-                ...role,
-                name: newRole.name || role.name,
-                description: newRole.description || role.description,
-                permissions: newRole.permissions || role.permissions,
-              }
-            : role,
-        ),
-      );
-
-      toast.success("Role has been updated successfully");
+      await updateRole.mutateAsync({
+        ...selectedRole,
+        name: newRole.name,
+        description: newRole.description || "",
+        permissions: newRole.permissions || [],
+      });
 
       setIsEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating role:", error);
-      toast.error("Failed to update role");
     }
   };
 
   // Delete role
-  const deleteRole = async () => {
+  const handleDeleteRole = async () => {
     if (!selectedRole) return;
 
     try {
-      const { error } = await supabase.from("roles").delete().eq("id", selectedRole.id);
-
-      if (error) throw error;
-
-      // Update local state
-      setRoles(roles.filter((role) => role.id !== selectedRole.id));
-
-      toast.success("Role has been deleted successfully");
-
+      await deleteRole.mutateAsync(selectedRole.id);
       setIsDeleteDialogOpen(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error deleting role:", error);
-      toast.error(error.message || "Failed to delete role");
+    }
+  };
+
+  // Update role permissions
+  const handleUpdateRolePermissions = async (roleId: string, permissions: string[]) => {
+    try {
+      await updateRolePermissions.mutateAsync({ roleId, permissions });
+    } catch (error) {
+      console.error("Error updating role permissions:", error);
     }
   };
 
@@ -302,7 +273,7 @@ export default function RolesList({
                     </DropdownMenuItem>
                     {!role.isSystem && (
                       <DropdownMenuItem
-                        onClick={() => handleDeleteRole(role)}
+                        onClick={() => openDeleteDialog(role)}
                         className="text-red-600 focus:text-red-600"
                       >
                         <Trash className="mr-2 h-4 w-4" />
@@ -466,7 +437,7 @@ export default function RolesList({
             <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={createNewRole}>Create Role</Button>
+            <Button onClick={handleCreateRole}>Create Role</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -592,7 +563,7 @@ export default function RolesList({
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={updateRole}>Save Changes</Button>
+            <Button onClick={handleUpdateRole}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -609,7 +580,7 @@ export default function RolesList({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={deleteRole} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction onClick={handleDeleteRole} className="bg-red-600 hover:bg-red-700">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

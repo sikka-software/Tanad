@@ -1,15 +1,11 @@
 import { ArrowLeft } from "lucide-react";
-import { Head } from "next/document";
+import Head from "next/head";
 import Link from "next/link";
 
 import RolesList from "@/components/app/new-role-dialog";
 import { Button } from "@/components/ui/button";
 
 export default function RolesPage() {
-  let roles: any[] = [];
-
-  //   get the permission from src/hooks/permissions.hook.tsx
-
   return (
     <>
       <Head>
@@ -35,7 +31,7 @@ export default function RolesPage() {
           Define roles and their permissions to control what users can do in the system.
         </p>
 
-        <RolesList initialRoles={roles} permissions={permissions} />
+        <RolesList />
       </div>
     </>
   );
