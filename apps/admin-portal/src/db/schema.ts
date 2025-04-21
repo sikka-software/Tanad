@@ -637,8 +637,13 @@ export const departments = pgTable(
       withTimezone: true,
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
+    updated_at: timestamp("updated_at", {
+      withTimezone: true,
+      mode: "string",
+    }).default(sql`timezone('utc'::text, now())`),
     name: text().notNull(),
     description: text(),
+    is_active: boolean("is_active").default(true).notNull(),
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
@@ -654,21 +659,21 @@ export const departmentLocations = pgTable(
     department_id: uuid("department_id")
       .notNull()
       .references(() => departments.id, { onDelete: "cascade" }),
-    location_type: text("location_type").$type<"office" | "branch" | "warehouse">().notNull(),
+    location_type: text("location_type", {
+      enum: ["office", "branch", "warehouse"],
+    }).notNull(),
     location_id: uuid("location_id").notNull(),
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    index("department_locations_department_id_idx").using(
-      "btree",
-      table.department_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("department_locations_location_id_idx").using(
-      "btree",
-      table.location_id.asc().nullsLast().op("uuid_ops"),
+    unique("unique_department_location").on(
+      table.department_id,
+      table.location_type,
+      table.location_id,
     ),
     check(
-      "department_locations_type_check",
+      "location_type_check",
       sql`location_type = ANY (ARRAY['office'::text, 'branch'::text, 'warehouse'::text])`,
     ),
   ],

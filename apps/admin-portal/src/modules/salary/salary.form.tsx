@@ -1,10 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import type { SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -15,11 +13,17 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import { CurrencyInput } from "@/components/ui/currency-input";
+
 import { generateDummyEmployee } from "@/lib/dummy-factory";
 
-import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
-import { employeeKeys, useEmployees } from "@/modules/employee/employee.hooks";
+import { EmployeeForm } from "@/modules/employee/employee.form";
+import { useEmployees } from "@/modules/employee/employee.hooks";
 import useUserStore from "@/stores/use-user-store";
+
+import useEmployeeStore from "../employee/employee.store";
+import { useCreateSalary, useUpdateSalary } from "./salary.hooks";
+import useSalaryStore from "./salary.store";
 
 const createSalarySchema = (t: (key: string) => string) =>
   z.object({
@@ -56,19 +60,25 @@ export type SalaryFormValues = z.infer<ReturnType<typeof createSalarySchema>>;
 interface SalaryFormProps {
   id?: string;
   loading?: boolean;
-  onSubmit: (data: SalaryFormValues) => void;
+  onSuccess?: () => void;
+  defaultValues?: SalaryFormValues | null;
+  editMode?: boolean;
 }
 
-export function SalaryForm({ id, onSubmit, loading }: SalaryFormProps) {
-  const router = useRouter();
+export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFormProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const { user } = useUserStore();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
+  const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
-  const [isEmployeeSaving, setIsEmployeeSaving] = useState(false);
-  const { locale } = useRouter();
   const queryClient = useQueryClient();
   const salarySchema = createSalarySchema(t);
+  const setLoading = useSalaryStore((state) => state.setIsLoading);
+  const loading = useSalaryStore((state) => state.isLoading);
+  const { mutate: createSalary } = useCreateSalary();
+  const { mutate: updateSalary } = useUpdateSalary();
 
   // Use SalaryFormValues directly with useForm
   const form = useForm<SalaryFormValues>({
@@ -91,66 +101,43 @@ export function SalaryForm({ id, onSubmit, loading }: SalaryFormProps) {
     value: `${emp.first_name} ${emp.last_name}`,
   }));
 
-  const handleEmployeeSubmit = async (data: EmployeeFormValues) => {
-    setIsEmployeeSaving(true);
+  const handleSubmit = async (data: SalaryFormValues) => {
+    setLoading(true);
     try {
-      if (!user?.id) {
-        throw new Error(t("error.not_authenticated"));
+      if (editMode) {
+        await updateSalary({
+          id: id!,
+          data: {
+            ...data,
+            deductions: data.deductions ? JSON.parse(data.deductions) : null,
+            notes: data.notes?.trim() || undefined,
+            user_id: user?.id,
+          },
+        });
+      } else {
+        await createSalary({
+          ...data,
+          deductions: data.deductions ? JSON.parse(data.deductions) : null,
+          notes: data.notes?.trim() || undefined,
+          user_id: user?.id,
+        });
+
+        toast.success(t("General.successful_operation"), {
+          description: t("Salaries.messages.success_created"),
+        });
+        onSuccess?.();
       }
-
-      const response = await fetch("/api/employees/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.id}`,
-        },
-        body: JSON.stringify({
-          first_name: data.first_name.trim(),
-          last_name: data.last_name.trim(),
-          email: data.email.trim(),
-          phone: data.phone?.trim() || null,
-          position: data.position.trim(),
-          department_id: data.department || null,
-          hire_date: data.hire_date,
-          salary: data.salary ? parseFloat(data.salary) : null,
-          status: data.status,
-          notes: data.notes?.trim() || null,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || t("Employees.messages.error"));
-      }
-
-      // Get the new employee data
-      const newEmployee = await response.json();
-
-      // Update the employees cache to include the new employee
-      const previousEmployees = queryClient.getQueryData(employeeKeys.lists()) || [];
-      queryClient.setQueryData(employeeKeys.lists(), [
-        ...(Array.isArray(previousEmployees) ? previousEmployees : []),
-        newEmployee,
-      ]);
-
-      // Set the new employee as the selected employee
-      const fullName = `${newEmployee.first_name} ${newEmployee.last_name}`;
-      form.setValue("employee_name", fullName);
-
-      // Close the dialog
-      setIsEmployeeDialogOpen(false);
-
-      // Show success message
-      toast.success(t("General.successful_operation"), {
-        description: t("Employees.success.created"),
-      });
     } catch (error) {
-      console.error("Error creating employee:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Employees.error.create"),
+      console.error("Failed to save salary:", error);
+      const description =
+        error instanceof SyntaxError
+          ? t("Salaries.form.deductions.invalid_json")
+          : error instanceof Error
+            ? error.message
+            : t("Salaries.messages.error_save");
+      toast.error(t("Salaries.error.title"), {
+        description,
       });
-    } finally {
-      setIsEmployeeSaving(false);
     }
   };
 
@@ -161,7 +148,7 @@ export function SalaryForm({ id, onSubmit, loading }: SalaryFormProps) {
   return (
     <>
       <Form {...form}>
-        <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="employee_name"
@@ -285,14 +272,12 @@ export function SalaryForm({ id, onSubmit, loading }: SalaryFormProps) {
                 <FormItem>
                   <FormLabel>{t("Salaries.form.gross_amount.label")} *</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
+                    <CurrencyInput
+                      showCommas={true}
+                      value={field.value ? parseFloat(String(field.value)) : undefined}
+                      onChange={(value) => field.onChange(value?.toString() || "")}
                       placeholder={t("Salaries.form.gross_amount.placeholder")}
-                      {...field}
                       disabled={loading}
-                      onChange={(e) => field.onChange(e.target.value)} // Pass string value
                     />
                   </FormControl>
                   <FormMessage />
@@ -306,14 +291,12 @@ export function SalaryForm({ id, onSubmit, loading }: SalaryFormProps) {
                 <FormItem>
                   <FormLabel>{t("Salaries.form.net_amount.label")} *</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
+                    <CurrencyInput
+                      showCommas={true}
+                      value={field.value ? parseFloat(String(field.value)) : undefined}
+                      onChange={(value) => field.onChange(value?.toString() || "")}
                       placeholder={t("Salaries.form.net_amount.placeholder")}
-                      {...field}
                       disabled={loading}
-                      onChange={(e) => field.onChange(e.target.value)} // Pass string value
                     />
                   </FormControl>
                   <FormMessage />
@@ -373,7 +356,13 @@ export function SalaryForm({ id, onSubmit, loading }: SalaryFormProps) {
         loadingSave={isEmployeeSaving}
         dummyData={() => process.env.NODE_ENV === "development" && generateDummyEmployee()}
       >
-        <EmployeeForm id="employee-form" onSubmit={handleEmployeeSubmit} />
+        <EmployeeForm
+          id="employee-form"
+          onSuccess={() => {
+            setIsEmployeeSaving(false);
+            setIsEmployeeDialogOpen(false);
+          }}
+        />
       </FormDialog>
     </>
   );

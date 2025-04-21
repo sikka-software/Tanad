@@ -1,8 +1,6 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
@@ -12,90 +10,22 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import DepartmentForm, { type DepartmentFormValues } from "@/modules/department/department.form";
-import { departmentKeys } from "@/modules/department/department.hooks";
-import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
+import DepartmentForm from "@/modules/department/department.form";
+import useDepartmentStore from "@/modules/department/department.store";
 
 export default function AddDepartmentPage() {
-  const supabase = createClient();
   const router = useRouter();
   const t = useTranslations();
-  const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
 
-  const handleSubmit = async (data: DepartmentFormValues) => {
-    setLoading(true);
-    try {
-      // Check if user ID is available
-      if (!user?.id) {
-        throw new Error(t("Departments.error.not_authenticated"));
-      }
-
-      // First create the department
-      const { data: newDepartment, error: departmentError } = await supabase
-        .from("departments")
-        .insert([
-          {
-            name: data.name.trim(),
-            description: data.description?.trim() || null,
-            user_id: user.id,
-          },
-        ])
-        .select()
-        .single();
-
-      if (departmentError) throw departmentError;
-
-      // Then create the department locations
-      if (data.locations && data.locations.length > 0) {
-        const locationInserts = data.locations.map((location_id) => ({
-          department_id: newDepartment.id,
-          location_id: location_id,
-          location_type: "office", // Default to office type
-        }));
-
-        const { error: locationError } = await supabase
-          .from("department_locations")
-          .insert(locationInserts);
-
-        if (locationError) throw locationError;
-
-        // Update the department object with locations before caching
-        newDepartment.locations = data.locations;
-      }
-
-      const previousDepartments = queryClient.getQueryData(departmentKeys.lists()) || [];
-      queryClient.setQueryData(departmentKeys.lists(), [
-        ...(Array.isArray(previousDepartments) ? previousDepartments : []),
-        newDepartment,
-      ]);
-
-      // Also set the individual department query data
-      queryClient.setQueryData(["departments", newDepartment.id], newDepartment);
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Departments.success.created"),
-      });
-
-      router.push("/departments");
-    } catch (error) {
-      console.error("Failed to save department:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Departments.error.create"),
-      });
-      setLoading(false);
-    }
-  };
+  const setIsLoading = useDepartmentStore((state) => state.setIsLoading);
+  const isLoading = useDepartmentStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
     const form = (window as any).departmentForm;
     if (form) {
-      form.setValue("name", dummyData.full_name);
+      form.setValue("name", dummyData.job_department);
       form.setValue("description", dummyData.description);
-      // form.setValue("locations", dummyData.locations);
     }
   };
 
@@ -105,24 +35,25 @@ export default function AddDepartmentPage() {
       <PageTitle
         formButtons
         formId="department-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/departments")}
+        dummyButton={handleDummyData}
         texts={{
           title: t("Departments.add_new"),
           submit_form: t("Departments.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <DepartmentForm id="department-form" onSubmit={handleSubmit} loading={loading} />
+        <DepartmentForm
+          id="department-form"
+          onSuccess={() =>
+            router.push("/departments").then(() => {
+              setIsLoading(false);
+            })
+          }
+        />
       </div>
     </div>
   );

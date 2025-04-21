@@ -11,6 +11,7 @@ import {
   FileInput,
   Warehouse,
   Store,
+  SaudiRiyal,
 } from "lucide-react";
 
 export const commandList = [
@@ -123,6 +124,12 @@ export const commandList = [
         label: "Expenses.title",
         shortcut: "⌘X",
         href: "/expenses",
+      },
+      {
+        icon: SaudiRiyal,
+        label: "Salaries.title",
+        shortcut: "⌘S",
+        href: "/salaries",
       },
     ],
   },

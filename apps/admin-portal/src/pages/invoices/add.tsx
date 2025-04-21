@@ -96,15 +96,8 @@ export default function AddInvoicePage() {
         }}
       />
 
-      <div className="p-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("invoice_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <InvoiceForm id="invoice-form" onSubmit={handleSubmit} loading={loading} />
-          </CardContent>
-        </Card>
+      <div className="mx-auto max-w-2xl p-4">
+        <InvoiceForm id="invoice-form" onSubmit={handleSubmit} loading={loading} />
       </div>
     </div>
   );

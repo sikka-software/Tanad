@@ -1,13 +1,17 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
-  createDepartment,
-  deleteDepartment,
-  fetchDepartmentById,
   fetchDepartments,
+  createDepartment,
   updateDepartment,
-} from "@/modules/department/department.service";
-import { Department, DepartmentCreateData } from "@/modules/department/department.type";
+  deleteDepartment,
+  duplicateDepartment,
+  bulkDeleteDepartments,
+  fetchDepartmentById,
+  fetchDepartmentsWithLocations,
+  createDepartmentWithLocations,
+} from "./department.service";
+import type { Department, DepartmentCreateData } from "./department.type";
 
 export const departmentKeys = {
   all: ["departments"] as const,
@@ -16,91 +20,83 @@ export const departmentKeys = {
   details: () => [...departmentKeys.all, "detail"] as const,
   detail: (id: string) => [...departmentKeys.details(), id] as const,
 };
-// Hooks
-export function useDepartments() {
+
+// List Query Hook
+export const useDepartments = () => {
   return useQuery({
     queryKey: departmentKeys.lists(),
-    queryFn: fetchDepartments,
+    queryFn: fetchDepartmentsWithLocations,
+    // queryFn: fetchDepartments,
   });
-}
+};
 
-export function useDepartment(id: string) {
+// Hook to fetch a single department
+export const useDepartment = (id: string) => {
   return useQuery({
     queryKey: departmentKeys.detail(id),
     queryFn: () => fetchDepartmentById(id),
+    enabled: !!id,
   });
-}
-
-export function useCreateDepartment() {
+};
+// Create Mutation Hook
+export const useCreateDepartment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (department: DepartmentCreateData) => createDepartment(department),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
-    },
-  });
-}
-
-export function useUpdateDepartment() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Department> }) => {
-      const response = await fetch(`/api/departments/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updates),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update department");
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
-    },
-  });
-}
-
-export function useDeleteDepartment() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => deleteDepartment(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
-    },
-  });
-}
-
-export const useDeleteDepartments = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (departmentIds: string[]) => {
-      const response = await fetch("/api/departments/bulk-delete", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ departmentIds }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to delete departments");
-      }
-
-      const result = await response.json();
-      return result;
-    },
+    // mutationFn: (data: DepartmentCreateData) => createDepartment(data),
+    mutationFn: (data: DepartmentCreateData) => createDepartmentWithLocations(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
   });
 };
+
+// Update Mutation Hook
+export const useUpdateDepartment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Department> }) =>
+      updateDepartment(id, data),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: departmentKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
+    },
+  });
+};
+
+// Duplicate Mutation Hook
+export const useDuplicateDepartment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => duplicateDepartment(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
+    },
+  });
+};
+
+// Delete Mutation Hook
+export const useDeleteDepartment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => deleteDepartment(id),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
+      queryClient.removeQueries({ queryKey: departmentKeys.detail(variables) });
+    },
+  });
+};
+
+// Hook to bulk delete departments
+export function useBulkDeleteDepartments() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: bulkDeleteDepartments,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
+    },
+  });
+}

@@ -10,6 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import { CurrencyInput } from "@/components/ui/currency-input";
+
 export const createProductSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Products.form.name.required")),
@@ -106,12 +108,11 @@ export function ProductForm({ id, onSubmit, loading }: ProductFormProps) {
               <FormItem>
                 <FormLabel>{t("Products.form.price.label")} *</FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
-                    {...field}
+                  <CurrencyInput
+                    showCommas={true}
+                    value={field.value ? parseFloat(String(field.value)) : undefined}
+                    onChange={(value) => field.onChange(value?.toString() || "")}
+                    placeholder={t("Products.form.price.placeholder")}
                     disabled={loading}
                   />
                 </FormControl>

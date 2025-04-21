@@ -1,10 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
+
+import { useCreateOffice, useUpdateOffice } from "./office.hooks";
+import useOfficeStore from "./office.store";
+import { OfficeUpdateData } from "./office.type";
 
 const createOfficeSchema = (t: (key: string) => string) =>
   z.object({
@@ -21,24 +26,79 @@ export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
 
 interface OfficeFormProps {
   id?: string;
-  onSubmit: (data: OfficeFormValues) => void;
-  loading?: boolean;
+  onSuccess?: () => void;
+  defaultValues?: OfficeUpdateData | null;
+  editMode?: boolean;
 }
 
-export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
+export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFormProps) {
   const t = useTranslations();
+  const { mutate: createOffice } = useCreateOffice();
+  const { mutate: updateOffice } = useUpdateOffice();
+
+  const isLoading = useOfficeStore((state) => state.isLoading);
+  const setIsLoading = useOfficeStore((state) => state.setIsLoading);
+
   const form = useForm<OfficeFormValues>({
     resolver: zodResolver(createOfficeSchema(t)),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
-      state: "",
-      zip_code: "",
+      name: defaultValues?.name || "",
+      email: defaultValues?.email || "",
+      phone: defaultValues?.phone || "",
+      address: defaultValues?.address || "",
+      city: defaultValues?.city || "",
+      state: defaultValues?.state || "",
+      zip_code: defaultValues?.zip_code || "",
     },
   });
+
+  const handleSubmit = async (data: OfficeFormValues) => {
+    setIsLoading(true);
+    try {
+      if (editMode) {
+        await updateOffice({
+          id: defaultValues?.id || "",
+          data: {
+            name: data.name.trim(),
+            email: data.email?.trim(),
+            phone: data.phone?.trim(),
+            address: data.address.trim(),
+            city: data.city.trim(),
+            state: data.state.trim(),
+            zip_code: data.zip_code.trim(),
+            is_active: true,
+          },
+        });
+        toast.success(t("General.successful_operation"), {
+          description: t("Offices.success.updated"),
+        });
+        onSuccess?.();
+      } else {
+        await createOffice({
+          name: data.name.trim(),
+          email: data.email?.trim(),
+          phone: data.phone?.trim(),
+          address: data.address.trim(),
+          city: data.city.trim(),
+          state: data.state.trim(),
+          zip_code: data.zip_code.trim(),
+          is_active: true,
+          updated_at: new Date().toISOString(),
+        });
+        toast.success(t("General.successful_operation"), {
+          description: t("Offices.success.created"),
+        });
+        if (onSuccess) {
+          onSuccess();
+        }
+      }
+    } catch (error) {
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Offices.error.creating"),
+      });
+      setIsLoading(false);
+    }
+  };
 
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
@@ -47,7 +107,11 @@ export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
 
   return (
     <Form {...form}>
-      <form id={id || "office-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        id={id || "office-form"}
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-4"
+      >
         <FormField
           control={form.control}
           name="name"
@@ -55,7 +119,7 @@ export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
             <FormItem>
               <FormLabel>{t("Offices.form.name.label")}</FormLabel>
               <FormControl>
-                <Input {...field} disabled={loading} />
+                <Input {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -69,7 +133,7 @@ export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
             <FormItem>
               <FormLabel>{t("Offices.form.email.label")}</FormLabel>
               <FormControl>
-                <Input {...field} type="email" disabled={loading} />
+                <Input {...field} type="email" disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,7 +147,7 @@ export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
             <FormItem>
               <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
               <FormControl>
-                <Input {...field} type="tel" disabled={loading} />
+                <Input {...field} type="tel" disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,7 +161,7 @@ export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
             <FormItem>
               <FormLabel>{t("Offices.form.address.label")}</FormLabel>
               <FormControl>
-                <Input {...field} disabled={loading} />
+                <Input {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -112,7 +176,7 @@ export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
               <FormItem>
                 <FormLabel>{t("Offices.form.city.label")}</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={loading} />
+                  <Input {...field} disabled={isLoading} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,7 +190,7 @@ export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
               <FormItem>
                 <FormLabel>{t("Offices.form.state.label")}</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={loading} />
+                  <Input {...field} disabled={isLoading} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -140,7 +204,7 @@ export function OfficeForm({ id, onSubmit, loading }: OfficeFormProps) {
               <FormItem>
                 <FormLabel>{t("Offices.form.zip_code.label")}</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={loading} />
+                  <Input {...field} disabled={isLoading} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

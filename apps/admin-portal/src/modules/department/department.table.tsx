@@ -32,32 +32,100 @@ interface DepartmentsTableProps {
   data: Department[];
   isLoading?: boolean;
   error?: Error | null;
+  onActionClicked: (action: string, rowId: string) => void;
 }
 
-const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => {
-  const t = useTranslations("Departments");
+const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: DepartmentsTableProps) => {
+  const t = useTranslations();
   const { mutateAsync: updateDepartment } = useUpdateDepartment();
+
   const { data: offices } = useOffices();
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
+
   const selectedRows = useDepartmentStore((state) => state.selectedRows);
   const setSelectedRows = useDepartmentStore((state) => state.setSelectedRows);
 
+  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
+
+  const columns: ExtendedColumnDef<Department>[] = [
+    {
+      accessorKey: "name",
+      header: t("Departments.form.name.label"),
+      validationSchema: nameSchema,
+      className: "min-w-[200px]",
+    },
+    {
+      accessorKey: "description",
+      header: t("Departments.form.description.label"),
+      validationSchema: descriptionSchema,
+      className: "min-w-[250px]",
+    },
+    {
+      accessorKey: "locations",
+      header: t("Departments.form.locations.label"),
+      validationSchema: locationSchema,
+      className: "min-w-[200px]",
+      cell: ({ row }) => {
+        const locations = row.original.locations || [];
+
+        if (locations.length === 0) {
+          return t("Departments.form.locations.noLocations");
+        } else if (locations.length === 1) {
+          return getLocationName(locations[0].location_id);
+        } else {
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-4 !p-0 !text-xs">
+                  {t("Departments.form.locations.multipleLocations", { count: locations.length })}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {locations.map((location) => (
+                  <DropdownMenuItem key={location.location_id} className="flex justify-between">
+                    <span>{getLocationName(location.location_id)}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveLocation(row, location.location_id);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        }
+      },
+    },
+    {
+      accessorKey: "created_at",
+      header: t("Departments.form.created_at.label"),
+      validationSchema: created_atSchema,
+      className: "min-w-[180px]",
+    },
+    {
+      accessorKey: "updated_at",
+      header: t("Departments.form.updated_at.label"),
+      validationSchema: updated_atSchema,
+      className: "min-w-[180px]",
+    },
+  ];
+
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateDepartment({ id: rowId, updates: { [columnId]: value } });
+    await updateDepartment({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(
     (rows: Department[]) => {
-      const newSelectedIds = rows.map((row) => row.id!);
-      // Only update if the selection has actually changed
-      const currentSelection = new Set(selectedRows);
-      const newSelection = new Set(newSelectedIds);
-
-      if (
-        newSelection.size !== currentSelection.size ||
-        !Array.from(newSelection).every((id) => currentSelection.has(id))
-      ) {
+      const newSelectedIds = rows.map((row) => row.id);
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
         setSelectedRows(newSelectedIds);
       }
     },
@@ -78,80 +146,10 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
   };
 
   const handleRemoveLocation = async (row: Row<Department>, location_id: string) => {
-    const locationIds = row.original.locations || [];
-    const updatedLocations = locationIds.filter((id: string) => id !== location_id);
-    await updateDepartment({ id: row.original.id, updates: { locations: updatedLocations } });
+    const locations = row.original.locations || [];
+    const updatedLocations = locations.filter((location) => location.location_id !== location_id);
+    await updateDepartment({ id: row.original.id, data: { locations: updatedLocations } });
   };
-
-  const columns: ExtendedColumnDef<Department>[] = [
-    {
-      accessorKey: "name",
-      header: t("form.name.label"),
-      validationSchema: nameSchema,
-      className: "min-w-[200px]",
-    },
-    {
-      accessorKey: "description",
-      header: t("form.description.label"),
-      validationSchema: descriptionSchema,
-      className: "min-w-[250px]",
-    },
-    {
-      accessorKey: "locations",
-      header: t("form.locations.label"),
-      validationSchema: locationSchema,
-      className: "min-w-[200px]",
-      cell: ({ row }) => {
-        const locationIds = row.original.locations || [];
-
-        if (locationIds.length === 0) {
-          return t("form.locations.noLocations");
-        } else if (locationIds.length === 1) {
-          return getLocationName(locationIds[0]);
-        } else {
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-4 !p-0 !text-xs">
-                  {t("form.locations.multipleLocations", { count: locationIds.length })}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                {locationIds.map((location_id) => (
-                  <DropdownMenuItem key={location_id} className="flex justify-between">
-                    <span>{getLocationName(location_id)}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-4 w-4 p-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveLocation(row, location_id);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        }
-      },
-    },
-    {
-      accessorKey: "created_at",
-      header: t("form.created_at.label"),
-      validationSchema: created_atSchema,
-      className: "min-w-[180px]",
-    },
-    {
-      accessorKey: "updated_at",
-      header: t("form.updated_at.label"),
-      validationSchema: updated_atSchema,
-      className: "min-w-[180px]",
-    },
-  ];
 
   if (isLoading) {
     return (
@@ -162,9 +160,6 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
   if (error) {
     return <ErrorComponent errorMessage={error.message} />;
   }
-
-  // Create a selection state object for the table
-  const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const departmentTableOptions = {
     state: {
@@ -186,7 +181,9 @@ const DepartmentsTable = ({ data, isLoading, error }: DepartmentsTableProps) => 
       data={data}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
       onEdit={handleEdit}
+      onActionClicked={onActionClicked}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={departmentTableOptions}
       texts={{

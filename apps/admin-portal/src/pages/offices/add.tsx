@@ -1,8 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
@@ -11,48 +9,20 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { OfficeForm, type OfficeFormValues } from "@/modules/office/office.form";
-import { useCreateOffice } from "@/modules/office/office.hooks";
+import { OfficeForm } from "@/modules/office/office.form";
+import useOfficeStore from "@/modules/office/office.store";
 
 export default function AddOfficePage() {
   const t = useTranslations();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const { mutate: createOffice } = useCreateOffice();
-
-  const handleSubmit = async (data: OfficeFormValues) => {
-    setLoading(true);
-    try {
-      await createOffice({
-        name: data.name.trim(),
-        email: data.email?.trim(),
-        phone: data.phone?.trim(),
-        address: data.address.trim(),
-        city: data.city.trim(),
-        state: data.state.trim(),
-        zip_code: data.zip_code.trim(),
-        is_active: true,
-        updated_at: new Date().toISOString(),
-      });
-
-      toast.success(t("General.successful_operation"), {
-        description: t("Offices.success.created"),
-      });
-      router.push("/offices");
-      setLoading(false);
-    } catch (error) {
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Offices.error.creating"),
-      });
-      setLoading(false);
-    }
-  };
+  const isLoading = useOfficeStore((state) => state.isLoading);
+  const setIsLoading = useOfficeStore((state) => state.setIsLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
     const form = (window as any).officeForm;
     if (form) {
-      form.setValue("name", dummyData.full_name);
+      form.setValue("name", "Office " + dummyData.randomNumber);
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
       form.setValue("address", dummyData.address);
@@ -68,7 +38,7 @@ export default function AddOfficePage() {
       <PageTitle
         formButtons
         formId="office-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/offices")}
         texts={{
           title: t("Offices.add_new"),
@@ -85,7 +55,14 @@ export default function AddOfficePage() {
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <OfficeForm id="office-form" onSubmit={handleSubmit} loading={loading} />
+        <OfficeForm
+          id="office-form"
+          onSuccess={() =>
+            router.push("/offices").then(() => {
+              setIsLoading(false);
+            })
+          }
+        />
       </div>
     </div>
   );

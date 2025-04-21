@@ -1,0 +1,299 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Module Pattern Guide
+
+This document outlines the standardized pattern for creating new modules and their corresponding pages in the admin portal.
+
+## Module Structure
+
+Each module follows a consistent file structure:
+
+```
+src/modules/<module-name>/
+├── <module-name>.type.ts      # Type definitions
+├── <module-name>.store.ts     # Zustand store
+├── <module-name>.service.ts   # API services
+├── <module-name>.form.tsx     # Form component
+├── <module-name>.table.tsx    # Table view component
+├── <module-name>.hooks.ts     # Custom hooks
+├── <module-name>.card.tsx     # Card view component
+└── <module-name>.options.ts   # Constants and options
+```
+
+## Type Definitions Pattern
+
+Types should be based on the schema definition from `src/db/schema.ts`. For example:
+
+```typescript
+// <module-name>.type.ts
+import type { InferModel } from "drizzle-orm";
+import type { companies } from "@/db/schema";
+
+// Base type from schema
+export type Company = InferModel<typeof companies>;
+
+// Create data type
+export type CompanyCreateData = Pick<Company, 
+  | "name" 
+  | "email" 
+  | "phone"
+  | "website"
+  | "address"
+  | "city"
+  | "state"
+  | "zip_code"
+  | "industry"
+  | "size"
+  | "notes"
+  | "user_id"
+>;
+
+// Update data type
+export type CompanyUpdateData = Partial<CompanyCreateData>;
+```
+
+## Store Pattern
+
+Zustand store should follow this structure:
+
+```typescript
+// <module-name>.store.ts
+import { create } from "zustand";
+
+interface CompanyStore {
+  viewMode: "table" | "card";
+  setViewMode: (mode: "table" | "card") => void;
+}
+
+export const useCompanyStore = create<CompanyStore>((set) => ({
+  viewMode: "table",
+  setViewMode: (mode) => set({ viewMode: mode }),
+}));
+```
+
+## Service Pattern
+
+Services should implement standard REST operations:
+
+```typescript
+// <module-name>.service.ts
+import type { Company, CompanyCreateData } from "./company.type";
+
+export async function fetchCompanies(): Promise<Company[]> {
+  const response = await fetch("/api/resource/companies");
+  if (!response.ok) throw new Error("Failed to fetch companies");
+  return response.json();
+}
+
+export async function createCompany(company: CompanyCreateData): Promise<Company> {
+  const response = await fetch("/api/resource/companies", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(company),
+  });
+  if (!response.ok) throw new Error("Failed to create company");
+  return response.json();
+}
+
+export async function updateCompany(
+  id: string,
+  updates: Partial<Company>,
+): Promise<Company> {
+  const response = await fetch(`/api/resource/companies/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
+  if (!response.ok) throw new Error("Failed to update company");
+  return response.json();
+}
+
+export async function deleteCompany(id: string): Promise<void> {
+  const response = await fetch(`/api/resource/companies/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) throw new Error("Failed to delete company");
+}
+
+export async function bulkDeleteCompanies(ids: string[]): Promise<void> {
+  const response = await fetch("/api/resource/companies", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) throw new Error("Failed to delete companies");
+}
+
+export async function duplicateCompany(id: string): Promise<Company> {
+  const response = await fetch(`/api/resource/companies/${id}/duplicate`, {
+    method: "POST",
+  });
+  if (!response.ok) throw new Error("Failed to duplicate company");
+  return response.json();
+}
+```
+
+## Page Structure
+
+Pages should be organized as:
+
+```
+src/pages/<module-plural>/
+├── index.tsx    # List view
+└── add.tsx      # Create view
+```
+
+### Index Page Pattern
+
+```typescript
+// pages/<module-plural>/index.tsx
+import { type NextPage } from "next";
+import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { PageLayout } from "@/components/page-layout";
+import { PageHeader } from "@/components/page-header";
+import { PageSearchAndFilter } from "@/components/page-search-and-filter";
+import { SelectionMode } from "@/components/selection-mode";
+import { DataModelList } from "@/components/data-model-list";
+import { FormDialog } from "@/components/form-dialog";
+import { ConfirmDelete } from "@/components/confirm-delete";
+import { CompanyForm } from "@/modules/company/company.form";
+import { CompanyTable } from "@/modules/company/company.table";
+import { CompanyCard } from "@/modules/company/company.card";
+import { useCompanyStore } from "@/modules/company/company.store";
+import {
+  useCompanies,
+  useDeleteCompany,
+  useDeleteCompanies,
+  useDuplicateCompany,
+} from "@/modules/company/company.hooks";
+import type { Company } from "@/modules/company/company.type";
+
+const CompaniesPage: NextPage = () => {
+  const { user } = useUser();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const viewMode = useCompanyStore((state) => state.viewMode);
+  
+  // Queries and mutations
+  const { data: companies, isLoading } = useCompanies();
+  const { mutate: deleteCompany } = useDeleteCompany();
+  const { mutate: deleteCompanies } = useDeleteCompanies();
+  const { mutate: duplicateCompany } = useDuplicateCompany();
+
+  // Event handlers
+  const handleDelete = () => {
+    if (selectedIds.length === 1) {
+      deleteCompany(selectedIds[0]);
+    } else {
+      deleteCompanies(selectedIds);
+    }
+    setSelectedIds([]);
+    setDeleteDialogOpen(false);
+  };
+
+  return (
+    <PageLayout>
+      <PageHeader 
+        title="Companies"
+        description="Manage your companies"
+        buttonLabel="Add Company"
+        onButtonClick={() => setFormDialogOpen(true)}
+      />
+
+      <PageSearchAndFilter />
+
+      {selectedIds.length > 0 && (
+        <SelectionMode
+          selectedIds={selectedIds}
+          onDelete={() => setDeleteDialogOpen(true)}
+          onDuplicate={() => duplicateCompany(selectedIds[0])}
+        />
+      )}
+
+      <DataModelList
+        isLoading={isLoading}
+        viewMode={viewMode}
+        TableComponent={
+          <CompanyTable
+            data={companies}
+            selectedIds={selectedIds}
+            onSelectedIdsChange={setSelectedIds}
+          />
+        }
+        CardComponent={
+          <CompanyCard
+            data={companies}
+            selectedIds={selectedIds}
+            onSelectedIdsChange={setSelectedIds}
+          />
+        }
+      />
+
+      <FormDialog
+        open={formDialogOpen}
+        onClose={() => setFormDialogOpen(false)}
+      >
+        <CompanyForm onSuccess={() => setFormDialogOpen(false)} />
+      </FormDialog>
+
+      <ConfirmDelete
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDelete}
+        selectedIds={selectedIds}
+      />
+    </PageLayout>
+  );
+};
+
+export default CompaniesPage;
+```
+
+### Add Page Pattern
+
+```typescript
+// pages/<module-plural>/add.tsx
+import { type NextPage } from "next";
+import { PageLayout } from "@/components/page-layout";
+import { PageHeader } from "@/components/page-header";
+import { CompanyForm } from "@/modules/company/company.form";
+
+const AddCompanyPage: NextPage = () => {
+  return (
+    <PageLayout>
+      <PageHeader
+        title="Add Company"
+        description="Add a new company to your account"
+      />
+      <CompanyForm />
+    </PageLayout>
+  );
+};
+
+export default AddCompanyPage;
+```
+
+## Example Implementation
+
+For reference implementation, see:
+- Companies module: [src/modules/company](mdc:src/modules/company)
+- Companies pages: [src/pages/companies](mdc:src/pages/companies)
+
+## Best Practices
+
+1. Follow the file naming convention strictly
+2. Use TypeScript for type safety
+3. Implement proper error handling
+4. Use consistent API patterns
+5. Follow the page layout structure
+6. Implement proper form validation
+7. Handle loading and error states
+8. Use proper toast notifications
+9. Implement proper access control
+10. Follow the store pattern for UI state
+

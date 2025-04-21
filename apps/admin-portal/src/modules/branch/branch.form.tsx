@@ -318,7 +318,7 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
           />
         </div>
 
-        <FormField
+        {/* <FormField
           control={form.control}
           name="is_active"
           render={({ field }) => (
@@ -335,7 +335,7 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
               </FormControl>
             </FormItem>
           )}
-        />
+        /> */}
 
         <FormField
           control={form.control}

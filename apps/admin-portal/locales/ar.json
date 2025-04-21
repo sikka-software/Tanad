@@ -1649,6 +1649,7 @@
     "enter_invoice_number": "أدخل رقم الفاتورة",
     "description": "الوصف",
     "enter_description": "أدخل وصف الفاتورة",
+    "search_invoices": "بحث عن فواتير",
     "price": "السعر",
     "price_required": "السعر مطلوب",
     "stock_quantity": "كمية المخزون",
@@ -1670,6 +1671,22 @@
     "amount": "المبلغ",
     "due_date": "تاريخ الاستحقاق",
     "select_status": "اختر حالة",
+    "success": {
+      "created": "تم إنشاء الفاتورة بنجاح",
+      "updated": "تم تحديث الفاتورة بنجاح",
+      "deleted": "تم حذف الفاتورة بنجاح",
+      "duplicated": "تم تكرار الفاتورة بنجاح"
+    },
+    "loading": {
+      "duplicating": "جاري تكرار الفاتورة...",
+      "deleting": "جاري حذف الفاتورة..."
+    },
+    "error": {
+      "creating": "حدث خطأ أثناء إنشاء الفاتورة",
+      "updating": "حدث خطأ أثناء تحديث الفاتورة",
+      "deleting": "حدث خطأ أثناء حذف الفاتورة",
+      "duplicating": "حدث خطأ أثناء تكرار الفاتورة"
+    },
     "status": {
       "title": "الحالة",
       "draft": "مسودة",
@@ -1681,16 +1698,6 @@
     "notes": "ملاحظات",
     "enter_notes": "أدخل أي ملاحظات إضافية",
     "client_added": "تمت إضافة العميل بنجاح",
-    "error": {
-      "load_clients": "فشل في تحميل العملاء",
-      "create": "فشل في إنشاء الفاتورة",
-      "fetch": "فشل في جلب الفواتير",
-      "title": "خطأ"
-    },
-    "success": {
-      "title": "تم بنجاح",
-      "created": "تم إنشاء الفاتورة بنجاح"
-    },
     "submitting": "جاري الإرسال...",
     "invoice_hash": "فاتورة #{number}",
     "issue_date": "تاريخ الإصدار",
@@ -1903,6 +1910,82 @@
   },
   "Requests": {
     "title": "الطلبات"
+  "EmployeeRequests": {
+    "title": "طلبات الموظفين",
+    "description": "طلبات الموظفين",
+    "add_new": "إضافة طلب موظف جديد",
+    "no_employee_requests_found": "لا توجد طلبات موظفين",
+    "search_requests": "بحث عن طلبات الموظفين...",
+    "form": {
+      "validation": {
+        "title_required": "العنوان مطلوب",
+        "type_required": "النوع مطلوب",
+        "employee_required": "الموظف مطلوب",
+        "description_required": "الوصف مطلوب",
+        "start_date_required": "تاريخ البدء مطلوب",
+        "end_date_required": "تاريخ الانتهاء مطلوب",
+        "amount_required": "المبلغ مطلوب",
+        "amount_positive": "المبلغ يجب أن يكون رقماً موجباً"
+      },
+      "title": {
+        "label": "العنوان",
+        "placeholder": "أدخل عنوان الطلب",
+        "required": "العنوان مطلوب"
+      },
+      "type": {
+        "label": "النوع",
+        "placeholder": "اختر نوع الطلب",
+        "leave": "إجازة",
+        "expense": "مصروفات",
+        "document": "وثيقة",
+        "other": "أخرى"
+      },
+      "employee": {
+        "label": "الموظف",
+        "placeholder": "اختر الموظف",
+        "required": "الموظف مطلوب",
+        "no_employees": "لا يوجد موظفين"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل وصف الطلب",
+        "required": "الوصف مطلوب"
+      },
+      "date_range": {
+        "label": "الفترة الزمنية",
+        "start": "تاريخ البدء",
+        "end": "تاريخ الانتهاء"
+      },
+      "amount": {
+        "label": "المبلغ",
+        "placeholder": "أدخل المبلغ",
+        "required": "المبلغ مطلوب"
+      },
+      "attachments": {
+        "label": "المرفقات",
+        "add": "إضافة مرفق",
+        "remove": "إزالة"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل أي ملاحظات إضافية",
+        "required": "الملاحظات مطلوبة"
+      },
+      "status": {
+        "label": "الحالة",
+        "pending": "قيد الانتظار",
+        "approved": "تمت الموافقة",
+        "rejected": "مرفوض"
+      }
+    },
+    "success": {
+      "title": "تم بنجاح",
+      "created": "تم إنشاء طلب الموظف بنجاح"
+    },
+    "error": {
+      "title": "خطأ",
+      "create": "فشل في إنشاء طلب الموظف"
+    }
   },
   "Clients": {
     "title": "العملاء",
@@ -2742,6 +2825,22 @@
     "edit": "تعديل الموظف",
     "back_to_list": "الرجوع للقائمة",
     "allEmployees": "جميع الموظفين",
+    "success": {
+      "created": "تم إنشاء الموظف بنجاح",
+      "updated": "تم تحديث الموظف بنجاح",
+      "deleted": "تم حذف الموظف بنجاح",
+      "duplicated": "تم تكرار الموظف بنجاح"
+    },
+    "loading": {
+      "duplicating": "جاري تكرار الموظف...",
+      "deleting": "جاري حذف الموظف..."
+    },
+    "error": {
+      "creating": "حدث خطأ أثناء إنشاء الموظف",
+      "updating": "حدث خطأ أثناء تحديث الموظف",
+      "deleting": "حدث خطأ أثناء حذف الموظف",
+      "duplicating": "حدث خطأ أثناء تكرار الموظف"
+    },
     "form": {
       "first_name": {
         "label": "الاسم الأول",
@@ -2806,21 +2905,6 @@
         "label": "ملاحظات",
         "placeholder": "أدخل ملاحظات"
       }
-    },
-    "messages": {
-      "creating": "جاري إنشاء الموظف...",
-      "create": "إنشاء موظف",
-      "create_employee": "إنشاء موظف",
-      "created": "تم إنشاء الموظف بنجاح",
-      "updated": "تم تحديث بيانات الموظف بنجاح",
-      "deleted": "تم حذف الموظف بنجاح",
-      "error": "حدث خطأ أثناء معالجة طلبك"
-    },
-    "success": {
-      "created": "تم إنشاء الموظف بنجاح"
-    },
-    "error": {
-      "create": "فشل إنشاء الموظف"
     }
   },
   "Contacts": {
@@ -2949,13 +3033,7 @@
     "back_to_list": "العودة إلى القائمة",
     "no_offices": "لم يتم العثور على مكاتب",
     "search_offices": "بحث عن المكاتب",
-    "table": {
-      "name": "الاسم",
-      "address": "العنوان",
-      "phone": "الهاتف",
-      "email": "البريد الإلكتروني",
-      "status": "الحالة"
-    },
+
     "form": {
       "name": {
         "label": "الاسم",
@@ -3008,6 +3086,10 @@
       "updated": "تم تحديث المكتب بنجاح",
       "deleted": "تم حذف المكتب بنجاح"
     },
+    "loading": {
+      "duplicating": "جاري تكرار المكتب...",
+      "deleting": "جاري حذف المكتب..."
+    },
     "error": {
       "creating": "حدث خطأ أثناء إنشاء المكتب",
       "updating": "حدث خطأ أثناء تحديث المكتب",
@@ -3050,20 +3132,44 @@
         "placeholder": "أدخل تاريخ الإنشاء"
       }
     },
-    "table": {
-      "name": "الاسم",
-      "description": "الوصف",
-      "locations": "المواقع",
-      "created_at": "تاريخ الإنشاء",
-      "updated_at": "تاريخ التحديث"
-    },
     "success": {
       "created": "تم إنشاء الإدارة بنجاح",
-      "updated": "تم تحديث الإدارة بنجاح"
+      "updated": "تم تحديث الإدارة بنجاح",
+      "deleted": "تم حذف الإدارة بنجاح",
+      "duplicated": "تم تكرار الإدارة بنجاح"
+    },
+    "loading": {
+      "duplicating": "جاري تكرار الإدارة...",
+      "deleting": "جاري حذف الإدارة..."
     },
     "error": {
       "creating": "حدث خطأ أثناء إنشاء الإدارة",
-      "updating": "حدث خطأ أثناء تحديث الإدارة"
+      "updating": "حدث خطأ أثناء تحديث الإدارة",
+      "deleting": "حدث خطأ أثناء حذف الإدارة",
+      "duplicating": "حدث خطأ أثناء تكرار الإدارة"
+    }
+  },
+  "Purchases": {
+    "title": "المشتريات",
+    "add_new": "إضافة مشترية جديدة",
+    "search_purchases": "بحث عن المشتريات",
+    "purchase_details": "تفاصيل المشترية",
+    "form": {},
+    "success": {
+      "created": "تم إنشاء المشترية بنجاح",
+      "updated": "تم تحديث المشترية بنجاح",
+      "deleted": "تم حذف المشترية بنجاح",
+      "duplicated": "تم تكرار المشترية بنجاح"
+    },
+    "loading": {
+      "duplicating": "جاري تكرار المشترية...",
+      "deleting": "جاري حذف المشترية..."
+    },
+    "error": {
+      "creating": "حدث خطأ أثناء إنشاء المشترية",
+      "updating": "حدث خطأ أثناء تحديث المشترية",
+      "deleting": "حدث خطأ أثناء حذف المشترية",
+      "duplicating": "حدث خطأ أثناء تكرار المشترية"
     }
   }
 }

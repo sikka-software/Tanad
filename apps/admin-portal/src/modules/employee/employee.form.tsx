@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,16 +13,16 @@ import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
-import DepartmentForm, { DepartmentFormValues } from "@/modules/department/department.form";
-import { useDepartments, departmentKeys } from "@/modules/department/department.hooks";
+import { CurrencyInput } from "@/components/ui/currency-input";
+
+import DepartmentForm from "@/modules/department/department.form";
+import { useDepartments } from "@/modules/department/department.hooks";
 import useEmployeeStore from "@/modules/employee/employee.store";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
-interface EmployeeFormProps {
-  id?: string;
-  onSubmit: (data: EmployeeFormValues) => Promise<void>;
-}
+import useDepartmentStore from "../department/department.store";
+import { useCreateEmployee, useUpdateEmployee } from "./employee.hooks";
 
 const createEmployeeFormSchema = (t: (key: string) => string) => {
   const supabase = createClient();
@@ -64,31 +63,40 @@ const createEmployeeFormSchema = (t: (key: string) => string) => {
 };
 export type EmployeeFormValues = z.infer<ReturnType<typeof createEmployeeFormSchema>>;
 
-export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
-  const supabase = createClient();
+interface EmployeeFormProps {
+  id?: string;
+  onSuccess?: () => void;
+  defaultValues?: EmployeeFormValues;
+  editMode?: boolean;
+}
+
+export function EmployeeForm({ id, onSuccess, defaultValues, editMode }: EmployeeFormProps) {
   const t = useTranslations();
+  const user = useUserStore((state) => state.user);
+  const { mutate: createEmployee } = useCreateEmployee();
+  const { mutate: updateEmployee } = useUpdateEmployee();
+
+  const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
+  const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
-  const [isDepartmentSaving, setIsDepartmentSaving] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
-  const { user } = useUserStore();
   const locale = useLocale();
-  const queryClient = useQueryClient();
   const setLoadingSave = useEmployeeStore((state) => state.setIsLoading);
   const loadingSave = useEmployeeStore((state) => state.isLoading);
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(createEmployeeFormSchema(t)),
     defaultValues: {
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone: "",
-      position: "",
-      department: null,
-      hire_date: undefined,
-      salary: "",
-      status: "active",
-      notes: "",
+      first_name: defaultValues?.first_name || "",
+      last_name: defaultValues?.last_name || "",
+      email: defaultValues?.email || "",
+      phone: defaultValues?.phone || "",
+      position: defaultValues?.position || "",
+      department: defaultValues?.department || null,
+      hire_date: defaultValues?.hire_date || undefined,
+      salary: defaultValues?.salary || "",
+      status: defaultValues?.status || "active",
+      notes: defaultValues?.notes || "",
     },
   });
 
@@ -99,89 +107,57 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
       value: department.id,
     })) || [];
 
-  const handleDepartmentSubmit = async (data: DepartmentFormValues) => {
-    setIsDepartmentSaving(true);
-    try {
-      // Check if user ID is available
-      if (!user?.id) {
-        throw new Error(t("error.not_authenticated"));
-      }
+  const handleSubmit = async (data: EmployeeFormValues) => {
+    setLoadingSave(true);
 
-      const { data: newDepartment, error } = await supabase
-        .from("departments")
-        .insert([
-          {
-            name: data.name.trim(),
-            description: data.description?.trim() || null,
-            user_id: user.id,
+    try {
+      if (editMode) {
+        await updateEmployee({
+          id: id!,
+          updates: {
+            first_name: data.first_name.trim(),
+            last_name: data.last_name.trim(),
+            email: data.email.trim(),
+            phone: data.phone?.trim() || undefined,
+            position: data.position.trim(),
+            hire_date: data.hire_date?.toISOString(),
+            salary: data.salary ? parseFloat(data.salary) : undefined,
+            status: data.status,
+            notes: data.notes?.trim() || undefined,
+            department_id: data.department || undefined,
           },
-        ])
-        .select()
-        .single();
+        });
 
-      if (error) throw error;
+        toast.success(t("General.successful_operation"), {
+          description: t("Employees.success.updated"),
+        });
+        onSuccess?.();
+      } else {
+        await createEmployee({
+          first_name: data.first_name.trim(),
+          last_name: data.last_name.trim(),
+          email: data.email.trim(),
+          phone: data.phone?.trim() || undefined,
+          position: data.position.trim(),
+          hire_date: data.hire_date?.toISOString(),
+          salary: data.salary ? parseFloat(data.salary) : undefined,
+          status: data.status,
+          notes: data.notes?.trim() || undefined,
+          department_id: data.department || undefined,
+        });
 
-      // Then create the department locations
-      if (data.locations && data.locations.length > 0) {
-        const locationInserts = data.locations.map((location_id) => ({
-          department_id: newDepartment.id,
-          location_id: location_id,
-          location_type: "office", // Default to office type
-        }));
-
-        const { error: locationError } = await supabase
-          .from("department_locations")
-          .insert(locationInserts);
-
-        if (locationError) throw locationError;
-
-        // Update the department object with locations
-        newDepartment.locations = data.locations;
+        toast.success(t("General.successful_operation"), {
+          description: t("Employees.success.created"),
+        });
+        onSuccess?.();
       }
-
-      // Update the departments cache
-      const previousDepartments = queryClient.getQueryData(departmentKeys.lists()) || [];
-      queryClient.setQueryData(departmentKeys.lists(), [
-        ...(Array.isArray(previousDepartments) ? previousDepartments : []),
-        newDepartment,
-      ]);
-
-      // Also set the individual department query data
-      queryClient.setQueryData(departmentKeys.detail(newDepartment.id), newDepartment);
-
-      // Set the new department as the selected department
-      form.setValue("department", newDepartment.id);
-
-      // Close the dialog
-      setIsDepartmentDialogOpen(false);
-
-      // Show success message
-      toast.success(t("General.successful_operation"), {
-        description: t("Departments.success.created"),
-      });
     } catch (error) {
-      console.error("Error creating department:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Departments.error.create"),
-      });
-    } finally {
-      setIsDepartmentSaving(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      setLoadingSave(true);
-      const isValid = await form.trigger();
-      if (!isValid) {
-        setLoadingSave(false);
-        return;
-      }
-      await form.handleSubmit(onSubmit)();
-    } catch (error) {
+      console.error(error);
       setLoadingSave(false);
-      console.error("Error submitting form:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Employees.error.create"),
+      });
+      throw error;
     }
   };
 
@@ -192,7 +168,20 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
   return (
     <>
       <Form {...form}>
-        <form id={id} onSubmit={handleSubmit} className="space-y-4">
+        <form
+          id={id}
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setLoadingSave(true);
+            const isValid = await form.trigger();
+            if (!isValid) {
+              setLoadingSave(false);
+              return;
+            }
+            form.handleSubmit(handleSubmit)(e);
+          }}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -345,13 +334,12 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
                 <FormItem>
                   <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
+                    <CurrencyInput
+                      showCommas={true}
+                      value={field.value ? parseFloat(field.value) : undefined}
+                      onChange={(value) => field.onChange(value?.toString() || "")}
                       placeholder={t("Employees.form.salary.placeholder")}
                       disabled={loadingSave}
-                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -420,7 +408,13 @@ export function EmployeeForm({ id, onSubmit }: EmployeeFormProps) {
         submitText={t("General.save")}
         loadingSave={isDepartmentSaving}
       >
-        <DepartmentForm id="department-form" onSubmit={handleDepartmentSubmit} />
+        <DepartmentForm
+          id="department-form"
+          onSuccess={() => {
+            setIsDepartmentDialogOpen(false);
+            setIsDepartmentSaving(false);
+          }}
+        />
       </FormDialog>
     </>
   );
