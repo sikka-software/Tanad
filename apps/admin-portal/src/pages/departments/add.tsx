@@ -24,17 +24,9 @@ export default function AddDepartmentPage() {
     const dummyData = generateDummyData();
     const form = (window as any).departmentForm;
     if (form) {
-      form.setValue("name", dummyData.full_name);
+      form.setValue("name", dummyData.job_department);
       form.setValue("description", dummyData.description);
     }
-  };
-
-  const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Departments.success.created"),
-    });
-    router.push("/departments");
-    setIsLoading(false);
   };
 
   return (
@@ -54,7 +46,14 @@ export default function AddDepartmentPage() {
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <DepartmentForm id="department-form" onSuccess={onAddSuccess} />
+        <DepartmentForm
+          id="department-form"
+          onSuccess={() =>
+            router.push("/departments").then(() => {
+              setIsLoading(false);
+            })
+          }
+        />
       </div>
     </div>
   );

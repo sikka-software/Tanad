@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { BuildingIcon, StoreIcon, WarehouseIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -14,13 +13,9 @@ import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
 import { useBranches } from "@/modules/branch/branch.hooks";
-import { Branch } from "@/modules/branch/branch.type";
 import { useOffices } from "@/modules/office/office.hooks";
-import { Office } from "@/modules/office/office.type";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
-import { Warehouse } from "@/modules/warehouse/warehouse.type";
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 import { useCreateDepartment, useUpdateDepartment } from "./department.hooks";
 import useDepartmentStore from "./department.store";
@@ -70,9 +65,6 @@ export default function DepartmentForm({
   const { mutateAsync: createDepartment } = useCreateDepartment();
   const { mutate: updateDepartment } = useUpdateDepartment();
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const supabase = createClient();
-  const isLoading = useDepartmentStore((state) => state.isLoading);
   const setIsLoading = useDepartmentStore((state) => state.setIsLoading);
 
   const { data: offices, isLoading: isOfficesLoading } = useOffices();
@@ -176,7 +168,9 @@ export default function DepartmentForm({
           toast.success(t("General.successful_operation"), {
             description: t("Departments.success.updated"),
           });
-          router.push("/departments");
+          if (onSuccess) {
+            onSuccess();
+          }
         } catch (error) {
           console.error("Error updating department:", error);
           toast.error(t("General.error_occurred"), {
@@ -206,8 +200,6 @@ export default function DepartmentForm({
           if (onSuccess) {
             onSuccess();
           }
-
-          router.push("/departments");
         } catch (error) {
           console.error("Error creating department:", error);
           toast.error(t("General.error_occurred"), {

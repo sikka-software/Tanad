@@ -331,9 +331,6 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                       onSelect={() => toggleOption(option.value)}
                       value={String(i)}
                       className="cursor-pointer"
-                      onMouseEnter={() => {
-                        console.log("option", option);
-                      }}
                     >
                       <div
                         className={cn(
