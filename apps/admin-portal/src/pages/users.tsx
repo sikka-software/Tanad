@@ -12,8 +12,8 @@ export default function UsersPage() {
 
   const [enterprises, setEnterprises] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
-
   const [users, setUsers] = useState<any[]>([]);
+  const [userPermissions, setUserPermissions] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     const getCurrentUserAndEnterprises = async () => {
@@ -34,17 +34,33 @@ export default function UsersPage() {
         .eq("id", user.id)
         .single();
 
-      // if (!profile || profile.role !== "superadmin") {
-      //   router.push("/");
-      //   return;
-      // }
-
       setCurrentUser(profile);
 
       // Fetch all enterprises
       const { data: enterprisesData } = await supabase.from("enterprises").select("*");
-
       setEnterprises(enterprisesData || []);
+
+      // Fetch all users with their roles
+      const { data: usersData } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      setUsers(usersData || []);
+
+      // Fetch permissions for each user
+      if (usersData) {
+        const permissionsMap: Record<string, string[]> = {};
+        for (const user of usersData) {
+          const { data: permissions } = await supabase
+            .from("role_permissions")
+            .select("permission")
+            .eq("role", user.role);
+
+          permissionsMap[user.id] = permissions?.map(p => p.permission) || [];
+        }
+        setUserPermissions(permissionsMap);
+      }
     };
 
     getCurrentUserAndEnterprises();
@@ -76,13 +92,26 @@ export default function UsersPage() {
 
       if (profileError) throw profileError;
 
-      // Refresh users list
+      // Refresh users list and permissions
       const { data: users } = await supabase
         .from("profiles")
         .select("*")
         .order("created_at", { ascending: false });
 
       setUsers(users || []);
+
+      // Fetch permissions for the new user
+      if (users) {
+        const { data: permissions } = await supabase
+          .from("role_permissions")
+          .select("permission")
+          .eq("role", role);
+
+        setUserPermissions(prev => ({
+          ...prev,
+          [authData.user.id]: permissions?.map(p => p.permission) || [],
+        }));
+      }
     } catch (error) {
       console.error("Error creating user:", error);
     }
@@ -104,6 +133,17 @@ export default function UsersPage() {
         .order("created_at", { ascending: false });
 
       setUsers(users || []);
+
+      // Fetch updated permissions for the user
+      const { data: permissions } = await supabase
+        .from("role_permissions")
+        .select("permission")
+        .eq("role", role);
+
+      setUserPermissions(prev => ({
+        ...prev,
+        [userId]: permissions?.map(p => p.permission) || [],
+      }));
     } catch (error) {
       console.error("Error updating user:", error);
     }
@@ -120,9 +160,9 @@ export default function UsersPage() {
       <UsersTable
         enterprises={enterprises}
         currentUser={currentUser}
-        // users={users}
-        // setUsers={setUsers}
-        // onUpdateUser={handleUpdateUser}
+        users={users}
+        userPermissions={userPermissions}
+        onUpdateUser={handleUpdateUser}
       />
     </div>
   );

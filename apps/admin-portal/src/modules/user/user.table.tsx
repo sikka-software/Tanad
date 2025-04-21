@@ -64,6 +64,9 @@ export type UserType = {
 interface UsersTableProps {
   enterprises: Array<{ id: string; name: string }>;
   currentUser: UserType;
+  users: UserType[];
+  userPermissions: Record<string, string[]>;
+  onUpdateUser: (userId: string, role: string, enterpriseId: string) => Promise<void>;
 }
 
 type NewUserType = {
@@ -73,8 +76,14 @@ type NewUserType = {
   enterpriseId: string;
 };
 
-export default function UsersTable({ enterprises, currentUser }: UsersTableProps) {
-  const { data: users = [], isLoading } = useUsers();
+export default function UsersTable({ 
+  enterprises, 
+  currentUser, 
+  users,
+  userPermissions,
+  onUpdateUser 
+}: UsersTableProps) {
+  const { data: usersData = [], isLoading } = useUsers();
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
@@ -300,9 +309,10 @@ export default function UsersTable({ enterprises, currentUser }: UsersTableProps
             <TableRow>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
+              <TableHead>Permissions</TableHead>
               <TableHead>Enterprise</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="w-[100px]">Actions</TableHead>
+              <TableHead>Created At</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -323,52 +333,43 @@ export default function UsersTable({ enterprises, currentUser }: UsersTableProps
                 <TableRow key={user.id}>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Badge variant={user.role === "superadmin" ? "default" : "secondary"}>
+                    <Badge variant="outline" className="flex items-center">
+                      {getRoleIcon(user.role)}
                       {user.role}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {enterprises.find((e) => e.id === user.enterprise_id)?.name}
+                    <div className="flex flex-wrap gap-1">
+                      {userPermissions[user.id]?.map((permission) => (
+                        <Badge key={permission} variant="secondary">
+                          {permission}
+                        </Badge>
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {enterprises.find((e) => e.id === user.enterprise_id)?.name || "N/A"}
                   </TableCell>
                   <TableCell>{formatDate(user.created_at)}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            const newRole = user.role === "accounting" ? "hr" : "accounting";
-                            updateUser.mutate({
-                              id: user.id,
-                              data: { role: newRole, enterprise_id: user.enterprise_id },
-                            });
-                          }}
-                        >
-                          Change Role
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            const newEnterpriseId = prompt("Enter new enterprise ID");
-                            if (newEnterpriseId) {
-                              updateUser.mutate({
-                                id: user.id,
-                                data: { role: user.role, enterprise_id: newEnterpriseId },
-                              });
-                            }
-                          }}
-                        >
-                          Change Enterprise
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                          Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           className="text-red-600"
                           onClick={() => handleDeleteUser(user)}
                         >
-                          Delete User
+                          Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
