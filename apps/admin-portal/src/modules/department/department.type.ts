@@ -10,7 +10,12 @@ export interface Department {
   created_at: string;
   updated_at: string;
   user_id: string;
-  locations: Office[] | Branch[] | Warehouse[];
+  locations: Array<{
+    department_id: string;
+    location_id: string;
+    location_type: "office" | "branch" | "warehouse";
+    user_id: string;
+  }>;
 }
 
 export type DepartmentLocation = {
@@ -21,7 +26,16 @@ export type DepartmentLocation = {
   created_at: string;
 };
 
-export type DepartmentCreateData = Omit<Department, "id" | "created_at" | "updated_at"> & {
+export type DepartmentCreateData = Omit<
+  Department,
+  "id" | "created_at" | "updated_at" | "locations"
+> & {
   user_id: string;
+  locations: Array<{
+    department_id: string;
+    location_id: string;
+    location_type: "office" | "branch" | "warehouse";
+    user_id: string;
+  }>;
 };
 export type DepartmentUpdateData = Partial<Department>;

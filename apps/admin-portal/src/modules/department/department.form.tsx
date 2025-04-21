@@ -50,7 +50,7 @@ export const createDepartmentSchema = (t: (key: string) => string) =>
       .min(1, t("Departments.form.validation.locations_required")),
   });
 
-export type DepartmentFormValues = z.input<ReturnType<typeof createDepartmentSchema>>;
+export type DepartmentFormValues = z.infer<ReturnType<typeof createDepartmentSchema>>;
 
 interface DepartmentFormProps {
   id?: string;
@@ -86,7 +86,11 @@ export default function DepartmentForm({
     defaultValues: {
       name: defaultValues?.name || "",
       description: defaultValues?.description || "",
-      locations: defaultValues?.locations || [],
+      locations:
+        defaultValues?.locations?.map((loc) => ({
+          id: loc.location_id,
+          type: loc.location_type,
+        })) || [],
     },
   });
 
@@ -151,20 +155,12 @@ export default function DepartmentForm({
     try {
       if (editMode) {
         try {
-          const locations = data.locations
-            .map((location) => {
-              switch (location.type) {
-                case "office":
-                  return offices?.find((o) => o.id === location.id);
-                case "branch":
-                  return branches?.find((b) => b.id === location.id);
-                case "warehouse":
-                  return warehouses?.find((w) => w.id === location.id);
-                default:
-                  return null;
-              }
-            })
-            .filter(Boolean);
+          const locations = data.locations.map((location) => ({
+            department_id: id!,
+            location_id: location.id,
+            location_type: location.type,
+            user_id: user.id,
+          }));
 
           await updateDepartment({
             id: id!,
@@ -173,7 +169,7 @@ export default function DepartmentForm({
               description: data.description || null,
               user_id: user.id,
               is_active: true,
-              locations: locations as (Office | Branch | Warehouse)[],
+              locations,
             },
           });
 
@@ -189,27 +185,17 @@ export default function DepartmentForm({
         }
       } else {
         try {
-          const locations = data.locations
-            .map((location) => {
-              switch (location.type) {
-                case "office":
-                  return offices?.find((o) => o.id === location.id);
-                case "branch":
-                  return branches?.find((b) => b.id === location.id);
-                case "warehouse":
-                  return warehouses?.find((w) => w.id === location.id);
-                default:
-                  return null;
-              }
-            })
-            .filter(Boolean);
-
           const createData: DepartmentCreateData = {
             name: data.name,
             description: data.description || null,
             user_id: user.id,
             is_active: true,
-            locations: locations as (Office | Branch | Warehouse)[],
+            locations: data.locations.map((location) => ({
+              department_id: id!,
+              location_id: location.id,
+              location_type: location.type,
+              user_id: user.id,
+            })),
           };
 
           await createDepartment(createData);

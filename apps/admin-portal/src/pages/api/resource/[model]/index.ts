@@ -5,14 +5,57 @@ import { createApiHandler } from "@/lib/api-handler";
 import { db } from "@/db/drizzle";
 import * as schema from "@/db/schema";
 
-const modelMap = {
+type ModelConfig = {
+  table: any;
+  query: any;
+  customHandlers?: {
+    POST?: (userId: string, req: NextApiRequest) => Promise<any>;
+    GET?: (userId: string, req: NextApiRequest) => Promise<any>;
+    DELETE?: (userId: string, req: NextApiRequest) => Promise<any>;
+  };
+};
+
+const modelMap: Record<string, ModelConfig> = {
   branches: { table: schema.branches, query: db.query.branches },
   companies: { table: schema.companies, query: db.query.companies },
   jobs: { table: schema.jobs, query: db.query.jobs },
   clients: { table: schema.clients, query: db.query.clients },
   expenses: { table: schema.expenses, query: db.query.expenses },
   departments: { table: schema.departments, query: db.query.departments },
-  departmentLocations: { table: schema.departmentLocations, query: db.query.departmentLocations },
+  departmentLocations: {
+    table: schema.departmentLocations,
+    query: db.query.departmentLocations,
+    customHandlers: {
+      POST: async (userId: string, req: NextApiRequest) => {
+        const locations = Array.isArray(req.body) ? req.body : [req.body];
+
+        console.log("Request body:", req.body);
+        console.log("Locations:", locations);
+
+        // Validate location types
+        const validTypes = ["office", "branch", "warehouse"];
+        for (const location of locations) {
+          console.log("Location:", location);
+          if (!location.type || !validTypes.includes(location.type)) {
+            throw new Error(`Invalid location type. Must be one of: ${validTypes.join(", ")}`);
+          }
+        }
+
+        const [created] = await db
+          .insert(schema.departmentLocations)
+          .values(
+            locations.map((location) => ({
+              department_id: location.department_id,
+              location_id: location.location_id,
+              location_type: location.type,
+              user_id: userId,
+            })),
+          )
+          .returning();
+        return created;
+      },
+    },
+  },
   offices: { table: schema.offices, query: db.query.offices },
   warehouses: { table: schema.warehouses, query: db.query.warehouses },
   employees: { table: schema.employees, query: db.query.employees },
@@ -29,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(404).json({ message: "Not found" });
   }
 
-  const { table, query } = modelMap[model as keyof typeof modelMap];
+  const { table, query, customHandlers } = modelMap[model as keyof typeof modelMap];
 
-  return createApiHandler({ table, query })(req, res);
+  return createApiHandler({ table, query, customHandlers })(req, res);
 }

@@ -75,7 +75,7 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
         if (locations.length === 0) {
           return t("Departments.form.locations.noLocations");
         } else if (locations.length === 1) {
-          return getLocationName(locations[0].id);
+          return getLocationName(locations[0].location_id);
         } else {
           return (
             <DropdownMenu>
@@ -86,15 +86,15 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 {locations.map((location) => (
-                  <DropdownMenuItem key={location.id} className="flex justify-between">
-                    <span>{getLocationName(location.id)}</span>
+                  <DropdownMenuItem key={location.location_id} className="flex justify-between">
+                    <span>{getLocationName(location.location_id)}</span>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-4 w-4 p-0"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRemoveLocation(row, location.id);
+                        handleRemoveLocation(row, location.location_id);
                       }}
                     >
                       <X className="h-3 w-3" />
@@ -150,7 +150,7 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
 
   const handleRemoveLocation = async (row: Row<Department>, location_id: string) => {
     const locations = row.original.locations || [];
-    const updatedLocations = locations.filter((location) => location.id !== location_id);
+    const updatedLocations = locations.filter((location) => location.location_id !== location_id);
     await updateDepartment({ id: row.original.id, data: { locations: updatedLocations } });
   };
 

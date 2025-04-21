@@ -53,7 +53,12 @@ export async function createDepartmentWithLocations(
   const deptRes = await fetch("/api/resource/departments", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(department),
+    body: JSON.stringify({
+      name: department.name,
+      description: department.description,
+      user_id: department.user_id,
+      is_active: department.is_active,
+    }),
   });
 
   if (!deptRes.ok) {
@@ -62,16 +67,16 @@ export async function createDepartmentWithLocations(
 
   const createdDept: Department = await deptRes.json();
 
-  // locationConnections: { location_id: string; location_type: "office" | "branch" | "warehouse" }[],
-  console.log("created dept", createdDept);
   // Step 2: Create department-location relations
   const relationRes = await fetch("/api/resource/departmentLocations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(
-      department.locations.map((conn) => ({
+      department.locations.map((location) => ({
         department_id: createdDept.id,
-        ...conn,
+        location_id: location.location_id,
+        type: location.location_type,
+        user_id: department.user_id,
       })),
     ),
   });
@@ -80,17 +85,9 @@ export async function createDepartmentWithLocations(
     throw new Error("Failed to create department-location relations");
   }
 
-  const createdRelations = await relationRes.json(); // optional if you want to use
-
-  // Optional: enhance with actual locations
-  const locationIds = department.locations.map((c) => c.id);
-  const locRes = await fetch("/api/resource/departmentLocations?ids=" + locationIds.join(","));
-  const locations = locRes.ok ? await locRes.json() : [];
-
-  return {
-    ...createdDept,
-    locations,
-  };
+  // Step 3: Fetch the created department with its locations
+  const deptWithLocations = await fetchDepartmentById(createdDept.id);
+  return deptWithLocations;
 }
 
 export async function createDepartment(department: DepartmentCreateData): Promise<Department> {
