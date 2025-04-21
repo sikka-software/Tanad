@@ -224,6 +224,7 @@ export default function RolesList() {
 
   return (
     <div className="space-y-6">
+       Permissions length: {permissions.length}
       <div className="flex items-center justify-between">
         <div className="relative w-full max-w-sm">
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />

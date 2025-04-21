@@ -54,16 +54,60 @@ export function usePermissions() {
   return useQuery({
     queryKey: permissionKeys.lists(),
     queryFn: async () => {
+      console.log("Fetching permissions...");
+
+      // First, let's check if we can access the table at all
+      const { data: tableInfo, error: tableError } = await supabase
+        .from("role_permissions")
+        .select("id")
+        .limit(1);
+
+      if (tableError) {
+        console.error("Error accessing role_permissions table:", tableError);
+        throw tableError;
+      }
+
+      console.log("Table access check:", tableInfo);
+
+      // Now try to get all permissions
       const { data, error } = await supabase.from("role_permissions").select(`
           permission,
           role
         `);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching permissions:", error);
+        throw error;
+      }
+
+      console.log("Raw permissions data:", data);
+      console.log("Number of permissions found:", data.length);
+
+      if (data.length === 0) {
+        console.warn("No permissions found in the role_permissions table");
+        // Return a default set of permissions if none are found
+        return [
+          {
+            id: "profiles.manage",
+            name: "manage profiles",
+            description: "Permission to manage profiles",
+            category: "profiles",
+          },
+          {
+            id: "enterprises.manage",
+            name: "manage enterprises",
+            description: "Permission to manage enterprises",
+            category: "enterprises",
+          },
+        ] as Permission[];
+      }
+
+      // Get unique permissions
+      const uniquePermissions = new Set(data.map((p) => p.permission));
+      console.log("Unique permissions:", Array.from(uniquePermissions));
 
       // Transform the data to match our Permission type
-      const uniquePermissions = new Set(data.map((p) => p.permission));
-      return Array.from(uniquePermissions).map((permission) => {
+      const transformedPermissions = Array.from(uniquePermissions).map((permission) => {
         const [category, action] = permission.split(".");
         return {
           id: permission,
@@ -72,6 +116,9 @@ export function usePermissions() {
           category,
         } as Permission;
       });
+
+      console.log("Transformed permissions:", transformedPermissions);
+      return transformedPermissions;
     },
   });
 }
