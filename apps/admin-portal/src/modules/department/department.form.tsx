@@ -131,7 +131,6 @@ export default function DepartmentForm({
     try {
       if (editMode) {
       } else {
-        // await createDepartment(data);
         // if (data.locations && data.locations.length > 0) {
         //   const locationInserts = data.locations.map((location_id) => ({
         //     department_id: newDepartment.id,

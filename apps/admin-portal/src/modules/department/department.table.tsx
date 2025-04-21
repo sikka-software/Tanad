@@ -36,7 +36,7 @@ interface DepartmentsTableProps {
 }
 
 const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: DepartmentsTableProps) => {
-  const t = useTranslations("Departments");
+  const t = useTranslations();
   const { mutateAsync: updateDepartment } = useUpdateDepartment();
 
   const { data: offices } = useOffices();
@@ -51,26 +51,26 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
   const columns: ExtendedColumnDef<Department>[] = [
     {
       accessorKey: "name",
-      header: t("form.name.label"),
+      header: t("Departments.form.name.label"),
       validationSchema: nameSchema,
       className: "min-w-[200px]",
     },
     {
       accessorKey: "description",
-      header: t("form.description.label"),
+      header: t("Departments.form.description.label"),
       validationSchema: descriptionSchema,
       className: "min-w-[250px]",
     },
     {
       accessorKey: "locations",
-      header: t("form.locations.label"),
+      header: t("Departments.form.locations.label"),
       validationSchema: locationSchema,
       className: "min-w-[200px]",
       cell: ({ row }) => {
         const locationIds = row.original.locations || [];
 
         if (locationIds.length === 0) {
-          return t("form.locations.noLocations");
+          return t("Departments.form.locations.noLocations");
         } else if (locationIds.length === 1) {
           return getLocationName(locationIds[0]);
         } else {
@@ -78,7 +78,7 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-4 !p-0 !text-xs">
-                  {t("form.locations.multipleLocations", { count: locationIds.length })}
+                  {t("Departments.form.locations.multipleLocations", { count: locationIds.length })}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
@@ -106,13 +106,13 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
     },
     {
       accessorKey: "created_at",
-      header: t("form.created_at.label"),
+      header: t("Departments.form.created_at.label"),
       validationSchema: created_atSchema,
       className: "min-w-[180px]",
     },
     {
       accessorKey: "updated_at",
-      header: t("form.updated_at.label"),
+      header: t("Departments.form.updated_at.label"),
       validationSchema: updated_atSchema,
       className: "min-w-[180px]",
     },
@@ -124,15 +124,9 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
 
   const handleRowSelectionChange = useCallback(
     (rows: Department[]) => {
-      const newSelectedIds = rows.map((row) => row.id!);
+      const newSelectedIds = rows.map((row) => row.id);
       // Only update if the selection has actually changed
-      const currentSelection = new Set(selectedRows);
-      const newSelection = new Set(newSelectedIds);
-
-      if (
-        newSelection.size !== currentSelection.size ||
-        !Array.from(newSelection).every((id) => currentSelection.has(id))
-      ) {
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
         setSelectedRows(newSelectedIds);
       }
     },
