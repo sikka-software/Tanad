@@ -67,34 +67,34 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
       validationSchema: locationSchema,
       className: "min-w-[200px]",
       cell: ({ row }) => {
-        const locationIds = row.original.locations || [];
+        const locations = row.original.locations || [];
 
         console.log("Department data:", row.original);
-        console.log("Location IDs:", locationIds);
-        
-        if (locationIds.length === 0) {
+        console.log("Locations:", locations);
+
+        if (locations.length === 0) {
           return t("Departments.form.locations.noLocations");
-        } else if (locationIds.length === 1) {
-          return getLocationName(locationIds[0]);
+        } else if (locations.length === 1) {
+          return getLocationName(locations[0].id);
         } else {
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-4 !p-0 !text-xs">
-                  {t("Departments.form.locations.multipleLocations", { count: locationIds.length })}
+                  {t("Departments.form.locations.multipleLocations", { count: locations.length })}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
-                {locationIds.map((location_id) => (
-                  <DropdownMenuItem key={location_id} className="flex justify-between">
-                    <span>{getLocationName(location_id)}</span>
+                {locations.map((location) => (
+                  <DropdownMenuItem key={location.id} className="flex justify-between">
+                    <span>{getLocationName(location.id)}</span>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-4 w-4 p-0"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRemoveLocation(row, location_id);
+                        handleRemoveLocation(row, location.id);
                       }}
                     >
                       <X className="h-3 w-3" />
@@ -149,8 +149,8 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
   };
 
   const handleRemoveLocation = async (row: Row<Department>, location_id: string) => {
-    const locationIds = row.original.locations || [];
-    const updatedLocations = locationIds.filter((id: string) => id !== location_id);
+    const locations = row.original.locations || [];
+    const updatedLocations = locations.filter((location) => location.id !== location_id);
     await updateDepartment({ id: row.original.id, data: { locations: updatedLocations } });
   };
 

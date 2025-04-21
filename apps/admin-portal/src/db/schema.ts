@@ -652,7 +652,6 @@ export const departments = pgTable(
   ],
 ).enableRLS();
 
-// Update your departmentLocations table definition:
 export const departmentLocations = pgTable(
   "department_locations",
   {
@@ -668,20 +667,29 @@ export const departmentLocations = pgTable(
     user_id: uuid("user_id").notNull(),
   },
   (table) => [
-    // Composite unique constraint to prevent duplicates
     unique("unique_department_location").on(
       table.department_id,
       table.location_type,
       table.location_id,
     ),
-    // Add foreign key checks for each location type (optional)
+    foreignKey({
+      columns: [table.location_id],
+      foreignColumns: [offices.id],
+      name: "department_locations_office_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.location_id],
+      foreignColumns: [branches.id],
+      name: "department_locations_branch_id_fkey",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.location_id],
+      foreignColumns: [warehouses.id],
+      name: "department_locations_warehouse_id_fkey",
+    }).onDelete("cascade"),
     check(
       "location_type_check",
-      sql`CASE
-        WHEN location_type = 'office' THEN location_id IN (SELECT id FROM offices)
-        WHEN location_type = 'branch' THEN location_id IN (SELECT id FROM branches)
-        WHEN location_type = 'warehouse' THEN location_id IN (SELECT id FROM warehouses)
-      END`,
+      sql`location_type = ANY (ARRAY['office'::text, 'branch'::text, 'warehouse'::text])`,
     ),
   ],
 ).enableRLS();

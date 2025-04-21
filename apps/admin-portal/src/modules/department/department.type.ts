@@ -1,3 +1,7 @@
+import { Branch } from "../branch/branch.type";
+import { Office } from "../office/office.type";
+import { Warehouse } from "../warehouse/warehouse.type";
+
 export interface Department {
   id: string;
   name: string;
@@ -6,7 +10,7 @@ export interface Department {
   created_at: string;
   updated_at: string;
   user_id: string;
-  locations: string[];
+  locations: Office[] | Branch[] | Warehouse[];
 }
 
 export type DepartmentLocation = {

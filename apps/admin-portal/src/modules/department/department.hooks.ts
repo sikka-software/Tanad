@@ -8,6 +8,8 @@ import {
   duplicateDepartment,
   bulkDeleteDepartments,
   fetchDepartmentById,
+  fetchDepartmentsWithLocations,
+  createDepartmentWithLocations,
 } from "./department.service";
 import type { Department, DepartmentCreateData } from "./department.type";
 
@@ -23,7 +25,8 @@ export const departmentKeys = {
 export const useDepartments = () => {
   return useQuery({
     queryKey: departmentKeys.lists(),
-    queryFn: fetchDepartments,
+    queryFn: fetchDepartmentsWithLocations,
+    // queryFn: fetchDepartments,
   });
 };
 
@@ -40,7 +43,8 @@ export const useCreateDepartment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: DepartmentCreateData) => createDepartment(data),
+    // mutationFn: (data: DepartmentCreateData) => createDepartment(data),
+    mutationFn: (data: DepartmentCreateData) => createDepartmentWithLocations(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: departmentKeys.lists() });
     },
