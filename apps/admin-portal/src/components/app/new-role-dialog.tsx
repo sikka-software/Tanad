@@ -1,8 +1,9 @@
 "use client";
 
 import { Plus, MoreVertical, Edit, Trash, Shield, Lock, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { toast } from "sonner";
+import React from "react";
 
 import {
   Accordion,
@@ -61,6 +62,82 @@ import {
   useDeleteRole,
   useUpdateRolePermissions,
 } from "@/hooks/use-roles";
+
+// Add this new component before the main RolesList component
+const PermissionsSection = React.memo(function PermissionsSection({
+  permissionsByCategory,
+  selectedPermissions,
+  onPermissionChange,
+  onCategoryToggle,
+  isDisabled = false,
+}: {
+  permissionsByCategory: Record<string, Permission[]>;
+  selectedPermissions: string[];
+  onPermissionChange: (permissionId: string) => void;
+  onCategoryToggle: (category: string) => void;
+  isDisabled?: boolean;
+}) {
+  const areAllPermissionsSelected = useCallback((category: string) => {
+    const categoryPermissions = permissionsByCategory[category] || [];
+    return categoryPermissions.every((p) => selectedPermissions.includes(p.id));
+  }, [permissionsByCategory, selectedPermissions]);
+
+  const countPermissionsByCategory = useCallback((category: string) => {
+    const categoryPermissions = permissionsByCategory[category] || [];
+    return categoryPermissions.filter((p) => selectedPermissions.includes(p.id)).length;
+  }, [permissionsByCategory, selectedPermissions]);
+
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <ScrollArea className="h-[300px] pr-4">
+          <Accordion type="multiple" className="w-full">
+            {Object.entries(permissionsByCategory).map(([category, categoryPermissions]) => (
+              <AccordionItem key={category} value={category}>
+                <AccordionTrigger className="py-2">
+                  <div className="flex w-full items-center justify-between pr-4">
+                    <span>{category}</span>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={areAllPermissionsSelected(category)}
+                        onCheckedChange={() => onCategoryToggle(category)}
+                        onClick={(e) => e.stopPropagation()}
+                        disabled={isDisabled}
+                      />
+                      <span className="text-muted-foreground text-xs">
+                        {countPermissionsByCategory(category)}/{categoryPermissions.length}
+                      </span>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-2 pt-2 pl-4">
+                    {categoryPermissions.map((permission) => (
+                      <div key={permission.id} className="flex items-start space-x-2">
+                        <Checkbox
+                          id={`permission-${permission.id}`}
+                          checked={selectedPermissions.includes(permission.id)}
+                          onCheckedChange={() => onPermissionChange(permission.id)}
+                          disabled={isDisabled}
+                        />
+                        <div className="space-y-1">
+                          <Label htmlFor={`permission-${permission.id}`} className="font-medium">
+                            {permission.name}
+                          </Label>
+                          <p className="text-muted-foreground text-sm">{permission.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </ScrollArea>
+      </CardContent>
+    </Card>
+  );
+});
 
 export default function RolesList() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -192,23 +269,11 @@ export default function RolesList() {
     }
   };
 
-  // Count permissions by category
-  const countPermissionsByCategory = (rolePermissions: string[], category: string) => {
-    const categoryPermissions = permissionsByCategory[category] || [];
-    return categoryPermissions.filter((p: Permission) => rolePermissions.includes(p.id)).length;
-  };
-
-  // Check if all permissions in a category are selected
-  const areAllPermissionsSelected = (rolePermissions: string[], category: string) => {
-    const categoryPermissions = permissionsByCategory[category] || [];
-    return categoryPermissions.every((p: Permission) => rolePermissions.includes(p.id));
-  };
-
   // Toggle all permissions in a category
   const toggleCategoryPermissions = (category: string, rolePermissions: string[]) => {
     const categoryPermissions = permissionsByCategory[category] || [];
 
-    if (areAllPermissionsSelected(rolePermissions, category)) {
+    if (rolePermissions.every((p) => categoryPermissions.some((cp) => cp.id === p))) {
       // Remove all permissions in this category
       return rolePermissions.filter(
         (id) => !categoryPermissions.some((p: Permission) => p.id === id),
@@ -220,6 +285,13 @@ export default function RolesList() {
         .map((p: Permission) => p.id);
       return [...rolePermissions, ...permissionsToAdd];
     }
+  };
+
+  // Helper function to count permissions in a category
+  const countPermissionsInCategory = (permissions: string[], category: string) => {
+    return permissions.filter((p) => 
+      permissionsByCategory[category]?.some((cp) => cp.id === p)
+    ).length;
   };
 
   return (
@@ -300,7 +372,7 @@ export default function RolesList() {
                         (p) => permissions.find((perm) => perm.id === p)?.category === category,
                       ) && (
                         <Badge key={category} variant="outline" className="text-xs">
-                          {category}: {countPermissionsByCategory(role.permissions, category)}/
+                          {category}: {countPermissionsInCategory(role.permissions, category)}/
                           {permissionsByCategory[category].length}
                         </Badge>
                       ),
@@ -355,82 +427,22 @@ export default function RolesList() {
 
             <div className="grid gap-3">
               <Label>Permissions</Label>
-              <Card>
-                <CardContent className="p-4">
-                  <ScrollArea className="h-[300px] pr-4">
-                    <Accordion type="multiple" className="w-full">
-                      {Object.entries(permissionsByCategory).map(
-                        ([category, categoryPermissions]) => (
-                          <AccordionItem key={category} value={category}>
-                            <AccordionTrigger className="py-2">
-                              <div className="flex w-full items-center justify-between pr-4">
-                                <span>{category}</span>
-                                <div className="flex items-center space-x-2">
-                                  <Checkbox
-                                    checked={areAllPermissionsSelected(
-                                      newRole.permissions || [],
-                                      category,
-                                    )}
-                                    onCheckedChange={() => {
-                                      setNewRole({
-                                        ...newRole,
-                                        permissions: toggleCategoryPermissions(
-                                          category,
-                                          newRole.permissions || [],
-                                        ),
-                                      });
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
-                                  <span className="text-muted-foreground text-xs">
-                                    {countPermissionsByCategory(
-                                      newRole.permissions || [],
-                                      category,
-                                    )}
-                                    /{categoryPermissions.length}
-                                  </span>
-                                </div>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <div className="space-y-2 pt-2 pl-4">
-                                {categoryPermissions.map((permission) => (
-                                  <div key={permission.id} className="flex items-start space-x-2">
-                                    <Checkbox
-                                      id={`permission-${permission.id}`}
-                                      checked={(newRole.permissions || []).includes(permission.id)}
-                                      onCheckedChange={() => {
-                                        setNewRole({
-                                          ...newRole,
-                                          permissions: togglePermission(
-                                            permission.id,
-                                            newRole.permissions || [],
-                                          ),
-                                        });
-                                      }}
-                                    />
-                                    <div className="space-y-1">
-                                      <Label
-                                        htmlFor={`permission-${permission.id}`}
-                                        className="font-medium"
-                                      >
-                                        {permission.name}
-                                      </Label>
-                                      <p className="text-muted-foreground text-sm">
-                                        {permission.description}
-                                      </p>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        ),
-                      )}
-                    </Accordion>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
+              <PermissionsSection
+                permissionsByCategory={permissionsByCategory}
+                selectedPermissions={newRole.permissions || []}
+                onPermissionChange={(permissionId) => {
+                  setNewRole({
+                    ...newRole,
+                    permissions: togglePermission(permissionId, newRole.permissions || []),
+                  });
+                }}
+                onCategoryToggle={(category) => {
+                  setNewRole({
+                    ...newRole,
+                    permissions: toggleCategoryPermissions(category, newRole.permissions || []),
+                  });
+                }}
+              />
             </div>
           </div>
 
@@ -481,82 +493,23 @@ export default function RolesList() {
 
             <div className="grid gap-3">
               <Label>Permissions</Label>
-              <Card>
-                <CardContent className="p-4">
-                  <ScrollArea className="h-[300px] pr-4">
-                    <Accordion type="multiple" className="w-full">
-                      {Object.entries(permissionsByCategory).map(
-                        ([category, categoryPermissions]) => (
-                          <AccordionItem key={category} value={category}>
-                            <AccordionTrigger className="py-2">
-                              <div className="flex w-full items-center justify-between pr-4">
-                                <span>{category}</span>
-                                <div className="flex items-center space-x-2">
-                                  <Checkbox
-                                    checked={areAllPermissionsSelected(
-                                      newRole.permissions || [],
-                                      category,
-                                    )}
-                                    onCheckedChange={() => {
-                                      setNewRole({
-                                        ...newRole,
-                                        permissions: toggleCategoryPermissions(
-                                          category,
-                                          newRole.permissions || [],
-                                        ),
-                                      });
-                                    }}
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
-                                  <span className="text-muted-foreground text-xs">
-                                    {countPermissionsByCategory(
-                                      newRole.permissions || [],
-                                      category,
-                                    )}
-                                    /{categoryPermissions.length}
-                                  </span>
-                                </div>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <div className="space-y-2 pt-2 pl-4">
-                                {categoryPermissions.map((permission) => (
-                                  <div key={permission.id} className="flex items-start space-x-2">
-                                    <Checkbox
-                                      id={`edit-permission-${permission.id}`}
-                                      checked={(newRole.permissions || []).includes(permission.id)}
-                                      onCheckedChange={() => {
-                                        setNewRole({
-                                          ...newRole,
-                                          permissions: togglePermission(
-                                            permission.id,
-                                            newRole.permissions || [],
-                                          ),
-                                        });
-                                      }}
-                                    />
-                                    <div className="space-y-1">
-                                      <Label
-                                        htmlFor={`edit-permission-${permission.id}`}
-                                        className="font-medium"
-                                      >
-                                        {permission.name}
-                                      </Label>
-                                      <p className="text-muted-foreground text-sm">
-                                        {permission.description}
-                                      </p>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        ),
-                      )}
-                    </Accordion>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
+              <PermissionsSection
+                permissionsByCategory={permissionsByCategory}
+                selectedPermissions={newRole.permissions || []}
+                onPermissionChange={(permissionId) => {
+                  setNewRole({
+                    ...newRole,
+                    permissions: togglePermission(permissionId, newRole.permissions || []),
+                  });
+                }}
+                onCategoryToggle={(category) => {
+                  setNewRole({
+                    ...newRole,
+                    permissions: toggleCategoryPermissions(category, newRole.permissions || []),
+                  });
+                }}
+                isDisabled={selectedRole?.isSystem}
+              />
             </div>
           </div>
 
