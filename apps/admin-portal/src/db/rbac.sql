@@ -170,23 +170,44 @@ CREATE POLICY "HR CAN MANAGE SALARIES"
   USING (authorize('salaries.manage'::app_permission, enterprise_id));
 
 -- Create policies for user_roles table
-CREATE POLICY "Users can view their own roles"
-  ON user_roles FOR SELECT
-  TO authenticated
-  USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can view their own roles" ON user_roles;
+DROP POLICY IF EXISTS "Users can create their own roles" ON user_roles;
+DROP POLICY IF EXISTS "Users can update their own roles" ON user_roles;
+DROP POLICY IF EXISTS "Users can delete their own roles" ON user_roles;
 
-CREATE POLICY "Users can create their own roles"
-  ON user_roles FOR INSERT
+CREATE POLICY "Only superadmins can manage roles"
+  ON user_roles FOR ALL
   TO authenticated
-  WITH CHECK (auth.uid() = user_id);
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  );
 
-CREATE POLICY "Users can update their own roles"
-  ON user_roles FOR UPDATE
+-- Create policies for role_permissions table
+CREATE POLICY "Only superadmins can manage role permissions"
+  ON role_permissions FOR ALL
   TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own roles"
-  ON user_roles FOR DELETE
-  TO authenticated
-  USING (auth.uid() = user_id); 
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  )
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_roles ur
+      WHERE ur.user_id = auth.uid()
+      AND ur.role = 'superadmin'
+    )
+  ); 
