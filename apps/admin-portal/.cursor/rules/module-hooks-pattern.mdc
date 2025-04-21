@@ -1,0 +1,161 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Module Hooks Pattern Guide
+
+This document outlines the standardized pattern for implementing hooks in module components.
+
+## Core Hooks Structure
+
+Each module's `hooks.ts` file should implement these standard hooks:
+
+```typescript
+// <module-name>.hooks.ts
+
+// 1. List Query Hook
+export const useModuleNames = () => {
+  return useQuery({
+    queryKey: ['moduleNames'],
+    queryFn: () => ModuleNameService.list()
+  });
+};
+
+// 2. Create Mutation Hook
+export const useCreateModuleName = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ModuleNameService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['moduleNames'] });
+    }
+  });
+};
+
+// 3. Update Mutation Hook
+export const useUpdateModuleName = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ModuleNameService.update,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['moduleNames'] });
+    }
+  });
+};
+
+// 4. Delete Mutation Hook
+export const useDeleteModuleName = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ModuleNameService.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['moduleNames'] });
+    }
+  });
+};
+
+// 5. Bulk Delete Mutation Hook
+export const useBulkDeleteModuleNames = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ModuleNameService.bulkDelete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['moduleNames'] });
+    }
+  });
+};
+
+// 6. Duplicate Mutation Hook
+export const useDuplicateModuleName = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ModuleNameService.duplicate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['moduleNames'] });
+    }
+  });
+};
+```
+
+## Hook Naming Conventions
+
+1. List Query: `use{ModuleName}s`
+2. Single Item Query: `use{ModuleName}`
+3. Create Mutation: `useCreate{ModuleName}`
+4. Update Mutation: `useUpdate{ModuleName}`
+5. Delete Mutation: `useDelete{ModuleName}`
+6. Bulk Delete: `useBulkDelete{ModuleNames}`
+7. Duplicate: `useDuplicate{ModuleName}`
+
+## Query Key Patterns
+
+Maintain consistent query key patterns:
+
+```typescript
+// List queries
+['moduleNames']
+
+// Single item queries
+['moduleName', id]
+
+// Filtered queries
+['moduleNames', { filters }]
+```
+
+## Error Handling Pattern
+
+Implement consistent error handling in hooks:
+
+```typescript
+export const useModuleNameOperation = () => {
+  return useMutation({
+    mutationFn: async (variables) => {
+      try {
+        const result = await ModuleNameService.operation(variables);
+        return result;
+      } catch (error) {
+        // Transform error to consistent format
+        throw new Error(error.message);
+      }
+    }
+  });
+};
+```
+
+## Cache Invalidation Pattern
+
+Follow consistent cache invalidation patterns:
+
+```typescript
+const queryClient = useQueryClient();
+
+// Single item invalidation
+queryClient.invalidateQueries({ queryKey: ['moduleNames'] });
+
+// Related data invalidation
+queryClient.invalidateQueries({ queryKey: ['relatedData'] });
+```
+
+## Example Implementation
+
+For reference implementation, see:
+- Companies hooks: [src/modules/company/company.hooks.ts](mdc:src/modules/company/company.hooks.ts)
+- Branches hooks: [src/modules/branch/branch.hooks.ts](mdc:src/modules/branch/branch.hooks.ts)
+
+## Best Practices
+
+1. Always use TypeScript for type safety
+2. Implement proper error handling
+3. Handle loading states
+4. Manage cache invalidation
+5. Use consistent naming conventions
+6. Document complex hooks
+7. Keep hooks focused and single-purpose
+8. Reuse common patterns across modules
+

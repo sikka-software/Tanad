@@ -1,0 +1,177 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Module Pattern Guide
+
+This document outlines the standardized pattern for creating new modules and their corresponding pages in the admin portal.
+
+## Module Structure
+
+Each module follows a consistent file structure:
+
+```
+src/modules/<module-name>/
+├── <module-name>.type.ts      # Type definitions
+├── <module-name>.store.ts     # Zustand store
+├── <module-name>.service.ts   # API services
+├── <module-name>.form.tsx     # Form component
+├── <module-name>.table.tsx    # Table view component
+├── <module-name>.hooks.ts     # Custom hooks
+├── <module-name>.card.tsx     # Card view component
+└── <module-name>.options.ts   # Constants and options
+```
+
+## Type Definitions Pattern
+
+Every module should define three core types:
+
+```typescript
+// <module-name>.type.ts
+export interface ModuleName {
+  id: string;
+  name: string;
+  is_active: boolean;
+  created_at: string;
+  user_id: string;
+  // ... other specific fields
+}
+
+export type ModuleNameCreateData = Omit<ModuleName, "id" | "created_at"> & { user_id: string };
+export type ModuleNameUpdateData = Partial<ModuleName>;
+```
+
+## Store Pattern
+
+Zustand store should follow this structure:
+
+```typescript
+// <module-name>.store.ts
+import { create } from 'zustand';
+
+const useModuleNameStore = create<ModuleNameStore>((set) => ({
+  isLoading: false,
+  setIsLoading: (isLoading) => set({ isLoading }),
+  viewMode: 'table',
+  // ... other state and actions
+}));
+```
+
+## Page Structure
+
+Pages should be organized as:
+
+```
+src/pages/<module-plural>/
+├── index.tsx    # List view
+└── add.tsx      # Create view
+```
+
+### Index Page Pattern
+
+The index page should implement:
+
+1. State Management:
+   - Form dialog state
+   - Selection state
+   - View mode (table/card)
+   - Sort and filter state
+
+2. Data Fetching:
+   - List query
+   - Delete mutation
+   - Duplicate mutation
+
+3. UI Components:
+   - PageSearchAndFilter
+   - SelectionMode
+   - DataModelList/Table view
+   - FormDialog
+   - ConfirmDelete
+
+### Common Features
+
+Every module should support:
+
+1. CRUD Operations:
+   - Create
+   - Read (list with pagination)
+   - Update
+   - Delete (single and bulk)
+   - Duplicate
+
+2. View Modes:
+   - Table view
+   - Card view
+
+3. Data Management:
+   - Sorting
+   - Filtering
+   - Search
+   - Bulk selection
+
+4. UI Patterns:
+   - Loading states
+   - Error handling
+   - Toast notifications
+   - Confirmation dialogs
+
+## Implementation Steps
+
+When creating a new module:
+
+1. Create the module directory structure
+2. Define types in `<module-name>.type.ts`
+3. Implement the store in `<module-name>.store.ts`
+4. Create service methods in `<module-name>.service.ts`
+5. Build UI components (form, table, card)
+6. Implement hooks in `<module-name>.hooks.ts`
+7. Define options in `<module-name>.options.ts`
+8. Create the pages following the index/add pattern
+
+## Naming Conventions
+
+1. File names: Use kebab-case for directories, camelCase for files
+2. Component names: Use PascalCase
+3. Hook names: Use camelCase starting with 'use'
+4. Type names: Use PascalCase
+5. Store names: Use camelCase starting with 'use'
+
+## Translation Keys
+
+Organize translations under the module name:
+
+```json
+{
+  "ModuleName": {
+    "title": "",
+    "description": "",
+    "create_modulename": "",
+    "search_modulenames": "",
+    "no_modulenames_found": "",
+    "loading": {
+      "deleting": "",
+      "duplicating": ""
+    },
+    "success": {
+      "deleted": "",
+      "duplicated": "",
+      "updated": ""
+    },
+    "error": {
+      "deleting": "",
+      "duplicating": ""
+    }
+  }
+}
+```
+
+## Example Reference
+
+For implementation reference:
+- Companies module: [src/modules/company](mdc:src/modules/company)
+- Branches module: [src/modules/branch](mdc:src/modules/branch)
+
+These modules demonstrate the complete pattern in action.
+
