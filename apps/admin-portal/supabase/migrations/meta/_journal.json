@@ -15,6 +15,13 @@
       "when": 1745342791600,
       "tag": "0001_smooth_jubilee",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1745343604906,
+      "tag": "0002_tough_clint_barton",
+      "breakpoints": true
     }
   ]
 }

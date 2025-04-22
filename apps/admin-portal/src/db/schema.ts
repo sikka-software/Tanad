@@ -15,6 +15,7 @@ import {
   varchar,
   pgPolicy,
   pgEnum,
+  primaryKey,
 } from "drizzle-orm/pg-core";
 
 export const appPermission = pgEnum("app_permission", [
@@ -472,6 +473,7 @@ export const profiles = pgTable(
     zipCode: text("zip_code"),
     country: text(),
     userId: uuid("user_id").notNull(),
+    role: text("role").notNull().default("user"),
   },
   (table) => [
     index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
@@ -1065,4 +1067,20 @@ export const quoteItems = pgTable(
       name: "quote_items_quote_id_fkey",
     }).onDelete("cascade"),
   ],
+);
+
+export const userRoles = pgTable(
+  "user_roles",
+  {
+    userId: uuid("user_id").notNull().references(() => profiles.id, { onDelete: "cascade" }),
+    role: appRole("role").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.role] }),
+    userIdIdx: index("user_roles_user_id_idx").on(table.userId),
+    roleIdx: index("user_roles_role_idx").on(table.role),
+  })
 );
