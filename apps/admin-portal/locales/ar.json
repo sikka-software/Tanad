@@ -2862,18 +2862,6 @@
       "duplicating": "حدث خطأ أثناء تكرار الشركة"
     }
   },
-  "form": {
-    "validation": {
-      "name_required": "الاسم مطلوب",
-      "email_required": "البريد الإلكتروني مطلوب",
-      "email_invalid": "عنوان البريد الإلكتروني غير صالح",
-      "phone_required": "رقم الهاتف مطلوب",
-      "address_required": "العنوان مطلوب",
-      "city_required": "المدينة مطلوبة",
-      "state_required": "المنطقة مطلوبة",
-      "zip_code_required": "الرمز البريدي مطلوب"
-    }
-  },
   "Navigation": {
     "main": "التنقل الرئيسي",
     "resources": "الموارد",
@@ -3027,5 +3015,11 @@
       "deleting": "حدث خطأ أثناء حذف المشترية",
       "duplicating": "حدث خطأ أثناء تكرار المشترية"
     }
+  },
+  "Roles": {
+    "title": "الأدوار",
+    "add_new": "إضافة أدوار جديدة",
+    "search_roles": "بحث عن الأدوار",
+    "role_details": "تفاصيل الأدوار"
   }
 }

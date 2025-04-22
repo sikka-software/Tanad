@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -76,12 +77,12 @@ type NewUserType = {
   enterprise_id: string;
 };
 
-export default function UsersTable({ 
-  enterprises, 
-  currentUser, 
+export default function UsersTable({
+  enterprises,
+  currentUser,
   users,
   userPermissions,
-  onUpdateUser 
+  onUpdateUser,
 }: UsersTableProps) {
   const { data: usersData = [], isLoading } = useUsers();
   const createUser = useCreateUser();
@@ -339,13 +340,18 @@ export default function UsersTable({
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {userPermissions[user.id]?.map((permission) => (
-                        <Badge key={permission} variant="secondary">
-                          {permission}
-                        </Badge>
-                      ))}
-                    </div>
+                    <Popover>
+                      <PopoverTrigger>Permissions</PopoverTrigger>
+                      <PopoverContent className="max-h-[300px] overflow-y-auto">
+                        <div className="flex flex-wrap gap-1">
+                          {userPermissions[user.id]?.map((permission) => (
+                            <Badge key={permission} variant="secondary">
+                              {permission}
+                            </Badge>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </TableCell>
                   <TableCell>
                     {enterprises.find((e) => e.id === user.enterprise_id)?.name || "N/A"}

@@ -37,6 +37,9 @@ export default function Auth() {
   const { isAuthenticated, loading: storeLoading } = useUserStore();
 
   useEffect(() => {
+    console.log("isAuthenticated", isAuthenticated);
+    console.log("storeLoading", storeLoading);
+
     if (isAuthenticated && !storeLoading) {
       router.replace("/dashboard");
     }
@@ -57,6 +60,7 @@ export default function Auth() {
       if (error) throw error;
       // Explicitly fetch user profile after successful sign-in
       await useUserStore.getState().fetchUserAndProfile();
+      await useUserStore.getState().fetchEnterprise();
       // Don't redirect here, let the useEffect handle it
     } catch (error: any) {
       toast.error(t("Auth." + error.code));
@@ -67,7 +71,7 @@ export default function Auth() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (password !== confirmPassword) {
       toast.error(t("Auth.passwords_do_not_match"));
       return;
@@ -83,14 +87,13 @@ export default function Auth() {
 
       if (error) throw error;
 
-      // Profile, enterprise, and role creation should be handled 
+      // Profile, enterprise, and role creation should be handled
       // by a Supabase database trigger on auth.users insertion.
-      
-      // After successful signup, the auth state listener and 
-      // useUserStore should handle fetching the user and profile 
+
+      // After successful signup, the auth state listener and
+      // useUserStore should handle fetching the user and profile
       // once the trigger has run and the session is established.
       toast.success(t("Auth.signup_successful_check_email"));
-
     } catch (error: any) {
       // Attempt to translate Supabase auth error codes
       const errorCode = error.code || error.message;

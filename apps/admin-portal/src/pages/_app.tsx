@@ -41,7 +41,12 @@ const landingPages = [
 
 function AppContent({ Component, pageProps, router }: AppProps) {
   const [mounted, setMounted] = useState(false);
-  const { loading, initialized, isAuthenticated, fetchUserAndProfile } = useUserStore();
+
+  const loading = useUserStore((state) => state.loading);
+  const initialized = useUserStore((state) => state.initialized);
+  const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+  const fetchUserAndProfile = useUserStore((state) => state.fetchUserAndProfile);
+  const fetchEnterprise = useUserStore((state) => state.fetchEnterprise);
 
   // Handle initial mount
   useEffect(() => {
@@ -52,8 +57,9 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   useEffect(() => {
     if (!initialized) {
       fetchUserAndProfile();
+      fetchEnterprise();
     }
-  }, [initialized, fetchUserAndProfile]);
+  }, [initialized, fetchUserAndProfile, fetchEnterprise]);
 
   // Handle auth redirects
   useEffect(() => {

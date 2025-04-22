@@ -43,16 +43,24 @@ export interface Profile {
   phone: string | null;
 }
 
+export interface Enterprise {
+  id: string;
+  name: string;
+}
+
 export interface UserState {
   user: User | null;
   profile: Profile | null;
+  enterprise: Enterprise | null;
   loading: boolean;
   initialized: boolean;
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   setProfile: (profile: Profile | null) => void;
+  setEnterprise: (enterprise: Enterprise | null) => void;
   fetchUserAndProfile: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  fetchEnterprise: () => Promise<void>;
   signOut: () => Promise<void>;
   setInitialized: (initialized: boolean) => void;
   setState: (state: Partial<UserState>) => void;
@@ -63,6 +71,7 @@ const useUserStore = create<UserState>()(
     (set, get) => ({
       user: null,
       profile: null,
+      enterprise: null,
       loading: false,
       initialized: false,
       isAuthenticated: false,
@@ -75,6 +84,11 @@ const useUserStore = create<UserState>()(
       setProfile: (profile) => {
         console.log("[UserStore] Setting profile:", profile?.id);
         set({ profile });
+      },
+
+      setEnterprise: (enterprise) => {
+        console.log("[UserStore] Setting enterprise:", enterprise?.id);
+        set({ enterprise });
       },
 
       setInitialized: (initialized) => {
@@ -150,6 +164,32 @@ const useUserStore = create<UserState>()(
             loading: false,
             initialized: true,
           });
+        }
+      },
+
+      fetchEnterprise: async () => {
+        const supabase = createClient();
+        const profile = get().profile;
+        if (!profile) {
+          console.log("[UserStore] Skipping enterprise fetch - no profile");
+          return;
+        }
+
+        set({ loading: true });
+        try {
+          const { data: enterprise, error } = await supabase
+            .from("enterprises")
+            .select("*")
+            .eq("id", profile?.enterprise_id)
+            .single();
+
+          console.log("[UserStore] Enterprise fetched:", enterprise);
+          if (error) throw error;
+
+          set({ enterprise, loading: false });
+        } catch (error) {
+          console.error("[UserStore] Error fetching enterprise:", error);
+          set({ loading: false });
         }
       },
 

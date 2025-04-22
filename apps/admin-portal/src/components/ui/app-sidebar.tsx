@@ -26,7 +26,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarRail,
-  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -54,20 +53,15 @@ type Menu = {
   }[];
 };
 
-type Group = {
-  groupLabel?: string;
-  groupLabelTranslationKey?: string;
-  icon: LucideIcon;
-  menus: Menu[];
-};
-
 export function AppSidebar() {
   const supabase = createClient();
   const t = useTranslations();
   const lang = useLocale();
   const [open, setOpen] = useState(false);
   const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
-  const { user, profile } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
+  const enterprise = useUserStore((state) => state.enterprise);
   const router = useRouter();
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
@@ -229,6 +223,14 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"} className="z-50">
+      <SidebarHeader>
+        <div className="flex items-center gap-2">
+          <span className="text-center text-xs font-medium">
+            {enterprise?.name} <br />
+            {profile?.enterprise_id}
+          </span>
+        </div>
+      </SidebarHeader>
       {state === "expanded" && (
         <SidebarHeader className="px-2 py-2">
           <div className="relative flex items-center gap-2 px-1.5">
