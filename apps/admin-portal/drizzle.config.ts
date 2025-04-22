@@ -8,7 +8,7 @@ const url = new URL(connectionString);
 
 export default {
   schema: "./src/db/schema.ts",
-  out: "./drizzle",
+  out: "./supabase/migrations",
   dialect: "postgresql",
   dbCredentials: {
     host: url.hostname,
