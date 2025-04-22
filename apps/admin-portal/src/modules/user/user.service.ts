@@ -26,6 +26,8 @@ export async function fetchUserById(id: string) {
 
 // Type for the data sent to the API route
 interface CreateUserPayload {
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   role: string;

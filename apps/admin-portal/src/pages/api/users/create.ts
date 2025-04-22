@@ -9,10 +9,12 @@ const supabaseAdmin = createClient(
 );
 
 type ProfileInsert = {
-  id: string;
+  user_id: string;
   email: string;
   role: string;
   enterprise_id: string;
+  first_name: string;
+  last_name: string;
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -28,13 +30,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   //    return res.status(403).json({ message: 'Forbidden: You do not have permission to create users.' });
   // }
 
-  const { email, password, role, enterprise_id } = req.body;
+  const { email, password, role, enterprise_id, firstName, lastName } = req.body;
 
   // Basic validation
-  if (!email || !password || !role || !enterprise_id) {
+  if (!email || !password || !role || !enterprise_id || !firstName || !lastName) {
     return res
       .status(400)
-      .json({ message: "Missing required fields: email, password, role, enterprise_id" });
+      .json({ message: "Missing required fields: email, password, role, enterprise_id, firstName, lastName" });
   }
 
   try {
@@ -61,10 +63,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // 2. Create the user profile in the 'profiles' table
     const profileData: ProfileInsert = {
-      id: authData.user.id,
-      email: authData.user.email!, // Email confirmed true, so it should exist
+      user_id: authData.user.id,
+      email: authData.user.email!,
       role,
       enterprise_id,
+      first_name: firstName,
+      last_name: lastName,
     };
 
     const { data: profile, error: profileError } = await supabaseAdmin
