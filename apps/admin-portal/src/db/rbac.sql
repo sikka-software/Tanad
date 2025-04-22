@@ -14,7 +14,8 @@ DROP TABLE IF EXISTS public.user_roles;
 DROP TYPE IF EXISTS public.app_permission CASCADE;
 DROP TYPE IF EXISTS public.app_role CASCADE;
 
--- Create enum types
+-- Create enum types first
+CREATE TYPE public.app_role AS ENUM ('superadmin', 'admin', 'accounting', 'hr');
 CREATE TYPE public.app_permission AS ENUM (
   -- Profiles
   'profiles.create',
@@ -154,12 +155,12 @@ CREATE TYPE public.app_permission AS ENUM (
   'branches.export'
 );
 
--- Create user_roles table with custom role names
+-- Create user_roles table with support for both predefined and custom roles
 CREATE TABLE IF NOT EXISTS public.user_roles (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
   role TEXT NOT NULL CHECK (
-    role IN ('superadmin', 'admin', 'accounting', 'hr') OR
+    role::text = ANY(enum_range(NULL::app_role)::text[]) OR
     role ~ '^[a-z0-9_]+$' -- Allow custom role names with lowercase letters, numbers, and underscores
   ),
   enterprise_id UUID REFERENCES enterprises(id) ON DELETE CASCADE,
@@ -167,11 +168,11 @@ CREATE TABLE IF NOT EXISTS public.user_roles (
   UNIQUE (user_id, role, enterprise_id)
 );
 
--- Create role_permissions table with custom role names
+-- Create role_permissions table with support for both predefined and custom roles
 CREATE TABLE IF NOT EXISTS public.role_permissions (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   role TEXT NOT NULL CHECK (
-    role IN ('superadmin', 'admin', 'accounting', 'hr') OR
+    role::text = ANY(enum_range(NULL::app_role)::text[]) OR
     role ~ '^[a-z0-9_]+$' -- Allow custom role names with lowercase letters, numbers, and underscores
   ),
   permission app_permission NOT NULL,

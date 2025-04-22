@@ -112,8 +112,8 @@ RETURNS boolean AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1
-    FROM user_roles ur
-    JOIN role_permissions rp ON ur.role = rp.role
+    FROM public.user_roles ur
+    JOIN public.role_permissions rp ON ur.role = rp.role
     WHERE ur.user_id = auth.uid()
     AND ur.enterprise_id = has_permission.enterprise_id
     AND rp.permission = permission_name::app_permission
@@ -126,7 +126,7 @@ CREATE OR REPLACE FUNCTION handle_new_user_role()
 RETURNS TRIGGER AS $$
 BEGIN
   -- Create a superadmin role for the new user
-  INSERT INTO user_roles (user_id, role, enterprise_id)
+  INSERT INTO public.user_roles (user_id, role, enterprise_id)
   VALUES (NEW.id, 'superadmin', NULL);
   
   RETURN NEW;
