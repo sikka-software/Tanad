@@ -51,6 +51,7 @@ interface CompanyFormProps {
 export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: CompanyFormProps) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
   const { mutate: createCompany } = useCreateCompany();
   const { mutate: updateCompany } = useUpdateCompany();
   const [pendingDocuments, setPendingDocuments] = useState<DocumentFile[]>([]);
@@ -152,6 +153,7 @@ export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: 
       } else {
         await createCompany(
           {
+            enterprise_id: profile?.enterprise_id || "",
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,

@@ -56,23 +56,6 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
 
   const handleSubmit = async (data: OfficeFormValues) => {
     setIsLoading(true);
-    console.log('Profile in office form:', profile);
-    
-    if (!profile?.enterprise_id) {
-      console.log('Profile missing enterprise_id, attempting to refresh...');
-      await useUserStore.getState().refreshProfile();
-      const refreshedProfile = useUserStore.getState().profile;
-      console.log('Refreshed profile:', refreshedProfile);
-      
-      if (!refreshedProfile?.enterprise_id) {
-        toast.error(t("General.error_operation"), {
-          description: "No enterprise found. Please try logging out and back in.",
-        });
-        setIsLoading(false);
-        return;
-      }
-    }
-
     try {
       if (editMode) {
         await updateOffice({
@@ -122,7 +105,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
         }
       }
     } catch (error) {
-      console.error('Error in office form:', error);
+      console.error("Error in office form:", error);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Offices.error.creating"),
       });

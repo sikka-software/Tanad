@@ -12,6 +12,7 @@ export interface Vendor {
   created_at: string;
   user_id: string;
   updated_at: string;
+  enterprise_id: string;
 }
-export type VendorCreateData = Omit<Vendor, "id" | "created_at" | "updated_at">;
-export type VendorUpdateData = Partial<VendorCreateData>;
+export type VendorCreateData = Omit<Vendor, "id" | "created_at"> & { user_id: string };
+export type VendorUpdateData = Partial<Vendor>;

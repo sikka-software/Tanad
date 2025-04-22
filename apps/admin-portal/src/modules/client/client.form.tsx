@@ -56,7 +56,8 @@ export function ClientForm({
 }: ClientFormProps) {
   const t = useTranslations();
   const { locale } = useRouter();
-  const { user } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
   const { data: companies, isLoading: companiesLoading } = useCompanies();
   const { mutate: createClient } = useCreateClient();
   const { mutate: updateClient } = useUpdateClient();
@@ -91,55 +92,6 @@ export function ClientForm({
       label: company.name,
       value: company.id,
     })) || [];
-
-  // const handleCompanySubmit = async (data: CompanyFormValues) => {
-  //   try {
-  //     // Check if user ID is available
-  //     if (!user_id) {
-  //       throw new Error(t("error.not_authenticated"));
-  //     }
-
-  //     const { data: newCompany, error } = await supabase
-  //       .from("companies")
-  //       .insert([
-  //         {
-  //           name: data.name.trim(),
-  //           email: data.email.trim(),
-  //           phone: data.phone?.trim() || null,
-  //           website: data.website?.trim() || null,
-  //           address: data.address?.trim() || null,
-  //           city: data.city?.trim() || null,
-  //           state: data.state?.trim() || null,
-  //           zip_code: data.zip_code?.trim() || null,
-  //           industry: data.industry?.trim() || null,
-  //           size: data.size?.trim() || null,
-  //           notes: data.notes?.trim() || null,
-  //           is_active: data.is_active,
-  //           user_id: user_id,
-  //         },
-  //       ])
-  //       .select()
-  //       .single();
-
-  //     if (error) throw error;
-
-  //     // Set the new company as the selected company
-  //     form.setValue("company", newCompany.name);
-
-  //     // Close the dialog
-  //     setIsCompanyDialogOpen(false);
-
-  //     // Show success message
-  //     toast.success(t("General.successful_operation"), {
-  //       description: t("Companies.success.created"),
-  //     });
-  //   } catch (error) {
-  //     console.error("Error creating company:", error);
-  //     toast.error(t("General.error_operation"), {
-  //       description: error instanceof Error ? error.message : t("Companies.error.create"),
-  //     });
-  //   }
-  // };
 
   const handleSubmit = async (data: ClientFormValues) => {
     setIsLoading(true);
@@ -187,6 +139,7 @@ export function ClientForm({
             state: data.state.trim(),
             zip_code: data.zip_code.trim(),
             notes: data.notes?.trim() || null,
+            enterprise_id: profile?.enterprise_id || "",
           },
           {
             onSuccess: async (response) => {

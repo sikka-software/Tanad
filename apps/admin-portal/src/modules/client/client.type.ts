@@ -13,6 +13,7 @@ export interface Client {
   zip_code: string;
   notes: string | null;
   created_at: string;
+  enterprise_id: string;
 }
 
 export type ClientCreateData = Omit<Client, "id" | "created_at" | "company_details"> & {

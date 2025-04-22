@@ -12,7 +12,7 @@ export interface Company {
   size?: string;
   notes?: string;
   is_active: boolean;
-
+  enterprise_id: string;
   created_at: string;
   user_id: string;
 }
