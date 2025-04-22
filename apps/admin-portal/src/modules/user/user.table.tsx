@@ -11,6 +11,7 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -77,6 +78,7 @@ export default function UsersTable({
   userPermissions,
   onUpdateUser,
 }: UsersTableProps) {
+  const t = useTranslations();
   const { data: usersData = [], isLoading } = useUsers();
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
@@ -232,9 +234,9 @@ export default function UsersTable({
                 <TableRow key={user.id}>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="flex w-fit items-center gap-1">
+                    <Badge variant="outline" className="flex w-fit items-center py-1">
                       {getRoleIcon(user.role)}
-                      {user.role}
+                      {t(`Roles.roles.${user.role}`)}
                     </Badge>
                   </TableCell>
                   <TableCell>
