@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 import { Role, Permission } from "@/types/rbac";
 
-import { app_permission } from "@/db/schema";
+import { appPermission } from "@/db/schema";
 import { createClient } from "@/utils/supabase/component";
 
 const supabase = createClient();
@@ -23,7 +23,7 @@ export const permissionKeys = {
 };
 
 // Available permissions from the enum
-const AVAILABLE_PERMISSIONS = app_permission.enumValues;
+const AVAILABLE_PERMISSIONS = appPermission.enumValues;
 
 // Action display names
 const ACTION_DISPLAY_NAMES: Record<string, string> = {
@@ -124,7 +124,9 @@ export function useCreateRole() {
   return useMutation({
     mutationFn: async (role: Omit<Role, "id" | "createdAt" | "updatedAt">) => {
       // Get the current user's ID
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
       // First create the role
@@ -144,21 +146,19 @@ export function useCreateRole() {
       if (role.permissions && role.permissions.length > 0) {
         // Validate that all permissions are valid enum values
         const invalidPermissions = role.permissions.filter(
-          permission => !app_permission.enumValues.includes(permission as any)
+          (permission) => !appPermission.enumValues.includes(permission as any),
         );
-        
+
         if (invalidPermissions.length > 0) {
           throw new Error(`Invalid permissions: ${invalidPermissions.join(", ")}`);
         }
 
-        const { error: permissionsError } = await supabase
-          .from("role_permissions")
-          .insert(
-            role.permissions.map((permission) => ({
-              role: role.name,
-              permission: permission as any, // Type assertion since we've validated the values
-            }))
-          );
+        const { error: permissionsError } = await supabase.from("role_permissions").insert(
+          role.permissions.map((permission) => ({
+            role: role.name,
+            permission: permission as any, // Type assertion since we've validated the values
+          })),
+        );
 
         if (permissionsError) throw permissionsError;
       }

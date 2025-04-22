@@ -25,8 +25,7 @@ export const departmentKeys = {
 export const useDepartments = () => {
   return useQuery({
     queryKey: departmentKeys.lists(),
-    queryFn: fetchDepartmentsWithLocations,
-    // queryFn: fetchDepartments,
+    queryFn: fetchDepartments,
   });
 };
 
