@@ -1,447 +1,786 @@
-import { sql } from "drizzle-orm";
-import {
-  pgTable,
-  pgPolicy,
-  index,
-  foreignKey,
-  unique,
-  check,
-  uuid,
-  text,
-  jsonb,
-  timestamp,
-  varchar,
-  boolean,
-  numeric,
-  date,
-  integer,
-} from "drizzle-orm/pg-core";
+import { pgTable, index, foreignKey, check, uuid, timestamp, text, jsonb, boolean, pgPolicy, numeric, date, unique, varchar, pgEnum } from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
 
-export const clients = pgTable(
-  "clients",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    name: text().notNull(),
-    email: text().notNull(),
-    phone: text().notNull(),
-    company: text(),
-    address: text().notNull(),
-    city: text().notNull(),
-    state: text().notNull(),
-    zip_code: text("zip_code").notNull(),
-    notes: text(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("clients_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-  ],
-).enableRLS();
+export const appPermission = pgEnum("app_permission", ['profiles.create', 'profiles.read', 'profiles.update', 'profiles.delete', 'profiles.export', 'enterprises.create', 'enterprises.read', 'enterprises.update', 'enterprises.delete', 'enterprises.export', 'invoices.create', 'invoices.read', 'invoices.update', 'invoices.delete', 'invoices.export', 'invoices.duplicate', 'products.create', 'products.read', 'products.update', 'products.delete', 'products.export', 'quotes.create', 'quotes.read', 'quotes.update', 'quotes.delete', 'quotes.export', 'quotes.duplicate', 'employees.create', 'employees.read', 'employees.update', 'employees.delete', 'employees.export', 'salaries.create', 'salaries.read', 'salaries.update', 'salaries.delete', 'salaries.export', 'documents.create', 'documents.read', 'documents.update', 'documents.delete', 'documents.export', 'templates.create', 'templates.read', 'templates.update', 'templates.delete', 'templates.export', 'templates.duplicate', 'employee_requests.create', 'employee_requests.read', 'employee_requests.update', 'employee_requests.delete', 'employee_requests.export', 'job_listings.create', 'job_listings.read', 'job_listings.update', 'job_listings.delete', 'job_listings.export', 'offices.create', 'offices.read', 'offices.update', 'offices.delete', 'offices.export', 'expenses.create', 'expenses.read', 'expenses.update', 'expenses.delete', 'expenses.export', 'expenses.duplicate', 'departments.create', 'departments.read', 'departments.update', 'departments.delete', 'departments.export', 'warehouses.create', 'warehouses.read', 'warehouses.update', 'warehouses.delete', 'warehouses.export', 'vendors.create', 'vendors.read', 'vendors.update', 'vendors.delete', 'vendors.export', 'clients.create', 'clients.read', 'clients.update', 'clients.delete', 'clients.export', 'companies.create', 'companies.read', 'companies.update', 'companies.delete', 'companies.export', 'branches.create', 'branches.read', 'branches.update', 'branches.delete', 'branches.export'])
+export const appRole = pgEnum("app_role", ['superadmin', 'admin', 'accounting', 'hr'])
 
-export const invoices = pgTable(
-  "invoices",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    invoice_number: text("invoice_number").notNull(),
-    issue_date: date("issue_date").notNull(),
-    due_date: date("due_date").notNull(),
-    status: text().default("draft").notNull(),
-    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
-    tax_rate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
-    tax_amount: numeric("tax_amount", {
-      precision: 10,
-      scale: 2,
-    }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
-    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(
-      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`,
-    ),
-    notes: text(),
-    client_id: uuid("client_id").notNull(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("invoices_client_id_idx").using(
-      "btree",
-      table.client_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
-    index("invoices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.client_id],
-      foreignColumns: [clients.id],
-      name: "invoices_client_id_fkey",
-    }).onDelete("cascade"),
 
-    check(
-      "invoices_status_check",
-      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`,
-    ),
-  ],
-).enableRLS();
+export const templates = pgTable("templates", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	type: text().notNull(),
+	content: jsonb().notNull(),
+	isDefault: boolean("is_default").default(false).notNull(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("templates_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	index("templates_type_idx").using("btree", table.type.asc().nullsLast().op("text_ops")),
+	index("templates_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "templates_enterprise_id_enterprises_id_fk"
+		}),
+	check("templates_type_check", sql`type = ANY (ARRAY['invoice'::text, 'quote'::text])`),
+]);
 
-export const invoiceItems = pgTable(
-  "invoice_items",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    description: text().notNull(),
-    quantity: numeric({ precision: 10, scale: 2 }).default("1").notNull(),
-    unit_price: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
-    amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
-    invoice_id: uuid("invoice_id").notNull(),
-    product_id: uuid("product_id"),
-  },
-  (table) => [
-    index("invoice_items_invoice_id_idx").using(
-      "btree",
-      table.invoice_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    foreignKey({
-      columns: [table.invoice_id],
-      foreignColumns: [invoices.id],
-      name: "invoice_items_invoice_id_fkey",
-    }).onDelete("cascade"),
-  ],
-).enableRLS();
+export const documents = pgTable("documents", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	url: text().notNull(),
+	filePath: text("file_path").notNull(),
+	entityId: uuid("entity_id").notNull(),
+	entityType: text("entity_type").notNull(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("documents_entity_id_idx").using("btree", table.entityId.asc().nullsLast().op("uuid_ops")),
+	index("documents_entity_type_idx").using("btree", table.entityType.asc().nullsLast().op("text_ops")),
+	index("documents_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "documents_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can view their own documents", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can upload their own documents", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own documents", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own documents", { as: "permissive", for: "delete", to: ["authenticated"] }),
+	check("documents_entity_type_check", sql`entity_type = ANY (ARRAY['company'::text, 'expense'::text])`),
+]);
 
-export const quotes = pgTable(
-  "quotes",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    quote_number: text("quote_number").notNull(),
-    issue_date: date("issue_date").notNull(),
-    expiry_date: date("expiry_date").notNull(),
-    status: text().default("draft").notNull(),
-    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
-    tax_rate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
-    tax_amount: numeric("tax_amount", {
-      precision: 10,
-      scale: 2,
-    }).generatedAlwaysAs(sql`((subtotal * tax_rate) / (100)::numeric)`),
-    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(
-      sql`(subtotal + ((subtotal * tax_rate) / (100)::numeric))`,
-    ),
-    notes: text(),
-    client_id: uuid("client_id").notNull(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("quotes_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
-    index("quotes_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
-    index("quotes_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.client_id],
-      foreignColumns: [clients.id],
-      name: "quotes_client_id_fkey",
-    }).onDelete("cascade"),
+export const products = pgTable("products", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	name: text().notNull(),
+	description: text(),
+	price: numeric({ precision: 10, scale:  2 }).notNull(),
+	sku: text(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+	cost: numeric({ precision: 10, scale:  2 }),
+	quantity: numeric({ precision: 10, scale:  2 }).default('0').notNull(),
+	unit: text(),
+	isActive: boolean("is_active").default(true).notNull(),
+}, (table) => [
+	index("products_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	index("products_sku_idx").using("btree", table.sku.asc().nullsLast().op("text_ops")),
+	index("products_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "products_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own products", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own products", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own products", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own products", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
 
-    check(
-      "quotes_status_check",
-      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`,
-    ),
-  ],
-).enableRLS();
+export const employeeRequests = pgTable("employee_requests", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	employeeId: uuid("employee_id").notNull(),
+	type: text().notNull(),
+	status: text().default('pending').notNull(),
+	title: text().notNull(),
+	description: text(),
+	startDate: date("start_date"),
+	endDate: date("end_date"),
+	amount: numeric({ precision: 10, scale:  2 }),
+	attachments: jsonb().default([]),
+	notes: text(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("employee_requests_created_at_idx").using("btree", table.createdAt.asc().nullsLast().op("timestamptz_ops")),
+	index("employee_requests_employee_id_idx").using("btree", table.employeeId.asc().nullsLast().op("uuid_ops")),
+	index("employee_requests_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+	index("employee_requests_type_idx").using("btree", table.type.asc().nullsLast().op("text_ops")),
+	index("employee_requests_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.employeeId],
+			foreignColumns: [employees.id],
+			name: "employee_requests_employee_id_employees_id_fk"
+		}),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "employee_requests_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own employee requests", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own employee requests", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own employee requests", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own employee requests", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
 
-export const quoteItems = pgTable(
-  "quote_items",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    description: text().notNull(),
-    quantity: numeric({ precision: 10, scale: 2 }).default("1").notNull(),
-    unit_price: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
-    amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
-    quote_id: uuid("quote_id").notNull(),
-  },
-  (table) => [
-    index("quote_items_quote_id_idx").using(
-      "btree",
-      table.quote_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    foreignKey({
-      columns: [table.quote_id],
-      foreignColumns: [quotes.id],
-      name: "quote_items_quote_id_fkey",
-    }).onDelete("cascade"),
-  ],
-).enableRLS();
+export const jobListingJobs = pgTable("job_listing_jobs", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	jobListingId: uuid("job_listing_id").notNull(),
+	jobId: uuid("job_id").notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("job_listing_jobs_job_id_idx").using("btree", table.jobId.asc().nullsLast().op("uuid_ops")),
+	index("job_listing_jobs_job_listing_id_idx").using("btree", table.jobListingId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "job_listing_jobs_enterprise_id_enterprises_id_fk"
+		}),
+	foreignKey({
+			columns: [table.jobId],
+			foreignColumns: [jobs.id],
+			name: "job_listing_jobs_job_id_jobs_id_fk"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.jobListingId],
+			foreignColumns: [jobListings.id],
+			name: "job_listing_jobs_job_listing_id_job_listings_id_fk"
+		}).onDelete("cascade"),
+	pgPolicy("Users can view job listing jobs for their listings", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(EXISTS ( SELECT 1
+   FROM job_listings jl
+  WHERE ((jl.id = job_listing_jobs.job_listing_id) AND (jl.user_id = auth.uid()))))` }),
+	pgPolicy("Users can add jobs to their listings", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update jobs in their listings", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can remove jobs from their listings", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
 
-export const profiles = pgTable(
-  "profiles",
-  {
-    id: uuid().primaryKey().notNull(),
-    full_name: text("full_name"),
-    stripe_customer_id: text("stripe_customer_id"),
-    avatar_url: text("avatar_url"),
-    address: text(),
-    email: varchar({ length: 255 }),
-    user_settings: jsonb("user_settings"),
-    username: text(),
-    subscribed_to: text("subscribed_to"),
-    price_id: text("price_id"),
-  },
-  (table) => [unique("profiles_username_key").on(table.username)],
-).enableRLS();
+export const invoices = pgTable("invoices", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	invoiceNumber: text("invoice_number").notNull(),
+	issueDate: date("issue_date").notNull(),
+	dueDate: date("due_date").notNull(),
+	status: text().notNull(),
+	subtotal: numeric({ precision: 10, scale:  2 }).default('0').notNull(),
+	taxRate: numeric("tax_rate", { precision: 5, scale:  2 }).default('0'),
+	notes: text(),
+	clientId: uuid("client_id").notNull(),
+	userId: uuid("user_id").notNull(),
+	taxAmount: numeric("tax_amount", { precision: 10, scale:  2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN (0)::numeric
+    ELSE round((subtotal * tax_rate), 2)
+END`),
+	total: numeric({ precision: 10, scale:  2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN subtotal
+    ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
+END`),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("invoices_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+	index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+	index("invoices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.clientId],
+			foreignColumns: [clients.id],
+			name: "invoices_client_id_fkey"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "invoices_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own invoices", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own invoices", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own invoices", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own invoices", { as: "permissive", for: "delete", to: ["authenticated"] }),
+	check("invoices_status_check", sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'overdue'::text, 'cancelled'::text])`),
+]);
 
-export const products = pgTable(
-  "products",
-  {
-    id: uuid().defaultRandom().primaryKey().notNull(),
-    name: varchar({ length: 255 }).notNull(),
-    description: text(),
-    price: numeric({ precision: 10, scale: 2 }).notNull(),
-    sku: varchar({ length: 50 }),
-    stockQuantity: integer("stock_quantity").default(0),
-    user_id: uuid("user_id").notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    updated_at: timestamp("updated_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-  },
-  (table) => [
-    unique("products_sku_key").on(table.sku),
-    index("products_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-  ],
-).enableRLS();
+export const invoiceItems = pgTable("invoice_items", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	description: text().notNull(),
+	quantity: numeric({ precision: 10, scale:  2 }).default('1').notNull(),
+	unitPrice: numeric("unit_price", { precision: 10, scale:  2 }).notNull(),
+	amount: numeric({ precision: 10, scale:  2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
+	invoiceId: uuid("invoice_id").notNull(),
+	productId: uuid("product_id"),
+}, (table) => [
+	index("invoice_items_invoice_id_idx").using("btree", table.invoiceId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.invoiceId],
+			foreignColumns: [invoices.id],
+			name: "invoice_items_invoice_id_fkey"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.productId],
+			foreignColumns: [products.id],
+			name: "invoice_items_product_id_fkey"
+		}),
+	pgPolicy("Users can read invoice items through invoices", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(EXISTS ( SELECT 1
+   FROM invoices i
+  WHERE ((i.id = invoice_items.invoice_id) AND (i.user_id = auth.uid()))))` }),
+	pgPolicy("Users can insert invoice items through invoices", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update invoice items through invoices", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete invoice items through invoices", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
+
+export const jobListings = pgTable("job_listings", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	description: text(),
+	isActive: boolean("is_active").default(true).notNull(),
+	slug: varchar({ length: 255 }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+	isPublic: boolean("is_public").default(false).notNull(),
+}, (table) => [
+	index("job_listings_slug_idx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
+	index("job_listings_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
+	index("job_listings_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "job_listings_enterprise_id_enterprises_id_fk"
+		}),
+	unique("job_listings_slug_unique").on(table.slug),
+	pgPolicy("Users can view their own job listings and public ones", { as: "permissive", for: "select", to: ["authenticated"], using: sql`((auth.uid() = user_id) OR (is_public = true))` }),
+	pgPolicy("Users can create job listings", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own job listings", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own job listings", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
+
+export const profiles = pgTable("profiles", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	fullName: text("full_name"),
+	email: text().notNull(),
+	userSettings: jsonb("user_settings"),
+	enterpriseId: uuid("enterprise_id"),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	stripeCustomerId: text("stripe_customer_id"),
+	avatarUrl: text("avatar_url"),
+	username: text(),
+	subscribedTo: text("subscribed_to"),
+	priceId: text("price_id"),
+	firstName: text("first_name").notNull(),
+	lastName: text("last_name").notNull(),
+	phone: text(),
+	address: text(),
+	city: text(),
+	state: text(),
+	zipCode: text("zip_code"),
+	country: text(),
+	userId: uuid("user_id").notNull(),
+	role: appRole(),
+}, (table) => [
+	index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	index("profiles_enterprise_id_idx").using("btree", table.enterpriseId.asc().nullsLast().op("uuid_ops")),
+	index("profiles_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	index("profiles_username_idx").using("btree", table.username.asc().nullsLast().op("text_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "profiles_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can view their own profile", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(id = auth.uid())` }),
+	pgPolicy("Users can update their own profile", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can create their own profile", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own profile", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
+
+export const offices = pgTable("offices", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	address: text().notNull(),
+	city: text().notNull(),
+	state: text().notNull(),
+	zipCode: text("zip_code").notNull(),
+	phone: text(),
+	email: text(),
+	isActive: boolean("is_active").default(true).notNull(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("offices_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	index("offices_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "offices_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can delete their own offices", { as: "permissive", for: "delete", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can read their own offices", { as: "permissive", for: "select", to: ["authenticated"] }),
+	pgPolicy("Users can insert their own offices", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own offices", { as: "permissive", for: "update", to: ["authenticated"] }),
+]);
+
+export const departmentLocations = pgTable("department_locations", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	departmentId: uuid("department_id").notNull(),
+	locationType: text("location_type").notNull(),
+	locationId: uuid("location_id").notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	foreignKey({
+			columns: [table.departmentId],
+			foreignColumns: [departments.id],
+			name: "department_locations_department_id_departments_id_fk"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "department_locations_enterprise_id_enterprises_id_fk"
+		}),
+	unique("unique_department_location").on(table.departmentId, table.locationType, table.locationId),
+	pgPolicy("Users can read department locations through departments", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(EXISTS ( SELECT 1
+   FROM departments d
+  WHERE ((d.id = department_locations.department_id) AND (d.user_id = auth.uid()))))` }),
+	pgPolicy("Users can insert department locations through departments", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update department locations through departments", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete department locations through departments", { as: "permissive", for: "delete", to: ["authenticated"] }),
+	check("location_type_check", sql`location_type = ANY (ARRAY['office'::text, 'branch'::text, 'warehouse'::text])`),
+]);
 
 export const employees = pgTable("employees", {
-  id: uuid().primaryKey().defaultRandom(),
-  first_name: varchar("first_name", { length: 255 }).notNull(),
-  last_name: varchar("last_name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  phone: varchar("phone", { length: 50 }),
-  position: varchar("position", { length: 255 }).notNull(),
-  department: varchar("department", { length: 255 }),
-  hire_date: date("hire_date").notNull(),
-  salary: numeric("salary", { precision: 10, scale: 2 }),
-  is_active: boolean("is_active").default(true).notNull(),
-  notes: text("notes"),
-  created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}).enableRLS();
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	firstName: text("first_name").notNull(),
+	lastName: text("last_name").notNull(),
+	email: text().notNull(),
+	phone: text(),
+	hireDate: date("hire_date"),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+	address: text(),
+	city: text(),
+	state: text(),
+	zipCode: text("zip_code"),
+	country: text(),
+	terminationDate: date("termination_date"),
+	isActive: boolean("is_active").default(true).notNull(),
+	departmentId: uuid("department_id"),
+}, (table) => [
+	index("employees_department_id_idx").using("btree", table.departmentId.asc().nullsLast().op("uuid_ops")),
+	index("employees_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	index("employees_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.departmentId],
+			foreignColumns: [departments.id],
+			name: "employees_department_id_departments_id_fk"
+		}).onDelete("set null"),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "employees_enterprise_id_enterprises_id_fk"
+		}),
+]);
 
-export const expenses = pgTable(
-  "expenses",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    expense_number: text("expense_number").notNull(),
-    issue_date: date("issue_date").notNull(),
-    due_date: date("due_date").notNull(),
-    status: text().default("pending").notNull(),
-    amount: numeric({ precision: 10, scale: 2 }).notNull(),
-    category: text("category").notNull(),
-    notes: text(),
-    client_id: uuid("client_id").notNull(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("expenses_client_id_idx").using(
-      "btree",
-      table.client_id.asc().nullsLast().op("uuid_ops"),
-    ),
-    index("expenses_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
-    index("expenses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    foreignKey({
-      columns: [table.client_id],
-      foreignColumns: [clients.id],
-      name: "expenses_client_id_fkey",
-    }).onDelete("cascade"),
+export const expenses = pgTable("expenses", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	expenseNumber: text("expense_number").notNull(),
+	issueDate: date("issue_date").notNull(),
+	dueDate: date("due_date").notNull(),
+	status: text().default('pending').notNull(),
+	amount: numeric({ precision: 10, scale:  2 }).notNull(),
+	category: text().notNull(),
+	notes: text(),
+	clientId: uuid("client_id"),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("expenses_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+	index("expenses_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+	index("expenses_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.clientId],
+			foreignColumns: [clients.id],
+			name: "expenses_client_id_fkey"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "expenses_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own expenses", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own expenses", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own expenses", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own expenses", { as: "permissive", for: "delete", to: ["authenticated"] }),
+	check("expenses_status_check", sql`status = ANY (ARRAY['pending'::text, 'paid'::text, 'overdue'::text])`),
+]);
 
-    check(
-      "expenses_status_check",
-      sql`status = ANY (ARRAY[\'pending\'::text, \'paid\'::text, \'overdue\'::text])`,
-    ),
-  ],
-).enableRLS();
+export const quotes = pgTable("quotes", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	quoteNumber: text("quote_number").notNull(),
+	issueDate: date("issue_date").notNull(),
+	expiryDate: date("expiry_date").notNull(),
+	status: text().default('draft').notNull(),
+	subtotal: numeric({ precision: 10, scale:  2 }).default('0').notNull(),
+	taxRate: numeric("tax_rate", { precision: 5, scale:  2 }).default('0'),
+	notes: text(),
+	clientId: uuid("client_id").notNull(),
+	userId: uuid("user_id").notNull(),
+	taxAmount: numeric("tax_amount", { precision: 10, scale:  2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN (0)::numeric
+    ELSE round((subtotal * tax_rate), 2)
+END`),
+	total: numeric({ precision: 10, scale:  2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN subtotal
+    ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
+END`),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("quotes_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+	index("quotes_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+	index("quotes_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.clientId],
+			foreignColumns: [clients.id],
+			name: "quotes_client_id_fkey"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "quotes_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own quotes", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own quotes", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own quotes", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own quotes", { as: "permissive", for: "delete", to: ["authenticated"] }),
+	check("quotes_status_check", sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`),
+]);
 
-export const vendors = pgTable(
-  "vendors",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone(\'utc\'::text, now())`),
-    name: text().notNull(),
-    email: text().notNull(),
-    phone: text().notNull(),
-    company: text().notNull(),
-    address: text().notNull(),
-    city: text().notNull(),
-    state: text().notNull(),
-    zip_code: text("zip_code").notNull(),
-    notes: text(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("vendors_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-    index("vendors_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("vendors_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-  ],
-).enableRLS();
+export const salaries = pgTable("salaries", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	notes: text(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+	employeeId: uuid("employee_id").notNull(),
+	amount: numeric({ precision: 10, scale:  2 }).notNull(),
+	currency: text().default('USD').notNull(),
+	paymentFrequency: text("payment_frequency").default('monthly').notNull(),
+	startDate: date("start_date").notNull(),
+	endDate: date("end_date"),
+}, (table) => [
+	index("salaries_employee_id_idx").using("btree", table.employeeId.asc().nullsLast().op("uuid_ops")),
+	index("salaries_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.employeeId],
+			foreignColumns: [employees.id],
+			name: "salaries_employee_id_fkey"
+		}).onDelete("cascade"),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "salaries_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own salary records", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own salary records", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own salary records", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own salary records", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
 
-export const salaries = pgTable(
-  "salaries",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone(\'utc\'::text, now())`),
-    pay_period_start: date("pay_period_start").notNull(),
-    pay_period_end: date("pay_period_end").notNull(),
-    payment_date: date("payment_date").notNull(),
-    gross_amount: numeric("gross_amount", { precision: 10, scale: 2 }).notNull(),
-    net_amount: numeric("net_amount", { precision: 10, scale: 2 }).notNull(),
-    deductions: jsonb("deductions"),
-    notes: text(),
-    employee_name: text("employee_name").notNull(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("salaries_payment_date_idx").using("btree", table.payment_date.asc().nullsLast()),
-    index("salaries_employee_name_idx").using(
-      "btree",
-      table.employee_name.asc().nullsLast().op("text_ops"),
-    ),
-    index("salaries_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-  ],
-).enableRLS();
+export const vendors = pgTable("vendors", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	email: text().notNull(),
+	phone: text().notNull(),
+	company: text().notNull(),
+	address: text().notNull(),
+	city: text().notNull(),
+	state: text().notNull(),
+	zipCode: text("zip_code").notNull(),
+	notes: text(),
+	userId: uuid("user_id").notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("vendors_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	index("vendors_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	index("vendors_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "vendors_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own vendors", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own vendors", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own vendors", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own vendors", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
 
-export const warehouses = pgTable(
-  "warehouses",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    name: text().notNull(),
-    code: text().notNull(),
-    address: text().notNull(),
-    city: text().notNull(),
-    state: text().notNull(),
-    zip_code: text("zip_code").notNull(),
-    capacity: numeric({ precision: 10, scale: 2 }),
-    is_active: boolean("is_active").default(true).notNull(),
-    notes: text(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("warehouses_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("warehouses_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
-    index("warehouses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    unique("warehouses_code_key").on(table.code),
-  ],
-).enableRLS();
+export const departments = pgTable("departments", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	description: text(),
+	userId: uuid("user_id").notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	isActive: boolean("is_active").default(true).notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("departments_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	index("departments_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "departments_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own departments", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own departments", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own departments", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own departments", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
 
-export const branches = pgTable(
-  "branches",
-  {
-    id: uuid()
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
-    created_at: timestamp("created_at", {
-      withTimezone: true,
-      mode: "string",
-    }).default(sql`timezone('utc'::text, now())`),
-    name: text().notNull(),
-    code: text().notNull(),
-    address: text().notNull(),
-    city: text().notNull(),
-    state: text().notNull(),
-    zip_code: text("zip_code").notNull(),
-    phone: text(),
-    email: text(),
-    manager: text(),
-    is_active: boolean("is_active").default(true).notNull(),
-    notes: text(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("branches_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    index("branches_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
-    index("branches_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-    unique("branches_code_key").on(table.code),
-  ],
-).enableRLS();
+export const warehouses = pgTable("warehouses", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	code: text().notNull(),
+	address: text().notNull(),
+	city: text().notNull(),
+	state: text().notNull(),
+	zipCode: text("zip_code").notNull(),
+	capacity: numeric({ precision: 10, scale:  2 }),
+	isActive: boolean("is_active").default(true).notNull(),
+	notes: text(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("warehouses_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
+	index("warehouses_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	index("warehouses_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "warehouses_enterprise_id_enterprises_id_fk"
+		}),
+	unique("warehouses_code_key").on(table.code),
+	pgPolicy("Users can read their own warehouses", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own warehouses", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own warehouses", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own warehouses", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
 
-export const jobs = pgTable(
-  "jobs",
-  {
-    id: uuid().primaryKey().defaultRandom(),
-    title: varchar("title", { length: 255 }).notNull(),
-    description: text("description"),
-    requirements: text("requirements"),
-    location: varchar("location", { length: 255 }),
-    department: varchar("department", { length: 255 }),
-    type: varchar("type", { length: 50 }).notNull(), // Full-time, Part-time, Contract, etc.
-    salary: numeric("salary", { precision: 10, scale: 2 }),
-    is_active: boolean("is_active").default(true).notNull(),
-    start_date: date("start_date"),
-    end_date: date("end_date"),
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-    user_id: uuid("user_id").notNull(),
-  },
-  (table) => [
-    index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
-    index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
-    index("jobs_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
-  ],
-).enableRLS();
+export const jobs = pgTable("jobs", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	title: varchar({ length: 255 }).notNull(),
+	description: text(),
+	requirements: text(),
+	location: varchar({ length: 255 }),
+	department: varchar({ length: 255 }),
+	type: varchar({ length: 50 }).notNull(),
+	salary: numeric({ precision: 10, scale:  2 }),
+	isActive: boolean("is_active").default(true).notNull(),
+	startDate: date("start_date"),
+	endDate: date("end_date"),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
+	index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
+	index("jobs_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "jobs_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own jobs", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own jobs", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own jobs", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own jobs", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
+
+export const branches = pgTable("branches", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	code: text(),
+	address: text().notNull(),
+	city: text().notNull(),
+	state: text().notNull(),
+	zipCode: text("zip_code").notNull(),
+	phone: text(),
+	email: text(),
+	manager: text(),
+	isActive: boolean("is_active").default(true).notNull(),
+	notes: text(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("branches_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
+	index("branches_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	index("branches_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "branches_enterprise_id_enterprises_id_fk"
+		}),
+	unique("branches_code_key").on(table.code),
+	pgPolicy("Users can insert their own branches", { as: "permissive", for: "insert", to: ["authenticated"], withCheck: sql`(auth.uid() = user_id)`  }),
+	pgPolicy("Users can update their own branches", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own branches", { as: "permissive", for: "delete", to: ["authenticated"] }),
+	pgPolicy("Users can read their own branches", { as: "permissive", for: "select", to: ["authenticated"] }),
+]);
+
+export const companies = pgTable("companies", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	email: text().notNull(),
+	phone: text(),
+	website: text(),
+	address: text(),
+	city: text(),
+	state: text(),
+	zipCode: text("zip_code"),
+	industry: text(),
+	size: text(),
+	notes: text(),
+	isActive: boolean("is_active").default(true).notNull(),
+	userId: uuid("user_id").notNull(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	index("companies_is_active_idx").using("btree", table.isActive.asc().nullsLast().op("bool_ops")),
+	index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "companies_enterprise_id_enterprises_id_fk"
+		}).onDelete("cascade"),
+	pgPolicy("Users can read their own companies", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own companies", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own companies", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own companies", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
+
+export const enterprises = pgTable("enterprises", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	email: text().notNull(),
+	phone: text(),
+	address: text(),
+	city: text(),
+	state: text(),
+	zipCode: text("zip_code"),
+	isActive: boolean("is_active").default(true).notNull(),
+	website: text(),
+	industry: text(),
+	size: text(),
+	notes: text(),
+}, (table) => [
+	index("enterprises_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	index("enterprises_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	pgPolicy("Users can create enterprises", { as: "permissive", for: "insert", to: ["authenticated"], withCheck: sql`true`  }),
+	pgPolicy("Users can view enterprises", { as: "permissive", for: "select", to: ["authenticated"] }),
+	pgPolicy("Users can update enterprises", { as: "permissive", for: "update", to: ["authenticated"] }),
+]);
+
+export const rolePermissions = pgTable("role_permissions", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	role: appRole().notNull(),
+	permission: appPermission().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+}, (table) => [
+	unique("role_permissions_role_permission_key").on(table.role, table.permission),
+	pgPolicy("Only superadmins can manage role permissions", { as: "permissive", for: "all", to: ["authenticated"], using: sql`(EXISTS ( SELECT 1
+   FROM user_roles ur
+  WHERE ((ur.user_id = auth.uid()) AND (ur.role = 'superadmin'::app_role))))`, withCheck: sql`(EXISTS ( SELECT 1
+   FROM user_roles ur
+  WHERE ((ur.user_id = auth.uid()) AND (ur.role = 'superadmin'::app_role))))`  }),
+]);
+
+export const userRoles = pgTable("user_roles", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	userId: uuid("user_id").notNull(),
+	role: appRole().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	enterpriseId: uuid("enterprise_id"),
+}, (table) => [
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "user_roles_enterprise_id_enterprises_id_fk"
+		}).onDelete("cascade"),
+	unique("user_roles_user_id_role_enterprise_id_key").on(table.userId, table.role, table.enterpriseId),
+	pgPolicy("Users can view their own roles", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(user_id = auth.uid())` }),
+	pgPolicy("Users can create initial role", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Only superadmins can manage roles", { as: "permissive", for: "all", to: ["authenticated"] }),
+]);
+
+export const clients = pgTable("clients", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	name: text().notNull(),
+	email: text(),
+	phone: text().notNull(),
+	address: text().notNull(),
+	city: text().notNull(),
+	state: text().notNull(),
+	zipCode: text("zip_code").notNull(),
+	notes: text(),
+	userId: uuid("user_id").notNull(),
+	company: uuid(),
+	enterpriseId: uuid("enterprise_id").notNull(),
+}, (table) => [
+	index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+	index("clients_user_id_idx").using("btree", table.userId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.company],
+			foreignColumns: [companies.id],
+			name: "clients_company_fkey"
+		}),
+	foreignKey({
+			columns: [table.enterpriseId],
+			foreignColumns: [enterprises.id],
+			name: "clients_enterprise_id_enterprises_id_fk"
+		}),
+	pgPolicy("Users can read their own clients", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
+	pgPolicy("Users can insert their own clients", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update their own clients", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete their own clients", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);
+
+export const quoteItems = pgTable("quote_items", {
+	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
+	description: text().notNull(),
+	quantity: numeric({ precision: 10, scale:  2 }).default('1').notNull(),
+	unitPrice: numeric("unit_price", { precision: 10, scale:  2 }).notNull(),
+	amount: numeric({ precision: 10, scale:  2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
+	quoteId: uuid("quote_id").notNull(),
+	productId: uuid("product_id"),
+}, (table) => [
+	index("quote_items_quote_id_idx").using("btree", table.quoteId.asc().nullsLast().op("uuid_ops")),
+	foreignKey({
+			columns: [table.productId],
+			foreignColumns: [products.id],
+			name: "quote_items_product_id_fkey"
+		}),
+	foreignKey({
+			columns: [table.quoteId],
+			foreignColumns: [quotes.id],
+			name: "quote_items_quote_id_fkey"
+		}).onDelete("cascade"),
+	pgPolicy("Users can read quote items through quotes", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(EXISTS ( SELECT 1
+   FROM quotes q
+  WHERE ((q.id = quote_items.quote_id) AND (q.user_id = auth.uid()))))` }),
+	pgPolicy("Users can insert quote items through quotes", { as: "permissive", for: "insert", to: ["authenticated"] }),
+	pgPolicy("Users can update quote items through quotes", { as: "permissive", for: "update", to: ["authenticated"] }),
+	pgPolicy("Users can delete quote items through quotes", { as: "permissive", for: "delete", to: ["authenticated"] }),
+]);

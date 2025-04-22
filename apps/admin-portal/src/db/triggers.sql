@@ -138,3 +138,99 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW
   EXECUTE FUNCTION handle_new_user_role();
+
+-- Create function to set updated_at timestamp
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = timezone('utc'::text, now());
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create function to handle new user profile creation
+CREATE OR REPLACE FUNCTION handle_new_user_profile()
+RETURNS TRIGGER AS $$
+DECLARE
+    _role public.app_role;
+BEGIN
+    -- Set the role
+    _role := 'superadmin'::public.app_role;
+
+    -- Log the trigger execution
+    INSERT INTO public.trigger_audit_log (trigger_name, table_name, user_id, data)
+    VALUES ('handle_new_user_profile', 'auth.users', NEW.id, row_to_json(NEW)::jsonb);
+
+    -- Insert into user_roles first with explicit schema
+    INSERT INTO public.user_roles (user_id, role)
+    VALUES (NEW.id, _role);
+
+    -- Then create the profile with explicit schema
+    INSERT INTO public.profiles (
+        id,
+        user_id,
+        email,
+        first_name,
+        last_name,
+        role,
+        created_at
+    )
+    VALUES (
+        NEW.id,
+        NEW.id,
+        NEW.email,
+        COALESCE(NULLIF(split_part(NEW.raw_user_meta_data->>'full_name', ' ', 1), ''), 'New'),
+        COALESCE(NULLIF(split_part(NEW.raw_user_meta_data->>'full_name', ' ', 2), ''), 'User'),
+        _role,
+        NOW()
+    );
+    
+    RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+    -- Log any errors
+    INSERT INTO public.trigger_audit_log (trigger_name, table_name, user_id, data)
+    VALUES ('handle_new_user_profile_error', 'auth.users', NEW.id, jsonb_build_object('error', SQLERRM));
+    RAISE;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- Create function for custom access token hook
+CREATE OR REPLACE FUNCTION custom_access_token_hook(event jsonb)
+RETURNS jsonb
+LANGUAGE plpgsql
+STABLE
+AS $$
+DECLARE
+    claims jsonb;
+    user_role public.app_role;
+    user_permissions text[];
+BEGIN
+    -- Fetch the user role in the user_roles table
+    SELECT role INTO user_role 
+    FROM public.user_roles 
+    WHERE user_id = (event->>'user_id')::uuid;
+
+    -- Get user permissions
+    SELECT array_agg(rp.permission::text)
+    INTO user_permissions
+    FROM public.role_permissions rp
+    WHERE rp.role = user_role;
+
+    claims := event->'claims';
+    
+    IF user_role IS NOT NULL THEN
+        -- Set the role claim
+        claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
+        -- Set the permissions claim
+        claims := jsonb_set(claims, '{user_permissions}', to_jsonb(user_permissions));
+    ELSE
+        claims := jsonb_set(claims, '{user_role}', 'null');
+        claims := jsonb_set(claims, '{user_permissions}', '[]');
+    END IF;
+
+    -- Update the claims object in the original event
+    event := jsonb_set(event, '{claims}', claims);
+    
+    RETURN event;
+END;
+$$;
