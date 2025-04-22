@@ -54,21 +54,22 @@ export default function Auth() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw error;
-      // REMOVED: Explicit fetch calls. The onAuthStateChange listener in the store handles this.
-      // await useUserStore.getState().fetchUserAndProfile();
-      // await useUserStore.getState().fetchEnterprise();
-      // Don't redirect here, let the useEffect handle it
-    } catch (error: any) {
-      // Attempt to translate Supabase auth error codes
-      const errorCode = error.code || error.message;
-      const translatedError = t(`Auth.${errorCode}`, undefined, errorCode); // Fallback to code/message if translation missing
-      toast.error(translatedError);
+
+      if (signInError) {
+        toast.error(t("Auth.invalid_credentials"));
+        return;
+      }
+
+    } catch (error) {
+      // Catch any unexpected errors
+      console.error("[handleSignIn] Unexpected error:", error);
+      toast.error(t("Auth.something_went_wrong"));
     } finally {
       setLoading(false);
     }
