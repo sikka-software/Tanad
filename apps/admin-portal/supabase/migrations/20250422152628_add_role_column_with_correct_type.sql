@@ -1,1 +1,0 @@
-ALTER TABLE user_roles ADD COLUMN role app_role NOT NULL;
