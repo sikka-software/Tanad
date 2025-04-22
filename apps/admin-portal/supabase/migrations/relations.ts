@@ -55,7 +55,7 @@ export const userRolesRelations = relations(userRoles, ({one}) => ({
 		references: [enterprises.id]
 	}),
 	usersInAuth: one(usersInAuth, {
-		fields: [userRoles.userId],
+		fields: [userRoles.user_id],
 		references: [usersInAuth.id]
 	}),
 }));
