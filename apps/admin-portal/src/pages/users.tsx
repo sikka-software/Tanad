@@ -5,8 +5,10 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { FormDialog } from "@/components/ui/form-dialog";
 import PageTitle from "@/components/ui/page-title";
 
+import { UserForm } from "@/modules/user/user.form";
 import UsersTable from "@/modules/user/user.table";
 import { createClient } from "@/utils/supabase/component";
 
@@ -20,6 +22,8 @@ export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [userPermissions, setUserPermissions] = useState<Record<string, string[]>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     const getCurrentUserAndEnterprises = async () => {
@@ -163,20 +167,30 @@ export default function UsersPage() {
     <div>
       <PageTitle
         texts={{ title: t("Users.title") }}
-        customButton={<Button>{t("Users.add_new")}</Button>}
+        customButton={
+          <Button size="sm" onClick={() => setFormDialogOpen(true)}>
+            {t("Users.add_new")}
+          </Button>
+        }
       />
       <div className="p-4">
-        {isLoading ? (
-          <p>Loading users...</p>
-        ) : (
-          <UsersTable
-            currentUser={currentUser}
-            users={users}
-            userPermissions={userPermissions}
-            onUpdateUser={handleUpdateUser}
-          />
-        )}
+        <UsersTable
+          loading={isLoading}
+          currentUser={currentUser}
+          users={users}
+          userPermissions={userPermissions}
+          onUpdateUser={handleUpdateUser}
+        />
       </div>
+
+      <FormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
+        title={t("Users.add_new")}
+        formId="user-form"
+      >
+        <UserForm currentUser={currentUser} onSuccess={() => setFormDialogOpen(false)} />
+      </FormDialog>
     </div>
   );
 }

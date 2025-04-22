@@ -288,7 +288,7 @@ export function AppSidebar() {
                     </Button>
                   ) : (
                     <Button variant={"outline"} className="w-full">
-                      {user?.user_metadata.email}
+                      {profile?.email}
                     </Button>
                   )}
                 </DropdownMenuTrigger>

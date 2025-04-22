@@ -37,8 +37,7 @@ const userFormSchema = z.object({
   lastName: z.string().min(1, { message: "Last name is required." }),
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-  // role: z.enum(["accounting", "hr"]), // Changed from enum
-  role: z.string().min(1, { message: "Role is required." }), // General string validation
+  role: z.string().min(1, { message: "Role is required." }),
 });
 
 // Infer the type from the schema
@@ -47,12 +46,13 @@ type UserFormData = z.infer<typeof userFormSchema>;
 interface UserFormProps {
   currentUser: UserType; // Need this to get the enterprise_id
   onSuccess: () => void; // Callback to close the dialog/form
+  id?: string;
 }
 
-export function UserForm({ currentUser, onSuccess }: UserFormProps) {
+export function UserForm({ currentUser, onSuccess, id }: UserFormProps) {
   const t = useTranslations();
   const createUser = useCreateUser();
-  const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles(); // Fetch roles
+  const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<UserFormData>({
@@ -62,11 +62,10 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
       lastName: "",
       email: "",
       password: "",
-      role: "", // Default role empty, user must select
+      role: "",
     },
   });
 
-  // Reset role if available roles change and current value is invalid
   useEffect(() => {
     if (roles && roles.length > 0) {
       const currentRoleValue = form.getValues("role");
@@ -93,8 +92,8 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
       toast.success(t("General.successful_operation"), {
         description: t("Users.messages.created"),
       });
-      form.reset(); // Reset form fields
-      onSuccess(); // Call the success callback (e.g., close dialog)
+      form.reset();
+      onSuccess();
     } catch (error) {
       console.error("Error creating user:", error);
       toast.error("Failed to create user", {
@@ -107,7 +106,7 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id || "user-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -116,7 +115,7 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
               <FormItem>
                 <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John" {...field} />
+                  <Input placeholder="John" {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,7 +128,7 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Doe" {...field} />
+                  <Input placeholder="Doe" {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -143,7 +142,12 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder="user@example.com" {...field} />
+                <Input
+                  type="email"
+                  placeholder="user@example.com"
+                  {...field}
+                  disabled={isSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -156,7 +160,7 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="********" {...field} />
+                <Input type="password" placeholder="********" {...field} disabled={isSubmitting} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -171,7 +175,7 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
               <Select
                 onValueChange={field.onChange}
                 value={field.value}
-                disabled={rolesLoading || !!rolesError}
+                disabled={rolesLoading || !!rolesError || isSubmitting}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -202,12 +206,6 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
             </FormItem>
           )}
         />
-        {/* Enterprise field removed - automatically assigned */}
-        <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={isSubmitting || rolesLoading || !!rolesError}>
-            {isSubmitting ? "Creating..." : "Create User"}
-          </Button>
-        </div>
       </form>
     </Form>
   );

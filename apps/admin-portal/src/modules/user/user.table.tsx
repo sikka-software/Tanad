@@ -70,6 +70,7 @@ interface UsersTableProps {
   users: UserType[];
   userPermissions: Record<string, string[]>;
   onUpdateUser?: (user_id: string, role: string, enterprise_id: string) => Promise<void>;
+  loading: boolean;
 }
 
 export default function UsersTable({
@@ -77,9 +78,9 @@ export default function UsersTable({
   users,
   userPermissions,
   onUpdateUser,
+  loading,
 }: UsersTableProps) {
   const t = useTranslations();
-  const { data: usersData = [], isLoading } = useUsers();
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
 
@@ -189,7 +190,7 @@ export default function UsersTable({
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+        {/* <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>{t("Users.add_dialog.title")}</DialogTitle>
@@ -197,22 +198,22 @@ export default function UsersTable({
             </DialogHeader>
             <UserForm currentUser={currentUser} onSuccess={() => setIsAddUserDialogOpen(false)} />
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
       </div>
 
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("Users.table.head.email")}</TableHead>
-              <TableHead>{t("Users.table.head.role")}</TableHead>
-              <TableHead>{t("Users.table.head.permissions")}</TableHead>
-              <TableHead>{t("Users.table.head.created_at")}</TableHead>
-              <TableHead className="text-right">{t("Users.table.head.actions")}</TableHead>
+              <TableHead>{t("Users.form.email.label")}</TableHead>
+              <TableHead>{t("Users.form.role.label")}</TableHead>
+              <TableHead>{t("Users.form.permissions.label")}</TableHead>
+              <TableHead>{t("Forms.created_at.label")}</TableHead>
+              <TableHead className="text-right">{t("General.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {loading ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-muted-foreground h-24 text-center">
                   {t("General.loading")}
@@ -236,7 +237,14 @@ export default function UsersTable({
                   </TableCell>
                   <TableCell>
                     <Popover>
-                      <PopoverTrigger>{t("Users.table.permissions_popover")}</PopoverTrigger>
+                      <PopoverTrigger>
+                        <div className="flex flex-row gap-2">
+                          {userPermissions[user.id]?.length}
+                          <span className="text-muted-foreground">
+                            {t("Users.form.permissions.label")}
+                          </span>
+                        </div>
+                      </PopoverTrigger>
                       <PopoverContent className="max-h-[300px] overflow-y-auto">
                         <div className="flex flex-wrap gap-1">
                           {userPermissions[user.id]?.map((permission) => (
