@@ -66,7 +66,7 @@ interface UsersTableProps {
   currentUser: UserType;
   users: UserType[];
   userPermissions: Record<string, string[]>;
-  onUpdateUser: (userId: string, role: string, enterpriseId: string) => Promise<void>;
+  onUpdateUser: (user_id: string, role: string, enterpriseId: string) => Promise<void>;
 }
 
 type NewUserType = {

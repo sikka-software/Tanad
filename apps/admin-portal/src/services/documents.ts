@@ -11,7 +11,7 @@ export async function uploadDocument(document: DocumentFile) {
     throw userError || new Error("Could not get user");
   }
 
-  const userId = userData.user.id;
+  const user_id = userData.user.id;
   if (!document.file || !document.entity_id || !document.entity_type) {
     throw new Error("Missing required document information");
   }
@@ -42,7 +42,7 @@ export async function uploadDocument(document: DocumentFile) {
       entity_id: document.entity_id,
       entity_type: document.entity_type,
       file_path: fileName,
-      user_id: userId,
+      user_id: user_id,
     })
     .select()
     .single();
