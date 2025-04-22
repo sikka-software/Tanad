@@ -1,28 +1,44 @@
-import { createClient } from "@/utils/supabase/component";
+// Remove Drizzle/DB imports as they are no longer used here
+// import { db } from "@/db/drizzle";
+// import { profiles } from "@/db/schema";
+// import { sql } from 'drizzle-orm';
 
-const supabase = createClient();
-
-// Define the Role type based on your DB table
+// Define the Role type - this should match the API response
 export interface Role {
   id: string;
   name: string;
-  // Add other fields if needed (e.g., description, permissions)
 }
 
 export async function fetchRoles(): Promise<Role[]> {
-  console.log("Fetching roles..."); // Debug log
-  const { data, error } = await supabase
-    .from("roles") // Assuming your table is named 'roles'
-    .select("id, name") // Select only needed fields
-    .order("name", { ascending: true });
+  console.log("Service: Calling /api/roles/list...");
 
-  if (error) {
-    console.error("Error fetching roles:", error);
-    throw new Error("Failed to fetch roles: " + error.message);
+  try {
+    const response = await fetch('/api/roles/list', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      const errorMessage = result.message || `API Error: ${response.status} ${response.statusText}`;
+      console.error("Fetch Roles API Error:", result);
+      throw new Error(errorMessage);
+    }
+
+    console.log("Service: Received roles from API:", result);
+    return result as Role[]; // Type assertion based on API contract
+
+  } catch (error) {
+    console.error("Error in fetchRoles service function:", error);
+    // Rethrow or handle error as appropriate
+    if (error instanceof Error) {
+       throw new Error("Failed to fetch roles via API: " + error.message);
+    }
+    throw new Error("An unknown error occurred while fetching roles via API.");
   }
-
-  console.log("Fetched roles:", data); // Debug log
-  return data || []; // Return empty array if data is null
 }
 
-// Add other role service functions if needed (create, update, delete) 
+// Add other role service functions if needed (create, update, delete)
