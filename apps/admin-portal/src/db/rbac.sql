@@ -9,8 +9,8 @@ DROP POLICY IF EXISTS "Only superadmins can manage roles" ON user_roles;
 DROP POLICY IF EXISTS "Only superadmins can manage role permissions" ON role_permissions;
 
 -- Now drop the tables and types
-DROP TABLE IF EXISTS public.role_permissions;
-DROP TABLE IF EXISTS public.user_roles;
+DROP TABLE IF EXISTS public.role_permissions CASCADE;
+DROP TABLE IF EXISTS public.user_roles CASCADE;
 DROP TYPE IF EXISTS public.app_permission CASCADE;
 DROP TYPE IF EXISTS public.app_role CASCADE;
 
@@ -155,155 +155,80 @@ CREATE TYPE public.app_permission AS ENUM (
   'branches.export'
 );
 
--- Create user_roles table with support for both predefined and custom roles
-CREATE TABLE IF NOT EXISTS public.user_roles (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
-  role TEXT NOT NULL CHECK (
-    role::text = ANY(enum_range(NULL::app_role)::text[]) OR
-    role ~ '^[a-z0-9_]+$' -- Allow custom role names with lowercase letters, numbers, and underscores
-  ),
-  enterprise_id UUID REFERENCES enterprises(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
-  UNIQUE (user_id, role, enterprise_id)
+-- Create tables
+CREATE TABLE public.user_roles (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  role app_role NOT NULL,
+  created_at timestamptz DEFAULT now() NOT NULL,
+  updated_at timestamptz DEFAULT now() NOT NULL,
+  UNIQUE(user_id, role)
 );
 
--- Create role_permissions table with support for both predefined and custom roles
-CREATE TABLE IF NOT EXISTS public.role_permissions (
-  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  role TEXT NOT NULL CHECK (
-    role::text = ANY(enum_range(NULL::app_role)::text[]) OR
-    role ~ '^[a-z0-9_]+$' -- Allow custom role names with lowercase letters, numbers, and underscores
-  ),
+CREATE TABLE public.role_permissions (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  role app_role NOT NULL,
   permission app_permission NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
-  UNIQUE (role, permission)
+  created_at timestamptz DEFAULT now() NOT NULL,
+  updated_at timestamptz DEFAULT now() NOT NULL,
+  UNIQUE(role, permission)
 );
 
--- Create the authorization function
-CREATE OR REPLACE FUNCTION public.authorize(
-  requested_permission app_permission,
-  enterprise_id UUID DEFAULT NULL
-)
-RETURNS boolean
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  bind_permissions int;
-BEGIN
-  SELECT COUNT(*)
-  INTO bind_permissions
-  FROM public.user_roles ur
-  JOIN public.role_permissions rp ON ur.role = rp.role
-  WHERE ur.user_id = auth.uid()
-    AND rp.permission = requested_permission
-    AND (enterprise_id IS NULL OR ur.enterprise_id = enterprise_id);
+-- Insert role permissions for superadmin (all permissions)
+INSERT INTO public.role_permissions (role, permission)
+SELECT 'superadmin', permission
+FROM unnest(enum_range(NULL::app_permission)) AS permission;
 
-  RETURN bind_permissions > 0;
-END;
+-- Enable RLS
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.role_permissions ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Users can view their own roles"
+  ON public.user_roles
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can view all role permissions"
+  ON public.role_permissions
+  FOR SELECT
+  USING (true);
+
+-- Create functions
+CREATE OR REPLACE FUNCTION public.has_role(role_name app_role)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.user_roles
+    WHERE user_id = auth.uid()
+    AND role = role_name
+  );
 $$;
 
--- Insert role permissions
-INSERT INTO public.role_permissions (role, permission)
-VALUES
-  ('superadmin', 'profiles.create'),
-  ('superadmin', 'profiles.read'),
-  ('superadmin', 'profiles.update'),
-  ('superadmin', 'profiles.delete'),
-  ('superadmin', 'profiles.export'),
-  ('superadmin', 'enterprises.create'),
-  ('superadmin', 'enterprises.read'),
-  ('superadmin', 'enterprises.update'),
-  ('superadmin', 'enterprises.delete'),
-  ('superadmin', 'enterprises.export'),
-  ('superadmin', 'invoices.create'),
-  ('superadmin', 'invoices.read'),
-  ('superadmin', 'invoices.update'),
-  ('superadmin', 'invoices.delete'),
-  ('superadmin', 'invoices.export'),
-  ('superadmin', 'invoices.duplicate'),
-  ('superadmin', 'products.create'),
-  ('superadmin', 'products.read'),
-  ('superadmin', 'products.update'),
-  ('superadmin', 'products.delete'),
-  ('superadmin', 'products.export'),
-  ('superadmin', 'quotes.create'),
-  ('superadmin', 'quotes.read'),
-  ('superadmin', 'quotes.update'),
-  ('superadmin', 'quotes.delete'),
-  ('superadmin', 'quotes.export'),
-  ('superadmin', 'quotes.duplicate'),
-  ('superadmin', 'employees.create'),
-  ('superadmin', 'employees.read'),
-  ('superadmin', 'employees.update'),
-  ('superadmin', 'employees.delete'),
-  ('superadmin', 'employees.export'),
-  ('superadmin', 'salaries.create'),
-  ('superadmin', 'salaries.read'),
-  ('superadmin', 'salaries.update'),
-  ('superadmin', 'salaries.delete'),
-  ('superadmin', 'salaries.export'),
-  ('superadmin', 'documents.create'),
-  ('superadmin', 'documents.read'),
-  ('superadmin', 'documents.update'),
-  ('superadmin', 'documents.delete'),
-  ('superadmin', 'documents.export'),
-  ('superadmin', 'templates.create'),
-  ('superadmin', 'templates.read'),
-  ('superadmin', 'templates.update'),
-  ('superadmin', 'templates.delete'),
-  ('superadmin', 'templates.export'),
-  ('superadmin', 'templates.duplicate'),
-  ('superadmin', 'employee_requests.create'),
-  ('superadmin', 'employee_requests.read'),
-  ('superadmin', 'employee_requests.update'),
-  ('superadmin', 'employee_requests.delete'),
-  ('superadmin', 'employee_requests.export'),
-  ('superadmin', 'job_listings.create'),
-  ('superadmin', 'job_listings.read'),
-  ('superadmin', 'job_listings.update'),
-  ('superadmin', 'job_listings.delete'),
-  ('superadmin', 'job_listings.export'),
-  ('superadmin', 'offices.create'),
-  ('superadmin', 'offices.read'),
-  ('superadmin', 'offices.update'),
-  ('superadmin', 'offices.delete'),
-  ('superadmin', 'offices.export'),
-  ('superadmin', 'expenses.create'),
-  ('superadmin', 'expenses.read'),
-  ('superadmin', 'expenses.update'),
-  ('superadmin', 'expenses.delete'),
-  ('superadmin', 'expenses.export'),
-  ('superadmin', 'expenses.duplicate'),
-  ('superadmin', 'departments.create'),
-  ('superadmin', 'departments.read'),
-  ('superadmin', 'departments.update'),
-  ('superadmin', 'departments.delete'),
-  ('superadmin', 'departments.export'),
-  ('superadmin', 'warehouses.create'),
-  ('superadmin', 'warehouses.read'),
-  ('superadmin', 'warehouses.update'),
-  ('superadmin', 'warehouses.delete'),
-  ('superadmin', 'warehouses.export'),
-  ('superadmin', 'vendors.create'),
-  ('superadmin', 'vendors.read'),
-  ('superadmin', 'vendors.update'),
-  ('superadmin', 'vendors.delete'),
-  ('superadmin', 'vendors.export'),
-  ('superadmin', 'clients.create'),
-  ('superadmin', 'clients.read'),
-  ('superadmin', 'clients.update'),
-  ('superadmin', 'clients.delete'),
-  ('superadmin', 'clients.export'),
-  ('superadmin', 'companies.create'),
-  ('superadmin', 'companies.read'),
-  ('superadmin', 'companies.update'),
-  ('superadmin', 'companies.delete'),
-  ('superadmin', 'companies.export'),
-  ('superadmin', 'branches.create'),
-  ('superadmin', 'branches.read'),
-  ('superadmin', 'branches.update'),
-  ('superadmin', 'branches.delete'),
-  ('superadmin', 'branches.export'); 
+CREATE OR REPLACE FUNCTION public.has_permission(permission_name app_permission)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.user_roles ur
+    JOIN public.role_permissions rp ON ur.role = rp.role
+    WHERE ur.user_id = auth.uid()
+    AND rp.permission = permission_name
+  );
+$$;
+
+-- Create triggers
+CREATE TRIGGER set_updated_at
+  BEFORE UPDATE ON public.user_roles
+  FOR EACH ROW
+  EXECUTE FUNCTION public.set_updated_at();
+
+CREATE TRIGGER set_updated_at
+  BEFORE UPDATE ON public.role_permissions
+  FOR EACH ROW
+  EXECUTE FUNCTION public.set_updated_at(); 
