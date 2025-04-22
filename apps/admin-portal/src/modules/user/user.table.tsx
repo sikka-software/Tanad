@@ -166,11 +166,11 @@ export default function UsersTable({
   const getRoleIcon = (role: string) => {
     switch (role) {
       case "superadmin":
-        return <Shield className="mr-1 h-4 w-4" />;
+        return <Shield className="me-1 h-4 w-4" />;
       case "admin":
-        return <UserCog className="mr-1 h-4 w-4" />;
+        return <UserCog className="me-1 h-4 w-4" />;
       default:
-        return <User className="mr-1 h-4 w-4" />;
+        return <User className="me-1 h-4 w-4" />;
     }
   };
 
@@ -232,7 +232,7 @@ export default function UsersTable({
                 <TableRow key={user.id}>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="flex items-center">
+                    <Badge variant="outline" className="flex items-center w-fit gap-1">
                       {getRoleIcon(user.role)}
                       {user.role}
                     </Badge>

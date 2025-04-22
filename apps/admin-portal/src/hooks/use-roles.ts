@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Role, Permission } from "@/types/rbac";
 
 import { appPermission } from "@/db/schema";
+import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
 const supabase = createClient();
@@ -41,13 +42,18 @@ export function useRoles() {
     queryKey: roleKeys.lists(),
     queryFn: async () => {
       // 1. Fetch user role assignments
-      const { data: userRolesData, error: userRolesError } = await supabase.from("user_roles")
-        .select(`
+      const { profile } = useUserStore.getState();
+      const { data: userRolesData, error: userRolesError } = await supabase
+        .from("user_roles")
+        .select(
+          `
           user_id,
           role,
           created_at,
           enterprise_id
-        `);
+        `,
+        )
+        .eq("enterprise_id", profile?.enterprise_id);
 
       if (userRolesError) throw userRolesError;
 
