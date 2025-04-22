@@ -10,8 +10,10 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import LoadingPage from "@/components/loading-page";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
+import { usePermission } from "@/hooks/use-permission";
 import OfficeCard from "@/modules/office/office.card";
 import { useOffices, useBulkDeleteOffices } from "@/modules/office/office.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/office/office.options";
@@ -20,6 +22,17 @@ import OfficesTable from "@/modules/office/office.table";
 
 export default function OfficesPage() {
   const t = useTranslations();
+  const { hasPermission, isLoading: isCheckingPermission } = usePermission("offices.view");
+
+  // If still checking permissions, show loading state
+  if (isCheckingPermission) {
+    return <LoadingPage />;
+  }
+
+  // If no permission, the hook will automatically redirect to home
+  if (!hasPermission) {
+    return <div>No permission</div>;
+  }
 
   const viewMode = useOfficeStore((state) => state.viewMode);
   const isDeleteDialogOpen = useOfficeStore((state) => state.isDeleteDialogOpen);
