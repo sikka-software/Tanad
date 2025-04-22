@@ -10,6 +10,7 @@ export default {
   schema: "./src/db/schema.ts",
   out: "./supabase/migrations",
   dialect: "postgresql",
+  schemaFilter: ["public", "auth"],
   dbCredentials: {
     host: url.hostname,
     port: parseInt(url.port),
