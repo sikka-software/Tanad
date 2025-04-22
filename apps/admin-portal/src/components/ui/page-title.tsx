@@ -25,13 +25,13 @@ const PageTitle = ({
   formId?: string;
   loading?: boolean;
   texts?: {
-    title: string;
-    submit_form: string;
-    cancel: string;
+    title?: string;
+    submit_form?: string;
+    cancel?: string;
   };
 }) => {
   return (
-    <div className="bg-background bg-background sticky top-0 flex !min-h-12 items-center justify-between border-b p-2 py-0">
+    <div className="bg-background sticky top-0 flex !min-h-12 items-center justify-between border-b p-2 py-0">
       {texts?.title && <h2 className="ms-2 text-xl font-bold">{texts?.title}</h2>}
       {formButtons && (
         <div className="flex gap-2 p-0">

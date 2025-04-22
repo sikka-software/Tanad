@@ -1,12 +1,17 @@
 import { GetStaticProps } from "next";
+import { useTranslations } from "next-intl";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import PageTitle from "@/components/ui/page-title";
 
 import UsersTable from "@/modules/user/user.table";
 import { createClient } from "@/utils/supabase/component";
 
 export default function UsersPage() {
+  const t = useTranslations();
   const supabase = createClient();
   const router = useRouter();
 
@@ -155,25 +160,23 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="mb-6 text-3xl font-bold">User Management</h1>
-      <p className="text-muted-foreground mb-8">
-        Manage users within your enterprise.{" "}
-        {currentUser?.role === "superadmin"
-          ? "As a superadmin, you can manage users across all enterprises."
-          : ""}
-      </p>
-
-      {isLoading ? (
-        <p>Loading users...</p>
-      ) : (
-        <UsersTable
-          currentUser={currentUser}
-          users={users}
-          userPermissions={userPermissions}
-          onUpdateUser={handleUpdateUser}
-        />
-      )}
+    <div>
+      <PageTitle
+        texts={{ title: t("Users.title") }}
+        customButton={<Button>{t("Users.add_new")}</Button>}
+      />
+      <div className="p-4">
+        {isLoading ? (
+          <p>Loading users...</p>
+        ) : (
+          <UsersTable
+            currentUser={currentUser}
+            users={users}
+            userPermissions={userPermissions}
+            onUpdateUser={handleUpdateUser}
+          />
+        )}
+      </div>
     </div>
   );
 }

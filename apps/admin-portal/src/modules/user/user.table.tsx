@@ -121,15 +121,15 @@ export default function UsersTable({
         },
       });
 
-      toast.success("User updated", {
-        description: "User information has been updated successfully.",
+      toast.success(t("Users.toast.success.updated"), {
+        description: t("Users.toast.success.updated_description"),
       });
 
       setIsEditDialogOpen(false);
     } catch (error) {
       console.error("Error updating user:", error);
-      toast.error("Failed to update user information.", {
-        description: "Failed to update user information.",
+      toast.error(t("Users.toast.error.update_failed"), {
+        description: t("Users.toast.error.update_failed_description"),
       });
     }
   };
@@ -141,22 +141,22 @@ export default function UsersTable({
     try {
       await deleteUser.mutateAsync(selectedUser.id);
 
-      toast.success("User deleted", {
-        description: "User has been deleted successfully.",
+      toast.success(t("Users.toast.success.deleted"), {
+        description: t("Users.toast.success.deleted_description"),
       });
 
       setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting user:", error);
-      toast.error("Failed to delete user.", {
-        description: "Failed to delete user.",
+      toast.error(t("Users.toast.error.delete_failed"), {
+        description: t("Users.toast.error.delete_failed_description"),
       });
     }
   };
 
   // Format date for display
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Never";
+    if (!dateString) return t("Users.table.created_at_never");
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -183,22 +183,17 @@ export default function UsersTable({
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
           <Input
             type="search"
-            placeholder="Search users..."
+            placeholder={t("Users.search_placeholder")}
             className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>Add User</Button>
-          </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Add New User</DialogTitle>
-              <DialogDescription>
-                Fill in the details to create a new user. They will belong to the same enterprise.
-              </DialogDescription>
+              <DialogTitle>{t("Users.add_dialog.title")}</DialogTitle>
+              <DialogDescription>{t("Users.add_dialog.description")}</DialogDescription>
             </DialogHeader>
             <UserForm currentUser={currentUser} onSuccess={() => setIsAddUserDialogOpen(false)} />
           </DialogContent>
@@ -209,24 +204,24 @@ export default function UsersTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Permissions</TableHead>
-              <TableHead>Created At</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t("Users.table.head.email")}</TableHead>
+              <TableHead>{t("Users.table.head.role")}</TableHead>
+              <TableHead>{t("Users.table.head.permissions")}</TableHead>
+              <TableHead>{t("Users.table.head.created_at")}</TableHead>
+              <TableHead className="text-right">{t("Users.table.head.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-muted-foreground h-24 text-center">
-                  Loading...
+                  {t("General.loading")}
                 </TableCell>
               </TableRow>
             ) : filteredUsers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-muted-foreground h-24 text-center">
-                  No users found.
+                  {t("Users.table.no_users")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -241,7 +236,7 @@ export default function UsersTable({
                   </TableCell>
                   <TableCell>
                     <Popover>
-                      <PopoverTrigger>Permissions</PopoverTrigger>
+                      <PopoverTrigger>{t("Users.table.permissions_popover")}</PopoverTrigger>
                       <PopoverContent className="max-h-[300px] overflow-y-auto">
                         <div className="flex flex-wrap gap-1">
                           {userPermissions[user.id]?.map((permission) => (
@@ -260,14 +255,14 @@ export default function UsersTable({
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
+                            <span className="sr-only">{t("Users.actions.open_menu")}</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuLabel>{t("Users.table.head.actions")}</DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => handleEditUser(user)}>
-                            Edit
+                            {t("General.edit")}
                           </DropdownMenuItem>
                           <>
                             <DropdownMenuSeparator />
@@ -275,7 +270,7 @@ export default function UsersTable({
                               className="text-red-600"
                               onClick={() => handleDeleteUser(user)}
                             >
-                              Delete
+                              {t("General.delete")}
                             </DropdownMenuItem>
                           </>
                         </DropdownMenuContent>
@@ -293,19 +288,19 @@ export default function UsersTable({
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
-            <DialogDescription>Make changes to the user&apos;s profile here.</DialogDescription>
+            <DialogTitle>{t("Users.edit_dialog.title")}</DialogTitle>
+            <DialogDescription>{t("Users.edit_dialog.description")}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">
-                Email
+                {t("Users.edit_dialog.email_label")}
               </Label>
               <Input id="email" value={selectedUser?.email} disabled className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">
-                Role
+                {t("Users.edit_dialog.role_label")}
               </Label>
               <Select
                 value={selectedUser?.role}
@@ -316,21 +311,21 @@ export default function UsersTable({
                 }
               >
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select role" />
+                  <SelectValue placeholder={t("Users.edit_dialog.select_role_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="superadmin">Superadmin</SelectItem>
-                  <SelectItem value="accounting">Accounting</SelectItem>
-                  <SelectItem value="hr">HR</SelectItem>
+                  <SelectItem value="superadmin">{t("Roles.roles.superadmin")}</SelectItem>
+                  <SelectItem value="accounting">{t("Roles.roles.accounting")}</SelectItem>
+                  <SelectItem value="hr">{t("Roles.roles.hr")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-              Cancel
+              {t("General.cancel")}
             </Button>
-            <Button onClick={saveUserChanges}>Save changes</Button>
+            <Button onClick={saveUserChanges}>{t("Users.edit_dialog.save_button")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -339,25 +334,23 @@ export default function UsersTable({
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this user? This action cannot be undone.
-            </DialogDescription>
+            <DialogTitle>{t("Users.delete_dialog.title")}</DialogTitle>
+            <DialogDescription>{t("Users.delete_dialog.description")}</DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <p className="text-muted-foreground">
-              User:{" "}
+              {t("Users.delete_dialog.user_prefix")}{" "}
               <span className="text-foreground font-medium">
-                {selectedUser?.email || "No email"}
+                {selectedUser?.email || t("Users.delete_dialog.no_email")}
               </span>
             </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancel
+              {t("General.cancel")}
             </Button>
             <Button variant="destructive" onClick={handleDelete}>
-              Delete
+              {t("Users.delete_dialog.delete_button")}
             </Button>
           </DialogFooter>
         </DialogContent>
