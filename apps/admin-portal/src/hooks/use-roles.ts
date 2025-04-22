@@ -41,7 +41,7 @@ export function useRoles() {
     queryKey: roleKeys.lists(),
     queryFn: async () => {
       const { data, error } = await supabase.from("user_roles").select(`
-          id,
+          user_id,
           role,
           created_at,
           enterprise_id
@@ -51,13 +51,13 @@ export function useRoles() {
 
       // Transform the data to match our Role type
       return data.map((role) => ({
-        id: role.id,
+        id: `${role.user_id}-${role.role}-${role.enterprise_id}`, // Synthetic ID
         name: role.role,
-        description: `Role: ${role.role}`,
+        description: `Role: ${role.role}`, // Consider adding a description field to the db
         permissions: [], // We'll fetch these separately
+        isSystem: false, // Custom roles are not system roles
         createdAt: role.created_at,
-        updatedAt: role.created_at,
-        isSystem: false,
+        updatedAt: role.created_at, // Use created_at as updated_at for now
       })) as Role[];
     },
   });
@@ -123,26 +123,40 @@ export function useCreateRole() {
 
   return useMutation({
     mutationFn: async (role: Omit<Role, "id" | "createdAt" | "updatedAt">) => {
-      // Get the current user's ID
+      // 1. Get the current user's ID
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+      if (userError || !user) throw new Error("User not authenticated");
 
-      // First create the role
+      // 2. Fetch the user's profile to get their enterprise_id
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("enterprise_id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (profileError) throw profileError;
+      if (!profileData || !profileData.enterprise_id) {
+        throw new Error("User profile or enterprise ID not found.");
+      }
+      const enterprise_id = profileData.enterprise_id;
+
+      // 3. First create the role entry in user_roles
       const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
         .insert({
           role: role.name,
           user_id: user.id,
-          enterprise_id: null, // For now, we don't support enterprise-specific roles
+          enterprise_id: enterprise_id, // Use fetched enterprise_id
         })
         .select()
         .single();
 
       if (roleError) throw roleError;
 
-      // Then create the role permissions if any are selected
+      // 4. Then create the role permissions if any are selected
       if (role.permissions && role.permissions.length > 0) {
         // Validate that all permissions are valid enum values
         const invalidPermissions = role.permissions.filter(
@@ -156,16 +170,18 @@ export function useCreateRole() {
         const { error: permissionsError } = await supabase.from("role_permissions").insert(
           role.permissions.map((permission) => ({
             role: role.name,
-            permission: permission as any, // Type assertion since we've validated the values
+            permission: permission as any, // Type assertion since we've validated
           })),
         );
 
         if (permissionsError) throw permissionsError;
       }
 
+      // 5. Return the created role structure
       return {
         ...role,
-        id: roleData.id,
+        id: `${user.id}-${role.name}-${enterprise_id}`, // Use the same synthetic ID structure
+        isSystem: false, // It's a custom role
         createdAt: roleData.created_at,
         updatedAt: roleData.created_at,
       } as Role;

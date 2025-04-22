@@ -66,14 +66,14 @@ interface UsersTableProps {
   currentUser: UserType;
   users: UserType[];
   userPermissions: Record<string, string[]>;
-  onUpdateUser: (userId: string, role: string, enterpriseId: string) => Promise<void>;
+  onUpdateUser: (user_id: string, role: string, enterprise_id: string) => Promise<void>;
 }
 
 type NewUserType = {
   email: string;
   password: string;
   role: "accounting" | "hr";
-  enterpriseId: string;
+  enterprise_id: string;
 };
 
 export default function UsersTable({ 
@@ -97,7 +97,7 @@ export default function UsersTable({
     email: "",
     password: "",
     role: "accounting",
-    enterpriseId: "",
+    enterprise_id: "",
   });
 
   // Filter users based on search query
@@ -188,14 +188,14 @@ export default function UsersTable({
   };
 
   const handleCreate = async () => {
-    if (!newUser.email || !newUser.password || !newUser.enterpriseId) return;
+    if (!newUser.email || !newUser.password || !newUser.enterprise_id) return;
 
     try {
       await createUser.mutateAsync({
         email: newUser.email,
         password: newUser.password,
         role: newUser.role,
-        enterprise_id: newUser.enterpriseId,
+        enterprise_id: newUser.enterprise_id,
       });
 
       setIsCreating(false);
@@ -203,7 +203,7 @@ export default function UsersTable({
         email: "",
         password: "",
         role: "accounting",
-        enterpriseId: "",
+        enterprise_id: "",
       });
 
       toast.success("User created", {
@@ -278,8 +278,8 @@ export default function UsersTable({
             <div>
               <Label htmlFor="enterprise">Enterprise</Label>
               <Select
-                value={newUser.enterpriseId}
-                onValueChange={(value) => setNewUser({ ...newUser, enterpriseId: value })}
+                value={newUser.enterprise_id}
+                onValueChange={(value) => setNewUser({ ...newUser, enterprise_id: value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select enterprise" />

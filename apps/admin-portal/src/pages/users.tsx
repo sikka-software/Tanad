@@ -70,7 +70,7 @@ export default function UsersPage() {
     email: string,
     password: string,
     role: string,
-    enterpriseId: string,
+    enterprise_id: string,
   ) => {
     try {
       // Create the user in auth
@@ -87,7 +87,7 @@ export default function UsersPage() {
         id: authData.user.id,
         email,
         role,
-        enterprise_id: enterpriseId,
+        enterprise_id: enterprise_id,
       });
 
       if (profileError) throw profileError;
@@ -117,12 +117,12 @@ export default function UsersPage() {
     }
   };
 
-  const handleUpdateUser = async (userId: string, role: string, enterpriseId: string) => {
+  const handleUpdateUser = async (user_id: string, role: string, enterprise_id: string) => {
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({ role, enterprise_id: enterpriseId })
-        .eq("id", userId);
+        .update({ role, enterprise_id: enterprise_id })
+        .eq("id", user_id);
 
       if (error) throw error;
 
@@ -142,7 +142,7 @@ export default function UsersPage() {
 
       setUserPermissions(prev => ({
         ...prev,
-        [userId]: permissions?.map(p => p.permission) || [],
+        [user_id]: permissions?.map(p => p.permission) || [],
       }));
     } catch (error) {
       console.error("Error updating user:", error);
