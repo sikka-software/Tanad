@@ -4,12 +4,13 @@ export async function fetchWarehouses(): Promise<Warehouse[]> {
   try {
     const response = await fetch("/api/warehouses");
     if (!response.ok) {
-      throw new Error("Failed to fetch warehouses");
+      console.error("Failed to fetch warehouses:", response.statusText);
+      return [];
     }
     return response.json();
   } catch (error) {
     console.error("Error fetching warehouses:", error);
-    throw error;
+    return [];
   }
 }
 

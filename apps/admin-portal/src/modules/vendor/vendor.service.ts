@@ -1,11 +1,17 @@
 import { Vendor } from "@/modules/vendor/vendor.type";
 
 export async function fetchVendors(): Promise<Vendor[]> {
-  const response = await fetch("/api/resource/vendors");
-  if (!response.ok) {
-    throw new Error("Failed to fetch vendors");
+  try {
+    const response = await fetch("/api/resource/vendors");
+    if (!response.ok) {
+      console.error("Failed to fetch vendors:", response.statusText);
+      return [];
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching vendors:", error);
+    return [];
   }
-  return response.json();
 }
 
 export async function fetchVendorById(id: string): Promise<Vendor> {
