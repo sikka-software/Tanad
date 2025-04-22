@@ -43,14 +43,17 @@ const userFormSchema = z.object({
 // Infer the type from the schema
 type UserFormData = z.infer<typeof userFormSchema>;
 
+import { createClient } from "@/utils/supabase/component";
+import useUserStore from "@/stores/use-user-store";
+
 interface UserFormProps {
-  currentUser: UserType; // Need this to get the enterprise_id
   onSuccess: () => void; // Callback to close the dialog/form
   id?: string;
 }
 
-export function UserForm({ currentUser, onSuccess, id }: UserFormProps) {
+export function UserForm({ onSuccess, id }: UserFormProps) {
   const t = useTranslations();
+  const profile = useUserStore((state) => state.profile);
   const createUser = useCreateUser();
   const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,9 +80,8 @@ export function UserForm({ currentUser, onSuccess, id }: UserFormProps) {
   }, [roles, form]);
 
   const onSubmit = async (values: UserFormData) => {
-    if (!currentUser?.enterprise_id) {
+    if (!profile?.enterprise_id) {
       toast.error("Cannot create user: Enterprise information missing.");
-      console.error("Current user enterprise_id is missing", currentUser);
       return;
     }
 
@@ -87,7 +89,7 @@ export function UserForm({ currentUser, onSuccess, id }: UserFormProps) {
     try {
       await createUser.mutateAsync({
         ...values,
-        enterprise_id: currentUser.enterprise_id,
+        enterprise_id: profile?.enterprise_id,
       });
       toast.success(t("General.successful_operation"), {
         description: t("Users.messages.created"),

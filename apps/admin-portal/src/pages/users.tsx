@@ -86,6 +86,17 @@ export default function UsersPage() {
     enterprise_id: string,
   ) => {
     try {
+      // Fetch the current user's profile
+      const { data: currentProfile, error: currentProfileError } = await supabase
+        .from("profiles")
+        .select("enterprise_id")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (currentProfileError) throw currentProfileError;
+
+      const currentEnterpriseId = currentProfile?.enterprise_id;
+
       // Create the user in auth
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email,
@@ -100,7 +111,7 @@ export default function UsersPage() {
         id: authData.user.id,
         email,
         role,
-        enterprise_id: enterprise_id,
+        enterprise_id: currentEnterpriseId,
       });
 
       if (profileError) throw profileError;
@@ -109,7 +120,7 @@ export default function UsersPage() {
       const { error: userRoleError } = await supabase.from("user_roles").insert({
         user_id: authData.user.id,
         role,
-        enterprise_id: enterprise_id,
+        enterprise_id: currentEnterpriseId,
       });
 
       if (userRoleError) throw userRoleError;
@@ -118,7 +129,7 @@ export default function UsersPage() {
       const { data: users } = await supabase
         .from("profiles")
         .select("*")
-        .eq("enterprise_id", enterprise_id)
+        .eq("enterprise_id", currentEnterpriseId)
         .order("created_at", { ascending: false });
 
       setUsers(users || []);
@@ -135,6 +146,15 @@ export default function UsersPage() {
           [authData.user.id]: permissions?.map((p) => p.permission) || [],
         }));
       }
+
+      // Refresh current user
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      setCurrentUser(profile);
     } catch (error) {
       console.error("Error creating user:", error);
     }
@@ -198,7 +218,7 @@ export default function UsersPage() {
         title={t("Users.add_new")}
         formId="user-form"
       >
-        <UserForm currentUser={currentUser} onSuccess={() => setFormDialogOpen(false)} />
+        <UserForm onSuccess={() => setFormDialogOpen(false)} />
       </FormDialog>
     </div>
   );
