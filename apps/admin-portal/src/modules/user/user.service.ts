@@ -24,35 +24,38 @@ export async function fetchUserById(id: string) {
   return data as UserType;
 }
 
-export async function createUser(userData: {
+// Type for the data sent to the API route
+interface CreateUserPayload {
   email: string;
   password: string;
   role: string;
   enterprise_id: string;
-}) {
-  // First create auth user
-  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-    email: userData.email,
-    password: userData.password,
-    email_confirm: true,
+}
+
+// Type expected from the API route on success
+// This should match the structure returned by the API route (likely the profile)
+// Using UserType for now, adjust if API returns something different
+type CreateUserResponse = UserType;
+
+export async function createUser(userData: CreateUserPayload): Promise<CreateUserResponse> {
+  const response = await fetch('/api/users/create', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
   });
 
-  if (authError) throw authError;
+  const result = await response.json();
 
-  // Then create profile
-  const { data, error } = await supabase
-    .from("profiles")
-    .insert({
-      id: authData.user.id,
-      email: userData.email,
-      role: userData.role,
-      enterprise_id: userData.enterprise_id,
-    })
-    .select()
-    .single();
+  if (!response.ok) {
+    // Forward the error message from the API route
+    const errorMessage = result.message || `API Error: ${response.status} ${response.statusText}`;
+    console.error("Create User API Error:", result);
+    throw new Error(errorMessage);
+  }
 
-  if (error) throw error;
-  return data as UserType;
+  return result as CreateUserResponse;
 }
 
 export async function updateUser(id: string, userData: { role: string; enterprise_id: string }) {
