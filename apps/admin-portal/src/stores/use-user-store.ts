@@ -52,18 +52,17 @@ export interface UserState {
   user: User | null;
   profile: Profile | null;
   enterprise: Enterprise | null;
-  loading: boolean;
-  initialized: boolean;
+  loading: boolean; // Represents loading state for async operations like fetching profile/enterprise
+  initialized: boolean; // Represents if the store has attempted initial auth check
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   setProfile: (profile: Profile | null) => void;
   setEnterprise: (enterprise: Enterprise | null) => void;
-  fetchUserAndProfile: () => Promise<void>;
+  fetchUserAndRelatedData: (userId: string) => Promise<void>; // Renamed and combined
   refreshProfile: () => Promise<void>;
-  fetchEnterprise: () => Promise<void>;
   signOut: () => Promise<void>;
-  setInitialized: (initialized: boolean) => void;
-  setState: (state: Partial<UserState>) => void;
+  initializeAuth: () => Promise<void>; // New initialization action
+  setState: (state: Partial<UserState>) => void; // Keep for flexibility if needed
 }
 
 const useUserStore = create<UserState>()(
@@ -77,121 +76,125 @@ const useUserStore = create<UserState>()(
       isAuthenticated: false,
 
       setUser: (user) => {
-        console.log("[UserStore] Setting user:", user?.id);
+        // console.log("[UserStore] Setting user:", user?.id);
         set({ user, isAuthenticated: !!user });
       },
 
       setProfile: (profile) => {
-        console.log("[UserStore] Setting profile:", profile?.id);
+        // console.log("[UserStore] Setting profile:", profile?.id);
         set({ profile });
       },
 
       setEnterprise: (enterprise) => {
-        console.log("[UserStore] Setting enterprise:", enterprise?.id);
+        // console.log("[UserStore] Setting enterprise:", enterprise?.id);
         set({ enterprise });
       },
 
-      setInitialized: (initialized) => {
-        set({ initialized });
+      // Fetches profile and potentially enterprise based on profile data
+      fetchUserAndRelatedData: async (userId: string) => {
+        if (!userId) {
+          console.warn("[UserStore] fetchUserAndRelatedData called without userId.");
+          set({ profile: null, enterprise: null, loading: false });
+          return;
+        }
+        // console.log(`[UserStore] Fetching profile & enterprise for user: ${userId}`);
+        set({ loading: true });
+        const supabase = createClient();
+        let fetchedProfile: Profile | null = null;
+        let fetchedEnterprise: Enterprise | null = null;
+
+        try {
+          // Fetch profile
+          const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", userId)
+            .single();
+
+          if (profileError) {
+            console.error("[UserStore] Profile fetch error:", profileError);
+            // Don't throw, just set profile to null and continue
+            set({ profile: null });
+          } else {
+            fetchedProfile = profileData;
+            // console.log("[UserStore] Profile fetched:", fetchedProfile?.id);
+            set({ profile: fetchedProfile });
+
+            // Fetch enterprise if profile has enterprise_id
+            if (fetchedProfile?.enterprise_id) {
+              try {
+                const { data: enterpriseData, error: enterpriseError } = await supabase
+                  .from("enterprises")
+                  .select("*")
+                  .eq("id", fetchedProfile.enterprise_id)
+                  .single();
+
+                if (enterpriseError) {
+                  console.error("[UserStore] Enterprise fetch error:", enterpriseError);
+                  set({ enterprise: null }); // Clear enterprise if fetch fails
+                } else {
+                  fetchedEnterprise = enterpriseData;
+                  // console.log("[UserStore] Enterprise fetched:", fetchedEnterprise?.id);
+                  set({ enterprise: fetchedEnterprise });
+                }
+              } catch (error) {
+                console.error("[UserStore] Error fetching enterprise:", error);
+                set({ enterprise: null });
+              }
+            } else {
+              // No enterprise_id, ensure enterprise state is null
+              set({ enterprise: null });
+            }
+          }
+        } catch (error) {
+          console.error("[UserStore] Error fetching profile:", error);
+          set({ profile: null, enterprise: null }); // Clear both on general error
+        } finally {
+          set({ loading: false });
+        }
       },
 
-      fetchUserAndProfile: async () => {
-        const currentState = get();
+      initializeAuth: async () => {
         const supabase = createClient();
-        console.log("[UserStore] Fetching user and profile");
-        // If already initialized and we have both user and profile, return early
-        // if (currentState.initialized && currentState.user && currentState.profile) {
-        //   // console.log(
-        //   //   "[UserStore] Already fully initialized with user and profile, skipping fetch",
-        //   // );
-        //   return;
-        // }
+        const { initialized, user: existingUser } = get();
 
-        // console.log("[UserStore] Starting fetch");
-        set({ loading: true });
+        // console.log("[UserStore] Initializing auth. Already initialized?", initialized);
+        if (initialized) {
+          return; // Already initialized
+        }
 
+        set({ loading: true }); // Indicate loading during initialization
         try {
           const {
             data: { session },
             error: sessionError,
           } = await supabase.auth.getSession();
 
-          console.log("[UserStore] Session error:", sessionError);
           if (sessionError) {
+            console.error("[UserStore] Error getting session during init:", sessionError);
             throw sessionError;
           }
 
-          // console.log("[UserStore] Session check result:", {
-          //   hasSession: !!session,
-          //   user_id: session?.user?.id,
-          // });
-          console.log("[UserStore] Session:", session);
+          // console.log("[UserStore] Init session:", session);
           if (session?.user) {
+            // Session exists, set user and fetch related data if needed
             set({ user: session.user, isAuthenticated: true });
-
-            try {
-              const { data: profile, error: profileError } = await supabase
-                .from("profiles")
-                .select("*")
-                .eq("id", session.user.id)
-                .single();
-
-              if (profileError) {
-                console.error("[UserStore] Profile fetch error:", profileError);
-                throw profileError;
-              }
-
-              console.log("[UserStore] Profile fetched successfully:", profile?.id);
-              set({ profile, user: session.user, loading: false, initialized: true });
-            } catch (error) {
-              console.error("[UserStore] Error fetching profile:", error);
-              set({ loading: false, initialized: true });
+            // Fetch profile/enterprise only if not already present from persistence
+            if (!get().profile || get().profile?.id !== session.user.id) {
+              await get().fetchUserAndRelatedData(session.user.id);
             }
           } else {
-            // console.log("[UserStore] No session found, clearing state");
-            set({
-              user: null,
-              profile: null,
-              isAuthenticated: false,
-              loading: false,
-              initialized: true,
-            });
+            // No session, ensure state is cleared
+            set({ user: null, profile: null, enterprise: null, isAuthenticated: false });
           }
         } catch (error) {
-          console.error("[UserStore] Error in fetchUserAndProfile:", error);
-          set({
-            user: null,
-            profile: null,
-            isAuthenticated: false,
-            loading: false,
-            initialized: true,
-          });
-        }
-      },
-
-      fetchEnterprise: async () => {
-        const supabase = createClient();
-        const profile = get().profile;
-        if (!profile) {
-          console.log("[UserStore] Skipping enterprise fetch - no profile");
-          return;
-        }
-
-        set({ loading: true });
-        try {
-          const { data: enterprise, error } = await supabase
-            .from("enterprises")
-            .select("*")
-            .eq("id", profile?.enterprise_id)
-            .single();
-
-          console.log("[UserStore] Enterprise fetched:", enterprise);
-          if (error) throw error;
-
-          set({ enterprise, loading: false });
-        } catch (error) {
-          console.error("[UserStore] Error fetching enterprise:", error);
-          set({ loading: false });
+          console.error("[UserStore] Error during initializeAuth:", error);
+          // Ensure clean state on error
+          set({ user: null, profile: null, enterprise: null, isAuthenticated: false });
+        } finally {
+          // Mark as initialized regardless of outcome
+          set({ initialized: true, loading: false });
+          // console.log("[UserStore] Auth initialization complete.");
         }
       },
 
@@ -222,19 +225,22 @@ const useUserStore = create<UserState>()(
       },
 
       signOut: async () => {
+        const supabase = createClient();
         try {
-          const supabase = createClient();
           await supabase.auth.signOut();
           // console.log("[UserStore] Sign out successful");
+        } catch (error) {
+          console.error("[UserStore] Error signing out:", error);
+        } finally {
+          // Clear state regardless of sign-out success/failure
           set({
             user: null,
             profile: null,
+            enterprise: null,
             isAuthenticated: false,
-            initialized: false,
+            initialized: false, // Reset initialized on sign out
             loading: false,
           });
-        } catch (error) {
-          console.error("[UserStore] Error signing out:", error);
         }
       },
 
@@ -276,36 +282,34 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     // On sign in, set user but don't fetch profile if we already have it
     store.setUser(session.user);
 
-    // Only fetch profile if we don't have it or it doesn't match current user
-    if (!store.profile || store.profile.id !== session.user.id) {
-      store.setState({ loading: true });
-      try {
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-
-        if (error) throw error;
-
-        // console.log("[UserStore] Profile fetched on auth change:", profile?.id);
-        store.setProfile(profile);
-      } catch (error) {
-        console.error("[UserStore] Error fetching profile on auth change:", error);
-        store.setProfile(null);
-      } finally {
-        store.setState({ loading: false });
-      }
-    }
-
-    // Always mark as initialized after SIGNED_IN is handled
-    store.setInitialized(true);
+    // Fetch profile and enterprise data when signed in
+    // This might be redundant if initializeAuth already fetched, but ensures consistency
+    // especially if the user signs in *after* initial load.
+    await store.fetchUserAndRelatedData(session.user.id);
+    // Ensure initialized is true after sign in is processed
+    store.setState({ initialized: true, loading: false }); // Also set loading false here
   } else if (event === "SIGNED_OUT") {
-    // Clear everything on sign out
-    store.setUser(null);
-    store.setProfile(null);
-    store.setInitialized(false);
-    store.setState({ loading: false });
+    // Clear everything on sign out - handled by store.signOut() now,
+    // but we ensure state is cleared here too for robustness.
+    store.setState({
+      user: null,
+      profile: null,
+      enterprise: null,
+      isAuthenticated: false,
+      initialized: false, // Reset initialized
+      loading: false,
+    });
+  } else if (event === "USER_UPDATED" && session?.user) {
+    // Handle user updates if necessary (e.g., email change confirmation)
+    store.setUser(session.user);
+    // Optionally refresh profile if user metadata might affect it
+    // await store.refreshProfile();
+  } else if (event === "PASSWORD_RECOVERY") {
+    // Handle password recovery state if needed
+  } else if (event === "TOKEN_REFRESHED" && session?.user) {
+    // Update user state if token refresh provides new user data (unlikely but possible)
+    store.setUser(session.user);
+    store.setState({ isAuthenticated: true }); // Ensure authenticated state is true
   }
 });
 

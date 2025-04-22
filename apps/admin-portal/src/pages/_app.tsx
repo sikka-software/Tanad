@@ -45,26 +45,23 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   const loading = useUserStore((state) => state.loading);
   const initialized = useUserStore((state) => state.initialized);
   const isAuthenticated = useUserStore((state) => state.isAuthenticated);
-  const fetchUserAndProfile = useUserStore((state) => state.fetchUserAndProfile);
-  const fetchEnterprise = useUserStore((state) => state.fetchEnterprise);
+  // Get the initializeAuth action
+  const initializeAuth = useUserStore((state) => state.initializeAuth);
 
-  // Handle initial mount
+  // Handle initial mount and auth initialization
   useEffect(() => {
     setMounted(true);
-  }, []);
-
-  // Handle auth initialization
-  useEffect(() => {
-    if (!initialized) {
-      fetchUserAndProfile();
-      // fetchEnterprise();
-    }
-  }, [initialized, fetchUserAndProfile]);
+    // Call initializeAuth only once when the component mounts
+    // It handles checking if initialization is needed internally
+    initializeAuth();
+  }, [initializeAuth]); // Dependency array ensures it runs once
 
   // Handle auth redirects
   useEffect(() => {
-    if (!mounted || loading || !initialized) return;
+    // Wait until the component is mounted AND the auth state is initialized
+    if (!mounted || !initialized) return;
 
+    // Now that we are mounted and initialized, we can check auth status
     const isPublicPage =
       landingPages.includes(router.pathname) || authPages.includes(router.pathname);
     const isAuthPage = authPages.includes(router.pathname);

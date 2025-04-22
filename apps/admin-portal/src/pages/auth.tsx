@@ -34,16 +34,18 @@ export default function Auth() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { isAuthenticated, loading: storeLoading } = useUserStore();
+  // Get state directly from the store
+  const { isAuthenticated, initialized, loading: storeLoading } = useUserStore();
 
   useEffect(() => {
-    console.log("isAuthenticated", isAuthenticated);
-    console.log("storeLoading", storeLoading);
-
-    if (isAuthenticated && !storeLoading) {
+    // Redirect only when the store is initialized and the user is authenticated
+    // console.log("Auth Page Effect:", { isAuthenticated, initialized, storeLoading });
+    if (initialized && isAuthenticated) {
+      // console.log("Redirecting to /dashboard");
       router.replace("/dashboard");
     }
-  }, [isAuthenticated, storeLoading, router]);
+    // We depend on initialized and isAuthenticated. storeLoading is less relevant here.
+  }, [initialized, isAuthenticated, router]);
 
   useEffect(() => {
     router.events.emit("routeChangeComplete", router.asPath);
@@ -58,12 +60,15 @@ export default function Auth() {
         password,
       });
       if (error) throw error;
-      // Explicitly fetch user profile after successful sign-in
-      await useUserStore.getState().fetchUserAndProfile();
-      await useUserStore.getState().fetchEnterprise();
+      // REMOVED: Explicit fetch calls. The onAuthStateChange listener in the store handles this.
+      // await useUserStore.getState().fetchUserAndProfile();
+      // await useUserStore.getState().fetchEnterprise();
       // Don't redirect here, let the useEffect handle it
     } catch (error: any) {
-      toast.error(t("Auth." + error.code));
+      // Attempt to translate Supabase auth error codes
+      const errorCode = error.code || error.message;
+      const translatedError = t(`Auth.${errorCode}`, undefined, errorCode); // Fallback to code/message if translation missing
+      toast.error(translatedError);
     } finally {
       setLoading(false);
     }
