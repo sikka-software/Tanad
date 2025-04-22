@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { enterprises, templates, documents, products, userRoles, usersInAuth, employees, employeeRequests, jobListingJobs, jobs, jobListings, ssoProvidersInAuth, samlProvidersInAuth, flowStateInAuth, samlRelayStatesInAuth, clients, invoices, invoiceItems, profiles, offices, identitiesInAuth, sessionsInAuth, refreshTokensInAuth, mfaFactorsInAuth, oneTimeTokensInAuth, mfaAmrClaimsInAuth, mfaChallengesInAuth, ssoDomainsInAuth, departments, departmentLocations, expenses, quotes, salaries, vendors, warehouses, branches, companies, quoteItems } from "./schema";
+import { enterprises, templates, documents, products, userRoles, usersInAuth, employees, employeeRequests, jobListingJobs, jobs, jobListings, clients, invoices, invoiceItems, profiles, offices, departments, departmentLocations, expenses, quotes, salaries, vendors, warehouses, branches, companies, quoteItems } from "./schema";
 
 export const templatesRelations = relations(templates, ({one}) => ({
 	enterprise: one(enterprises, {
@@ -62,10 +62,6 @@ export const userRolesRelations = relations(userRoles, ({one}) => ({
 
 export const usersInAuthRelations = relations(usersInAuth, ({many}) => ({
 	userRoles: many(userRoles),
-	identitiesInAuths: many(identitiesInAuth),
-	sessionsInAuths: many(sessionsInAuth),
-	mfaFactorsInAuths: many(mfaFactorsInAuth),
-	oneTimeTokensInAuths: many(oneTimeTokensInAuth),
 }));
 
 export const employeeRequestsRelations = relations(employeeRequests, ({one}) => ({
@@ -123,34 +119,6 @@ export const jobListingsRelations = relations(jobListings, ({one, many}) => ({
 	}),
 }));
 
-export const samlProvidersInAuthRelations = relations(samlProvidersInAuth, ({one}) => ({
-	ssoProvidersInAuth: one(ssoProvidersInAuth, {
-		fields: [samlProvidersInAuth.ssoProviderId],
-		references: [ssoProvidersInAuth.id]
-	}),
-}));
-
-export const ssoProvidersInAuthRelations = relations(ssoProvidersInAuth, ({many}) => ({
-	samlProvidersInAuths: many(samlProvidersInAuth),
-	samlRelayStatesInAuths: many(samlRelayStatesInAuth),
-	ssoDomainsInAuths: many(ssoDomainsInAuth),
-}));
-
-export const samlRelayStatesInAuthRelations = relations(samlRelayStatesInAuth, ({one}) => ({
-	flowStateInAuth: one(flowStateInAuth, {
-		fields: [samlRelayStatesInAuth.flowStateId],
-		references: [flowStateInAuth.id]
-	}),
-	ssoProvidersInAuth: one(ssoProvidersInAuth, {
-		fields: [samlRelayStatesInAuth.ssoProviderId],
-		references: [ssoProvidersInAuth.id]
-	}),
-}));
-
-export const flowStateInAuthRelations = relations(flowStateInAuth, ({many}) => ({
-	samlRelayStatesInAuths: many(samlRelayStatesInAuth),
-}));
-
 export const invoicesRelations = relations(invoices, ({one, many}) => ({
 	client: one(clients, {
 		fields: [invoices.clientId],
@@ -199,65 +167,6 @@ export const officesRelations = relations(offices, ({one}) => ({
 	enterprise: one(enterprises, {
 		fields: [offices.enterpriseId],
 		references: [enterprises.id]
-	}),
-}));
-
-export const identitiesInAuthRelations = relations(identitiesInAuth, ({one}) => ({
-	usersInAuth: one(usersInAuth, {
-		fields: [identitiesInAuth.userId],
-		references: [usersInAuth.id]
-	}),
-}));
-
-export const sessionsInAuthRelations = relations(sessionsInAuth, ({one, many}) => ({
-	usersInAuth: one(usersInAuth, {
-		fields: [sessionsInAuth.userId],
-		references: [usersInAuth.id]
-	}),
-	refreshTokensInAuths: many(refreshTokensInAuth),
-	mfaAmrClaimsInAuths: many(mfaAmrClaimsInAuth),
-}));
-
-export const refreshTokensInAuthRelations = relations(refreshTokensInAuth, ({one}) => ({
-	sessionsInAuth: one(sessionsInAuth, {
-		fields: [refreshTokensInAuth.sessionId],
-		references: [sessionsInAuth.id]
-	}),
-}));
-
-export const mfaFactorsInAuthRelations = relations(mfaFactorsInAuth, ({one, many}) => ({
-	usersInAuth: one(usersInAuth, {
-		fields: [mfaFactorsInAuth.userId],
-		references: [usersInAuth.id]
-	}),
-	mfaChallengesInAuths: many(mfaChallengesInAuth),
-}));
-
-export const oneTimeTokensInAuthRelations = relations(oneTimeTokensInAuth, ({one}) => ({
-	usersInAuth: one(usersInAuth, {
-		fields: [oneTimeTokensInAuth.userId],
-		references: [usersInAuth.id]
-	}),
-}));
-
-export const mfaAmrClaimsInAuthRelations = relations(mfaAmrClaimsInAuth, ({one}) => ({
-	sessionsInAuth: one(sessionsInAuth, {
-		fields: [mfaAmrClaimsInAuth.sessionId],
-		references: [sessionsInAuth.id]
-	}),
-}));
-
-export const mfaChallengesInAuthRelations = relations(mfaChallengesInAuth, ({one}) => ({
-	mfaFactorsInAuth: one(mfaFactorsInAuth, {
-		fields: [mfaChallengesInAuth.factorId],
-		references: [mfaFactorsInAuth.id]
-	}),
-}));
-
-export const ssoDomainsInAuthRelations = relations(ssoDomainsInAuth, ({one}) => ({
-	ssoProvidersInAuth: one(ssoProvidersInAuth, {
-		fields: [ssoDomainsInAuth.ssoProviderId],
-		references: [ssoProvidersInAuth.id]
 	}),
 }));
 
