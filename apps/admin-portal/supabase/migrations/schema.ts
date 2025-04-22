@@ -13,13 +13,13 @@ export const templates = pgTable("templates", {
 	content: jsonb().notNull(),
 	isDefault: boolean("is_default").default(false).notNull(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("templates_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
 	index("templates_type_idx").using("btree", table.type.asc().nullsLast().op("text_ops")),
 	index("templates_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "templates_enterprise_id_enterprises_id_fk"
 		}),
@@ -36,13 +36,13 @@ export const documents = pgTable("documents", {
 	entityId: uuid("entity_id").notNull(),
 	entityType: text("entity_type").notNull(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("documents_entity_id_idx").using("btree", table.entityId.asc().nullsLast().op("uuid_ops")),
 	index("documents_entity_type_idx").using("btree", table.entityType.asc().nullsLast().op("text_ops")),
 	index("documents_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "documents_enterprise_id_enterprises_id_fk"
 		}),
@@ -57,17 +57,17 @@ export const products = pgTable("products", {
 	sku: text(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 	cost: numeric({ precision: 10, scale:  2 }),
 	quantity: numeric({ precision: 10, scale:  2 }).default('0').notNull(),
 	unit: text(),
-	isActive: boolean("is_active").default(true).notNull(),
+	is_active: boolean("is_active").default(true).notNull(),
 }, (table) => [
 	index("products_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
 	index("products_sku_idx").using("btree", table.sku.asc().nullsLast().op("text_ops")),
 	index("products_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "products_enterprise_id_enterprises_id_fk"
 		}),
@@ -77,11 +77,11 @@ export const userRoles = pgTable("user_roles", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	user_id: uuid("user_id"),
 	role: appRole().notNull(),
-	enterpriseId: uuid("enterprise_id"),
+	enterprise_id: uuid("enterprise_id"),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "user_roles_enterprise_id_fkey"
 		}).onDelete("cascade"),
@@ -90,7 +90,7 @@ export const userRoles = pgTable("user_roles", {
 			foreignColumns: [users.id],
 			name: "user_roles_user_id_fkey"
 		}).onDelete("cascade"),
-	unique("user_roles_user_id_role_enterprise_id_key").on(table.user_id, table.role, table.enterpriseId),
+	unique("user_roles_user_id_role_enterprise_id_key").on(table.user_id, table.role, table.enterprise_id),
 ]);
 
 export const rolePermissions = pgTable("role_permissions", {
@@ -117,7 +117,7 @@ export const employeeRequests = pgTable("employee_requests", {
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("employee_requests_created_at_idx").using("btree", table.createdAt.asc().nullsLast().op("timestamptz_ops")),
 	index("employee_requests_employee_id_idx").using("btree", table.employeeId.asc().nullsLast().op("uuid_ops")),
@@ -130,7 +130,7 @@ export const employeeRequests = pgTable("employee_requests", {
 			name: "employee_requests_employee_id_employees_id_fk"
 		}),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "employee_requests_enterprise_id_enterprises_id_fk"
 		}),
@@ -142,12 +142,12 @@ export const jobListingJobs = pgTable("job_listing_jobs", {
 	jobId: uuid("job_id").notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("job_listing_jobs_job_id_idx").using("btree", table.jobId.asc().nullsLast().op("uuid_ops")),
 	index("job_listing_jobs_job_listing_id_idx").using("btree", table.jobListingId.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "job_listing_jobs_enterprise_id_enterprises_id_fk"
 		}),
@@ -185,7 +185,7 @@ CASE
     WHEN (tax_rate IS NULL) THEN subtotal
     ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
 END`),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("invoices_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
 	index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
@@ -196,7 +196,7 @@ END`),
 			name: "invoices_client_id_fkey"
 		}).onDelete("cascade"),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "invoices_enterprise_id_enterprises_id_fk"
 		}),
@@ -230,19 +230,19 @@ export const jobListings = pgTable("job_listings", {
 	id: uuid().defaultRandom().primaryKey().notNull(),
 	title: varchar({ length: 255 }).notNull(),
 	description: text(),
-	isActive: boolean("is_active").default(true).notNull(),
+	is_active: boolean("is_active").default(true).notNull(),
 	slug: varchar({ length: 255 }).notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 	isPublic: boolean("is_public").default(false).notNull(),
 }, (table) => [
 	index("job_listings_slug_idx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
 	index("job_listings_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
 	index("job_listings_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "job_listings_enterprise_id_enterprises_id_fk"
 		}),
@@ -254,7 +254,7 @@ export const profiles = pgTable("profiles", {
 	fullName: text("full_name"),
 	email: text().notNull(),
 	userSettings: jsonb("user_settings"),
-	enterpriseId: uuid("enterprise_id"),
+	enterprise_id: uuid("enterprise_id"),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
 	stripeCustomerId: text("stripe_customer_id"),
 	avatarUrl: text("avatar_url"),
@@ -267,16 +267,16 @@ export const profiles = pgTable("profiles", {
 	address: text(),
 	city: text(),
 	state: text(),
-	zipCode: text("zip_code"),
+	zip_code: text("zip_code"),
 	country: text(),
 	user_id: uuid("user_id").notNull(),
 }, (table) => [
 	index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-	index("profiles_enterprise_id_idx").using("btree", table.enterpriseId.asc().nullsLast().op("uuid_ops")),
+	index("profiles_enterprise_id_idx").using("btree", table.enterprise_id.asc().nullsLast().op("uuid_ops")),
 	index("profiles_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	index("profiles_username_idx").using("btree", table.username.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "profiles_enterprise_id_enterprises_id_fk"
 		}),
@@ -289,17 +289,17 @@ export const offices = pgTable("offices", {
 	address: text().notNull(),
 	city: text().notNull(),
 	state: text().notNull(),
-	zipCode: text("zip_code").notNull(),
+	zip_code: text("zip_code").notNull(),
 	phone: text(),
 	email: text(),
-	isActive: boolean("is_active").default(true).notNull(),
+	is_active: boolean("is_active").default(true).notNull(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("offices_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
 	index("offices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "offices_enterprise_id_enterprises_id_fk"
 		}),
@@ -312,7 +312,7 @@ export const departmentLocations = pgTable("department_locations", {
 	locationId: uuid("location_id").notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	foreignKey({
 			columns: [table.departmentId],
@@ -320,7 +320,7 @@ export const departmentLocations = pgTable("department_locations", {
 			name: "department_locations_department_id_departments_id_fk"
 		}).onDelete("cascade"),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "department_locations_enterprise_id_enterprises_id_fk"
 		}),
@@ -337,14 +337,14 @@ export const employees = pgTable("employees", {
 	hireDate: date("hire_date"),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 	address: text(),
 	city: text(),
 	state: text(),
-	zipCode: text("zip_code"),
+	zip_code: text("zip_code"),
 	country: text(),
 	terminationDate: date("termination_date"),
-	isActive: boolean("is_active").default(true).notNull(),
+	is_active: boolean("is_active").default(true).notNull(),
 	departmentId: uuid("department_id"),
 }, (table) => [
 	index("employees_department_id_idx").using("btree", table.departmentId.asc().nullsLast().op("uuid_ops")),
@@ -356,7 +356,7 @@ export const employees = pgTable("employees", {
 			name: "employees_department_id_departments_id_fk"
 		}).onDelete("set null"),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "employees_enterprise_id_enterprises_id_fk"
 		}),
@@ -374,7 +374,7 @@ export const expenses = pgTable("expenses", {
 	notes: text(),
 	clientId: uuid("client_id"),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("expenses_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
 	index("expenses_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
@@ -385,7 +385,7 @@ export const expenses = pgTable("expenses", {
 			name: "expenses_client_id_fkey"
 		}).onDelete("cascade"),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "expenses_enterprise_id_enterprises_id_fk"
 		}),
@@ -414,7 +414,7 @@ CASE
     WHEN (tax_rate IS NULL) THEN subtotal
     ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
 END`),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("quotes_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
 	index("quotes_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
@@ -425,7 +425,7 @@ END`),
 			name: "quotes_client_id_fkey"
 		}).onDelete("cascade"),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "quotes_enterprise_id_enterprises_id_fk"
 		}),
@@ -437,7 +437,7 @@ export const salaries = pgTable("salaries", {
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
 	notes: text(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 	employeeId: uuid("employee_id").notNull(),
 	amount: numeric({ precision: 10, scale:  2 }).notNull(),
 	currency: text().default('USD').notNull(),
@@ -453,7 +453,7 @@ export const salaries = pgTable("salaries", {
 			name: "salaries_employee_id_fkey"
 		}).onDelete("cascade"),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "salaries_enterprise_id_enterprises_id_fk"
 		}),
@@ -469,17 +469,17 @@ export const vendors = pgTable("vendors", {
 	address: text().notNull(),
 	city: text().notNull(),
 	state: text().notNull(),
-	zipCode: text("zip_code").notNull(),
+	zip_code: text("zip_code").notNull(),
 	notes: text(),
 	user_id: uuid("user_id").notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("vendors_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
 	index("vendors_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
 	index("vendors_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "vendors_enterprise_id_enterprises_id_fk"
 		}),
@@ -492,13 +492,13 @@ export const departments = pgTable("departments", {
 	description: text(),
 	user_id: uuid("user_id").notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).default(sql`timezone('utc'::text, now())`),
-	isActive: boolean("is_active").default(true).notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	is_active: boolean("is_active").default(true).notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("departments_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
 	index("departments_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "departments_enterprise_id_enterprises_id_fk"
 		}),
@@ -512,18 +512,18 @@ export const warehouses = pgTable("warehouses", {
 	address: text().notNull(),
 	city: text().notNull(),
 	state: text().notNull(),
-	zipCode: text("zip_code").notNull(),
+	zip_code: text("zip_code").notNull(),
 	capacity: numeric({ precision: 10, scale:  2 }),
-	isActive: boolean("is_active").default(true).notNull(),
+	is_active: boolean("is_active").default(true).notNull(),
 	notes: text(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("warehouses_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
 	index("warehouses_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
 	index("warehouses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "warehouses_enterprise_id_enterprises_id_fk"
 		}),
@@ -539,19 +539,19 @@ export const jobs = pgTable("jobs", {
 	department: varchar({ length: 255 }),
 	type: varchar({ length: 50 }).notNull(),
 	salary: numeric({ precision: 10, scale:  2 }),
-	isActive: boolean("is_active").default(true).notNull(),
+	is_active: boolean("is_active").default(true).notNull(),
 	startDate: date("start_date"),
 	endDate: date("end_date"),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("jobs_department_idx").using("btree", table.department.asc().nullsLast().op("text_ops")),
 	index("jobs_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
 	index("jobs_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "jobs_enterprise_id_enterprises_id_fk"
 		}),
@@ -565,20 +565,20 @@ export const branches = pgTable("branches", {
 	address: text().notNull(),
 	city: text().notNull(),
 	state: text().notNull(),
-	zipCode: text("zip_code").notNull(),
+	zip_code: text("zip_code").notNull(),
 	phone: text(),
 	email: text(),
 	manager: text(),
-	isActive: boolean("is_active").default(true).notNull(),
+	is_active: boolean("is_active").default(true).notNull(),
 	notes: text(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("branches_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
 	index("branches_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
 	index("branches_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "branches_enterprise_id_enterprises_id_fk"
 		}),
@@ -595,19 +595,19 @@ export const companies = pgTable("companies", {
 	address: text(),
 	city: text(),
 	state: text(),
-	zipCode: text("zip_code"),
+	zip_code: text("zip_code"),
 	industry: text(),
 	size: text(),
 	notes: text(),
-	isActive: boolean("is_active").default(true).notNull(),
+	is_active: boolean("is_active").default(true).notNull(),
 	user_id: uuid("user_id").notNull(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
-	index("companies_is_active_idx").using("btree", table.isActive.asc().nullsLast().op("bool_ops")),
+	index("companies_is_active_idx").using("btree", table.is_active.asc().nullsLast().op("bool_ops")),
 	index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "companies_enterprise_id_enterprises_id_fk"
 		}).onDelete("cascade"),
@@ -622,8 +622,8 @@ export const enterprises = pgTable("enterprises", {
 	address: text(),
 	city: text(),
 	state: text(),
-	zipCode: text("zip_code"),
-	isActive: boolean("is_active").default(true).notNull(),
+	zip_code: text("zip_code"),
+	is_active: boolean("is_active").default(true).notNull(),
 	website: text(),
 	industry: text(),
 	size: text(),
@@ -646,11 +646,11 @@ export const clients = pgTable("clients", {
 	address: text().notNull(),
 	city: text().notNull(),
 	state: text().notNull(),
-	zipCode: text("zip_code").notNull(),
+	zip_code: text("zip_code").notNull(),
 	notes: text(),
 	user_id: uuid("user_id").notNull(),
 	company: uuid(),
-	enterpriseId: uuid("enterprise_id").notNull(),
+	enterprise_id: uuid("enterprise_id").notNull(),
 }, (table) => [
 	index("clients_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
 	index("clients_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
@@ -661,7 +661,7 @@ export const clients = pgTable("clients", {
 			name: "clients_company_fkey"
 		}),
 	foreignKey({
-			columns: [table.enterpriseId],
+			columns: [table.enterprise_id],
 			foreignColumns: [enterprises.id],
 			name: "clients_enterprise_id_enterprises_id_fk"
 		}),

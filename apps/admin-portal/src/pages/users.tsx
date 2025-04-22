@@ -117,12 +117,12 @@ export default function UsersPage() {
     }
   };
 
-  const handleUpdateUser = async (user_id: string, role: string, enterpriseId: string) => {
+  const handleUpdateUser = async (userId: string, role: string, enterpriseId: string) => {
     try {
       const { error } = await supabase
         .from("profiles")
         .update({ role, enterprise_id: enterpriseId })
-        .eq("id", user_id);
+        .eq("id", userId);
 
       if (error) throw error;
 
@@ -142,7 +142,7 @@ export default function UsersPage() {
 
       setUserPermissions(prev => ({
         ...prev,
-        [user_id]: permissions?.map(p => p.permission) || [],
+        [userId]: permissions?.map(p => p.permission) || [],
       }));
     } catch (error) {
       console.error("Error updating user:", error);
