@@ -3,7 +3,7 @@ FROM node:20-slim AS base
 # Install pnpm and required dependencies
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN npm install -g pnpm@10.6.2
+RUN npm install -g pnpm@10.9.0
 
 # Builder base
 FROM base AS builder-base
