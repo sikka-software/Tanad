@@ -77,29 +77,9 @@ export default function Auth() {
       });
       if (error) throw error;
 
-      // Create profile for the new user
+      // Create a new enterprise for the user
       if (data.user) {
         try {
-          const { error: profileError } = await supabase.from("profiles").insert([
-            {
-              id: data.user.id,
-              email: data.user.email,
-              full_name: "Default Full Name",
-              first_name: "Default",
-              last_name: "User",
-              role: "superadmin",
-              stripe_customer_id: null,
-              avatar_url: null,
-              user_settings: { currency: "SAR", calendar_type: "gregorian" },
-              username: null,
-              subscribed_to: "tanad_free",
-              price_id: FREE_PLAN_ID,
-            },
-          ]);
-
-          if (profileError) throw profileError;
-
-          // Create a new enterprise for the user
           const { data: enterpriseData, error: enterpriseError } = await supabase
             .from("enterprises")
             .insert([
@@ -127,9 +107,9 @@ export default function Auth() {
 
           // After successful signup and profile creation, let the store handle the session
           await useUserStore.getState().fetchUserAndProfile();
-        } catch (profileError: any) {
-          console.error("Error creating profile:", profileError);
-          toast.error(t("Auth.error_creating_profile"));
+        } catch (error: any) {
+          console.error("Error in signup process:", error);
+          toast.error(t("Auth.error_during_signup"));
         }
       }
     } catch (error: any) {
