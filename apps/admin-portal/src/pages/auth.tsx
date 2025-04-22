@@ -78,8 +78,12 @@ export default function Auth() {
       if (error) throw error;
 
       // Create a new enterprise for the user
-      if (data.user) {
+      if (data.user && data.user.email) {
         try {
+          // Wait a moment for the profile to be created by the trigger
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          console.log('Creating enterprise for user:', data.user.id);
           const { data: enterpriseData, error: enterpriseError } = await supabase
             .from("enterprises")
             .insert([
@@ -92,7 +96,11 @@ export default function Auth() {
             .select()
             .single();
 
-          if (enterpriseError) throw enterpriseError;
+          if (enterpriseError) {
+            console.error('Error creating enterprise:', enterpriseError);
+            throw enterpriseError;
+          }
+          console.log('Enterprise created:', enterpriseData);
 
           // Add superadmin role to user_roles table with enterprise_id
           const { error: roleError } = await supabase.from("user_roles").insert([
@@ -103,10 +111,65 @@ export default function Auth() {
             }
           ]);
 
-          if (roleError) throw roleError;
+          if (roleError) {
+            console.error('Error creating user role:', roleError);
+            throw roleError;
+          }
+          console.log('User role created');
+
+          // Update the user's profile with the enterprise_id
+          const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .upsert({
+              id: data.user.id,
+              user_id: data.user.id,
+              email: data.user.email,
+              enterprise_id: enterpriseData.id,
+              first_name: "User",
+              last_name: data.user.email.split('@')[0],
+            })
+            .select()
+            .single();
+
+          if (profileError) {
+            console.error('Error updating profile:', profileError);
+            throw profileError;
+          }
+          console.log('Profile updated:', profileData);
+
+          // Verify the profile was updated correctly
+          const { data: checkProfile, error: checkError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", data.user.id)
+            .single();
+
+          if (checkError) {
+            console.error('Error checking profile:', checkError);
+          } else {
+            console.log('Profile check:', checkProfile);
+          }
 
           // After successful signup and profile creation, let the store handle the session
           await useUserStore.getState().fetchUserAndProfile();
+          
+          // Wait a moment for the store to update
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Verify the store was updated
+          const storeProfile = useUserStore.getState().profile;
+          console.log('Store profile after update:', storeProfile);
+
+          // If the store profile doesn't have enterprise_id, try to refresh it
+          if (!storeProfile?.enterprise_id) {
+            console.log('Profile missing enterprise_id, refreshing...');
+            await useUserStore.getState().refreshProfile();
+            
+            // Check one more time
+            const finalProfile = useUserStore.getState().profile;
+            console.log('Final profile check:', finalProfile);
+          }
+
         } catch (error: any) {
           console.error("Error in signup process:", error);
           toast.error(t("Auth.error_during_signup"));

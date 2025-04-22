@@ -10,6 +10,7 @@ export interface Office {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  enterprise_id: string;
 }
 
 export type OfficeCreateData = Omit<Office, "id" | "created_at"> & {

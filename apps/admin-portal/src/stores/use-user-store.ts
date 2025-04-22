@@ -11,6 +11,7 @@ export interface Profile {
   full_name: string | null;
   stripe_customer_id: string | null;
   avatar_url: string | null;
+  enterprise_id: string | null;
   address: string | null;
   user_settings: {
     currency: string;
