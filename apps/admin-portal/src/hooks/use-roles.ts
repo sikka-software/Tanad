@@ -40,24 +40,48 @@ export function useRoles() {
   return useQuery({
     queryKey: roleKeys.lists(),
     queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select(`
+      // 1. Fetch user role assignments
+      const { data: userRolesData, error: userRolesError } = await supabase.from("user_roles")
+        .select(`
           user_id,
           role,
           created_at,
           enterprise_id
         `);
 
-      if (error) throw error;
+      if (userRolesError) throw userRolesError;
 
-      // Transform the data to match our Role type
-      return data.map((role) => ({
-        id: `${role.user_id}-${role.role}-${role.enterprise_id}`, // Synthetic ID
-        name: role.role,
-        description: `Role: ${role.role}`, // Consider adding a description field to the db
-        permissions: [], // We'll fetch these separately
+      // 2. Fetch all role-permission links
+      const { data: rolePermissionsData, error: rolePermissionsError } = await supabase.from(
+        "role_permissions",
+      ).select(`
+          role,
+          permission
+        `);
+
+      if (rolePermissionsError) throw rolePermissionsError;
+
+      // 3. Group permissions by role name
+      const permissionsByRole = rolePermissionsData.reduce(
+        (acc, item) => {
+          if (!acc[item.role]) {
+            acc[item.role] = [];
+          }
+          acc[item.role].push(item.permission);
+          return acc;
+        },
+        {} as Record<string, string[]>,
+      );
+
+      // 4. Transform the data to match our Role type, including permissions
+      return userRolesData.map((roleData) => ({
+        id: `${roleData.user_id}-${roleData.role}-${roleData.enterprise_id}`, // Synthetic ID
+        name: roleData.role,
+        description: `Role: ${roleData.role}`, // Consider adding a description field to the db
+        permissions: permissionsByRole[roleData.role] || [], // Include fetched permissions
         isSystem: false, // Custom roles are not system roles
-        createdAt: role.created_at,
-        updatedAt: role.created_at, // Use created_at as updated_at for now
+        createdAt: roleData.created_at,
+        updatedAt: roleData.created_at, // Use created_at as updated_at for now
       })) as Role[];
     },
   });
