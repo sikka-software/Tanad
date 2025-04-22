@@ -1910,6 +1910,7 @@
   },
   "Requests": {
     "title": "الطلبات"
+  },
   "EmployeeRequests": {
     "title": "طلبات الموظفين",
     "description": "طلبات الموظفين",
@@ -2990,7 +2991,6 @@
         "email_required": "البريد الإلكتروني مطلوب",
         "email_invalid": "البريد الإلكتروني غير صالح"
       }
-
     },
     "success": {
       "created": "تم إنشاء الشركة بنجاح",
