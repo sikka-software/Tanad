@@ -23,6 +23,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -51,7 +52,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { useCreateUser, useDeleteUser, useUpdateUser, useUsers } from "./user.hooks";
+import { UserForm } from "./user.form";
+import { useDeleteUser, useUpdateUser, useUsers } from "./user.hooks";
 
 // Define user types
 export type UserType = {
@@ -63,29 +65,19 @@ export type UserType = {
 };
 
 interface UsersTableProps {
-  enterprises: Array<{ id: string; name: string }>;
   currentUser: UserType;
   users: UserType[];
   userPermissions: Record<string, string[]>;
-  onUpdateUser: (user_id: string, role: string, enterprise_id: string) => Promise<void>;
+  onUpdateUser?: (user_id: string, role: string, enterprise_id: string) => Promise<void>;
 }
 
-type NewUserType = {
-  email: string;
-  password: string;
-  role: "accounting" | "hr";
-  enterprise_id: string;
-};
-
 export default function UsersTable({
-  enterprises,
   currentUser,
   users,
   userPermissions,
   onUpdateUser,
 }: UsersTableProps) {
   const { data: usersData = [], isLoading } = useUsers();
-  const createUser = useCreateUser();
   const updateUser = useUpdateUser();
   const deleteUser = useDeleteUser();
 
@@ -93,13 +85,7 @@ export default function UsersTable({
   const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
-  const [newUser, setNewUser] = useState<NewUserType>({
-    email: "",
-    password: "",
-    role: "accounting",
-    enterprise_id: "",
-  });
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
 
   // Filter users based on search query
   const filteredUsers = users.filter(
@@ -188,36 +174,6 @@ export default function UsersTable({
     }
   };
 
-  const handleCreate = async () => {
-    if (!newUser.email || !newUser.password || !newUser.enterprise_id) return;
-
-    try {
-      await createUser.mutateAsync({
-        email: newUser.email,
-        password: newUser.password,
-        role: newUser.role,
-        enterprise_id: newUser.enterprise_id,
-      });
-
-      setIsCreating(false);
-      setNewUser({
-        email: "",
-        password: "",
-        role: "accounting",
-        enterprise_id: "",
-      });
-
-      toast.success("User created", {
-        description: "User has been created successfully.",
-      });
-    } catch (error) {
-      console.error("Error creating user:", error);
-      toast.error("Failed to create user.", {
-        description: "Failed to create user.",
-      });
-    }
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -231,78 +187,21 @@ export default function UsersTable({
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+        <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>Add User</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Add New User</DialogTitle>
+              <DialogDescription>
+                Fill in the details to create a new user. They will belong to the same enterprise.
+              </DialogDescription>
+            </DialogHeader>
+            <UserForm currentUser={currentUser} onSuccess={() => setIsAddUserDialogOpen(false)} />
+          </DialogContent>
+        </Dialog>
       </div>
-
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Users</h2>
-        <Button onClick={() => setIsCreating(true)}>Add User</Button>
-      </div>
-
-      {isCreating && (
-        <div className="mb-4 rounded-lg border p-4">
-          <h3 className="mb-4 text-lg font-medium">Create New User</h3>
-          <div className="grid gap-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={newUser.password}
-                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="role">Role</Label>
-              <Select
-                value={newUser.role}
-                onValueChange={(value) =>
-                  setNewUser({ ...newUser, role: value as "accounting" | "hr" })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="accounting">Accounting</SelectItem>
-                  <SelectItem value="hr">HR</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="enterprise">Enterprise</Label>
-              <Select
-                value={newUser.enterprise_id}
-                onValueChange={(value) => setNewUser({ ...newUser, enterprise_id: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select enterprise" />
-                </SelectTrigger>
-                <SelectContent>
-                  {enterprises.map((enterprise) => (
-                    <SelectItem key={enterprise.id} value={enterprise.id}>
-                      {enterprise.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsCreating(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleCreate}>Create</Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="rounded-md border">
         <Table>
@@ -311,7 +210,6 @@ export default function UsersTable({
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Permissions</TableHead>
-              <TableHead>Enterprise</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -353,9 +251,7 @@ export default function UsersTable({
                       </PopoverContent>
                     </Popover>
                   </TableCell>
-                  <TableCell>
-                    {enterprises.find((e) => e.id === user.enterprise_id)?.name || "N/A"}
-                  </TableCell>
+
                   <TableCell>{formatDate(user.created_at)}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -420,28 +316,6 @@ export default function UsersTable({
                   <SelectItem value="superadmin">Superadmin</SelectItem>
                   <SelectItem value="accounting">Accounting</SelectItem>
                   <SelectItem value="hr">HR</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="enterprise" className="text-right">
-                Enterprise
-              </Label>
-              <Select
-                value={selectedUser?.enterprise_id}
-                onValueChange={(value) =>
-                  setSelectedUser((prev) => (prev ? { ...prev, enterprise_id: value } : null))
-                }
-              >
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select enterprise" />
-                </SelectTrigger>
-                <SelectContent>
-                  {enterprises.map((enterprise) => (
-                    <SelectItem key={enterprise.id} value={enterprise.id}>
-                      {enterprise.name}
-                    </SelectItem>
-                  ))}
                 </SelectContent>
               </Select>
             </div>

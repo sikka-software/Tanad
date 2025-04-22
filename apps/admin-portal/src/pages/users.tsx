@@ -14,6 +14,7 @@ export default function UsersPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [userPermissions, setUserPermissions] = useState<Record<string, string[]>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getCurrentUserAndEnterprises = async () => {
@@ -62,6 +63,8 @@ export default function UsersPage() {
         }
         setUserPermissions(permissionsMap);
       }
+
+      setIsLoading(false);
     };
 
     getCurrentUserAndEnterprises();
@@ -155,17 +158,22 @@ export default function UsersPage() {
     <div className="container mx-auto p-4">
       <h1 className="mb-6 text-3xl font-bold">User Management</h1>
       <p className="text-muted-foreground mb-8">
-        Manage all users in your enterprise. As a superadmin, you can edit user details, change
-        roles, and control account access.
+        Manage users within your enterprise.{" "}
+        {currentUser?.role === "superadmin"
+          ? "As a superadmin, you can manage users across all enterprises."
+          : ""}
       </p>
 
-      <UsersTable
-        enterprises={enterprises}
-        currentUser={currentUser}
-        users={users}
-        userPermissions={userPermissions}
-        onUpdateUser={handleUpdateUser}
-      />
+      {isLoading ? (
+        <p>Loading users...</p>
+      ) : (
+        <UsersTable
+          currentUser={currentUser}
+          users={users}
+          userPermissions={userPermissions}
+          onUpdateUser={handleUpdateUser}
+        />
+      )}
     </div>
   );
 }
