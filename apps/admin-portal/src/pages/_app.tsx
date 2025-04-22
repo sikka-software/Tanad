@@ -57,9 +57,9 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   useEffect(() => {
     if (!initialized) {
       fetchUserAndProfile();
-      fetchEnterprise();
+      // fetchEnterprise();
     }
-  }, [initialized, fetchUserAndProfile, fetchEnterprise]);
+  }, [initialized, fetchUserAndProfile]);
 
   // Handle auth redirects
   useEffect(() => {

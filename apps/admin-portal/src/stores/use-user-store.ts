@@ -98,13 +98,14 @@ const useUserStore = create<UserState>()(
       fetchUserAndProfile: async () => {
         const currentState = get();
         const supabase = createClient();
+        console.log("[UserStore] Fetching user and profile");
         // If already initialized and we have both user and profile, return early
-        if (currentState.initialized && currentState.user && currentState.profile) {
-          // console.log(
-          //   "[UserStore] Already fully initialized with user and profile, skipping fetch",
-          // );
-          return;
-        }
+        // if (currentState.initialized && currentState.user && currentState.profile) {
+        //   // console.log(
+        //   //   "[UserStore] Already fully initialized with user and profile, skipping fetch",
+        //   // );
+        //   return;
+        // }
 
         // console.log("[UserStore] Starting fetch");
         set({ loading: true });
@@ -115,6 +116,7 @@ const useUserStore = create<UserState>()(
             error: sessionError,
           } = await supabase.auth.getSession();
 
+          console.log("[UserStore] Session error:", sessionError);
           if (sessionError) {
             throw sessionError;
           }
@@ -123,7 +125,7 @@ const useUserStore = create<UserState>()(
           //   hasSession: !!session,
           //   user_id: session?.user?.id,
           // });
-
+          console.log("[UserStore] Session:", session);
           if (session?.user) {
             set({ user: session.user, isAuthenticated: true });
 
@@ -139,7 +141,7 @@ const useUserStore = create<UserState>()(
                 throw profileError;
               }
 
-              // console.log("[UserStore] Profile fetched successfully:", profile?.id);
+              console.log("[UserStore] Profile fetched successfully:", profile?.id);
               set({ profile, user: session.user, loading: false, initialized: true });
             } catch (error) {
               console.error("[UserStore] Error fetching profile:", error);

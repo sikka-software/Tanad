@@ -61,7 +61,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
   const router = useRouter();
-  const { user } = useUserStore();
+  const { user, profile } = useUserStore();
 
   // Use our existing hooks
   const { data: employees } = useEmployees();
@@ -211,6 +211,9 @@ export default function Dashboard() {
     );
   }
 
+  console.log(user);
+  console.log(user?.id);
+  console.log(profile);
   return (
     <div>
       <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />

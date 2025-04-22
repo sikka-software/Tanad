@@ -28,14 +28,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const storeUser = userStore.user;
   const fetchUserAndProfile = userStore.fetchUserAndProfile;
   const initialized = userStore.initialized;
-  const fetchEnterprise = userStore.fetchEnterprise;
+  // const fetchEnterprise = userStore.fetchEnterprise;
   useEffect(() => {
     async function loadUser() {
       try {
         if (!initialized || !storeUser) {
           // Initialize the user store
           await fetchUserAndProfile();
-          await fetchEnterprise();
+          // await fetchEnterprise();
 
           // Also try to get user directly from Supabase
           const { data, error } = await supabase.auth.getUser();

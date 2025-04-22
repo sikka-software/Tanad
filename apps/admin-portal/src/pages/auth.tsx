@@ -83,6 +83,11 @@ export default function Auth() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            enterprise_owner: true,
+          },
+        },
       });
 
       if (error) throw error;
