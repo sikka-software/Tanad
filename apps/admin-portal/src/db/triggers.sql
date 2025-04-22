@@ -127,7 +127,7 @@ RETURNS TRIGGER AS $$
 BEGIN
   -- Create a superadmin role for the new user
   INSERT INTO public.user_roles (user_id, role, enterprise_id)
-  VALUES (NEW.id, 'superadmin', NULL);
+  VALUES (NEW.id, 'superadmin'::app_role, NULL);
   
   RETURN NEW;
 END;
