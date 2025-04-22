@@ -1074,13 +1074,15 @@ export const userRoles = pgTable(
   {
     userId: uuid("user_id").notNull().references(() => profiles.id, { onDelete: "cascade" }),
     role: appRole("role").notNull(),
+    enterpriseId: uuid("enterprise_id").notNull().references(() => enterprises.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.userId, table.role] }),
+    pk: primaryKey({ columns: [table.userId, table.role, table.enterpriseId] }),
     userIdIdx: index("user_roles_user_id_idx").on(table.userId),
     roleIdx: index("user_roles_role_idx").on(table.role),
+    enterpriseIdIdx: index("user_roles_enterprise_id_idx").on(table.enterpriseId),
   })
 );

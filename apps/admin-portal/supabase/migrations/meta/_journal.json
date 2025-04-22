@@ -22,6 +22,13 @@
       "when": 1745343604906,
       "tag": "0002_tough_clint_barton",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1745343927799,
+      "tag": "0003_jittery_meteorite",
+      "breakpoints": true
     }
   ]
 }
