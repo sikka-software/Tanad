@@ -55,9 +55,9 @@ export function useRoles() {
         name: role.role,
         description: `Role: ${role.role}`,
         permissions: [], // We'll fetch these separately
-        isSystem: true, // All roles from the enum are system roles
         createdAt: role.created_at,
         updatedAt: role.created_at,
+        isSystem: false,
       })) as Role[];
     },
   });
