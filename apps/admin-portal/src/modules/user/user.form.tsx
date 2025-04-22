@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/select";
 import { useCreateUser } from "./user.hooks";
 import type { UserType } from "./user.table"; // Or define Profile type in user.type.ts
+import { useRoles } from "../role/role.hooks";
+import type { Role } from "../role/role.service"; // Import Role type
 
 // Define the Zod schema for form validation
 const userFormSchema = z.object({
@@ -30,7 +32,8 @@ const userFormSchema = z.object({
   lastName: z.string().min(1, { message: "Last name is required." }),
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
-  role: z.enum(["accounting", "hr"]), // Only allow specific roles for creation
+  // role: z.enum(["accounting", "hr"]), // Changed from enum
+  role: z.string().min(1, { message: "Role is required." }), // General string validation
 });
 
 // Infer the type from the schema
@@ -43,6 +46,7 @@ interface UserFormProps {
 
 export function UserForm({ currentUser, onSuccess }: UserFormProps) {
   const createUser = useCreateUser();
+  const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles(); // Fetch roles
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<UserFormData>({
@@ -52,9 +56,20 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
       lastName: "",
       email: "",
       password: "",
-      role: "accounting", // Default role
+      role: "", // Default role empty, user must select
     },
   });
+
+  // Reset role if available roles change and current value is invalid
+  useEffect(() => {
+    if (roles && roles.length > 0) {
+      const currentRoleValue = form.getValues("role");
+      const isValidRole = roles.some((role: Role) => role.name === currentRoleValue);
+      if (!isValidRole && currentRoleValue) {
+        form.setValue("role", "");
+      }
+    }
+  }, [roles, form]);
 
   const onSubmit = async (values: UserFormData) => {
     if (!currentUser?.enterprise_id) {
@@ -145,16 +160,32 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Role</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                disabled={rolesLoading || !!rolesError}
+              >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a role" />
+                    <SelectValue placeholder={rolesLoading ? "Loading roles..." : "Select a role"} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="accounting">Accounting</SelectItem>
-                  <SelectItem value="hr">HR</SelectItem>
-                  {/* Add other roles if needed, ensure they match the enum */}
+                  {rolesError ? (
+                    <SelectItem value="error" disabled>
+                      Error loading roles
+                    </SelectItem>
+                  ) : roles && roles.length > 0 ? (
+                    roles.map((role: Role) => (
+                      <SelectItem key={role.id} value={role.name}>
+                        {role.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="loading" disabled>
+                      {rolesLoading ? "Loading..." : "No roles available"}
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -163,7 +194,7 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
         />
         {/* Enterprise field removed - automatically assigned */}
         <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting || rolesLoading || !!rolesError}>
             {isSubmitting ? "Creating..." : "Create User"}
           </Button>
         </div>

@@ -36,7 +36,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!email || !password || !role || !enterprise_id || !firstName || !lastName) {
     return res
       .status(400)
-      .json({ message: "Missing required fields: email, password, role, enterprise_id, firstName, lastName" });
+      .json({
+        message:
+          "Missing required fields: email, password, role, enterprise_id, firstName, lastName",
+      });
   }
 
   try {
