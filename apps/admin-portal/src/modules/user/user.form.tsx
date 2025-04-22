@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -21,10 +22,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCreateUser } from "./user.hooks";
-import type { UserType } from "./user.table"; // Or define Profile type in user.type.ts
+
+// Or define Profile type in user.type.ts
 import { useRoles } from "../role/role.hooks";
-import type { Role } from "../role/role.service"; // Import Role type
+import type { Role } from "../role/role.service";
+import { useCreateUser } from "./user.hooks";
+import type { UserType } from "./user.table";
+
+// Import Role type
 
 // Define the Zod schema for form validation
 const userFormSchema = z.object({
@@ -45,6 +50,7 @@ interface UserFormProps {
 }
 
 export function UserForm({ currentUser, onSuccess }: UserFormProps) {
+  const t = useTranslations();
   const createUser = useCreateUser();
   const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles(); // Fetch roles
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,7 +90,9 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
         ...values,
         enterprise_id: currentUser.enterprise_id,
       });
-      toast.success("User created successfully!");
+      toast.success(t("General.successful_operation"), {
+        description: t("Users.messages.created"),
+      });
       form.reset(); // Reset form fields
       onSuccess(); // Call the success callback (e.g., close dialog)
     } catch (error) {
@@ -167,7 +175,9 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder={rolesLoading ? "Loading roles..." : "Select a role"} />
+                    <SelectValue
+                      placeholder={rolesLoading ? "Loading roles..." : "Select a role"}
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -201,4 +211,4 @@ export function UserForm({ currentUser, onSuccess }: UserFormProps) {
       </form>
     </Form>
   );
-} 
+}

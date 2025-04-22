@@ -2508,13 +2508,6 @@
     "email_label": "Email: {value}",
     "phone_label": "Phone: {value}",
     "department_label": "Department: {value}",
-    "table": {
-      "name": "Name",
-      "email": "Email",
-      "phone": "Phone",
-      "position": "Position",
-      "department": "Department"
-    },
     "form": {
       "first_name": {
         "label": "First Name",
@@ -2606,18 +2599,6 @@
     "phone": "Phone",
     "address": "Address"
   },
-  "form": {
-    "validation": {
-      "name_required": "Name is required",
-      "email_required": "Email is required",
-      "email_invalid": "Invalid email address",
-      "phone_required": "Phone number is required",
-      "address_required": "Address is required",
-      "city_required": "City is required",
-      "state_required": "State is required",
-      "zip_code_required": "ZIP code is required"
-    }
-  },
   "Companies": {
     "title": "Companies",
     "add_new": "Add New Company",
@@ -2671,6 +2652,24 @@
       "notes": {
         "label": "Notes"
       }
+    },
+    "messages": {
+      "creating": "Creating company...",
+      "create": "Create Company",
+      "created": "Company created successfully",
+      "updated": "Company updated successfully",
+      "deleted": "Company deleted successfully",
+      "error": "An error occurred while processing your request"
+    },
+    "success": {
+      "created": "Company created successfully",
+      "updated": "Company updated successfully",
+      "deleted": "Company deleted successfully"
+    },
+    "error": {
+      "creating": "An error occurred while creating the company",
+      "updating": "An error occurred while updating the company",
+      "deleting": "An error occurred while deleting the company"
     }
   },
   "Navigation": {
