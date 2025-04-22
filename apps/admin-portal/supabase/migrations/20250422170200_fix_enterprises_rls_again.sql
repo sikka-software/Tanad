@@ -6,6 +6,10 @@ DROP POLICY IF EXISTS "Enable insert for authenticated users" ON enterprises;
 DROP POLICY IF EXISTS "Enable read access for users with access to the enterprise" ON enterprises;
 DROP POLICY IF EXISTS "Enable update for users with access to the enterprise" ON enterprises;
 DROP POLICY IF EXISTS "Enable delete for superadmins" ON enterprises;
+DROP POLICY IF EXISTS "Enable insert for signup" ON enterprises;
+DROP POLICY IF EXISTS "Enable read for users" ON enterprises;
+DROP POLICY IF EXISTS "Enable update for owners" ON enterprises;
+DROP POLICY IF EXISTS "Enable delete for owners" ON enterprises;
 
 -- Create a more permissive insert policy
 CREATE POLICY "Enable insert for signup"
