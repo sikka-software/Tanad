@@ -2216,6 +2216,60 @@
     "no_users": "لا يوجد مستخدمين",
     "active_users": "المستخدمون النشطون",
     "inactive_users": "المستخدمون غير النشطين",
+    "search_placeholder": "بحث عن مستخدمين...",
+    "add_dialog": {
+      "title": "إضافة مستخدم جديد",
+      "description": "املأ التفاصيل لإنشاء مستخدم جديد. سينتمي إلى نفس المؤسسة."
+    },
+    "table": {
+      "head": {
+        "email": "البريد الإلكتروني",
+        "role": "الدور",
+        "permissions": "الصلاحيات",
+        "created_at": "تاريخ الإنشاء",
+        "actions": "الإجراءات"
+      },
+      "no_users": "لم يتم العثور على مستخدمين.",
+      "permissions_popover": "الصلاحيات",
+      "created_at_never": "أبدًا"
+    },
+    "actions": {
+      "open_menu": "فتح القائمة",
+      "edit": "تعديل المستخدم",
+      "delete": "حذف المستخدم",
+      "activate": "تفعيل المستخدم",
+      "deactivate": "تعطيل المستخدم",
+      "reset_password": "إعادة تعيين كلمة المرور"
+    },
+    "edit_dialog": {
+      "title": "تعديل المستخدم",
+      "description": "قم بإجراء تغييرات على ملف تعريف المستخدم هنا.",
+      "email_label": "البريد الإلكتروني",
+      "role_label": "الدور",
+      "select_role_placeholder": "اختر الدور",
+      "save_button": "حفظ التغييرات"
+    },
+    "delete_dialog": {
+      "title": "حذف المستخدم",
+      "description": "هل أنت متأكد أنك تريد حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.",
+      "user_prefix": "المستخدم: ",
+      "no_email": "لا يوجد بريد إلكتروني",
+      "delete_button": "حذف"
+    },
+    "toast": {
+      "success": {
+        "updated": "تم تحديث المستخدم",
+        "updated_description": "تم تحديث معلومات المستخدم بنجاح.",
+        "deleted": "تم حذف المستخدم",
+        "deleted_description": "تم حذف المستخدم بنجاح."
+      },
+      "error": {
+        "update_failed": "فشل تحديث معلومات المستخدم.",
+        "update_failed_description": "فشل تحديث معلومات المستخدم.",
+        "delete_failed": "فشل حذف المستخدم.",
+        "delete_failed_description": "فشل حذف المستخدم."
+      }
+    },
     "form": {
       "name": {
         "label": "الاسم الكامل",
@@ -2265,13 +2319,6 @@
         "upload": "رفع صورة",
         "remove": "إزالة الصورة"
       }
-    },
-    "actions": {
-      "edit": "تعديل المستخدم",
-      "delete": "حذف المستخدم",
-      "activate": "تفعيل المستخدم",
-      "deactivate": "تعطيل المستخدم",
-      "reset_password": "إعادة تعيين كلمة المرور"
     },
     "messages": {
       "creating": "جاري إنشاء المستخدم...",
