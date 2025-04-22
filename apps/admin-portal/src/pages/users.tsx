@@ -105,6 +105,15 @@ export default function UsersPage() {
 
       if (profileError) throw profileError;
 
+      // Create the user_role entry
+      const { error: userRoleError } = await supabase.from("user_roles").insert({
+        user_id: authData.user.id,
+        role,
+        enterprise_id: enterprise_id,
+      });
+
+      if (userRoleError) throw userRoleError;
+
       // Refresh users list and permissions
       const { data: users } = await supabase
         .from("profiles")
