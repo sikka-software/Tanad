@@ -118,7 +118,7 @@ export const appPermission = pgEnum("app_permission", [
   "branches.read",
   "branches.update",
   "branches.delete",
-  "branches.export"
+  "branches.export",
 ]);
 
 // Define enterprises first since it's referenced by other tables
@@ -191,9 +191,7 @@ export const rolePermissions = pgTable(
       mode: "string",
     }).default(sql`timezone('utc'::text, now())`),
   },
-  (table) => [
-    unique("role_permissions_role_permission_key").on(table.role, table.permission),
-  ],
+  (table) => [unique("role_permissions_role_permission_key").on(table.role, table.permission)],
 ).enableRLS();
 
 // Define profiles table
@@ -218,10 +216,24 @@ export const profiles = pgTable(
     zip_code: text("zip_code"),
     country: text("country"),
     user_id: uuid("user_id").notNull(),
+    full_name: text("full_name"),
+    user_settings: jsonb("user_settings"),
+    enterprise_id: uuid("enterprise_id").references(() => enterprises.id),
+    role: text("role"),
+    stripe_customer_id: text("stripe_customer_id"),
+    avatar_url: text("avatar_url"),
+    username: text("username"),
+    subscribed_to: text("subscribed_to"),
+    price_id: text("price_id"),
   },
   (table) => [
     index("profiles_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     index("profiles_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("profiles_username_idx").using("btree", table.username.asc().nullsLast().op("text_ops")),
+    index("profiles_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
   ],
 ).enableRLS();
 
@@ -249,11 +261,15 @@ export const companies = pgTable(
     size: text(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
-    enterprise_id: uuid("enterprise_id").references(() => enterprises.id, { onDelete: "cascade" }).notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .references(() => enterprises.id, { onDelete: "cascade" })
+      .notNull(),
+    is_active: boolean().default(true).notNull(),
   },
   (table) => [
     index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("companies_is_active_idx").using("btree", table.is_active.asc().nullsLast()),
   ],
 ).enableRLS();
 
