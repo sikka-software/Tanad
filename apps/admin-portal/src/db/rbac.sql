@@ -1,4 +1,14 @@
 -- Drop existing RBAC objects
+-- First drop the dependent policies
+DROP POLICY IF EXISTS "Superadmins can view all users" ON auth.users;
+DROP POLICY IF EXISTS "Superadmins can manage all users" ON auth.users;
+DROP POLICY IF EXISTS "Users can update enterprises" ON enterprises;
+DROP POLICY IF EXISTS "Users can view their own roles" ON user_roles;
+DROP POLICY IF EXISTS "Users can create initial role" ON user_roles;
+DROP POLICY IF EXISTS "Only superadmins can manage roles" ON user_roles;
+DROP POLICY IF EXISTS "Only superadmins can manage role permissions" ON role_permissions;
+
+-- Now drop the tables and types
 DROP TABLE IF EXISTS public.role_permissions;
 DROP TABLE IF EXISTS public.user_roles;
 DROP TYPE IF EXISTS public.app_permission CASCADE;
