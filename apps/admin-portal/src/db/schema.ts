@@ -538,10 +538,12 @@ export const employees = pgTable(
     enterprise_id: uuid("enterprise_id")
       .references(() => enterprises.id)
       .notNull(),
+    department_id: uuid("department_id").references(() => departments.id, { onDelete: "set null" }),
   },
   (table) => [
     index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     index("employees_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    index("employees_department_id_idx").using("btree", table.department_id.asc().nullsLast().op("uuid_ops")),
   ],
 ).enableRLS();
 
