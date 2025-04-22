@@ -44,6 +44,7 @@ export default function UsersPage() {
       const { data: usersData } = await supabase
         .from("profiles")
         .select("*")
+        .eq("enterprise_id", profile?.enterprise_id)
         .order("created_at", { ascending: false });
 
       setUsers(usersData || []);
@@ -57,7 +58,7 @@ export default function UsersPage() {
             .select("permission")
             .eq("role", user.role);
 
-          permissionsMap[user.id] = permissions?.map(p => p.permission) || [];
+          permissionsMap[user.id] = permissions?.map((p) => p.permission) || [];
         }
         setUserPermissions(permissionsMap);
       }
@@ -96,6 +97,7 @@ export default function UsersPage() {
       const { data: users } = await supabase
         .from("profiles")
         .select("*")
+        .eq("enterprise_id", enterprise_id)
         .order("created_at", { ascending: false });
 
       setUsers(users || []);
@@ -107,9 +109,9 @@ export default function UsersPage() {
           .select("permission")
           .eq("role", role);
 
-        setUserPermissions(prev => ({
+        setUserPermissions((prev) => ({
           ...prev,
-          [authData.user.id]: permissions?.map(p => p.permission) || [],
+          [authData.user.id]: permissions?.map((p) => p.permission) || [],
         }));
       }
     } catch (error) {
@@ -140,9 +142,9 @@ export default function UsersPage() {
         .select("permission")
         .eq("role", role);
 
-      setUserPermissions(prev => ({
+      setUserPermissions((prev) => ({
         ...prev,
-        [user_id]: permissions?.map(p => p.permission) || [],
+        [user_id]: permissions?.map((p) => p.permission) || [],
       }));
     } catch (error) {
       console.error("Error updating user:", error);
