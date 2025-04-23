@@ -16,6 +16,9 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import useUserStore from "@/stores/use-user-store";
 import "@/styles/globals.css";
 
+// App component - gradually building up authentication
+console.log("[_app] Component loaded");
+
 const arabicFont = IBM_Plex_Sans_Arabic({
   weight: ["100", "200", "300", "400", "500", "600", "700"],
   subsets: ["arabic"],
@@ -40,19 +43,39 @@ const landingPages = [
 ];
 
 function AppContent({ Component, pageProps, router }: AppProps) {
-  // const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // const loading = useUserStore((state) => state.loading);
-  // const initialized = useUserStore((state) => state.initialized);
+  // Get auth state from store
+  const loading = useUserStore((state) => state.loading);
+  const initialized = useUserStore((state) => state.initialized);
   const isAuthenticated = useUserStore((state) => state.isAuthenticated);
-
+  const user = useUserStore((state) => state.user);
   const initializeAuth = useUserStore((state) => state.initializeAuth);
 
   useEffect(() => {
-    // setMounted(true);
-    console.log("[AppContent] initializing auth");
+    setMounted(true);
+    console.log("[AppContent] Component mounted");
+    console.log("[AppContent] Initializing auth");
     initializeAuth();
-  }, [isAuthenticated]);
+    
+    // Debug current auth state
+    console.log("[AppContent] Initial auth state:", {
+      isAuthenticated,
+      initialized,
+      loading,
+      hasUser: !!user
+    });
+  }, []);
+  
+  // Log auth state changes for debugging
+  useEffect(() => {
+    console.log("[AppContent] Auth state updated:", {
+      isAuthenticated,
+      initialized,
+      loading,
+      hasUser: !!user
+    });
+  }, [isAuthenticated, initialized, loading, user]);
 
   // // Handle auth redirects
   // useEffect(() => {
@@ -94,8 +117,17 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   //   );
   // }
 
+  // Don't render anything until mounted
+  if (!mounted) {
+    console.log("[AppContent] Not mounted yet, returning null");
+    return null;
+  }
+  
+  console.log("[AppContent] Rendering for path:", router.pathname);
+  
   // Auth Pages
   if (authPages.includes(router.pathname)) {
+    console.log("[AppContent] Rendering with AuthLayout");
     return (
       <div className={`${arabicFont.className}`}>
         <QueryProvider>
@@ -105,6 +137,13 @@ function AppContent({ Component, pageProps, router }: AppProps) {
             timeZone="Asia/Riyadh"
             now={new Date()}
           >
+            {/* Debug overlay */}
+            <div className="bg-muted/20 text-xs fixed top-0 right-0 p-2 z-50">
+              _app Debug: {initialized ? "Initialized" : "Not Initialized"} | 
+              {loading ? " Loading" : " Not Loading"} | 
+              {isAuthenticated ? " Authenticated" : " Not Authenticated"}
+            </div>
+            
             <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
             <ReactQueryDevtools initialIsOpen={false} />
           </NextIntlClientProvider>
@@ -115,6 +154,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
 
   // Landing Page
   if (landingPages.includes(router.pathname)) {
+    console.log("[AppContent] Rendering with LandingLayout");
     return (
       <div className={`${arabicFont.className}`}>
         <QueryProvider>
@@ -124,6 +164,13 @@ function AppContent({ Component, pageProps, router }: AppProps) {
             timeZone="Asia/Riyadh"
             now={new Date()}
           >
+            {/* Debug overlay */}
+            <div className="bg-muted/20 text-xs fixed top-0 right-0 p-2 z-50">
+              _app Debug: {initialized ? "Initialized" : "Not Initialized"} | 
+              {loading ? " Loading" : " Not Loading"} | 
+              {isAuthenticated ? " Authenticated" : " Not Authenticated"}
+            </div>
+            
             <LandingLayout>{<Component {...pageProps} />}</LandingLayout>
             <ReactQueryDevtools initialIsOpen={false} />
           </NextIntlClientProvider>
@@ -134,6 +181,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
 
   // Invoice pages
   if (router.pathname === "/invoices/[code]") {
+    console.log("[AppContent] Rendering with InvoicePages");
     return (
       <div className={`${arabicFont.className}`}>
         <QueryProvider>
@@ -143,6 +191,13 @@ function AppContent({ Component, pageProps, router }: AppProps) {
             timeZone="Asia/Riyadh"
             now={new Date()}
           >
+            {/* Debug overlay */}
+            <div className="bg-muted/20 text-xs fixed top-0 right-0 p-2 z-50">
+              _app Debug: {initialized ? "Initialized" : "Not Initialized"} | 
+              {loading ? " Loading" : " Not Loading"} | 
+              {isAuthenticated ? " Authenticated" : " Not Authenticated"}
+            </div>
+            
             <InvoicePages>{<Component {...pageProps} />}</InvoicePages>
             <ReactQueryDevtools initialIsOpen={false} />
           </NextIntlClientProvider>
@@ -152,6 +207,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   }
 
   // App Pages
+  console.log("[AppContent] Rendering with AppLayout");
   return (
     <div className={`${arabicFont.className}`}>
       <QueryProvider>
@@ -161,6 +217,13 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           timeZone="Asia/Riyadh"
           now={new Date()}
         >
+          {/* Debug overlay */}
+          <div className="bg-muted/20 text-xs fixed top-0 right-0 p-2 z-50">
+            _app Debug: {initialized ? "Initialized" : "Not Initialized"} | 
+            {loading ? " Loading" : " Not Loading"} | 
+            {isAuthenticated ? " Authenticated" : " Not Authenticated"}
+          </div>
+          
           <AppLayout>
             <Component {...pageProps} />
           </AppLayout>

@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 
 import useUserStore from "@/stores/use-user-store";
 
+// Protected route component - gradually building up
+console.log("[ProtectedRoute] Component loaded");
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
@@ -19,25 +22,36 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   // Initialize user data if needed
   useEffect(() => {
-    //   let mounted = true;
+    console.log("[ProtectedRoute] useEffect running for initialization");
+    
+    // Commented out for gradual build-up
+    /*
+    let mounted = true;
 
-    //   async function initializeUser() {
-    //     // Skip if already initialized and we have a user
-    //     if (initialized && user) {
-    //       return;
-    //     }
+    async function initializeUser() {
+      // Skip if already initialized and we have a user
+      if (initialized && user) {
+        return;
+      }
 
-    //     try {
-    //       // await fetchUserAndProfile();
-    //     } catch (err) {
-    //       console.error("[ProtectedRoute] Error initializing user:", err);
-    //     }
-    //   }
+      try {
+        // await fetchUserAndProfile();
+      } catch (err) {
+        console.error("[ProtectedRoute] Error initializing user:", err);
+      }
+    }
+    */
 
+    console.log("[ProtectedRoute] Calling initializeAuth");
     initializeAuth();
+    
+    // For debugging
+    console.log("[ProtectedRoute] Initial state - user:", user);
+    console.log("[ProtectedRoute] Initial state - loading:", loading);
+    console.log("[ProtectedRoute] Initial state - initialized:", initialized);
 
-    //   return () => {
-    //     mounted = false;
+    // return () => {
+    //   mounted = false;
     // };
   }, []); // Only run on mount
 
@@ -58,8 +72,13 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   //   }
   // }, [user, loading, router, isRedirecting, initialized]);
 
-  console.log("[ProtectedRoute] initialized", initialized);
-  console.log("[ProtectedRoute] loading", loading);
+  // Enhanced logging for debugging
+  console.log("[ProtectedRoute] Render state - initialized:", initialized);
+  console.log("[ProtectedRoute] Render state - loading:", loading);
+  console.log("[ProtectedRoute] Render state - user:", user ? "exists" : "null");
+  
+  // Commented out for gradual build-up - we'll temporarily allow access regardless of auth state
+  /*
   // Show nothing while loading or redirecting
   if (!initialized) {
     return (
@@ -78,9 +97,19 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   if (!user) {
     return <div className="flex h-screen w-screen items-center justify-center">No user</div>;
   }
-
-  // If we have a user, show the protected content
-  return <>{children}</>;
+  */
+  
+  // For debugging - show auth state but always render children
+  return (
+    <>
+      <div className="bg-muted/20 text-xs fixed bottom-0 right-0 p-2 z-50">
+        Auth Debug: {initialized ? "Initialized" : "Not Initialized"} | 
+        {loading ? " Loading" : " Not Loading"} | 
+        {user ? " User: " + user.id : " No User"}
+      </div>
+      {children}
+    </>
+  );
 };
 
 export default ProtectedRoute;

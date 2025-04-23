@@ -4,6 +4,9 @@ import { persist, createJSONStorage } from "zustand/middleware";
 
 import { createClient } from "@/utils/supabase/component";
 
+// Authentication store - gradually building up
+console.log("[UserStore] Initializing user store");
+
 // Define strong types for our user data
 export interface Profile {
   id: string;
@@ -88,6 +91,10 @@ const useUserStore = create<UserState>()(
       },
 
       fetchUserAndRelatedData: async (userId: string) => {
+        console.log("[UserStore] fetchUserAndRelatedData called with userId:", userId);
+        
+        // Commented out for gradual build-up
+        /*
         if (!userId) {
           console.warn("[UserStore] fetchUserAndRelatedData called without userId.");
           set({ profile: null, enterprise: null, loading: false });
@@ -139,19 +146,36 @@ const useUserStore = create<UserState>()(
         } finally {
           set({ loading: false });
         }
+        */
+        
+        // Simplified version for debugging
+        set({ loading: true });
+        console.log("[UserStore] Setting loading to true");
+        
+        // Mock data for testing
+        setTimeout(() => {
+          console.log("[UserStore] Simulating fetch completion");
+          set({ loading: false });
+        }, 1000);
       },
 
       initializeAuth: async () => {
-        const supabase = createClient();
+        console.log("[UserStore] initializeAuth called");
         const { initialized } = get();
-        console.log("[UserStore] initalizing", initialized);
+        console.log("[UserStore] initializing, current initialized state:", initialized);
+        
         if (initialized) {
-          console.log("[UserStore] not initialized", initialized);
+          console.log("[UserStore] already initialized, skipping");
           return;
         }
 
         set({ loading: true });
+        console.log("[UserStore] Setting loading to true");
+        
+        // Commented out for gradual build-up
+        /*
         try {
+          const supabase = createClient();
           const {
             data: { session },
             error: sessionError,
@@ -179,9 +203,29 @@ const useUserStore = create<UserState>()(
           console.error("[UserStore] Error during initializeAuth:", error);
           set({ user: null, profile: null, enterprise: null, isAuthenticated: false });
         }
+        */
+        
+        // Simplified version for debugging
+        console.log("[UserStore] Simulating auth initialization");
+        
+        // For testing, let's set a mock user after a delay
+        setTimeout(() => {
+          console.log("[UserStore] Setting mock initialized state");
+          set({ 
+            initialized: true, 
+            loading: false,
+            // Uncomment to test with a mock user
+            // user: { id: 'mock-user-id', email: 'test@example.com' } as User,
+            // isAuthenticated: true
+          });
+        }, 1000);
       },
 
       signOut: async () => {
+        console.log("[UserStore] signOut called");
+        
+        // Commented out for gradual build-up
+        /*
         const supabase = createClient();
         try {
           await supabase.auth.signOut();
@@ -197,17 +241,33 @@ const useUserStore = create<UserState>()(
             loading: false,
           });
         }
+        */
+        
+        // Simplified version for debugging
+        console.log("[UserStore] Simulating sign out");
+        set({
+          user: null,
+          profile: null,
+          enterprise: null,
+          isAuthenticated: false,
+          initialized: false,
+          loading: false,
+        });
       },
 
       refreshProfile: async () => {
-        const supabase = createClient();
+        console.log("[UserStore] refreshProfile called");
         const user = get().user;
+        
         if (!user) {
           console.log("[UserStore] Skipping profile refresh - no user");
           return;
         }
 
+        // Commented out for gradual build-up
+        /*
         set({ loading: true });
+        const supabase = createClient();
         try {
           const { data: profile, error } = await supabase
             .from("profiles")
@@ -221,6 +281,16 @@ const useUserStore = create<UserState>()(
           console.error("[UserStore] Error refreshing profile:", error);
           set({ loading: false });
         }
+        */
+        
+        // Simplified version for debugging
+        console.log("[UserStore] Simulating profile refresh for user:", user.id);
+        set({ loading: true });
+        
+        setTimeout(() => {
+          console.log("[UserStore] Profile refresh complete");
+          set({ loading: false });
+        }, 500);
       },
 
       setState: (state) => {
@@ -257,13 +327,18 @@ const useUserStore = create<UserState>()(
   ),
 );
 
-// Set up auth state change listener
-const supabase = createClient();
-
+// Auth state change listener - commented out for gradual build-up
 if (typeof window !== "undefined") {
+  console.log("[UserStore] Setting up auth state change listener");
+  
+  // Commented out for gradual build-up
+  /*
+  const supabase = createClient();
+  
   // Only set up the listener in the browser
   supabase.auth.onAuthStateChange(async (event, session) => {
     const store = useUserStore.getState();
+    console.log("[UserStore] Auth state changed:", event);
 
     if (event === "SIGNED_IN" && session?.user) {
       store.setUser(session.user);
@@ -285,6 +360,10 @@ if (typeof window !== "undefined") {
       store.setState({ isAuthenticated: true });
     }
   });
+  */
+  
+  // Mock listener for debugging
+  console.log("[UserStore] Mock auth state listener ready");
 }
 
 export default useUserStore;
