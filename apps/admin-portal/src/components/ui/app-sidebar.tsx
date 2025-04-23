@@ -322,9 +322,21 @@ export function AppSidebar() {
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={() => {
-                      supabase.auth.signOut().then(() => {
-                        localStorage.removeItem(CACHE_KEY(user?.id!));
-                        localStorage.removeItem("analytics_date_range");
+                      console.log("[AppSidebar] Sign out clicked");
+
+                      // Use our store's signOut method instead of direct Supabase call
+                      const signOut = useUserStore.getState().signOut;
+
+                      // Clean up local storage
+                      if (user?.id) {
+                        console.log("[AppSidebar] Removing cache for user:", user.id);
+                        localStorage.removeItem(CACHE_KEY(user.id));
+                      }
+                      localStorage.removeItem("analytics_date_range");
+
+                      // Call our signOut method which we've updated for gradual build-up
+                      signOut().then(() => {
+                        console.log("[AppSidebar] Sign out complete, redirecting to /auth");
                         router.replace("/auth");
                       });
                     }}

@@ -154,7 +154,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
             </div>
             
             <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
-            <ReactQueryDevtools initialIsOpen={false} />
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
           </NextIntlClientProvider>
         </QueryProvider>
       </div>
@@ -181,7 +181,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
             </div>
             
             <LandingLayout>{<Component {...pageProps} />}</LandingLayout>
-            <ReactQueryDevtools initialIsOpen={false} />
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
           </NextIntlClientProvider>
         </QueryProvider>
       </div>
@@ -208,7 +208,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
             </div>
             
             <InvoicePages>{<Component {...pageProps} />}</InvoicePages>
-            <ReactQueryDevtools initialIsOpen={false} />
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
           </NextIntlClientProvider>
         </QueryProvider>
       </div>
@@ -236,7 +236,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           <AppLayout>
             <Component {...pageProps} />
           </AppLayout>
-          <ReactQueryDevtools initialIsOpen={false} />
+          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
         </NextIntlClientProvider>
       </QueryProvider>
     </div>
