@@ -50,22 +50,28 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   const initialized = useUserStore((state) => state.initialized);
   const isAuthenticated = useUserStore((state) => state.isAuthenticated);
   const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
   const initializeAuth = useUserStore((state) => state.initializeAuth);
 
   useEffect(() => {
     setMounted(true);
     console.log("[AppContent] Component mounted");
-    console.log("[AppContent] Initializing auth");
-    initializeAuth();
+    
+    // Only initialize if not already initialized
+    if (!initialized) {
+      console.log("[AppContent] Initializing auth");
+      initializeAuth();
+    }
     
     // Debug current auth state
-    console.log("[AppContent] Initial auth state:", {
+    console.log("[AppContent] Current auth state:", {
       isAuthenticated,
       initialized,
       loading,
-      hasUser: !!user
+      hasUser: !!user,
+      hasProfile: !!profile
     });
-  }, []);
+  }, [initialized]);
   
   // Log auth state changes for debugging
   useEffect(() => {
@@ -73,18 +79,17 @@ function AppContent({ Component, pageProps, router }: AppProps) {
       isAuthenticated,
       initialized,
       loading,
-      hasUser: !!user
+      hasUser: !!user,
+      hasProfile: !!profile,
+      currentPath: router.pathname
     });
-    
-    // For debugging - log current path when auth state changes
-    console.log("[AppContent] Current path:", router.pathname);
     
     // Handle auth redirects for debugging
     if (isAuthenticated && router.pathname === "/auth") {
       console.log("[AppContent] User is authenticated and on auth page, redirecting to dashboard");
       router.replace("/dashboard");
     }
-  }, [isAuthenticated, initialized, loading, user, router]);
+  }, [isAuthenticated, initialized, loading, user, profile, router.pathname]);
 
   // // Handle auth redirects
   // useEffect(() => {
@@ -150,7 +155,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
             <div className="bg-muted/20 text-xs fixed top-0 right-0 p-2 z-50">
               _app Debug: {initialized ? "Initialized" : "Not Initialized"} | 
               {loading ? " Loading" : " Not Loading"} | 
-              {isAuthenticated ? " Authenticated" : " Not Authenticated"}
+              {isAuthenticated ? " Authenticated" : " Not Authenticated"} |
+              {profile ? " Has Profile" : " No Profile"}
             </div>
             
             <AuthLayout>{<Component {...pageProps} />}</AuthLayout>
@@ -177,7 +183,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
             <div className="bg-muted/20 text-xs fixed top-0 right-0 p-2 z-50">
               _app Debug: {initialized ? "Initialized" : "Not Initialized"} | 
               {loading ? " Loading" : " Not Loading"} | 
-              {isAuthenticated ? " Authenticated" : " Not Authenticated"}
+              {isAuthenticated ? " Authenticated" : " Not Authenticated"} |
+              {profile ? " Has Profile" : " No Profile"}
             </div>
             
             <LandingLayout>{<Component {...pageProps} />}</LandingLayout>
@@ -230,7 +237,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           <div className="bg-muted/20 text-xs fixed top-0 right-0 p-2 z-50">
             _app Debug: {initialized ? "Initialized" : "Not Initialized"} | 
             {loading ? " Loading" : " Not Loading"} | 
-            {isAuthenticated ? " Authenticated" : " Not Authenticated"}
+            {isAuthenticated ? " Authenticated" : " Not Authenticated"} |
+            {profile ? " Has Profile" : " No Profile"}
           </div>
           
           <AppLayout>

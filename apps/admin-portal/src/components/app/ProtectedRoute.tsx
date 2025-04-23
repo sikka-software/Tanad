@@ -17,124 +17,95 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const loading = useUserStore((state) => state.loading);
   const initialized = useUserStore((state) => state.initialized);
   const initializeAuth = useUserStore((state) => state.initializeAuth);
-  // const fetchUserAndProfile = useUserStore((state) => state.fetchUserAndProfile);
   const router = useRouter();
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [initAttempted, setInitAttempted] = useState(false);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
 
   // Initialize user data if needed
   useEffect(() => {
     console.log("[ProtectedRoute] useEffect running for initialization");
     
-    // Commented out for gradual build-up
-    /*
-    let mounted = true;
+    if (!initialized && !initAttempted) {
+      console.log("[ProtectedRoute] Calling initializeAuth");
+      setInitAttempted(true);
+      initializeAuth();
 
-    async function initializeUser() {
-      // Skip if already initialized and we have a user
-      if (initialized && user) {
-        return;
-      }
+      // Set a timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        console.log("[ProtectedRoute] Loading timeout reached");
+        setLoadingTimeout(true);
+      }, 5000); // 5 second timeout
 
-      try {
-        // await fetchUserAndProfile();
-      } catch (err) {
-        console.error("[ProtectedRoute] Error initializing user:", err);
-      }
+      return () => clearTimeout(timeoutId);
     }
-    */
+  }, [initialized, initAttempted, initializeAuth]);
 
-    console.log("[ProtectedRoute] Calling initializeAuth");
-    initializeAuth();
-    
-    // For debugging
-    console.log("[ProtectedRoute] Initial state - user:", user);
-    console.log("[ProtectedRoute] Initial state - loading:", loading);
-    console.log("[ProtectedRoute] Initial state - initialized:", initialized);
+  // Handle auth redirects
+  useEffect(() => {
+    console.log("[ProtectedRoute] Checking redirect conditions:", {
+      loading,
+      user: !!user,
+      isRedirecting,
+      initialized,
+      loadingTimeout
+    });
 
-    // return () => {
-    //   mounted = false;
-    // };
-  }, []); // Only run on mount
+    const shouldRedirect = (!loading && !user && !isRedirecting && initialized) || 
+                         (loadingTimeout && !user);
 
-  // // Handle auth redirects
-  // useEffect(() => {
-  //   if (!loading && !user && !isRedirecting && initialized) {
-  //     setIsRedirecting(true);
+    if (shouldRedirect) {
+      console.log("[ProtectedRoute] Initiating redirect to auth");
+      setIsRedirecting(true);
 
-  //     // Store the intended URL to redirect back after auth
-  //     const currentPath = router.asPath;
-  //     if (currentPath !== "/auth") {
-  //       sessionStorage.setItem("redirectAfterAuth", currentPath);
-  //     }
+      // Store the intended URL to redirect back after auth
+      const currentPath = router.asPath;
+      if (currentPath !== "/auth") {
+        sessionStorage.setItem("redirectAfterAuth", currentPath);
+      }
 
-  //     router.replace("/auth").then(() => {
-  //       setIsRedirecting(false);
-  //     });
-  //   }
-  // }, [user, loading, router, isRedirecting, initialized]);
+      router.replace("/auth").then(() => {
+        setIsRedirecting(false);
+      });
+    }
+  }, [user, loading, router, isRedirecting, initialized, loadingTimeout]);
 
-  // Enhanced logging for debugging
-  console.log("[ProtectedRoute] Render state - initialized:", initialized);
-  console.log("[ProtectedRoute] Render state - loading:", loading);
-  console.log("[ProtectedRoute] Render state - user:", user ? "exists" : "null");
-  
-  // Gradually building up authentication - show loading and auth states
-  if (loading) {
-    console.log("[ProtectedRoute] Showing loading state");
+  // Show loading state only during initial load or when explicitly loading
+  if ((!initialized || loading) && !loadingTimeout) {
+    console.log("[ProtectedRoute] Showing loading state:", { initialized, loading });
     return (
       <div className="flex h-screen w-screen items-center justify-center flex-col">
         <Loader2 className="animate-spin mb-4" />
         <div>Loading authentication state...</div>
-        <div className="text-xs mt-2">Debug: Loading: {loading.toString()}</div>
-      </div>
-    );
-  }
-  
-  if (!initialized) {
-    console.log("[ProtectedRoute] Not initialized yet");
-    return (
-      <div className="flex h-screen w-screen items-center justify-center flex-col">
-        <div className="mb-4">Initializing authentication...</div>
-        <Button 
-          onClick={() => {
-            console.log("[ProtectedRoute] Manual init triggered");
-            initializeAuth();
-          }}
-        >
-          Retry Initialization
-        </Button>
+        <div className="text-sm text-muted-foreground mt-2">
+          {!initialized ? "Initializing..." : "Loading..."}
+        </div>
       </div>
     );
   }
 
-  // For our gradual build-up, we'll check if user exists but allow access with a warning
-  if (!user) {
-    console.log("[ProtectedRoute] No user found, but allowing access for debugging");
+  // If loading has timed out or no user is authenticated, show redirect message
+  if (!user || loadingTimeout) {
+    console.log("[ProtectedRoute] No user found or loading timeout, showing redirect message");
     return (
-      <>
-        <div className="bg-yellow-500/80 text-black p-2 text-center">
-          ⚠️ Not authenticated - this would normally redirect to login
-        </div>
-        <div className="bg-muted/20 text-xs fixed bottom-0 right-0 p-2 z-50">
-          Auth Debug: {initialized ? "Initialized" : "Not Initialized"} | 
-          {loading ? " Loading" : " Not Loading"} | No User
-        </div>
-        {children}
-      </>
+      <div className="flex h-screen w-screen items-center justify-center flex-col">
+        <Loader2 className="animate-spin mb-4" />
+        <div>Redirecting to login...</div>
+        {loadingTimeout && (
+          <div className="text-sm text-muted-foreground mt-2">
+            Loading took too long, redirecting...
+          </div>
+        )}
+      </div>
     );
   }
   
   // User is authenticated, show the protected content
-  console.log("[ProtectedRoute] User authenticated, showing content");
+  console.log("[ProtectedRoute] Rendering protected content for user:", user.email);
   return (
     <>
       <div className="bg-green-500/20 text-green-700 dark:text-green-300 p-1 text-center text-xs">
         ✓ Authenticated as {user.email}
-      </div>
-      <div className="bg-muted/20 text-xs fixed bottom-0 right-0 p-2 z-50">
-        Auth Debug: {initialized ? "Initialized" : "Not Initialized"} | 
-        {loading ? " Loading" : " Not Loading"} | 
-        {user ? " User: " + user.id : " No User"}
       </div>
       {children}
     </>

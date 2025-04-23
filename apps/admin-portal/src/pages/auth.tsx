@@ -61,69 +61,26 @@ export default function Auth() {
     console.log("[Auth] Signing in with email:", email);
     
     try {
-      // TESTING MODE: Skip actual authentication for testing
-      console.log("[Auth] TESTING MODE: Bypassing actual authentication");
-      console.log("[Auth] Creating mock user for testing");
-      
-      // Create a mock user
-      const mockUser = {
-        id: 'mock-user-id',
-        email: email,
-        app_metadata: {},
-        user_metadata: {},
-        aud: 'authenticated',
-        created_at: new Date().toISOString()
-      } as User;
-      
-      // Manually update the user store
-      console.log("[Auth] Manually setting mock user in store");
-      const userStore = useUserStore.getState();
-      userStore.setUser(mockUser);
-      userStore.setState({ 
-        initialized: true, 
-        isAuthenticated: true,
-        // Add mock profile and enterprise for testing
-        profile: {
-          id: 'mock-user-id',
-          email: email,
-          full_name: 'Test User',
-          stripe_customer_id: null,
-          avatar_url: null,
-          enterprise_id: 'mock-enterprise-id',
-          address: null,
-          user_settings: {
-            currency: 'USD',
-            calendar_type: 'gregorian',
-            timezone: 'UTC'
-          },
-          username: null,
-          subscribed_to: null,
-          price_id: null,
-          phone: null
-        } as Profile,
-        enterprise: {
-          id: 'mock-enterprise-id',
-          name: 'Mock Enterprise'
-        } as Enterprise
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      
-      // Show success message
-      toast.success("Logged in successfully (TEST MODE)");
-      
-      // Force immediate redirect to dashboard
-      console.log("[Auth] Forcing IMMEDIATE redirect to dashboard");
-      router.push("/dashboard");
-      
-      // Add a fallback redirect in case the first one doesn't work
-      setTimeout(() => {
-        console.log("[Auth] Fallback redirect to dashboard");
-        window.location.href = "/dashboard";
-      }, 1000);
 
-    } catch (error) {
-      // Catch any unexpected errors
-      console.error("[Auth] Unexpected error:", error);
-      toast.error(t("Auth.something_went_wrong"));
+      if (error) throw error;
+
+      // The auth state listener in useUserStore will handle setting the user
+      // and fetching the profile and enterprise data
+      toast.success(t("Auth.logged_in_successfully"));
+
+      // Let the auth state listener handle the redirect
+      // The _app component will handle redirecting to /dashboard
+      
+    } catch (error: any) {
+      console.error("[Auth] Sign in error:", error);
+      // Attempt to translate Supabase auth error codes
+      const errorCode = error.code || error.message;
+      const translatedError = t(`Auth.${errorCode}`, undefined, errorCode);
+      toast.error(translatedError);
     } finally {
       setLoading(false);
     }
