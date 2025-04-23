@@ -40,61 +40,59 @@ const landingPages = [
 ];
 
 function AppContent({ Component, pageProps, router }: AppProps) {
-  const [mounted, setMounted] = useState(false);
+  // const [mounted, setMounted] = useState(false);
 
-  const loading = useUserStore((state) => state.loading);
-  const initialized = useUserStore((state) => state.initialized);
+  // const loading = useUserStore((state) => state.loading);
+  // const initialized = useUserStore((state) => state.initialized);
   const isAuthenticated = useUserStore((state) => state.isAuthenticated);
-  // Get the initializeAuth action
+
   const initializeAuth = useUserStore((state) => state.initializeAuth);
 
-  // Handle initial mount and auth initialization
   useEffect(() => {
-    setMounted(true);
-    // Call initializeAuth only once when the component mounts
-    // It handles checking if initialization is needed internally
+    // setMounted(true);
+    console.log("[AppContent] initializing auth");
     initializeAuth();
-  }, [initializeAuth]); // Dependency array ensures it runs once
+  }, [isAuthenticated]);
 
-  // Handle auth redirects
-  useEffect(() => {
-    // Wait until the component is mounted AND the auth state is initialized
-    if (!mounted || !initialized) return;
+  // // Handle auth redirects
+  // useEffect(() => {
+  //   // Wait until the component is mounted AND the auth state is initialized
+  //   if (!mounted || !initialized) return;
 
-    // Now that we are mounted and initialized, we can check auth status
-    const isPublicPage =
-      landingPages.includes(router.pathname) || authPages.includes(router.pathname);
-    const isAuthPage = authPages.includes(router.pathname);
+  //   // Now that we are mounted and initialized, we can check auth status
+  //   const isPublicPage =
+  //     landingPages.includes(router.pathname) || authPages.includes(router.pathname);
+  //   const isAuthPage = authPages.includes(router.pathname);
 
-    if (isAuthenticated && isAuthPage) {
-      // If user is authenticated and on auth page, redirect to dashboard
-      router.replace("/dashboard");
-    } else if (!isAuthenticated && !isPublicPage) {
-      // If user is not authenticated and not on a public page, redirect to auth
-      router.replace("/auth");
-    }
-  }, [mounted, loading, initialized, isAuthenticated, router.pathname]);
+  //   if (isAuthenticated && isAuthPage) {
+  //     // If user is authenticated and on auth page, redirect to dashboard
+  //     router.replace("/dashboard");
+  //   } else if (!isAuthenticated && !isPublicPage) {
+  //     // If user is not authenticated and not on a public page, redirect to auth
+  //     router.replace("/auth");
+  //   }
+  // }, [mounted, loading, initialized, isAuthenticated, router.pathname]);
 
-  useEffect(() => {
-    router.events.emit("routeChangeComplete", router.asPath);
-  }, [router]);
+  // useEffect(() => {
+  //   router.events.emit("routeChangeComplete", router.asPath);
+  // }, [router]);
 
-  const invoicePages = router.pathname === "/[code]";
-  const shouldUseLayout = !router.pathname.startsWith("/pay/");
-  const isPublicPage =
-    landingPages.includes(router.pathname) || authPages.includes(router.pathname);
+  // const invoicePages = router.pathname === "/[code]";
+  // const shouldUseLayout = !router.pathname.startsWith("/pay/");
+  // const isPublicPage =
+  //   landingPages.includes(router.pathname) || authPages.includes(router.pathname);
 
-  // Don't render anything until mounted
-  if (!mounted) return null;
+  // // Don't render anything until mounted
+  // if (!mounted) return null;
 
   // Show loading state for protected pages during initialization
-  if ((loading || !initialized) && !isPublicPage) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <LoadingBar />
-      </div>
-    );
-  }
+  // if ((loading || !initialized) && !isPublicPage) {
+  //   return (
+  //     <div className="flex h-screen w-full items-center justify-center">
+  //       <LoadingBar />
+  //     </div>
+  //   );
+  // }
 
   // Auth Pages
   if (authPages.includes(router.pathname)) {
@@ -135,7 +133,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   }
 
   // Invoice pages
-  if (invoicePages) {
+  if (router.pathname === "/invoices/[code]") {
     return (
       <div className={`${arabicFont.className}`}>
         <QueryProvider>
@@ -163,13 +161,9 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           timeZone="Asia/Riyadh"
           now={new Date()}
         >
-          {shouldUseLayout ? (
-            <AppLayout>
-              <Component {...pageProps} />
-            </AppLayout>
-          ) : (
+          <AppLayout>
             <Component {...pageProps} />
-          )}
+          </AppLayout>
           <ReactQueryDevtools initialIsOpen={false} />
         </NextIntlClientProvider>
       </QueryProvider>

@@ -1,4 +1,4 @@
-import { Plus, Users, Building2, Briefcase, Package, MapPin } from "lucide-react";
+import { Plus, Users, Building2, Briefcase, Package, MapPin, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
 import PageTitle from "@/components/ui/page-title";
@@ -57,11 +58,11 @@ export default function Dashboard() {
     totalWarehouses: 0,
     totalBranches: 0,
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
   const router = useRouter();
-  const { user, profile } = useUserStore();
+  const { user, profile, enterprise, initialized, loading: authLoading } = useUserStore();
 
   // Use our existing hooks
   const { data: employees } = useEmployees();
@@ -105,29 +106,30 @@ export default function Dashboard() {
     }
   };
 
+  // Check authentication first
+  useEffect(() => {
+    if (!authLoading && initialized) {
+      if (!user || !profile || !enterprise) {
+        router.replace("/auth");
+      }
+    }
+  }, [user, profile, enterprise, initialized, authLoading, router]);
+
   // Fetch dashboard stats
   useEffect(() => {
     let isMounted = true;
 
     async function fetchDashboardStats() {
-      if (!isMounted || !user?.id) {
-        console.log("[Dashboard] Skipping fetch - conditions not met:", {
-          isMounted,
-          hasUser: !!user?.id,
-        });
+      if (!isMounted || !user?.id || !enterprise?.id) {
         return;
       }
-
-      console.log("[Dashboard] Starting stats fetch for user:", user.id);
-      setLoading(true);
-      setError(null);
 
       try {
         // Fetch total invoices and revenue
         const { data: invoiceStats, error: invoiceError } = await supabase
           .from("invoices")
           .select("id, total, status")
-          .eq("user_id", user.id);
+          .eq("enterprise_id", enterprise.id);
 
         if (invoiceError) throw invoiceError;
 
@@ -135,7 +137,7 @@ export default function Dashboard() {
         const { count: productCount, error: productError } = await supabase
           .from("products")
           .select("id", { count: "exact" })
-          .eq("user_id", user.id);
+          .eq("enterprise_id", enterprise.id);
 
         if (productError) throw productError;
 
@@ -175,13 +177,16 @@ export default function Dashboard() {
       }
     }
 
-    fetchDashboardStats();
+    if (user?.id && enterprise?.id) {
+      fetchDashboardStats();
+    }
 
     return () => {
       isMounted = false;
     };
   }, [
     user?.id,
+    enterprise?.id,
     employees,
     departments,
     jobs,
@@ -193,21 +198,42 @@ export default function Dashboard() {
     branches,
   ]);
 
+  // Show loading state while auth is initializing
+  if (authLoading || !initialized) {
+    return (
+      <DataPageLayout>
+        <div className="flex h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </DataPageLayout>
+    );
+  }
+
+  // Show loading state while fetching data
+  if (loading) {
+    return (
+      <DataPageLayout>
+        <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
+        <PageTitle texts={{ title: t("Dashboard.title") }} />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(8)].map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+      </DataPageLayout>
+    );
+  }
+
+  // Show error state
   if (error) {
     return (
-      <div>
+      <DataPageLayout>
         <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
-        <PageTitle
-          texts={{
-            title: t("Dashboard.title"),
-            submit_form: t("Dashboard.title"),
-            cancel: t("General.cancel"),
-          }}
-        />
-        <div className="p-4">
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
+        <div className="flex flex-col items-center justify-center gap-4 p-8">
+          <h2 className="text-xl font-semibold">{t("Dashboard.error_loading")}</h2>
+          <p className="text-muted-foreground">{error}</p>
         </div>
-      </div>
+      </DataPageLayout>
     );
   }
 

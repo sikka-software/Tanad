@@ -1,101 +1,107 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { redirect } from "next/navigation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { FormDialog } from "@/components/ui/form-dialog";
 import PageTitle from "@/components/ui/page-title";
+import DataPageLayout from "@/components/layouts/data-page-layout";
+import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { UserForm } from "@/modules/user/user.form";
-import UsersTable from "@/modules/user/user.table";
+import UsersTable, { UserType } from "@/modules/user/user.table";
 import { createClient } from "@/utils/supabase/component";
+import useUserStore from "@/stores/use-user-store";
+import { toast } from "sonner";
 
 export default function UsersPage() {
   const t = useTranslations();
   const supabase = createClient();
   const router = useRouter();
+  const { user: currentUser, profile, enterprise, initialized, loading: authLoading } = useUserStore();
 
-  const [enterprises, setEnterprises] = useState<any[]>([]);
-  const [currentUser, setCurrentUser] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [userPermissions, setUserPermissions] = useState<Record<string, string[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Check authentication first
+  useEffect(() => {
+    if (!authLoading && initialized) {
+      if (!currentUser || !profile || !enterprise) {
+        router.replace("/auth");
+      }
+    }
+  }, [currentUser, profile, enterprise, initialized, authLoading, router]);
 
   useEffect(() => {
-    const getCurrentUserAndEnterprises = async () => {
-      // Check if user is authenticated and has superadmin role
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    let isMounted = true;
 
-      if (!user) {
-        router.push("/login");
+    const fetchUsers = async () => {
+      if (!isMounted || !enterprise?.id) {
         return;
       }
 
-      // Fetch the current user's profile
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+      try {
+        // Fetch all users with their roles for the current enterprise
+        const { data: usersData, error: usersError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("enterprise_id", enterprise.id)
+          .order("created_at", { ascending: false });
 
-      setCurrentUser(profile);
+        if (usersError) throw usersError;
+        if (!isMounted) return;
+        
+        setUsers(usersData || []);
 
-      // Fetch all enterprises
-      const { data: enterprisesData } = await supabase.from("enterprises").select("*");
-      setEnterprises(enterprisesData || []);
+        // Fetch permissions for each user
+        if (usersData) {
+          const permissionsMap: Record<string, string[]> = {};
+          for (const user of usersData) {
+            const { data: permissions } = await supabase
+              .from("role_permissions")
+              .select("permission")
+              .eq("role", user.role);
 
-      // Fetch all users with their roles
-      const { data: usersData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("enterprise_id", profile?.enterprise_id)
-        .order("created_at", { ascending: false });
-
-      setUsers(usersData || []);
-
-      // Fetch permissions for each user
-      if (usersData) {
-        const permissionsMap: Record<string, string[]> = {};
-        for (const user of usersData) {
-          const { data: permissions } = await supabase
-            .from("role_permissions")
-            .select("permission")
-            .eq("role", user.role);
-
-          permissionsMap[user.id] = permissions?.map((p) => p.permission) || [];
+            if (isMounted) {
+              permissionsMap[user.id] = permissions?.map((p) => p.permission) || [];
+            }
+          }
+          if (isMounted) {
+            setUserPermissions(permissionsMap);
+          }
         }
-        setUserPermissions(permissionsMap);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        if (isMounted) {
+          toast.error(t("Users.error_fetching"));
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-
-      setIsLoading(false);
     };
 
-    getCurrentUserAndEnterprises();
-  }, []);
+    if (enterprise?.id) {
+      fetchUsers();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [enterprise?.id, supabase, t]);
 
   const handleCreateUser = async (
     email: string,
     password: string,
     role: string,
-    enterprise_id: string,
   ) => {
     try {
-      // Fetch the current user's profile
-      const { data: currentProfile, error: currentProfileError } = await supabase
-        .from("profiles")
-        .select("enterprise_id")
-        .eq("id", currentUser.id)
-        .single();
-
-      if (currentProfileError) throw currentProfileError;
-
-      const currentEnterpriseId = currentProfile?.enterprise_id;
+      if (!enterprise) return;
 
       // Create the user in auth
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
@@ -111,7 +117,7 @@ export default function UsersPage() {
         id: authData.user.id,
         email,
         role,
-        enterprise_id: currentEnterpriseId,
+        enterprise_id: enterprise.id,
       });
 
       if (profileError) throw profileError;
@@ -120,52 +126,36 @@ export default function UsersPage() {
       const { error: userRoleError } = await supabase.from("user_roles").insert({
         user_id: authData.user.id,
         role,
-        enterprise_id: currentEnterpriseId,
+        enterprise_id: enterprise.id,
       });
 
       if (userRoleError) throw userRoleError;
 
-      // Refresh users list and permissions
+      // Refresh the users list
       const { data: users } = await supabase
         .from("profiles")
         .select("*")
-        .eq("enterprise_id", currentEnterpriseId)
+        .eq("enterprise_id", enterprise.id)
         .order("created_at", { ascending: false });
 
       setUsers(users || []);
-
-      // Fetch permissions for the new user
-      if (users) {
-        const { data: permissions } = await supabase
-          .from("role_permissions")
-          .select("permission")
-          .eq("role", role);
-
-        setUserPermissions((prev) => ({
-          ...prev,
-          [authData.user.id]: permissions?.map((p) => p.permission) || [],
-        }));
-      }
-
-      // Refresh current user
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .single();
-
-      setCurrentUser(profile);
+      toast.success(t("Users.user_created"));
+      setFormDialogOpen(false);
     } catch (error) {
       console.error("Error creating user:", error);
+      toast.error(t("Users.error_creating"));
     }
   };
 
-  const handleUpdateUser = async (user_id: string, role: string, enterprise_id: string) => {
+  const handleUpdateUser = async (user_id: string, role: string) => {
     try {
+      if (!enterprise) return;
+
       const { error } = await supabase
         .from("profiles")
-        .update({ role, enterprise_id: enterprise_id })
-        .eq("id", user_id);
+        .update({ role })
+        .eq("id", user_id)
+        .eq("enterprise_id", enterprise.id);
 
       if (error) throw error;
 
@@ -173,6 +163,7 @@ export default function UsersPage() {
       const { data: users } = await supabase
         .from("profiles")
         .select("*")
+        .eq("enterprise_id", enterprise.id)
         .order("created_at", { ascending: false });
 
       setUsers(users || []);
@@ -187,40 +178,69 @@ export default function UsersPage() {
         ...prev,
         [user_id]: permissions?.map((p) => p.permission) || [],
       }));
+
+      toast.success(t("Users.user_updated"));
     } catch (error) {
       console.error("Error updating user:", error);
+      toast.error(t("Users.error_updating"));
     }
   };
 
+  // Show loading state while auth is initializing
+  if (authLoading || !initialized) {
+    return (
+      <DataPageLayout>
+        <div className="flex h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </DataPageLayout>
+    );
+  }
+
+  // Show loading state while fetching data
+  if (isLoading) {
+    return (
+      <DataPageLayout>
+        <PageTitle texts={{ title: t("Users.title") }} />
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-16" />
+          ))}
+        </div>
+      </DataPageLayout>
+    );
+  }
+
   return (
-    <div>
+    <DataPageLayout>
       <PageTitle
         texts={{ title: t("Users.title") }}
         customButton={
           <Button size="sm" onClick={() => setFormDialogOpen(true)}>
-            {t("Users.add_new")}
+            {t("Users.add_user")}
           </Button>
         }
       />
-      <div className="p-4">
-        <UsersTable
-          loading={isLoading}
-          currentUser={currentUser}
-          users={users}
-          userPermissions={userPermissions}
-          onUpdateUser={handleUpdateUser}
-        />
-      </div>
+
+      <UsersTable
+        users={users}
+        userPermissions={userPermissions}
+        onUpdateUser={handleUpdateUser}
+        currentUser={currentUser as unknown as UserType}
+        loading={isLoading}
+      />
 
       <FormDialog
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
-        title={t("Users.add_new")}
+        title={t("Users.add_user")}
         formId="user-form"
       >
-        <UserForm onSuccess={() => setFormDialogOpen(false)} />
+        <UserForm id="user-form" onSuccess={() => {
+          setFormDialogOpen(false);
+        }} />
       </FormDialog>
-    </div>
+    </DataPageLayout>
   );
 }
 
