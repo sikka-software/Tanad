@@ -2,6 +2,7 @@ import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import useUserStore from "@/stores/use-user-store";
 
 // Protected route component - gradually building up
@@ -77,31 +78,59 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   console.log("[ProtectedRoute] Render state - loading:", loading);
   console.log("[ProtectedRoute] Render state - user:", user ? "exists" : "null");
   
-  // Commented out for gradual build-up - we'll temporarily allow access regardless of auth state
-  /*
-  // Show nothing while loading or redirecting
-  if (!initialized) {
+  // Gradually building up authentication - show loading and auth states
+  if (loading) {
+    console.log("[ProtectedRoute] Showing loading state");
     return (
-      <div className="flex h-screen w-screen items-center justify-center">User Not initialized</div>
+      <div className="flex h-screen w-screen items-center justify-center flex-col">
+        <Loader2 className="animate-spin mb-4" />
+        <div>Loading authentication state...</div>
+        <div className="text-xs mt-2">Debug: Loading: {loading.toString()}</div>
+      </div>
     );
   }
-  if (loading) {
+  
+  if (!initialized) {
+    console.log("[ProtectedRoute] Not initialized yet");
     return (
-      <div className="flex h-screen w-screen items-center justify-center">
-        <Loader2 className="animate-spin" />
+      <div className="flex h-screen w-screen items-center justify-center flex-col">
+        <div className="mb-4">Initializing authentication...</div>
+        <Button 
+          onClick={() => {
+            console.log("[ProtectedRoute] Manual init triggered");
+            initializeAuth();
+          }}
+        >
+          Retry Initialization
+        </Button>
       </div>
     );
   }
 
-  // If we have no user after initialization, return null (redirect effect will handle it)
+  // For our gradual build-up, we'll check if user exists but allow access with a warning
   if (!user) {
-    return <div className="flex h-screen w-screen items-center justify-center">No user</div>;
+    console.log("[ProtectedRoute] No user found, but allowing access for debugging");
+    return (
+      <>
+        <div className="bg-yellow-500/80 text-black p-2 text-center">
+          ⚠️ Not authenticated - this would normally redirect to login
+        </div>
+        <div className="bg-muted/20 text-xs fixed bottom-0 right-0 p-2 z-50">
+          Auth Debug: {initialized ? "Initialized" : "Not Initialized"} | 
+          {loading ? " Loading" : " Not Loading"} | No User
+        </div>
+        {children}
+      </>
+    );
   }
-  */
   
-  // For debugging - show auth state but always render children
+  // User is authenticated, show the protected content
+  console.log("[ProtectedRoute] User authenticated, showing content");
   return (
     <>
+      <div className="bg-green-500/20 text-green-700 dark:text-green-300 p-1 text-center text-xs">
+        ✓ Authenticated as {user.email}
+      </div>
       <div className="bg-muted/20 text-xs fixed bottom-0 right-0 p-2 z-50">
         Auth Debug: {initialized ? "Initialized" : "Not Initialized"} | 
         {loading ? " Loading" : " Not Loading"} | 

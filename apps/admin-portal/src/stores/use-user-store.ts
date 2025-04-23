@@ -79,7 +79,14 @@ const useUserStore = create<UserState>()(
       isAuthenticated: false,
 
       setUser: (user) => {
-        set({ user, isAuthenticated: !!user });
+        console.log("[UserStore] setUser called with:", user ? "user object" : "null");
+        set({ 
+          user, 
+          isAuthenticated: !!user,
+          // When setting a user, also ensure initialized is true
+          initialized: true
+        });
+        console.log("[UserStore] After setUser - isAuthenticated:", !!user);
       },
 
       setProfile: (profile) => {
@@ -294,7 +301,13 @@ const useUserStore = create<UserState>()(
       },
 
       setState: (state) => {
+        console.log("[UserStore] setState called with:", state);
         set(state);
+        console.log("[UserStore] After setState - store state:", {
+          user: !!get().user,
+          isAuthenticated: get().isAuthenticated,
+          initialized: get().initialized
+        });
       },
     }),
     {

@@ -108,9 +108,24 @@ export default function Dashboard() {
 
   // Check authentication first
   useEffect(() => {
+    console.log("[Dashboard] Auth check - user:", !!user, "profile:", !!profile, "enterprise:", !!enterprise);
+    console.log("[Dashboard] Auth state - initialized:", initialized, "authLoading:", authLoading);
+    
+    // Commented out for gradual build-up of authentication
+    /*
     if (!authLoading && initialized) {
       if (!user || !profile || !enterprise) {
         router.replace("/auth");
+      }
+    }
+    */
+    
+    // For our gradual build-up, we'll just log the auth state but allow access
+    if (!authLoading && initialized) {
+      if (!user) {
+        console.log("[Dashboard] No user found, but allowing access for debugging");
+      } else {
+        console.log("[Dashboard] User authenticated:", user.email);
       }
     }
   }, [user, profile, enterprise, initialized, authLoading, router]);
@@ -199,14 +214,21 @@ export default function Dashboard() {
   ]);
 
   // Show loading state while auth is initializing
-  if (authLoading || !initialized) {
+  if (authLoading) {
+    console.log("[Dashboard] Showing loading state - authLoading:", authLoading);
     return (
       <DataPageLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <div className="flex h-[50vh] items-center justify-center flex-col">
+          <Loader2 className="h-8 w-8 animate-spin mb-4" />
+          <div>Loading authentication state...</div>
         </div>
       </DataPageLayout>
     );
+  }
+  
+  // For our gradual build-up, we'll show a warning if not initialized but still allow access
+  if (!initialized) {
+    console.log("[Dashboard] Not initialized yet, but allowing access");
   }
 
   // Show loading state while fetching data
@@ -237,11 +259,23 @@ export default function Dashboard() {
     );
   }
 
-  console.log(user);
-  console.log(user?.id);
-  console.log(profile);
+  // Debug auth state
+  console.log("[Dashboard] Render - user:", user);
+  console.log("[Dashboard] Render - user ID:", user?.id);
+  console.log("[Dashboard] Render - profile:", profile);
+  console.log("[Dashboard] Render - enterprise:", enterprise);
+  
+  // Add auth debug banner
+  const AuthDebugBanner = () => (
+    <div className={`p-2 text-center text-xs ${user ? 'bg-green-500/20 text-green-700 dark:text-green-300' : 'bg-yellow-500/80 text-black'}`}>
+      {user 
+        ? `✓ Authenticated as ${user.email}` 
+        : '⚠️ Not authenticated - this would normally redirect to login'}
+    </div>
+  );
   return (
     <div>
+      <AuthDebugBanner />
       <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
       <PageTitle
         texts={{

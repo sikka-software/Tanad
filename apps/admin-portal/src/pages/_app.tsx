@@ -75,7 +75,16 @@ function AppContent({ Component, pageProps, router }: AppProps) {
       loading,
       hasUser: !!user
     });
-  }, [isAuthenticated, initialized, loading, user]);
+    
+    // For debugging - log current path when auth state changes
+    console.log("[AppContent] Current path:", router.pathname);
+    
+    // Handle auth redirects for debugging
+    if (isAuthenticated && router.pathname === "/auth") {
+      console.log("[AppContent] User is authenticated and on auth page, redirecting to dashboard");
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, initialized, loading, user, router]);
 
   // // Handle auth redirects
   // useEffect(() => {

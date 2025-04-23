@@ -4,6 +4,9 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 
 import ProtectedRoute from "@/components/app/ProtectedRoute";
+
+// App layout - gradually building up authentication
+console.log("[AppLayout] Component loaded");
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
@@ -22,6 +25,10 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const defaultOpen = Cookies.get("sidebar_state") === "true";
   const { setOpenCommandMenu } = useMainStore();
 
+  console.log("[AppLayout] Rendering");
+  
+  // For our gradual build-up, we'll still use ProtectedRoute but with our modified version
+  // that allows access during debugging
   return (
     <ProtectedRoute>
       <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
