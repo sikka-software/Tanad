@@ -1,24 +1,20 @@
-import type { User } from "@supabase/supabase-js";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
 
-import { FREE_PLAN_ID } from "@/lib/constants";
-
-import useUserStore, { Profile, Enterprise } from "@/stores/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
 export default function Auth() {
@@ -41,12 +37,17 @@ export default function Auth() {
   useEffect(() => {
     // Redirect only when the store is initialized and the user is authenticated
     console.log("[Auth] Auth Page Effect:", { isAuthenticated, initialized, storeLoading });
-    
+
     if (initialized && isAuthenticated) {
       console.log("[Auth] Redirecting to /dashboard");
       router.replace("/dashboard");
     } else {
-      console.log("[Auth] Not redirecting - initialized:", initialized, "isAuthenticated:", isAuthenticated);
+      console.log(
+        "[Auth] Not redirecting - initialized:",
+        initialized,
+        "isAuthenticated:",
+        isAuthenticated,
+      );
     }
     // We depend on initialized and isAuthenticated. storeLoading is less relevant here.
   }, [initialized, isAuthenticated, router]);
@@ -59,7 +60,7 @@ export default function Auth() {
     e.preventDefault();
     setLoading(true);
     console.log("[Auth] Signing in with email:", email);
-    
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -68,13 +69,16 @@ export default function Auth() {
 
       if (error) throw error;
 
-      // The auth state listener in useUserStore will handle setting the user
-      // and fetching the profile and enterprise data
+      // Display success toast
       toast.success(t("Auth.logged_in_successfully"));
 
-      // Let the auth state listener handle the redirect
-      // The _app component will handle redirecting to /dashboard
-      
+      console.log("[Auth] Login successful, data:", data);
+
+      // Set a timeout to force navigation if the auth state listener doesn't trigger
+      setTimeout(() => {
+        console.log("[Auth] Login timeout reached, forcing navigation to dashboard");
+        router.replace("/dashboard");
+      }, 2000);
     } catch (error: any) {
       console.error("[Auth] Sign in error:", error);
       // Attempt to translate Supabase auth error codes
@@ -109,13 +113,21 @@ export default function Auth() {
 
       if (error) throw error;
 
-      // Profile, enterprise, and role creation should be handled
-      // by a Supabase database trigger on auth.users insertion.
+      console.log("[Auth] Signup successful, data:", data);
 
-      // After successful signup, the auth state listener and
-      // useUserStore should handle fetching the user and profile
-      // once the trigger has run and the session is established.
+      // Success message
       toast.success(t("Auth.signup_successful_check_email"));
+
+      // If auto-confirm is enabled, we might already be logged in
+      if (data.session) {
+        console.log("[Auth] Session created during signup, redirecting to dashboard");
+
+        // Set a timeout to force navigation if the auth state listener doesn't trigger
+        setTimeout(() => {
+          console.log("[Auth] Signup timeout reached, forcing navigation to dashboard");
+          router.replace("/dashboard");
+        }, 2000);
+      }
     } catch (error: any) {
       // Attempt to translate Supabase auth error codes
       const errorCode = error.code || error.message;

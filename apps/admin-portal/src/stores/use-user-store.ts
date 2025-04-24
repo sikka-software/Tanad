@@ -1,6 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 import { createClient } from "@/utils/supabase/component";
 
@@ -80,10 +80,10 @@ const useUserStore = create<UserState>()(
 
       setUser: (user) => {
         console.log("[UserStore] setUser called with:", user ? "user object" : "null");
-        set({ 
-          user, 
+        set({
+          user,
           isAuthenticated: !!user,
-          initialized: true
+          initialized: true,
         });
         console.log("[UserStore] After setUser - isAuthenticated:", !!user);
       },
@@ -98,7 +98,7 @@ const useUserStore = create<UserState>()(
 
       fetchUserAndRelatedData: async (userId: string) => {
         console.log("[UserStore] fetchUserAndRelatedData called with userId:", userId);
-        
+
         if (!userId) {
           console.warn("[UserStore] fetchUserAndRelatedData called without userId.");
           set({ profile: null, enterprise: null, loading: false });
@@ -108,11 +108,14 @@ const useUserStore = create<UserState>()(
         set({ loading: true });
         const supabase = createClient();
 
+        // Set a timeout to prevent infinite loading state
+        const timeoutId = setTimeout(() => {
+          console.warn("[UserStore] Profile fetch timeout - forcing loading state to false");
+          set({ loading: false });
+        }, 10000); // 10 second timeout
+
         try {
           console.log("[UserStore] Fetching profile data for userId:", userId);
-          
-          // Log the supabase client state
-          console.log("[UserStore] Checking Supabase client...");
 
           // First try a simpler query to test the connection
           console.log("[UserStore] Testing database connection...");
@@ -131,17 +134,16 @@ const useUserStore = create<UserState>()(
           // Now try the actual profile fetch with timeout
           let profileResult: { data: any; error: any };
           try {
-            const profilePromise = supabase
-              .from("profiles")
-              .select("*")
-              .eq("id", userId)
-              .single();
+            const profilePromise = supabase.from("profiles").select("*").eq("id", userId).single();
 
             const timeoutPromise = new Promise((_, reject) => {
               setTimeout(() => reject(new Error("Profile fetch timeout after 5s")), 5000);
             });
 
-            profileResult = await Promise.race([profilePromise, timeoutPromise]) as { data: any; error: any };
+            profileResult = (await Promise.race([profilePromise, timeoutPromise])) as {
+              data: any;
+              error: any;
+            };
           } catch (error) {
             console.error("[UserStore] Profile fetch failed:", error);
             throw error;
@@ -149,18 +151,18 @@ const useUserStore = create<UserState>()(
 
           const { data: profileData, error: profileError } = profileResult;
 
-          console.log("[UserStore] Profile fetch result:", { 
-            success: !profileError, 
+          console.log("[UserStore] Profile fetch result:", {
+            success: !profileError,
             hasData: !!profileData,
-            error: profileError ? profileError.message : null 
+            error: profileError ? profileError.message : null,
           });
 
           if (profileError) {
             console.error("[UserStore] Profile fetch error:", profileError);
-            set({ 
-              profile: null, 
+            set({
+              profile: null,
               enterprise: null,
-              loading: false 
+              loading: false,
             });
             return;
           }
@@ -172,25 +174,25 @@ const useUserStore = create<UserState>()(
             const { data: newProfile, error: createError } = await supabase
               .from("profiles")
               .insert([
-                { 
+                {
                   id: userId,
                   email: get().user?.email,
                   user_settings: {
                     currency: "USD",
                     calendar_type: "gregorian",
-                    timezone: "UTC"
-                  }
-                }
+                    timezone: "UTC",
+                  },
+                },
               ])
               .select()
               .single();
 
             if (createError) {
               console.error("[UserStore] Failed to create profile:", createError);
-              set({ 
-                profile: null, 
+              set({
+                profile: null,
                 enterprise: null,
-                loading: false 
+                loading: false,
               });
               return;
             }
@@ -217,7 +219,7 @@ const useUserStore = create<UserState>()(
             console.log("[UserStore] Enterprise fetch result:", {
               success: !enterpriseError,
               hasData: !!enterpriseData,
-              error: enterpriseError ? enterpriseError.message : null
+              error: enterpriseError ? enterpriseError.message : null,
             });
 
             if (enterpriseError) {
@@ -235,6 +237,8 @@ const useUserStore = create<UserState>()(
           console.error("[UserStore] Error in fetchUserAndRelatedData:", error);
           set({ profile: null, enterprise: null });
         } finally {
+          // Clear the timeout
+          clearTimeout(timeoutId);
           console.log("[UserStore] Completing fetchUserAndRelatedData, clearing loading state");
           set({ loading: false });
         }
@@ -244,7 +248,7 @@ const useUserStore = create<UserState>()(
         console.log("[UserStore] initializeAuth called");
         const { initialized } = get();
         console.log("[UserStore] initializing, current initialized state:", initialized);
-        
+
         if (initialized) {
           console.log("[UserStore] already initialized, skipping");
           return;
@@ -252,7 +256,20 @@ const useUserStore = create<UserState>()(
 
         set({ loading: true });
         console.log("[UserStore] Setting loading to true");
-        
+
+        // Set a timeout to force loading to false if it takes too long
+        const timeoutId = setTimeout(() => {
+          console.warn("[UserStore] Auth initialization timeout - forcing loading state to false");
+          set({
+            loading: false,
+            initialized: true,
+            isAuthenticated: false,
+            user: null,
+            profile: null,
+            enterprise: null,
+          });
+        }, 10000); // 10 second timeout
+
         try {
           const supabase = createClient();
           const {
@@ -260,21 +277,21 @@ const useUserStore = create<UserState>()(
             error: sessionError,
           } = await supabase.auth.getSession();
 
-          console.log("[UserStore] Session check result:", { 
-            hasSession: !!session, 
+          console.log("[UserStore] Session check result:", {
+            hasSession: !!session,
             hasUser: !!session?.user,
-            error: sessionError ? sessionError.message : null
+            error: sessionError ? sessionError.message : null,
           });
 
           if (sessionError) {
             console.error("[UserStore] Error getting session during init:", sessionError);
-            set({ 
-              user: null, 
-              profile: null, 
-              enterprise: null, 
+            set({
+              user: null,
+              profile: null,
+              enterprise: null,
               isAuthenticated: false,
               initialized: true,
-              loading: false 
+              loading: false,
             });
             return;
           }
@@ -282,36 +299,39 @@ const useUserStore = create<UserState>()(
           if (session?.user) {
             console.log("[UserStore] Found existing session for user:", session.user.email);
             set({ user: session.user, isAuthenticated: true });
-            
+
             try {
               await get().fetchUserAndRelatedData(session.user.id);
             } catch (error) {
               console.error("[UserStore] Error fetching user data:", error);
             }
-            
+
             set({ initialized: true, loading: false });
             console.log("[UserStore] Initialization complete with user");
           } else {
             console.log("[UserStore] No active session found");
-            set({ 
-              user: null, 
-              profile: null, 
-              enterprise: null, 
+            set({
+              user: null,
+              profile: null,
+              enterprise: null,
               isAuthenticated: false,
               initialized: true,
-              loading: false 
+              loading: false,
             });
           }
         } catch (error) {
           console.error("[UserStore] Error during initializeAuth:", error);
-          set({ 
-            user: null, 
-            profile: null, 
-            enterprise: null, 
+          set({
+            user: null,
+            profile: null,
+            enterprise: null,
             isAuthenticated: false,
             initialized: true,
-            loading: false 
+            loading: false,
           });
+        } finally {
+          // Clear the timeout
+          clearTimeout(timeoutId);
         }
       },
 
@@ -337,7 +357,7 @@ const useUserStore = create<UserState>()(
       refreshProfile: async () => {
         console.log("[UserStore] refreshProfile called");
         const user = get().user;
-        
+
         if (!user) {
           console.log("[UserStore] Skipping profile refresh - no user");
           return;
@@ -366,7 +386,7 @@ const useUserStore = create<UserState>()(
         console.log("[UserStore] After setState - store state:", {
           user: !!get().user,
           isAuthenticated: get().isAuthenticated,
-          initialized: get().initialized
+          initialized: get().initialized,
         });
       },
     }),
@@ -400,9 +420,9 @@ const useUserStore = create<UserState>()(
 // Auth state change listener
 if (typeof window !== "undefined") {
   console.log("[UserStore] Setting up auth state change listener");
-  
+
   const supabase = createClient();
-  
+
   supabase.auth.onAuthStateChange(async (event, session) => {
     const store = useUserStore.getState();
     console.log("[UserStore] Auth state changed:", event, "Session:", !!session);

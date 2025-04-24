@@ -1,13 +1,11 @@
-import { Plus, Users, Building2, Briefcase, Package, MapPin, Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
 import PageTitle from "@/components/ui/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -108,9 +106,16 @@ export default function Dashboard() {
 
   // Check authentication first
   useEffect(() => {
-    console.log("[Dashboard] Auth check - user:", !!user, "profile:", !!profile, "enterprise:", !!enterprise);
+    console.log(
+      "[Dashboard] Auth check - user:",
+      !!user,
+      "profile:",
+      !!profile,
+      "enterprise:",
+      !!enterprise,
+    );
     console.log("[Dashboard] Auth state - initialized:", initialized, "authLoading:", authLoading);
-    
+
     // Commented out for gradual build-up of authentication
     /*
     if (!authLoading && initialized) {
@@ -119,7 +124,7 @@ export default function Dashboard() {
       }
     }
     */
-    
+
     // For our gradual build-up, we'll just log the auth state but allow access
     if (!authLoading && initialized) {
       if (!user) {
@@ -213,19 +218,174 @@ export default function Dashboard() {
     branches,
   ]);
 
+  // Debug auth state
+  console.log("[Dashboard] Render - user:", user);
+  console.log("[Dashboard] Render - user ID:", user?.id);
+  console.log("[Dashboard] Render - profile:", profile);
+  console.log("[Dashboard] Render - enterprise:", enterprise);
+
+  // Add auth debug banner
+  const AuthDebugBanner = () => (
+    <div
+      className={`p-2 text-center text-xs ${user ? "bg-green-500/20 text-green-700 dark:text-green-300" : "bg-yellow-500/80 text-black"}`}
+    >
+      {user
+        ? `✓ Authenticated as ${user.email}`
+        : "⚠️ Not authenticated - this would normally redirect to login"}
+    </div>
+  );
+
   // Show loading state while auth is initializing
   if (authLoading) {
     console.log("[Dashboard] Showing loading state - authLoading:", authLoading);
+    const [timeoutReached, setTimeoutReached] = useState(false);
+
+    // Add a useEffect to break out of loading state after 5 seconds
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        console.log("[Dashboard] Loading timeout reached, forcing render");
+        setTimeoutReached(true);
+      }, 5000); // 5 second timeout
+
+      return () => clearTimeout(timer);
+    }, []);
+
+    // If timeout reached, show dashboard anyway
+    if (timeoutReached) {
+      console.log("[Dashboard] Loading timeout triggered, showing dashboard anyway");
+      return (
+        <DataPageLayout>
+          <AuthDebugBanner />
+          <div className="mb-6 rounded-md border border-yellow-300 bg-yellow-100 p-4 dark:border-yellow-700 dark:bg-yellow-900/30">
+            <p className="text-yellow-800 dark:text-yellow-200">
+              Authentication is taking longer than expected. Some features may not work correctly.
+            </p>
+          </div>
+          <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
+          <PageTitle texts={{ title: t("Dashboard.title") }} />
+          <div className="space-y-8 p-4">
+            {/* Contacts Section */}
+            <div>
+              <h2 className="mb-4 text-lg font-semibold">{t("Contacts.title")}</h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <StatCard
+                  title={t("Clients.title")}
+                  value={stats.totalClients}
+                  loading={loading}
+                  link="/clients"
+                />
+                <StatCard
+                  title={t("Companies.title")}
+                  value={stats.totalCompanies}
+                  loading={loading}
+                  link="/companies"
+                />
+                <StatCard
+                  title={t("Vendors.title")}
+                  value={stats.totalVendors}
+                  loading={loading}
+                  link="/vendors"
+                />
+              </div>
+            </div>
+
+            {/* Locations Section */}
+            <div>
+              <h2 className="mb-4 text-lg font-semibold">{t("Locations.title")}</h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <StatCard
+                  title={t("Offices.title")}
+                  value={stats.totalOffices}
+                  loading={loading}
+                  link="/offices"
+                />
+                <StatCard
+                  title={t("Warehouses.title")}
+                  value={stats.totalWarehouses}
+                  loading={loading}
+                  link="/warehouses"
+                />
+                <StatCard
+                  title={t("Branches.title")}
+                  value={stats.totalBranches}
+                  loading={loading}
+                  link="/branches"
+                />
+              </div>
+            </div>
+
+            {/* Sales & Revenue Section */}
+            <div>
+              <h2 className="mb-4 text-lg font-semibold">{t("Sales.title")}</h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <StatCard
+                  title={t("Invoices.title")}
+                  value={stats.totalInvoices}
+                  loading={loading}
+                  link="/invoices"
+                  additionalText={`${stats.pendingInvoices} ${t("Dashboard.pending")}`}
+                />
+                <StatCard
+                  title={t("Products.title")}
+                  value={stats.totalProducts}
+                  loading={loading}
+                  link="/products"
+                />
+                <StatCard
+                  title={t("Revenue.title")}
+                  value={`$${stats.totalRevenue.toFixed(2)}`}
+                  loading={loading}
+                />
+                <StatCard
+                  title={t("Invoices.title")}
+                  value={stats.pendingInvoices}
+                  loading={loading}
+                  additionalText={`${((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}% ${t(
+                    "Dashboard.of_total",
+                  )}`}
+                />
+              </div>
+            </div>
+
+            {/* Human Resources Section */}
+            <div>
+              <h2 className="mb-4 text-lg font-semibold">{t("HumanResources.title")}</h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <StatCard
+                  title={t("Employees.title")}
+                  value={stats.totalEmployees}
+                  loading={loading}
+                  link="/employees"
+                />
+                <StatCard
+                  title={t("Departments.title")}
+                  value={stats.totalDepartments}
+                  loading={loading}
+                  link="/departments"
+                />
+                <StatCard
+                  title={t("Jobs.title")}
+                  value={stats.totalJobs}
+                  loading={loading}
+                  link="/jobs"
+                />
+              </div>
+            </div>
+          </div>
+        </DataPageLayout>
+      );
+    }
+
     return (
       <DataPageLayout>
-        <div className="flex h-[50vh] items-center justify-center flex-col">
-          <Loader2 className="h-8 w-8 animate-spin mb-4" />
+        <div className="flex h-[50vh] flex-col items-center justify-center">
+          <Loader2 className="mb-4 h-8 w-8 animate-spin" />
           <div>Loading authentication state...</div>
         </div>
       </DataPageLayout>
     );
   }
-  
+
   // For our gradual build-up, we'll show a warning if not initialized but still allow access
   if (!initialized) {
     console.log("[Dashboard] Not initialized yet, but allowing access");
@@ -259,20 +419,6 @@ export default function Dashboard() {
     );
   }
 
-  // Debug auth state
-  console.log("[Dashboard] Render - user:", user);
-  console.log("[Dashboard] Render - user ID:", user?.id);
-  console.log("[Dashboard] Render - profile:", profile);
-  console.log("[Dashboard] Render - enterprise:", enterprise);
-  
-  // Add auth debug banner
-  const AuthDebugBanner = () => (
-    <div className={`p-2 text-center text-xs ${user ? 'bg-green-500/20 text-green-700 dark:text-green-300' : 'bg-yellow-500/80 text-black'}`}>
-      {user 
-        ? `✓ Authenticated as ${user.email}` 
-        : '⚠️ Not authenticated - this would normally redirect to login'}
-    </div>
-  );
   return (
     <div>
       <AuthDebugBanner />
