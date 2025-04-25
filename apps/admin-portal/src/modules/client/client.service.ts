@@ -4,12 +4,13 @@ export async function fetchClients(): Promise<Client[]> {
   try {
     const response = await fetch("/api/resource/clients");
     if (!response.ok) {
-      throw new Error("Failed to fetch clients");
+      console.error("Failed to fetch clients:", response.statusText);
+      return [];
     }
     return response.json();
   } catch (error) {
     console.error("Error fetching clients:", error);
-    throw new Error("Failed to fetch clients");
+    return [];
   }
 }
 

@@ -1,33 +1,38 @@
 import { Department, DepartmentCreateData } from "@/modules/department/department.type";
 
 export async function fetchDepartmentsWithLocations(): Promise<Department[]> {
-  const [departmentsRes, relRes] = await Promise.all([
-    fetch("/api/resource/departments"),
-    fetch("/api/resource/departmentLocations"), // or similar
-  ]);
+  try {
+    const [departmentsRes, relRes] = await Promise.all([
+      fetch("/api/resource/departments"),
+      fetch("/api/resource/departmentLocations"), // or similar
+    ]);
 
-  if (!departmentsRes.ok || !relRes.ok) throw new Error("Failed to load data");
+    if (!departmentsRes.ok || !relRes.ok) throw new Error("Failed to load data");
 
-  const departments = await departmentsRes.json();
-  const relations = await relRes.json(); // includes department_id, location_id, location_type
+    const departments = await departmentsRes.json();
+    const relations = await relRes.json(); // includes department_id, location_id, location_type
 
-  // Optional: fetch all locations in one go and map by ID/type
-  const allLocationIds = [...new Set(relations.map((r: any) => r.location_id))];
-  const locationsRes = await fetch(
-    "/api/resource/departmentLocations?ids=" + allLocationIds.join(","),
-  );
-  const locations = await locationsRes.json(); // Assume includes office/branch/warehouse in one response
-  const locationMap = Object.fromEntries(locations.map((loc: any) => [loc.id, loc]));
+    // Optional: fetch all locations in one go and map by ID/type
+    const allLocationIds = [...new Set(relations.map((r: any) => r.location_id))];
+    const locationsRes = await fetch(
+      "/api/resource/departmentLocations?ids=" + allLocationIds.join(","),
+    );
+    const locations = await locationsRes.json(); // Assume includes office/branch/warehouse in one response
+    const locationMap = Object.fromEntries(locations.map((loc: any) => [loc.id, loc]));
 
-  return departments.map((dept: any) => ({
-    ...dept,
-    locations: relations
-      .filter((r: any) => r.department_id === dept.id)
-      .map((r: any) => ({
-        ...r,
-        location: locationMap[r.location_id],
-      })),
-  }));
+    return departments.map((dept: any) => ({
+      ...dept,
+      locations: relations
+        .filter((r: any) => r.department_id === dept.id)
+        .map((r: any) => ({
+          ...r,
+          location: locationMap[r.location_id],
+        })),
+    }));
+  } catch (error) {
+    console.error("Error fetching departments with locations:", error);
+    return [];
+  }
 }
 
 export async function fetchDepartments(): Promise<Department[]> {

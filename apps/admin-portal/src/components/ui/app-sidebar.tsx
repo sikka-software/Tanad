@@ -1,11 +1,11 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { User2, LogOut, MessageSquareWarning, CreditCard, Search } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { CreditCard, LogOut, MessageSquareWarning, Search, User2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -26,15 +26,13 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarRail,
-  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar";
 
 import { CACHE_KEY } from "@/lib/constants";
-import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
+import { applyCustomMenuOrder, getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
 import { NavMain } from "./sidebar-menu";
@@ -54,20 +52,12 @@ type Menu = {
   }[];
 };
 
-type Group = {
-  groupLabel?: string;
-  groupLabelTranslationKey?: string;
-  icon: LucideIcon;
-  menus: Menu[];
-};
-
 export function AppSidebar() {
-  const supabase = createClient();
   const t = useTranslations();
   const lang = useLocale();
   const [open, setOpen] = useState(false);
   const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
-  const { user, profile } = useUserStore();
+  const { user, profile, enterprise } = useUserStore();
   const router = useRouter();
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
@@ -76,6 +66,7 @@ export function AppSidebar() {
     groups: new Set(),
     menus: new Set(),
   });
+  const signOut = useUserStore((state) => state.signOut);
 
   // Store and clear expanded states when sidebar collapses
   useEffect(() => {
@@ -229,6 +220,14 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"} className="z-50">
+      <SidebarHeader>
+        <div className="flex items-center gap-2">
+          <span className="text-center text-xs font-medium">
+            {enterprise?.name} <br />
+            {profile?.enterprise_id}
+          </span>
+        </div>
+      </SidebarHeader>
       {state === "expanded" && (
         <SidebarHeader className="px-2 py-2">
           <div className="relative flex items-center gap-2 px-1.5">
@@ -286,7 +285,7 @@ export function AppSidebar() {
                     </Button>
                   ) : (
                     <Button variant={"outline"} className="w-full">
-                      {user?.user_metadata.email}
+                      {profile?.email}
                     </Button>
                   )}
                 </DropdownMenuTrigger>
@@ -319,12 +318,23 @@ export function AppSidebar() {
                   </Link>
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => {
-                      supabase.auth.signOut().then(() => {
-                        localStorage.removeItem(CACHE_KEY(user?.id!));
-                        localStorage.removeItem("analytics_date_range");
+                    onClick={async () => {
+                      console.log("[AppSidebar] Sign out clicked");
+
+                      // Clean up local storage
+                      if (user?.id) {
+                        console.log("[AppSidebar] Removing cache for user:", user.id);
+                        localStorage.removeItem(CACHE_KEY(user.id));
+                      }
+                      localStorage.removeItem("analytics_date_range");
+
+                      try {
+                        await signOut();
+                        console.log("[AppSidebar] Sign out complete, redirecting to /auth");
                         router.replace("/auth");
-                      });
+                      } catch (error) {
+                        console.error("[AppSidebar] Error signing out:", error);
+                      }
                     }}
                   >
                     <LogOut className="!size-4" /> <span>{t("Auth.sign_out")}</span>

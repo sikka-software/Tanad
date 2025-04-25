@@ -8,8 +8,12 @@ const url = new URL(connectionString);
 
 export default {
   schema: "./src/db/schema.ts",
-  out: "./drizzle",
+  out: "./supabase/migrations",
   dialect: "postgresql",
+  schemaFilter: ["public"],
+  introspect: {
+    casing: "preserve",
+  },
   dbCredentials: {
     host: url.hostname,
     port: parseInt(url.port),

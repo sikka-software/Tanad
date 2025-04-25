@@ -14,17 +14,13 @@ import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
 
-import { FREE_PLAN_ID } from "@/lib/constants";
-import { createStripeCustomer } from "@/lib/stripe";
-
-// Store
 import useUserStore from "@/stores/use-user-store";
-// Utils
 import { createClient } from "@/utils/supabase/component";
 
 export default function Auth() {
   const t = useTranslations();
   const lang = useLocale();
+  const supabase = createClient();
   const { resolvedTheme } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,85 +31,116 @@ export default function Auth() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { isAuthenticated, loading: storeLoading } = useUserStore();
-  const supabase = createClient();
-
+  const { user } = useUserStore();
   useEffect(() => {
-    if (isAuthenticated && !storeLoading) {
-      router.replace("/dashboard");
+    if (user) {
+      // Check if there's a redirect path in sessionStorage
+      const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
+      sessionStorage.removeItem("redirectAfterAuth");
+      router.replace(redirectPath);
     }
-  }, [isAuthenticated, storeLoading, router]);
-
-  useEffect(() => {
-    router.events.emit("routeChangeComplete", router.asPath);
-  }, []);
+  }, [user, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+
       if (error) throw error;
-      // Don't redirect here, let the useEffect handle it
+      toast.success(t("Auth.logged_in_successfully"));
     } catch (error: any) {
-      toast.error(t("Auth." + error.code));
+      // Attempt to translate Supabase auth error codes
+      const errorCode = error.code || error.message;
+      const translatedError = t(`Auth.${errorCode}`, undefined, errorCode);
+      toast.error(translatedError);
+    } finally {
       setLoading(false);
     }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+
     if (password !== confirmPassword) {
       toast.error(t("Auth.passwords_do_not_match"));
-      setLoading(false);
       return;
     }
+
+    setLoading(true);
     try {
+      // Step 1: Perform the Supabase signup
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            enterprise_owner: true,
+          },
+        },
       });
+
       if (error) throw error;
 
-      // Create Stripe customer
-      let stripeCustomerId = null;
       if (data.user) {
-        stripeCustomerId = await createStripeCustomer(data.user.email || "");
-      }
+        // Step 2: Create an enterprise first, since we need its ID for the profile
+        const enterpriseName = `${email.split("@")[0]}'s Enterprise`;
+        const { data: enterpriseData, error: enterpriseError } = await supabase
+          .from("enterprises")
+          .insert({
+            name: enterpriseName,
+            email: email,
+          })
+          .select()
+          .single();
 
-      // Create profile for the new user
-      if (data.user) {
-        try {
-          const { error: profileError } = await supabase.from("profiles").insert([
-            {
-              id: data.user.id,
-              email: data.user.email,
-              full_name: "Default Full Name",
-              stripe_customer_id: stripeCustomerId,
-              avatar_url: null,
-              address: null,
-              user_settings: { currency: "SAR", calendar_type: "gregorian" },
-              username: null,
-              subscribed_to: "tanad_free",
-              price_id: FREE_PLAN_ID,
+        if (enterpriseError) {
+          console.error("Enterprise creation error:", enterpriseError);
+          throw enterpriseError;
+        }
+
+        // Step 3: Create the user profile with the enterprise ID
+        const stripeCustomerId = `cus_${Math.random().toString(36).substring(2, 15)}`;
+        const { error: profileError } = await supabase.from("profiles").upsert({
+          id: data.user.id,
+          user_id: data.user.id,
+          email: data.user.email,
+          first_name: email.split("@")[0], // Placeholder
+          last_name: "", // Placeholder
+          stripe_customer_id: stripeCustomerId,
+          enterprise_id: enterpriseData.id, // Link to the enterprise we created
+          user_settings: {
+            currency: "USD",
+            calendar_type: "gregorian",
+            timezone: "UTC",
+            notifications: {
+              email_updates: true,
+              email_marketing: false,
+              email_security: true,
+              app_mentions: true,
+              app_comments: true,
+              app_tasks: true,
             },
-          ]);
+          },
+        });
 
-          if (profileError) throw profileError;
-
-          // After successful signup and profile creation, let the store handle the session
-          await useUserStore.getState().fetchUserAndProfile();
-        } catch (profileError: any) {
-          console.error("Error creating profile:", profileError);
-          toast.error(t("Auth.error_creating_profile"));
+        if (profileError) {
+          toast.error(t("Auth.profile_creation_error"));
+          throw profileError;
         }
       }
+
+      // Success message
+      toast.success(t("Auth.signup_successful_check_email"));
     } catch (error: any) {
-      toast.error(t("Auth." + error.code));
+      // Attempt to translate Supabase auth error codes
+      const errorCode = error.code || error.message;
+      const translatedError = t(`Auth.${errorCode}`, undefined, errorCode);
+      toast.error(translatedError);
     } finally {
       setLoading(false);
     }
@@ -136,26 +163,6 @@ export default function Auth() {
       toast.error(t("Auth.failed_to_sign_in_with_google"));
     } finally {
       setLoadingGoogle(false);
-    }
-  };
-
-  const handleAuthDirection = async () => {
-    try {
-      // Check if there's a pending URL to shorten
-      const pendingUrl = sessionStorage.getItem("pendingShortUrl");
-      if (pendingUrl) {
-        // Navigate to dashboard with state to open create dialog
-        router.push("/dashboard", {
-          query: { openCreateDialog: true, pendingUrl },
-        });
-        // Clear the pending URL
-        sessionStorage.removeItem("pendingShortUrl");
-      } else {
-        router.push("/dashboard");
-      }
-    } catch (error: any) {
-      toast.error(error.message);
-      setLoading(false);
     }
   };
 
@@ -183,7 +190,7 @@ export default function Auth() {
 
   // Return null or loading state before client-side mount
   if (!mounted) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return (
@@ -193,16 +200,7 @@ export default function Auth() {
     >
       <CustomPageMeta title={t("SEO.auth.title")} description={t("SEO.auth.description")} />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          Tanad
-          {/* <Image
-            src={`/assets/pukla-logo-full-${resolvedTheme === "dark" ? "green" : "purple"}.png`}
-            alt="Tanad"
-            className="h-12 w-auto"
-            width={512}
-            height={512}
-          /> */}
-        </div>
+        <div className="flex justify-center">Tanad</div>
       </div>
       {isForgotPassword ? (
         <div className="mt-8 flex w-full max-w-[90%] flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-md">
@@ -348,12 +346,6 @@ export default function Auth() {
                       t("Auth.sign_in")
                     )}
                   </Button>
-
-                  {/* <GoogleButton
-                    text={t("continue_with_google")}
-                    onClick={handleGoogleAuth}
-                    loading={loadingGoogle}
-                  /> */}
                 </div>
               </form>
 

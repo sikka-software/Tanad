@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,7 +15,12 @@ import { Textarea } from "@/ui/textarea";
 import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
 import { useCompanies } from "@/modules/company/company.hooks";
 import { fetchVendorById } from "@/modules/vendor/vendor.service";
+import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
+
+import { useCreateVendor } from "./vendor.hooks";
+import useVendorStore from "./vendor.store";
+import { Vendor, VendorUpdateData } from "./vendor.type";
 
 export const createVendorSchema = (t: (key: string) => string) =>
   z.object({
@@ -33,25 +38,24 @@ export const createVendorSchema = (t: (key: string) => string) =>
 export type VendorFormValues = z.input<ReturnType<typeof createVendorSchema>>;
 
 interface VendorFormProps {
-  formId?: string;
-  vendor_id?: string;
-  loading?: boolean;
-  user_id: string | undefined;
-  onSubmit?: (data: VendorFormValues) => void;
+  id?: string;
+  onSuccess?: () => void;
+  defaultValues?: VendorUpdateData | null;
+  editMode?: boolean;
 }
 
-export function VendorForm({
-  formId,
-  vendor_id,
-  loading: externalLoading = false,
-  user_id,
-  onSubmit,
-}: VendorFormProps) {
+export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: VendorFormProps) {
   const supabase = createClient();
   const t = useTranslations();
-  const { locale } = useRouter();
-  const [internalLoading, setInternalLoading] = useState(false);
-  const loading = externalLoading || internalLoading;
+  const locale = useLocale();
+
+  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
+  const { mutate: createVendor } = useCreateVendor();
+  const isLoading = useVendorStore((state) => state.isLoading);
+  const setIsLoading = useVendorStore((state) => state.setIsLoading);
+
+  // const [loadingCompanies, setLoadingCompanies] = useState(false);
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
   const { data: companies, isLoading: companiesLoading } = useCompanies();
 
@@ -82,40 +86,10 @@ export function VendorForm({
       value: company.id,
     })) || [];
 
-  // Fetch vendor data if vendor_id is provided (edit mode)
-  useEffect(() => {
-    if (vendor_id) {
-      setInternalLoading(true);
-      fetchVendorById(vendor_id)
-        .then((vendor) => {
-          form.reset({
-            name: vendor.name,
-            email: vendor.email,
-            phone: vendor.phone,
-            company: vendor.company || "",
-            address: vendor.address,
-            city: vendor.city,
-            state: vendor.state,
-            zip_code: vendor.zip_code,
-            notes: vendor.notes || "",
-          });
-        })
-        .catch((error) => {
-          console.error("Failed to fetch vendor:", error);
-          toast.error(t("General.error_operation"), {
-            description: t("Vendors.messages.error_fetch"),
-          });
-        })
-        .finally(() => {
-          setInternalLoading(false);
-        });
-    }
-  }, [vendor_id, form, t]);
-
   const handleCompanySubmit = async (data: CompanyFormValues) => {
     try {
       // Check if user ID is available
-      if (!user_id) {
+      if (!user?.id) {
         throw new Error(t("error.not_authenticated"));
       }
 
@@ -135,7 +109,7 @@ export function VendorForm({
             size: data.size?.trim() || null,
             notes: data.notes?.trim() || null,
             is_active: data.is_active,
-            user_id: user_id,
+            user_id: user?.id,
           },
         ])
         .select()
@@ -161,16 +135,47 @@ export function VendorForm({
     }
   };
 
-  const handleSubmit = (data: VendorFormValues) => {
-    if (onSubmit) {
-      onSubmit(data);
+  const handleSubmit = async (data: VendorFormValues) => {
+    setIsLoading(true);
+    try {
+      if (editMode) {
+      } else {
+        await createVendor({
+          user_id: user?.id || "",
+          updated_at: new Date().toISOString(),
+          name: data.name.trim(),
+          email: data.email.trim(),
+          phone: data.phone.trim(),
+          company: data.company?.trim() || "",
+          address: data.address.trim(),
+          city: data.city.trim(),
+          state: data.state.trim(),
+          zip_code: data.zip_code.trim(),
+          notes: data.notes?.trim() || null,
+          enterprise_id: profile?.enterprise_id || "",
+        });
+
+        if (onSuccess) {
+          onSuccess();
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Failed to save vendor:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Vendors.messages.error_save"),
+      });
     }
   };
 
   return (
     <>
       <Form {...form}>
-        <form id={formId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form
+          id={id || "vendor-form"}
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -182,7 +187,7 @@ export function VendorForm({
                     <Input
                       placeholder={t("Vendors.form.name.placeholder")}
                       {...field}
-                      disabled={loading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -230,7 +235,7 @@ export function VendorForm({
                       type="email"
                       placeholder={t("Vendors.form.email.placeholder")}
                       {...field}
-                      disabled={loading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -249,7 +254,7 @@ export function VendorForm({
                       type="tel"
                       placeholder={t("Vendors.form.phone.placeholder")}
                       {...field}
-                      disabled={loading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -268,7 +273,7 @@ export function VendorForm({
                   <Input
                     placeholder={t("Vendors.form.address.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -287,7 +292,7 @@ export function VendorForm({
                     <Input
                       placeholder={t("Vendors.form.city.placeholder")}
                       {...field}
-                      disabled={loading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -305,7 +310,7 @@ export function VendorForm({
                     <Input
                       placeholder={t("Vendors.form.state.placeholder")}
                       {...field}
-                      disabled={loading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -323,7 +328,7 @@ export function VendorForm({
                     <Input
                       placeholder={t("Vendors.form.zip_code.placeholder")}
                       {...field}
-                      disabled={loading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -343,7 +348,7 @@ export function VendorForm({
                     placeholder={t("Vendors.form.notes.placeholder")}
                     {...field}
                     value={field.value ?? ""}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />

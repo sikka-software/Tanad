@@ -1,6 +1,6 @@
 
 # Run the admin portal
-run `./admin.sh` in the root of the project
+run `pnpm admin` in the root of the project
 
 # Database Management with Drizzle
 

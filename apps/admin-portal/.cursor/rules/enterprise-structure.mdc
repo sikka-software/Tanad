@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+This project is meant to be multi-tenant. we refer to the tenant as enterprise.
+
+when the user signs up, they create an enterprise. And in the enterprise they can invite users with custom/predefined roles.
+
+When a user signs in and they're part of an enterprise, they login to that enterprise.

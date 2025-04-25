@@ -7,7 +7,7 @@ const models = [
   "invoices",
   "products",
   "employees",
-  "employeeRequests",
+  "employee-requests",
   "salaries",
   "jobs",
   "companies",
@@ -16,6 +16,7 @@ const models = [
   "expenses",
   "purchases",
   "quotes", 
+
 ];
 
 interface SortOptions {

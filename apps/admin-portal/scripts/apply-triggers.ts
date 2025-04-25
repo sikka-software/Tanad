@@ -31,7 +31,7 @@ async function applyTriggers() {
 
     for (const line of sqlContent.split("\n")) {
       const trimmedLine = line.trim();
-      
+
       // Check for dollar-quoted string start/end
       if (trimmedLine.includes("$$")) {
         const matches = trimmedLine.match(/\$\$/g) || [];
@@ -64,7 +64,7 @@ async function applyTriggers() {
       const statement = statements[i];
       try {
         await sql.unsafe(statement);
-        console.log(`Executed statement ${i + 1}/${statements.length}`);
+        console.log(`✅ Trigger statement executed ${i + 1}/${statements.length}`);
       } catch (error) {
         console.error(`Error executing statement ${i + 1}:`);
         console.error(statement);

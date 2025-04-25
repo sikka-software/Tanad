@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- Anytime you want to understand our db schema refer to [schema.ts](mdc:src/db/schema.ts)
+- Anytime you want to make changes to the db run `supabase migration new FILE_NAME`
+- And to apply the migrations run `supabase migration up --include-all`

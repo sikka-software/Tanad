@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { CommandMenu } from "@/components/ui/command-menu";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import { LoadingBar } from "@/components/ui/loading-bar";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
+import { UserDropdown } from "@/components/ui/user-dropdown";
 
 import { useMainStore } from "@/hooks/main.store";
 
@@ -55,10 +55,9 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 </Button>
                 <ThemeSwitcher />
                 <LanguageSwitcher />
+                <UserDropdown />
               </div>
             </div>
-            {/* Breadcrumb navigation */}
-            {/* {process.env.NODE_ENV === "development" && <DebugPukla />} */}
             <div className="relative mx-auto">{children}</div>
           </div>
         </SidebarProvider>

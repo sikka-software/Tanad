@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
+  bulkDeleteVendors,
   createVendor,
   deleteVendor,
   fetchVendorById,
@@ -83,24 +84,11 @@ export function useDeleteVendor() {
   });
 }
 
+// Hook to bulk delete vendors
 export function useBulkDeleteVendors() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/vendors/bulk-delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete vendors");
-      }
-    },
+    mutationFn: bulkDeleteVendors,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
     },

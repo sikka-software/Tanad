@@ -9,9 +9,9 @@ type ModelConfig = {
   table: any;
   query: any;
   customHandlers?: {
-    POST?: (userId: string, req: NextApiRequest) => Promise<any>;
-    GET?: (userId: string, req: NextApiRequest) => Promise<any>;
-    DELETE?: (userId: string, req: NextApiRequest) => Promise<any>;
+    POST?: (user_id: string, req: NextApiRequest) => Promise<any>;
+    GET?: (user_id: string, req: NextApiRequest) => Promise<any>;
+    DELETE?: (user_id: string, req: NextApiRequest) => Promise<any>;
   };
 };
 
@@ -26,7 +26,7 @@ const modelMap: Record<string, ModelConfig> = {
     table: schema.departmentLocations,
     query: db.query.departmentLocations,
     customHandlers: {
-      POST: async (userId: string, req: NextApiRequest) => {
+      POST: async (user_id: string, req: NextApiRequest) => {
         const locations = Array.isArray(req.body) ? req.body : [req.body];
 
         console.log("Request body:", req.body);
@@ -48,7 +48,7 @@ const modelMap: Record<string, ModelConfig> = {
               department_id: location.department_id,
               location_id: location.location_id,
               location_type: location.type,
-              user_id: userId,
+              user_id: user_id,
             })),
           )
           .returning();

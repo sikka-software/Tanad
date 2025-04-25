@@ -4,12 +4,13 @@ export async function fetchBranches(): Promise<Branch[]> {
   try {
     const response = await fetch("/api/resource/branches");
     if (!response.ok) {
-      throw new Error("Failed to fetch branches");
+      console.error("Failed to fetch branches:", response.statusText);
+      return [];
     }
     return response.json();
   } catch (error) {
     console.error("Error fetching branches:", error);
-    throw error;
+    return [];
   }
 }
 

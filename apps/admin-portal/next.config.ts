@@ -16,8 +16,8 @@ const nextConfig: NextConfig = {
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
 
   i18n: {
-    locales: ["en", "ar"], // Add your supported locales
-    defaultLocale: "ar", // Set your default locale
+    locales: ["en", "ar"],
+    defaultLocale: "ar",
     localeDetection: false,
   },
   publicRuntimeConfig: { version },

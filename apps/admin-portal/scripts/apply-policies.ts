@@ -53,9 +53,9 @@ async function applyPolicies() {
       const statement = statements[i];
       try {
         await sql.unsafe(statement);
-        console.log(`Executed statement ${i + 1}/${statements.length}`);
+        console.log(`Policy statement executed ${i + 1}/${statements.length}`);
       } catch (error) {
-        console.error(`Error executing statement ${i + 1}: ${statement}`);
+        console.error(`❌ Error executing statement ${i + 1}: ${statement}`);
         console.error(error);
         // Continue with next statement despite errors
       }

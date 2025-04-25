@@ -15,9 +15,9 @@ type Options<T extends UserOwnedTable> = {
   table: T;
   query: any; // you can type this further if you want
   customHandlers?: Partial<{
-    GET: (userId: string, req: NextApiRequest) => Promise<any>;
-    POST: (userId: string, req: NextApiRequest) => Promise<any>;
-    DELETE: (userId: string, req: NextApiRequest) => Promise<any>;
+    GET: (user_id: string, req: NextApiRequest) => Promise<any>;
+    POST: (user_id: string, req: NextApiRequest) => Promise<any>;
+    DELETE: (user_id: string, req: NextApiRequest) => Promise<any>;
   }>;
 };
 
@@ -36,25 +36,25 @@ export function createApiHandler<T extends UserOwnedTable>({
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const userId = user.id;
+    const user_id = user.id;
 
     try {
       switch (req.method) {
         case "GET":
           if (customHandlers.GET) {
-            const data = await customHandlers.GET(userId, req);
+            const data = await customHandlers.GET(user_id, req);
             return res.status(200).json(data);
           }
 
           const list = await query.findMany({
-            where: eq(table.user_id, userId),
+            where: eq(table.user_id, user_id),
             orderBy: desc(table.created_at),
           });
           return res.status(200).json(list);
 
         case "POST":
           if (customHandlers.POST) {
-            const data = await customHandlers.POST(userId, req);
+            const data = await customHandlers.POST(user_id, req);
             return res.status(201).json(data);
           }
 
@@ -62,14 +62,14 @@ export function createApiHandler<T extends UserOwnedTable>({
             .insert(table)
             .values({
               ...req.body,
-              user_id: userId,
+              user_id: user_id,
             })
             .returning();
           return res.status(201).json(created);
 
         case "DELETE":
           if (customHandlers.DELETE) {
-            await customHandlers.DELETE(userId, req);
+            await customHandlers.DELETE(user_id, req);
             return res.status(204).end();
           }
 

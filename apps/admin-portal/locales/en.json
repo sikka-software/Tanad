@@ -2446,6 +2446,60 @@
     "no_users": "No users found",
     "active_users": "Active Users",
     "inactive_users": "Inactive Users",
+    "search_placeholder": "Search users...",
+    "add_dialog": {
+      "title": "Add New User",
+      "description": "Fill in the details to create a new user. They will belong to the same enterprise."
+    },
+    "table": {
+      "head": {
+        "email": "Email",
+        "role": "Role",
+        "permissions": "Permissions",
+        "created_at": "Created At",
+        "actions": "Actions"
+      },
+      "no_users": "No users found.",
+      "permissions_popover": "Permissions",
+      "created_at_never": "Never"
+    },
+    "actions": {
+      "open_menu": "Open menu",
+      "edit": "Edit User",
+      "delete": "Delete User",
+      "activate": "Activate User",
+      "deactivate": "Deactivate User",
+      "reset_password": "Reset Password"
+    },
+    "edit_dialog": {
+      "title": "Edit User",
+      "description": "Make changes to the user's profile here.",
+      "email_label": "Email",
+      "role_label": "Role",
+      "select_role_placeholder": "Select role",
+      "save_button": "Save changes"
+    },
+    "delete_dialog": {
+      "title": "Delete User",
+      "description": "Are you sure you want to delete this user? This action cannot be undone.",
+      "user_prefix": "User: ",
+      "no_email": "No email",
+      "delete_button": "Delete"
+    },
+    "toast": {
+      "success": {
+        "updated": "User updated",
+        "updated_description": "User information has been updated successfully.",
+        "deleted": "User deleted",
+        "deleted_description": "User has been deleted successfully."
+      },
+      "error": {
+        "update_failed": "Failed to update user information.",
+        "update_failed_description": "Failed to update user information.",
+        "delete_failed": "Failed to delete user.",
+        "delete_failed_description": "Failed to delete user."
+      }
+    },
     "form": {
       "name": {
         "label": "Full Name",
@@ -2453,37 +2507,26 @@
         "required": "Full name is required"
       },
       "email": {
-        "label": "Email Address",
+        "label": "Email",
         "placeholder": "Enter email address",
-        "required": "Email address is required",
-        "invalid": "Invalid email address"
+        "required": "Email is required"
       },
       "password": {
         "label": "Password",
         "placeholder": "Enter password",
-        "required": "Password is required",
-        "min_length": "Password must be at least 8 characters",
-        "confirm": "Confirm Password",
-        "confirm_placeholder": "Confirm your password",
-        "mismatch": "Passwords do not match"
+        "required": "Password is required"
       },
       "role": {
         "label": "Role",
         "placeholder": "Select a role",
-        "required": "Role is required",
-        "admin": "Administrator",
-        "manager": "Manager",
-        "employee": "Employee",
-        "user": "Regular User"
+        "required": "Role is required"
       },
       "status": {
         "label": "Status",
-        "active": "Active",
-        "inactive": "Inactive",
-        "suspended": "Suspended"
+        "placeholder": "Select status"
       },
       "phone": {
-        "label": "Phone Number",
+        "label": "Phone",
         "placeholder": "Enter phone number"
       },
       "department": {
@@ -2495,22 +2538,6 @@
         "upload": "Upload Image",
         "remove": "Remove Image"
       }
-    },
-    "actions": {
-      "edit": "Edit User",
-      "delete": "Delete User",
-      "activate": "Activate User",
-      "deactivate": "Deactivate User",
-      "reset_password": "Reset Password"
-    },
-    "messages": {
-      "created": "User created successfully",
-      "updated": "User updated successfully",
-      "deleted": "User deleted successfully",
-      "activated": "User activated successfully",
-      "deactivated": "User deactivated successfully",
-      "password_reset": "Password reset email sent successfully",
-      "error": "An error occurred while processing your request"
     }
   },
   "Warehouses": {
@@ -2679,13 +2706,6 @@
     "email_label": "Email: {value}",
     "phone_label": "Phone: {value}",
     "department_label": "Department: {value}",
-    "table": {
-      "name": "Name",
-      "email": "Email",
-      "phone": "Phone",
-      "position": "Position",
-      "department": "Department"
-    },
     "form": {
       "first_name": {
         "label": "First Name",
@@ -2853,6 +2873,24 @@
       "notes": {
         "label": "Notes"
       }
+    },
+    "messages": {
+      "creating": "Creating company...",
+      "create": "Create Company",
+      "created": "Company created successfully",
+      "updated": "Company updated successfully",
+      "deleted": "Company deleted successfully",
+      "error": "An error occurred while processing your request"
+    },
+    "success": {
+      "created": "Company created successfully",
+      "updated": "Company updated successfully",
+      "deleted": "Company deleted successfully"
+    },
+    "error": {
+      "creating": "An error occurred while creating the company",
+      "updating": "An error occurred while updating the company",
+      "deleting": "An error occurred while deleting the company"
     }
   },
   "Navigation": {

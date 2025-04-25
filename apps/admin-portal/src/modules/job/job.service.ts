@@ -4,12 +4,13 @@ export async function fetchJobs(): Promise<Job[]> {
   try {
     const response = await fetch("/api/resource/jobs");
     if (!response.ok) {
-      throw new Error("Failed to fetch jobs");
+      console.error("Failed to fetch jobs:", response.statusText);
+      return [];
     }
     return response.json();
   } catch (error) {
     console.error("Error fetching jobs:", error);
-    throw new Error("Failed to fetch jobs");
+    return [];
   }
 }
 

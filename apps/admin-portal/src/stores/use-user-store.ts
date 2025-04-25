@@ -1,298 +1,144 @@
+import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 
-import { ExtendedUser } from "@/types";
 import { createClient } from "@/utils/supabase/component";
 
-// Define strong types for our user data
-export interface Profile {
+interface ProfileType {
   id: string;
-  email: string | null;
-  full_name: string | null;
+  user_id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
   stripe_customer_id: string | null;
-  avatar_url: string | null;
-  address: string | null;
-  user_settings: {
-    currency: string;
-    calendar_type: string;
-    timezone: string;
-    notifications?: {
-      email_updates: boolean;
-      email_marketing: boolean;
-      email_security: boolean;
-      app_mentions: boolean;
-      app_comments: boolean;
-      app_tasks: boolean;
-    };
-    navigation?: Record<
-      string,
-      Array<{
-        title: string;
-        translationKey?: string;
-        url?: string;
-        is_active?: boolean;
-        action?: string;
-      }>
-    >;
-    hidden_menu_items?: Record<string, string[]>;
-  };
-  username: string | null;
   subscribed_to: string | null;
   price_id: string | null;
-  phone: string | null;
+  user_settings: Record<string, any> | null;
+  role?: string;
+  enterprise_id?: string;
 }
 
-export interface UserState {
-  user: ExtendedUser | null;
-  profile: Profile | null;
+interface EnterpriseType {
+  id: string;
+  name: string;
+}
+
+interface UserState {
+  user: User | null;
+  profile: ProfileType | null;
+  enterprise: EnterpriseType | null;
   loading: boolean;
-  initialized: boolean;
-  isAuthenticated: boolean;
-  setUser: (user: ExtendedUser | null) => void;
-  setProfile: (profile: Profile | null) => void;
+  error: string | null;
   fetchUserAndProfile: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
-  setInitialized: (initialized: boolean) => void;
-  setState: (state: Partial<UserState>) => void;
+  setUser: (user: User | null) => void;
+  setProfile: (profile: ProfileType | null) => void;
+  setEnterprise: (enterprise: EnterpriseType | null) => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
 }
-
-const useUserStore = create<UserState>()(
-  persist(
-    (set, get) => ({
-      user: null,
-      profile: null,
-      loading: false,
-      initialized: false,
-      isAuthenticated: false,
-
-      setUser: (user) => {
-        set({ user, isAuthenticated: !!user });
-      },
-
-      setProfile: (profile) => {
-        console.log("[UserStore] Setting profile:", profile?.id);
-        set({ profile });
-      },
-
-      setInitialized: (initialized) => {
-        set({ initialized });
-      },
-
-      fetchUserAndProfile: async () => {
-        const currentState = get();
-        const supabase = createClient();
-        // If already initialized and we have both user and profile, return early
-        if (currentState.initialized && currentState.user && currentState.profile) {
-          // console.log(
-          //   "[UserStore] Already fully initialized with user and profile, skipping fetch",
-          // );
-          return;
-        }
-
-        // console.log("[UserStore] Starting fetch");
-        set({ loading: true });
-
-        try {
-          const {
-            data: { session },
-            error: sessionError,
-          } = await supabase.auth.getSession();
-
-          if (sessionError) {
-            throw sessionError;
-          }
-
-          // console.log("[UserStore] Session check result:", {
-          //   hasSession: !!session,
-          //   user_id: session?.user?.id,
-          // });
-
-          if (session?.user) {
-            set({ user: session.user, isAuthenticated: true });
-
-            try {
-              const { data: profile, error: profileError } = await supabase
-                .from("profiles")
-                .select("*")
-                .eq("id", session.user.id)
-                .single();
-
-              if (profileError) {
-                console.error("[UserStore] Profile fetch error:", profileError);
-                throw profileError;
-              }
-
-              // Copy stripe_customer_id from profile to user object
-              const updatedUser = {
-                ...session.user,
-                stripe_customer_id: profile?.stripe_customer_id || undefined,
-                profile: profile,
-              };
-
-              // console.log("[UserStore] Profile fetched successfully:", profile?.id);
-              set({
-                user: updatedUser,
-                profile,
-                loading: false,
-                initialized: true,
-              });
-
-            } catch (error) {
-              console.error("[UserStore] Error fetching profile:", error);
-              set({ loading: false, initialized: true });
-            }
-          } else {
-            // console.log("[UserStore] No session found, clearing state");
-            set({
-              user: null,
-              profile: null,
-              isAuthenticated: false,
-              loading: false,
-              initialized: true,
-            });
-          }
-        } catch (error) {
-          console.error("[UserStore] Error in fetchUserAndProfile:", error);
-          set({
-            user: null,
-            profile: null,
-            isAuthenticated: false,
-            loading: false,
-            initialized: true,
-          });
-        }
-      },
-
-      refreshProfile: async () => {
-        const supabase = createClient();
-        const user = get().user;
-        if (!user) {
-          console.log("[UserStore] Skipping profile refresh - no user");
-          return;
-        }
-
-        set({ loading: true });
-        try {
-          const { data: profile, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", user.id)
-            .single();
-
-          if (error) throw error;
-
-          // Copy stripe_customer_id from profile to user object
-          const updatedUser = {
-            ...user,
-            stripe_customer_id: profile?.stripe_customer_id || undefined,
-            profile: profile,
-          };
-
-          set({
-            user: updatedUser,
-            profile,
-            loading: false,
-          });
-        } catch (error) {
-          console.error("[UserStore] Error refreshing profile:", error);
-          set({ loading: false });
-        }
-      },
-
-      signOut: async () => {
-        try {
-          const supabase = createClient();
-          await supabase.auth.signOut();
-          // console.log("[UserStore] Sign out successful");
-          set({
-            user: null,
-            profile: null,
-            isAuthenticated: false,
-            initialized: false,
-            loading: false,
-          });
-        } catch (error) {
-          console.error("[UserStore] Error signing out:", error);
-        }
-      },
-
-      setState: (state) => {
-        set(state);
-      },
-    }),
-    {
-      name: "tanad-user-store", // unique name for localStorage
-      partialize: (state) => ({
-        user: state.user,
-        profile: state.profile,
-        isAuthenticated: state.isAuthenticated,
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (!state) return;
-
-        // When store is rehydrated from storage, mark as initialized if we have both user and profile
-        if (state.user && state.profile) {
-          state.initialized = true;
-          state.isAuthenticated = true;
-        } else {
-          // If we don't have both, we need to re-fetch
-          state.initialized = false;
-          state.isAuthenticated = false;
-        }
-      },
-    },
-  ),
-);
 
 const supabase = createClient();
-// Set up auth state change listener
-supabase.auth.onAuthStateChange(async (event, session) => {
-  // console.log("[UserStore] Auth state changed:", { event, user_id: session?.user?.id });
-  const store = useUserStore.getState();
 
-  if (event === "SIGNED_IN" && session?.user) {
-    // On sign in, set user but don't fetch profile if we already have it
-    store.setUser(session.user);
+const useUserStore = create<UserState>((set, get) => ({
+  user: null,
+  profile: null,
+  enterprise: null,
+  loading: false,
+  error: null,
 
-    // Only fetch profile if we don't have it or it doesn't match current user
-    if (!store.profile || store.profile.id !== session.user.id) {
-      store.setState({ loading: true });
-      try {
-        const { data: profile, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
+  setUser: (user) => set({ user }),
+  setProfile: (profile) => set({ profile }),
+  setEnterprise: (enterprise) => set({ enterprise }),
+  setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
 
-        if (error) throw error;
-
-        // Copy stripe_customer_id from profile to user
-        const updatedUser = {
-          ...session.user,
-          stripe_customer_id: profile?.stripe_customer_id || undefined,
-          profile: profile,
-        };
-
-        // Update both user and profile
-        store.setUser(updatedUser);
-        store.setProfile(profile);
-      } catch (error) {
-        console.error("[UserStore] Error fetching profile on auth change:", error);
-        store.setProfile(null);
-      } finally {
-        store.setState({ loading: false });
-      }
+  signOut: async () => {
+    try {
+      set({ loading: true });
+      await supabase.auth.signOut();
+      set({
+        user: null,
+        profile: null,
+        enterprise: null,
+        loading: false,
+        error: null,
+      });
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error signing out:", error);
+      return Promise.reject(error);
     }
+  },
 
-    // Always mark as initialized after SIGNED_IN is handled
-    store.setInitialized(true);
+  fetchUserAndProfile: async () => {
+    // Skip if already loading
+    if (get().loading) return;
+
+    try {
+      set({ loading: true, error: null });
+
+      // Get the current session
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        set({
+          user: null,
+          profile: null,
+          enterprise: null,
+          loading: false,
+        });
+        return;
+      }
+
+      // Set the user from the session
+      set({ user: session.user });
+
+      // Get profile data
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profileData) {
+        set({ profile: profileData as ProfileType });
+
+        // Get enterprise data if profile has enterprise_id
+        if (profileData.enterprise_id) {
+          const { data: enterpriseData } = await supabase
+            .from("enterprises")
+            .select("*")
+            .eq("id", profileData.enterprise_id)
+            .single();
+
+          if (enterpriseData) {
+            set({ enterprise: enterpriseData as EnterpriseType });
+          }
+        }
+      }
+    } catch (error: any) {
+      console.error("Error fetching user data:", error);
+      set({ error: error.message });
+    } finally {
+      set({ loading: false });
+    }
+  },
+}));
+
+// Setup auth state change listener
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_IN") {
+    useUserStore.getState().fetchUserAndProfile();
   } else if (event === "SIGNED_OUT") {
-    // Clear everything on sign out
-    store.setUser(null);
-    store.setProfile(null);
-    store.setInitialized(false);
-    store.setState({ loading: false });
+    useUserStore.setState({
+      user: null,
+      profile: null,
+      enterprise: null,
+      loading: false,
+      error: null,
+    });
   }
 });
 

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -11,63 +11,53 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const user = useUserStore((state) => state.user);
   const loading = useUserStore((state) => state.loading);
-  const initialized = useUserStore((state) => state.initialized);
-  const fetchUserAndProfile = useUserStore((state) => state.fetchUserAndProfile);
   const router = useRouter();
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 
-  // Initialize user data if needed
+  // Try to load user data if not available
   useEffect(() => {
-    let mounted = true;
-
-    async function initializeUser() {
-      // Skip if already initialized and we have a user
-      if (initialized && user) {
-        return;
-      }
-
-      try {
-        await fetchUserAndProfile();
-      } catch (err) {
-        console.error("[ProtectedRoute] Error initializing user:", err);
-      }
+    if (!user && !loading) {
+      useUserStore.getState().fetchUserAndProfile();
     }
 
-    initializeUser();
+    // Show loader after a small delay if still loading
+    const timer = setTimeout(() => {
+      if (loading) {
+        setShowLoader(true);
+      }
+    }, 300);
 
-    return () => {
-      mounted = false;
-    };
-  }, []); // Only run on mount
+    return () => clearTimeout(timer);
+  }, [user, loading]);
 
-  // Handle auth redirects
+  // Redirect to login if user isn't authenticated after loading
   useEffect(() => {
-    if (!loading && !user && !isRedirecting && initialized) {
-      setIsRedirecting(true);
-
+    if (!user && !loading) {
       // Store the intended URL to redirect back after auth
       const currentPath = router.asPath;
       if (currentPath !== "/auth") {
         sessionStorage.setItem("redirectAfterAuth", currentPath);
       }
-
-      router.replace("/auth").then(() => {
-        setIsRedirecting(false);
-      });
+      router.replace("/auth");
     }
-  }, [user, loading, router, isRedirecting, initialized]);
+  }, [user, loading, router]);
 
-  // Show nothing while loading or redirecting
-  if (loading || isRedirecting || !initialized) {
+  // While loading, show a loader after a brief delay
+  if (loading || !user) {
+    if (showLoader) {
+      return (
+        <div className="flex h-screen w-full items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="text-primary h-8 w-8 animate-spin" />
+            <p className="text-muted-foreground text-sm">Loading...</p>
+          </div>
+        </div>
+      );
+    }
     return null;
   }
 
-  // If we have no user after initialization, return null (redirect effect will handle it)
-  if (!user) {
-    return null;
-  }
-
-  // If we have a user, show the protected content
+  // User is authenticated, show the protected content
   return <>{children}</>;
 };
 

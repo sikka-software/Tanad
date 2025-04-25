@@ -7,6 +7,8 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
+import useUserStore from "@/stores/use-user-store";
+
 import { useCreateOffice, useUpdateOffice } from "./office.hooks";
 import useOfficeStore from "./office.store";
 import { OfficeUpdateData } from "./office.type";
@@ -35,7 +37,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
   const t = useTranslations();
   const { mutate: createOffice } = useCreateOffice();
   const { mutate: updateOffice } = useUpdateOffice();
-
+  const { profile } = useUserStore();
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
 
@@ -74,6 +76,15 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
         });
         onSuccess?.();
       } else {
+        const currentProfile = profile || useUserStore.getState().profile;
+        if (!currentProfile?.enterprise_id) {
+          toast.error(t("General.error_operation"), {
+            description: "No enterprise found. Please try logging out and back in.",
+          });
+          setIsLoading(false);
+          return;
+        }
+
         await createOffice({
           name: data.name.trim(),
           email: data.email?.trim(),
@@ -83,6 +94,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
           state: data.state.trim(),
           zip_code: data.zip_code.trim(),
           is_active: true,
+          enterprise_id: currentProfile.enterprise_id,
           updated_at: new Date().toISOString(),
         });
         toast.success(t("General.successful_operation"), {
@@ -93,6 +105,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
         }
       }
     } catch (error) {
+      console.error("Error in office form:", error);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Offices.error.creating"),
       });
