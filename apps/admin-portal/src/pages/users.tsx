@@ -2,39 +2,34 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
+import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Button } from "@/components/ui/button";
 import { FormDialog } from "@/components/ui/form-dialog";
 import PageTitle from "@/components/ui/page-title";
-import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import useUserStore from "@/hooks/use-user";
 import { UserForm } from "@/modules/user/user.form";
 import UsersTable, { UserType } from "@/modules/user/user.table";
 import { createClient } from "@/utils/supabase/component";
-import useUserStore from "@/stores/use-user-store";
-import { toast } from "sonner";
 
 export default function UsersPage() {
   const t = useTranslations();
   const supabase = createClient();
   const router = useRouter();
-  const { user: currentUser, profile, enterprise, initialized, loading: authLoading } = useUserStore();
+  const { user: currentUser, profile, enterprise, loading: authLoading } = useUserStore();
 
   const [users, setUsers] = useState<any[]>([]);
   const [userPermissions, setUserPermissions] = useState<Record<string, string[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
 
-  // Check authentication first
+  // Initialize user data if needed
   useEffect(() => {
-    if (!authLoading && initialized) {
-      if (!currentUser || !profile || !enterprise) {
-        router.replace("/auth");
-      }
-    }
-  }, [currentUser, profile, enterprise, initialized, authLoading, router]);
+    useUserStore.getState().fetchUserAndProfile();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -54,7 +49,7 @@ export default function UsersPage() {
 
         if (usersError) throw usersError;
         if (!isMounted) return;
-        
+
         setUsers(usersData || []);
 
         // Fetch permissions for each user
@@ -95,11 +90,7 @@ export default function UsersPage() {
     };
   }, [enterprise?.id, supabase, t]);
 
-  const handleCreateUser = async (
-    email: string,
-    password: string,
-    role: string,
-  ) => {
+  const handleCreateUser = async (email: string, password: string, role: string) => {
     try {
       if (!enterprise) return;
 
@@ -186,17 +177,6 @@ export default function UsersPage() {
     }
   };
 
-  // Show loading state while auth is initializing
-  if (authLoading || !initialized) {
-    return (
-      <DataPageLayout>
-        <div className="flex h-[50vh] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      </DataPageLayout>
-    );
-  }
-
   // Show loading state while fetching data
   if (isLoading) {
     return (
@@ -236,9 +216,12 @@ export default function UsersPage() {
         title={t("Users.add_user")}
         formId="user-form"
       >
-        <UserForm id="user-form" onSuccess={() => {
-          setFormDialogOpen(false);
-        }} />
+        <UserForm
+          id="user-form"
+          onSuccess={() => {
+            setFormDialogOpen(false);
+          }}
+        />
       </FormDialog>
     </DataPageLayout>
   );
