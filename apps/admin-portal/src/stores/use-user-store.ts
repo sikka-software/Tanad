@@ -1,96 +1,131 @@
+import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
 import { createClient } from "@/utils/supabase/component";
 
-const supabase = createClient();
-
-interface Profile {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
+interface ProfileType {
+  id: string;
+  user_id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  stripe_customer_id: string | null;
+  subscribed_to: string | null;
+  price_id: string | null;
+  user_settings: Record<string, any> | null;
+  role?: string;
+  enterprise_id?: string;
 }
 
-const useUserStore = create<{
-  user: any | null;
-  profile: any | null;
+interface EnterpriseType {
+  id: string;
+  name: string;
+  owner_id: string;
+}
+
+interface UserState {
+  user: User | null;
+  profile: ProfileType | null;
+  enterprise: EnterpriseType | null;
   loading: boolean;
-  setUser: (user: any) => void;
-  setProfile: (profile: any) => void;
   fetchUserAndProfile: () => Promise<void>;
-}>((set) => ({
+  signOut: () => Promise<void>;
+  setUser: (user: User | null) => void;
+  setProfile: (profile: ProfileType | null) => void;
+  setEnterprise: (enterprise: EnterpriseType | null) => void;
+  setLoading: (loading: boolean) => void;
+}
+
+const supabase = createClient();
+
+const useUserStore = create<UserState>((set, get) => ({
   user: null,
   profile: null,
+  enterprise: null,
   loading: true,
-  setUser: (user: any) => set({ user }),
-  setProfile: (profile: any) => set({ profile }),
-  fetchUserAndProfile: async () => {
-    set({ loading: true });
+
+  setUser: (user) => set({ user }),
+  setProfile: (profile) => set({ profile }),
+  setEnterprise: (enterprise) => set({ enterprise }),
+  setLoading: (loading) => set({ loading }),
+
+  signOut: async () => {
     try {
-      // Fetch the authenticated user
+      await supabase.auth.signOut();
+      set({
+        user: null,
+        profile: null,
+        enterprise: null,
+        loading: false,
+      });
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error signing out:", error);
+      return Promise.reject(error);
+    }
+  },
+
+  fetchUserAndProfile: async () => {
+    const { setLoading, setUser, setProfile, setEnterprise } = get();
+
+    try {
+      setLoading(true);
+
+      // Get the current session
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      const user = session?.user || null;
-      set({ user: user as any });
 
-      // Fetch the profile info if user exists
-      if (user) {
-        const { data: profile, error } = await supabase
-          .from("profiles")
+      if (!session) {
+        setUser(null);
+        setProfile(null);
+        setEnterprise(null);
+        return;
+      }
+
+      // Set the user from the session
+      setUser(session.user);
+
+      // Get profile data
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profileData) {
+        setProfile(profileData as ProfileType);
+
+        // Get enterprise data
+        const { data: enterpriseData } = await supabase
+          .from("enterprises")
           .select("*")
-          .eq("id", user.id)
+          .eq("owner_id", session.user.id)
           .single();
 
-        if (error) console.error("Error fetching profile:", error);
-        set({ profile });
-      } else {
-        set({ profile: null });
+        if (enterpriseData) {
+          setEnterprise(enterpriseData as EnterpriseType);
+        }
       }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
     } finally {
-      set({ loading: false });
+      setLoading(false);
     }
   },
 }));
 
-// Set up auth state change listener
+// Setup auth state change listener
 supabase.auth.onAuthStateChange((event, session) => {
-  if (session?.user) {
-    // Don't reset the entire state, just update what changed
-    const currentState = useUserStore.getState();
-    if (currentState.user?.id === session.user.id) {
-      // If it's the same user, don't do anything
-      return;
-    }
-    // If it's a different user, update with full profile
-    supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", session.user.id)
-      .single()
-      .then(({ data: profile }) => {
-        useUserStore.setState({
-          user: {
-            ...session.user,
-            stripe_customer_id: profile?.stripe_customer_id,
-            full_name: profile?.full_name,
-            subscribed_to: profile?.subscribed_to,
-            price_id: profile?.price_id,
-            profile: profile?.profile,
-            user_settings: profile?.user_settings,
-            address: profile?.address,
-            phone: profile?.phone,
-            email: profile?.email,
-            avatar_url: profile?.avatar_url,
-          } as any,
-          profile,
-        });
-      });
-  } else {
-    useUserStore.setState({ user: null, profile: null });
+  if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+    useUserStore.getState().fetchUserAndProfile();
+  } else if (event === "SIGNED_OUT") {
+    useUserStore.setState({
+      user: null,
+      profile: null,
+      enterprise: null,
+      loading: false,
+    });
   }
 });
 
