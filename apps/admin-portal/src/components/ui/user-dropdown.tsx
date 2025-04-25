@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import useUserStore from "@/hooks/use-user";
+import useUserStore from "@/stores/use-user-store";
 
 import {
   DropdownMenu,

@@ -10,9 +10,9 @@ import { FormDialog } from "@/components/ui/form-dialog";
 import PageTitle from "@/components/ui/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import useUserStore from "@/hooks/use-user";
 import { UserForm } from "@/modules/user/user.form";
 import UsersTable, { UserType } from "@/modules/user/user.table";
+import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
 export default function UsersPage() {

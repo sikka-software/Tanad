@@ -1,19 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
 import { ComboboxAdd } from "@/ui/combobox-add";
-import { FormControl, FormItem, FormLabel, FormMessage, FormField } from "@/ui/form";
-import { Form } from "@/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
@@ -23,10 +19,9 @@ import { Textarea } from "@/ui/textarea";
 import { cn } from "@/lib/utils";
 
 import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
-import { EmployeeForm, type EmployeeFormValues } from "@/modules/employee/employee.form";
-import { employeeKeys, useEmployees } from "@/modules/employee/employee.hooks";
+import { EmployeeForm } from "@/modules/employee/employee.form";
+import { useEmployees } from "@/modules/employee/employee.hooks";
 import useEmployeeStore from "@/modules/employee/employee.store";
-import useUserStore from "@/stores/use-user-store";
 
 const createRequestSchema = (t: (key: string) => string) =>
   z.object({

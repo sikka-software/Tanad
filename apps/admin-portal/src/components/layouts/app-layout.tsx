@@ -4,18 +4,15 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 
 import ProtectedRoute from "@/components/app/ProtectedRoute";
-
-// App layout - gradually building up authentication
-console.log("[AppLayout] Component loaded");
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { CommandMenu } from "@/components/ui/command-menu";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import { LoadingBar } from "@/components/ui/loading-bar";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
+import { UserDropdown } from "@/components/ui/user-dropdown";
 
 import { useMainStore } from "@/hooks/main.store";
 
@@ -25,10 +22,6 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const defaultOpen = Cookies.get("sidebar_state") === "true";
   const { setOpenCommandMenu } = useMainStore();
 
-  console.log("[AppLayout] Rendering");
-  
-  // For our gradual build-up, we'll still use ProtectedRoute but with our modified version
-  // that allows access during debugging
   return (
     <ProtectedRoute>
       <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
@@ -62,10 +55,9 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 </Button>
                 <ThemeSwitcher />
                 <LanguageSwitcher />
+                <UserDropdown />
               </div>
             </div>
-            {/* Breadcrumb navigation */}
-            {/* {process.env.NODE_ENV === "development" && <DebugPukla />} */}
             <div className="relative mx-auto">{children}</div>
           </div>
         </SidebarProvider>

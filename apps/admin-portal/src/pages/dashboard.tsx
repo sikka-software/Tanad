@@ -11,7 +11,6 @@ import PageTitle from "@/components/ui/page-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/ui/stat-card";
 
-import useUserStore from "@/hooks/use-user";
 import { useBranches } from "@/modules/branch/branch.hooks";
 import { useClients } from "@/modules/client/client.hooks";
 import { useCompanies } from "@/modules/company/company.hooks";
@@ -21,6 +20,7 @@ import { useJobs } from "@/modules/job/job.hooks";
 import { useOffices } from "@/modules/office/office.hooks";
 import { useVendors } from "@/modules/vendor/vendor.hooks";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
+import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
 interface DashboardStats {
