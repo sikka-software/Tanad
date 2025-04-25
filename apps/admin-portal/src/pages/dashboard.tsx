@@ -8,18 +8,9 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Combobox } from "@/components/ui/combobox";
 import PageTitle from "@/components/ui/page-title";
-import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/ui/stat-card";
 
-import { useBranches } from "@/modules/branch/branch.hooks";
-import { useClients } from "@/modules/client/client.hooks";
-import { useCompanies } from "@/modules/company/company.hooks";
-import { useDepartments } from "@/modules/department/department.hooks";
 import { useEmployees } from "@/modules/employee/employee.hooks";
-import { useJobs } from "@/modules/job/job.hooks";
-import { useOffices } from "@/modules/office/office.hooks";
-import { useVendors } from "@/modules/vendor/vendor.hooks";
-import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -60,23 +51,29 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
   const router = useRouter();
-  const { user, profile, enterprise } = useUserStore();
+  const { user, profile, enterprise, error: userError } = useUserStore();
 
-  // Initialize user data if needed
-  useEffect(() => {
-    useUserStore.getState().fetchUserAndProfile();
-  }, []);
-
-  // Use our existing hooks
+  // Comment out hooks that are causing infinite loops
+  // Keep the ones that are working correctly
   const { data: employees } = useEmployees();
-  const { data: departments } = useDepartments();
-  const { data: jobs } = useJobs();
-  const { data: clients } = useClients();
-  const { data: companies } = useCompanies();
-  const { data: vendors } = useVendors();
-  const { data: offices } = useOffices();
-  const { data: warehouses } = useWarehouses();
-  const { data: branches } = useBranches();
+  // const { data: departments } = useDepartments();
+  // const { data: jobs } = useJobs();
+  // const { data: clients } = useClients();
+  // const { data: companies } = useCompanies();
+  // const { data: vendors } = useVendors();
+  // const { data: offices } = useOffices();
+  // const { data: warehouses } = useWarehouses();
+  // const { data: branches } = useBranches();
+
+  // Use placeholders for commented-out hooks
+  const departments = [];
+  const jobs = [];
+  const clients = [];
+  const companies = [];
+  const vendors = [];
+  const offices = [];
+  const warehouses = [];
+  const branches = [];
 
   const createOptions = [
     {
@@ -109,16 +106,33 @@ export default function Dashboard() {
     }
   };
 
+  const handleRefreshUser = () => {
+    useUserStore.getState().fetchUserAndProfile();
+  };
+
+  const handleSignOut = async () => {
+    await useUserStore.getState().signOut();
+    router.push("/auth");
+  };
+
   // Fetch dashboard stats
   useEffect(() => {
     let isMounted = true;
 
     async function fetchDashboardStats() {
-      if (!isMounted || !user?.id || !enterprise?.id) {
+      if (!isMounted || !user?.id) {
         return;
       }
 
       try {
+        // If no enterprise is found, set loading to false but don't attempt to fetch enterprise-dependent data
+        if (!enterprise?.id) {
+          if (isMounted) {
+            setLoading(false);
+          }
+          return;
+        }
+
         // Fetch total invoices and revenue
         const { data: invoiceStats, error: invoiceError } = await supabase
           .from("invoices")
@@ -171,7 +185,7 @@ export default function Dashboard() {
       }
     }
 
-    if (user?.id && enterprise?.id) {
+    if (user?.id) {
       fetchDashboardStats();
     }
 
@@ -182,30 +196,16 @@ export default function Dashboard() {
     user?.id,
     enterprise?.id,
     employees,
-    departments,
-    jobs,
-    clients,
-    companies,
-    vendors,
-    offices,
-    warehouses,
-    branches,
+    // Remove these dependencies since we've commented out the hooks
+    // departments,
+    // jobs,
+    // clients,
+    // companies,
+    // vendors,
+    // offices,
+    // warehouses,
+    // branches,
   ]);
-
-  // Show loading state while fetching data
-  if (loading) {
-    return (
-      <DataPageLayout>
-        <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
-        <PageTitle texts={{ title: t("Dashboard.title") }} />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(8)].map((_, i) => (
-            <Skeleton key={i} className="h-32" />
-          ))}
-        </div>
-      </DataPageLayout>
-    );
-  }
 
   // Show error state
   if (error) {

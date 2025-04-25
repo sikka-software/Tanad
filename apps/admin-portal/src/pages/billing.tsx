@@ -2,22 +2,30 @@
 import { CreditCard, Package, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import PageTitle from "@/components/ui/page-title";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import useUserStore from "@/stores/use-user-store";
 
 export default function Billing() {
   const t = useTranslations();
-  const { profile } = useUserStore();
+  const { profile, loading } = useUserStore();
 
-  // Initialize user data if needed
-  useEffect(() => {
-    useUserStore.getState().fetchUserAndProfile();
-  }, []);
+  // Show a skeleton while loading
+  if (loading) {
+    return (
+      <>
+        <CustomPageMeta title={t("Billing.title")} description={t("Billing.description")} />
+        <PageTitle texts={{ title: t("Billing.title") }} />
+        <main className="space-y-6 p-4">
+          <Skeleton className="h-64 w-full" />
+        </main>
+      </>
+    );
+  }
 
   return (
     <>

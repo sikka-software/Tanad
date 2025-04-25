@@ -26,11 +26,7 @@ export default function UsersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
 
-  // Initialize user data if needed
-  useEffect(() => {
-    useUserStore.getState().fetchUserAndProfile();
-  }, []);
-
+  // Fetch users data when enterprise is available
   useEffect(() => {
     let isMounted = true;
 
@@ -83,12 +79,15 @@ export default function UsersPage() {
 
     if (enterprise?.id) {
       fetchUsers();
+    } else if (!authLoading) {
+      // If not loading and no enterprise, show empty state
+      setIsLoading(false);
     }
 
     return () => {
       isMounted = false;
     };
-  }, [enterprise?.id, supabase, t]);
+  }, [enterprise?.id, supabase, t, authLoading]);
 
   const handleCreateUser = async (email: string, password: string, role: string) => {
     try {
@@ -178,7 +177,7 @@ export default function UsersPage() {
   };
 
   // Show loading state while fetching data
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <DataPageLayout>
         <PageTitle texts={{ title: t("Users.title") }} />
@@ -186,6 +185,20 @@ export default function UsersPage() {
           {[...Array(5)].map((_, i) => (
             <Skeleton key={i} className="h-16" />
           ))}
+        </div>
+      </DataPageLayout>
+    );
+  }
+
+  // Show empty state if no enterprise
+  if (!enterprise) {
+    return (
+      <DataPageLayout>
+        <PageTitle texts={{ title: t("Users.title") }} />
+        <div className="flex h-40 items-center justify-center">
+          <p className="text-muted-foreground">
+            No enterprise found. Please contact your administrator.
+          </p>
         </div>
       </DataPageLayout>
     );

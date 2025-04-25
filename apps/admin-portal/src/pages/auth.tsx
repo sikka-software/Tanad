@@ -86,10 +86,25 @@ export default function Auth() {
 
       if (error) throw error;
 
-      // Step 2: Create or update the user's profile with the Stripe customer ID
       if (data.user) {
-        const stripeCustomerId = `cus_${Math.random().toString(36).substring(2, 15)}`;
+        // Step 2: Create an enterprise first, since we need its ID for the profile
+        const enterpriseName = `${email.split("@")[0]}'s Enterprise`;
+        const { data: enterpriseData, error: enterpriseError } = await supabase
+          .from("enterprises")
+          .insert({
+            name: enterpriseName,
+            email: email,
+          })
+          .select()
+          .single();
 
+        if (enterpriseError) {
+          console.error("Enterprise creation error:", enterpriseError);
+          throw enterpriseError;
+        }
+
+        // Step 3: Create the user profile with the enterprise ID
+        const stripeCustomerId = `cus_${Math.random().toString(36).substring(2, 15)}`;
         const { error: profileError } = await supabase.from("profiles").upsert({
           id: data.user.id,
           user_id: data.user.id,
@@ -97,6 +112,7 @@ export default function Auth() {
           first_name: email.split("@")[0], // Placeholder
           last_name: "", // Placeholder
           stripe_customer_id: stripeCustomerId,
+          enterprise_id: enterpriseData.id, // Link to the enterprise we created
           user_settings: {
             currency: "USD",
             calendar_type: "gregorian",
@@ -114,6 +130,7 @@ export default function Auth() {
 
         if (profileError) {
           toast.error(t("Auth.profile_creation_error"));
+          throw profileError;
         }
       }
 

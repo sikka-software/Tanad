@@ -20,7 +20,6 @@ interface ProfileType {
 interface EnterpriseType {
   id: string;
   name: string;
-  owner_id: string;
 }
 
 interface UserState {
@@ -28,12 +27,14 @@ interface UserState {
   profile: ProfileType | null;
   enterprise: EnterpriseType | null;
   loading: boolean;
+  error: string | null;
   fetchUserAndProfile: () => Promise<void>;
   signOut: () => Promise<void>;
   setUser: (user: User | null) => void;
   setProfile: (profile: ProfileType | null) => void;
   setEnterprise: (enterprise: EnterpriseType | null) => void;
   setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
 const supabase = createClient();
@@ -42,21 +43,25 @@ const useUserStore = create<UserState>((set, get) => ({
   user: null,
   profile: null,
   enterprise: null,
-  loading: true,
+  loading: false,
+  error: null,
 
   setUser: (user) => set({ user }),
   setProfile: (profile) => set({ profile }),
   setEnterprise: (enterprise) => set({ enterprise }),
   setLoading: (loading) => set({ loading }),
+  setError: (error) => set({ error }),
 
   signOut: async () => {
     try {
+      set({ loading: true });
       await supabase.auth.signOut();
       set({
         user: null,
         profile: null,
         enterprise: null,
         loading: false,
+        error: null,
       });
       return Promise.resolve();
     } catch (error) {
@@ -66,10 +71,11 @@ const useUserStore = create<UserState>((set, get) => ({
   },
 
   fetchUserAndProfile: async () => {
-    const { setLoading, setUser, setProfile, setEnterprise } = get();
+    // Skip if already loading
+    if (get().loading) return;
 
     try {
-      setLoading(true);
+      set({ loading: true, error: null });
 
       // Get the current session
       const {
@@ -77,14 +83,17 @@ const useUserStore = create<UserState>((set, get) => ({
       } = await supabase.auth.getSession();
 
       if (!session) {
-        setUser(null);
-        setProfile(null);
-        setEnterprise(null);
+        set({
+          user: null,
+          profile: null,
+          enterprise: null,
+          loading: false,
+        });
         return;
       }
 
       // Set the user from the session
-      setUser(session.user);
+      set({ user: session.user });
 
       // Get profile data
       const { data: profileData } = await supabase
@@ -94,30 +103,33 @@ const useUserStore = create<UserState>((set, get) => ({
         .single();
 
       if (profileData) {
-        setProfile(profileData as ProfileType);
+        set({ profile: profileData as ProfileType });
 
-        // Get enterprise data
-        const { data: enterpriseData } = await supabase
-          .from("enterprises")
-          .select("*")
-          .eq("owner_id", session.user.id)
-          .single();
+        // Get enterprise data if profile has enterprise_id
+        if (profileData.enterprise_id) {
+          const { data: enterpriseData } = await supabase
+            .from("enterprises")
+            .select("*")
+            .eq("id", profileData.enterprise_id)
+            .single();
 
-        if (enterpriseData) {
-          setEnterprise(enterpriseData as EnterpriseType);
+          if (enterpriseData) {
+            set({ enterprise: enterpriseData as EnterpriseType });
+          }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching user data:", error);
+      set({ error: error.message });
     } finally {
-      setLoading(false);
+      set({ loading: false });
     }
   },
 }));
 
 // Setup auth state change listener
 supabase.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+  if (event === "SIGNED_IN") {
     useUserStore.getState().fetchUserAndProfile();
   } else if (event === "SIGNED_OUT") {
     useUserStore.setState({
@@ -125,6 +137,7 @@ supabase.auth.onAuthStateChange((event, session) => {
       profile: null,
       enterprise: null,
       loading: false,
+      error: null,
     });
   }
 });
