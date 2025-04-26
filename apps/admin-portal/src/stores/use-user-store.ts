@@ -1,6 +1,6 @@
-import { User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
+import { ExtendedUser } from "@/types";
 import { createClient } from "@/utils/supabase/component";
 
 interface ProfileType {
@@ -23,14 +23,14 @@ interface EnterpriseType {
 }
 
 interface UserState {
-  user: User | null;
+  user: ExtendedUser | null;
   profile: ProfileType | null;
   enterprise: EnterpriseType | null;
   loading: boolean;
   error: string | null;
   fetchUserAndProfile: () => Promise<void>;
   signOut: () => Promise<void>;
-  setUser: (user: User | null) => void;
+  setUser: (user: ExtendedUser | null) => void;
   setProfile: (profile: ProfileType | null) => void;
   setEnterprise: (enterprise: EnterpriseType | null) => void;
   setLoading: (loading: boolean) => void;
@@ -93,7 +93,7 @@ const useUserStore = create<UserState>((set, get) => ({
       }
 
       // Set the user from the session
-      set({ user: session.user });
+      set({ user: session.user as ExtendedUser });
 
       // Get profile data
       const { data: profileData } = await supabase
@@ -104,6 +104,15 @@ const useUserStore = create<UserState>((set, get) => ({
 
       if (profileData) {
         set({ profile: profileData as ProfileType });
+
+        // Add the stripe_customer_id to the user object too
+        const updatedUser = {
+          ...session.user,
+          stripe_customer_id: profileData.stripe_customer_id,
+          profile: profileData,
+        } as ExtendedUser;
+
+        set({ user: updatedUser });
 
         // Get enterprise data if profile has enterprise_id
         if (profileData.enterprise_id) {

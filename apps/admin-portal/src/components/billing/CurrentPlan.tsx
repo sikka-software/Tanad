@@ -1,6 +1,6 @@
 import { RefreshCcw } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -22,11 +22,27 @@ export default function CurrentPlan() {
   const t = useTranslations();
   const locale = useLocale();
   const subscription = useSubscription();
-  const { user, fetchUserAndProfile } = useUserStore();
+  const { user, profile, fetchUserAndProfile } = useUserStore();
   const { getPlans } = usePricing(TANAD_PRODUCT_ID);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(Date.now());
-  console.log("user is ", user);
+
+  console.log("CurrentPlan rendering with:", {
+    user: user?.id,
+    profile: profile
+      ? {
+          id: profile.id,
+          subscribed_to: profile.subscribed_to,
+          price_id: profile.price_id,
+          stripe_customer_id: profile.stripe_customer_id,
+        }
+      : null,
+    subscription: {
+      loading: subscription.loading,
+      plan: subscription.planLookupKey,
+      status: subscription.status,
+    },
+  });
 
   // Memoize the refresh function to prevent unnecessary re-renders
   const refreshData = useCallback(async () => {
@@ -38,10 +54,48 @@ export default function CurrentPlan() {
       await fetchUserAndProfile();
       await subscription.refetch();
       setLastRefreshTime(Date.now()); // Update refresh timestamp
+      console.log("Data refresh complete");
     } catch (error) {
       console.error("Error refreshing data:", error);
     }
   }, [user, fetchUserAndProfile, subscription]);
+
+  // Listen for subscription update events
+  useEffect(() => {
+    const handleSubscriptionUpdated = () => {
+      console.log("Subscription updated event received, refreshing data");
+      refreshData();
+    };
+
+    window.addEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
+
+    return () => {
+      window.removeEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
+    };
+  }, [refreshData]);
+
+  // Refresh data on mount and when profile changes
+  useEffect(() => {
+    // Refresh on initial load
+    if (!subscription.loading && user) {
+      console.log("CurrentPlan: Initial data refresh");
+      refreshData();
+    }
+  }, [user, refreshData, subscription.loading]);
+
+  // Additional refresh when profile's subscribed_to changes
+  useEffect(() => {
+    if (profile && profile.subscribed_to && subscription.planLookupKey !== profile.subscribed_to) {
+      console.log(
+        "Detected mismatch between profile.subscribed_to and subscription.planLookupKey, refreshing",
+        {
+          profile_subscribed_to: profile.subscribed_to,
+          subscription_plan: subscription.planLookupKey,
+        },
+      );
+      subscription.refetch();
+    }
+  }, [profile, subscription]);
 
   if (subscription.loading || !user) {
     return <Skeleton className="h-24 w-full rounded-lg" />;

@@ -73,13 +73,39 @@ export default function Auth() {
 
     setLoading(true);
     try {
-      // Step 1: Perform the Supabase signup
+      // Step 1: Create a Stripe customer first
+      const createStripeCustomerResponse = await fetch("/api/stripe/create-customer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          name: email.split("@")[0], // Use part of email as name initially
+        }),
+      });
+
+      if (!createStripeCustomerResponse.ok) {
+        const errorData = await createStripeCustomerResponse.json();
+        throw new Error(errorData.message || "Failed to create Stripe customer");
+      }
+
+      const { customerId } = await createStripeCustomerResponse.json();
+
+      if (!customerId) {
+        throw new Error("No Stripe customer ID returned from API");
+      }
+
+      console.log("Created Stripe customer ID:", customerId);
+
+      // Step 2: Perform the Supabase signup
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             enterprise_owner: true,
+            stripe_customer_id: customerId, // Store in auth metadata too
           },
         },
       });
@@ -87,7 +113,7 @@ export default function Auth() {
       if (error) throw error;
 
       if (data.user) {
-        // Step 2: Create an enterprise first, since we need its ID for the profile
+        // Step 3: Create an enterprise first, since we need its ID for the profile
         const enterpriseName = `${email.split("@")[0]}'s Enterprise`;
         const { data: enterpriseData, error: enterpriseError } = await supabase
           .from("enterprises")
@@ -103,15 +129,14 @@ export default function Auth() {
           throw enterpriseError;
         }
 
-        // Step 3: Create the user profile with the enterprise ID
-        const stripeCustomerId = `cus_${Math.random().toString(36).substring(2, 15)}`;
+        // Step 4: Create the user profile with the enterprise ID and Stripe customer ID
         const { error: profileError } = await supabase.from("profiles").upsert({
           id: data.user.id,
           user_id: data.user.id,
           email: data.user.email,
           first_name: email.split("@")[0], // Placeholder
           last_name: "", // Placeholder
-          stripe_customer_id: stripeCustomerId,
+          stripe_customer_id: customerId, // Use the real Stripe customer ID
           enterprise_id: enterpriseData.id, // Link to the enterprise we created
           user_settings: {
             currency: "USD",
@@ -149,6 +174,9 @@ export default function Auth() {
   const handleGoogleAuth = async () => {
     setLoadingGoogle(true);
     try {
+      // Store metadata indicating we need to create a Stripe customer on successful OAuth
+      sessionStorage.setItem("create_stripe_customer", "true");
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {

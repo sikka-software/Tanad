@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { useSubscription } from "@/hooks/use-subscription";
 import useUserStore from "@/stores/use-user-store";
+import { ExtendedUser } from "@/types";
 import { createClient } from "@/utils/supabase/component";
 
 // Load Stripe with publishable key
@@ -247,7 +248,8 @@ export function PaymentDialog({
       if (user && !user.stripe_customer_id && customerId) {
         console.log("Setting stripe_customer_id from passed prop:", customerId);
         // This is just client-side for this session
-        user.stripe_customer_id = customerId;
+        const updatedUser = { ...user, stripe_customer_id: customerId } as ExtendedUser;
+        useUserStore.getState().setUser(updatedUser);
       }
     }
   }, [open, user, customerId, selectedPlan]);

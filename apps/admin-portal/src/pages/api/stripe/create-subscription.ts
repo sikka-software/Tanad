@@ -493,7 +493,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // First check if profile exists and create it if it doesn't
         const { data: profileCheck, error: profileCheckError } = await supabase
           .from("profiles")
-          .select("id, subscribed_to, stripe_customer_id")
+          .select("id, subscribed_to, stripe_customer_id, email, user_id")
           .eq("id", userId)
           .maybeSingle();
 
@@ -502,15 +502,61 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!profileCheck && !profileCheckError) {
           // Profile doesn't exist, create it first
           console.log(`Creating new profile for user ${userId}`);
+
+          // Get user email from the request body or metadata
+          let emailToUse = "";
+
+          // Option 1: Try getting from request body
+          if (req.body.email) {
+            emailToUse = req.body.email;
+            console.log(`Using email from request body: ${emailToUse}`);
+          }
+          // Option 2: Try getting from Stripe customer
+          else if (customerIdToUse) {
+            try {
+              const stripeCustomer = await stripe.customers.retrieve(customerIdToUse);
+              if (stripeCustomer && !stripeCustomer.deleted && stripeCustomer.email) {
+                emailToUse = stripeCustomer.email;
+                console.log(`Using email from Stripe customer: ${emailToUse}`);
+              }
+            } catch (stripeError) {
+              console.error("Error retrieving Stripe customer:", stripeError);
+            }
+          }
+
+          // Fallback option
+          if (!emailToUse) {
+            emailToUse = `${userId}@example.com`;
+            console.log(`Using fallback email: ${emailToUse}`);
+          }
+
           const { error: createError } = await supabase.from("profiles").insert({
             id: userId,
+            user_id: userId, // Ensure user_id is set
+            email: emailToUse, // Required field
             subscribed_to: lookupKey,
             price_id: priceId,
             stripe_customer_id: customerIdToUse,
+            first_name: "", // Add empty strings for required fields
+            last_name: "",
           });
 
           if (createError) {
             console.error(`Failed to create profile: ${createError.message}`, createError);
+
+            // Try minimal insert as fallback
+            const { error: minimalError } = await supabase.from("profiles").insert({
+              id: userId,
+              user_id: userId,
+              email: emailToUse,
+              subscribed_to: lookupKey,
+            });
+
+            if (minimalError) {
+              console.error(`Failed minimal profile creation: ${minimalError.message}`);
+            } else {
+              console.log(`Created minimal profile for user ${userId}`);
+            }
           } else {
             console.log(`Created new profile for user ${userId} with subscription ${lookupKey}`);
           }
@@ -518,13 +564,50 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           // Profile exists, update it
           console.log(`Updating existing profile for user ${userId}`);
 
+          // Log all profile fields we can retrieve first
+          console.log("Profile check details:", profileCheck);
+
+          // Make sure we have the email field
+          let emailToUse = profileCheck?.email;
+          if (!emailToUse) {
+            // Try getting email from multiple sources
+
+            // Option 1: Try getting from request body
+            if (req.body.email) {
+              emailToUse = req.body.email;
+              console.log(`Using email from request body for existing profile: ${emailToUse}`);
+            }
+            // Option 2: Try getting from Stripe customer
+            else if (customerIdToUse) {
+              try {
+                const stripeCustomer = await stripe.customers.retrieve(customerIdToUse);
+                if (stripeCustomer && !stripeCustomer.deleted && stripeCustomer.email) {
+                  emailToUse = stripeCustomer.email;
+                  console.log(
+                    `Using email from Stripe customer for existing profile: ${emailToUse}`,
+                  );
+                }
+              } catch (stripeError) {
+                console.error("Error retrieving Stripe customer:", stripeError);
+              }
+            }
+
+            // Fallback option
+            if (!emailToUse) {
+              emailToUse = `${userId}@example.com`;
+              console.log(`Using fallback email for existing profile: ${emailToUse}`);
+            }
+          }
+
           // Use upsert instead of update to ensure the record exists
           const { error: upsertError } = await supabase.from("profiles").upsert({
             id: userId,
             subscribed_to: lookupKey,
             price_id: priceId,
             stripe_customer_id: customerIdToUse,
-            updated_at: new Date().toISOString(),
+            // Include email since it's a required field
+            email: emailToUse,
+            user_id: userId, // Ensure user_id is set
           });
 
           if (upsertError) {
@@ -533,13 +616,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               upsertError,
             );
 
-            // Try direct update as fallback
+            // Try direct update as fallback - only update subscription fields, not the whole record
             const { error: directUpdateError } = await supabase
               .from("profiles")
               .update({
                 subscribed_to: lookupKey,
                 price_id: priceId,
-                updated_at: new Date().toISOString(),
               })
               .eq("id", userId);
 
@@ -563,6 +645,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .single();
 
         console.log(`Profile after update:`, verifyProfile);
+
+        // Force a refresh of the subscription data in the client
+        try {
+          // This is an API route, so we can't directly dispatch events to the client
+          // Instead, we'll make sure our response includes the updated subscription data
+          console.log("Subscription created and profile updated successfully");
+        } catch (refreshError) {
+          console.error("Error refreshing subscription data:", refreshError);
+        }
       } catch (dbError) {
         console.error(`Error updating profile subscription status: ${dbError}`);
       }

@@ -81,10 +81,30 @@ export function useSubscription() {
         return;
       }
 
+      // Log current profile data
+      console.log("Current profile data:", {
+        id: profile?.id,
+        email: profile?.email,
+        stripe_customer_id: profile?.stripe_customer_id,
+        subscribed_to: profile?.subscribed_to,
+        price_id: profile?.price_id,
+      });
+
       // Find free plan
       const freePlan = plans.find(
         (plan) => plan.lookup_key === "tanad_free" || plan.lookup_key?.includes("free"),
       );
+
+      // Check if user has a subscription in their profile
+      if (profile?.subscribed_to && profile.subscribed_to !== "tanad_free") {
+        console.log(`Profile indicates user is subscribed to: ${profile.subscribed_to}`);
+
+        // Try to find matching plan from the subscribed_to value
+        const profilePlan = plans.find((plan) => plan.lookup_key === profile.subscribed_to);
+        if (profilePlan) {
+          console.log("Found matching plan from profile.subscribed_to:", profilePlan);
+        }
+      }
 
       // If no user or customer ID, return free plan
       if (!user || !profile?.stripe_customer_id) {
@@ -214,7 +234,37 @@ export function useSubscription() {
           });
         }
       } else {
-        // No subscription found, use free plan
+        // No subscription found from Stripe API
+        console.log("No active subscription found from Stripe API");
+
+        // Check if profile has subscribed_to that's not the free plan
+        if (profile?.subscribed_to && profile.subscribed_to !== "tanad_free") {
+          console.log(`Using subscription info from profile: ${profile.subscribed_to}`);
+
+          // Try to find the plan based on the profile's subscribed_to value
+          const profilePlan = plans.find((plan) => plan.lookup_key === profile.subscribed_to);
+
+          if (profilePlan) {
+            console.log("Found matching plan from profile:", profilePlan);
+
+            // Use the profile plan details
+            setSubscriptionData({
+              id: "profile-based", // Placeholder ID
+              name: profilePlan.name || profile.subscribed_to,
+              price: profilePlan.price || profile.price_id || "Price unavailable",
+              billingCycle: "month", // Default to month
+              nextBillingDate: "-", // No next billing date available
+              planLookupKey: profilePlan.lookup_key || profile.subscribed_to,
+              status: "active", // Assume active since it's in the profile
+              isExpired: false,
+              cancelAt: null,
+            });
+            setLoading(false);
+            return;
+          }
+        }
+
+        // If no profile subscription info or no matching plan, default to free plan
         setSubscriptionData({
           id: null,
           name: freePlan?.name || t("plans.free.title"),
@@ -380,9 +430,26 @@ export function useSubscription() {
     // }, [profile?.stripe_customer_id, user?.id, profile?.subscribed_to, plansLoading, userLoading]);
   }, [userLoading, user, plansLoading]); // When user or plans data changes
 
+  /**
+   * Refetch the subscription data
+   */
   const refetch = async () => {
-    console.log("Manually refetching subscription data");
-    return fetchSubscription();
+    console.log("Refetching subscription data");
+
+    // First refresh user and profile data
+    try {
+      await fetchUserAndProfile();
+      console.log("User and profile data refreshed");
+    } catch (profileError) {
+      console.error("Error refreshing user profile:", profileError);
+    }
+
+    // Then fetch subscription data
+    await fetchSubscription();
+    console.log("Subscription refetch complete");
+
+    // Update state to indicate data was refreshed
+    return true;
   };
 
   // The subscription data and utility functions to expose
