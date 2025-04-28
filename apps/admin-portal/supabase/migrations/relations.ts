@@ -1,36 +1,45 @@
 import { relations } from "drizzle-orm/relations";
-import { enterprises, templates, documents, products, userRoles,  employees, employeeRequests, jobListingJobs, jobs, jobListings, clients, invoices, invoiceItems, profiles, offices, departments, departmentLocations, expenses, quotes, salaries, vendors, warehouses, branches, companies, quoteItems } from "./schema";
+import { enterprises, products, templates, documents, job_listing_jobs, jobs, job_listings, employees, employee_requests, profiles, invoices, invoice_items, clients, offices, departments, department_locations, expenses, quotes, salaries, vendors, warehouses, branches, companies, quote_items, user_roles } from "./schema";
+
+export const productsRelations = relations(products, ({one, many}) => ({
+	enterprise: one(enterprises, {
+		fields: [products.enterprise_id],
+		references: [enterprises.id]
+	}),
+	invoice_items: many(invoice_items),
+	quote_items: many(quote_items),
+}));
+
+export const enterprisesRelations = relations(enterprises, ({many}) => ({
+	products: many(products),
+	templates: many(templates),
+	documents: many(documents),
+	job_listing_jobs: many(job_listing_jobs),
+	employee_requests: many(employee_requests),
+	profiles: many(profiles),
+	invoices: many(invoices),
+	job_listings: many(job_listings),
+	offices: many(offices),
+	department_locations: many(department_locations),
+	employees: many(employees),
+	expenses: many(expenses),
+	quotes: many(quotes),
+	salaries: many(salaries),
+	departments: many(departments),
+	jobs: many(jobs),
+	vendors: many(vendors),
+	warehouses: many(warehouses),
+	branches: many(branches),
+	companies: many(companies),
+	clients: many(clients),
+	user_roles: many(user_roles),
+}));
 
 export const templatesRelations = relations(templates, ({one}) => ({
 	enterprise: one(enterprises, {
 		fields: [templates.enterprise_id],
 		references: [enterprises.id]
 	}),
-}));
-
-export const enterprisesRelations = relations(enterprises, ({many}) => ({
-	templates: many(templates),
-	documents: many(documents),
-	products: many(products),
-	userRoles: many(userRoles),
-	employeeRequests: many(employeeRequests),
-	jobListingJobs: many(jobListingJobs),
-	invoices: many(invoices),
-	jobListings: many(jobListings),
-	profiles: many(profiles),
-	offices: many(offices),
-	departmentLocations: many(departmentLocations),
-	employees: many(employees),
-	expenses: many(expenses),
-	quotes: many(quotes),
-	salaries: many(salaries),
-	vendors: many(vendors),
-	departments: many(departments),
-	warehouses: many(warehouses),
-	jobs: many(jobs),
-	branches: many(branches),
-	companies: many(companies),
-	clients: many(clients),
 }));
 
 export const documentsRelations = relations(documents, ({one}) => ({
@@ -40,43 +49,50 @@ export const documentsRelations = relations(documents, ({one}) => ({
 	}),
 }));
 
-export const productsRelations = relations(products, ({one, many}) => ({
+export const job_listing_jobsRelations = relations(job_listing_jobs, ({one}) => ({
 	enterprise: one(enterprises, {
-		fields: [products.enterprise_id],
+		fields: [job_listing_jobs.enterprise_id],
 		references: [enterprises.id]
 	}),
-	invoiceItems: many(invoiceItems),
-	quoteItems: many(quoteItems),
+	job: one(jobs, {
+		fields: [job_listing_jobs.job_id],
+		references: [jobs.id]
+	}),
+	job_listing: one(job_listings, {
+		fields: [job_listing_jobs.job_listing_id],
+		references: [job_listings.id]
+	}),
 }));
 
-export const userRolesRelations = relations(userRoles, ({one}) => ({
+export const jobsRelations = relations(jobs, ({one, many}) => ({
+	job_listing_jobs: many(job_listing_jobs),
 	enterprise: one(enterprises, {
-		fields: [userRoles.enterprise_id],
+		fields: [jobs.enterprise_id],
 		references: [enterprises.id]
 	}),
-	usersInAuth: one(usersInAuth, {
-		fields: [userRoles.user_id],
-		references: [usersInAuth.id]
+}));
+
+export const job_listingsRelations = relations(job_listings, ({one, many}) => ({
+	job_listing_jobs: many(job_listing_jobs),
+	enterprise: one(enterprises, {
+		fields: [job_listings.enterprise_id],
+		references: [enterprises.id]
 	}),
 }));
 
-export const usersInAuthRelations = relations(usersInAuth, ({many}) => ({
-	userRoles: many(userRoles),
-}));
-
-export const employeeRequestsRelations = relations(employeeRequests, ({one}) => ({
+export const employee_requestsRelations = relations(employee_requests, ({one}) => ({
 	employee: one(employees, {
-		fields: [employeeRequests.employeeId],
+		fields: [employee_requests.employee_id],
 		references: [employees.id]
 	}),
 	enterprise: one(enterprises, {
-		fields: [employeeRequests.enterprise_id],
+		fields: [employee_requests.enterprise_id],
 		references: [enterprises.id]
 	}),
 }));
 
 export const employeesRelations = relations(employees, ({one, many}) => ({
-	employeeRequests: many(employeeRequests),
+	employee_requests: many(employee_requests),
 	department: one(departments, {
 		fields: [employees.department_id],
 		references: [departments.id]
@@ -88,38 +104,27 @@ export const employeesRelations = relations(employees, ({one, many}) => ({
 	salaries: many(salaries),
 }));
 
-export const jobListingJobsRelations = relations(jobListingJobs, ({one}) => ({
+export const profilesRelations = relations(profiles, ({one, many}) => ({
 	enterprise: one(enterprises, {
-		fields: [jobListingJobs.enterprise_id],
+		fields: [profiles.enterprise_id],
 		references: [enterprises.id]
 	}),
-	job: one(jobs, {
-		fields: [jobListingJobs.job_id],
-		references: [jobs.id]
-	}),
-	jobListing: one(jobListings, {
-		fields: [jobListingJobs.job_listing_id],
-		references: [jobListings.id]
-	}),
+	user_roles: many(user_roles),
 }));
 
-export const jobsRelations = relations(jobs, ({one, many}) => ({
-	jobListingJobs: many(jobListingJobs),
-	enterprise: one(enterprises, {
-		fields: [jobs.enterprise_id],
-		references: [enterprises.id]
+export const invoice_itemsRelations = relations(invoice_items, ({one}) => ({
+	invoice: one(invoices, {
+		fields: [invoice_items.invoice_id],
+		references: [invoices.id]
 	}),
-}));
-
-export const jobListingsRelations = relations(jobListings, ({one, many}) => ({
-	jobListingJobs: many(jobListingJobs),
-	enterprise: one(enterprises, {
-		fields: [jobListings.enterprise_id],
-		references: [enterprises.id]
+	product: one(products, {
+		fields: [invoice_items.product_id],
+		references: [products.id]
 	}),
 }));
 
 export const invoicesRelations = relations(invoices, ({one, many}) => ({
+	invoice_items: many(invoice_items),
 	client: one(clients, {
 		fields: [invoices.client_id],
 		references: [clients.id]
@@ -128,7 +133,6 @@ export const invoicesRelations = relations(invoices, ({one, many}) => ({
 		fields: [invoices.enterprise_id],
 		references: [enterprises.id]
 	}),
-	invoiceItems: many(invoiceItems),
 }));
 
 export const clientsRelations = relations(clients, ({one, many}) => ({
@@ -145,24 +149,6 @@ export const clientsRelations = relations(clients, ({one, many}) => ({
 	}),
 }));
 
-export const invoiceItemsRelations = relations(invoiceItems, ({one}) => ({
-	invoice: one(invoices, {
-		fields: [invoiceItems.invoiceId],
-		references: [invoices.id]
-	}),
-	product: one(products, {
-		fields: [invoiceItems.product_id],
-		references: [products.id]
-	}),
-}));
-
-export const profilesRelations = relations(profiles, ({one}) => ({
-	enterprise: one(enterprises, {
-		fields: [profiles.enterprise_id],
-		references: [enterprises.id]
-	}),
-}));
-
 export const officesRelations = relations(offices, ({one}) => ({
 	enterprise: one(enterprises, {
 		fields: [offices.enterprise_id],
@@ -170,19 +156,19 @@ export const officesRelations = relations(offices, ({one}) => ({
 	}),
 }));
 
-export const departmentLocationsRelations = relations(departmentLocations, ({one}) => ({
+export const department_locationsRelations = relations(department_locations, ({one}) => ({
 	department: one(departments, {
-		fields: [departmentLocations.department_id],
+		fields: [department_locations.department_id],
 		references: [departments.id]
 	}),
 	enterprise: one(enterprises, {
-		fields: [departmentLocations.enterprise_id],
+		fields: [department_locations.enterprise_id],
 		references: [enterprises.id]
 	}),
 }));
 
 export const departmentsRelations = relations(departments, ({one, many}) => ({
-	departmentLocations: many(departmentLocations),
+	department_locations: many(department_locations),
 	employees: many(employees),
 	enterprise: one(enterprises, {
 		fields: [departments.enterprise_id],
@@ -210,12 +196,12 @@ export const quotesRelations = relations(quotes, ({one, many}) => ({
 		fields: [quotes.enterprise_id],
 		references: [enterprises.id]
 	}),
-	quoteItems: many(quoteItems),
+	quote_items: many(quote_items),
 }));
 
 export const salariesRelations = relations(salaries, ({one}) => ({
 	employee: one(employees, {
-		fields: [salaries.employeeId],
+		fields: [salaries.employee_id],
 		references: [employees.id]
 	}),
 	enterprise: one(enterprises, {
@@ -253,13 +239,24 @@ export const companiesRelations = relations(companies, ({one, many}) => ({
 	clients: many(clients),
 }));
 
-export const quoteItemsRelations = relations(quoteItems, ({one}) => ({
+export const quote_itemsRelations = relations(quote_items, ({one}) => ({
 	product: one(products, {
-		fields: [quoteItems.product_id],
+		fields: [quote_items.product_id],
 		references: [products.id]
 	}),
 	quote: one(quotes, {
-		fields: [quoteItems.quoteId],
+		fields: [quote_items.quote_id],
 		references: [quotes.id]
+	}),
+}));
+
+export const user_rolesRelations = relations(user_roles, ({one}) => ({
+	enterprise: one(enterprises, {
+		fields: [user_roles.enterprise_id],
+		references: [enterprises.id]
+	}),
+	profile: one(profiles, {
+		fields: [user_roles.user_id],
+		references: [profiles.id]
 	}),
 }));
