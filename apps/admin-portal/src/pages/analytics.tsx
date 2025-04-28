@@ -1,14 +1,14 @@
 import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  eachMonthOfInterval,
   differenceInDays,
   eachDayOfInterval,
+  eachMonthOfInterval,
   eachWeekOfInterval,
-  startOfWeek,
+  endOfMonth,
   endOfWeek,
+  format,
   parseISO,
+  startOfMonth,
+  startOfWeek,
 } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -16,16 +16,16 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { CartesianGrid, XAxis, BarChart, Bar } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import AnalyticsTable from "@/components/app/AnalyticsTable";
 import NoPuklas from "@/components/app/NoPuklas";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -35,10 +35,10 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
-  SelectValue,
-  SelectTrigger,
-  SelectItem,
   SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 // UI Components
 import { Skeleton } from "@/components/ui/skeleton";

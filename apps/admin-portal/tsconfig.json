@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,36 +14,15 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@hooks/*": [
-        "./src/hooks/*"
-      ],
-      "@lib/*": [
-        "./src/lib/*"
-      ],
-      "@pages/*": [
-        "./src/pages/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      // forms
-      "@/forms/*": [
-        "./src/components/forms/*"
-      ],
-      // tables
-      "@/tables/*": [
-        "./src/components/tables/*"
-      ],
-      // ui
-      "@/ui/*": [
-        "./src/components/ui/*"
-      ]
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@pages/*": ["./src/pages/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@/forms/*": ["./src/components/forms/*"],
+      "@/tables/*": ["./src/components/tables/*"],
+      "@/ui/*": ["./src/components/ui/*"]
     },
     "plugins": [
       {
@@ -55,13 +30,6 @@
       }
     ]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "next-env.d.ts",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["**/*.ts", "**/*.tsx", "next-env.d.ts", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

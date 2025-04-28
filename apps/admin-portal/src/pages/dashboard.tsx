@@ -1,27 +1,16 @@
-import { Plus, Users, Building2, Briefcase, Package, MapPin, Loader2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Combobox } from "@/components/ui/combobox";
 import PageTitle from "@/components/ui/page-title";
-import { Skeleton } from "@/components/ui/skeleton";
 import { StatCard } from "@/components/ui/stat-card";
 
-import { useBranches } from "@/modules/branch/branch.hooks";
-import { useClients } from "@/modules/client/client.hooks";
-import { useCompanies } from "@/modules/company/company.hooks";
-import { useDepartments } from "@/modules/department/department.hooks";
 import { useEmployees } from "@/modules/employee/employee.hooks";
-import { useJobs } from "@/modules/job/job.hooks";
-import { useOffices } from "@/modules/office/office.hooks";
-import { useVendors } from "@/modules/vendor/vendor.hooks";
-import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -62,18 +51,29 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
   const router = useRouter();
-  const { user, profile, enterprise, initialized, loading: authLoading } = useUserStore();
+  const { user, profile, enterprise, error: userError } = useUserStore();
 
-  // Use our existing hooks
+  // Comment out hooks that are causing infinite loops
+  // Keep the ones that are working correctly
   const { data: employees } = useEmployees();
-  const { data: departments } = useDepartments();
-  const { data: jobs } = useJobs();
-  const { data: clients } = useClients();
-  const { data: companies } = useCompanies();
-  const { data: vendors } = useVendors();
-  const { data: offices } = useOffices();
-  const { data: warehouses } = useWarehouses();
-  const { data: branches } = useBranches();
+  // const { data: departments } = useDepartments();
+  // const { data: jobs } = useJobs();
+  // const { data: clients } = useClients();
+  // const { data: companies } = useCompanies();
+  // const { data: vendors } = useVendors();
+  // const { data: offices } = useOffices();
+  // const { data: warehouses } = useWarehouses();
+  // const { data: branches } = useBranches();
+
+  // Use placeholders for commented-out hooks
+  const departments = [];
+  const jobs = [];
+  const clients = [];
+  const companies = [];
+  const vendors = [];
+  const offices = [];
+  const warehouses = [];
+  const branches = [];
 
   const createOptions = [
     {
@@ -106,40 +106,24 @@ export default function Dashboard() {
     }
   };
 
-  // Check authentication first
-  useEffect(() => {
-    console.log("[Dashboard] Auth check - user:", !!user, "profile:", !!profile, "enterprise:", !!enterprise);
-    console.log("[Dashboard] Auth state - initialized:", initialized, "authLoading:", authLoading);
-    
-    // Commented out for gradual build-up of authentication
-    /*
-    if (!authLoading && initialized) {
-      if (!user || !profile || !enterprise) {
-        router.replace("/auth");
-      }
-    }
-    */
-    
-    // For our gradual build-up, we'll just log the auth state but allow access
-    if (!authLoading && initialized) {
-      if (!user) {
-        console.log("[Dashboard] No user found, but allowing access for debugging");
-      } else {
-        console.log("[Dashboard] User authenticated:", user.email);
-      }
-    }
-  }, [user, profile, enterprise, initialized, authLoading, router]);
-
   // Fetch dashboard stats
   useEffect(() => {
     let isMounted = true;
 
     async function fetchDashboardStats() {
-      if (!isMounted || !user?.id || !enterprise?.id) {
+      if (!isMounted || !user?.id) {
         return;
       }
 
       try {
+        // If no enterprise is found, set loading to false but don't attempt to fetch enterprise-dependent data
+        if (!enterprise?.id) {
+          if (isMounted) {
+            setLoading(false);
+          }
+          return;
+        }
+
         // Fetch total invoices and revenue
         const { data: invoiceStats, error: invoiceError } = await supabase
           .from("invoices")
@@ -179,7 +163,7 @@ export default function Dashboard() {
           totalBranches: branches?.length || 0,
         });
       } catch (err) {
-        console.error("[Dashboard] Error fetching stats:", err);
+        console.error("Error fetching stats:", err);
         if (isMounted) {
           setError(
             err instanceof Error ? err.message : "An error occurred while fetching dashboard stats",
@@ -192,7 +176,7 @@ export default function Dashboard() {
       }
     }
 
-    if (user?.id && enterprise?.id) {
+    if (user?.id) {
       fetchDashboardStats();
     }
 
@@ -203,48 +187,16 @@ export default function Dashboard() {
     user?.id,
     enterprise?.id,
     employees,
-    departments,
-    jobs,
-    clients,
-    companies,
-    vendors,
-    offices,
-    warehouses,
-    branches,
+    // Remove these dependencies since we've commented out the hooks
+    // departments,
+    // jobs,
+    // clients,
+    // companies,
+    // vendors,
+    // offices,
+    // warehouses,
+    // branches,
   ]);
-
-  // Show loading state while auth is initializing
-  if (authLoading) {
-    console.log("[Dashboard] Showing loading state - authLoading:", authLoading);
-    return (
-      <DataPageLayout>
-        <div className="flex h-[50vh] items-center justify-center flex-col">
-          <Loader2 className="h-8 w-8 animate-spin mb-4" />
-          <div>Loading authentication state...</div>
-        </div>
-      </DataPageLayout>
-    );
-  }
-  
-  // For our gradual build-up, we'll show a warning if not initialized but still allow access
-  if (!initialized) {
-    console.log("[Dashboard] Not initialized yet, but allowing access");
-  }
-
-  // Show loading state while fetching data
-  if (loading) {
-    return (
-      <DataPageLayout>
-        <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
-        <PageTitle texts={{ title: t("Dashboard.title") }} />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(8)].map((_, i) => (
-            <Skeleton key={i} className="h-32" />
-          ))}
-        </div>
-      </DataPageLayout>
-    );
-  }
 
   // Show error state
   if (error) {
@@ -259,23 +211,13 @@ export default function Dashboard() {
     );
   }
 
-  // Debug auth state
-  console.log("[Dashboard] Render - user:", user);
-  console.log("[Dashboard] Render - user ID:", user?.id);
-  console.log("[Dashboard] Render - profile:", profile);
-  console.log("[Dashboard] Render - enterprise:", enterprise);
-  
-  // Add auth debug banner
-  const AuthDebugBanner = () => (
-    <div className={`p-2 text-center text-xs ${user ? 'bg-green-500/20 text-green-700 dark:text-green-300' : 'bg-yellow-500/80 text-black'}`}>
-      {user 
-        ? `✓ Authenticated as ${user.email}` 
-        : '⚠️ Not authenticated - this would normally redirect to login'}
-    </div>
-  );
   return (
     <div>
-      <AuthDebugBanner />
+      {profile?.stripe_customer_id && (
+        <div className="bg-green-500/20 p-1 text-center text-xs text-green-700 dark:text-green-300">
+          ✓ Premium Account
+        </div>
+      )}
       <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
       <PageTitle
         texts={{
