@@ -1074,13 +1074,38 @@ export const quoteItems = pgTable(
   ],
 );
 
+export const roles = pgTable(
+  "roles",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    name: text().notNull(),
+    description: text(),
+    permissions: jsonb().default([]),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
+    enterprise_id: uuid("enterprise_id")
+      .notNull()
+      .references(() => enterprises.id, { onDelete: "cascade" }),
+  },
+  (table) => ({
+    nameIdx: index("roles_name_idx").on(table.name),
+    enterpriseIdIdx: index("roles_enterprise_id_idx").on(table.enterprise_id),
+  }),
+);
+
 export const userRoles = pgTable(
   "user_roles",
   {
     user_id: uuid("user_id")
       .notNull()
       .references(() => profiles.id, { onDelete: "cascade" }),
-    role: text("role").notNull(),
+    role_id: uuid("role_id")
+      .notNull()
+      .references(() => roles.id, { onDelete: "cascade" }),
     enterprise_id: uuid("enterprise_id")
       .notNull()
       .references(() => enterprises.id, { onDelete: "cascade" }),
@@ -1089,9 +1114,9 @@ export const userRoles = pgTable(
       .notNull(),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.user_id, table.role, table.enterprise_id] }),
-    user_idIdx: index("user_roles_user_id_idx").on(table.user_id),
-    roleIdx: index("user_roles_role_idx").on(table.role),
-    enterprise_idIdx: index("user_roles_enterprise_id_idx").on(table.enterprise_id),
+    pk: primaryKey({ columns: [table.user_id, table.role_id, table.enterprise_id] }),
+    userIdIdx: index("user_roles_user_id_idx").on(table.user_id),
+    roleIdIdx: index("user_roles_role_id_idx").on(table.role_id),
+    enterpriseIdIdx: index("user_roles_enterprise_id_idx").on(table.enterprise_id),
   }),
 );
