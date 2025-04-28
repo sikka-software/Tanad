@@ -13,37 +13,54 @@ CREATE TABLE IF NOT EXISTS roles (
 CREATE INDEX IF NOT EXISTS roles_name_idx ON roles(name);
 CREATE INDEX IF NOT EXISTS roles_enterprise_id_idx ON roles(enterprise_id);
 
--- Backup existing user_roles data
-CREATE TEMP TABLE user_roles_backup AS
-SELECT * FROM user_roles;
-
--- Drop existing user_roles table
-DROP TABLE user_roles;
-
--- Create new user_roles table with role_id reference
-CREATE TABLE user_roles (
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  role_id UUID NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
-  enterprise_id UUID NOT NULL REFERENCES enterprises(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
-  PRIMARY KEY (user_id, role_id, enterprise_id)
-);
-
--- Create indexes for user_roles table
-CREATE INDEX IF NOT EXISTS user_roles_user_id_idx ON user_roles(user_id);
-CREATE INDEX IF NOT EXISTS user_roles_role_id_idx ON user_roles(role_id);
-CREATE INDEX IF NOT EXISTS user_roles_enterprise_id_idx ON user_roles(enterprise_id);
-
--- Create default roles for each enterprise and migrate existing data
+-- Insert default roles based on existing user_roles
 INSERT INTO roles (name, description, enterprise_id)
 SELECT DISTINCT role, 'Default role', enterprise_id
-FROM user_roles_backup;
+FROM user_roles;
 
--- Migrate user_roles data
-INSERT INTO user_roles (user_id, role_id, enterprise_id)
-SELECT ub.user_id, r.id, ub.enterprise_id
-FROM user_roles_backup ub
-JOIN roles r ON r.name = ub.role AND r.enterprise_id = ub.enterprise_id;
+-- Add role_id column to user_roles
+ALTER TABLE user_roles 
+ADD COLUMN role_id UUID REFERENCES roles(id);
 
--- Drop temporary table
-DROP TABLE user_roles_backup;
+-- Update user_roles with role_id values
+UPDATE user_roles ur
+SET role_id = r.id
+FROM roles r
+WHERE r.name = ur.role 
+AND r.enterprise_id = ur.enterprise_id;
+
+-- Make role_id NOT NULL after populating data
+ALTER TABLE user_roles 
+ALTER COLUMN role_id SET NOT NULL;
+
+-- Rename old role column to deprecated_role instead of dropping it
+-- This allows existing dependencies to continue working while you migrate them
+ALTER TABLE user_roles
+RENAME COLUMN role TO deprecated_role;
+
+-- Add comment to indicate this column is deprecated
+COMMENT ON COLUMN user_roles.deprecated_role IS 'DEPRECATED: This column is replaced by role_id referencing the roles table. Maintain temporarily for backward compatibility.';
+
+-- Drop existing primary key constraint
+DO $$ 
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.table_constraints 
+        WHERE table_name = 'user_roles' 
+        AND constraint_type = 'PRIMARY KEY'
+    ) THEN
+        EXECUTE (
+            SELECT 'ALTER TABLE user_roles DROP CONSTRAINT ' || quote_ident(constraint_name)
+            FROM information_schema.table_constraints
+            WHERE table_name = 'user_roles'
+            AND constraint_type = 'PRIMARY KEY'
+        );
+    END IF;
+END $$;
+
+-- Add new primary key
+ALTER TABLE user_roles
+ADD PRIMARY KEY (user_id, role_id, enterprise_id);
+
+-- Create new indexes
+CREATE INDEX IF NOT EXISTS user_roles_role_id_idx ON user_roles(role_id);
