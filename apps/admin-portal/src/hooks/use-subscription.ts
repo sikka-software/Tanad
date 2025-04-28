@@ -1,10 +1,14 @@
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
 
 import { usePricing } from "@/hooks/use-pricing";
 import useUserStore from "@/stores/use-user-store";
+
+// Cache for subscription requests to prevent duplicate API calls
+let lastRequestTime = 0;
+let requestPromise: Promise<any> | null = null;
 
 interface SubscriptionData {
   id: string | null;
@@ -67,6 +71,7 @@ export function useSubscription() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, profile, loading: userLoading, fetchUserAndProfile } = useUserStore();
+  const lastRefetchRef = useRef<number | null>(null);
 
   const fetchSubscription = async () => {
     setLoading(true);
@@ -124,22 +129,35 @@ export function useSubscription() {
         return;
       }
 
-      // Fetch subscription from API
-      const response = await fetch("/api/stripe/subscription", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          customerId: profile?.stripe_customer_id,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch subscription: ${response.status}`);
+      // Use cached request if it's recent enough (within 2 seconds)
+      const now = Date.now();
+      if (requestPromise && now - lastRequestTime < 2000) {
+        console.log("Using cached subscription request");
+        await requestPromise;
+        return;
       }
 
-      const { subscription } = await response.json();
+      // Fetch subscription from API
+      lastRequestTime = now;
+      requestPromise = (async () => {
+        const response = await fetch("/api/stripe/subscription", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            customerId: profile?.stripe_customer_id,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch subscription: ${response.status}`);
+        }
+
+        return await response.json();
+      })();
+
+      const { subscription } = await requestPromise;
       if (subscription) {
         // Access plan details directly from the plan property
         const planDetails = subscription.plan || {};
@@ -421,20 +439,69 @@ export function useSubscription() {
     }
   };
 
-  // Add refetch to useEffect dependencies to ensure it runs when needed
+  // Fix the useEffect to prevent infinite loops
   useEffect(() => {
-    if (!userLoading && user) {
-      console.log("User data updated, fetching subscription data");
-      fetchSubscription();
+    // Add a check to prevent excessive fetching
+    const fetchId = Math.random().toString(36).slice(2, 9);
+    console.log(`[${fetchId}] Subscription hook effect checking dependencies`);
+
+    const plans = getPlans();
+    // Only fetch when all dependencies are loaded and stable
+    if (!userLoading && user && !plansLoading && plans.length > 0 && profile?.stripe_customer_id) {
+      console.log(`[${fetchId}] Fetching subscription with stable dependencies`);
+
+      // Using cached version to avoid dependency cycle
+      let isMounted = true;
+
+      // Use debouncing to prevent multiple fetches
+      const now = Date.now();
+      const lastFetch = window.lastSubscriptionFetchTime || 0;
+
+      if (now - lastFetch < 3000) {
+        console.log(
+          `[${fetchId}] Skipping fetch - too soon since last fetch (${now - lastFetch}ms)`,
+        );
+        return;
+      }
+
+      window.lastSubscriptionFetchTime = now;
+
+      const doFetch = async () => {
+        try {
+          console.log(`[${fetchId}] Starting subscription fetch`);
+          await fetchSubscription();
+          console.log(`[${fetchId}] Subscription fetch completed`);
+        } catch (error) {
+          console.error(`[${fetchId}] Error in subscription fetch effect:`, error);
+        }
+      };
+
+      if (isMounted) {
+        doFetch();
+      }
+
+      return () => {
+        console.log(`[${fetchId}] Cleaning up subscription fetch effect`);
+        isMounted = false;
+      };
     }
-    // }, [profile?.stripe_customer_id, user?.id, profile?.subscribed_to, plansLoading, userLoading]);
-  }, [userLoading, user, plansLoading]); // When user or plans data changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userLoading, user, plansLoading, profile?.stripe_customer_id]);
 
   /**
    * Refetch the subscription data
    */
   const refetch = async () => {
     console.log("Refetching subscription data");
+
+    // Check if we've recently refetched to prevent excessive API calls
+    const now = Date.now();
+    const lastRefetch = lastRefetchRef.current || 0;
+    if (now - lastRefetch < 2000) {
+      console.log("Skipping refetch - too soon since last refetch");
+      return true;
+    }
+    lastRefetchRef.current = now;
 
     // First refresh user and profile data
     try {

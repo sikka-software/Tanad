@@ -59,9 +59,15 @@ export function BillingHistoryDialog({ open, onOpenChange, user }: BillingHistor
   // Fetch billing history when dialog opens
   useEffect(() => {
     if (open && user) {
-      fetchBillingHistory();
+      // Add debounce protection to prevent rapid refetching
+      const now = Date.now();
+      // Only fetch if we haven't fetched in the last 2 seconds
+      if (now - lastRefreshTime > 2000) {
+        console.log("BillingHistoryDialog: Fetching billing history");
+        fetchBillingHistory();
+      }
     }
-  }, [open, user, lastRefreshTime]);
+  }, [open, user]);
 
   // Create a local refresh function that doesn't depend on parent scope
   const refreshUserData = async () => {

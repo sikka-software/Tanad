@@ -21,8 +21,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   // Try to load user data if not available
   useEffect(() => {
+    // Only fetch if we don't have a user and we're not currently loading
     if (!user && !loading) {
-      useUserStore.getState().fetchUserAndProfile();
+      fetchUserAndProfile();
     }
 
     // Show loader after a small delay if still loading
@@ -33,7 +34,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [user, loading]);
+  }, [user, loading, fetchUserAndProfile]);
 
   // Handle Stripe customer creation for new users
   useEffect(() => {
@@ -178,7 +179,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }, [user, loading, router]);
 
   // While loading, show a loader after a brief delay
-  if (loading || !user) {
+  if (loading && !user) {
     if (showLoader) {
       return (
         <div className="flex h-screen w-full items-center justify-center">
@@ -192,8 +193,13 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return null;
   }
 
-  // User is authenticated, show the protected content
-  return <>{children}</>;
+  // If user is available, render children immediately without waiting
+  if (user) {
+    return <>{children}</>;
+  }
+
+  // This is to handle the case where loading is false but user is also null
+  return null;
 };
 
 export default ProtectedRoute;

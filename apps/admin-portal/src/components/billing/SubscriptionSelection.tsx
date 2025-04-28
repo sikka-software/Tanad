@@ -27,6 +27,14 @@ import useUserStore from "@/stores/use-user-store";
 
 import { PaymentDialog } from "./PaymentDialog";
 
+// Add TypeScript declaration for window
+declare global {
+  interface Window {
+    lastSubscriptionRefresh?: number;
+    lastSubscriptionFetchTime?: number;
+  }
+}
+
 // Map plan lookup keys to plan titles for direct use in component
 const planTitles: Record<string, string> = {
   tanad_free: "Free Plan",
@@ -278,22 +286,34 @@ export default function SubscriptionSelection({
           // Wait a moment for backend to process the subscription
           await new Promise((resolve) => setTimeout(resolve, 1000));
 
-          // Refresh the data
-          await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
-          console.log("Subscription data refreshed successfully");
-          success = true;
+          // Refresh the data - but use a debounce to prevent infinite loops
+          const now = Date.now();
+          const lastRefresh = window.lastSubscriptionRefresh || 0;
+          if (now - lastRefresh > 2000) {
+            window.lastSubscriptionRefresh = now;
+            await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
+            console.log("Subscription data refreshed successfully");
+            success = true;
+          } else {
+            console.log("Skipping refresh - too soon since last refresh");
+            success = true;
+          }
         } catch (error) {
           console.error(`Retry ${retryCount + 1}/${maxRetries} failed:`, error);
           retryCount++;
         }
       }
 
-      // Dispatch custom events to notify other components
+      // Dispatch custom events to notify other components - ONLY ONCE
       console.log("Broadcasting subscription update events");
-      window.dispatchEvent(new CustomEvent("subscription_updated"));
 
-      // Force UI refresh
-      window.location.hash = "billing";
+      // Use setTimeout to ensure we don't trigger another refresh immediately
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent("subscription_updated"));
+
+        // Force UI refresh
+        window.location.hash = "billing";
+      }, 500);
     } catch (error) {
       console.error("Error refreshing subscription data:", error);
     }

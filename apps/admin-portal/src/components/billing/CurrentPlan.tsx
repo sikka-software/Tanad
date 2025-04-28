@@ -1,6 +1,6 @@
 import { RefreshCcw } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -76,16 +76,25 @@ export default function CurrentPlan() {
 
   // Refresh data on mount and when profile changes
   useEffect(() => {
-    // Refresh on initial load
-    if (!subscription.loading && user) {
+    // Refresh on initial load - but only once
+    if (!subscription.loading && user && !refreshedInitially.current) {
       console.log("CurrentPlan: Initial data refresh");
+      refreshedInitially.current = true;
       refreshData();
     }
   }, [user, refreshData, subscription.loading]);
 
-  // Additional refresh when profile's subscribed_to changes
+  // Use a ref to track initial refresh
+  const refreshedInitially = React.useRef(false);
+
+  // Additional refresh when profile's subscribed_to changes - modified to prevent infinite loop
   useEffect(() => {
-    if (profile && profile.subscribed_to && subscription.planLookupKey !== profile.subscribed_to) {
+    if (
+      profile &&
+      profile.subscribed_to &&
+      subscription.planLookupKey !== profile.subscribed_to &&
+      !subscription.loading
+    ) {
       console.log(
         "Detected mismatch between profile.subscribed_to and subscription.planLookupKey, refreshing",
         {
@@ -93,7 +102,12 @@ export default function CurrentPlan() {
           subscription_plan: subscription.planLookupKey,
         },
       );
-      subscription.refetch();
+      // Only refresh if it hasn't happened in the last 2 seconds
+      const now = Date.now();
+      if (now - lastRefreshTime > 2000) {
+        subscription.refetch();
+        setLastRefreshTime(now);
+      }
     }
   }, [profile, subscription]);
 

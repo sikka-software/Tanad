@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 import { ExtendedUser } from "@/types";
 import { createClient } from "@/utils/supabase/component";
@@ -39,102 +40,115 @@ interface UserState {
 
 const supabase = createClient();
 
-const useUserStore = create<UserState>((set, get) => ({
-  user: null,
-  profile: null,
-  enterprise: null,
-  loading: false,
-  error: null,
+const useUserStore = create<UserState>()(
+  persist(
+    (set, get) => ({
+      user: null,
+      profile: null,
+      enterprise: null,
+      loading: false,
+      error: null,
 
-  setUser: (user) => set({ user }),
-  setProfile: (profile) => set({ profile }),
-  setEnterprise: (enterprise) => set({ enterprise }),
-  setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error }),
+      setUser: (user) => set({ user }),
+      setProfile: (profile) => set({ profile }),
+      setEnterprise: (enterprise) => set({ enterprise }),
+      setLoading: (loading) => set({ loading }),
+      setError: (error) => set({ error }),
 
-  signOut: async () => {
-    try {
-      set({ loading: true });
-      await supabase.auth.signOut();
-      set({
-        user: null,
-        profile: null,
-        enterprise: null,
-        loading: false,
-        error: null,
-      });
-      return Promise.resolve();
-    } catch (error) {
-      console.error("Error signing out:", error);
-      return Promise.reject(error);
-    }
-  },
+      signOut: async () => {
+        try {
+          set({ loading: true });
+          await supabase.auth.signOut();
+          set({
+            user: null,
+            profile: null,
+            enterprise: null,
+            loading: false,
+            error: null,
+          });
+          return Promise.resolve();
+        } catch (error) {
+          console.error("Error signing out:", error);
+          return Promise.reject(error);
+        }
+      },
 
-  fetchUserAndProfile: async () => {
-    // Skip if already loading
-    if (get().loading) return;
+      fetchUserAndProfile: async () => {
+        // Skip if already loading
+        if (get().loading) return;
 
-    try {
-      set({ loading: true, error: null });
+        try {
+          set({ loading: true, error: null });
 
-      // Get the current session
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+          // Get the current session
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
 
-      if (!session) {
-        set({
-          user: null,
-          profile: null,
-          enterprise: null,
-          loading: false,
-        });
-        return;
-      }
+          if (!session) {
+            set({
+              user: null,
+              profile: null,
+              enterprise: null,
+              loading: false,
+            });
+            return;
+          }
 
-      // Set the user from the session
-      set({ user: session.user as ExtendedUser });
+          // Set the user from the session
+          set({ user: session.user as ExtendedUser });
 
-      // Get profile data
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profileData) {
-        set({ profile: profileData as ProfileType });
-
-        // Add the stripe_customer_id to the user object too
-        const updatedUser = {
-          ...session.user,
-          stripe_customer_id: profileData.stripe_customer_id,
-          profile: profileData,
-        } as ExtendedUser;
-
-        set({ user: updatedUser });
-
-        // Get enterprise data if profile has enterprise_id
-        if (profileData.enterprise_id) {
-          const { data: enterpriseData } = await supabase
-            .from("enterprises")
+          // Get profile data
+          const { data: profileData } = await supabase
+            .from("profiles")
             .select("*")
-            .eq("id", profileData.enterprise_id)
+            .eq("id", session.user.id)
             .single();
 
-          if (enterpriseData) {
-            set({ enterprise: enterpriseData as EnterpriseType });
+          if (profileData) {
+            set({ profile: profileData as ProfileType });
+
+            // Add the stripe_customer_id to the user object too
+            const updatedUser = {
+              ...session.user,
+              stripe_customer_id: profileData.stripe_customer_id,
+              profile: profileData,
+            } as ExtendedUser;
+
+            set({ user: updatedUser });
+
+            // Get enterprise data if profile has enterprise_id
+            if (profileData.enterprise_id) {
+              const { data: enterpriseData } = await supabase
+                .from("enterprises")
+                .select("*")
+                .eq("id", profileData.enterprise_id)
+                .single();
+
+              if (enterpriseData) {
+                set({ enterprise: enterpriseData as EnterpriseType });
+              }
+            }
           }
+        } catch (error: any) {
+          console.error("Error fetching user data:", error);
+          set({ error: error.message });
+        } finally {
+          set({ loading: false });
         }
-      }
-    } catch (error: any) {
-      console.error("Error fetching user data:", error);
-      set({ error: error.message });
-    } finally {
-      set({ loading: false });
-    }
-  },
-}));
+      },
+    }),
+    {
+      name: "user-store", // unique name for the storage
+      partialize: (state) => ({
+        user: state.user,
+        profile: state.profile,
+        enterprise: state.enterprise,
+        // We don't persist loading or error states
+      }),
+    },
+  ),
+);
 
 // Setup auth state change listener
 supabase.auth.onAuthStateChange((event, session) => {

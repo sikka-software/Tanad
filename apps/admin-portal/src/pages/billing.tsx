@@ -3,7 +3,7 @@
 import { Info } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import CurrentPlan from "@/components/billing/CurrentPlan";
 import SubscriptionSelection from "@/components/billing/SubscriptionSelection";
@@ -21,6 +21,19 @@ export default function Billing() {
   const { user } = useUserStore();
   const subscription = useSubscription();
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
+
+  // Cleanup subscription on unmount
+  useEffect(() => {
+    // Keep track of component mount status
+    let mounted = true;
+
+    // Return cleanup function
+    return () => {
+      mounted = false;
+      // Clear any refresh timers or flags
+      window.lastSubscriptionRefresh = undefined;
+    };
+  }, []);
 
   // Show subscription management for active subscriptions (including canceled ones)
   const showSubscriptionManagement =
