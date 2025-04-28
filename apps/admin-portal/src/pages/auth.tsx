@@ -1,24 +1,20 @@
-import type { User } from "@supabase/supabase-js";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
-import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import LanguageSwitcher from "@/components/ui/language-switcher";
 import ThemeSwitcher from "@/components/ui/theme-switcher";
 
-import { FREE_PLAN_ID } from "@/lib/constants";
-
-import useUserStore, { Profile, Enterprise } from "@/stores/use-user-store";
+import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
 export default function Auth() {
@@ -35,48 +31,30 @@ export default function Auth() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  // Get state directly from the store
-  const { isAuthenticated, initialized, loading: storeLoading } = useUserStore();
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
-    // Redirect only when the store is initialized and the user is authenticated
-    console.log("[Auth] Auth Page Effect:", { isAuthenticated, initialized, storeLoading });
-    
-    if (initialized && isAuthenticated) {
-      console.log("[Auth] Redirecting to /dashboard");
-      router.replace("/dashboard");
-    } else {
-      console.log("[Auth] Not redirecting - initialized:", initialized, "isAuthenticated:", isAuthenticated);
+    if (user) {
+      // Check if there's a redirect path in sessionStorage
+      const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
+      sessionStorage.removeItem("redirectAfterAuth");
+      router.replace(redirectPath);
     }
-    // We depend on initialized and isAuthenticated. storeLoading is less relevant here.
-  }, [initialized, isAuthenticated, router]);
-
-  useEffect(() => {
-    router.events.emit("routeChangeComplete", router.asPath);
-  }, []);
+  }, [user, router]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log("[Auth] Signing in with email:", email);
-    
+
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
-
-      // The auth state listener in useUserStore will handle setting the user
-      // and fetching the profile and enterprise data
       toast.success(t("Auth.logged_in_successfully"));
-
-      // Let the auth state listener handle the redirect
-      // The _app component will handle redirecting to /dashboard
-      
     } catch (error: any) {
-      console.error("[Auth] Sign in error:", error);
       // Attempt to translate Supabase auth error codes
       const errorCode = error.code || error.message;
       const translatedError = t(`Auth.${errorCode}`, undefined, errorCode);
@@ -96,7 +74,7 @@ export default function Auth() {
 
     setLoading(true);
     try {
-      // Only perform the Supabase signup
+      // Step 1: Perform the Supabase signup
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -109,17 +87,60 @@ export default function Auth() {
 
       if (error) throw error;
 
-      // Profile, enterprise, and role creation should be handled
-      // by a Supabase database trigger on auth.users insertion.
+      if (data.user) {
+        // Step 2: Create an enterprise first, since we need its ID for the profile
+        const enterpriseName = `${email.split("@")[0]}'s Enterprise`;
+        const { data: enterpriseData, error: enterpriseError } = await supabase
+          .from("enterprises")
+          .insert({
+            name: enterpriseName,
+            email: email,
+          })
+          .select()
+          .single();
 
-      // After successful signup, the auth state listener and
-      // useUserStore should handle fetching the user and profile
-      // once the trigger has run and the session is established.
+        if (enterpriseError) {
+          console.error("Enterprise creation error:", enterpriseError);
+          throw enterpriseError;
+        }
+
+        // Step 3: Create the user profile with the enterprise ID
+        const stripeCustomerId = `cus_${Math.random().toString(36).substring(2, 15)}`;
+        const { error: profileError } = await supabase.from("profiles").upsert({
+          id: data.user.id,
+          user_id: data.user.id,
+          email: data.user.email,
+          first_name: email.split("@")[0], // Placeholder
+          last_name: "", // Placeholder
+          stripe_customer_id: stripeCustomerId,
+          enterprise_id: enterpriseData.id, // Link to the enterprise we created
+          user_settings: {
+            currency: "USD",
+            calendar_type: "gregorian",
+            timezone: "UTC",
+            notifications: {
+              email_updates: true,
+              email_marketing: false,
+              email_security: true,
+              app_mentions: true,
+              app_comments: true,
+              app_tasks: true,
+            },
+          },
+        });
+
+        if (profileError) {
+          toast.error(t("Auth.profile_creation_error"));
+          throw profileError;
+        }
+      }
+
+      // Success message
       toast.success(t("Auth.signup_successful_check_email"));
     } catch (error: any) {
       // Attempt to translate Supabase auth error codes
       const errorCode = error.code || error.message;
-      const translatedError = t(`Auth.${errorCode}`, undefined, errorCode); // Fallback to code/message if translation missing
+      const translatedError = t(`Auth.${errorCode}`, undefined, errorCode);
       toast.error(translatedError);
     } finally {
       setLoading(false);
@@ -143,26 +164,6 @@ export default function Auth() {
       toast.error(t("Auth.failed_to_sign_in_with_google"));
     } finally {
       setLoadingGoogle(false);
-    }
-  };
-
-  const handleAuthDirection = async () => {
-    try {
-      // Check if there's a pending URL to shorten
-      const pendingUrl = sessionStorage.getItem("pendingShortUrl");
-      if (pendingUrl) {
-        // Navigate to dashboard with state to open create dialog
-        router.push("/dashboard", {
-          query: { openCreateDialog: true, pendingUrl },
-        });
-        // Clear the pending URL
-        sessionStorage.removeItem("pendingShortUrl");
-      } else {
-        router.push("/dashboard");
-      }
-    } catch (error: any) {
-      toast.error(error.message);
-      setLoading(false);
     }
   };
 
@@ -190,7 +191,7 @@ export default function Auth() {
 
   // Return null or loading state before client-side mount
   if (!mounted) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return (
@@ -200,16 +201,7 @@ export default function Auth() {
     >
       <CustomPageMeta title={t("SEO.auth.title")} description={t("SEO.auth.description")} />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">
-          Tanad
-          {/* <Image
-            src={`/assets/pukla-logo-full-${resolvedTheme === "dark" ? "green" : "purple"}.png`}
-            alt="Pukla"
-            className="h-12 w-auto"
-            width={512}
-            height={512}
-          /> */}
-        </div>
+        <div className="flex justify-center">Tanad</div>
       </div>
       {isForgotPassword ? (
         <div className="mt-8 flex w-full max-w-[90%] flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-md">
@@ -355,12 +347,6 @@ export default function Auth() {
                       t("Auth.sign_in")
                     )}
                   </Button>
-
-                  {/* <GoogleButton
-                    text={t("continue_with_google")}
-                    onClick={handleGoogleAuth}
-                    loading={loadingGoogle}
-                  /> */}
                 </div>
               </form>
 

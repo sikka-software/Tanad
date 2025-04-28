@@ -1,11 +1,11 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { User2, LogOut, MessageSquareWarning, CreditCard, Search } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { CreditCard, LogOut, MessageSquareWarning, Search, User2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -30,10 +30,9 @@ import {
 } from "@/components/ui/sidebar";
 
 import { CACHE_KEY } from "@/lib/constants";
-import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
+import { applyCustomMenuOrder, getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
 import { NavMain } from "./sidebar-menu";
@@ -54,14 +53,10 @@ type Menu = {
 };
 
 export function AppSidebar() {
-  const supabase = createClient();
   const t = useTranslations();
   const lang = useLocale();
   const [open, setOpen] = useState(false);
   const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
-  const user = useUserStore((state) => state.user);
-  const profile = useUserStore((state) => state.profile);
-  const enterprise = useUserStore((state) => state.enterprise);
   const router = useRouter();
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
@@ -70,6 +65,10 @@ export function AppSidebar() {
     groups: new Set(),
     menus: new Set(),
   });
+  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
+  const enterprise = useUserStore((state) => state.enterprise);
+  const signOut = useUserStore((state) => state.signOut);
 
   // Store and clear expanded states when sidebar collapses
   useEffect(() => {
@@ -321,11 +320,8 @@ export function AppSidebar() {
                   </Link>
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onClick={() => {
+                    onClick={async () => {
                       console.log("[AppSidebar] Sign out clicked");
-
-                      // Use our store's signOut method instead of direct Supabase call
-                      const signOut = useUserStore.getState().signOut;
 
                       // Clean up local storage
                       if (user?.id) {
@@ -334,11 +330,13 @@ export function AppSidebar() {
                       }
                       localStorage.removeItem("analytics_date_range");
 
-                      // Call our signOut method which we've updated for gradual build-up
-                      signOut().then(() => {
+                      try {
+                        await signOut();
                         console.log("[AppSidebar] Sign out complete, redirecting to /auth");
                         router.replace("/auth");
-                      });
+                      } catch (error) {
+                        console.error("[AppSidebar] Error signing out:", error);
+                      }
                     }}
                   >
                     <LogOut className="!size-4" /> <span>{t("Auth.sign_out")}</span>
