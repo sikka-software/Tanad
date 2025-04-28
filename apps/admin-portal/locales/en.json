@@ -1032,6 +1032,7 @@
     "need_custom_solution": "Need a custom solution?",
     "contact_sales_description": "Contact our sales team for a tailored plan that meets your specific requirements",
     "contact_sales": "Contact Sales",
+    "free_plan_badge": "Free",
     "current_plan": {
       "title": "Current Plan",
       "refresh": "Refresh"

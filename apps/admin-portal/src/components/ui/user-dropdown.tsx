@@ -47,7 +47,9 @@ export function UserDropdown() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm leading-none font-medium">{user.email}</p>
             {profile?.stripe_customer_id && (
-              <p className="text-muted-foreground text-xs leading-none">Premium Plan</p>
+              <p className="text-muted-foreground text-xs leading-none">
+                {t("Billing.current_plan.title")}
+              </p>
             )}
           </div>
         </DropdownMenuLabel>

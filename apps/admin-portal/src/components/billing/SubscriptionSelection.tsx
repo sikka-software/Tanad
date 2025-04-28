@@ -137,6 +137,7 @@ export default function SubscriptionSelection({
     refetch: refetchSubscription,
     cancelAt: subscriptionCancelAt,
     createSubscription,
+    planLookupKey,
   } = useSubscription();
   const { loading: pricesLoading, getPlans } = usePricing(TANAD_PRODUCT_ID);
   const { user, profile, fetchUserAndProfile } = useUserStore();
@@ -333,7 +334,12 @@ export default function SubscriptionSelection({
   }
 
   // Hide if user has an active subscription or promotion
-  if (subscriptionStatus && (subscriptionStatus as string) === "active" && !subscriptionCancelAt) {
+  if (
+    subscriptionStatus &&
+    (subscriptionStatus as string) === "active" &&
+    !subscriptionCancelAt &&
+    planLookupKey !== "tanad_free"
+  ) {
     return null;
   }
 

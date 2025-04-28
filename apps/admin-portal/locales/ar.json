@@ -950,6 +950,7 @@
     "title": "الدفع",
     "description": "إدارة جميع طرق الدفع الخاصة بك",
     "subscription_plans": "الباقات",
+    "free_plan_badge": "مجاني",
     "upgrade_dialog": {
       "title": "ترقية إلى المستوى التالي",
       "description": "قم بترقية خطتك لإنشاء المزيد من البكلات",

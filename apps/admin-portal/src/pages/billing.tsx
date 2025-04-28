@@ -47,6 +47,7 @@ export default function Billing() {
       subscription.status === "incomplete_expired" || // Failed subscription
       subscription.status === "unpaid" || // Unpaid subscription
       (subscription.status === "active" && subscription.price === "0") || // Free plan
+      subscription.planLookupKey === "tanad_free" || // When plan is tanad_free
       (subscription.cancelAt && new Date(Number(subscription.cancelAt) * 1000) < new Date())); // Expired subscription
 
   if (!user) {

@@ -170,9 +170,16 @@ export default function CurrentPlan() {
                     })
                   : t("Billing.tanad_free", { fallback: "Free Plan" })}
               </span>
-              {subscription.status === "active" && !subscription.cancelAt && (
-                <Badge variant="outline" className="border-green-500 bg-green-50 text-green-700">
-                  {t("Billing.subscription_status.active")}
+              {subscription.status === "active" &&
+                !subscription.cancelAt &&
+                subscription.planLookupKey !== "tanad_free" && (
+                  <Badge variant="outline" className="border-green-500 bg-green-50 text-green-700">
+                    {t("Billing.subscription_status.active")}
+                  </Badge>
+                )}
+              {subscription.planLookupKey === "tanad_free" && (
+                <Badge variant="outline" className="border-blue-500 bg-blue-50 text-blue-700">
+                  {t("Billing.free_plan_badge", { fallback: "Free" })}
                 </Badge>
               )}
               {subscription.status === "trialing" && (
