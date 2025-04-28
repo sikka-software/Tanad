@@ -213,42 +213,19 @@ export default function Dashboard() {
 
   return (
     <div>
+      <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
       {profile?.stripe_customer_id && (
         <div className="bg-green-500/20 p-1 text-center text-xs text-green-700 dark:text-green-300">
           ✓ Premium Account
         </div>
       )}
-      <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
-      <PageTitle
+      {/* <PageTitle
         texts={{
           title: t("Dashboard.title"),
           submit_form: t("Dashboard.title"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          <div className="flex items-center">
-            <Combobox
-              data={createOptions}
-              onChange={handleCreateOption}
-              texts={{
-                placeholder: t("Dashboard.select_create_option"),
-                noItems: t("General.no_results"),
-                searchPlaceholder: t("General.search"),
-              }}
-              width="fit"
-              inputProps={{
-                className: "focus:ring-0",
-              }}
-              renderSelected={(item) => (
-                <div className="flex items-center">
-                  <Plus className="me-2 h-4 w-4" />
-                  {item.label}
-                </div>
-              )}
-            />
-          </div>
-        }
-      />
+      /> */}
       <div className="space-y-8 p-4">
         {/* Contacts Section */}
         <div>

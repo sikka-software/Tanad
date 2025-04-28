@@ -47,13 +47,7 @@ export default function AddVendorPage() {
           submit_form: t("Vendors.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
+        dummyButton={handleDummyData}
       />
 
       <div className="mx-auto max-w-2xl p-4">
@@ -63,7 +57,7 @@ export default function AddVendorPage() {
             router.push("/vendors").then(() => {
               setIsLoading(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Vendors.messages.success_created"),
+                description: t("Vendors.success.created"),
               });
             });
           }}

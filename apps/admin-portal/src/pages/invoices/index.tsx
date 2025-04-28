@@ -1,7 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";

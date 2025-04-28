@@ -7,15 +7,11 @@ const DataPageLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div
-      className={cn(
-        "w-full transition-all duration-200 ease-linear ",
-
-        {
-          "w-full max-w-[calc(100vw)]": isMobile,
-          "w-full max-w-[calc(100vw-16rem)]": state === "expanded" && !isMobile,
-          "w-full max-w-[calc(100vw-3rem)]": state !== "expanded" && !isMobile,
-        },
-      )}
+      className={cn("w-full transition-all duration-200 ease-linear", {
+        "w-full max-w-[calc(100vw)]": isMobile,
+        "w-full max-w-[calc(100vw-16rem)]": state === "expanded" && !isMobile,
+        "w-full max-w-[calc(100vw-3rem)]": state !== "expanded" && !isMobile,
+      })}
     >
       {children}
     </div>

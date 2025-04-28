@@ -81,13 +81,13 @@ export function Breadcrumb() {
 
   const breadcrumbs = getBreadcrumbs();
 
-  if (breadcrumbs.length <= 1) {
-    return null;
-  }
+  // if (breadcrumbs.length <= 1) {
+  //   return null;
+  // }
 
   return (
     <nav
-      className="text-muted-foreground flex items-center space-x-1 px-4 py-2 text-sm"
+      className="text-muted-foreground flex items-center space-x-1 px-2 p-0 text-sm"
       aria-label="Breadcrumb"
     >
       {breadcrumbs.map((crumb, index) => (

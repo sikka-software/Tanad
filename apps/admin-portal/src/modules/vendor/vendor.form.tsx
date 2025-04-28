@@ -200,7 +200,7 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
               name="company"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Vendors.form.company.label")} *</FormLabel>
+                  <FormLabel>{t("Vendors.form.company.label")}</FormLabel>
                   <FormControl>
                     <ComboboxAdd
                       direction={locale === "ar" ? "rtl" : "ltr"}

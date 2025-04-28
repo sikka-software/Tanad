@@ -1,7 +1,6 @@
-import * as React from "react";
-
+import { LabelProps } from "@radix-ui/react-label";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
-import { cn } from "@/lib/utils";
+import * as React from "react";
 
 import {
   Command,
@@ -16,7 +15,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LabelProps } from "@radix-ui/react-label";
+
+import { cn } from "@/lib/utils";
+
+import { Button } from "./button";
 
 type ComboboxTypes<T> = {
   labelKey?: keyof T | any;
@@ -82,9 +84,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
         setOpen(open);
       }
     };
-    const selectedItem = data.find(
-      (item) => getProperty(item, valueKey) === value,
-    );
+    const selectedItem = data.find((item) => getProperty(item, valueKey) === value);
 
     return (
       <div
@@ -110,12 +110,14 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                     props.preview ? "opacity-100" : "opacity-0",
                   )}
                 ></div>
-                <button
+                <Button
                   role="combobox"
                   type="button"
+                  variant="outline"
+                  size="sm"
                   aria-expanded={open}
                   className={cn(
-                    "inline-flex h-10 w-full select-none items-center justify-between rounded-md border py-2 text-sm font-normal ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                    "ring-offset-background focus-visible:ring-ring inline-flex w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
                     props.preview
                       ? "cursor-default rounded-none border-transparent px-0"
                       : "bg-background px-3",
@@ -137,9 +139,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                     xmlns="http://www.w3.org/2000/svg"
                     className={cn(
                       "size-4 transition-all",
-                      !props.preview
-                        ? "visible opacity-100"
-                        : "invisible opacity-0",
+                      !props.preview ? "visible opacity-100" : "invisible opacity-0",
                     )}
                     aria-label="Chevron down icon"
                     viewBox="0 0 24 24"
@@ -151,24 +151,21 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                   >
                     <path d="m6 9 6 6 6-6" />
                   </svg>
-                </button>
+                </Button>
                 {/* <HelperText helperText={props.helperText} /> */}
               </div>
             )}
           </PopoverTrigger>
           <PopoverContent
-            sideOffset={0}
-            className={cn(
-              "w-[--radix-popover-trigger-width] p-0",
-              props.helperText && "-mt-4",
-            )}
+            // sideOffset={0}
+            align="start"
+            className={cn("w-[--radix-popover-trigger-width] p-0", props.helperText && "-mt-4")}
             dir={direction}
             // container={containerRef.current}
           >
             <Command
               filter={(value, search) => {
-                if (value.toLowerCase().includes(search.toLowerCase()))
-                  return 1;
+                if (value.toLowerCase().includes(search.toLowerCase())) return 1;
                 return 0;
               }}
             >
@@ -179,28 +176,17 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                   placeholder={props.texts?.searchPlaceholder || "Search"}
                 />
               )}
-              <CommandEmpty>
-                {props.texts?.noItems || "No items found."}
-              </CommandEmpty>
+              <CommandEmpty>{props.texts?.noItems || "No items found."}</CommandEmpty>
               <CommandList>
-                <CommandGroup
-                  className={cn(
-                    "max-h-[200px]",
-                    data.length > 0 && "overflow-y-auto",
-                  )}
-                >
+                <CommandGroup className={cn("max-h-[200px]", data.length > 0 && "overflow-y-auto")}>
                   {data.map((item: any, i) => (
                     <CommandItem
                       key={i}
                       onSelect={() => {
                         const newValue = getProperty(item, valueKey);
-                        setValue(
-                          newValue === value ? "" : (newValue as string),
-                        );
+                        setValue(newValue === value ? "" : (newValue as string));
                         if (props.onChange) {
-                          props.onChange(
-                            newValue === value ? "" : (newValue as string),
-                          );
+                          props.onChange(newValue === value ? "" : (newValue as string));
                         }
                         setOpen(false);
                       }}
@@ -218,17 +204,13 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                         strokeLinejoin="round"
                         className={cn(
                           "icon",
-                          value === getProperty(item, valueKey)
-                            ? "opacity-100"
-                            : "opacity-0",
+                          value === getProperty(item, valueKey) ? "opacity-100" : "opacity-0",
                         )}
                         style={{ marginInlineEnd: "0.5rem" }}
                       >
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      {renderOption
-                        ? renderOption(item)
-                        : getProperty(item, labelKey)}
+                      {renderOption ? renderOption(item) : getProperty(item, labelKey)}
                     </CommandItem>
                   ))}
                 </CommandGroup>

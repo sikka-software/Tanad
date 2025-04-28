@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import { useLocale, useTranslations } from "next-intl";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "sonner";
 
 import ProtectedRoute from "@/components/app/ProtectedRoute";
@@ -21,7 +21,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const lang = useLocale();
   const defaultOpen = Cookies.get("sidebar_state") === "true";
   const { setOpenCommandMenu } = useMainStore();
-
+  const { theme } = useTheme();
   return (
     <ProtectedRoute>
       <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
@@ -30,6 +30,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           <AppSidebar />
           <CommandMenu dir={lang === "ar" ? "rtl" : "ltr"} />
           <Toaster
+            theme={theme as "light" | "dark"}
             richColors
             position={lang === "ar" ? "bottom-left" : "bottom-right"}
             dir={lang === "ar" ? "rtl" : "ltr"}
@@ -37,7 +38,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
           />
           <div className="w-full">
             <div className="flex w-full flex-row justify-between border-b p-2">
-              <div className="flex flex-row items-center gap-0">
+              <div className="flex flex-row items-center gap-0 p-0">
                 <SidebarTrigger />
                 <Breadcrumb />
               </div>

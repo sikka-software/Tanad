@@ -224,10 +224,12 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"} className="z-50">
       <SidebarHeader>
         <div className="flex items-center gap-2">
-          <span className="text-center text-xs font-medium">
-            {enterprise?.name} <br />
-            {profile?.enterprise_id}
-          </span>
+          {process.env.NODE_ENV === "development" && state === "expanded" && (
+            <span className="text-center text-xs font-medium">
+              {enterprise?.name} <br />
+              {profile?.enterprise_id}
+            </span>
+          )}
         </div>
       </SidebarHeader>
       {state === "expanded" && (

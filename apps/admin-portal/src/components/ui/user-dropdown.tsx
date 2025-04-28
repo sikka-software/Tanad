@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { Button } from "./button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,9 +39,9 @@ export function UserDropdown() {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex items-center justify-center rounded-md p-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-1 focus-visible:outline-none">
+        <Button size="icon_sm" variant="outline">
           <User className="h-5 w-5" />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
