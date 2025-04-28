@@ -19,7 +19,7 @@ export default function UsersPage() {
   const t = useTranslations();
   const supabase = createClient();
   const router = useRouter();
-  const { user: currentUser, profile, enterprise, loading: authLoading } = useUserStore();
+  const { user: currentUser, enterprise, loading: authLoading } = useUserStore();
 
   const [users, setUsers] = useState<any[]>([]);
   const [userPermissions, setUserPermissions] = useState<Record<string, string[]>>({});

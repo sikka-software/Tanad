@@ -57,7 +57,6 @@ export function AppSidebar() {
   const lang = useLocale();
   const [open, setOpen] = useState(false);
   const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
-  const { user, profile, enterprise } = useUserStore();
   const router = useRouter();
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
   const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set());
@@ -66,6 +65,9 @@ export function AppSidebar() {
     groups: new Set(),
     menus: new Set(),
   });
+  const user = useUserStore((state) => state.user);
+  const profile = useUserStore((state) => state.profile);
+  const enterprise = useUserStore((state) => state.enterprise);
   const signOut = useUserStore((state) => state.signOut);
 
   // Store and clear expanded states when sidebar collapses

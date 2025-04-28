@@ -12,7 +12,31 @@ interface ProfileType {
   stripe_customer_id: string | null;
   subscribed_to: string | null;
   price_id: string | null;
-  user_settings: Record<string, any> | null;
+  // user_settings: Record<string, any> | null;
+  user_settings: {
+    currency: string;
+    calendar_type: string;
+    timezone: string;
+    notifications?: {
+      email_updates: boolean;
+      email_marketing: boolean;
+      email_security: boolean;
+      app_mentions: boolean;
+      app_comments: boolean;
+      app_tasks: boolean;
+    };
+    navigation?: Record<
+      string,
+      Array<{
+        title: string;
+        translationKey?: string;
+        url?: string;
+        is_active?: boolean;
+        action?: string;
+      }>
+    >;
+    hidden_menu_items?: Record<string, string[]>;
+  };
   role?: string;
   enterprise_id?: string;
 }

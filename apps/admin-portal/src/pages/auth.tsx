@@ -31,7 +31,8 @@ export default function Auth() {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { user } = useUserStore();
+  const user = useUserStore((state) => state.user);
+
   useEffect(() => {
     if (user) {
       // Check if there's a redirect path in sessionStorage

@@ -106,15 +106,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleRefreshUser = () => {
-    useUserStore.getState().fetchUserAndProfile();
-  };
-
-  const handleSignOut = async () => {
-    await useUserStore.getState().signOut();
-    router.push("/auth");
-  };
-
   // Fetch dashboard stats
   useEffect(() => {
     let isMounted = true;
