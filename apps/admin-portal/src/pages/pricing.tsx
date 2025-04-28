@@ -1,13 +1,13 @@
-import { useState } from "react";
-
 import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
+import { useState } from "react";
 
 import BottomCTA from "@/components/landing/BottomCTA";
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import HeroSection from "@/components/landing/HeroSection";
 import { PricingPlans } from "@/components/landing/PricingPlans";
+import WaitlistSection from "@/components/landing/waitlist-section";
 import {
   Accordion,
   AccordionContent,
@@ -15,6 +15,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { PricingCardProps } from "@/components/ui/pricing-card";
+
 import { plan1Price, plan2Price, plan3Price } from "@/lib/utils";
 
 import settings from "../../landing.config";
@@ -252,7 +253,8 @@ export default function PricingPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("SEO.pricing.title")} description={t("SEO.pricing.description")} />
+      <WaitlistSection />
+      {/* <CustomPageMeta title={t("SEO.pricing.title")} description={t("SEO.pricing.description")} />
       <div className="flex flex-col gap-[150px] px-10 pt-24 md:pt-44">
         <HeroSection title={t("Pricing.hero.title")} subtitle={t("Pricing.hero.subtitle")} />
       </div>
@@ -319,7 +321,7 @@ export default function PricingPage() {
         subtitle={t("Landing.cta.subtitle")}
         primaryActionText={t("Landing.cta.action-1-text")}
         primaryActionSlug={"/dashboard"}
-      />
+      /> */}
     </div>
   );
 }

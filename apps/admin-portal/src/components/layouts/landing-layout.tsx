@@ -21,7 +21,7 @@ const LandingLayout: React.FC<LayoutType> = ({ children }) => {
       <main className="flex min-h-screen flex-col" dir={lang === "ar" ? "rtl" : "ltr"}>
         <GridBG className="-z-10" />
         <Navigation onSticky={isSticky} />
-        <div className="w-full flex-1 flex-col justify-center bg-blue-900">
+        <div className="w-full flex-1 flex-col justify-center">
           <LoadingBar />
           {children}
         </div>

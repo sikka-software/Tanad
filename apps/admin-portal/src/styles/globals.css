@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
 @custom-variant dark (&:is(.dark *));
 
 body {
@@ -192,6 +191,7 @@ body {
 }
 
 @theme {
+  --spacing-landing: calc(100vh - 90px);
   --animate-collapsible-down: collapsible-down 0.2s ease-out;
   --animate-collapsible-up: collapsible-up 0.2s ease-out;
   --animate-accordion-down: accordion-down 0.2s ease-out;

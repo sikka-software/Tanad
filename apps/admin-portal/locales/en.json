@@ -309,6 +309,12 @@
     "feature-highlight-2": {
       "title": "All Your Favorite Platforms",
       "subtitle": "From social media platforms to delivery apps and even communication methods like WhatsApp or direct calls!"
+    },
+    "waitlist": {
+      "title": "Join Our Product Launch Waitlist",
+      "subtitle": "Be part of something truly extraordinary. Join thousands of others already gaining early access to our revolutionary new product.",
+      "placeholder": "Enter your email",
+      "button": "Get Notified"
     }
   },
 

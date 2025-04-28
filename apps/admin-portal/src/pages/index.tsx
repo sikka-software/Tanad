@@ -8,7 +8,7 @@ export default function LandingPage() {
   const t = useTranslations();
 
   return (
-    <div className="flex flex-1 flex-grow flex-col h-full p-2 bg-red-700">
+    <div className="flex flex-col">
       <CustomPageMeta title={t("SEO.landing.title")} description={t("SEO.landing.description")} />
       <WaitlistSection />
     </div>
