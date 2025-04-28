@@ -21,7 +21,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-400">
           {t("stock_label", {
-            value: product.stockQuantity || 0,
+            value: product.stock_quantity || 0,
           })}
         </p>
       </CardContent>

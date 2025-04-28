@@ -1,5 +1,5 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { eq } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { templates } from "@/db/schema";
@@ -20,16 +20,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json(result);
     } catch (error) {
       console.error("Template fetch error:", error);
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: "Failed to fetch templates",
-        details: error instanceof Error ? error.message : String(error)
+        details: error instanceof Error ? error.message : String(error),
       });
     }
   }
 
   if (req.method === "POST") {
     try {
-      const { name, type, content, is_default, user_id } = req.body;
+      const { name, type, content, is_default, user_id, enterprise_id } = req.body;
 
       // Log request body for debugging
       console.log("Template creation request:", {
@@ -37,19 +37,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         type,
         contentType: typeof content,
         is_default,
-        user_id
+        user_id,
       });
 
       // Validate required fields
       if (!name || !type || !content || !user_id) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           error: "Missing required fields",
           missing: {
             name: !name,
             type: !type,
             content: !content,
-            user_id: !user_id
-          }
+            user_id: !user_id,
+          },
         });
       }
 
@@ -64,19 +64,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
           parsedContent = JSON.parse(content);
         } catch (e) {
-          return res.status(400).json({ 
+          return res.status(400).json({
             error: "Invalid JSON content",
-            details: e instanceof Error ? e.message : String(e)
+            details: e instanceof Error ? e.message : String(e),
           });
         }
       }
 
       // If setting as default, update existing default templates
       if (is_default) {
-        await db
-          .update(templates)
-          .set({ is_default: false })
-          .where(eq(templates.user_id, user_id));
+        await db.update(templates).set({ is_default: false }).where(eq(templates.user_id, user_id));
       }
 
       // Create new template
@@ -85,18 +82,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         type,
         content: parsedContent,
         is_default: is_default || false,
-        user_id: user_id,
-      });
 
+        user_id: user_id,
+        enterprise_id: enterprise_id,
+      });
       return res.status(201).json(result);
     } catch (error) {
       console.error("Template creation error details:", error);
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: "Failed to create template",
-        details: error instanceof Error ? error.message : String(error)
+        details: error instanceof Error ? error.message : String(error),
       });
     }
   }
 
   return res.status(405).json({ error: "Method not allowed" });
-} 
+}

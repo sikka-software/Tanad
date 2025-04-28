@@ -2,15 +2,25 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { jobListings, jobListingJobs } from "@/db/schema";
+import { createClient } from "@/utils/supabase/server-props";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const user_id = req.headers["x-user-id"] as string;
-  if (!user_id) {
-    return res.status(401).json({ error: "User ID is required" });
+  const supabase = createClient({ req, res, query: {}, resolvedUrl: "" });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user?.id) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  const user_id = user.id;
+  const enterprise_id = user.app_metadata.enterprise_id;
+  if (!enterprise_id) {
+    return res.status(400).json({ error: "Enterprise association not found for user" });
   }
 
   try {
@@ -29,6 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         is_active: true,
         slug: title.trim().toLowerCase().replace(/\s+/g, "-"),
         user_id: user_id,
+        enterprise_id: enterprise_id,
       })
       .returning();
 
@@ -38,6 +49,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         jobs.map((job_id: string) => ({
           job_listing_id: newListing.id,
           job_id: job_id,
+          user_id: user_id,
+          enterprise_id: enterprise_id,
         })),
       );
     }

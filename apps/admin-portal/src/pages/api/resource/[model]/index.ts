@@ -4,6 +4,7 @@ import { createApiHandler } from "@/lib/api-handler";
 
 import { db } from "@/db/drizzle";
 import * as schema from "@/db/schema";
+import { createClient } from "@/utils/supabase/server-props";
 
 type ModelConfig = {
   table: any;
@@ -26,7 +27,26 @@ const modelMap: Record<string, ModelConfig> = {
     table: schema.departmentLocations,
     query: db.query.departmentLocations,
     customHandlers: {
-      POST: async (user_id: string, req: NextApiRequest) => {
+      POST: async (user_id_param: string, req: NextApiRequest) => {
+        const supabase = createClient({
+          req,
+          res: {} as NextApiResponse,
+          query: {},
+          resolvedUrl: "",
+        });
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user?.id) {
+          throw new Error("Unauthorized");
+        }
+        const user_id = user.id;
+        const enterprise_id = user.app_metadata.enterprise_id;
+        if (!enterprise_id) {
+          throw new Error("Enterprise association not found for user");
+        }
+
         const locations = Array.isArray(req.body) ? req.body : [req.body];
 
         console.log("Request body:", req.body);
@@ -46,9 +66,10 @@ const modelMap: Record<string, ModelConfig> = {
           .values(
             locations.map((location) => ({
               department_id: location.department_id,
-              location_id: location.location_id,
-              location_type: location.type,
+              locationId: location.location_id,
+              locationType: location.type,
               user_id: user_id,
+              enterprise_id: enterprise_id,
             })),
           )
           .returning();

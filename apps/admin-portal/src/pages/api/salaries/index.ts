@@ -1,27 +1,9 @@
 import { desc, eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { SalaryCreateData } from "@/modules/salary/salary.type";
-
 import { db } from "@/db/drizzle";
 import { salaries } from "@/db/schema";
 import { createClient } from "@/utils/supabase/server-props";
-
-// Helper to convert Drizzle salary to our Salary type
-function convertDrizzleSalary(data: typeof salaries.$inferSelect) {
-  return {
-    id: data.id,
-    created_at: data.created_at?.toString() || "",
-    pay_period_start: data.pay_period_start,
-    pay_period_end: data.pay_period_end,
-    payment_date: data.payment_date,
-    gross_amount: Number(data.gross_amount),
-    net_amount: Number(data.net_amount),
-    deductions: data.deductions as Record<string, number> | null,
-    notes: data.notes || undefined,
-    employee_name: data.employee_name,
-  };
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createClient({
@@ -42,13 +24,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         const data = await db.query.salaries.findMany({
           where: eq(salaries.user_id, user?.id),
-          orderBy: desc(salaries.payment_date),
+          orderBy: desc(salaries.start_date),
         });
-        return res.status(200).json(data.map(convertDrizzleSalary));
+        return res.status(200).json(data);
       }
 
       case "POST": {
-        const salary = req.body as SalaryCreateData;
+        const { employeeId, amount, start_date, notes, currency, paymentFrequency, end_date } =
+          req.body;
+
         const {
           data: { user },
         } = await supabase.auth.getUser();
@@ -56,24 +40,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!user?.id) {
           return res.status(401).json({ message: "Unauthorized" });
         }
-        // Map salary data to match Drizzle schema
-        const dbSalary = {
-          pay_period_start: salary.pay_period_start,
-          pay_period_end: salary.pay_period_end,
-          payment_date: salary.payment_date,
-          gross_amount: salary.gross_amount.toString(),
-          net_amount: salary.net_amount.toString(),
-          deductions: salary.deductions,
-          notes: salary.notes,
-          employee_name: salary.employee_name,
-          user_id: user?.id,
-        };
+        // Ensure enterprise_id exists
+        const enterprise_id = user.app_metadata.enterprise_id;
+        if (!enterprise_id) {
+          return res.status(400).json({ error: "Enterprise association not found for user" });
+        }
 
-        const [data] = await db.insert(salaries).values(dbSalary).returning();
+        // Validate required fields from request
+        if (!employeeId || amount === undefined || !start_date) {
+          return res.status(400).json({
+            error:
+              "Missing required fields: employeeId, amount, start_date are required in the request body",
+          });
+        }
+
+        const [data] = await db
+          .insert(salaries)
+          .values({
+            employeeId: employeeId,
+            amount: amount.toString(),
+            start_date: start_date,
+            notes: notes,
+            currency: currency,
+            paymentFrequency: paymentFrequency,
+            end_date: end_date,
+            user_id: user.id,
+            enterprise_id: enterprise_id,
+          })
+          .returning();
         if (!data) {
           throw new Error("Failed to create salary");
         }
-        return res.status(201).json(convertDrizzleSalary(data));
+        return res.status(201).json(data);
       }
 
       default:

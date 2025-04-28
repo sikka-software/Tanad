@@ -30,16 +30,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   //    return res.status(403).json({ message: 'Forbidden: You do not have permission to create users.' });
   // }
 
-  const { email, password, role, enterprise_id, firstName, lastName } = req.body;
+  const { email, password, role, enterprise_id, first_name, last_name } = req.body;
 
   // Basic validation
-  if (!email || !password || !role || !enterprise_id || !firstName || !lastName) {
-    return res
-      .status(400)
-      .json({
-        message:
-          "Missing required fields: email, password, role, enterprise_id, firstName, lastName",
-      });
+  if (!email || !password || !role || !enterprise_id || !first_name || !last_name) {
+    return res.status(400).json({
+      message:
+        "Missing required fields: email, password, role, enterprise_id, first_name, last_name",
+    });
   }
 
   try {
@@ -70,8 +68,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       email: authData.user.email!,
       role,
       enterprise_id,
-      first_name: firstName,
-      last_name: lastName,
+      first_name,
+      last_name,
     };
 
     const { data: profile, error: profileError } = await supabaseAdmin

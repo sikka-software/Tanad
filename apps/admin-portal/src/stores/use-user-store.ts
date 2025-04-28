@@ -12,7 +12,9 @@ interface ProfileType {
   stripe_customer_id: string | null;
   subscribed_to: string | null;
   price_id: string | null;
-  // user_settings: Record<string, any> | null;
+  avatar_url: string | null;
+  address: string | null;
+  username: string | null;
   user_settings: {
     currency: string;
     calendar_type: string;

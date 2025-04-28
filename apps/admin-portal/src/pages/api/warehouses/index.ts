@@ -1,10 +1,9 @@
 import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
-
 import { db } from "@/db/drizzle";
 import { warehouses } from "@/db/schema";
+import { WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
 import { createClient } from "@/utils/supabase/server-props";
 
 // Helper to convert Drizzle warehouse to our Warehouse type
@@ -77,10 +76,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!user?.id) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const data = req.body as WarehouseCreateData & { user_id: string };
-      const drizzleWarehouse = convertToDrizzleWarehouse(data);
-
-      const [newWarehouse] = await db.insert(warehouses).values(drizzleWarehouse).returning();
+      const data = req.body;
+      const [newWarehouse] = await db.insert(warehouses).values(data).returning();
       return res.status(201).json(convertDrizzleWarehouse(newWarehouse));
     } catch (error) {
       console.error("Error creating warehouse:", error);

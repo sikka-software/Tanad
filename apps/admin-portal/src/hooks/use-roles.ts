@@ -86,8 +86,8 @@ export function useRoles() {
         description: `Role: ${roleData.role}`, // Consider adding a description field to the db
         permissions: permissionsByRole[roleData.role] || [], // Include fetched permissions
         isSystem: false, // Custom roles are not system roles
-        createdAt: roleData.created_at,
-        updatedAt: roleData.created_at, // Use created_at as updated_at for now
+        created_at: roleData.created_at,
+        updated_at: roleData.created_at, // Use created_at as updated_at for now
       })) as Role[];
     },
   });
@@ -152,7 +152,7 @@ export function useCreateRole() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (role: Omit<Role, "id" | "createdAt" | "updatedAt">) => {
+    mutationFn: async (role: Omit<Role, "id" | "created_at" | "updated_at">) => {
       // 1. Get the current user's ID
       const {
         data: { user },
@@ -212,8 +212,8 @@ export function useCreateRole() {
         ...role,
         id: `${user.id}-${role.name}-${enterprise_id}`, // Use the same synthetic ID structure
         isSystem: false, // It's a custom role
-        createdAt: roleData.created_at,
-        updatedAt: roleData.created_at,
+        created_at: roleData.created_at,
+        updated_at: roleData.created_at,
       } as Role;
     },
     onSuccess: () => {
@@ -246,7 +246,7 @@ export function useUpdateRole() {
 
       return {
         ...role,
-        updatedAt: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       } as Role;
     },
     onSuccess: () => {

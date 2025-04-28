@@ -9,7 +9,7 @@ export type Product = {
   description?: string | null;
   price: number;
   sku?: string | null;
-  stockQuantity?: number;
+  stock_quantity?: number;
   user_id: string;
   created_at?: string;
   updated_at?: string;
@@ -21,7 +21,7 @@ export type ProductProps = {
   description?: string | null;
   price: number;
   sku?: string | null;
-  stockQuantity?: number | null;
+  stock_quantity?: number | null;
   user_id: string;
   created_at?: string | null;
   updated_at?: string | null;

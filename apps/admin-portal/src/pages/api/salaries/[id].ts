@@ -1,38 +1,22 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { eq } from 'drizzle-orm';
+import { eq } from "drizzle-orm";
+import { NextApiRequest, NextApiResponse } from "next";
 
-import { db } from '@/db/drizzle';
-import { salaries } from '@/db/schema';
-import { Salary } from '@/modules/salary/salary.type';
-
-// Helper to convert Drizzle salary to our Salary type
-function convertDrizzleSalary(data: typeof salaries.$inferSelect) {
-  return {
-    id: data.id,
-    created_at: data.created_at?.toString() || "",
-    pay_period_start: data.pay_period_start,
-    pay_period_end: data.pay_period_end,
-    payment_date: data.payment_date,
-    gross_amount: Number(data.gross_amount),
-    net_amount: Number(data.net_amount),
-    deductions: data.deductions as Record<string, number> | null,
-    notes: data.notes || undefined,
-    employee_name: data.employee_name,
-  };
-}
+import { db } from "@/db/drizzle";
+import { salaries } from "@/db/schema";
+import { Salary } from "@/modules/salary/salary.type";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
 
-  if (!id || typeof id !== 'string') {
-    return res.status(400).json({ error: 'Missing salary ID' });
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({ error: "Missing salary ID" });
   }
 
-  if (!db) throw new Error('Database connection not initialized');
+  if (!db) throw new Error("Database connection not initialized");
 
   try {
     switch (req.method) {
-      case 'GET': {
+      case "GET": {
         const data = await db.query.salaries.findFirst({
           where: eq(salaries.id, id),
         });
@@ -41,12 +25,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(404).json({ error: `Salary with id ${id} not found` });
         }
 
-        return res.status(200).json(convertDrizzleSalary(data));
+        return res.status(200).json(data);
       }
 
-      case 'PUT': {
+      case "PUT": {
         const salary = req.body as Partial<Salary>;
-        
+
         // Map salary data to match Drizzle schema
         const dbSalary = {
           ...(salary.pay_period_start && { pay_period_start: salary.pay_period_start }),
@@ -59,7 +43,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           ...(salary.employee_name && { employee_name: salary.employee_name }),
         };
 
-        const [data] = await db.update(salaries)
+        const [data] = await db
+          .update(salaries)
           .set(dbSalary)
           .where(eq(salaries.id, id))
           .returning();
@@ -68,20 +53,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(404).json({ error: `Salary with id ${id} not found` });
         }
 
-        return res.status(200).json(convertDrizzleSalary(data));
+        return res.status(200).json(data);
       }
 
-      case 'DELETE': {
+      case "DELETE": {
         await db.delete(salaries).where(eq(salaries.id, id));
         return res.status(200).json({ success: true });
       }
 
       default:
-        res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
+        res.setHeader("Allow", ["GET", "PUT", "DELETE"]);
         return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
     }
   } catch (error) {
-    console.error('Error in salary API:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error("Error in salary API:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
-} 
+}

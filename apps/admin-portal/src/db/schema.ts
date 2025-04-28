@@ -127,13 +127,13 @@ export const templates = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
     type: text().notNull(),
     content: jsonb().notNull(),
-    isDefault: boolean("is_default").default(false).notNull(),
+    is_default: boolean("is_default").default(false).notNull(),
     user_id: uuid("user_id").notNull(),
     enterprise_id: uuid("enterprise_id").notNull(),
   },
@@ -154,10 +154,10 @@ export const documents = pgTable(
   "documents",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).default(
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
@@ -201,7 +201,7 @@ export const products = pgTable(
     description: text(),
     price: numeric({ precision: 10, scale: 2 }).notNull(),
     sku: text(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     user_id: uuid("user_id").notNull(),
@@ -209,7 +209,7 @@ export const products = pgTable(
     cost: numeric({ precision: 10, scale: 2 }),
     quantity: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
     unit: text(),
-    isActive: boolean("is_active").default(true).notNull(),
+    is_active: boolean("is_active").default(true).notNull(),
   },
   (table) => [
     index("products_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
@@ -229,7 +229,7 @@ export const rolePermissions = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     role: text("role").notNull(),
     permission: appPermission().notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
   },
@@ -245,15 +245,15 @@ export const employeeRequests = pgTable(
     status: text().default("pending").notNull(),
     title: text().notNull(),
     description: text(),
-    startDate: date("start_date"),
-    endDate: date("end_date"),
+    start_date: date("start_date"),
+    end_date: date("end_date"),
     amount: numeric({ precision: 10, scale: 2 }),
     attachments: jsonb().default([]),
     notes: text(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
     user_id: uuid("user_id").notNull(),
@@ -262,7 +262,7 @@ export const employeeRequests = pgTable(
   (table) => [
     index("employee_requests_created_at_idx").using(
       "btree",
-      table.createdAt.asc().nullsLast().op("timestamptz_ops"),
+      table.created_at.asc().nullsLast().op("timestamptz_ops"),
     ),
     index("employee_requests_employee_id_idx").using(
       "btree",
@@ -294,9 +294,9 @@ export const jobListingJobs = pgTable(
   "job_listing_jobs",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    jobListingId: uuid("job_listing_id").notNull(),
-    jobId: uuid("job_id").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    job_listing_id: uuid("job_listing_id").notNull(),
+    job_id: uuid("job_id").notNull(),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
     user_id: uuid("user_id").notNull(),
@@ -305,11 +305,11 @@ export const jobListingJobs = pgTable(
   (table) => [
     index("job_listing_jobs_job_id_idx").using(
       "btree",
-      table.jobId.asc().nullsLast().op("uuid_ops"),
+      table.job_id.asc().nullsLast().op("uuid_ops"),
     ),
     index("job_listing_jobs_job_listing_id_idx").using(
       "btree",
-      table.jobListingId.asc().nullsLast().op("uuid_ops"),
+      table.job_listing_id.asc().nullsLast().op("uuid_ops"),
     ),
     foreignKey({
       columns: [table.enterprise_id],
@@ -317,12 +317,12 @@ export const jobListingJobs = pgTable(
       name: "job_listing_jobs_enterprise_id_enterprises_id_fk",
     }),
     foreignKey({
-      columns: [table.jobId],
+      columns: [table.job_id],
       foreignColumns: [jobs.id],
       name: "job_listing_jobs_job_id_jobs_id_fk",
     }).onDelete("cascade"),
     foreignKey({
-      columns: [table.jobListingId],
+      columns: [table.job_listing_id],
       foreignColumns: [jobListings.id],
       name: "job_listing_jobs_job_listing_id_job_listings_id_fk",
     }).onDelete("cascade"),
@@ -333,17 +333,17 @@ export const invoices = pgTable(
   "invoices",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     invoiceNumber: text("invoice_number").notNull(),
-    issueDate: date("issue_date").notNull(),
+    issue_date: date("issue_date").notNull(),
     dueDate: date("due_date").notNull(),
     status: text().notNull(),
     subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
-    taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
+    tax_rate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
     notes: text(),
-    clientId: uuid("client_id").notNull(),
+    client_id: uuid("client_id").notNull(),
     user_id: uuid("user_id").notNull(),
     taxAmount: numeric("tax_amount", { precision: 10, scale: 2 }).generatedAlwaysAs(sql`
 CASE
@@ -358,11 +358,11 @@ END`),
     enterprise_id: uuid("enterprise_id").notNull(),
   },
   (table) => [
-    index("invoices_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+    index("invoices_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
     index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     index("invoices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
-      columns: [table.clientId],
+      columns: [table.client_id],
       foreignColumns: [clients.id],
       name: "invoices_client_id_fkey",
     }).onDelete("cascade"),
@@ -385,7 +385,7 @@ export const invoiceItems = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     description: text().notNull(),
@@ -393,7 +393,7 @@ export const invoiceItems = pgTable(
     unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
     amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
     invoiceId: uuid("invoice_id").notNull(),
-    productId: uuid("product_id"),
+    product_id: uuid("product_id"),
   },
   (table) => [
     index("invoice_items_invoice_id_idx").using(
@@ -406,7 +406,7 @@ export const invoiceItems = pgTable(
       name: "invoice_items_invoice_id_fkey",
     }).onDelete("cascade"),
     foreignKey({
-      columns: [table.productId],
+      columns: [table.product_id],
       foreignColumns: [products.id],
       name: "invoice_items_product_id_fkey",
     }),
@@ -419,12 +419,12 @@ export const jobListings = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     title: varchar({ length: 255 }).notNull(),
     description: text(),
-    isActive: boolean("is_active").default(true).notNull(),
+    is_active: boolean("is_active").default(true).notNull(),
     slug: varchar({ length: 255 }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
     user_id: uuid("user_id").notNull(),
@@ -434,7 +434,10 @@ export const jobListings = pgTable(
   (table) => [
     index("job_listings_slug_idx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
     index("job_listings_title_idx").using("btree", table.title.asc().nullsLast().op("text_ops")),
-    index("job_listings_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("job_listings_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
     foreignKey({
       columns: [table.enterprise_id],
       foreignColumns: [enterprises.id],
@@ -451,25 +454,25 @@ export const profiles = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    fullName: text("full_name"),
+    full_name: text("full_name"),
     email: text().notNull(),
-    userSettings: jsonb("user_settings"),
+    user_settings: jsonb("user_settings"),
     enterprise_id: uuid("enterprise_id"),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
-    stripeCustomerId: text("stripe_customer_id"),
-    avatarUrl: text("avatar_url"),
+    stripe_customer_id: text("stripe_customer_id"),
+    avatar_url: text("avatar_url"),
     username: text(),
-    subscribedTo: text("subscribed_to"),
-    priceId: text("price_id"),
-    firstName: text("first_name").notNull(),
-    lastName: text("last_name").notNull(),
+    subscribed_to: text("subscribed_to"),
+    price_id: text("price_id"),
+    first_name: text("first_name").notNull(),
+    last_name: text("last_name").notNull(),
     phone: text(),
     address: text(),
     city: text(),
     state: text(),
-    zipCode: text("zip_code"),
+    zip_code: text("zip_code"),
     country: text(),
     user_id: uuid("user_id").notNull(),
     role: text("role").notNull().default("user"),
@@ -497,17 +500,17 @@ export const offices = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     phone: text(),
     email: text(),
-    isActive: boolean("is_active").default(true).notNull(),
+    is_active: boolean("is_active").default(true).notNull(),
     user_id: uuid("user_id").notNull(),
     enterprise_id: uuid("enterprise_id").notNull(),
   },
@@ -526,10 +529,10 @@ export const departmentLocations = pgTable(
   "department_locations",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    departmentId: uuid("department_id").notNull(),
+    department_id: uuid("department_id").notNull(),
     locationType: text("location_type").notNull(),
     locationId: uuid("location_id").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
     user_id: uuid("user_id").notNull(),
@@ -537,7 +540,7 @@ export const departmentLocations = pgTable(
   },
   (table) => [
     foreignKey({
-      columns: [table.departmentId],
+      columns: [table.department_id],
       foreignColumns: [departments.id],
       name: "department_locations_department_id_departments_id_fk",
     }).onDelete("cascade"),
@@ -547,7 +550,7 @@ export const departmentLocations = pgTable(
       name: "department_locations_enterprise_id_enterprises_id_fk",
     }),
     unique("unique_department_location").on(
-      table.departmentId,
+      table.department_id,
       table.locationType,
       table.locationId,
     ),
@@ -565,12 +568,12 @@ export const employees = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    firstName: text("first_name").notNull(),
-    lastName: text("last_name").notNull(),
+    first_name: text("first_name").notNull(),
+    last_name: text("last_name").notNull(),
     email: text().notNull(),
     phone: text(),
-    hireDate: date("hire_date"),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    hire_date: date("hire_date"),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     user_id: uuid("user_id").notNull(),
@@ -578,21 +581,24 @@ export const employees = pgTable(
     address: text(),
     city: text(),
     state: text(),
-    zipCode: text("zip_code"),
+    position: text(),
+    zip_code: text("zip_code"),
     country: text(),
-    terminationDate: date("termination_date"),
-    isActive: boolean("is_active").default(true).notNull(),
-    departmentId: uuid("department_id"),
+    salary: numeric({ precision: 10, scale: 2 }),
+    termination_date: date("termination_date"),
+    is_active: boolean("is_active").default(true).notNull(),
+    department_id: uuid("department_id"),
+    notes: text(),
   },
   (table) => [
     index("employees_department_id_idx").using(
       "btree",
-      table.departmentId.asc().nullsLast().op("uuid_ops"),
+      table.department_id.asc().nullsLast().op("uuid_ops"),
     ),
     index("employees_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
     index("employees_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
-      columns: [table.departmentId],
+      columns: [table.department_id],
       foreignColumns: [departments.id],
       name: "employees_department_id_departments_id_fk",
     }).onDelete("set null"),
@@ -611,26 +617,26 @@ export const expenses = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     expenseNumber: text("expense_number").notNull(),
-    issueDate: date("issue_date").notNull(),
+    issue_date: date("issue_date").notNull(),
     dueDate: date("due_date").notNull(),
     status: text().default("pending").notNull(),
     amount: numeric({ precision: 10, scale: 2 }).notNull(),
     category: text().notNull(),
     notes: text(),
-    clientId: uuid("client_id"),
+    client_id: uuid("client_id"),
     user_id: uuid("user_id").notNull(),
     enterprise_id: uuid("enterprise_id").notNull(),
   },
   (table) => [
-    index("expenses_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+    index("expenses_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
     index("expenses_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     index("expenses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
-      columns: [table.clientId],
+      columns: [table.client_id],
       foreignColumns: [clients.id],
       name: "expenses_client_id_fkey",
     }).onDelete("cascade"),
@@ -653,17 +659,17 @@ export const quotes = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
-    quoteNumber: text("quote_number").notNull(),
-    issueDate: date("issue_date").notNull(),
-    expiryDate: date("expiry_date").notNull(),
+    quote_number: text("quote_number").notNull(),
+    issue_date: date("issue_date").notNull(),
+    expiry_date: date("expiry_date").notNull(),
     status: text().default("draft").notNull(),
     subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
-    taxRate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
+    tax_rate: numeric("tax_rate", { precision: 5, scale: 2 }).default("0"),
     notes: text(),
-    clientId: uuid("client_id").notNull(),
+    client_id: uuid("client_id").notNull(),
     user_id: uuid("user_id").notNull(),
     taxAmount: numeric("tax_amount", { precision: 10, scale: 2 }).generatedAlwaysAs(sql`
 CASE
@@ -678,11 +684,11 @@ END`),
     enterprise_id: uuid("enterprise_id").notNull(),
   },
   (table) => [
-    index("quotes_client_id_idx").using("btree", table.clientId.asc().nullsLast().op("uuid_ops")),
+    index("quotes_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
     index("quotes_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
     index("quotes_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     foreignKey({
-      columns: [table.clientId],
+      columns: [table.client_id],
       foreignColumns: [clients.id],
       name: "quotes_client_id_fkey",
     }).onDelete("cascade"),
@@ -705,7 +711,7 @@ export const salaries = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     notes: text(),
@@ -715,8 +721,8 @@ export const salaries = pgTable(
     amount: numeric({ precision: 10, scale: 2 }).notNull(),
     currency: text().default("USD").notNull(),
     paymentFrequency: text("payment_frequency").default("monthly").notNull(),
-    startDate: date("start_date").notNull(),
-    endDate: date("end_date"),
+    start_date: date("start_date").notNull(),
+    end_date: date("end_date"),
   },
   (table) => [
     index("salaries_employee_id_idx").using(
@@ -744,7 +750,7 @@ export const vendors = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
@@ -754,10 +760,10 @@ export const vendors = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).default(
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     enterprise_id: uuid("enterprise_id").notNull(),
@@ -781,16 +787,16 @@ export const departments = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
     description: text(),
     user_id: uuid("user_id").notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).default(
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
-    isActive: boolean("is_active").default(true).notNull(),
+    is_active: boolean("is_active").default(true).notNull(),
     enterprise_id: uuid("enterprise_id").notNull(),
   },
   (table) => [
@@ -811,7 +817,7 @@ export const warehouses = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
@@ -819,9 +825,9 @@ export const warehouses = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     capacity: numeric({ precision: 10, scale: 2 }),
-    isActive: boolean("is_active").default(true).notNull(),
+    is_active: boolean("is_active").default(true).notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
     enterprise_id: uuid("enterprise_id").notNull(),
@@ -850,13 +856,13 @@ export const jobs = pgTable(
     department: varchar({ length: 255 }),
     type: varchar({ length: 50 }).notNull(),
     salary: numeric({ precision: 10, scale: 2 }),
-    isActive: boolean("is_active").default(true).notNull(),
-    startDate: date("start_date"),
-    endDate: date("end_date"),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    is_active: boolean("is_active").default(true).notNull(),
+    start_date: date("start_date"),
+    end_date: date("end_date"),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" })
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
     user_id: uuid("user_id").notNull(),
@@ -881,7 +887,7 @@ export const branches = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
@@ -889,11 +895,11 @@ export const branches = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     phone: text(),
     email: text(),
     manager: text(),
-    isActive: boolean("is_active").default(true).notNull(),
+    is_active: boolean("is_active").default(true).notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
     enterprise_id: uuid("enterprise_id").notNull(),
@@ -918,7 +924,7 @@ export const companies = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
@@ -928,11 +934,11 @@ export const companies = pgTable(
     address: text(),
     city: text(),
     state: text(),
-    zipCode: text("zip_code"),
+    zip_code: text("zip_code"),
     industry: text(),
     size: text(),
     notes: text(),
-    isActive: boolean("is_active").default(true).notNull(),
+    is_active: boolean("is_active").default(true).notNull(),
     user_id: uuid("user_id").notNull(),
     enterprise_id: uuid("enterprise_id").notNull(),
   },
@@ -940,7 +946,7 @@ export const companies = pgTable(
     index("companies_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
     index("companies_is_active_idx").using(
       "btree",
-      table.isActive.asc().nullsLast().op("bool_ops"),
+      table.is_active.asc().nullsLast().op("bool_ops"),
     ),
     index("companies_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     foreignKey({
@@ -958,7 +964,7 @@ export const enterprises = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
@@ -967,8 +973,8 @@ export const enterprises = pgTable(
     address: text(),
     city: text(),
     state: text(),
-    zipCode: text("zip_code"),
-    isActive: boolean("is_active").default(true).notNull(),
+    zip_code: text("zip_code"),
+    is_active: boolean("is_active").default(true).notNull(),
     website: text(),
     industry: text(),
     size: text(),
@@ -1001,7 +1007,7 @@ export const clients = pgTable(
   "clients",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     name: text().notNull(),
@@ -1010,7 +1016,7 @@ export const clients = pgTable(
     address: text().notNull(),
     city: text().notNull(),
     state: text().notNull(),
-    zipCode: text("zip_code").notNull(),
+    zip_code: text("zip_code").notNull(),
     notes: text(),
     user_id: uuid("user_id").notNull(),
     company: uuid(),
@@ -1040,7 +1046,7 @@ export const quoteItems = pgTable(
       .default(sql`uuid_generate_v4()`)
       .primaryKey()
       .notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
     description: text().notNull(),
@@ -1048,7 +1054,7 @@ export const quoteItems = pgTable(
     unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
     amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`(quantity * unit_price)`),
     quoteId: uuid("quote_id").notNull(),
-    productId: uuid("product_id"),
+    product_id: uuid("product_id"),
   },
   (table) => [
     index("quote_items_quote_id_idx").using(
@@ -1056,7 +1062,7 @@ export const quoteItems = pgTable(
       table.quoteId.asc().nullsLast().op("uuid_ops"),
     ),
     foreignKey({
-      columns: [table.productId],
+      columns: [table.product_id],
       foreignColumns: [products.id],
       name: "quote_items_product_id_fkey",
     }),
@@ -1078,7 +1084,7 @@ export const userRoles = pgTable(
     enterprise_id: uuid("enterprise_id")
       .notNull()
       .references(() => enterprises.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
   },

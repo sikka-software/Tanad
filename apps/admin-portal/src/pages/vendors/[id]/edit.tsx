@@ -54,7 +54,7 @@ export default function EditVendorPage() {
             <CardTitle>{t("vendor_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <VendorForm user_id={user?.id} vendor_id={vendor_id as string} />
+            <VendorForm />
           </CardContent>
         </Card>
       </div>

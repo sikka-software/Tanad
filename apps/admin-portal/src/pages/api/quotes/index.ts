@@ -85,9 +85,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           client_id,
           user_id,
         } = req.body;
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user?.id) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
         const [newQuote] = await db
           .insert(quotes)
           .values({
+            enterprise_id: user.app_metadata.enterprise_id,
             quote_number: quote_number,
             issue_date: issue_date,
             expiry_date: expiry_date,
@@ -95,7 +102,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             subtotal: subtotal.toString(),
             tax_rate: tax_rate.toString(),
             notes,
-            client_id,
+            client_id: client_id,
             user_id,
           })
           .returning();

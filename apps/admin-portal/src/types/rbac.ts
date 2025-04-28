@@ -11,6 +11,6 @@ export type Role = {
   description: string;
   permissions: string[]; // Array of permission IDs
   isSystem: boolean;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }; 

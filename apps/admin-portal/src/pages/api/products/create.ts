@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
 import { products as productsTable } from "@/db/schema";
+import { createClient } from "@/utils/supabase/server-props";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
@@ -15,6 +16,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === "POST") {
+    // Authenticate user and get enterprise_id
+    const supabase = createClient({ req, res, query: {}, resolvedUrl: "" });
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user?.id) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const enterprise_id = user.app_metadata.enterprise_id;
+    if (!enterprise_id) {
+      return res.status(400).json({ error: "Enterprise association not found for user" });
+    }
+
     try {
       const { name, description, price, sku, stock_quantity } = req.body;
 
@@ -37,12 +52,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const newProduct = await db
         .insert(productsTable)
         .values({
+          enterprise_id: enterprise_id,
           name: name.trim(),
           description: description?.trim() || null,
           price: price.toString(),
-          stockQuantity: parseInt(stock_quantity),
+          quantity: parseInt(stock_quantity).toString(),
           sku: sku?.trim() || null,
-          user_id: req.body.user_id,
+          user_id: user.id,
         })
         .returning();
 

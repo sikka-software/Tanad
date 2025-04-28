@@ -1,10 +1,8 @@
-import { useTranslations } from "next-intl";
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import useUserStore from "@/stores/use-user-store";
-import type { Profile as UserStoreProfile } from "@/stores/use-user-store";
 
 // Types for our profile data
 type ProfileData = {
@@ -54,7 +52,7 @@ const updateProfile = async ({
 
   console.log("[updateProfile] Updating profile for ID:", profile_id);
   console.log("[updateProfile] Update data:", data);
-  
+
   const response = await fetch(`/api/profile/update?profile_id=${profile_id}`, {
     method: "PATCH",
     headers: {
@@ -113,9 +111,10 @@ export function useUpdateProfile() {
       if (userStore.profile) {
         // Create a compatible user store profile object by preserving original values
         // and overriding with new data
-        const updatedProfile: UserStoreProfile = {
+        const updatedProfile = {
           ...userStore.profile,
-          full_name: data.full_name || userStore.profile.full_name,
+          full_name:
+            data.full_name || userStore.profile.first_name + " " + userStore.profile.last_name,
           avatar_url: data.avatar_url || userStore.profile.avatar_url,
           address: data.address || userStore.profile.address,
           email: data.email || userStore.profile.email,
@@ -127,9 +126,12 @@ export function useUpdateProfile() {
             timezone: data.user_settings?.timezone || userStore.profile.user_settings.timezone,
             notifications: userStore.profile.user_settings.notifications,
             // Preserve the navigation settings
-            navigation: data.user_settings?.navigation || userStore.profile.user_settings.navigation,
+            navigation:
+              data.user_settings?.navigation || userStore.profile.user_settings.navigation,
             // Preserve hidden menu items
-            hidden_menu_items: data.user_settings?.hidden_menu_items || userStore.profile.user_settings.hidden_menu_items,
+            hidden_menu_items:
+              data.user_settings?.hidden_menu_items ||
+              userStore.profile.user_settings.hidden_menu_items,
           },
         };
 

@@ -27,14 +27,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (req.method === "POST") {
     try {
-      const { name, type, content, is_default, user_id } = req.body;
+      const { name, type, content, is_default, user_id, enterprise_id } = req.body;
 
       const result = await db.insert(templates).values({
         name,
         type,
         content: JSON.parse(content),
-        is_default,
+        is_default: is_default,
         user_id,
+        enterprise_id,
       });
 
       return res.status(201).json(result);

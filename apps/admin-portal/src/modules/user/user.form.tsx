@@ -23,6 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
+
 // Or define Profile type in user.type.ts
 import { useRoles } from "../role/role.hooks";
 import type { Role } from "../role/role.service";
@@ -33,8 +36,8 @@ import type { UserType } from "./user.table";
 
 // Define the Zod schema for form validation
 const userFormSchema = z.object({
-  firstName: z.string().min(1, { message: "First name is required." }),
-  lastName: z.string().min(1, { message: "Last name is required." }),
+  first_name: z.string().min(1, { message: "First name is required." }),
+  last_name: z.string().min(1, { message: "Last name is required." }),
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
   role: z.string().min(1, { message: "Role is required." }),
@@ -42,9 +45,6 @@ const userFormSchema = z.object({
 
 // Infer the type from the schema
 type UserFormData = z.infer<typeof userFormSchema>;
-
-import { createClient } from "@/utils/supabase/component";
-import useUserStore from "@/stores/use-user-store";
 
 interface UserFormProps {
   onSuccess: () => void; // Callback to close the dialog/form
@@ -61,8 +61,8 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
   const form = useForm<UserFormData>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
       role: "",
@@ -90,6 +90,8 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
       await createUser.mutateAsync({
         ...values,
         enterprise_id: profile?.enterprise_id,
+        first_name: values.first_name,
+        last_name: values.last_name,
       });
       toast.success(t("General.successful_operation"), {
         description: t("Users.messages.created"),
@@ -112,7 +114,7 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="firstName"
+            name="first_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>First Name</FormLabel>
@@ -125,7 +127,7 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
           />
           <FormField
             control={form.control}
-            name="lastName"
+            name="last_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Last Name</FormLabel>

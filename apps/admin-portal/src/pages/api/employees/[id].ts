@@ -35,7 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         department_id,
         hire_date,
         salary,
-        status,
+        termination_date,
+        is_active,
         notes,
       } = req.body;
 
@@ -65,7 +66,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           department_id,
           hire_date,
           salary: salary ? sql`${salary}::numeric` : null,
-          status,
+          termination_date,
+          is_active,
           notes,
         })
         .where(sql`${employees.id} = ${id}`)
