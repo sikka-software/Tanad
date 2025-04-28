@@ -5,6 +5,7 @@ import Footer from "@/components/landing/Footer";
 import Navigation from "@/components/landing/Navbar";
 import GridBG from "@/components/ui/grid-bg";
 import { LoadingBar } from "@/components/ui/loading-bar";
+
 import useStickyHeader from "@/hooks/use-sticky-header";
 
 type LayoutType = {
@@ -20,12 +21,11 @@ const LandingLayout: React.FC<LayoutType> = ({ children }) => {
       <main className="flex min-h-screen flex-col" dir={lang === "ar" ? "rtl" : "ltr"}>
         <GridBG className="-z-10" />
         <Navigation onSticky={isSticky} />
-        <div className="w-full flex-1 flex-col justify-center">
+        <div className="w-full flex-1 flex-col justify-center bg-blue-900">
           <LoadingBar />
           {children}
-          {children}
         </div>
-        <Footer />
+        {/* <Footer /> */}
       </main>
     </ThemeProvider>
   );
