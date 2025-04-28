@@ -2,8 +2,8 @@
 
 import { Plus, MoreVertical, Edit, Trash, Shield, Lock, Search } from "lucide-react";
 import { useState, useMemo, useCallback } from "react";
-import { toast } from "sonner";
 import React from "react";
+import { toast } from "sonner";
 
 import {
   Accordion,
@@ -51,10 +51,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { Role, Permission } from "@/types/rbac";
+
 import {
   useRoles,
   usePermissions,
@@ -78,15 +85,21 @@ const PermissionsSection = React.memo(function PermissionsSection({
   onCategoryToggle: (category: string) => void;
   isDisabled?: boolean;
 }) {
-  const areAllPermissionsSelected = useCallback((category: string) => {
-    const categoryPermissions = permissionsByCategory[category] || [];
-    return categoryPermissions.every((p) => selectedPermissions.includes(p.id));
-  }, [permissionsByCategory, selectedPermissions]);
+  const areAllPermissionsSelected = useCallback(
+    (category: string) => {
+      const categoryPermissions = permissionsByCategory[category] || [];
+      return categoryPermissions.every((p) => selectedPermissions.includes(p.id));
+    },
+    [permissionsByCategory, selectedPermissions],
+  );
 
-  const countPermissionsByCategory = useCallback((category: string) => {
-    const categoryPermissions = permissionsByCategory[category] || [];
-    return categoryPermissions.filter((p) => selectedPermissions.includes(p.id)).length;
-  }, [permissionsByCategory, selectedPermissions]);
+  const countPermissionsByCategory = useCallback(
+    (category: string) => {
+      const categoryPermissions = permissionsByCategory[category] || [];
+      return categoryPermissions.filter((p) => selectedPermissions.includes(p.id)).length;
+    },
+    [permissionsByCategory, selectedPermissions],
+  );
 
   return (
     <Card>
@@ -112,7 +125,7 @@ const PermissionsSection = React.memo(function PermissionsSection({
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-2 pt-2 ps-4">
+                  <div className="space-y-2 ps-4 pt-2">
                     {categoryPermissions.map((permission) => (
                       <div key={permission.id} className="flex items-start space-x-2">
                         <Checkbox
@@ -290,9 +303,8 @@ export default function RolesList() {
 
   // Helper function to count permissions in a category
   const countPermissionsInCategory = (permissions: string[], category: string) => {
-    return permissions.filter((p) => 
-      permissionsByCategory[category]?.some((cp) => cp.id === p)
-    ).length;
+    return permissions.filter((p) => permissionsByCategory[category]?.some((cp) => cp.id === p))
+      .length;
   };
 
   // Add this constant at the top of the component
@@ -304,7 +316,7 @@ export default function RolesList() {
 
   return (
     <div className="space-y-6">
-       Permissions length: {permissions.length}
+      Permissions length: {permissions.length}
       <div className="flex items-center justify-between">
         <div className="relative w-full max-w-sm">
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
@@ -320,7 +332,6 @@ export default function RolesList() {
           <Plus className="me-2 h-4 w-4" /> Add Role
         </Button>
       </div>
-
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredRoles.map((role) => (
           <Card key={role.id} className="overflow-hidden">
@@ -401,7 +412,6 @@ export default function RolesList() {
           </Card>
         ))}
       </div>
-
       {/* Create Role Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
         <DialogContent className="max-w-2xl">
@@ -440,7 +450,7 @@ export default function RolesList() {
                     className="ps-2"
                   />
                   {newRole.name && !/^[a-z0-9_]+$/.test(newRole.name) && (
-                    <p className="text-xs text-red-500 mt-1">
+                    <p className="mt-1 text-xs text-red-500">
                       Role name must contain only lowercase letters, numbers, and underscores
                     </p>
                   )}
@@ -487,7 +497,6 @@ export default function RolesList() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Edit Role Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
@@ -554,7 +563,6 @@ export default function RolesList() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Delete Role Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
@@ -573,7 +581,6 @@ export default function RolesList() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
       {/* Empty state */}
       {filteredRoles.length === 0 && (
         <div className="py-10 text-center">

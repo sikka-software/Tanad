@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import AppLayout from "@/components/layouts/app-layout";
 import AuthLayout from "@/components/layouts/auth-layout";
 import LandingLayout from "@/components/layouts/landing-layout";
+import DebugTools from "@/components/ui/debug-tools";
 import { LoadingBar } from "@/components/ui/loading-bar";
 
 import { QueryProvider } from "@/providers/QueryProvider";
@@ -122,6 +123,7 @@ export default function App(props: AppProps) {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryProvider>
         <AppContent {...props} />
+        <DebugTools />
       </QueryProvider>
     </ThemeProvider>
   );

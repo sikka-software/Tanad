@@ -28,15 +28,14 @@ export const routeMap: RouteMap = {
   "/departments": { label: "Departments", translationKey: "Departments.title" },
   "/offices": { label: "Offices", translationKey: "Offices.title" },
   "/expenses": { label: "Expenses", translationKey: "Expenses.title" },
+  "/roles": { label: "Roles", translationKey: "Roles.title" },
 };
 
 // Dynamic route patterns and their handling
 export const dynamicRoutePatterns = [
   {
     pattern: /^\/dashboard$/,
-    breadcrumbs: [{ path: "/dashboard", labelKey: "Dashboard.title" },
-      
-    ],
+    breadcrumbs: [{ path: "/dashboard", labelKey: "Dashboard.title" }],
   },
   {
     pattern: /^\/invoices\/add$/,

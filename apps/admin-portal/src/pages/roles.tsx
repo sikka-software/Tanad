@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
@@ -20,14 +20,19 @@ export default function RolesPage() {
       </Head>
 
       <PageTitle
-        // store={useJobsStore}
-        // sortableColumns={SORTABLE_COLUMNS}
-        // filterableFields={FILTERABLE_FIELDS}
         texts={{
           submit_form: "Create Role",
           cancel: "Cancel",
           title: "Role Management",
         }}
+        customButton={
+          <Button
+            size={"sm"}
+            // onClick={() => setIsCreateDialogOpen(true)}
+          >
+            <Plus className="me-2 h-4 w-4" /> Add Role
+          </Button>
+        }
       />
 
       <div className="container mx-auto p-4">
