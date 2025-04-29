@@ -155,22 +155,17 @@ const useUserStore = create<UserState>((set, get) => ({
             set({ enterprise: enterpriseData as EnterpriseType });
           }
 
-          // Fetch user's permissions for the current enterprise
+          // Fetch user's permissions using the new user_role_permissions table
           const { data: permissionsData } = await supabase
-            .from("user_roles")
-            .select(`
-              role,
-              role_permissions!inner(permission)
-            `)
+            .from("user_role_permissions")
+            .select("permission")
             .eq("user_id", session.user.id)
             .eq("enterprise_id", profileData.enterprise_id);
 
           if (permissionsData) {
-            // Extract unique permissions from all roles
+            // Extract unique permissions
             const permissions = [...new Set(
-              permissionsData.flatMap(roleData => 
-                roleData.role_permissions.map((p: { permission: string }) => p.permission)
-              )
+              permissionsData.map(p => p.permission)
             )];
             set({ permissions });
           }
