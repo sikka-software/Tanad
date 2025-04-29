@@ -1,5 +1,6 @@
 -- Drop existing role_permissions table if it exists
 DROP TABLE IF EXISTS public.role_permissions CASCADE;
+DROP VIEW IF EXISTS public.user_permissions_view;
 
 -- Create new role_permissions table with proper relationships
 CREATE TABLE public.role_permissions (
@@ -48,6 +49,28 @@ CREATE TRIGGER set_role_permissions_updated_at
     BEFORE UPDATE ON public.role_permissions
     FOR EACH ROW
     EXECUTE FUNCTION set_updated_at();
+
+-- Create view for user permissions
+CREATE OR REPLACE VIEW public.user_permissions_view AS
+SELECT 
+    ur.user_id,
+    ur.enterprise_id,
+    ur.role_id,
+    r.name as role_name,
+    rp.permission
+FROM user_roles ur
+JOIN roles r ON ur.role_id = r.id
+JOIN role_permissions rp ON r.id = rp.role_id;
+
+-- Enable RLS on the view
+ALTER VIEW public.user_permissions_view SECURITY ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for the view
+CREATE POLICY "Users can view their own permissions"
+    ON public.user_permissions_view
+    FOR SELECT
+    TO authenticated
+    USING (user_id = auth.uid());
 
 -- Insert default permissions for admin role
 INSERT INTO public.role_permissions (role_id, permission)

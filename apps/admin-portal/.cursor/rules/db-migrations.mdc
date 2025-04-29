@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Anytime you need to make an adjustment to the db, you run `supabase migrations new FILE_NAME` without npx (we already have it installed with brew). 
+
+After that in order to apply the migration you run `supabase db push --include-all`

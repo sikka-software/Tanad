@@ -24,6 +24,27 @@ ALTER TABLE job_listing_jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE enterprises ENABLE ROW LEVEL SECURITY;
+-- Create policies for authenticated users
+CREATE POLICY "Enable delete for owners" 
+ON role_permissions
+FOR DELETE 
+TO authenticated
+USING (true);
+
+CREATE POLICY "Enable insert for signup" 
+ON role_permissions
+FOR INSERT 
+TO authenticated;
+
+CREATE POLICY "Enable read for users" 
+ON role_permissions
+FOR SELECT 
+TO authenticated;
+
+CREATE POLICY "Enable update for owners" 
+ON role_permissions
+FOR UPDATE 
+TO authenticated;
 
 -- Drop all existing policies
 DROP POLICY IF EXISTS "Users can view their own profile" ON profiles;

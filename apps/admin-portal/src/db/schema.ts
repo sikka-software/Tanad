@@ -13,7 +13,6 @@ import {
   unique,
   date,
   varchar,
-  pgPolicy,
   pgEnum,
   primaryKey,
 } from "drizzle-orm/pg-core";
@@ -227,13 +226,21 @@ export const rolePermissions = pgTable(
   "role_permissions",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    role: text("role").notNull(),
+    role_id: uuid("role_id")
+      .notNull()
+      .references(() => roles.id, { onDelete: "cascade" }),
     permission: appPermission().notNull(),
     created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
       .defaultNow()
       .notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .defaultNow()
+      .notNull(),
   },
-  (table) => [unique("role_permissions_role_permission_key").on(table.role, table.permission)],
+  (table) => ({
+    rolePermissionUnique: unique("role_permissions_role_permission_key").on(table.role_id, table.permission),
+    roleIdIdx: index("role_permissions_role_id_idx").on(table.role_id),
+  }),
 );
 
 export const employeeRequests = pgTable(
@@ -983,23 +990,7 @@ export const enterprises = pgTable(
   (table) => [
     index("enterprises_email_idx").using("btree", table.email.asc().nullsLast().op("text_ops")),
     index("enterprises_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
-    pgPolicy("Enable delete for owners", {
-      as: "permissive",
-      for: "delete",
-      to: ["authenticated"],
-      using: sql`true`,
-    }),
-    pgPolicy("Enable insert for signup", {
-      as: "permissive",
-      for: "insert",
-      to: ["authenticated"],
-    }),
-    pgPolicy("Enable read for users", { as: "permissive", for: "select", to: ["authenticated"] }),
-    pgPolicy("Enable update for owners", {
-      as: "permissive",
-      for: "update",
-      to: ["authenticated"],
-    }),
+   
   ],
 );
 
