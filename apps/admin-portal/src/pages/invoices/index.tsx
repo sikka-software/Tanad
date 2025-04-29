@@ -25,26 +25,6 @@ export default function InvoicesPage() {
   const { hasPermission: canViewInvoices, isLoading: isCheckingPermission } =
     usePermission("invoices.read");
 
-  if (isCheckingPermission) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div>Checking permissions...</div>
-      </div>
-    );
-  }
-
-  if (!canViewInvoices) {
-    return (
-      <div className="flex h-screen items-center justify-center p-4">
-        <Alert variant="destructive" className="max-w-md">
-          <Shield className="h-4 w-4" />
-          <AlertTitle>{t("General.no_permission")}</AlertTitle>
-          <AlertDescription>{t("General.no_permission_description")}</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
   const viewMode = useInvoiceStore((state) => state.viewMode);
   const isDeleteDialogOpen = useInvoiceStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useInvoiceStore((state) => state.setIsDeleteDialogOpen);
@@ -81,6 +61,26 @@ export default function InvoicesPage() {
   const sortedInvoices = useMemo(() => {
     return getSortedInvoices(filteredInvoices);
   }, [filteredInvoices, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (isCheckingPermission) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div>Checking permissions...</div>
+      </div>
+    );
+  }
+
+  if (!canViewInvoices) {
+    return (
+      <div className="flex h-screen items-center justify-center p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <Shield className="h-4 w-4" />
+          <AlertTitle>{t("General.no_permission")}</AlertTitle>
+          <AlertDescription>{t("General.no_permission_description")}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div>
