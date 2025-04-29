@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { createClient } from "@/utils/supabase/server-props";
+import { createClient } from "@/utils/supabase/server-admin";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createClient({ req, res, query: {}, resolvedUrl: "" });
@@ -91,6 +91,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .single();
 
         if (createError) throw createError;
+
+        // First get or create the role
+        const { data: roleData, error: roleError } = await supabase
+          .from("roles")
+          .select()
+          .eq("name", role)
+          .eq("enterprise_id", creatorProfile.enterprise_id)
+          .single();
+
+        if (roleError) {
+          // Role doesn't exist, create it
+          const { data: newRole, error: createRoleError } = await supabase
+            .from("roles")
+            .insert({
+              name: role,
+              enterprise_id: creatorProfile.enterprise_id,
+            })
+            .select()
+            .single();
+
+          if (createRoleError) throw createRoleError;
+
+          // Create user_roles entry with the new role
+          const { error: userRoleError } = await supabase.from("user_roles").insert({
+            user_id: authData.user.id,
+            role_id: newRole.id,
+            enterprise_id: creatorProfile.enterprise_id,
+          });
+
+          if (userRoleError) throw userRoleError;
+        } else {
+          // Role exists, use it
+          const { error: userRoleError } = await supabase.from("user_roles").insert({
+            user_id: authData.user.id,
+            role_id: roleData.id,
+            enterprise_id: creatorProfile.enterprise_id,
+          });
+
+          if (userRoleError) throw userRoleError;
+        }
+
         return res.status(201).json(created);
 
       case "DELETE":
