@@ -40,14 +40,20 @@ export async function fetchRoles(): Promise<Role[]> {
 export class RoleService {
   private static readonly TABLE_NAME = "roles";
 
-  // List all roles
-  static async list(): Promise<Role[]> {
+  // List all roles for an enterprise
+  static async list(enterprise_id?: string): Promise<Role[]> {
     const supabase = createClient();
-    const { data, error } = await supabase
+    const query = supabase
       .from(this.TABLE_NAME)
       .select("*")
       .order("created_at", { ascending: false });
 
+    // Filter by enterprise_id if provided
+    if (enterprise_id) {
+      query.eq("enterprise_id", enterprise_id);
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
     return data;
   }
@@ -105,7 +111,7 @@ export class RoleService {
   }
 
   // Duplicate role
-  static async duplicate(id: string): Promise<Role> {
+  static async duplicate(id: string, enterprise_id: string): Promise<Role> {
     const supabase = createClient();
     // 1. Get the original role
     const original = await this.get(id);
@@ -113,8 +119,8 @@ export class RoleService {
     // 2. Remove unique fields and create new role
     const { id: _, created_at: __, updated_at: ___, ...duplicateData } = original;
 
-    // 3. Create the duplicate
-    return this.create(duplicateData as RoleCreateData);
+    // 3. Create the duplicate with the specified enterprise_id
+    return this.create({ ...duplicateData, enterprise_id } as RoleCreateData);
   }
 }
 

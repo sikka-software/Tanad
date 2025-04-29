@@ -137,10 +137,10 @@ export const commandList = [
     heading: "Navigation.organization",
     items: [
       {
-        icon: Building2,
-        label: "Companies.title",
-        shortcut: "⌘O",
-        href: "/companies",
+        icon: Users,
+        label: "Roles.title",
+        shortcut: "⌘R",
+        href: "/roles",
       },
       {
         icon: Settings,

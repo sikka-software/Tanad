@@ -19,11 +19,13 @@ import { useRoles, useBulkDeleteRoles, useDuplicateRole } from "@/modules/role/r
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/role/role.options";
 import useRoleStore from "@/modules/role/role.store";
 import { RoleUpdateData } from "@/modules/role/role.type";
+import useUserStore from "@/stores/use-user-store";
 
 export default function RolesPage() {
   const t = useTranslations();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableRole, setActionableRole] = useState<RoleUpdateData | null>(null);
+  const { enterprise } = useUserStore();
 
   const loadingSaveRole = useRoleStore((state) => state.isLoading);
   const setLoadingSaveRole = useRoleStore((state) => state.setIsLoading);
@@ -37,7 +39,7 @@ export default function RolesPage() {
   const filterCaseSensitive = useRoleStore((state) => state.filterCaseSensitive);
   const getFilteredRoles = useRoleStore((state) => state.getFilteredData);
 
-  const { data: roles, isLoading: loadingFetchRoles, error } = useRoles();
+  const { data: roles, isLoading: loadingFetchRoles, error } = useRoles(enterprise?.id);
   const { mutate: duplicateRole } = useDuplicateRole();
   const { mutateAsync: deleteRoles, isPending: isDeleting } = useBulkDeleteRoles();
   const { createDeleteHandler } = useDeleteHandler();
@@ -69,22 +71,33 @@ export default function RolesPage() {
       const toastId = toast.loading(t("General.loading_operation"), {
         description: t("Roles.loading.duplicating"),
       });
-      await duplicateRole(rowId, {
-        onSuccess: () => {
-          toast.success(t("General.successful_operation"), {
-            description: t("Roles.success.duplicated"),
-          });
-          toast.dismiss(toastId);
+      await duplicateRole(
+        { id: rowId, enterprise_id: enterprise?.id || "" },
+        {
+          onSuccess: () => {
+            toast.success(t("General.successful_operation"), {
+              description: t("Roles.success.duplicated"),
+            });
+            toast.dismiss(toastId);
+          },
+          onError: () => {
+            toast.error(t("General.error_operation"), {
+              description: t("Roles.error.duplicating"),
+            });
+            toast.dismiss(toastId);
+          },
         },
-        onError: () => {
-          toast.error(t("General.error_operation"), {
-            description: t("Roles.error.duplicating"),
-          });
-          toast.dismiss(toastId);
-        },
-      });
+      );
     }
   };
+
+  if (!enterprise) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-lg text-gray-600">{t("General.select_enterprise")}</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -139,8 +152,11 @@ export default function RolesPage() {
                 description: t("Roles.success.updated"),
               });
             }}
-            // defaultValues={actionableRole}
-            editMode={true}
+            defaultValues={{
+              ...actionableRole,
+              enterprise_id: enterprise.id,
+            }}
+            editMode={!!actionableRole}
           />
         </FormDialog>
 

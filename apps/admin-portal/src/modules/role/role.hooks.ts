@@ -7,10 +7,11 @@ import type { Role, RoleCreateData, RoleUpdateData } from "./role.type";
 const ROLES_QUERY_KEY = "roles";
 
 // Fetch roles hook
-export function useRoles() {
+export function useRoles(enterprise_id?: string) {
   return useQuery({
-    queryKey: [ROLES_QUERY_KEY],
-    queryFn: () => RoleService.list(),
+    queryKey: [ROLES_QUERY_KEY, enterprise_id],
+    queryFn: () => RoleService.list(enterprise_id),
+    enabled: !!enterprise_id, // Only fetch if enterprise_id is provided
   });
 }
 
@@ -20,8 +21,10 @@ export function useCreateRole() {
 
   return useMutation({
     mutationFn: (data: RoleCreateData) => RoleService.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ROLES_QUERY_KEY] });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ 
+        queryKey: [ROLES_QUERY_KEY, variables.enterprise_id] 
+      });
     },
   });
 }
@@ -33,8 +36,10 @@ export function useUpdateRole() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: RoleUpdateData }) =>
       RoleService.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ROLES_QUERY_KEY] });
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ 
+        queryKey: [ROLES_QUERY_KEY, variables.data.enterprise_id] 
+      });
     },
   });
 }
@@ -45,8 +50,12 @@ export function useDeleteRole() {
 
   return useMutation({
     mutationFn: (id: string) => RoleService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ROLES_QUERY_KEY] });
+    onSuccess: (_, __, context: { enterprise_id?: string }) => {
+      if (context?.enterprise_id) {
+        queryClient.invalidateQueries({ 
+          queryKey: [ROLES_QUERY_KEY, context.enterprise_id] 
+        });
+      }
     },
   });
 }
@@ -57,8 +66,12 @@ export function useBulkDeleteRoles() {
 
   return useMutation({
     mutationFn: (ids: string[]) => RoleService.bulkDelete(ids),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ROLES_QUERY_KEY] });
+    onSuccess: (_, __, context: { enterprise_id?: string }) => {
+      if (context?.enterprise_id) {
+        queryClient.invalidateQueries({ 
+          queryKey: [ROLES_QUERY_KEY, context.enterprise_id] 
+        });
+      }
     },
   });
 }
@@ -68,9 +81,12 @@ export function useDuplicateRole() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => RoleService.duplicate(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ROLES_QUERY_KEY] });
+    mutationFn: ({ id, enterprise_id }: { id: string; enterprise_id: string }) => 
+      RoleService.duplicate(id, enterprise_id),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ 
+        queryKey: [ROLES_QUERY_KEY, variables.enterprise_id] 
+      });
     },
   });
 }
