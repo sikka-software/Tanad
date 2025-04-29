@@ -23,13 +23,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 import useUserStore from "@/stores/use-user-store";
@@ -37,13 +30,6 @@ import useUserStore from "@/stores/use-user-store";
 import { Permission, usePermissions } from "../permission/permission.hooks";
 import { useCreateRole, useUpdateRole } from "./role.hooks";
 import type { RoleCreateData, RoleUpdateData } from "./role.type";
-
-// Add this constant for predefined roles
-const AVAILABLE_ROLES = [
-  { value: "admin", label: "Admin" },
-  { value: "accounting", label: "Accounting" },
-  { value: "hr", label: "HR" },
-] as const;
 
 const formSchema = z.object({
   name: z
@@ -228,32 +214,18 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode }: RoleFormPro
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("Roles.form.name")}</FormLabel>
-              <div className="flex gap-2">
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => field.onChange(value)}
+              <FormControl>
+                <Input 
+                  {...field} 
+                  placeholder={t("Roles.form.name_placeholder")}
                   disabled={editMode}
-                >
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Select predefined role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {AVAILABLE_ROLES.map((role) => (
-                      <SelectItem key={role.value} value={role.value}>
-                        {role.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="relative flex-1">
-                  <Input {...field} placeholder="Or enter custom role name" disabled={editMode} />
-                  {field.value && !/^[a-z0-9_]+$/.test(field.value) && (
-                    <p className="text-destructive mt-1 text-xs">
-                      Role name must contain only lowercase letters, numbers, and underscores
-                    </p>
-                  )}
-                </div>
-              </div>
+                />
+              </FormControl>
+              {field.value && !/^[a-z0-9_]+$/.test(field.value) && (
+                <p className="text-destructive mt-1 text-xs">
+                  {t("Roles.form.name_format")}
+                </p>
+              )}
               <FormMessage />
             </FormItem>
           )}

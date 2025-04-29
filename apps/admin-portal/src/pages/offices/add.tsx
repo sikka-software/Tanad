@@ -45,13 +45,7 @@ export default function AddOfficePage() {
           submit_form: t("Offices.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
+        dummyButton={handleDummyData}
       />
 
       <div className="mx-auto max-w-2xl p-4">

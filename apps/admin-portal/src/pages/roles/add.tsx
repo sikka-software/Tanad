@@ -1,22 +1,50 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { Button } from "@/components/ui/button";
+import PageTitle from "@/components/ui/page-title";
 
 import { RoleForm } from "@/modules/role/role.form";
+import useEnterpriseUserStore from "@/modules/user/user.store";
 
 export default function AddRolePage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const setIsLoading = useEnterpriseUserStore((state) => state.setIsLoading);
+  const isLoading = useEnterpriseUserStore((state) => state.isLoading);
+
+  const handleDummyData = () => {};
 
   return (
     <div>
-      <CustomPageMeta title={t("Roles.add_new")} description={t("Roles.add_description")} />
-      <DataPageLayout>
-        <div className="container mx-auto p-4">
-          <RoleForm />
-        </div>
-      </DataPageLayout>
+      <CustomPageMeta title={t("Roles.add_new")} />
+      <PageTitle
+        formButtons
+        formId="role-form"
+        loading={isLoading}
+        onCancel={() => router.push("/roles")}
+        texts={{
+          title: t("Roles.add_new"),
+          submit_form: t("Roles.add_new"),
+          cancel: t("General.cancel"),
+        }}
+        dummyButton={handleDummyData}
+      />
+
+      <div className="mx-auto max-w-2xl p-4">
+        <RoleForm
+          id="role-form"
+          onSuccess={() =>
+            router.push("/roles").then(() => {
+              setIsLoading(false);
+            })
+          }
+        />
+      </div>
     </div>
   );
 }
