@@ -90,6 +90,7 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
         enterprise_id: profile.enterprise_id,
         first_name: values.first_name,
         last_name: values.last_name,
+        password: values.password,
       });
       toast.success(t("General.successful_operation"), {
         description: t("Users.messages.created"),

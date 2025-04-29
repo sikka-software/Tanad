@@ -6,7 +6,9 @@ import type { profiles } from "@/db/schema";
 export type User = InferModel<typeof profiles>;
 
 // Create data type
-export type UserCreateData = Pick<User, "email" | "role" | "enterprise_id" | "first_name" | "last_name">;
+export type UserCreateData = Pick<User, "email" | "role" | "enterprise_id" | "first_name" | "last_name"> & {
+  password: string;
+};
 
 // Update data type
 export type UserUpdateData = Partial<UserCreateData>;

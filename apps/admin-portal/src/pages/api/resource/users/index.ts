@@ -35,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .select("*")
           .eq("enterprise_id", userProfile.enterprise_id)
           .order("created_at", { ascending: false });
-
+        console.log("enterprise users are users", users?.length);
         if (fetchError) throw fetchError;
         return res.status(200).json(users);
 
@@ -53,6 +53,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const { email, password, role, first_name, last_name } = req.body;
+
+        if (!email || !password || !role || !first_name || !last_name) {
+          return res.status(400).json({
+            error: "Missing required fields",
+            details: "Email, password, role, first name, and last name are required",
+          });
+        }
 
         // First create the auth user using the admin client
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
