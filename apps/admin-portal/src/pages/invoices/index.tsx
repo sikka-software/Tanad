@@ -1,3 +1,4 @@
+import { Shield } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
@@ -9,8 +10,10 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
+import { usePermission } from "@/hooks/use-permission";
 import InvoiceCard from "@/modules/invoice/invoice.card";
 import { useInvoices, useBulkDeleteInvoices } from "@/modules/invoice/invoice.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/invoice/invoice.options";
@@ -19,6 +22,28 @@ import InvoicesTable from "@/modules/invoice/invoice.table";
 
 export default function InvoicesPage() {
   const t = useTranslations();
+  const { hasPermission: canViewInvoices, isLoading: isCheckingPermission } =
+    usePermission("invoice.read");
+
+  if (isCheckingPermission) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div>Checking permissions...</div>
+      </div>
+    );
+  }
+
+  if (!canViewInvoices) {
+    return (
+      <div className="flex h-screen items-center justify-center p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <Shield className="h-4 w-4" />
+          <AlertTitle>{t("General.no_permission")}</AlertTitle>
+          <AlertDescription>{t("General.no_permission_description")}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   const viewMode = useInvoiceStore((state) => state.viewMode);
   const isDeleteDialogOpen = useInvoiceStore((state) => state.isDeleteDialogOpen);

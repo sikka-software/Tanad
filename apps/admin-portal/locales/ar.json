@@ -20,6 +20,8 @@
     "must_be_logged_in": "يجب عليك تسجيل الدخول لتنفيذ هذه العملية",
     "clear": "مسح",
     "close": "اغلاق",
+    "no_permission": "ليس لديك الصلاحية لتنفيذ هذه العملية",
+    "no_permission_description": "يرجى الاتصال بالمدير للحصول على الصلاحية اللازمة",
     "no_results_found": "لا توجد نتائج",
     "quick_access": "الوصول السريع",
     "items_selected": "عناصر مختارة",

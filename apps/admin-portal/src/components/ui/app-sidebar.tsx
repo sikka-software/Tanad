@@ -141,10 +141,10 @@ export function AppSidebar() {
 
         return result;
       } catch (error) {
-        console.error("[app-sidebar] Error applying custom menu order:", error);
+        // console.error("[app-sidebar] Error applying custom menu order:", error);
       }
     } else {
-      console.log("[app-sidebar] No navigation settings found in profile");
+      // console.log("[app-sidebar] No navigation settings found in profile");
     }
     return defaultMenuGroups;
   }, [defaultMenuGroups, profile?.user_settings]);

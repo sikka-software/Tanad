@@ -52,6 +52,7 @@ interface UserState {
   user: User | null;
   profile: ProfileType | null;
   enterprise: EnterpriseType | null;
+  permissions: string[];
   loading: boolean;
   error: string | null;
   fetchUserAndProfile: () => Promise<void>;
@@ -59,8 +60,10 @@ interface UserState {
   setUser: (user: User | null) => void;
   setProfile: (profile: ProfileType | null) => void;
   setEnterprise: (enterprise: EnterpriseType | null) => void;
+  setPermissions: (permissions: string[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  hasPermission: (permission: string) => boolean;
 }
 
 const supabase = createClient();
@@ -69,14 +72,21 @@ const useUserStore = create<UserState>((set, get) => ({
   user: null,
   profile: null,
   enterprise: null,
+  permissions: [],
   loading: false,
   error: null,
 
   setUser: (user) => set({ user }),
   setProfile: (profile) => set({ profile }),
   setEnterprise: (enterprise) => set({ enterprise }),
+  setPermissions: (permissions) => set({ permissions }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
+
+  hasPermission: (permission) => {
+    const permissions = get().permissions;
+    return permissions.includes(permission);
+  },
 
   signOut: async () => {
     try {
@@ -86,6 +96,7 @@ const useUserStore = create<UserState>((set, get) => ({
         user: null,
         profile: null,
         enterprise: null,
+        permissions: [],
         loading: false,
         error: null,
       });
@@ -113,6 +124,7 @@ const useUserStore = create<UserState>((set, get) => ({
           user: null,
           profile: null,
           enterprise: null,
+          permissions: [],
           loading: false,
         });
         return;
@@ -142,6 +154,26 @@ const useUserStore = create<UserState>((set, get) => ({
           if (enterpriseData) {
             set({ enterprise: enterpriseData as EnterpriseType });
           }
+
+          // Fetch user's permissions for the current enterprise
+          const { data: permissionsData } = await supabase
+            .from("user_roles")
+            .select(`
+              role,
+              role_permissions!inner(permission)
+            `)
+            .eq("user_id", session.user.id)
+            .eq("enterprise_id", profileData.enterprise_id);
+
+          if (permissionsData) {
+            // Extract unique permissions from all roles
+            const permissions = [...new Set(
+              permissionsData.flatMap(roleData => 
+                roleData.role_permissions.map((p: { permission: string }) => p.permission)
+              )
+            )];
+            set({ permissions });
+          }
         }
       }
     } catch (error: any) {
@@ -162,6 +194,7 @@ supabase.auth.onAuthStateChange((event, session) => {
       user: null,
       profile: null,
       enterprise: null,
+      permissions: [],
       loading: false,
       error: null,
     });

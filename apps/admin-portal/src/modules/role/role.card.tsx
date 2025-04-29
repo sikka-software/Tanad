@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { usePermission } from "@/hooks/use-permission";
 import type { Role } from "./role.type";
 
 interface RoleCardProps {
@@ -25,6 +26,7 @@ interface RoleCardProps {
 
 export default function RoleCard({ role, onActionClick }: RoleCardProps) {
   const t = useTranslations();
+  const { hasPermission: canDeleteRoles } = usePermission("roles.delete");
 
   return (
     <Card className="relative">
@@ -47,12 +49,14 @@ export default function RoleCard({ role, onActionClick }: RoleCardProps) {
               <DropdownMenuItem onClick={() => onActionClick?.("duplicate", role.id)}>
                 {t("General.duplicate")}
               </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-destructive"
-                onClick={() => onActionClick?.("delete", role.id)}
-              >
-                {t("General.delete")}
-              </DropdownMenuItem>
+              {canDeleteRoles && (
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={() => onActionClick?.("delete", role.id)}
+                >
+                  {t("General.delete")}
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
