@@ -18,13 +18,17 @@ export default function AddInvoicePage() {
   const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const { user } = useUserStore();
+  const { user, enterprise } = useUserStore();
 
   const handleSubmit = async (data: InvoiceFormValues) => {
     setLoading(true);
     try {
       if (!user?.id) {
         throw new Error("You must be logged in to create an invoice");
+      }
+
+      if (!enterprise?.id) {
+        throw new Error("You must be associated with an enterprise to create an invoice");
       }
 
       // Calculate final amounts
@@ -46,6 +50,7 @@ export default function AddInvoicePage() {
             tax_rate: data.tax_rate,
             notes: data.notes?.trim() || null,
             user_id: user?.id,
+            enterprise_id: enterprise.id,
           },
         ])
         .select()
