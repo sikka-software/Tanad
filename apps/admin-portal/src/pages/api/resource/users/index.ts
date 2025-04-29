@@ -5,15 +5,15 @@ import { createClient } from "@/utils/supabase/server-props";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createClient({ req, res, query: {}, resolvedUrl: "" });
 
-  // Get user session
   const {
-    data: { session },
-    error: authError,
-  } = await supabase.auth.getSession();
-  if (authError || !session) {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
+  console.log("user", user);
   try {
     switch (req.method) {
       case "GET":

@@ -75,14 +75,11 @@ export default function Auth() {
     setLoading(true);
     try {
       // Step 1: Perform the Supabase signup
+      // users who register through this page are automatically enterprise owners
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            enterprise_owner: true,
-          },
-        },
+        options: { data: { enterprise_owner: true } },
       });
 
       if (error) throw error;
@@ -104,7 +101,17 @@ export default function Auth() {
           throw enterpriseError;
         }
 
-        // Step 3: Create the user profile with the enterprise ID
+        // Step 3: Update the user meta data to have the enterprise id
+        const { data: updatedUserData, error: updateUserError } = await supabase.auth.updateUser({
+          data: { enterprise_id: enterpriseData.id }, // Add enterprise_id to user_metadata
+        });
+
+        if (updateUserError) {
+          console.error("User update error:", updateUserError);
+          throw updateUserError;
+        }
+
+        // Step 4: Create the user profile with the enterprise ID
         const stripeCustomerId = `cus_${Math.random().toString(36).substring(2, 15)}`;
         const { error: profileError } = await supabase.from("profiles").upsert({
           id: data.user.id,
