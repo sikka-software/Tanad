@@ -7,6 +7,7 @@ import { createClient } from "@/utils/supabase/server-props";
 
 type UserOwnedTable = PgTable & {
   user_id: AnyPgColumn;
+  enterprise_id: AnyPgColumn;
   created_at: AnyPgColumn;
   id: AnyPgColumn;
 };
@@ -60,17 +61,18 @@ export function createApiHandler<T extends UserOwnedTable>({
             return res.status(200).json(data);
           }
 
+          const enterprise_id = await getUserEnterpriseId(supabase, user_id);
           const list = await query.findMany({
-            where: eq(table.user_id, user_id),
+            where: eq(table.enterprise_id, enterprise_id),
             orderBy: desc(table.created_at),
           });
           return res.status(200).json(list);
 
         case "POST":
-          const enterprise_id = await getUserEnterpriseId(supabase, user_id);
+          const postEnterpriseId = await getUserEnterpriseId(supabase, user_id);
           
           if (customHandlers.POST) {
-            const data = await customHandlers.POST(user_id, enterprise_id, req);
+            const data = await customHandlers.POST(user_id, postEnterpriseId, req);
             return res.status(201).json(data);
           }
 
@@ -79,7 +81,7 @@ export function createApiHandler<T extends UserOwnedTable>({
             .values({
               ...req.body,
               user_id,
-              enterprise_id,
+              enterprise_id: postEnterpriseId,
             })
             .returning();
           return res.status(201).json(created);
