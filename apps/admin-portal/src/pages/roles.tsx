@@ -10,6 +10,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { Badge } from "@/components/ui/badge";
 import { FormDialog } from "@/components/ui/form-dialog";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
@@ -25,7 +26,7 @@ export default function RolesPage() {
   const t = useTranslations();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableRole, setActionableRole] = useState<RoleUpdateData | null>(null);
-  const { enterprise } = useUserStore();
+  const { enterprise, profile } = useUserStore();
 
   const loadingSaveRole = useRoleStore((state) => state.isLoading);
   const setLoadingSaveRole = useRoleStore((state) => state.setIsLoading);
@@ -123,6 +124,14 @@ export default function RolesPage() {
         )}
 
         <div className="p-4">
+          {profile?.role && (
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-sm">Your role:</span>
+              <Badge variant="outline" className="text-sm">
+                {profile.role}
+              </Badge>
+            </div>
+          )}
           <DataModelList
             data={filteredRoles}
             isLoading={loadingFetchRoles}

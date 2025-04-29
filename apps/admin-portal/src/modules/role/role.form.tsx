@@ -5,7 +5,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -15,6 +22,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -82,47 +90,50 @@ const PermissionsSection = ({
   };
 
   return (
-    <div className="space-y-4">
-      {Object.entries(permissionsByCategory).map(([category, permissions]) => (
-        <div key={category} className="space-y-2">
-          <div className="flex items-center justify-between">
-            <FormLabel className="text-base">{category}</FormLabel>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={areAllPermissionsSelected(category)}
-                onChange={() => onCategoryToggle(category)}
-                disabled={isDisabled}
-                className="h-4 w-4 rounded border-gray-300"
-              />
-              <span className="text-muted-foreground text-xs">
-                {countPermissionsByCategory(category)}/{permissions.length}
-              </span>
-            </div>
-          </div>
-          <div className="grid gap-2">
-            {permissions.map((permission) => (
-              <div key={permission.id} className="flex items-start space-x-3">
-                <input
-                  type="checkbox"
-                  id={`permission-${permission.id}`}
-                  checked={selectedPermissions.includes(permission.id)}
-                  onChange={() => onPermissionChange(permission.id)}
-                  disabled={isDisabled}
-                  className="mt-1 h-4 w-4 rounded border-gray-300"
-                />
-                <div>
-                  <label htmlFor={`permission-${permission.id}`} className="font-medium">
-                    {permission.name}
-                  </label>
-                  <p className="text-muted-foreground text-sm">{permission.description}</p>
+    <ScrollArea className="h-[300px] pe-4">
+      <Accordion type="multiple" className="w-full">
+        {Object.entries(permissionsByCategory).map(([category, permissions]) => (
+          <AccordionItem key={category} value={category}>
+            <AccordionTrigger className="py-2">
+              <div className="flex w-full items-center justify-between pe-4">
+                <span>{category}</span>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={areAllPermissionsSelected(category)}
+                    onCheckedChange={() => onCategoryToggle(category)}
+                    onClick={(e) => e.stopPropagation()}
+                    disabled={isDisabled}
+                  />
+                  <span className="text-muted-foreground text-xs">
+                    {countPermissionsByCategory(category)}/{permissions.length}
+                  </span>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-2 ps-4 pt-2">
+                {permissions.map((permission) => (
+                  <div key={permission.id} className="flex items-start space-x-2">
+                    <Checkbox
+                      id={`permission-${permission.id}`}
+                      checked={selectedPermissions.includes(permission.id)}
+                      onCheckedChange={() => onPermissionChange(permission.id)}
+                      disabled={isDisabled}
+                    />
+                    <div className="space-y-1">
+                      <label htmlFor={`permission-${permission.id}`} className="font-medium">
+                        {permission.name}
+                      </label>
+                      <p className="text-muted-foreground text-sm">{permission.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </ScrollArea>
   );
 };
 

@@ -269,4 +269,11 @@ export const dynamicRoutePatterns = [
       { path: "", labelKey: "Expenses.edit", is_active: true },
     ],
   },
+  {
+    pattern: /^\/roles\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/roles", labelKey: "Roles.title" },
+    ],
+  },
 ];
