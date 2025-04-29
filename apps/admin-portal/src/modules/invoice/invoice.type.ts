@@ -4,8 +4,8 @@ export type Invoice = {
   id: string;
   user_id: string;
   invoice_number: string;
-  issue_date: Date;
-  due_date: Date;
+  issue_date: string;
+  due_date: string;
   status: "paid" | "pending" | "overdue";
   subtotal: number;
   tax_rate?: number;
@@ -13,7 +13,7 @@ export type Invoice = {
   notes?: string;
   client_id?: string;
   client?: Client;
-  created_at: Date;
+  created_at: string;
 };
 
 export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "client">;

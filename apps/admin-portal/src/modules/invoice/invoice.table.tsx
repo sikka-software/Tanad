@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import React from "react";
@@ -26,6 +26,17 @@ interface InvoicesTableProps {
   error?: Error | null;
 }
 
+const formatDate = (dateStr: string) => {
+  try {
+    // If the date includes time information, take only the date part
+    const datePart = dateStr.split('T')[0];
+    return format(parseISO(datePart), "MMM dd, yyyy");
+  } catch (error) {
+    console.error('Error formatting date:', dateStr, error);
+    return 'Invalid Date';
+  }
+};
+
 const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
   const t = useTranslations("Invoices");
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
@@ -49,19 +60,24 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
       accessorKey: "issue_date",
       header: t("form.issue_date.label"),
       validationSchema: issue_dateSchema,
-      cell: ({ row }) => format(new Date(row.original.issue_date), "MMM dd, yyyy"),
+      cell: ({ row }) => formatDate(row.original.issue_date),
     },
     {
       accessorKey: "due_date",
       header: t("form.due_date.label"),
       validationSchema: due_dateSchema,
-      cell: ({ row }) => format(new Date(row.original.due_date), "MMM dd, yyyy"),
+      cell: ({ row }) => formatDate(row.original.due_date),
     },
     {
       accessorKey: "total",
       header: t("form.total.label"),
       validationSchema: totalSchema,
-      cell: ({ row }) => `$${row.original.total.toFixed(2)}`,
+      cell: ({ row }) => {
+        const total = typeof row.original.total === 'string' 
+          ? parseFloat(row.original.total) 
+          : row.original.total;
+        return `$${Number(total).toFixed(2)}`;
+      },
     },
     {
       accessorKey: "status",
