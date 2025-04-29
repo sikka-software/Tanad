@@ -52,9 +52,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(400).json({ error: "User is not associated with an enterprise" });
         }
 
-        // Add enterprise_id to the new user data
+        const { email, password, role, first_name, last_name } = req.body;
+
+        // First create the auth user using the admin client
+        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+        });
+
+        if (authError) throw authError;
+        if (!authData.user) {
+          throw new Error("Failed to create auth user");
+        }
+
+        // Then create the profile with the auth user's ID
         const userData = {
-          ...req.body,
+          id: authData.user.id,
+          user_id: authData.user.id,
+          email,
+          role,
+          first_name,
+          last_name,
           enterprise_id: creatorProfile.enterprise_id,
         };
 
@@ -82,7 +101,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(400).json({ error: "User is not associated with an enterprise" });
         }
 
-        // Only delete users from the same enterprise
+        // First delete the auth users using the admin client
+        for (const id of ids) {
+          const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(id);
+          if (deleteAuthError) throw deleteAuthError;
+        }
+
+        // Then delete the profiles
         const { error: deleteError } = await supabase
           .from("profiles")
           .delete()
