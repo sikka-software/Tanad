@@ -16,10 +16,24 @@ type Options<T extends UserOwnedTable> = {
   query: any; // you can type this further if you want
   customHandlers?: Partial<{
     GET: (user_id: string, req: NextApiRequest) => Promise<any>;
-    POST: (user_id: string, req: NextApiRequest) => Promise<any>;
+    POST: (user_id: string, enterprise_id: string, req: NextApiRequest) => Promise<any>;
     DELETE: (user_id: string, req: NextApiRequest) => Promise<any>;
   }>;
 };
+
+async function getUserEnterpriseId(supabase: any, user_id: string): Promise<string> {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("enterprise_id")
+    .eq("id", user_id)
+    .single();
+
+  if (!profile?.enterprise_id) {
+    throw new Error("User is not associated with an enterprise");
+  }
+
+  return profile.enterprise_id;
+}
 
 export function createApiHandler<T extends UserOwnedTable>({
   table,
@@ -53,20 +67,11 @@ export function createApiHandler<T extends UserOwnedTable>({
           return res.status(200).json(list);
 
         case "POST":
+          const enterprise_id = await getUserEnterpriseId(supabase, user_id);
+          
           if (customHandlers.POST) {
-            const data = await customHandlers.POST(user_id, req);
+            const data = await customHandlers.POST(user_id, enterprise_id, req);
             return res.status(201).json(data);
-          }
-
-          // Get the user's enterprise_id from their profile
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("enterprise_id")
-            .eq("id", user_id)
-            .single();
-
-          if (!profile?.enterprise_id) {
-            return res.status(400).json({ message: "User is not associated with an enterprise" });
           }
 
           const [created] = await db
@@ -74,7 +79,7 @@ export function createApiHandler<T extends UserOwnedTable>({
             .values({
               ...req.body,
               user_id,
-              enterprise_id: profile.enterprise_id,
+              enterprise_id,
             })
             .returning();
           return res.status(201).json(created);
@@ -98,6 +103,9 @@ export function createApiHandler<T extends UserOwnedTable>({
       }
     } catch (error) {
       console.error(`Error in ${req.method}:`, error);
+      if (error instanceof Error) {
+        return res.status(400).json({ message: error.message });
+      }
       return res.status(500).json({ message: `Error handling ${req.method}` });
     }
   };

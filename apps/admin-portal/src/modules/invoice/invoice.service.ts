@@ -1,7 +1,7 @@
 import { Invoice } from "@/modules/invoice/invoice.type";
 
 export async function fetchInvoices(): Promise<Invoice[]> {
-  const response = await fetch("/api/invoices");
+  const response = await fetch("/api/resource/invoices");
   if (!response.ok) {
     throw new Error("Failed to fetch invoices");
   }
@@ -9,7 +9,7 @@ export async function fetchInvoices(): Promise<Invoice[]> {
 }
 
 export async function fetchInvoiceById(id: string): Promise<Invoice> {
-  const response = await fetch(`/api/invoices/${id}`);
+  const response = await fetch(`/api/resource/invoices/${id}`);
   if (!response.ok) {
     throw new Error("Failed to fetch invoice");
   }
@@ -17,7 +17,7 @@ export async function fetchInvoiceById(id: string): Promise<Invoice> {
 }
 
 export async function createInvoice(invoice: Omit<Invoice, "id" | "created_at">): Promise<Invoice> {
-  const response = await fetch("/api/invoices", {
+  const response = await fetch("/api/resource/invoices", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export async function createInvoice(invoice: Omit<Invoice, "id" | "created_at">)
 }
 
 export async function updateInvoice(id: string, invoice: Partial<Invoice>): Promise<Invoice> {
-  const response = await fetch(`/api/invoices/${id}`, {
+  const response = await fetch(`/api/resource/invoices/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export async function updateInvoice(id: string, invoice: Partial<Invoice>): Prom
 }
 
 export async function deleteInvoice(id: string): Promise<void> {
-  const response = await fetch(`/api/invoices/${id}`, {
+  const response = await fetch(`/api/resource/invoices/${id}`, {
     method: "DELETE",
   });
   if (!response.ok) {
@@ -55,7 +55,7 @@ export async function deleteInvoice(id: string): Promise<void> {
 
 export async function bulkDeleteInvoices(ids: string[]): Promise<void> {
   try {
-    const response = await fetch("/api/invoices/bulk-delete", {
+    const response = await fetch("/api/resource/invoices/bulk-delete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),
