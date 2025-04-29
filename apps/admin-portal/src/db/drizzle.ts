@@ -17,9 +17,9 @@ const ssl = connectionString.includes("sslmode=require")
 
 const pool = new Pool({
   connectionString,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  max: 10,
+  idleTimeoutMillis: 60000,
+  connectionTimeoutMillis: 10000,
   ssl,
 });
 

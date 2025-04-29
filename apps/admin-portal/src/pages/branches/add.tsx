@@ -14,6 +14,7 @@ import { generateDummyData } from "@/lib/dummy-generator";
 
 import { BranchForm, type BranchFormValues } from "@/modules/branch/branch.form";
 import { branchKeys } from "@/modules/branch/branch.hooks";
+import useBranchStore from "@/modules/branch/branch.store";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -21,9 +22,11 @@ export default function AddBranchPage() {
   const supabase = createClient();
   const router = useRouter();
   const t = useTranslations();
-  const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useUserStore();
+
+  const setIsLoading = useBranchStore((state) => state.setIsLoading);
+  const isLoading = useBranchStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -43,13 +46,21 @@ export default function AddBranchPage() {
     }
   };
 
+  const onAddSuccess = () => {
+    toast.success(t("General.successful_operation"), {
+      description: t("Branches.success.created"),
+    });
+    router.push("/branches");
+    setIsLoading(false);
+  };
+
   return (
     <div>
       <CustomPageMeta title={t("Branches.add_new")} />
       <PageTitle
         formButtons
         formId="branch-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/branches")}
         texts={{
           title: t("Branches.add_new"),
@@ -60,7 +71,7 @@ export default function AddBranchPage() {
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <BranchForm id="branch-form" />
+        <BranchForm id="branch-form" onSuccess={onAddSuccess} />
       </div>
     </div>
   );

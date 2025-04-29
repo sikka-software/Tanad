@@ -58,11 +58,23 @@ export function createApiHandler<T extends UserOwnedTable>({
             return res.status(201).json(data);
           }
 
+          // Get the user's enterprise_id from their profile
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("enterprise_id")
+            .eq("id", user_id)
+            .single();
+
+          if (!profile?.enterprise_id) {
+            return res.status(400).json({ message: "User is not associated with an enterprise" });
+          }
+
           const [created] = await db
             .insert(table)
             .values({
               ...req.body,
-              user_id: user_id,
+              user_id,
+              enterprise_id: profile.enterprise_id,
             })
             .returning();
           return res.status(201).json(created);
