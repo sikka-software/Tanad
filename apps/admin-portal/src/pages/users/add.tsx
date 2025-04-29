@@ -10,14 +10,14 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { generateDummyData } from "@/lib/dummy-generator";
 
 import { UserForm } from "@/modules/user/user.form";
-import { useUserStore } from "@/modules/user/user.store";
+import useEnterpriseUserStore from "@/modules/user/user.store";
 
 export default function AddUserPage() {
   const t = useTranslations();
   const router = useRouter();
 
-  const setIsLoading = useUserStore((state) => state.setIsLoading);
-  const isLoading = useUserStore((state) => state.isLoading);
+  const setIsLoading = useEnterpriseUserStore((state) => state.setIsLoading);
+  const isLoading = useEnterpriseUserStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();

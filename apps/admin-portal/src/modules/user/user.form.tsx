@@ -26,13 +26,10 @@ import {
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
-// Or define Profile type in user.type.ts
 import { useRoles } from "../role/role.hooks";
-import type { Role } from "../role/role.service";
+import type { Role } from "../role/role.type";
 import { useCreateUser } from "./user.hooks";
 import type { UserType } from "./user.table";
-
-// Import Role type
 
 // Define the Zod schema for form validation
 const userFormSchema = z.object({
@@ -55,7 +52,7 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
   const t = useTranslations();
   const profile = useUserStore((state) => state.profile);
   const createUser = useCreateUser();
-  const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles();
+  const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles(profile?.enterprise_id);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<UserFormData>({
@@ -88,10 +85,9 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
     setIsSubmitting(true);
     try {
       await createUser.mutateAsync({
-        ...values,
-        enterprise_id: profile?.enterprise_id,
-        first_name: values.first_name,
-        last_name: values.last_name,
+        email: values.email,
+        role: values.role,
+        enterprise_id: profile.enterprise_id,
       });
       toast.success(t("General.successful_operation"), {
         description: t("Users.messages.created"),
