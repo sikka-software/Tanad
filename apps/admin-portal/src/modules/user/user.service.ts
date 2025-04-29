@@ -1,78 +1,104 @@
-import { createClient } from "@/utils/supabase/component";
+import { User, UserCreateData, UserUpdateData } from "./user.type";
 
-import type { UserType } from "./user.table";
-
-const supabase = createClient();
-
-export async function fetchUsers() {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) throw error;
-  return data as UserType[];
+export async function fetchUsers(): Promise<User[]> {
+  try {
+    const response = await fetch("/api/resource/users");
+    if (!response.ok) {
+      console.error("Failed to fetch users:", response.statusText);
+      return [];
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
 }
 
-export async function fetchUserById(id: string) {
-  const { data, error } = await supabase.from("profiles").select("*").eq("id", id).single();
-
-  if (error) throw error;
-  return data as UserType;
+export async function fetchUserById(id: string): Promise<User> {
+  try {
+    const response = await fetch(`/api/resource/users/${id}`);
+    if (!response.ok) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching user by id:", error);
+    throw error;
+  }
 }
 
-// Type for the data sent to the API route
-interface CreateUserPayload {
-  first_name: string;
-  last_name: string;
-  email: string;
-  password: string;
-  role: string;
-  enterprise_id: string;
+export async function createUser(user: UserCreateData): Promise<User> {
+  try {
+    const response = await fetch("/api/resource/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to create user");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error creating user:", error);
+    throw error;
+  }
 }
 
-// Type expected from the API route on success
-// This should match the structure returned by the API route (likely the profile)
-// Using UserType for now, adjust if API returns something different
-type CreateUserResponse = UserType;
-
-export async function createUser(userData: CreateUserPayload): Promise<CreateUserResponse> {
-  const response = await fetch("/api/users/create", {
-    method: "POST",
+export async function updateUser(id: string, updates: UserUpdateData): Promise<User> {
+  const response = await fetch(`/api/resource/users/${id}`, {
+    method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(userData),
+    body: JSON.stringify(updates),
   });
-
-  const result = await response.json();
-
   if (!response.ok) {
-    // Forward the error message from the API route
-    const errorMessage = result.message || `API Error: ${response.status} ${response.statusText}`;
-    console.error("Create User API Error:", result);
-    throw new Error(errorMessage);
+    throw new Error(`Failed to update user with id ${id}`);
   }
-
-  return result as CreateUserResponse;
+  return response.json();
 }
 
-export async function updateUser(id: string, userData: { role: string; enterprise_id: string }) {
-  const { data, error } = await supabase
-    .from("profiles")
-    .update({
-      role: userData.role,
-      enterprise_id: userData.enterprise_id,
-    })
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data as UserType;
+export async function duplicateUser(id: string): Promise<User> {
+  const response = await fetch(`/api/resource/users/${id}/duplicate`, {
+    method: "POST",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to duplicate user with id ${id}`);
+  }
+  return response.json();
 }
 
-export async function deleteUser(id: string) {
-  const { error } = await supabase.from("profiles").delete().eq("id", id);
-  if (error) throw error;
+export async function deleteUser(id: string): Promise<void> {
+  const response = await fetch(`/api/resource/users/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to delete user with id ${id}`);
+  }
+}
+
+export async function bulkDeleteUsers(ids: string[]): Promise<void> {
+  const response = await fetch("/api/resource/users", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete users");
+  }
+}
+
+export async function getUserPermissions(role: string): Promise<string[]> {
+  try {
+    const response = await fetch(`/api/resource/users/permissions/${role}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch permissions for role ${role}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching user permissions:", error);
+    throw error;
+  }
 }

@@ -1,242 +1,158 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
-import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Button } from "@/components/ui/button";
-import { FormDialog } from "@/components/ui/form-dialog";
-import PageTitle from "@/components/ui/page-title";
-import { Skeleton } from "@/components/ui/skeleton";
+import ConfirmDelete from "@/ui/confirm-delete";
+import DataModelList from "@/ui/data-model-list";
+import PageSearchAndFilter from "@/ui/page-search-and-filter";
+import SelectionMode from "@/ui/selection-mode";
 
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormDialog } from "@/components/ui/form-dialog";
+
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+import UserCard from "@/modules/user/user.card";
 import { UserForm } from "@/modules/user/user.form";
+import { useUsers, useBulkDeleteUsers } from "@/modules/user/user.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/user/user.options";
+import useEnterpriseUsersStore from "@/modules/user/user.store";
 import UsersTable, { UserType } from "@/modules/user/user.table";
-import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
+import { User, UserUpdateData } from "@/modules/user/user.type";
 
 export default function UsersPage() {
   const t = useTranslations();
-  const supabase = createClient();
-  const router = useRouter();
-  const { user: currentUser, enterprise, loading: authLoading } = useUserStore();
 
-  const [users, setUsers] = useState<any[]>([]);
-  const [userPermissions, setUserPermissions] = useState<Record<string, string[]>>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const loadingSaveUser = useEnterpriseUsersStore((state) => state.isLoading);
+  const setLoadingSaveUser = useEnterpriseUsersStore((state) => state.setIsLoading);
+  const viewMode = useEnterpriseUsersStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useEnterpriseUsersStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useEnterpriseUsersStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useEnterpriseUsersStore((state) => state.selectedRows);
+  const setSelectedRows = useEnterpriseUsersStore((state) => state.setSelectedRows);
+  const clearSelection = useEnterpriseUsersStore((state) => state.clearSelection);
+  const sortRules = useEnterpriseUsersStore((state) => state.sortRules);
+  const sortCaseSensitive = useEnterpriseUsersStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useEnterpriseUsersStore((state) => state.sortNullsFirst);
+  const searchQuery = useEnterpriseUsersStore((state) => state.searchQuery);
+  const filterConditions = useEnterpriseUsersStore((state) => state.filterConditions);
+  const filterCaseSensitive = useEnterpriseUsersStore((state) => state.filterCaseSensitive);
+  const getFilteredUsers = useEnterpriseUsersStore((state) => state.getFilteredData);
+  const getSortedUsers = useEnterpriseUsersStore((state) => state.getSortedData);
 
-  // Fetch users data when enterprise is available
-  useEffect(() => {
-    let isMounted = true;
+  const { data: users, isLoading, error } = useUsers();
+  const { mutateAsync: deleteUsers, isPending: isDeleting } = useBulkDeleteUsers();
+  const { createDeleteHandler } = useDeleteHandler();
 
-    const fetchUsers = async () => {
-      if (!isMounted || !enterprise?.id) {
-        return;
-      }
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableUser, setActionableUser] = useState<UserUpdateData | null>(null);
 
-      try {
-        // Fetch all users with their roles for the current enterprise
-        const { data: usersData, error: usersError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("enterprise_id", enterprise.id)
-          .order("created_at", { ascending: false });
+  const handleConfirmDelete = createDeleteHandler(deleteUsers, {
+    loading: "Users.loading.deleting",
+    success: "Users.success.deleted",
+    error: "Users.error.deleting",
+    onSuccess: () => {
+      clearSelection();
+      setIsDeleteDialogOpen(false);
+    },
+  });
 
-        if (usersError) throw usersError;
-        if (!isMounted) return;
+  const filteredUsers = useMemo(() => {
+    return getFilteredUsers(users || []);
+  }, [users, getFilteredUsers, searchQuery, filterConditions, filterCaseSensitive]);
 
-        setUsers(usersData || []);
+  const sortedUsers = useMemo(() => {
+    return getSortedUsers(filteredUsers);
+  }, [filteredUsers, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-        // Fetch permissions for each user
-        if (usersData) {
-          const permissionsMap: Record<string, string[]> = {};
-          for (const user of usersData) {
-            const { data: permissions } = await supabase
-              .from("role_permissions")
-              .select("permission")
-              .eq("role", user.role);
-
-            if (isMounted) {
-              permissionsMap[user.id] = permissions?.map((p) => p.permission) || [];
-            }
-          }
-          if (isMounted) {
-            setUserPermissions(permissionsMap);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        if (isMounted) {
-          toast.error(t("Users.error_fetching"));
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    if (enterprise?.id) {
-      fetchUsers();
-    } else if (!authLoading) {
-      // If not loading and no enterprise, show empty state
-      setIsLoading(false);
+  const onActionClicked = async (action: string, rowId: string) => {
+    if (action === "edit") {
+      setIsFormDialogOpen(true);
+      setActionableUser(users?.find((user) => user.id === rowId) || null);
     }
 
-    return () => {
-      isMounted = false;
-    };
-  }, [enterprise?.id, supabase, t, authLoading]);
-
-  const handleCreateUser = async (email: string, password: string, role: string) => {
-    try {
-      if (!enterprise) return;
-
-      // Create the user in auth
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-      });
-
-      if (authError) throw authError;
-
-      // Create the profile
-      const { error: profileError } = await supabase.from("profiles").insert({
-        id: authData.user.id,
-        email,
-        role,
-        enterprise_id: enterprise.id,
-      });
-
-      if (profileError) throw profileError;
-
-      // Create the user_role entry
-      const { error: userRoleError } = await supabase.from("user_roles").insert({
-        user_id: authData.user.id,
-        role,
-        enterprise_id: enterprise.id,
-      });
-
-      if (userRoleError) throw userRoleError;
-
-      // Refresh the users list
-      const { data: users } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("enterprise_id", enterprise.id)
-        .order("created_at", { ascending: false });
-
-      setUsers(users || []);
-      toast.success(t("Users.user_created"));
-      setFormDialogOpen(false);
-    } catch (error) {
-      console.error("Error creating user:", error);
-      toast.error(t("Users.error_creating"));
+    if (action === "delete") {
+      setSelectedRows([rowId]);
+      setIsDeleteDialogOpen(true);
     }
   };
-
-  const handleUpdateUser = async (user_id: string, role: string) => {
-    try {
-      if (!enterprise) return;
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({ role })
-        .eq("id", user_id)
-        .eq("enterprise_id", enterprise.id);
-
-      if (error) throw error;
-
-      // Refresh users list
-      const { data: users } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("enterprise_id", enterprise.id)
-        .order("created_at", { ascending: false });
-
-      setUsers(users || []);
-
-      // Fetch updated permissions for the user
-      const { data: permissions } = await supabase
-        .from("role_permissions")
-        .select("permission")
-        .eq("role", role);
-
-      setUserPermissions((prev) => ({
-        ...prev,
-        [user_id]: permissions?.map((p) => p.permission) || [],
-      }));
-
-      toast.success(t("Users.user_updated"));
-    } catch (error) {
-      console.error("Error updating user:", error);
-      toast.error(t("Users.error_updating"));
-    }
-  };
-
-  // Show loading state while fetching data
-  if (isLoading || authLoading) {
-    return (
-      <DataPageLayout>
-        <PageTitle texts={{ title: t("Users.title") }} />
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-16" />
-          ))}
-        </div>
-      </DataPageLayout>
-    );
-  }
-
-  // Show empty state if no enterprise
-  if (!enterprise) {
-    return (
-      <DataPageLayout>
-        <PageTitle texts={{ title: t("Users.title") }} />
-        <div className="flex h-40 items-center justify-center">
-          <p className="text-muted-foreground">
-            No enterprise found. Please contact your administrator.
-          </p>
-        </div>
-      </DataPageLayout>
-    );
-  }
 
   return (
-    <DataPageLayout>
-      <PageTitle
-        texts={{ title: t("Users.title") }}
-        customButton={
-          <Button size="sm" onClick={() => setFormDialogOpen(true)}>
-            {t("Users.add_user")}
-          </Button>
-        }
-      />
+    <div>
+      <CustomPageMeta title={t("Users.title")} description={t("Users.description")} />
+      <DataPageLayout>
+        {selectedRows.length > 0 ? (
+          <SelectionMode
+            selectedRows={selectedRows}
+            clearSelection={clearSelection}
+            isDeleting={isDeleting}
+            setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          />
+        ) : (
+          <PageSearchAndFilter
+            store={useEnterpriseUsersStore}
+            sortableColumns={SORTABLE_COLUMNS}
+            filterableFields={FILTERABLE_FIELDS}
+            title={t("Users.title")}
+            createHref="/users/add"
+            createLabel={t("Users.create_user")}
+            searchPlaceholder={t("Users.search_users")}
+          />
+        )}
 
-      <UsersTable
-        users={users}
-        userPermissions={userPermissions}
-        onUpdateUser={handleUpdateUser}
-        currentUser={currentUser as unknown as UserType}
-        loading={isLoading}
-      />
+        <div>
+          {viewMode === "table" ? (
+            <UsersTable
+              users={sortedUsers as UserType[]}
+              isLoading={isLoading}
+              error={error as Error | null}
+              onActionClicked={onActionClicked}
+            />
+          ) : (
+            <div className="p-4">
+              <DataModelList
+                data={sortedUsers}
+                isLoading={isLoading}
+                error={error as Error | null}
+                emptyMessage={t("Users.no_users_found")}
+                renderItem={(user) => <UserCard key={user.id} user={user as User} />}
+                gridCols="3"
+              />
+            </div>
+          )}
+        </div>
 
-      <FormDialog
-        open={formDialogOpen}
-        onOpenChange={setFormDialogOpen}
-        title={t("Users.add_user")}
-        formId="user-form"
-      >
-        <UserForm
-          id="user-form"
-          onSuccess={() => {
-            setFormDialogOpen(false);
-          }}
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Users.add_new")}
+          formId="user-form"
+          loadingSave={loadingSaveUser}
+        >
+          <UserForm
+            id="user-form"
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableUser(null);
+              setLoadingSaveUser(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("Users.success.updated"),
+              });
+            }}
+          />
+        </FormDialog>
+
+        <ConfirmDelete
+          isDeleteDialogOpen={isDeleteDialogOpen}
+          setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+          isDeleting={isDeleting}
+          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          title={t("Users.confirm_delete")}
+          description={t("Users.delete_description", { count: selectedRows.length })}
         />
-      </FormDialog>
-    </DataPageLayout>
+      </DataPageLayout>
+    </div>
   );
 }
 
