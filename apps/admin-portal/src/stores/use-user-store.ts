@@ -85,6 +85,11 @@ const useUserStore = create<UserState>((set, get) => ({
 
   hasPermission: (permission) => {
     const permissions = get().permissions;
+    console.log('Checking permission in store:', {
+      requestedPermission: permission,
+      availablePermissions: permissions,
+      hasPermission: permissions.includes(permission)
+    });
     return permissions.includes(permission);
   },
 
@@ -113,11 +118,14 @@ const useUserStore = create<UserState>((set, get) => ({
 
     try {
       set({ loading: true, error: null });
+      console.log('Starting fetchUserAndProfile...');
 
       // Get the current session
       const {
         data: { session },
       } = await supabase.auth.getSession();
+
+      console.log('Session:', session ? 'Found' : 'Not found');
 
       if (!session) {
         set({
@@ -140,6 +148,8 @@ const useUserStore = create<UserState>((set, get) => ({
         .eq("id", session.user.id)
         .single();
 
+      console.log('Profile data:', profileData ? 'Found' : 'Not found');
+
       if (profileData) {
         set({ profile: profileData as ProfileType });
 
@@ -151,22 +161,31 @@ const useUserStore = create<UserState>((set, get) => ({
             .eq("id", profileData.enterprise_id)
             .single();
 
+          console.log('Enterprise data:', enterpriseData ? 'Found' : 'Not found');
+
           if (enterpriseData) {
             set({ enterprise: enterpriseData as EnterpriseType });
           }
 
           // Fetch user's permissions using the new user_role_permissions table
-          const { data: permissionsData } = await supabase
+          const { data: permissionsData, error: permissionsError } = await supabase
             .from("user_role_permissions")
             .select("permission")
             .eq("user_id", session.user.id)
             .eq("enterprise_id", profileData.enterprise_id);
+
+          console.log('Permissions fetch:', {
+            success: !permissionsError,
+            error: permissionsError?.message,
+            data: permissionsData
+          });
 
           if (permissionsData) {
             // Extract unique permissions
             const permissions = [...new Set(
               permissionsData.map(p => p.permission)
             )];
+            console.log('Setting permissions:', permissions);
             set({ permissions });
           }
         }

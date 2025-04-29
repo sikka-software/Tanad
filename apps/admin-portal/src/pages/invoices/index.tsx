@@ -23,7 +23,7 @@ import InvoicesTable from "@/modules/invoice/invoice.table";
 export default function InvoicesPage() {
   const t = useTranslations();
   const { hasPermission: canViewInvoices, isLoading: isCheckingPermission } =
-    usePermission("invoice.read");
+    usePermission("invoices.read");
 
   if (isCheckingPermission) {
     return (
