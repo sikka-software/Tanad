@@ -1565,22 +1565,45 @@
     "issue_date": "تاريخ الإصدار",
     "form": {
       "invoice_number": {
-        "label": "رقم الفاتورة"
+        "label": "رقم الفاتورة",
+        "placeholder": "أدخل رقم الفاتورة"
       },
       "client": {
-        "label": "العميل"
+        "label": "العميل",
+        "select_client": "اختر عميل",
+        "search_clients": "بحث عن عملاء...",
+        "no_clients": "لا يوجد عملاء",
+        "add_new_client": "إضافة عميل جديد"
       },
       "issue_date": {
-        "label": "تاريخ الإصدار"
+        "label": "تاريخ الإصدار",
+        "placeholder": "اختر تاريخ الإصدار"
       },
       "due_date": {
-        "label": "تاريخ الاستحقاق"
+        "label": "تاريخ الاستحقاق",
+        "placeholder": "اختر تاريخ الاستحقاق"
       },
       "total": {
         "label": "المجموع"
       },
       "status": {
-        "label": "الحالة"
+        "label": "الحالة",
+        "placeholder": "اختر حالة",
+        "draft": "مسودة",
+        "pending": "قيد الانتظار",
+        "paid": "مدفوعة",
+        "overdue": "متأخرة",
+        "cancelled": "ملغاة"
+      },
+      "subtotal": {
+        "label": "المجموع الفرعي"
+      },
+      "tax_rate": {
+        "label": "نسبة الضريبة"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظاتك"
       }
     },
     "actions": {
@@ -2826,6 +2849,10 @@
     "address": "العنوان"
   },
   "Forms": {
+    "description": {
+      "label": "الوصف",
+      "placeholder": "أدخل الوصف"
+    },
     "created_at": {
       "label": "تاريخ الإنشاء",
       "placeholder": "أدخل تاريخ الإنشاء"

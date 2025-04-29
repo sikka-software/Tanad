@@ -83,8 +83,23 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
   const [user_id, setuser_id] = useState<string | undefined>();
   const [clientsLoading, setClientsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
-  const t = useTranslations("Invoices");
+  const t = useTranslations();
   const locale = useLocale();
+
+  const form = useForm<InvoiceFormValues>({
+    resolver: zodResolver(createInvoiceSchema(t)),
+    defaultValues: {
+      client_id: "",
+      invoice_number: "",
+      issue_date: new Date(),
+      due_date: undefined,
+      status: "draft",
+      subtotal: 0,
+      tax_rate: 0,
+      notes: "",
+      items: [{ product_id: "", description: "", quantity: "1", unit_price: "0" }],
+    },
+  });
 
   useEffect(() => {
     // Get the current user ID and fetch clients
@@ -109,16 +124,13 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
         setClients(data || []);
       } catch (error) {
         console.error("Error fetching clients:", error);
-        toast.error(t("error.load_clients"));
+        toast.error(t("General.error_operation"), {
+          description: t("General.error_load_clients"),
+        });
       } finally {
         setClientsLoading(false);
       }
     };
-
-    getClients();
-  }, [t]);
-
-  useEffect(() => {
     // Fetch products
     const fetchProducts = async () => {
       setProductsLoading(true);
@@ -133,29 +145,18 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
         setProducts(data || []);
       } catch (error) {
         console.error("Error fetching products:", error);
-        toast.error("Failed to load products");
+        toast.error(t("General.error_operation"), {
+          description: t("General.error_load_products"),
+        });
       } finally {
         setProductsLoading(false);
       }
     };
 
     fetchProducts();
-  }, []);
 
-  const form = useForm<InvoiceFormValues>({
-    resolver: zodResolver(createInvoiceSchema(t)),
-    defaultValues: {
-      client_id: "",
-      invoice_number: "",
-      issue_date: new Date(),
-      due_date: undefined,
-      status: "draft",
-      subtotal: 0,
-      tax_rate: 0,
-      notes: "",
-      items: [{ product_id: "", description: "", quantity: "1", unit_price: "0" }],
-    },
-  });
+    getClients();
+  }, [t]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -229,7 +230,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
     () => [
       {
         id: "product",
-        header: t("products.product"),
+        header: t("Invoices.products.product"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -248,11 +249,11 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
                         handleProductSelection(index, value);
                       }}
                       texts={{
-                        placeholder: t("products.select_product"),
-                        searchPlaceholder: t("products.search_products"),
-                        noItems: t("products.no_products_found"),
+                        placeholder: t("Invoices.products.select_product"),
+                        searchPlaceholder: t("Invoices.products.search_products"),
+                        noItems: t("Invoices.products.no_products_found"),
                       }}
-                      addText={t("products.add_new_product")}
+                      addText={t("Invoices.products.add_new_product")}
                       onAddClick={() => setIsNewProductDialogOpen(true)}
                     />
                   </FormControl>
@@ -265,7 +266,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
       },
       {
         id: "quantity",
-        header: t("products.quantity"),
+        header: t("Invoices.products.quantity"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -286,7 +287,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
       },
       {
         id: "unit_price",
-        header: t("products.unit_price"),
+        header: t("Invoices.products.unit_price"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -314,7 +315,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
       },
       {
         id: "description",
-        header: t("description"),
+        header: t("Forms.description.label"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -324,7 +325,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
               render={({ field }) => (
                 <FormItem className="space-y-0">
                   <FormControl>
-                    <Input placeholder={t("products.product_description")} {...field} />
+                    <Input placeholder={t("Forms.description.placeholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -335,7 +336,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
       },
       {
         id: "subtotal",
-        header: t("products.subtotal"),
+        header: t("Invoices.products.subtotal"),
         cell: ({ row }: any) => {
           const index = row.index;
           return (
@@ -363,9 +364,9 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
                 variant="ghost"
                 size="sm"
                 onClick={() => remove(index)}
-                className="h-8 w-8 p-0"
+                className="size-8 p-0"
               >
-                <Trash2 className="h-4 w-4 text-red-500" />
+                <Trash2 className="size-4 text-red-500" />
               </Button>
             )
           );
@@ -383,17 +384,25 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
     getCoreRowModel: getCoreRowModel(),
   });
 
+  if (typeof window !== "undefined") {
+    (window as any).invoiceForm = form;
+  }
+
   return (
     <>
       <Form {...form}>
-        <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          id={id || "invoice-form"}
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="client_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("client")} *</FormLabel>
+                  <FormLabel>{t("Invoices.form.client.label")} *</FormLabel>
                   <FormControl>
                     <ComboboxAdd
                       data={clientOptions}
@@ -401,11 +410,11 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
                       defaultValue={field.value}
                       onChange={(value) => field.onChange(value || null)}
                       texts={{
-                        placeholder: t("select_client"),
-                        searchPlaceholder: t("search_clients"),
-                        noItems: t("no_clients"),
+                        placeholder: t("Invoices.form.client.select_client"),
+                        searchPlaceholder: t("Invoices.form.client.search_clients"),
+                        noItems: t("Invoices.form.client.no_clients"),
                       }}
-                      addText={t("add_new_client")}
+                      addText={t("Invoices.form.client.add_new_client")}
                       onAddClick={() => setIsDialogOpen(true)}
                     />
                   </FormControl>
@@ -419,9 +428,9 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
               name="invoice_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("invoice_number")} *</FormLabel>
+                  <FormLabel>{t("Invoices.form.invoice_number.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("enter_invoice_number")} {...field} />
+                    <Input placeholder={t("Invoices.form.invoice_number.placeholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -435,7 +444,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
               name="subtotal"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("subtotal")}</FormLabel>
+                  <FormLabel>{t("Invoices.form.subtotal.label")}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -455,7 +464,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
               name="tax_rate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("tax_rate")} (%)</FormLabel>
+                  <FormLabel>{t("Invoices.form.tax_rate.label")} (%)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -481,12 +490,12 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
               name="issue_date"
               render={({ field: { value, onChange, ...field } }) => (
                 <FormItem>
-                  <FormLabel>{t("issue_date")} *</FormLabel>
+                  <FormLabel>{t("Invoices.form.issue_date.label")} *</FormLabel>
                   <FormControl>
                     <DatePicker
                       date={value}
                       onSelect={onChange}
-                      placeholder={t("select_issue_date")}
+                      placeholder={t("Invoices.form.issue_date.placeholder")}
                     />
                   </FormControl>
                   <FormMessage />
@@ -499,12 +508,12 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
               name="due_date"
               render={({ field: { value, onChange, ...field } }) => (
                 <FormItem>
-                  <FormLabel>{t("due_date")} *</FormLabel>
+                  <FormLabel>{t("Invoices.form.due_date.label")} *</FormLabel>
                   <FormControl>
                     <DatePicker
                       date={value}
                       onSelect={onChange}
-                      placeholder={t("select_due_date")}
+                      placeholder={t("Invoices.form.due_date.placeholder")}
                     />
                   </FormControl>
                   <FormMessage />
@@ -518,7 +527,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
             name="status"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("status")} *</FormLabel>
+                <FormLabel>{t("Invoices.form.status.label")} *</FormLabel>
                 <Select
                   defaultValue={field.value}
                   onValueChange={field.onChange}
@@ -526,15 +535,15 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder={t("select_status")} />
+                      <SelectValue placeholder={t("Invoices.form.status.placeholder")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="draft">{t("status.draft")}</SelectItem>
-                    <SelectItem value="pending">{t("status.pending")}</SelectItem>
-                    <SelectItem value="paid">{t("status.paid")}</SelectItem>
-                    <SelectItem value="overdue">{t("status.overdue")}</SelectItem>
-                    <SelectItem value="cancelled">{t("status.cancelled")}</SelectItem>
+                    <SelectItem value="draft">{t("Invoices.form.status.draft")}</SelectItem>
+                    <SelectItem value="pending">{t("Invoices.form.status.pending")}</SelectItem>
+                    <SelectItem value="paid">{t("Invoices.form.status.paid")}</SelectItem>
+                    <SelectItem value="overdue">{t("Invoices.form.status.overdue")}</SelectItem>
+                    <SelectItem value="cancelled">{t("Invoices.form.status.cancelled")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -545,7 +554,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
           {/* Products Section with Table */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">{t("products.title")}</h3>
+              <h3 className="text-lg font-medium">{t("Invoices.products.title")}</h3>
               <Button
                 type="button"
                 variant="outline"
@@ -554,8 +563,8 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
                   append({ product_id: "", description: "", quantity: "1", unit_price: "" })
                 }
               >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {t("products.add_product")}
+                <PlusCircle className="mr-2 size-4" />
+                {t("Invoices.products.add_product")}
               </Button>
             </div>
 
@@ -600,9 +609,9 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("notes")}</FormLabel>
+                <FormLabel>{t("Invoices.form.notes.label")}</FormLabel>
                 <FormControl>
-                  <Textarea placeholder={t("enter_notes")} {...field} />
+                  <Textarea placeholder={t("Invoices.form.notes.placeholder")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

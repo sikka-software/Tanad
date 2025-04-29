@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
@@ -36,6 +37,10 @@ export default function AddInvoicePage() {
       const tax_amount = (subtotal * data.tax_rate) / 100;
       const total = subtotal + tax_amount;
 
+      // Format dates to ISO string (YYYY-MM-DD)
+      const formattedIssueDate = format(data.issue_date, "yyyy-MM-dd");
+      const formattedDueDate = format(data.due_date, "yyyy-MM-dd");
+
       // First create the invoice
       const { data: invoice, error: invoiceError } = await supabase
         .from("invoices")
@@ -43,8 +48,8 @@ export default function AddInvoicePage() {
           {
             client_id: data.client_id,
             invoice_number: data.invoice_number.trim(),
-            issue_date: data.issue_date,
-            due_date: data.due_date,
+            issue_date: formattedIssueDate,
+            due_date: formattedDueDate,
             status: data.status,
             subtotal: subtotal,
             tax_rate: data.tax_rate,
