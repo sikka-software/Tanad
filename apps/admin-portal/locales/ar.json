@@ -3138,6 +3138,22 @@
     "add_new": "أدوار جديدة",
     "search_roles": "بحث عن الأدوار",
     "role_details": "تفاصيل الأدوار",
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم الأدوار",
+        "required": "الاسم مطلوب",
+        "format": "يجب أن يحتوي اسم الدور على أحرف صغيرة وأرقام وشرطات سفلية فقط"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل وصف الأدوار",
+        "required": "الوصف مطلوب"
+      },
+      "permissions": {
+        "label": "الصلاحيات"
+      }
+    },
     "roles": {
       "superadmin": "مدير النظام",
       "admin": "مدير المؤسسة",

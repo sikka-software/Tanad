@@ -211,7 +211,7 @@ export default function RolesPage() {
           loadingSave={loadingSaveRole}
         >
           <RoleForm
-            id={actionableRole?.id}
+            formId={"role-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableRole(null);
