@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
+  bulkDeleteProducts,
   createProduct,
   deleteProduct,
   fetchProductById,
@@ -77,30 +78,11 @@ export function useDeleteProduct() {
     },
   });
 }
-
-// Hook to delete multiple products
 export function useBulkDeleteProducts() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/products/bulk-delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw error;
-      }
-
-      return response.json();
-    },
+    mutationFn: bulkDeleteProducts,
     onSuccess: () => {
-      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
     },
   });

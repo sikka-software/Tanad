@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { inArray } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
-import { products as productsTable, quoteItems } from "@/db/schema";
+import { products as productsTable, quote_items as quoteItems } from "@/db/schema";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {

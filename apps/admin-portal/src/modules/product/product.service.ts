@@ -1,7 +1,7 @@
 import { Product } from "@/modules/product/product.type";
 
 export async function fetchProducts(): Promise<Product[]> {
-  const response = await fetch("/api/products");
+  const response = await fetch("/api/resources/products");
   if (!response.ok) {
     throw new Error("Failed to fetch products");
   }
@@ -9,7 +9,7 @@ export async function fetchProducts(): Promise<Product[]> {
 }
 
 export async function fetchProductById(id: string): Promise<Product> {
-  const response = await fetch(`/api/products/${id}`);
+  const response = await fetch(`/api/resources/products/${id}`);
   if (!response.ok) {
     throw new Error("Failed to fetch product");
   }
@@ -18,7 +18,7 @@ export async function fetchProductById(id: string): Promise<Product> {
 
 export async function createProduct(product: Omit<Product, "id" | "created_at">): Promise<Product> {
   try {
-    const response = await fetch("/api/products", {
+    const response = await fetch("/api/resources/products", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export async function updateProduct(
   id: string,
   product: Partial<Omit<Product, "id" | "created_at">>,
 ): Promise<Product> {
-  const response = await fetch(`/api/products/${id}`, {
+  const response = await fetch(`/api/resources/products/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -53,10 +53,21 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  const response = await fetch(`/api/products/${id}`, {
+  const response = await fetch(`/api/resources/products/${id}`, {
     method: "DELETE",
   });
   if (!response.ok) {
     throw new Error("Failed to delete product");
+  }
+}
+
+export async function bulkDeleteProducts(ids: string[]): Promise<void> {
+  const response = await fetch("/api/resource/products", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete products");
   }
 }
