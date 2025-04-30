@@ -21,7 +21,7 @@ import { useUsers, useBulkDeleteUsers } from "@/modules/user/user.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/user/user.options";
 import useEnterpriseUsersStore from "@/modules/user/user.store";
 import UsersTable, { UserType } from "@/modules/user/user.table";
-import { User, UserUpdateData } from "@/modules/user/user.type";
+import { User } from "@/modules/user/user.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function UsersPage() {
@@ -31,8 +31,6 @@ export default function UsersPage() {
   const canReadUsers = useUserStore((state) => state.hasPermission("users.read"));
   const canCreateUsers = useUserStore((state) => state.hasPermission("users.create"));
 
-  const loadingSaveUser = useEnterpriseUsersStore((state) => state.isLoading);
-  const setLoadingSaveUser = useEnterpriseUsersStore((state) => state.setIsLoading);
   const viewMode = useEnterpriseUsersStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEnterpriseUsersStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useEnterpriseUsersStore((state) => state.setIsDeleteDialogOpen);
@@ -48,12 +46,12 @@ export default function UsersPage() {
   const getFilteredUsers = useEnterpriseUsersStore((state) => state.getFilteredData);
   const getSortedUsers = useEnterpriseUsersStore((state) => state.getSortedData);
 
-  const { data: users, isLoading, error } = useUsers();
+  const { data: users, isLoading, error, refetch: refetchUsers } = useUsers();
   const { mutateAsync: deleteUsers, isPending: isDeleting } = useBulkDeleteUsers();
   const { createDeleteHandler } = useDeleteHandler();
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableUser, setActionableUser] = useState<UserUpdateData | null>(null);
+  const [actionableUser, setActionableUser] = useState<User | null>(null);
 
   const handleConfirmDelete = createDeleteHandler(deleteUsers, {
     loading: "Users.loading.deleting",
@@ -62,11 +60,12 @@ export default function UsersPage() {
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
+      refetchUsers();
     },
   });
 
   const filteredUsers = useMemo(() => {
-    return getFilteredUsers(users || []);
+    return getFilteredUsers((users as User[]) || []);
   }, [users, getFilteredUsers, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedUsers = useMemo(() => {
@@ -74,9 +73,10 @@ export default function UsersPage() {
   }, [filteredUsers, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const onActionClicked = async (action: string, rowId: string) => {
+    const userToActOn = users?.find((user) => user.id === rowId) || null;
     if (action === "edit") {
+      setActionableUser(userToActOn as User | null);
       setIsFormDialogOpen(true);
-      setActionableUser(users?.find((user) => user.id === rowId) || null);
     }
 
     if (action === "delete") {
@@ -85,9 +85,20 @@ export default function UsersPage() {
     }
   };
 
+  const handleAddClick = () => {
+    if (canCreateUsers) {
+      setActionableUser(null);
+      setIsFormDialogOpen(true);
+    } else {
+      toast.error(t("General.no_permission"));
+    }
+  };
+
   if (!canReadUsers) {
     return <NoPermission />;
   }
+
+  const formDialogTitle = actionableUser ? t("Users.edit_user") : t("Users.add_new");
 
   return (
     <div>
@@ -106,7 +117,7 @@ export default function UsersPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Users.title")}
-            onAddClick={() => router.push("/users/add")}
+            onAddClick={handleAddClick}
             createLabel={t("Users.add_new")}
             searchPlaceholder={t("Users.search_users")}
           />
@@ -122,12 +133,12 @@ export default function UsersPage() {
             />
           ) : (
             <div className="p-4">
-              <DataModelList
+              <DataModelList<User>
                 data={sortedUsers}
                 isLoading={isLoading}
                 error={error as Error | null}
                 emptyMessage={t("Users.no_users_found")}
-                renderItem={(user) => <UserCard key={user.id} user={user as User} />}
+                renderItem={(user) => <UserCard key={user.id} user={user} />}
                 gridCols="3"
               />
             </div>
@@ -137,19 +148,16 @@ export default function UsersPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Users.add_new")}
+          title={formDialogTitle}
           formId="user-form"
-          loadingSave={loadingSaveUser}
         >
           <UserForm
             id="user-form"
+            initialData={actionableUser}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableUser(null);
-              setLoadingSaveUser(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Users.success.updated"),
-              });
+              refetchUsers();
             }}
           />
         </FormDialog>
