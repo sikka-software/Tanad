@@ -112,15 +112,18 @@ export function useCreateRole() {
   const queryClient = useQueryClient();
 
   return useMutation<Role, Error, RoleCreateData & { enterprise_id: string }>({
-    // Add enterprise_id to input type as it's needed for user_roles
     mutationFn: async (data: RoleCreateData & { enterprise_id: string }) => {
-      // 1. Create the role first
+      if (!data.enterprise_id) {
+        throw new Error("Enterprise ID is required to create a custom role.");
+      }
+      // 1. Create the role first, including the enterprise_id
       const { data: roleData, error: roleError } = await supabase
         .from("roles")
         .insert({
           name: data.name,
           description: data.description,
-          // is_system defaults to false, enterprise_id is NOT on roles table
+          enterprise_id: data.enterprise_id, // Insert the enterprise_id
+          is_system: false, // Explicitly set is_system to false
         })
         .select()
         .single();
@@ -149,9 +152,12 @@ export function useCreateRole() {
 
       return roleData as Role;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles if needed
+    onSuccess: (_, variables) => {
+      // Invalidate lists for the specific enterprise and potentially system roles
+      queryClient.invalidateQueries({ queryKey: roleKeys.list(variables.enterprise_id) });
+      queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
+      // Also invalidate the general custom roles list if used elsewhere
+      queryClient.invalidateQueries({ queryKey: [...roleKeys.lists(), "custom"] });
       toast.success("Role created successfully");
     },
     onError: (error) => {
@@ -428,16 +434,25 @@ export function useSystemRoles() {
   });
 }
 
-// Hook to fetch all non-system (custom) roles
+// Hook to fetch all non-system (custom) roles for the current enterprise
 export function useCustomRoles() {
+  const { enterprise } = useUserStore(); // Get current enterprise
+  const enterpriseId = enterprise?.id;
+
   return useQuery<RoleWithPermissions[], Error>({
-    queryKey: [...roleKeys.lists(), "custom"], // Specific key for custom roles
+    queryKey: [...roleKeys.lists(), "custom", { enterpriseId }], // Key includes enterpriseId
     queryFn: async () => {
-      // 1. Fetch non-system roles
+      if (!enterpriseId) {
+        console.warn("useCustomRoles: No enterprise selected, returning empty array.");
+        return [];
+      }
+
+      // 1. Fetch non-system roles for the current enterprise
       const { data: rolesData, error: rolesError } = await supabase
         .from("roles")
         .select("*")
-        .eq("is_system", false); // Filter for custom roles
+        .eq("is_system", false) // Filter for custom roles
+        .eq("enterprise_id", enterpriseId); // Filter by current enterprise
 
       if (rolesError) throw rolesError;
       const roles = (rolesData || []) as Role[];
@@ -470,6 +485,7 @@ export function useCustomRoles() {
 
       return rolesWithPermissions;
     },
+    enabled: !!enterpriseId, // Only run if enterpriseId is available
     // Consider adding staleTime if roles don't change often
     // staleTime: 5 * 60 * 1000, // 5 minutes
   });

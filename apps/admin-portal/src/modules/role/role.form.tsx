@@ -61,7 +61,7 @@ interface RoleFormProps {
 export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: RoleFormProps) {
   const t = useTranslations();
   const { enterprise } = useUserStore();
-  const enterpriseId = enterprise?.id as string;
+  const enterpriseId = enterprise?.id;
   const { mutateAsync: createRole, isPending: isCreating } = useCreateRole();
   const { mutateAsync: updateRole, isPending: isUpdating } = useUpdateRole();
   const { data: permissions = [] } = usePermissions();
@@ -127,22 +127,28 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
 
   const onSubmit = async (formData: FormData) => {
     try {
-      if (editMode) {
+      if (editMode && id) { // Ensure id exists for edit mode
         await updateRole({
-          id: id as string,
+          id: id,
           data: {
             name: formData.name,
             description: formData.description,
             permissions: selectedPermissions,
+            // Note: enterprise_id cannot be updated for a role
           },
         });
-      } else {
+      } else if (!editMode && enterpriseId) { // Ensure enterpriseId exists for create mode
         await createRole({
           name: formData.name,
           description: formData.description,
           permissions: selectedPermissions,
-          enterprise_id: enterpriseId,
+          enterprise_id: enterpriseId, // Pass enterpriseId
         });
+      } else {
+        // Handle missing id for edit or missing enterpriseId for create
+        console.error("Missing ID for edit mode or Enterprise ID for create mode");
+        // Optionally show an error toast to the user
+        return; // Prevent submission
       }
       onSuccess?.();
     } catch (error) {

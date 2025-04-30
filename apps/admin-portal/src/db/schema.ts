@@ -1283,8 +1283,16 @@ export const roles = pgTable(
     name: text().notNull(),
     description: text(),
     is_system: boolean().default(false).notNull(),
+    enterprise_id: uuid().references(() => enterprises.id, { onDelete: "cascade" }),
   },
-  (table) => [unique("roles_name_key").on(table.name)],
+  (table) => [
+    unique("roles_name_key").on(table.name),
+    index("idx_roles_enterprise_id").using("btree", table.enterprise_id),
+    check(
+      "roles_enterprise_id_check",
+      sql`(is_system = true AND enterprise_id IS NULL) OR (is_system = false AND enterprise_id IS NOT NULL)`,
+    ),
+  ],
 );
 
 export const permissions = pgTable(
@@ -1300,7 +1308,7 @@ export const permissions = pgTable(
       foreignColumns: [roles.id],
       name: "permissions_role_id_fkey",
     }).onDelete("cascade"),
-    index("permissions_role_id_idx").using("btree", table.role_id.asc().nullsLast().op("uuid_ops"))
+    index("permissions_role_id_idx").using("btree", table.role_id.asc().nullsLast().op("uuid_ops")),
   ],
 );
 
