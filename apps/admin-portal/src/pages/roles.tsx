@@ -14,9 +14,9 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { FormDialog } from "@/components/ui/form-dialog";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import { usePermission } from "@/hooks/use-permission";
 import RoleCard from "@/modules/role/role.card";
 import { RoleForm } from "@/modules/role/role.form";
 import {
@@ -33,6 +33,10 @@ import useUserStore from "@/stores/use-user-store";
 
 export default function RolesPage() {
   const t = useTranslations();
+
+  const canReadRoles = useUserStore((state) => state.hasPermission("roles.read"));
+  const canCreateRoles = useUserStore((state) => state.hasPermission("roles.create"));
+
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableRole, setActionableRole] = useState<(RoleUpdateData & { id?: string }) | null>(
     null,
@@ -51,11 +55,7 @@ export default function RolesPage() {
   const filterCaseSensitive = useRoleStore((state) => state.filterCaseSensitive);
   const getFilteredRoles = useRoleStore((state) => state.getFilteredData);
 
-  const {
-    data: customRoles,
-    isLoading: loadingCustomRoles,
-    error: customError,
-  } = useCustomRoles();
+  const { data: customRoles, isLoading: loadingCustomRoles, error: customError } = useCustomRoles();
   const { data: systemRoles, isLoading: loadingSystemRoles, error: systemError } = useSystemRoles();
 
   const allRoles = useMemo(() => {
@@ -67,8 +67,7 @@ export default function RolesPage() {
 
   const isLoading = loadingCustomRoles || loadingSystemRoles;
   const error = customError || systemError;
-  const { hasPermission: canViewRoles, isLoading: isCheckingPermission } =
-    usePermission("roles.read");
+
   const { mutate: duplicateRole } = useDuplicateRole();
   const { mutateAsync: deleteRoles, isPending: isDeleting } = useBulkDeleteRoles();
   const { createDeleteHandler } = useDeleteHandler();
@@ -140,16 +139,8 @@ export default function RolesPage() {
 
   const userRoleName = allRoles.find((role) => role.id === membership?.role_id)?.name;
 
-  if (!canViewRoles) {
-    return (
-      <div className="flex h-screen items-center justify-center p-4">
-        <Alert variant="destructive" className="max-w-md">
-          <Shield className="h-4 w-4" />
-          <AlertTitle>{t("General.no_permission")}</AlertTitle>
-          <AlertDescription>{t("General.no_permission_description")}</AlertDescription>
-        </Alert>
-      </div>
-    );
+  if (!canReadRoles) {
+    return <NoPermission />;
   }
 
   return (
@@ -170,8 +161,12 @@ export default function RolesPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Roles.title")}
             onAddClick={() => {
-              setActionableRole(null);
-              setIsFormDialogOpen(true);
+              if (canCreateRoles) {
+                setActionableRole(null);
+                setIsFormDialogOpen(true);
+              } else {
+                return undefined;
+              }
             }}
             createLabel={t("Roles.create_role")}
             searchPlaceholder={t("Roles.search_roles")}
@@ -180,10 +175,10 @@ export default function RolesPage() {
 
         <div className="p-4">
           {userRoleName && (
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground text-sm">Your role:</span>
+            <div className="mb-4 flex items-center gap-2">
+              <span className="text-muted-foreground text-sm">{t("Roles.your_role")}:</span>
               <Badge variant="outline" className="text-sm">
-                {userRoleName}
+                {t(`Roles.predefined.${userRoleName.toLowerCase()}.title`)}
               </Badge>
             </div>
           )}
@@ -215,6 +210,7 @@ export default function RolesPage() {
             formId={"role-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
+              setLoadingSaveRole(false);
               setActionableRole(null);
               toast.success(t("General.successful_operation"), {
                 description: actionableRole?.id

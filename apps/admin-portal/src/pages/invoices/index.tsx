@@ -1,4 +1,3 @@
-import { Shield } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -14,7 +13,6 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import { usePermission } from "@/hooks/use-permission";
 import InvoiceCard from "@/modules/invoice/invoice.card";
 import { useInvoices, useBulkDeleteInvoices } from "@/modules/invoice/invoice.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/invoice/invoice.options";

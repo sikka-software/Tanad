@@ -158,7 +158,6 @@ export function useCreateRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
       // Also invalidate the general custom roles list if used elsewhere
       queryClient.invalidateQueries({ queryKey: [...roleKeys.lists(), "custom"] });
-      toast.success("Role created successfully");
     },
     onError: (error) => {
       console.error("Error creating role:", error);
@@ -216,7 +215,6 @@ export function useUpdateRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles
-      toast.success("Role updated successfully");
     },
     onError: (error) => {
       console.error("Error updating role:", error);
@@ -251,7 +249,6 @@ export function useDeleteRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles
-      toast.success("Role deleted successfully");
     },
     onError: (error) => {
       console.error("Error deleting role:", error);
@@ -295,7 +292,6 @@ export function useBulkDeleteRoles() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles
-      toast.success("Selected roles deleted successfully");
     },
     onError: (error) => {
       console.error("Error deleting roles:", error);
@@ -379,7 +375,6 @@ export function useDuplicateRole() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
-      toast.success("Role duplicated successfully");
     },
     onError: (error) => {
       console.error("Error duplicating role:", error);

@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Shield } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -28,24 +28,27 @@ import { Textarea } from "@/components/ui/textarea";
 import useUserStore from "@/stores/use-user-store";
 
 import { usePermissions } from "../permission/permission.hooks";
-import { useCreateRole, useUpdateRole } from "./role.hooks";
 // Assuming Permission type looks like { id: string; name: string }
 // import type { Permission } from "../permission/permission.type";
-import type { Permission } from "../permission/permission.hooks"; // Import the correct type
+import type { Permission } from "../permission/permission.hooks";
+import { useCreateRole, useUpdateRole } from "./role.hooks";
+import useRoleStore from "./role.store";
+// Import the correct type
 import type { RoleCreateData, RoleUpdateData } from "./role.type";
 
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Name is required")
-    .regex(/^[a-z0-9_]+$/, {
-      message: "Role name must contain only lowercase letters, numbers, and underscores",
-    }),
-  description: z.string().nullable(),
-  permissions: z.array(z.string()),
-});
+const createRoleSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z
+      .string()
+      .min(1, t("Roles.form.name.required"))
+      .regex(/^[a-z0-9_]+$/, {
+        message: "Role name must contain only lowercase letters, numbers, and underscores",
+      }),
+    description: z.string().nullable(),
+    permissions: z.array(z.string()),
+  });
 
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<ReturnType<typeof createRoleSchema>>;
 
 interface RoleFormProps {
   id?: string;
@@ -61,7 +64,8 @@ interface RoleFormProps {
 
 export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: RoleFormProps) {
   const t = useTranslations();
-  const { enterprise } = useUserStore();
+  const locale = useLocale();
+  const enterprise = useUserStore((state) => state.enterprise);
   const enterpriseId = enterprise?.id;
   const { mutateAsync: createRole, isPending: isCreating } = useCreateRole();
   const { mutateAsync: updateRole, isPending: isUpdating } = useUpdateRole();
@@ -69,6 +73,8 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>(
     defaultValues?.permissions || [],
   );
+  const isLoading = useRoleStore((state) => state.isLoading);
+  const setIsLoading = useRoleStore((state) => state.setIsLoading);
 
   // Group permissions by resource (first part of 'resource.action' from permission.id)
   const permissionsByCategory = permissions.reduce<
@@ -86,7 +92,7 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
   }, {});
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(createRoleSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
       description: defaultValues?.description || null,
@@ -117,9 +123,7 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
         return current.filter((pId) => !categoryPermissions.some((cp) => cp.id === pId));
       } else {
         // Add permissions from this category that are not already selected (using permission.id)
-        const toAdd = categoryPermissions
-          .filter((p) => !current.includes(p.id))
-          .map((p) => p.id); // Add the resource.action string (permission.id)
+        const toAdd = categoryPermissions.filter((p) => !current.includes(p.id)).map((p) => p.id); // Add the resource.action string (permission.id)
         return [...current, ...toAdd];
       }
     });
@@ -130,7 +134,9 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
     const permissionsToSubmit = selectedPermissions;
 
     try {
-      if (editMode && id) { // Ensure id exists for edit mode
+      setIsLoading(true);
+      if (editMode && id) {
+        // Ensure id exists for edit mode
         await updateRole({
           id: id,
           data: {
@@ -140,7 +146,8 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
             // Note: enterprise_id cannot be updated for a role
           },
         });
-      } else if (!editMode && enterpriseId) { // Ensure enterpriseId exists for create mode
+      } else if (!editMode && enterpriseId) {
+        // Ensure enterpriseId exists for create mode
         await createRole({
           name: formData.name,
           description: formData.description,
@@ -156,6 +163,7 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
       onSuccess?.();
     } catch (error) {
       console.error("Error submitting role form:", error);
+      setIsLoading(false);
     }
   };
 
@@ -171,12 +179,12 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
               <FormControl>
                 <Input
                   {...field}
-                  placeholder={t("Roles.form.name_placeholder")}
+                  placeholder={t("Roles.form.name.placeholder")}
                   disabled={editMode}
                 />
               </FormControl>
               {field.value && !/^[a-z0-9_]+$/.test(field.value) && (
-                <p className="text-destructive mt-1 text-xs">{t("Roles.form.name_format")}</p>
+                <p className="text-destructive mt-1 text-xs">{t("Roles.form.name.format")}</p>
               )}
               <FormMessage />
             </FormItem>
@@ -203,14 +211,14 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
 
         <div className="space-y-4">
           <FormLabel>{t("Roles.form.permissions.label")}</FormLabel>
-          <ScrollArea className="h-[300px] pe-4">
+          <ScrollArea className="h-[300px] pe-4" dir={locale === "ar" ? "rtl" : "ltr"}>
             <Accordion type="multiple" className="w-full">
               {Object.entries(permissionsByCategory).map(([category, perms]) => (
                 <AccordionItem key={category} value={category}>
                   <AccordionTrigger className="py-2">
                     <div className="flex w-full items-center justify-between pe-4">
                       {/* Display the capitalized category name */}
-                      <span>{category}</span>
+                      <span>{t(`${category}.title`)}</span>
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           // Check if all permissions in this category are selected by permission.id
@@ -235,7 +243,8 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
                         const nameParts = permission.id.split("."); // Split permission.id
                         const actionName = nameParts.length > 1 ? nameParts[1] : permission.id;
                         // Capitalize action for display
-                        const displayActionName = actionName.charAt(0).toUpperCase() + actionName.slice(1);
+                        const displayActionName =
+                          actionName.charAt(0).toUpperCase() + actionName.slice(1);
 
                         return (
                           <div key={permission.id} className="flex items-start space-x-2">
@@ -246,12 +255,12 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
                               onCheckedChange={() => togglePermission(permission.id)}
                               id={`permission-${permission.id}`} // Unique ID for the checkbox using the action string
                             />
-                             <label
+                            <label
                               htmlFor={`permission-${permission.id}`} // Associate label with checkbox
-                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
                               {/* Display the capitalized action name (e.g., Create, Read) */}
-                              {displayActionName}
+                              {t(`Roles.permissions.${displayActionName.toLowerCase()}`)}
                             </label>
                           </div>
                         );

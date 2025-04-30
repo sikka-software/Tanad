@@ -207,7 +207,6 @@ export function useCreateRole() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
-      toast.success("Role created successfully");
     },
     onError: (error) => {
       console.error("Error creating role:", error);
@@ -240,7 +239,6 @@ export function useUpdateRole() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
-      toast.success("Role updated successfully");
     },
     onError: (error) => {
       console.error("Error updating role:", error);
@@ -261,7 +259,6 @@ export function useDeleteRole() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
-      toast.success("Role deleted successfully");
     },
     onError: (error) => {
       console.error("Error deleting role:", error);
@@ -308,7 +305,6 @@ export function useUpdateRolePermissions() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: permissionKeys.lists() });
-      toast.success("Role permissions updated successfully");
     },
     onError: (error) => {
       console.error("Error updating role permissions:", error);

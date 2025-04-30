@@ -1,5 +1,5 @@
 import { MoreHorizontal } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-import { usePermission } from "@/hooks/use-permission";
+import { app_permission } from "@/db/schema";
+import useUserStore from "@/stores/use-user-store";
 
 import type { Role, RoleWithPermissions } from "./role.type";
 
@@ -21,19 +24,76 @@ interface RoleCardProps {
   disableActions?: boolean;
 }
 
+const getAllPermissionsByCategory = () => {
+  const grouped: Record<string, string[]> = {};
+  app_permission.enumValues.forEach((perm) => {
+    const [category] = perm.split(".");
+    if (!grouped[category]) {
+      grouped[category] = [];
+    }
+    grouped[category].push(perm);
+  });
+  return grouped;
+};
+
+const allPermissionsByCategory = getAllPermissionsByCategory();
+
 export default function RoleCard({ role, onActionClick, disableActions = false }: RoleCardProps) {
   const t = useTranslations();
-  const { hasPermission: canDeleteRoles } = usePermission("roles.delete");
-  const { hasPermission: canUpdateRoles } = usePermission("roles.update");
-  const { hasPermission: canCreateRoles } = usePermission("roles.create");
+  const locale = useLocale();
+
+  const canUpdateRoles = useUserStore((state) => state.hasPermission("roles.update"));
+  const canDuplicateRoles = useUserStore((state) => state.hasPermission("roles.duplicate"));
+  const canDeleteRoles = useUserStore((state) => state.hasPermission("roles.delete"));
+
+  const assignedPermissionsByCategory = (role.permissions || []).reduce(
+    (acc, perm) => {
+      const [category] = perm.split(".");
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(perm);
+      return acc;
+    },
+    {} as Record<string, string[]>,
+  );
+
+  const predefinedRoles = [
+    {
+      id: "superadmin",
+      name: t("Roles.predefined.superadmin.title"),
+      description: t("Roles.predefined.superadmin.description"),
+    },
+    {
+      id: "admin",
+      name: t("Roles.predefined.admin.title"),
+      description: t("Roles.predefined.admin.description"),
+    },
+    {
+      id: "human_resources",
+      name: t("Roles.predefined.human_resources.title"),
+      description: t("Roles.predefined.human_resources.description"),
+    },
+  ];
 
   return (
     <Card className="relative">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-lg">{role.name}</CardTitle>
-            <CardDescription>{role.description || t("Roles.no_description")}</CardDescription>
+            <CardTitle className="text-lg">
+              {role.is_system ? predefinedRoles.find((r) => r.id === role.name)?.name : role.name}
+              {role.is_system && (
+                <Badge variant="secondary" className="ms-2">
+                  {t("Roles.predefined.system")}
+                </Badge>
+              )}
+            </CardTitle>
+            <CardDescription>
+              {role.is_system
+                ? predefinedRoles.find((r) => r.id === role.name)?.description
+                : role.description || null}
+            </CardDescription>
           </div>
           {!disableActions && (
             <DropdownMenu>
@@ -48,7 +108,7 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
                     {t("General.edit")}
                   </DropdownMenuItem>
                 )}
-                {canCreateRoles && (
+                {canDuplicateRoles && (
                   <DropdownMenuItem onClick={() => onActionClick?.("duplicate", role.id)}>
                     {t("General.duplicate")}
                   </DropdownMenuItem>
@@ -69,15 +129,45 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
       <CardContent>
         <div className="space-y-2">
           <div>
-            <h4 className="text-sm font-medium">{t("Roles.permissions")}</h4>
-            <div className="text-muted-foreground flex flex-wrap gap-1 text-sm">
-              {role.permissions && role.permissions.length > 0 ? (
-                role.permissions.map((perm) => (
-                  <Badge key={perm} variant="secondary" className="font-normal">
-                    {perm}
-                  </Badge>
-                ))
+            <h4 className="text-sm font-medium">{t("Roles.permissions.title")}</h4>
+            <div className="text-muted-foreground flex flex-wrap gap-1 pt-1 text-sm">
+              {Object.keys(allPermissionsByCategory).length > 0 ? (
+                Object.entries(allPermissionsByCategory)
+                  .filter(([category]) => assignedPermissionsByCategory[category]?.length > 0)
+                  .map(([category]) => {
+                    const assignedPerms = assignedPermissionsByCategory[category] || [];
+                    const assignedCount = assignedPerms.length;
+
+                    const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
+
+                    return (
+                      <Popover key={category}>
+                        <PopoverTrigger asChild>
+                          <Badge variant="secondary" className="cursor-pointer font-normal">
+                            {t(`${displayCategory}.title`)} ({assignedCount})
+                          </Badge>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-fit p-0" dir={locale === "ar" ? "rtl" : "ltr"}>
+                          <ScrollArea className="h-auto max-h-48">
+                            <div className="p-4">
+                              <h5 className="mb-2 text-sm leading-none font-medium">
+                                {t(`${displayCategory}.title`)}
+                              </h5>
+                              <ul className="space-y-1 text-center text-xs">
+                                {assignedPerms.map((perm) => (
+                                  <li key={perm}>{t(`Roles.permissions.${perm.split(".")[1]}`)}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          </ScrollArea>
+                        </PopoverContent>
+                      </Popover>
+                    );
+                  })
               ) : (
+                <span>{t("Roles.no_permissions")}</span>
+              )}
+              {(!role.permissions || role.permissions.length === 0) && (
                 <span>{t("Roles.no_permissions")}</span>
               )}
             </div>
