@@ -27,8 +27,8 @@ const modelMap: Record<string, ModelConfig> = {
   expenses: { table: schema.expenses, query: db.query.expenses, idField: "id" },
   departments: { table: schema.departments, query: db.query.departments, idField: "id" },
   departmentLocations: {
-    table: schema.departmentLocations,
-    query: db.query.departmentLocations,
+    table: schema.department_locations,
+    query: db.query.department_locations,
     idField: "id",
   },
   offices: { table: schema.offices, query: db.query.offices, idField: "id" },

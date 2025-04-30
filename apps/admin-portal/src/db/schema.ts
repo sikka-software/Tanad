@@ -1351,6 +1351,7 @@ export const profiles = pgTable(
     email: text(),
     full_name: text(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
+    user_settings: jsonb(),
   },
   (table) => [
     foreignKey({
