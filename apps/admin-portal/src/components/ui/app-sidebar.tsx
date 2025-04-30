@@ -23,7 +23,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
   SidebarMenuItem,
   SidebarRail,
   useSidebar,
@@ -65,10 +64,7 @@ export function AppSidebar() {
     groups: new Set(),
     menus: new Set(),
   });
-  const user = useUserStore((state) => state.user);
-  const profile = useUserStore((state) => state.profile);
-  const enterprise = useUserStore((state) => state.enterprise);
-  const signOut = useUserStore((state) => state.signOut);
+  const { user, profile, enterprise, membership, signOut, hasPermission } = useUserStore();
 
   // Store and clear expanded states when sidebar collapses
   useEffect(() => {
@@ -112,11 +108,9 @@ export function AppSidebar() {
     [state, isMobile, setSidebarOpen],
   );
 
-  // Get default menu list
-  const defaultMenuGroups = getMenuList(router.pathname);
+  const defaultMenuGroups = useMemo(() => getMenuList(router.pathname), [router.pathname]);
 
-  // Apply custom order from user settings if available
-  const menuGroups = useMemo(() => {
+  const orderedMenuGroups = useMemo(() => {
     if (profile?.user_settings && "navigation" in profile.user_settings) {
       try {
         const result = applyCustomMenuOrder(
@@ -148,6 +142,58 @@ export function AppSidebar() {
     }
     return defaultMenuGroups;
   }, [defaultMenuGroups, profile?.user_settings]);
+
+  // Filter menu items based on permissions
+  const filterGroupsByPermission = (
+    groups: Record<string, SidebarMenuGroupProps["items"]>,
+  ): Record<string, SidebarMenuGroupProps["items"]> => {
+    const filteredGroups: Record<string, SidebarMenuGroupProps["items"]> = {};
+
+    // Iterate over each group name (e.g., "Administration", "Accounting")
+    for (const groupName in groups) {
+      const items = groups[groupName];
+
+      // Explicitly type the result of the map operation
+      const mappedItems: (SidebarMenuGroupProps["items"][number] | null)[] = items.map((item) => {
+        // 1. Filter sub-items first (if they exist)
+        let filteredSubItems: typeof item.items | undefined = undefined;
+        if (item.items) {
+          filteredSubItems = item.items.filter((subItem) => {
+            // Keep sub-item if no permission is required or user has permission
+            return !subItem.requiredPermission || hasPermission(subItem.requiredPermission);
+          });
+        }
+
+        // 3. Determine if the parent item should be kept based on children
+        // If it had sub-items originally, but none are left after filtering, hide the parent item.
+        // Exception: Keep parent even with no children if it has its own URL (acts as a direct link)
+        if (item.items && (!filteredSubItems || filteredSubItems.length === 0) && !item.url) {
+          return null;
+        }
+
+        // Return the item, potentially with filtered sub-items
+        return {
+          ...item,
+          items: filteredSubItems, // Update sub-items
+        };
+      });
+
+      // Filter out the null values using a simpler filter
+      const filteredItems = mappedItems.filter((item) => item !== null);
+
+      // Only add the group to the result if it still contains items after filtering
+      if (filteredItems.length > 0) {
+        // Explicitly cast back to the required type
+        filteredGroups[groupName] = filteredItems as SidebarMenuGroupProps["items"];
+      }
+    }
+    return filteredGroups;
+  };
+
+  const finalMenuGroups = useMemo(
+    () => filterGroupsByPermission(orderedMenuGroups),
+    [orderedMenuGroups, hasPermission],
+  );
 
   const filterMenuItems = (items: any, query: string) => {
     if (!query) return items;
@@ -213,7 +259,10 @@ export function AppSidebar() {
     };
   };
 
-  const filteredMenuGroups = filterMenuItems(menuGroups, searchQuery);
+  const searchableMenuGroups = useMemo(
+    () => filterMenuItems(finalMenuGroups, searchQuery),
+    [finalMenuGroups, searchQuery, t],
+  );
 
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
@@ -227,7 +276,7 @@ export function AppSidebar() {
           {process.env.NODE_ENV === "development" && state === "expanded" && (
             <span className="text-center text-xs font-medium">
               {enterprise?.name} <br />
-              {enterprise?.id}
+              {membership?.enterprise_id}
             </span>
           )}
         </div>
@@ -247,17 +296,17 @@ export function AppSidebar() {
         </SidebarHeader>
       )}
       <SidebarContent>
-        {filteredMenuGroups.Administration && filteredMenuGroups.Administration.length > 0 && (
-          <NavMain title={t("Administration.title")} items={filteredMenuGroups.Administration} />
+        {searchableMenuGroups.Administration && searchableMenuGroups.Administration.length > 0 && (
+          <NavMain title={t("Administration.title")} items={searchableMenuGroups.Administration} />
         )}
-        {filteredMenuGroups.Accounting && filteredMenuGroups.Accounting.length > 0 && (
-          <NavMain title={t("Accounting.title")} items={filteredMenuGroups.Accounting} />
+        {searchableMenuGroups.Accounting && searchableMenuGroups.Accounting.length > 0 && (
+          <NavMain title={t("Accounting.title")} items={searchableMenuGroups.Accounting} />
         )}
-        {filteredMenuGroups.HumanResources && filteredMenuGroups.HumanResources.length > 0 && (
-          <NavMain title={t("HumanResources.title")} items={filteredMenuGroups.HumanResources} />
+        {searchableMenuGroups.HumanResources && searchableMenuGroups.HumanResources.length > 0 && (
+          <NavMain title={t("HumanResources.title")} items={searchableMenuGroups.HumanResources} />
         )}
-        {filteredMenuGroups.Settings && filteredMenuGroups.Settings.length > 0 && (
-          <NavMain title={t("Settings.title")} items={filteredMenuGroups.Settings} />
+        {searchableMenuGroups.Settings && searchableMenuGroups.Settings.length > 0 && (
+          <NavMain title={t("Settings.title")} items={searchableMenuGroups.Settings} />
         )}
       </SidebarContent>
       <SidebarFooter className="px-0">
@@ -276,77 +325,75 @@ export function AppSidebar() {
             </DialogTrigger>
             <FeedbackDialog onOpenChange={setOpen} />
           </Dialog>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <DropdownMenu dir={lang === "ar" ? "rtl" : "ltr"}>
-                <DropdownMenuTrigger asChild>
-                  {!isMobile && state === "collapsed" ? (
-                    <Button
-                      variant="outline"
-                      className="text-muted-foreground flex !h-[34px] items-center gap-2 rounded-md border !p-1.5 text-xs"
-                    >
-                      <User2 className="!size-4" />
-                    </Button>
-                  ) : (
-                    <Button variant={"outline"} className="w-full">
-                      {profile?.email}
-                    </Button>
-                  )}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  side="top"
-                  className={
-                    !isMobile && state === "collapsed"
-                      ? "w-[var(--radix-popper-content-width)]"
-                      : "w-[var(--radix-popper-anchor-width)]"
-                  }
-                  align="start"
-                >
-                  {!isMobile && state === "collapsed" && (
-                    <>
-                      <DropdownMenuLabel>{user?.user_metadata.email}</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
-                  <Link href="/account">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <User2 className="!size-4" />
-                      <span>{t("Account.title")}</span>
-                    </DropdownMenuItem>
-                  </Link>
-                  <Link href="/billing">
-                    <DropdownMenuItem className="cursor-pointer">
-                      <CreditCard className="!size-4" />
-                      <span>{t("Billing.title")}</span>
-                    </DropdownMenuItem>
-                  </Link>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={async () => {
-                      console.log("[AppSidebar] Sign out clicked");
-
-                      // Clean up local storage
-                      if (user?.id) {
-                        console.log("[AppSidebar] Removing cache for user:", user.id);
-                        localStorage.removeItem(CACHE_KEY(user.id));
-                      }
-                      localStorage.removeItem("analytics_date_range");
-
-                      try {
-                        await signOut();
-                        console.log("[AppSidebar] Sign out complete, redirecting to /auth");
-                        router.replace("/auth");
-                      } catch (error) {
-                        console.error("[AppSidebar] Error signing out:", error);
-                      }
-                    }}
+          <SidebarMenuItem>
+            <DropdownMenu dir={lang === "ar" ? "rtl" : "ltr"}>
+              <DropdownMenuTrigger asChild>
+                {!isMobile && state === "collapsed" ? (
+                  <Button
+                    variant="outline"
+                    className="text-muted-foreground flex !h-[34px] items-center gap-2 rounded-md border !p-1.5 text-xs"
                   >
-                    <LogOut className="!size-4" /> <span>{t("Auth.sign_out")}</span>
+                    <User2 className="!size-4" />
+                  </Button>
+                ) : (
+                  <Button variant={"outline"} className="w-full">
+                    {profile?.email}
+                  </Button>
+                )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className={
+                  !isMobile && state === "collapsed"
+                    ? "w-[var(--radix-popper-content-width)]"
+                    : "w-[var(--radix-popper-anchor-width)]"
+                }
+                align="start"
+              >
+                {!isMobile && state === "collapsed" && (
+                  <>
+                    <DropdownMenuLabel>{user?.user_metadata.email}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <Link href="/account">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <User2 className="!size-4" />
+                    <span>{t("Account.title")}</span>
                   </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          </SidebarMenu>
+                </Link>
+                <Link href="/billing">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <CreditCard className="!size-4" />
+                    <span>{t("Billing.title")}</span>
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={async () => {
+                    console.log("[AppSidebar] Sign out clicked");
+
+                    // Clean up local storage
+                    if (user?.id) {
+                      console.log("[AppSidebar] Removing cache for user:", user.id);
+                      localStorage.removeItem(CACHE_KEY(user.id));
+                    }
+                    localStorage.removeItem("analytics_date_range");
+
+                    try {
+                      await signOut();
+                      console.log("[AppSidebar] Sign out complete, redirecting to /auth");
+                      router.replace("/auth");
+                    } catch (error) {
+                      console.error("[AppSidebar] Error signing out:", error);
+                    }
+                  }}
+                >
+                  <LogOut className="!size-4" /> <span>{t("Auth.sign_out")}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
         </div>
       </SidebarFooter>
       <SidebarRail />

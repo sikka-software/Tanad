@@ -20,12 +20,14 @@ export type SidebarMenuGroupProps = {
     icon?: LucideIcon;
     is_active?: boolean;
     action?: string;
+    requiredPermission?: string;
     items?: {
       title: string;
       translationKey: string;
       is_active?: boolean;
       url: string;
       action?: string;
+      requiredPermission?: string;
     }[];
   }[];
 };
@@ -113,6 +115,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       url: "/analytics",
       icon: BarChart,
       is_active: pathname.startsWith("/analytics"),
+      requiredPermission: "analytics.read",
     },
 
     {
@@ -121,12 +124,14 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       url: "/contacts",
       icon: Users,
       is_active: pathname.startsWith("/contacts"),
+      requiredPermission: "contacts.read",
       items: [
         {
           title: "All Contacts",
           translationKey: "Contacts.all",
           is_active: pathname === "/contacts",
           url: "/contacts",
+          requiredPermission: "contacts.read",
         },
         {
           title: "Companies",
@@ -134,6 +139,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
           is_active: pathname === "/companies",
           action: "/companies/add",
           url: "/companies",
+          requiredPermission: "companies.read",
         },
         {
           title: "Clients",
@@ -141,6 +147,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
           is_active: pathname.startsWith("/clients"),
           action: "/clients/add",
           url: "/clients",
+          requiredPermission: "clients.read",
         },
         {
           title: "Vendors",
@@ -148,6 +155,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
           is_active: pathname.startsWith("/vendors"),
           action: "/vendors/add",
           url: "/vendors",
+          requiredPermission: "vendors.read",
         },
       ],
     },
@@ -157,6 +165,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       url: "/locations",
       icon: MapPin,
       is_active: pathname.startsWith("/warehouses") || pathname.startsWith("/branches"),
+      requiredPermission: "locations.read",
       items: [
         {
           title: "Offices",
@@ -164,6 +173,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
           url: "/offices",
           action: "/offices/add",
           is_active: pathname.startsWith("/offices"),
+          requiredPermission: "offices.read",
         },
         {
           title: "Warehouses",
@@ -171,6 +181,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
           url: "/warehouses",
           action: "/warehouses/add",
           is_active: pathname.startsWith("/warehouses"),
+          requiredPermission: "warehouses.read",
         },
         {
           title: "Branches",
@@ -178,6 +189,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
           url: "/branches",
           action: "/branches/add",
           is_active: pathname.startsWith("/branches"),
+          requiredPermission: "branches.read",
         },
       ],
     },
@@ -193,6 +205,7 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
       url: "",
       icon: SaudiRiyal,
       is_active: pathname.startsWith("/products"),
+      requiredPermission: "sales.read",
       items: [
         {
           title: "Invoices",
@@ -200,6 +213,7 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
           is_active: pathname.startsWith("/invoices"),
           url: "/invoices",
           action: "/invoices/add",
+          requiredPermission: "invoices.read",
         },
         {
           title: "Quotes",
@@ -207,6 +221,7 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
           is_active: pathname.startsWith("/quotes"),
           url: "/quotes",
           action: "/quotes/add",
+          requiredPermission: "quotes.read",
         },
         {
           title: "Expenses",
@@ -214,6 +229,7 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
           is_active: pathname.startsWith("/expenses"),
           url: "/expenses",
           action: "/expenses/add",
+          requiredPermission: "expenses.read",
         },
       ],
     },
@@ -223,6 +239,7 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
       url: "",
       icon: Package,
       is_active: pathname.startsWith("/products"),
+      requiredPermission: "storage.read",
       items: [
         {
           title: "Purchases",
@@ -230,6 +247,7 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
           is_active: pathname.startsWith("/purchases"),
           url: "/purchases",
           action: "/purchases/add",
+          requiredPermission: "purchases.read",
         },
         {
           title: "Products",
@@ -237,6 +255,7 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
           is_active: pathname.startsWith("/products"),
           url: "/products",
           action: "/products/add",
+          requiredPermission: "products.read",
         },
         {
           title: "Warehouses",
@@ -244,6 +263,7 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
           is_active: pathname.startsWith("/warehouses"),
           url: "/warehouses",
           action: "/warehouses/add",
+          requiredPermission: "warehouses.read",
         },
       ],
     },
@@ -259,6 +279,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
       url: "",
       icon: Users,
       is_active: pathname.startsWith("/employees"),
+      requiredPermission: "human_resources.read",
       items: [
         {
           title: "All Employees",
@@ -266,6 +287,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           url: "/employees",
           action: "/employees/add",
           is_active: pathname === "/employees",
+          requiredPermission: "employees.read",
         },
         {
           title: "Departments",
@@ -273,6 +295,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           url: "/departments",
           action: "/departments/add",
           is_active: pathname.startsWith("/departments"),
+          requiredPermission: "departments.read",
         },
         {
           title: "Salaries",
@@ -280,6 +303,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           url: "/salaries",
           action: "/salaries/add",
           is_active: pathname === "/salaries",
+          requiredPermission: "salaries.read",
         },
         // {
         //   title: "Leave",
@@ -307,6 +331,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           url: "/employee-requests",
           action: "/employee-requests/add",
           is_active: pathname.startsWith("/employee-requests"),
+          requiredPermission: "employee_requests.read",
         },
       ],
     },
@@ -316,6 +341,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
       url: "",
       icon: Briefcase,
       is_active: pathname.startsWith("/recruitment"),
+      requiredPermission: "recruitment.read",
       items: [
         {
           title: "Job Listing",
@@ -323,6 +349,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           url: "/jobs/listings",
           action: "/jobs/listings/add",
           is_active: pathname === "/jobs/listings",
+          requiredPermission: "job_listings.read",
         },
         {
           title: "Jobs",
@@ -330,6 +357,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           url: "/jobs",
           action: "/jobs/add",
           is_active: pathname === "/jobs",
+          requiredPermission: "jobs.read",
         },
         {
           title: "Applicants",
@@ -337,6 +365,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
           url: "/applicants",
           action: "/applicants/add",
           is_active: pathname === "/applicants",
+          requiredPermission: "applicants.read",
         },
       ],
     },
