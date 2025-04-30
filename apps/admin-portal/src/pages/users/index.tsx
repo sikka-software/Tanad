@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -23,6 +24,7 @@ import { User, UserUpdateData } from "@/modules/user/user.type";
 
 export default function UsersPage() {
   const t = useTranslations();
+  const router = useRouter();
 
   const loadingSaveUser = useEnterpriseUsersStore((state) => state.isLoading);
   const setLoadingSaveUser = useEnterpriseUsersStore((state) => state.setIsLoading);
@@ -95,8 +97,8 @@ export default function UsersPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Users.title")}
-            createHref="/users/add"
-            createLabel={t("Users.create_user")}
+            onAddClick={() => router.push("/users/add")}
+            createLabel={t("Users.add_new")}
             searchPlaceholder={t("Users.search_users")}
           />
         )}

@@ -1455,7 +1455,7 @@
   },
   "Products": {
     "title": "المنتجات",
-    "add_new": "إضافة منتج جديد",
+    "add_new": "منتج جديد",
     "search_products": "بحث عن منتجات",
     "product_details": "تفاصيل المنتج",
     "product_name": "اسم المنتج",
@@ -1526,7 +1526,7 @@
       "select_product": "اختر منتج",
       "search_products": "بحث عن منتجات",
       "no_products_found": "لا توجد منتجات",
-      "add_new_product": "إضافة منتج جديد",
+      "add_new_product": "منتج جديد",
       "product_description": "وصف المنتج",
       "name": "الاسم",
       "save_product": "حفظ المنتج"
@@ -1534,7 +1534,7 @@
   },
   "Invoices": {
     "title": "الفواتير",
-    "add_new": "إضافة فاتورة جديدة",
+    "add_new": "فاتورة جديدة",
     "invoice_details": "تفاصيل الفاتورة",
     "invoice_number": "فاتورة #{number}",
     "enter_invoice_number": "أدخل رقم الفاتورة",
@@ -1558,7 +1558,7 @@
     "select_client": "اختر عميل",
     "search_clients": "بحث عن عملاء...",
     "no_clients": "لا يوجد عملاء",
-    "add_new_client": "إضافة عميل جديد",
+    "add_new_client": "عميل جديد",
     "amount": "المبلغ",
     "due_date": "تاريخ الاستحقاق",
     "select_status": "اختر حالة",
@@ -1602,7 +1602,7 @@
         "select_client": "اختر عميل",
         "search_clients": "بحث عن عملاء...",
         "no_clients": "لا يوجد عملاء",
-        "add_new_client": "إضافة عميل جديد"
+        "add_new_client": "عميل جديد"
       },
       "issue_date": {
         "label": "تاريخ الإصدار",
@@ -1649,13 +1649,13 @@
       "select_product": "اختر منتج",
       "search_products": "بحث عن منتجات",
       "no_products_found": "لم يتم العثور على منتجات",
-      "add_new_product": "إضافة منتج جديد",
+      "add_new_product": "منتج جديد",
       "product_description": "وصف المنتج"
     }
   },
   "Sales": {
     "title": "المبيعات",
-    "add_new": "إضافة مبيعات جديدة",
+    "add_new": "مبيعات جديدة",
     "sale_details": "تفاصيل البيع",
     "description": "الوصف",
     "description_required": "الوصف مطلوب",
@@ -1682,7 +1682,7 @@
     "select_client": "اختر عميل",
     "search_clients": "بحث عن عملاء...",
     "no_clients": "لا يوجد عملاء",
-    "add_new_client": "إضافة عميل جديد",
+    "add_new_client": "عميل جديد",
     "client_added": "تمت إضافة العميل بنجاح",
     "products": {
       "title": "المنتجات",
@@ -1695,7 +1695,7 @@
       "select_product": "اختر منتج",
       "search_products": "بحث عن منتجات",
       "no_products_found": "لا توجد منتجات",
-      "add_new_product": "إضافة منتج جديد",
+      "add_new_product": "منتج جديد",
       "product_description": "وصف المنتج"
     },
     "error": {
@@ -1713,7 +1713,7 @@
   "Quotes": {
     "title": "عروض الأسعار",
     "create_quote": "إنشاء عرض سعر",
-    "add_new": "إضافة عرض سعر جديد",
+    "add_new": "عرض سعر جديد",
     "back_to_list": "العودة إلى عروض الأسعار",
     "quote_details": "تفاصيل عرض السعر",
     "submitting": "جاري الإرسال...",
@@ -1723,7 +1723,7 @@
     "select_client": "اختر عميل",
     "search_clients": "البحث عن عملاء",
     "no_clients": "لم يتم العثور على عملاء",
-    "add_new_client": "إضافة عميل جديد",
+    "add_new_client": "عميل جديد",
     "quote_number": "رقم عرض السعر",
     "enter_quote_number": "أدخل رقم عرض السعر",
     "subtotal": "المجموع الفرعي",
@@ -1778,7 +1778,7 @@
       "select_product": "اختر منتج",
       "search_products": "البحث عن منتجات",
       "no_products_found": "لم يتم العثور على منتجات",
-      "add_new_product": "إضافة منتج جديد",
+      "add_new_product": "منتج جديد",
       "add_product": "إضافة منتج",
       "quantity": "الكمية",
       "unit_price": "سعر الوحدة",
@@ -1819,7 +1819,7 @@
   "EmployeeRequests": {
     "title": "طلبات الموظفين",
     "description": "طلبات الموظفين",
-    "add_new": "إضافة طلب موظف جديد",
+    "add_new": "طلب موظف جديد",
     "no_employee_requests_found": "لا توجد طلبات موظفين",
     "search_requests": "بحث عن طلبات الموظفين...",
     "form": {
@@ -1895,7 +1895,7 @@
   },
   "Clients": {
     "title": "العملاء",
-    "add_new": "إضافة عميل جديد",
+    "add_new": "عميل جديد",
     "create_client": "إضافة عميل",
     "back_to_list": "الرجوع للقائمة",
     "client_details": "تفاصيل العميل",
@@ -1974,7 +1974,7 @@
   },
   "Warehouses": {
     "title": "المستودعات",
-    "add_new": "إضافة مستودع جديد",
+    "add_new": "مستودع جديد",
     "warehouse_details": "تفاصيل المستودع",
     "search_warehouses": "بحث عن مستودعات...",
     "name": "الاسم",
@@ -2070,7 +2070,7 @@
   },
   "Branches": {
     "title": "الفروع",
-    "add_new": "إضافة فرع جديد",
+    "add_new": "فرع جديد",
     "branch_details": "تفاصيل الفرع",
     "create_branch": "إنشاء فرع",
     "no_branches_found": "لا توجد فروع",
@@ -2154,7 +2154,7 @@
   },
   "Vendors": {
     "title": "الموردين",
-    "add_new": "إضافة مورد جديد",
+    "add_new": "مورد جديد",
     "back_to_list": "الرجوع للقائمة",
     "vendor_details": "تفاصيل المورد",
     "no_vendors": "لا يوجد موردين",
@@ -2270,7 +2270,7 @@
   },
   "Users": {
     "title": "المستخدمون",
-    "add_new": "إضافة مستخدم جديد",
+    "add_new": "مستخدم جديد",
     "user_details": "تفاصيل المستخدم",
     "login_details": "تفاصيل تسجيل الدخول",
     "personal_info": "المعلومات الشخصية",
@@ -2280,7 +2280,7 @@
     "inactive_users": "المستخدمون غير النشطين",
     "search_placeholder": "بحث عن مستخدمين...",
     "add_dialog": {
-      "title": "إضافة مستخدم جديد",
+      "title": "مستخدم جديد",
       "description": "املأ التفاصيل لإنشاء مستخدم جديد. سينتمي إلى نفس المؤسسة."
     },
     "permissions_popover": "الصلاحيات",
@@ -2405,7 +2405,7 @@
   },
   "Salaries": {
     "title": "الرواتب",
-    "add_new": "إضافة راتب جديد",
+    "add_new": "راتب جديد",
     "create_salary": "إضافة راتب",
     "edit_salary": "تعديل الراتب",
     "delete_salary": "حذف الراتب",
@@ -2488,8 +2488,8 @@
     "add_job": "إضافة وظيفة",
     "edit_job": "تعديل الوظيفة",
     "job_details": "تفاصيل الوظيفة",
-    "add_new": "إضافة وظيفة جديدة",
-    "add_new_listing": "إضافة صفحة توظيف جديدة",
+    "add_new": "وظيفة جديدة",
+    "add_new_listing": "صفحة توظيف جديدة",
     "listing_details": "تفاصيل صفحة توظيف",
     "back_to_list": "العودة إلى القائمة",
     "no_jobs_found": "لم يتم العثور على وظائف",
@@ -2572,7 +2572,7 @@
   "JobListings": {
     "title": "صفحات التوظيف",
     "create_listing": "إنشاء صفحة توظيف",
-    "add_new_listing": "إضافة صفحة توظيف جديدة",
+    "add_new_listing": "صفحة توظيف جديدة",
     "search_listings": "البحث في صفحات التوظيف...",
     "listing_details": "تفاصيل صفحة التوظيف",
     "messages": {
@@ -2616,7 +2616,7 @@
   "Expenses": {
     "title": "المصروفات",
     "description": "إدارة وتتبع المصروفات",
-    "add_new": "إضافة مصروف جديد",
+    "add_new": "مصروف جديد",
     "search_expenses": "البحث في المصروفات",
     "no_expenses_found": "لم يتم العثور على مصروفات",
     "confirm_delete_title": "تأكيد حذف المصروفات",
@@ -2686,7 +2686,7 @@
   },
   "Applicants": {
     "title": "المتقدمين",
-    "add_new": "إضافة متقدم جديد",
+    "add_new": "متقدم جديد",
     "applicant_details": "تفاصيل المتقدم",
     "back_to_list": "العودة إلى القائمة",
     "no_applicants": "لم يتم العثور على متقدمين",
@@ -2777,7 +2777,7 @@
   },
   "Employees": {
     "title": "الموظفين",
-    "add_new": "إضافة موظف جديد",
+    "add_new": "موظف جديد",
     "add_employee": "إضافة موظف",
     "search_employees": "بحث عن موظفين",
     "cancel": "إلغاء",
@@ -2871,7 +2871,7 @@
   "Contacts": {
     "title": "جهات الاتصال",
     "all": "جميع جهات الاتصال",
-    "add_new": "إضافة جهة إتصال جديدة",
+    "add_new": "جهة إتصال جديدة",
     "name": "الاسم",
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
@@ -2985,7 +2985,7 @@
   },
   "Offices": {
     "title": "المكاتب",
-    "add_new": "إضافة مكتب جديد",
+    "add_new": "مكتب جديد",
     "office_details": "تفاصيل المكتب",
     "back_to_list": "العودة إلى القائمة",
     "no_offices": "لم يتم العثور على مكاتب",
@@ -3055,7 +3055,7 @@
   },
   "Departments": {
     "title": "الإدارات",
-    "add_new": "إضافة إدارة جديدة",
+    "add_new": "إدارة جديدة",
     "search_departments": "بحث عن الإدارات",
     "department_details": "تفاصيل الإدارة",
     "form": {
@@ -3111,7 +3111,7 @@
   },
   "Purchases": {
     "title": "المشتريات",
-    "add_new": "إضافة مشترية جديدة",
+    "add_new": "مشترية جديدة",
     "search_purchases": "بحث عن المشتريات",
     "purchase_details": "تفاصيل المشترية",
     "form": {},
@@ -3135,7 +3135,7 @@
   "Roles": {
     "title": "الأدوار",
     "create_role": "إنشاء دور جديد",
-    "add_new": "إضافة أدوار جديدة",
+    "add_new": "أدوار جديدة",
     "search_roles": "بحث عن الأدوار",
     "role_details": "تفاصيل الأدوار",
     "roles": {
