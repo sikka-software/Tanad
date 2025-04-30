@@ -38,58 +38,45 @@ const ACTION_DISPLAY_NAMES: Record<string, string> = {
 
 // Fetch all roles
 export function useRoles() {
+  const { enterprise } = useUserStore();
+  
   return useQuery({
     queryKey: roleKeys.lists(),
     queryFn: async () => {
-      // 1. Fetch user role assignments
-      const { profile } = useUserStore.getState();
-      const { data: userRolesData, error: userRolesError } = await supabase
-        .from("user_roles")
-        .select(
-          `
-          user_id,
-          role,
+      if (!enterprise?.id) {
+        throw new Error("No enterprise ID found");
+      }
+
+      // 1. Get user's enterprise roles
+      const { data: userRoles, error: userRolesError } = await supabase
+        .from("roles")
+        .select(`
+          id,
+          name,
+          description,
+          is_system,
           created_at,
-          enterprise_id
-        `,
-        )
-        .eq("enterprise_id", profile?.enterprise_id);
+          updated_at,
+          role_permissions (
+            permission
+          )
+        `)
+        .eq("enterprise_id", enterprise.id);
 
       if (userRolesError) throw userRolesError;
 
-      // 2. Fetch all role-permission links
-      const { data: rolePermissionsData, error: rolePermissionsError } = await supabase.from(
-        "role_permissions",
-      ).select(`
-          role,
-          permission
-        `);
-
-      if (rolePermissionsError) throw rolePermissionsError;
-
-      // 3. Group permissions by role name
-      const permissionsByRole = rolePermissionsData.reduce(
-        (acc, item) => {
-          if (!acc[item.role]) {
-            acc[item.role] = [];
-          }
-          acc[item.role].push(item.permission);
-          return acc;
-        },
-        {} as Record<string, string[]>,
-      );
-
-      // 4. Transform the data to match our Role type, including permissions
-      return userRolesData.map((roleData) => ({
-        id: `${roleData.user_id}-${roleData.role}-${roleData.enterprise_id}`, // Synthetic ID
-        name: roleData.role,
-        description: `Role: ${roleData.role}`, // Consider adding a description field to the db
-        permissions: permissionsByRole[roleData.role] || [], // Include fetched permissions
-        isSystem: false, // Custom roles are not system roles
-        created_at: roleData.created_at,
-        updated_at: roleData.created_at, // Use created_at as updated_at for now
+      // 2. Transform the data to match our Role type
+      return userRoles.map((role) => ({
+        id: role.id,
+        name: role.name,
+        description: role.description || "",
+        isSystem: role.is_system,
+        permissions: role.role_permissions.map((rp) => rp.permission),
+        created_at: role.created_at,
+        updated_at: role.updated_at,
       })) as Role[];
     },
+    enabled: !!enterprise?.id,
   });
 }
 

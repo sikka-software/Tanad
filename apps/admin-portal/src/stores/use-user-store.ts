@@ -167,12 +167,12 @@ const useUserStore = create<UserState>((set, get) => ({
             set({ enterprise: enterpriseData as EnterpriseType });
           }
 
-          // Fetch user's permissions using the new user_role_permissions table
+          // Fetch user's permissions using the get_user_permissions function
           const { data: permissionsData, error: permissionsError } = await supabase
-            .from("user_role_permissions")
-            .select("permission")
-            .eq("user_id", session.user.id)
-            .eq("enterprise_id", profileData.enterprise_id);
+            .rpc('get_user_permissions', {
+              user_id: session.user.id,
+              enterprise_id: profileData.enterprise_id
+            }) as { data: string[] | null, error: any };
 
           console.log('Permissions fetch:', {
             success: !permissionsError,
@@ -182,11 +182,11 @@ const useUserStore = create<UserState>((set, get) => ({
 
           if (permissionsData) {
             // Extract unique permissions
-            const permissions = [...new Set(
-              permissionsData.map(p => p.permission)
-            )];
+            const permissions = [...new Set(permissionsData)];
             console.log('Setting permissions:', permissions);
             set({ permissions });
+          } else if (permissionsError) {
+            console.error('Error fetching permissions:', permissionsError);
           }
         }
       }
