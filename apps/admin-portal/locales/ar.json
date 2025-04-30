@@ -1364,14 +1364,41 @@
     "zimbabwe": "زيمبابوي"
   },
   "OnBoarding": {
-    "title": "مرحباً بك في بكلة",
-    "congratulations": "تهانينا!",
-    "pukla_created": "لقد نجحت في إنشاء البكلة الأولى!",
-    "next_steps": "ما التالي؟",
-    "editor_info": "قم بزيارة صفحة الروابط لترتيب روابطك وإضافة المزيد من المزايا إليها.",
-    "theme_info": "انتقل إلى صفحة التصميم لتخصيص تصميم ومظهر البكلة الخاصة بك.",
-    "go_to_editor": "تعديل الروابط",
-    "go_to_theme": "تصميم البكلة"
+    "title": "مرحباً بك في تند",
+    "description": "أنشئ مؤسستك للبدء",
+    "welcome_message": "قم بإعداد مؤسستك وابدأ في إدارة منظمتك بكفاءة.",
+    "form": {
+      "enterprise_name": "اسم المؤسسة",
+      "enterprise_name_placeholder": "أدخل اسم مؤسستك",
+      "description": "الوصف",
+      "description_placeholder": "أخبرنا عن مؤسستك",
+      "logo": "رابط الشعار",
+      "logo_placeholder": "أدخل رابط شعار مؤسستك",
+      "email": "البريد الإلكتروني للمؤسسة",
+      "email_placeholder": "أدخل البريد الإلكتروني للمؤسسة",
+      "industry": "المجال",
+      "industry_placeholder": "اختر مجال عمل مؤسستك",
+      "size": "حجم المؤسسة",
+      "size_placeholder": "اختر حجم مؤسستك",
+      "create_enterprise": "إنشاء المؤسسة"
+    },
+    "industry_options": {
+      "technology": "التقنية",
+      "healthcare": "الرعاية الصحية",
+      "finance": "المالية",
+      "education": "التعليم",
+      "manufacturing": "التصنيع",
+      "retail": "التجزئة",
+      "other": "أخرى"
+    },
+    "size_options": {
+      "1-10": "1-10 موظفين",
+      "11-50": "11-50 موظف",
+      "51-200": "51-200 موظف",
+      "201-500": "201-500 موظف",
+      "501-1000": "501-1000 موظف",
+      "1000+": "أكثر من 1000 موظف"
+    }
   },
   "OnBoardingForm": {
     "username": "اسم المستخدم",

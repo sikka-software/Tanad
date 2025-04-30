@@ -74,44 +74,15 @@ export default function Auth() {
 
     setLoading(true);
     try {
-      // Step 1: Perform the Supabase signup
-      // users who register through this page are automatically enterprise owners
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { enterprise_owner: true } },
       });
 
       if (error) throw error;
 
       if (data.user) {
-        // Step 2: Create an enterprise first, since we need its ID for the profile
-        const enterpriseName = `${email.split("@")[0]}'s Enterprise`;
-        const { data: enterpriseData, error: enterpriseError } = await supabase
-          .from("enterprises")
-          .insert({
-            name: enterpriseName,
-            email: email,
-          })
-          .select()
-          .single();
-
-        if (enterpriseError) {
-          console.error("Enterprise creation error:", enterpriseError);
-          throw enterpriseError;
-        }
-
-        // Step 3: Update the user meta data to have the enterprise id
-        const { data: updatedUserData, error: updateUserError } = await supabase.auth.updateUser({
-          data: { enterprise_id: enterpriseData.id }, // Add enterprise_id to user_metadata
-        });
-
-        if (updateUserError) {
-          console.error("User update error:", updateUserError);
-          throw updateUserError;
-        }
-
-        // Step 4: Create the user profile with the enterprise ID
+        // Create the user profile
         const stripeCustomerId = `cus_${Math.random().toString(36).substring(2, 15)}`;
         const { error: profileError } = await supabase.from("profiles").upsert({
           id: data.user.id,
@@ -120,7 +91,6 @@ export default function Auth() {
           first_name: email.split("@")[0], // Placeholder
           last_name: "", // Placeholder
           stripe_customer_id: stripeCustomerId,
-          enterprise_id: enterpriseData.id, // Link to the enterprise we created
           user_settings: {
             currency: "USD",
             calendar_type: "gregorian",
@@ -140,9 +110,11 @@ export default function Auth() {
           toast.error(t("Auth.profile_creation_error"));
           throw profileError;
         }
+
+        // Redirect to onboarding
+        router.push("/onboarding");
       }
 
-      // Success message
       toast.success(t("Auth.signup_successful_check_email"));
     } catch (error: any) {
       // Attempt to translate Supabase auth error codes

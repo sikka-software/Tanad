@@ -101,6 +101,22 @@ function AppContent({ Component, pageProps, router }: AppProps) {
     );
   }
 
+  // OnBoarding Pages
+  if (router.pathname === "/onboarding") {
+    return (
+      <div className={`${arabicFont.className}`}>
+        <NextIntlClientProvider
+          messages={pageProps.messages}
+          locale={router.locale}
+          timeZone="Asia/Riyadh"
+          now={new Date()}
+        >
+          <Component {...pageProps} />
+        </NextIntlClientProvider>
+      </div>
+    );
+  }
+
   // App Pages
   return (
     <div className={`${arabicFont.className}`}>
