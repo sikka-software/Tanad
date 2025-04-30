@@ -1,6 +1,27 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { PostgrestError } from '@supabase/supabase-js';
 
 import { createClient } from "@/utils/supabase/server-admin";
+
+// Define the expected shape of the data returned by the query
+interface MembershipWithDetails {
+  profile_id: string;
+  enterprise_id: string;
+  role_id: string;
+  profiles: {
+    id: string;
+    email: string | null;
+    created_at: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
+    phone: string | null;
+    // Add other profile fields if needed
+  } | null; // Profile might be null if join fails or profile deleted
+  roles: {
+    name: string | null;
+  } | null; // Role might be null
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createClient({ req, res, query: {}, resolvedUrl: "" });
@@ -38,24 +59,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const enterpriseId = userMembership.enterprise_id;
 
-        // Then fetch all profile_ids belonging to that enterprise from memberships
-        const { data: enterpriseMemberships, error: enterpriseMembershipsError } = await supabase
+        // Fetch memberships for the enterprise, joining profiles and roles
+        const { data, error: fetchError } = (await supabase
           .from("memberships")
-          .select("profile_id")
-          .eq("enterprise_id", enterpriseId);
+          .select(
+            `
+            profile_id,
+            enterprise_id,
+            role_id,
+            profiles:profiles!inner (*),
+            roles:roles!inner (name)
+          `,
+          )
+          .eq("enterprise_id", enterpriseId)) as { data: MembershipWithDetails[] | null; error: PostgrestError | null };
 
-        if (enterpriseMembershipsError) {
-          console.error("Enterprise Memberships Error:", enterpriseMembershipsError);
-          throw enterpriseMembershipsError;
+        // Use the correctly typed 'data' variable
+        const membershipsWithDetails = data;
+
+        console.log(
+          `Fetched ${membershipsWithDetails?.length ?? 0} memberships for enterprise ${enterpriseId}`,
+        );
+
+        if (fetchError) {
+          console.error("Fetch Memberships with Details Error:", fetchError);
+          throw fetchError;
         }
 
-        const profileIds = enterpriseMemberships?.map((m) => m.profile_id) || [];
+        // Transform the data to match the expected UserType structure
+        const users =
+          membershipsWithDetails
+            ?.filter((m) => m.profiles && m.roles) // Filter out entries with null profiles or roles
+            .map((m) => ({
+              id: m.profiles!.id, // Use non-null assertion as we filtered nulls
+              email: m.profiles!.email,
+              role: m.roles!.name, // Use non-null assertion
+              enterprise_id: m.enterprise_id,
+              created_at: m.profiles!.created_at,
+              first_name: m.profiles!.first_name,
+              last_name: m.profiles!.last_name,
+              avatar_url: m.profiles!.avatar_url,
+              phone: m.profiles!.phone,
+              // role_id: m.role_id
+            })) || [];
 
-        if (profileIds.length === 0) {
-          return res.status(200).json([]); // No users found for this enterprise
-        }
-
+        console.log(`Transformed ${users.length} users data`);
         // Finally, fetch the profiles for these IDs
+        /*
         const { data: users, error: fetchError } = await supabase
           .from("profiles")
           .select("*")
@@ -67,6 +116,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.error("Fetch Profiles Error:", fetchError);
           throw fetchError;
         }
+        */
         return res.status(200).json(users);
 
       case "POST":

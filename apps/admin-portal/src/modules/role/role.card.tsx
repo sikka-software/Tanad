@@ -16,6 +16,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { app_permission } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
+import { predefinedRoles } from "./role.options";
 import type { Role, RoleWithPermissions } from "./role.type";
 
 interface RoleCardProps {
@@ -58,31 +59,13 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
     {} as Record<string, string[]>,
   );
 
-  const predefinedRoles = [
-    {
-      id: "superadmin",
-      name: t("Roles.predefined.superadmin.title"),
-      description: t("Roles.predefined.superadmin.description"),
-    },
-    {
-      id: "admin",
-      name: t("Roles.predefined.admin.title"),
-      description: t("Roles.predefined.admin.description"),
-    },
-    {
-      id: "human_resources",
-      name: t("Roles.predefined.human_resources.title"),
-      description: t("Roles.predefined.human_resources.description"),
-    },
-  ];
-
   return (
     <Card className="relative">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div>
             <CardTitle className="text-lg">
-              {role.is_system ? predefinedRoles.find((r) => r.id === role.name)?.name : role.name}
+              {role.is_system ? predefinedRoles(t, role.name)?.name : role.name}
               {role.is_system && (
                 <Badge variant="secondary" className="ms-2">
                   {t("Roles.predefined.system")}
@@ -91,7 +74,7 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
             </CardTitle>
             <CardDescription>
               {role.is_system
-                ? predefinedRoles.find((r) => r.id === role.name)?.description
+                ? predefinedRoles(t, role.name)?.description
                 : role.description || null}
             </CardDescription>
           </div>

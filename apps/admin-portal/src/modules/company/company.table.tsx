@@ -8,6 +8,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import useCompanyStore from "@/modules/company/company.store";
 import { Company } from "@/modules/company/company.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateCompany } from "./company.hooks";
 
@@ -34,6 +35,12 @@ interface CompaniesTableProps {
 const CompaniesTable = ({ data, isLoading, error, onActionClicked }: CompaniesTableProps) => {
   const t = useTranslations();
   const { mutate: updateCompany } = useUpdateCompany();
+
+  const canEditCompany = useUserStore((state) => state.hasPermission("companies.update"));
+  const canDuplicateCompany = useUserStore((state) => state.hasPermission("companies.duplicate"));
+  const canViewCompany = useUserStore((state) => state.hasPermission("companies.view"));
+  const canArchiveCompany = useUserStore((state) => state.hasPermission("companies.archive"));
+  const canDeleteCompany = useUserStore((state) => state.hasPermission("companies.delete"));
 
   const selectedRows = useCompanyStore((state) => state.selectedRows);
   const setSelectedRows = useCompanyStore((state) => state.setSelectedRows);
@@ -138,6 +145,11 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: CompaniesTa
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      canEditAction={canEditCompany}
+      canDuplicateAction={canDuplicateCompany}
+      canViewAction={canViewCompany}
+      canArchiveAction={canArchiveCompany}
+      canDeleteAction={canDeleteCompany}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={companyTableOptions}
       onActionClicked={onActionClicked}

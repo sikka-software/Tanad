@@ -59,6 +59,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { predefinedRoles } from "../role/role.options";
 import { UserForm } from "./user.form";
 import { useDeleteUser, useUpdateUser, useUsers } from "./user.hooks";
 import useEnterpriseUsersStore from "./user.store";
@@ -67,7 +68,7 @@ import useEnterpriseUsersStore from "./user.store";
 export type UserType = {
   id: string;
   email: string;
-  role: "superadmin" | "accounting" | "hr";
+  role: string;
   enterprise_id: string;
   created_at: string;
 };
@@ -97,9 +98,7 @@ export default function UsersTable({ users, isLoading, error, onActionClicked }:
       header: t("Users.form.role.label"),
       cell: ({ row }) => {
         const role = row.original.role;
-        console.log("role is", role);
-        return <Badge variant="outline">{role}</Badge>;
-        // return <Badge variant="outline">{t(`Roles.predefined.${role.toLowerCase()}.title`)}</Badge>;
+        return <Badge variant="outline">{predefinedRoles(t, role)?.name || role}</Badge>;
       },
       validationSchema: roleSchema,
     },

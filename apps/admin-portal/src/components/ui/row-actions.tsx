@@ -31,8 +31,14 @@ const RowActions = ({
 }: RowActionsProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const expandedWidth = 100;
-  const collapsedWidth = 32;
+  const actions = [onDelete, onEdit, onDuplicate, onView, onArchive];
+  const availableActionsCount = actions.filter(Boolean).length; // Count how many actions are defined
+  const collapsedWidth = 32; // Default width when collapsed or no actions
+  // Calculate expanded width based on the number of actions:
+  // Each button is w-7 (28px), gap is gap-1 (4px), padding is p-1 (4px on each side)
+  // Width = (count * 28) + (max(0, count - 1) * 4) + (2 * 4)
+  // Simplified: Width = 32 * count + 4 (for count >= 1)
+  const expandedWidth = availableActionsCount > 0 ? availableActionsCount * 32 + 4 : collapsedWidth;
   return (
     <motion.div
       className="relative flex items-center justify-end"
@@ -47,36 +53,46 @@ const RowActions = ({
             exit={{ width: collapsedWidth, opacity: 0 }}
             className="bg-background flex items-center justify-between gap-1 overflow-clip rounded-md p-1 shadow-sm"
           >
-            <IconButton
-              icon={<Trash2 className="size-4" />}
-              label={texts?.delete || "delete"}
-              className="h-7 w-7"
-              onClick={onDelete}
+            {onDelete && (
+              <IconButton
+                icon={<Trash2 className="size-4" />}
+                label={texts?.delete || "delete"}
+                className="h-7 w-7"
+                onClick={onDelete}
+              />
+            )}
+            {onEdit && (
+              <IconButton
+                icon={<Edit className="size-4" />}
+                label={texts?.edit || "edit"}
+                className="h-7 w-7"
+                onClick={onEdit}
+              />
+            )}
+            {onDuplicate && (
+              <IconButton
+                icon={<Copy className="size-4" />}
+                label={texts?.duplicate || "duplicate"}
+                className="h-7 w-7"
+                onClick={onDuplicate}
+              />
+            )}
+            {/* {onView && (
+              <IconButton
+                icon={<Eye className="size-4" />}
+                label={texts?.view || "view"}
+                className="h-7 w-7"
+                onClick={onView}
             />
-            <IconButton
-              icon={<Edit className="size-4" />}
-              label={texts?.edit || "edit"}
-              className="h-7 w-7"
-              onClick={onEdit}
-            />
-            <IconButton
-              icon={<Copy className="size-4" />}
-              label={texts?.duplicate || "duplicate"}
-              className="h-7 w-7"
-              onClick={onDuplicate}
-            />
-            {/* <IconButton
-              icon={<Eye className="size-4" />}
-              label={texts?.view || "view"}
-              className="h-7 w-7"
-              onClick={onView}
-            />
-            <IconButton
-              icon={<Archive className="size-4" />}
-              label={texts?.archive || "archive"}
-              className="h-7 w-7"
-              onClick={onArchive}
-            /> */}
+            )}
+            {onArchive && (
+              <IconButton
+                icon={<Archive className="size-4" />}
+                label={texts?.archive || "archive"}
+                className="h-7 w-7"
+                onClick={onArchive}
+              />
+            )} */}
           </motion.div>
         ) : (
           <motion.div

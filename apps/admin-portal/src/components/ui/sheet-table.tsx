@@ -227,6 +227,11 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   };
 
   onActionClicked?: (action: string, rowId: string) => void;
+  canEditAction?: boolean;
+  canDuplicateAction?: boolean;
+  canViewAction?: boolean;
+  canArchiveAction?: boolean;
+  canDeleteAction?: boolean;
 }
 
 /**
@@ -943,11 +948,17 @@ function SheetTable<
             <div className="sticky end-0 z-2">
               <RowActions
                 texts={texts}
-                onEdit={() => onActionClicked?.("edit", rowId)}
-                onDuplicate={() => onActionClicked?.("duplicate", rowId)}
-                onView={() => onActionClicked?.("view", rowId)}
-                onArchive={() => onActionClicked?.("archive", rowId)}
-                onDelete={() => onActionClicked?.("delete", rowId)}
+                onEdit={props.canEditAction ? () => onActionClicked?.("edit", rowId) : undefined}
+                onDuplicate={
+                  props.canDuplicateAction ? () => onActionClicked?.("duplicate", rowId) : undefined
+                }
+                onView={props.canViewAction ? () => onActionClicked?.("view", rowId) : undefined}
+                onArchive={
+                  props.canArchiveAction ? () => onActionClicked?.("archive", rowId) : undefined
+                }
+                onDelete={
+                  props.canDeleteAction ? () => onActionClicked?.("delete", rowId) : undefined
+                }
               />
             </div>
           )}

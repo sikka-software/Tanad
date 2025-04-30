@@ -33,8 +33,6 @@ import { usePermissions } from "../permission/permission.hooks";
 import type { Permission } from "../permission/permission.hooks";
 import { useCreateRole, useUpdateRole } from "./role.hooks";
 import useRoleStore from "./role.store";
-// Import the correct type
-import type { RoleCreateData, RoleUpdateData } from "./role.type";
 
 const createRoleSchema = (t: (key: string) => string) =>
   z.object({
