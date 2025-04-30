@@ -17,26 +17,56 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     switch (req.method) {
       case "GET":
-        // First get the user's profile to get their enterprise_id
-        const { data: userProfile, error: profileError } = await supabase
-          .from("profiles")
+        // First get the user's membership to find their enterprise_id
+        const { data: userMembership, error: membershipError } = await supabase
+          .from("memberships")
           .select("enterprise_id")
-          .eq("id", user.id)
+          .eq("profile_id", user.id)
           .single();
 
-        if (profileError) throw profileError;
-        if (!userProfile?.enterprise_id) {
+        if (membershipError) {
+          console.error("Membership Error:", membershipError);
+          if (membershipError.code === "PGRST116") {
+            // Resource not found
+            return res.status(400).json({ error: "User is not associated with an enterprise" });
+          }
+          throw membershipError;
+        }
+        if (!userMembership?.enterprise_id) {
           return res.status(400).json({ error: "User is not associated with an enterprise" });
         }
 
-        // Then fetch all users from the same enterprise
+        const enterpriseId = userMembership.enterprise_id;
+
+        // Then fetch all profile_ids belonging to that enterprise from memberships
+        const { data: enterpriseMemberships, error: enterpriseMembershipsError } = await supabase
+          .from("memberships")
+          .select("profile_id")
+          .eq("enterprise_id", enterpriseId);
+
+        if (enterpriseMembershipsError) {
+          console.error("Enterprise Memberships Error:", enterpriseMembershipsError);
+          throw enterpriseMembershipsError;
+        }
+
+        const profileIds = enterpriseMemberships?.map((m) => m.profile_id) || [];
+
+        if (profileIds.length === 0) {
+          return res.status(200).json([]); // No users found for this enterprise
+        }
+
+        // Finally, fetch the profiles for these IDs
         const { data: users, error: fetchError } = await supabase
           .from("profiles")
           .select("*")
-          .eq("enterprise_id", userProfile.enterprise_id)
+          .in("id", profileIds) // Use 'in' operator with the list of profile IDs
           .order("created_at", { ascending: false });
-        console.log("enterprise users are users", users?.length);
-        if (fetchError) throw fetchError;
+
+        console.log(`Fetched ${users?.length ?? 0} users for enterprise ${enterpriseId}`);
+        if (fetchError) {
+          console.error("Fetch Profiles Error:", fetchError);
+          throw fetchError;
+        }
         return res.status(200).json(users);
 
       case "POST":
