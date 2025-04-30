@@ -1368,14 +1368,41 @@
     "zimbabwe": "Zimbabwe"
   },
   "OnBoarding": {
-    "title": "Welcome to Pukla",
-    "congratulations": "Congratulations!",
-    "pukla_created": "You've successfully created your first Pukla page!",
-    "next_steps": "What's Next?",
-    "editor_info": "Visit the Editor page to sort your links and add more functionality to them.",
-    "theme_info": "Head to the Theme page to customize the design and appearance of your Pukla.",
-    "go_to_editor": "Go to Editor",
-    "go_to_theme": "Customize Theme"
+    "title": "Welcome to Tanad",
+    "description": "Create your enterprise to get started",
+    "welcome_message": "Set up your enterprise and start managing your organization efficiently.",
+    "form": {
+      "enterprise_name": "Enterprise Name",
+      "enterprise_name_placeholder": "Enter your enterprise name",
+      "description": "Description",
+      "description_placeholder": "Tell us about your enterprise",
+      "logo": "Logo URL",
+      "logo_placeholder": "Enter your logo URL",
+      "email": "Enterprise Email",
+      "email_placeholder": "Enter your enterprise email",
+      "industry": "Industry",
+      "industry_placeholder": "Select your industry",
+      "size": "Company Size",
+      "size_placeholder": "Select your company size",
+      "create_enterprise": "Create Enterprise"
+    },
+    "industry_options": {
+      "technology": "Technology",
+      "healthcare": "Healthcare",
+      "finance": "Finance",
+      "education": "Education",
+      "manufacturing": "Manufacturing",
+      "retail": "Retail",
+      "other": "Other"
+    },
+    "size_options": {
+      "1-10": "1-10 employees",
+      "11-50": "11-50 employees",
+      "51-200": "51-200 employees",
+      "201-500": "201-500 employees",
+      "501-1000": "501-1000 employees",
+      "1000+": "1000+ employees"
+    }
   },
   "OnBoardingForm": {
     "username": "Username",
