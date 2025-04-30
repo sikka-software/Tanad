@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +12,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import ExpenseCard from "@/modules/expense/expense.card";
@@ -24,9 +26,19 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/expense/expense.o
 import useExpenseStore from "@/modules/expense/expense.store";
 import ExpensesTable from "@/modules/expense/expense.table";
 import { ExpenseUpdateData } from "@/modules/expense/expense.type";
+import useUserStore from "@/stores/use-user-store";
 
 export default function ExpensesPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadExpenses = useUserStore((state) => state.hasPermission("expenses.read"));
+  const canCreateExpenses = useUserStore((state) => state.hasPermission("expenses.create"));
+
+  if (!canReadExpenses) {
+    return <NoPermission />;
+  }
+
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableExpense, setActionableExpense] = useState<ExpenseUpdateData | null>(null);
 
@@ -120,7 +132,7 @@ export default function ExpensesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Expenses.title")}
-            createHref="/expenses/add"
+            onAddClick={canCreateExpenses ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Expenses.add_new")}
             searchPlaceholder={t("Expenses.search_expenses")}
           />

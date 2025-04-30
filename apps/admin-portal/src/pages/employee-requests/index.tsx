@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -10,7 +11,9 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import NoPermission from "@/components/ui/no-permission";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import EmployeeRequestCard from "@/modules/employee-request/employee-request.card";
 import {
   useEmployeeRequests,
@@ -22,10 +25,22 @@ import {
 } from "@/modules/employee-request/employee-request.options";
 import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
 import EmployeeRequestsTable from "@/modules/employee-request/employee-request.table";
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
+import useUserStore from "@/stores/use-user-store";
 
 export default function EmployeeRequestsPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadEmployeeRequests = useUserStore((state) =>
+    state.hasPermission("employee-requests.read"),
+  );
+  const canCreateEmployeeRequests = useUserStore((state) =>
+    state.hasPermission("employee-requests.create"),
+  );
+
+  if (!canReadEmployeeRequests) {
+    return <NoPermission />;
+  }
 
   const viewMode = useEmployeeRequestsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEmployeeRequestsStore((state) => state.isDeleteDialogOpen);
@@ -42,7 +57,8 @@ export default function EmployeeRequestsPage() {
   const getSortedEmployeeRequests = useEmployeeRequestsStore((state) => state.getSortedData);
 
   const { data: requests, isLoading, error } = useEmployeeRequests();
-  const { mutateAsync: deleteEmployeeRequests, isPending: isDeleting } = useBulkDeleteEmployeeRequests();
+  const { mutateAsync: deleteEmployeeRequests, isPending: isDeleting } =
+    useBulkDeleteEmployeeRequests();
   const { createDeleteHandler } = useDeleteHandler();
 
   const handleConfirmDelete = createDeleteHandler(deleteEmployeeRequests, {
@@ -62,7 +78,6 @@ export default function EmployeeRequestsPage() {
   const sortedEmployeeRequests = useMemo(() => {
     return getSortedEmployeeRequests(filteredEmployeeRequests);
   }, [filteredEmployeeRequests, sortRules, sortCaseSensitive, sortNullsFirst]);
-  
 
   return (
     <div>
@@ -84,7 +99,9 @@ export default function EmployeeRequestsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("EmployeeRequests.title")}
-            createHref="/employee-requests/add"
+            onAddClick={
+              canCreateEmployeeRequests ? () => router.push(router.pathname + "/add") : undefined
+            }
             createLabel={t("EmployeeRequests.add_new")}
             searchPlaceholder={t("EmployeeRequests.search_requests")}
           />

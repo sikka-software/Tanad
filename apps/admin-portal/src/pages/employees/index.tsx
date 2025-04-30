@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -10,6 +11,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import EmployeeCard from "@/modules/employee/employee.card";
@@ -17,10 +19,18 @@ import { useEmployees, useBulkDeleteEmployees } from "@/modules/employee/employe
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/employee/employee.options";
 import useEmployeesStore from "@/modules/employee/employee.store";
 import EmployeesTable from "@/modules/employee/employee.table";
-import { Employee } from "@/modules/employee/employee.types";
+import useUserStore from "@/stores/use-user-store";
 
 export default function EmployeesPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadEmployees = useUserStore((state) => state.hasPermission("employees.read"));
+  const canCreateEmployees = useUserStore((state) => state.hasPermission("employees.create"));
+
+  if (!canReadEmployees) {
+    return <NoPermission />;
+  }
 
   const viewMode = useEmployeesStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEmployeesStore((state) => state.isDeleteDialogOpen);
@@ -75,7 +85,9 @@ export default function EmployeesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Employees.title")}
-            createHref="/employees/add"
+            onAddClick={
+              canCreateEmployees ? () => router.push(router.pathname + "/add") : undefined
+            }
             createLabel={t("Employees.add_new")}
             searchPlaceholder={t("Employees.search_employees")}
           />

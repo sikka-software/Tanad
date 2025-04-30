@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -10,6 +11,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import QuoteCard from "@/modules/quote/quote.card";
@@ -17,9 +19,18 @@ import { useQuotes, useBulkDeleteQuotes } from "@/modules/quote/quote.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/quote/quote.options";
 import useQuotesStore from "@/modules/quote/quote.store";
 import QuotesTable from "@/modules/quote/quote.table";
+import useUserStore from "@/stores/use-user-store";
 
 export default function QuotesPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadQuotes = useUserStore((state) => state.hasPermission("quotes.read"));
+  const canCreateQuotes = useUserStore((state) => state.hasPermission("quotes.create"));
+
+  if (!canReadQuotes) {
+    return <NoPermission />;
+  }
 
   const viewMode = useQuotesStore((state) => state.viewMode);
   const isDeleteDialogOpen = useQuotesStore((state) => state.isDeleteDialogOpen);
@@ -74,7 +85,7 @@ export default function QuotesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Quotes.title")}
-            createHref="/quotes/add"
+            onAddClick={canCreateQuotes ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Quotes.add_new")}
             searchPlaceholder={t("Quotes.search_quotes")}
           />

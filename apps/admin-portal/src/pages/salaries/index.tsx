@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -9,6 +10,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import SalaryCard from "@/modules/salary/salary.card";
@@ -16,9 +18,18 @@ import { useSalaries, useBulkDeleteSalaries } from "@/modules/salary/salary.hook
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/salary/salary.options";
 import useSalaryStore from "@/modules/salary/salary.store";
 import SalariesTable from "@/modules/salary/salary.table";
+import useUserStore from "@/stores/use-user-store";
 
 export default function SalariesPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadSalaries = useUserStore((state) => state.hasPermission("salaries.read"));
+  const canCreateSalaries = useUserStore((state) => state.hasPermission("salaries.create"));
+
+  if (!canReadSalaries) {
+    return <NoPermission />;
+  }
 
   const viewMode = useSalaryStore((state) => state.viewMode);
   const isDeleteDialogOpen = useSalaryStore((state) => state.isDeleteDialogOpen);
@@ -73,7 +84,7 @@ export default function SalariesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Salaries.title")}
-            createHref="/salaries/add"
+            onAddClick={canCreateSalaries ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Salaries.create_salary")}
             searchPlaceholder={t("Salaries.search_salaries")}
           />

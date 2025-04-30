@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -10,6 +11,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import WarehouseCard from "@/modules/warehouse/warehouse.card";
@@ -17,9 +19,18 @@ import { useBulkDeleteWarehouses, useWarehouses } from "@/modules/warehouse/ware
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/warehouse/warehouse.options";
 import useWarehouseStore from "@/modules/warehouse/warehouse.store";
 import WarehouseTable from "@/modules/warehouse/warehouse.table";
+import useUserStore from "@/stores/use-user-store";
 
 export default function WarehousesPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadWarehouses = useUserStore((state) => state.hasPermission("warehouses.read"));
+  const canCreateWarehouses = useUserStore((state) => state.hasPermission("warehouses.create"));
+
+  if (!canReadWarehouses) {
+    return <NoPermission />;
+  }
 
   const viewMode = useWarehouseStore((state) => state.viewMode);
   const isDeleteDialogOpen = useWarehouseStore((state) => state.isDeleteDialogOpen);
@@ -75,7 +86,9 @@ export default function WarehousesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Warehouses.title")}
-            createHref="/warehouses/add"
+            onAddClick={
+              canCreateWarehouses ? () => router.push(router.pathname + "/add") : undefined
+            }
             createLabel={t("Warehouses.create_warehouse")}
             searchPlaceholder={t("Warehouses.search_warehouses")}
           />

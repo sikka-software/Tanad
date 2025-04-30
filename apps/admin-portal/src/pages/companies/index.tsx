@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +12,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CompanyCard from "@/modules/company/company.card";
@@ -24,9 +26,18 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/company/company.o
 import useCompanyStore from "@/modules/company/company.store";
 import CompaniesTable from "@/modules/company/company.table";
 import { CompanyUpdateData } from "@/modules/company/company.type";
+import useUserStore from "@/stores/use-user-store";
 
 export default function CompaniesPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadCompanies = useUserStore((state) => state.hasPermission("companies.read"));
+  const canCreateCompanies = useUserStore((state) => state.hasPermission("companies.create"));
+
+  if (!canReadCompanies) {
+    return <NoPermission />;
+  }
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableCompany, setActionableCompany] = useState<CompanyUpdateData | null>(null);
 
@@ -120,7 +131,9 @@ export default function CompaniesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Companies.title")}
-            createHref="/companies/add"
+            onAddClick={
+              canCreateCompanies ? () => router.push(router.pathname + "/add") : undefined
+            }
             createLabel={t("Companies.create_company")}
             searchPlaceholder={t("Companies.search_companies")}
           />

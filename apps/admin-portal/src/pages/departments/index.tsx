@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +12,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import DepartmentCard from "@/modules/department/department.card";
@@ -24,9 +26,19 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/department/depart
 import useDepartmentsStore from "@/modules/department/department.store";
 import DepartmentsTable from "@/modules/department/department.table";
 import { Department } from "@/modules/department/department.type";
+import useUserStore from "@/stores/use-user-store";
 
 export default function DepartmentsPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadDepartments = useUserStore((state) => state.hasPermission("departments.read"));
+  const canCreateDepartments = useUserStore((state) => state.hasPermission("departments.create"));
+
+  if (!canReadDepartments) {
+    return <NoPermission />;
+  }
+
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableDepartment, setActionableDepartment] = useState<Department | null>(null);
 
@@ -122,7 +134,9 @@ export default function DepartmentsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Departments.title")}
-            createHref="/departments/add"
+            onAddClick={
+              canCreateDepartments ? () => router.push(router.pathname + "/add") : undefined
+            }
             createLabel={t("Departments.add_new")}
             searchPlaceholder={t("Departments.search_departments")}
           />

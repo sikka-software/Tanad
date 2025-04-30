@@ -11,6 +11,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import LoadingPage from "@/components/loading-page";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import { usePermission } from "@/hooks/use-permission";
@@ -19,20 +20,16 @@ import { useOffices, useBulkDeleteOffices } from "@/modules/office/office.hooks"
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/office/office.options";
 import useOfficeStore from "@/modules/office/office.store";
 import OfficesTable from "@/modules/office/office.table";
+import useUserStore from "@/stores/use-user-store";
 
 export default function OfficesPage() {
   const t = useTranslations();
   const router = useRouter();
-  const { hasPermission, isLoading: isCheckingPermission } = usePermission("offices.view");
+  const canReadOffices = useUserStore((state) => state.hasPermission("offices.read"));
+  const canCreateOffices = useUserStore((state) => state.hasPermission("offices.create"));
 
-  // If still checking permissions, show loading state
-  if (isCheckingPermission) {
-    return <LoadingPage />;
-  }
-
-  // If no permission, the hook will automatically redirect to home
-  if (!hasPermission) {
-    return <div>No permission</div>;
+  if (!canReadOffices) {
+    return <NoPermission />;
   }
 
   const viewMode = useOfficeStore((state) => state.viewMode);
@@ -88,7 +85,7 @@ export default function OfficesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Offices.title")}
-            onAddClick={() => router.push("/offices/add")}
+            onAddClick={canCreateOffices ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Offices.add_new")}
             searchPlaceholder={t("Offices.search_offices")}
           />

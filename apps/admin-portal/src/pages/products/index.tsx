@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -10,6 +10,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import ProductCard from "@/modules/product/product.card";
@@ -17,9 +18,18 @@ import { useProducts, useBulkDeleteProducts } from "@/modules/product/product.ho
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/product/product.options";
 import useProductStore from "@/modules/product/product.store";
 import ProductsTable from "@/modules/product/product.table";
+import useUserStore from "@/stores/use-user-store";
 
 export default function ProductsPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadProducts = useUserStore((state) => state.hasPermission("products.read"));
+  const canCreateProducts = useUserStore((state) => state.hasPermission("products.create"));
+
+  if (!canReadProducts) {
+    return <NoPermission />;
+  }
 
   const viewMode = useProductStore((state) => state.viewMode);
   const isDeleteDialogOpen = useProductStore((state) => state.isDeleteDialogOpen);
@@ -74,7 +84,7 @@ export default function ProductsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Products.title")}
-            createHref="/products/add"
+            onAddClick={canCreateProducts ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Products.add_new")}
             searchPlaceholder={t("Products.search_products")}
           />

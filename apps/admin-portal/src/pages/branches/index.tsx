@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,7 +12,9 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
+import NoPermission from "@/components/ui/no-permission";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import BranchCard from "@/modules/branch/branch.card";
 import { BranchForm } from "@/modules/branch/branch.form";
 import {
@@ -23,10 +26,18 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/branch/branch.opt
 import useBranchStore from "@/modules/branch/branch.store";
 import BranchesTable from "@/modules/branch/branch.table";
 import { BranchUpdateData } from "@/modules/branch/branch.type";
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
+import useUserStore from "@/stores/use-user-store";
 
 export default function BranchesPage() {
   const t = useTranslations();
+  const router = useRouter();
+  const canReadBranches = useUserStore((state) => state.hasPermission("branches.read"));
+  const canCreateBranches = useUserStore((state) => state.hasPermission("branches.create"));
+
+  if (!canReadBranches) {
+    return <NoPermission />;
+  }
+
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
 
@@ -69,7 +80,7 @@ export default function BranchesPage() {
   const sortedBranches = useMemo(() => {
     return getSortedBranches(filteredBranches);
   }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
- 
+
   const onActionClicked = async (action: string, rowId: string) => {
     console.log(action, rowId);
     if (action === "edit") {
@@ -121,7 +132,7 @@ export default function BranchesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Branches.title")}
-            createHref="/branches/add"
+            onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Branches.create_branch")}
             searchPlaceholder={t("Branches.search_branches")}
           />

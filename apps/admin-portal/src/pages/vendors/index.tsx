@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -10,6 +11,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import VendorCard from "@/modules/vendor/vendor.card";
@@ -17,9 +19,18 @@ import { useVendors, useBulkDeleteVendors } from "@/modules/vendor/vendor.hooks"
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/vendor/vendor.options";
 import useVendorsStore from "@/modules/vendor/vendor.store";
 import VendorsTable from "@/modules/vendor/vendor.table";
+import useUserStore from "@/stores/use-user-store";
 
 export default function VendorsPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadVendors = useUserStore((state) => state.hasPermission("vendors.read"));
+  const canCreateVendors = useUserStore((state) => state.hasPermission("vendors.create"));
+
+  if (!canReadVendors) {
+    return <NoPermission />;
+  }
 
   const viewMode = useVendorsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useVendorsStore((state) => state.isDeleteDialogOpen);
@@ -76,7 +87,7 @@ export default function VendorsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Vendors.title")}
-            createHref="/vendors/add"
+            onAddClick={canCreateVendors ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Vendors.add_new")}
             searchPlaceholder={t("Vendors.search_vendors")}
           />

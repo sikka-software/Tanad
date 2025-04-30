@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +12,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import ClientCard from "@/modules/client/client.card";
@@ -24,9 +26,17 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/client/client.opt
 import useClientStore from "@/modules/client/client.store";
 import ClientsTable from "@/modules/client/client.table";
 import { ClientUpdateData } from "@/modules/client/client.type";
+import useUserStore from "@/stores/use-user-store";
 
 export default function ClientsPage() {
   const t = useTranslations();
+  const router = useRouter();
+  const canReadClients = useUserStore((state) => state.hasPermission("clients.read"));
+  const canCreateClients = useUserStore((state) => state.hasPermission("clients.create"));
+
+  if (!canReadClients) {
+    return <NoPermission />;
+  }
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableClient, setActionableClient] = useState<ClientUpdateData | null>(null);
 
@@ -121,7 +131,7 @@ export default function ClientsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Clients.title")}
-            createHref="/clients/add"
+            onAddClick={canCreateClients ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Clients.add_new")}
             searchPlaceholder={t("Clients.search_clients")}
           />

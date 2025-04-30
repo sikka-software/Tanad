@@ -11,7 +11,7 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import { usePermission } from "@/hooks/use-permission";
@@ -25,14 +25,14 @@ import useUserStore from "@/stores/use-user-store";
 export default function InvoicesPage() {
   const t = useTranslations();
   const router = useRouter();
-  const { hasPermission: canViewInvoices, isLoading: isCheckingPermission } =
-    usePermission("invoices.read");
 
   const canReadInvoices = useUserStore((state) => state.hasPermission("invoices.read"));
   const canCreateInvoices = useUserStore((state) => state.hasPermission("invoices.create"));
 
-  console.log("canReadInvoices", canReadInvoices);
-  console.log("canCreateInvoices", canCreateInvoices);
+  if (!canReadInvoices) {
+    return <NoPermission />;
+  }
+
   const viewMode = useInvoiceStore((state) => state.viewMode);
   const isDeleteDialogOpen = useInvoiceStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useInvoiceStore((state) => state.setIsDeleteDialogOpen);
@@ -69,26 +69,6 @@ export default function InvoicesPage() {
   const sortedInvoices = useMemo(() => {
     return getSortedInvoices(filteredInvoices);
   }, [filteredInvoices, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  if (isCheckingPermission) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div>Checking permissions...</div>
-      </div>
-    );
-  }
-
-  if (!canReadInvoices) {
-    return (
-      <div className="flex h-screen items-center justify-center p-4">
-        <Alert variant="destructive" className="max-w-md">
-          <Shield className="h-4 w-4" />
-          <AlertTitle>{t("General.no_permission")}</AlertTitle>
-          <AlertDescription>{t("General.no_permission_description")}</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
 
   return (
     <div>
