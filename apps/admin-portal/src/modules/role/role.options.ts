@@ -30,6 +30,11 @@ export const predefinedRoles = (t: (key: string) => string, role: string) => {
       name: t("Roles.predefined.human_resources.title"),
       description: t("Roles.predefined.human_resources.description"),
     },
+    {
+      id: "accounting",
+      name: t("Roles.predefined.accounting.title"),
+      description: t("Roles.predefined.accounting.description"),
+    },
   ];
 
   return systemRoles.find((r) => r.id === role);

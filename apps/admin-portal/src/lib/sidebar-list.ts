@@ -165,7 +165,6 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       url: "/locations",
       icon: MapPin,
       is_active: pathname.startsWith("/warehouses") || pathname.startsWith("/branches"),
-      requiredPermission: "locations.read",
       items: [
         {
           title: "Offices",
@@ -205,7 +204,6 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
       url: "",
       icon: SaudiRiyal,
       is_active: pathname.startsWith("/products"),
-      requiredPermission: "sales.read",
       items: [
         {
           title: "Invoices",
@@ -239,7 +237,6 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
       url: "",
       icon: Package,
       is_active: pathname.startsWith("/products"),
-      requiredPermission: "storage.read",
       items: [
         {
           title: "Purchases",

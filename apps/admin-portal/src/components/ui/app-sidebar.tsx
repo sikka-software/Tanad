@@ -166,8 +166,7 @@ export function AppSidebar() {
 
         // 3. Determine if the parent item should be kept based on children
         // If it had sub-items originally, but none are left after filtering, hide the parent item.
-        // Exception: Keep parent even with no children if it has its own URL (acts as a direct link)
-        if (item.items && (!filteredSubItems || filteredSubItems.length === 0) && !item.url) {
+        if (item.items && (!filteredSubItems || filteredSubItems.length === 0)) {
           return null;
         }
 
@@ -227,6 +226,7 @@ export function AppSidebar() {
             );
           });
 
+          
           if (matchesTitle) return item;
 
           if (item.items) {

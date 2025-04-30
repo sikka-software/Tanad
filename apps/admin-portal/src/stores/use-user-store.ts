@@ -89,11 +89,11 @@ const useUserStore = create<UserState>((set, get) => ({
 
   hasPermission: (permission) => {
     const permissions = get().permissions;
-    console.log("Checking permission in store:", {
-      requestedPermission: permission,
-      availablePermissions: permissions,
-      hasPermission: permissions.includes(permission),
-    });
+    // console.log("Checking permission in store:", {
+    //   requestedPermission: permission,
+    //   availablePermissions: permissions,
+    //   hasPermission: permissions.includes(permission),
+    // });
     return permissions.includes(permission);
   },
 
