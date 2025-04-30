@@ -14,7 +14,6 @@ import {
   pgSchema,
   unique,
   uniqueIndex,
-  pgPolicy,
   varchar,
   smallint,
   json,
@@ -408,12 +407,7 @@ export const usersInAuth = auth.table(
       table.is_anonymous.asc().nullsLast().op("bool_ops"),
     ),
     unique("users_phone_key").on(table.phone),
-    pgPolicy("Users can view their own user data", {
-      as: "permissive",
-      for: "select",
-      to: ["authenticated"],
-      using: sql`(auth.uid() = id)`,
-    }),
+
     check(
       "users_email_change_confirm_status_check",
       sql`(email_change_confirm_status >= 0) AND (email_change_confirm_status <= 2)`,
@@ -1261,23 +1255,6 @@ export const user_enterprise_roles = pgTable(
       table.user_id,
       table.enterprise_id,
     ),
-    pgPolicy("Enable delete for users", {
-      as: "permissive",
-      for: "delete",
-      to: ["authenticated"],
-      using: sql`(auth.uid() = user_id)`,
-    }),
-    pgPolicy("Enable insert for authenticated users", {
-      as: "permissive",
-      for: "insert",
-      to: ["authenticated"],
-    }),
-    pgPolicy("Enable read access for users", {
-      as: "permissive",
-      for: "select",
-      to: ["authenticated"],
-    }),
-    pgPolicy("Enable update for users", { as: "permissive", for: "update", to: ["authenticated"] }),
   ],
 );
 
@@ -1296,14 +1273,6 @@ export const profiles = pgTable(
       name: "profiles_id_fkey",
     }).onDelete("cascade"),
     unique("profiles_email_key").on(table.email),
-    pgPolicy("Users can insert own profile", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-      withCheck: sql`(auth.uid() = id)`,
-    }),
-    pgPolicy("Users can update own profile", { as: "permissive", for: "update", to: ["public"] }),
-    pgPolicy("Users can view own profile", { as: "permissive", for: "select", to: ["public"] }),
   ],
 );
 
@@ -1339,16 +1308,7 @@ export const enterprises = pgTable(
     name: text().notNull(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
   },
-  (table) => [
-    pgPolicy("Access if member", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-      using: sql`(EXISTS ( SELECT 1
-   FROM memberships
-  WHERE ((memberships.enterprise_id = enterprises.id) AND (memberships.profile_id = auth.uid()))))`,
-    }),
-  ],
+  (table) => [],
 );
 
 export const memberships = pgTable(
@@ -1377,12 +1337,6 @@ export const memberships = pgTable(
       name: "memberships_role_id_fkey",
     }).onDelete("restrict"),
     unique("memberships_profile_id_enterprise_id_key").on(table.profile_id, table.enterprise_id),
-    pgPolicy("Access if same user", {
-      as: "permissive",
-      for: "select",
-      to: ["public"],
-      using: sql`(profile_id = auth.uid())`,
-    }),
   ],
 );
 
@@ -1391,13 +1345,42 @@ export const invoices = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     enterprise_id: uuid(),
-    issued_to: text(),
-    amount: numeric(),
-    issued_at: date().default(sql`CURRENT_DATE`),
+    invoice_number: text().notNull(),
+    issue_date: date().default(sql`CURRENT_DATE`),
+    due_date: date(),
+    status: text().default("draft").notNull(),
+    subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
+    tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
+    tax_amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN (0)::numeric
+    ELSE round((subtotal * tax_rate), 2)
+END`),
+    total: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
+CASE
+    WHEN (tax_rate IS NULL) THEN subtotal
+    ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
+END`),
+    notes: text(),
+    client_id: uuid().notNull(),
     created_by: uuid(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
   },
   (table) => [
+    index("invoices_client_id_idx").using(
+      "btree",
+      table.client_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("invoices_status_idx").using("btree", table.status.asc().nullsLast().op("text_ops")),
+    index("invoices_invoice_number_idx").using(
+      "btree",
+      table.invoice_number.asc().nullsLast().op("text_ops"),
+    ),
+    foreignKey({
+      columns: [table.client_id],
+      foreignColumns: [clients.id],
+      name: "invoices_client_id_fkey",
+    }).onDelete("cascade"),
     foreignKey({
       columns: [table.created_by],
       foreignColumns: [profiles.id],
@@ -1408,15 +1391,10 @@ export const invoices = pgTable(
       foreignColumns: [enterprises.id],
       name: "invoices_enterprise_id_fkey",
     }).onDelete("cascade"),
-    pgPolicy("Delete if has permission", {
-      as: "permissive",
-      for: "delete",
-      to: ["public"],
-      using: sql`(EXISTS ( SELECT 1
-   FROM user_permissions_view
-  WHERE ((user_permissions_view.permission = 'invoices.delete'::text) AND (user_permissions_view.profile_id = auth.uid()) AND (user_permissions_view.enterprise_id = invoices.enterprise_id))))`,
-    }),
-    pgPolicy("Read if has permission", { as: "permissive", for: "select", to: ["public"] }),
+    check(
+      "invoices_status_check",
+      sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'paid'::text, 'partially_paid'::text, 'overdue'::text, 'void'::text])`,
+    ),
   ],
 );
 
@@ -1442,15 +1420,6 @@ export const expenses = pgTable(
       foreignColumns: [enterprises.id],
       name: "expenses_enterprise_id_fkey",
     }).onDelete("cascade"),
-    pgPolicy("Create if has permission", {
-      as: "permissive",
-      for: "insert",
-      to: ["public"],
-      withCheck: sql`(EXISTS ( SELECT 1
-   FROM user_permissions_view
-  WHERE ((user_permissions_view.permission = 'expenses.create'::text) AND (user_permissions_view.profile_id = auth.uid()) AND (user_permissions_view.enterprise_id = expenses.enterprise_id))))`,
-    }),
-    pgPolicy("Read if has permission", { as: "permissive", for: "select", to: ["public"] }),
   ],
 );
 
@@ -1491,13 +1460,6 @@ export const user_roles = pgTable(
     primaryKey({
       columns: [table.user_id, table.role_id, table.enterprise_id],
       name: "user_roles_pkey",
-    }),
-    pgPolicy("Admins can manage user roles", {
-      as: "permissive",
-      for: "all",
-      to: ["authenticated"],
-      using: sql`has_enterprise_permission(enterprise_id, ARRAY['roles.create'::app_permission, 'roles.update'::app_permission])`,
-      withCheck: sql`has_enterprise_permission(enterprise_id, ARRAY['roles.create'::app_permission, 'roles.update'::app_permission])`,
     }),
   ],
 );

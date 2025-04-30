@@ -23,9 +23,9 @@ const modelMap: Record<string, ModelConfig> = {
   clients: { table: schema.clients, query: db.query.clients },
   expenses: { table: schema.expenses, query: db.query.expenses },
   departments: { table: schema.departments, query: db.query.departments },
-  departmentLocations: {
-    table: schema.departmentLocations,
-    query: db.query.departmentLocations,
+  department_locations: {
+    table: schema.department_locations,
+    query: db.query.department_locations,
     customHandlers: {
       POST: async (user_id_param: string, req: NextApiRequest) => {
         const supabase = createClient({
@@ -62,12 +62,12 @@ const modelMap: Record<string, ModelConfig> = {
         }
 
         const [created] = await db
-          .insert(schema.departmentLocations)
+          .insert(schema.department_locations)
           .values(
             locations.map((location) => ({
               department_id: location.department_id,
-              locationId: location.location_id,
-              locationType: location.type,
+              location_id: location.location_id,
+              location_type: location.type,
               user_id: user_id,
               enterprise_id: enterprise_id,
             })),
