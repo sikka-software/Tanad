@@ -1281,6 +1281,8 @@ export const roles = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     name: text().notNull(),
+    description: text(),
+    is_system: boolean().default(false).notNull(),
   },
   (table) => [unique("roles_name_key").on(table.name)],
 );
@@ -1289,7 +1291,7 @@ export const permissions = pgTable(
   "permissions",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
-    role_id: uuid(),
+    role_id: uuid().notNull(),
     permission: text().notNull(),
   },
   (table) => [
@@ -1298,6 +1300,7 @@ export const permissions = pgTable(
       foreignColumns: [roles.id],
       name: "permissions_role_id_fkey",
     }).onDelete("cascade"),
+    index("permissions_role_id_idx").using("btree", table.role_id.asc().nullsLast().op("uuid_ops"))
   ],
 );
 
@@ -1420,18 +1423,6 @@ export const expenses = pgTable(
       foreignColumns: [enterprises.id],
       name: "expenses_enterprise_id_fkey",
     }).onDelete("cascade"),
-  ],
-);
-
-export const role_permissions = pgTable(
-  "role_permissions",
-  {
-    role_id: uuid().notNull(),
-    permission_id: uuid().notNull(),
-    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
-  },
-  (table) => [
-    primaryKey({ columns: [table.role_id, table.permission_id], name: "role_permissions_pkey" }),
   ],
 );
 

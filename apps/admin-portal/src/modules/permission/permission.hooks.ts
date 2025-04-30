@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { appPermission } from "@/db/schema";
+import { app_permission } from "@/db/schema";
 
 export interface Permission {
   id: string;
@@ -25,7 +25,7 @@ function getPermissionDescription(permission: string): string {
 
 // Helper function to structure permissions
 function structurePermissions(): Permission[] {
-  return appPermission.enumValues.map((permission) => {
+  return app_permission.enumValues.map((permission) => {
     const [category] = permission.split('.');
     return {
       id: permission,

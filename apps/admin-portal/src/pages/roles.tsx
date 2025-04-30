@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -16,17 +16,24 @@ import { FormDialog } from "@/components/ui/form-dialog";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import RoleCard from "@/modules/role/role.card";
 import { RoleForm } from "@/modules/role/role.form";
-import { useRoles, useBulkDeleteRoles, useDuplicateRole } from "@/modules/role/role.hooks";
+import {
+  useRoles,
+  useSystemRoles,
+  useBulkDeleteRoles,
+  useDuplicateRole,
+} from "@/modules/role/role.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/role/role.options";
 import useRoleStore from "@/modules/role/role.store";
-import { RoleUpdateData } from "@/modules/role/role.type";
+import { Role, RoleUpdateData, RoleWithPermissions } from "@/modules/role/role.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function RolesPage() {
   const t = useTranslations();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableRole, setActionableRole] = useState<RoleUpdateData | null>(null);
-  const { enterprise, profile } = useUserStore();
+  const [actionableRole, setActionableRole] = useState<(RoleUpdateData & { id?: string }) | null>(
+    null,
+  );
+  const { enterprise, profile, membership } = useUserStore();
 
   const loadingSaveRole = useRoleStore((state) => state.isLoading);
   const setLoadingSaveRole = useRoleStore((state) => state.setIsLoading);
@@ -40,7 +47,23 @@ export default function RolesPage() {
   const filterCaseSensitive = useRoleStore((state) => state.filterCaseSensitive);
   const getFilteredRoles = useRoleStore((state) => state.getFilteredData);
 
-  const { data: roles, isLoading: loadingFetchRoles, error } = useRoles(enterprise?.id);
+  const {
+    data: enterpriseRoles,
+    isLoading: loadingEnterpriseRoles,
+    error: enterpriseError,
+  } = useRoles();
+  const { data: systemRoles, isLoading: loadingSystemRoles, error: systemError } = useSystemRoles();
+
+  const allRoles = useMemo(() => {
+    const combined = new Map<string, RoleWithPermissions>();
+    (enterpriseRoles || []).forEach((role) => combined.set(role.id, role));
+    (systemRoles || []).forEach((role) => combined.set(role.id, role));
+    return Array.from(combined.values());
+  }, [enterpriseRoles, systemRoles]);
+
+  const isLoading = loadingEnterpriseRoles || loadingSystemRoles;
+  const error = enterpriseError || systemError;
+
   const { mutate: duplicateRole } = useDuplicateRole();
   const { mutateAsync: deleteRoles, isPending: isDeleting } = useBulkDeleteRoles();
   const { createDeleteHandler } = useDeleteHandler();
@@ -55,42 +78,62 @@ export default function RolesPage() {
     },
   });
 
-  const filteredRoles = getFilteredRoles(roles || []);
+  const filteredRoles = getFilteredRoles(allRoles || []) as RoleWithPermissions[];
 
   const onActionClicked = async (action: string, rowId: string) => {
     if (action === "edit") {
-      setIsFormDialogOpen(true);
-      setActionableRole(roles?.find((role) => role.id === rowId) || null);
+      const roleToEdit = allRoles.find((role) => role.id === rowId);
+      if (roleToEdit) {
+        setActionableRole({
+          id: roleToEdit.id,
+          name: roleToEdit.name,
+          description: roleToEdit.description,
+          permissions: roleToEdit.permissions || [],
+        });
+        setIsFormDialogOpen(true);
+      }
     }
 
     if (action === "delete") {
-      setSelectedRows([rowId]);
-      setIsDeleteDialogOpen(true);
+      const roleToDelete = allRoles.find((r) => r.id === rowId);
+      if (roleToDelete && !roleToDelete.is_system) {
+        setSelectedRows([rowId]);
+        setIsDeleteDialogOpen(true);
+      } else if (roleToDelete?.is_system) {
+        toast.warning(t("Roles.cannot_delete_system"));
+      }
     }
 
     if (action === "duplicate") {
-      const toastId = toast.loading(t("General.loading_operation"), {
-        description: t("Roles.loading.duplicating"),
-      });
-      await duplicateRole(
-        { id: rowId, enterprise_id: enterprise?.id || "" },
-        {
-          onSuccess: () => {
-            toast.success(t("General.successful_operation"), {
-              description: t("Roles.success.duplicated"),
-            });
-            toast.dismiss(toastId);
+      const roleToDuplicate = allRoles.find((r) => r.id === rowId);
+      if (roleToDuplicate && !roleToDuplicate.is_system) {
+        const toastId = toast.loading(t("General.loading_operation"), {
+          description: t("Roles.loading.duplicating"),
+        });
+        await duplicateRole(
+          { id: rowId, enterprise_id: enterprise?.id || "" },
+          {
+            onSuccess: () => {
+              toast.success(t("General.successful_operation"), {
+                description: t("Roles.success.duplicated"),
+              });
+              toast.dismiss(toastId);
+            },
+            onError: () => {
+              toast.error(t("General.error_operation"), {
+                description: t("Roles.error.duplicating"),
+              });
+              toast.dismiss(toastId);
+            },
           },
-          onError: () => {
-            toast.error(t("General.error_operation"), {
-              description: t("Roles.error.duplicating"),
-            });
-            toast.dismiss(toastId);
-          },
-        },
-      );
+        );
+      } else if (roleToDuplicate?.is_system) {
+        toast.warning(t("Roles.cannot_duplicate_system"));
+      }
     }
   };
+
+  const userRoleName = allRoles.find((role) => role.id === membership?.role_id)?.name;
 
   if (!enterprise) {
     return (
@@ -117,28 +160,36 @@ export default function RolesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Roles.title")}
-            createHref="/roles/add"
+            onAddClick={() => {
+              setActionableRole(null);
+              setIsFormDialogOpen(true);
+            }}
             createLabel={t("Roles.create_role")}
             searchPlaceholder={t("Roles.search_roles")}
           />
         )}
 
         <div className="p-4">
-          {profile?.role && (
+          {userRoleName && (
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground text-sm">Your role:</span>
               <Badge variant="outline" className="text-sm">
-                {profile.role}
+                {userRoleName}
               </Badge>
             </div>
           )}
           <DataModelList
             data={filteredRoles}
-            isLoading={loadingFetchRoles}
+            isLoading={isLoading}
             error={error as Error | null}
             emptyMessage={t("Roles.no_roles_found")}
             renderItem={(role) => (
-              <RoleCard key={role.id} role={role} onActionClick={onActionClicked} />
+              <RoleCard
+                key={role.id}
+                role={role}
+                onActionClick={onActionClicked}
+                disableActions={role.is_system}
+              />
             )}
             gridCols="3"
           />
@@ -147,25 +198,31 @@ export default function RolesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Roles.add_new")}
+          title={actionableRole?.id ? t("Roles.edit_role") : t("Roles.add_new")}
           formId="role-form"
           loadingSave={loadingSaveRole}
         >
           <RoleForm
-            id={"role-form"}
+            id={actionableRole?.id}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableRole(null);
-              setLoadingSaveRole(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Roles.success.updated"),
+                description: actionableRole?.id
+                  ? t("Roles.success.updated")
+                  : t("Roles.success.created"),
               });
             }}
-            defaultValues={{
-              ...actionableRole,
-              enterprise_id: enterprise.id,
-            }}
-            editMode={!!actionableRole}
+            editMode={!!actionableRole?.id}
+            defaultValues={
+              actionableRole
+                ? {
+                    name: actionableRole.name || "",
+                    description: actionableRole.description || null,
+                    permissions: actionableRole.permissions || [],
+                  }
+                : undefined
+            }
           />
         </FormDialog>
 

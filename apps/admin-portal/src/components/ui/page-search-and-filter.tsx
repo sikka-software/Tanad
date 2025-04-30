@@ -36,7 +36,7 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
     setSelectedRows: (ids: string[]) => void;
   }>;
   title?: string;
-  createHref?: string;
+  onAddClick?: () => void;
   createLabel?: string;
   searchPlaceholder?: string;
   sortableColumns: SortableColumn[];
@@ -47,7 +47,7 @@ const PageSearchAndFilter = ({
   store,
   className,
   title = "Items",
-  createHref = "#",
+  onAddClick,
   createLabel = "Create",
   searchPlaceholder = "Search...",
   sortableColumns,
@@ -123,12 +123,12 @@ const PageSearchAndFilter = ({
           onNullsFirstChange={setSortNullsFirst}
         />
 
-        <Link href={createHref} className="flex items-center">
-          <Button size="sm" className="h-8">
+        {onAddClick && (
+          <Button size="sm" className="h-8" onClick={onAddClick}>
             <Plus className="me-1 h-4 w-4" />
             <span>{createLabel}</span>
           </Button>
-        </Link>
+        )}
       </div>
     </div>
   );
