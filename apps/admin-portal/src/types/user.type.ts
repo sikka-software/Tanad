@@ -22,7 +22,6 @@ export type UserProps = {
   first_name?: MultiLangString;
   last_name?: MultiLangString;
 
-  clerk_user?: string;
   stripe_customer_id?: string;
 
   default_card: string | null;
