@@ -402,4 +402,51 @@ export function useSystemRoles() {
   });
 }
 
+// Hook to fetch all non-system (custom) roles
+export function useCustomRoles() {
+  return useQuery<RoleWithPermissions[], Error>({
+    queryKey: [...roleKeys.lists(), "custom"], // Specific key for custom roles
+    queryFn: async () => {
+      // 1. Fetch non-system roles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from("roles")
+        .select("*")
+        .eq("is_system", false); // Filter for custom roles
+
+      if (rolesError) throw rolesError;
+      const roles = (rolesData || []) as Role[];
+      if (roles.length === 0) return [];
+
+      const roleIds = roles.map((r) => r.id);
+
+      // 2. Fetch permissions for these roles
+      const { data: permissionsData, error: permissionsError } = await supabase
+        .from("permissions")
+        .select("role_id, permission")
+        .in("role_id", roleIds);
+
+      if (permissionsError) throw permissionsError;
+
+      const rolePermissionsMap = (permissionsData || []).reduce(
+        (acc, { role_id, permission }) => {
+          if (!acc[role_id]) acc[role_id] = [];
+          acc[role_id].push(permission);
+          return acc;
+        },
+        {} as Record<string, string[]>,
+      );
+
+      // 3. Combine roles and their permissions
+      const rolesWithPermissions: RoleWithPermissions[] = roles.map((role) => ({
+        ...role,
+        permissions: rolePermissionsMap[role.id] || [],
+      }));
+
+      return rolesWithPermissions;
+    },
+    // Consider adding staleTime if roles don't change often
+    // staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
 // Add other role hooks if needed (e.g., useRoleById, useCreateRole, etc.)

@@ -3,7 +3,7 @@ import { toast } from "sonner";
 
 import { Role, Permission } from "@/types/rbac";
 
-import { appPermission } from "@/db/schema";
+import { app_permission } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
@@ -24,7 +24,7 @@ export const permissionKeys = {
 };
 
 // Available permissions from the enum
-const AVAILABLE_PERMISSIONS = appPermission.enumValues;
+const AVAILABLE_PERMISSIONS = app_permission.enumValues;
 
 // Action display names
 const ACTION_DISPLAY_NAMES: Record<string, string> = {
@@ -39,10 +39,10 @@ const ACTION_DISPLAY_NAMES: Record<string, string> = {
 // Fetch all roles
 export function useRoles() {
   const { enterprise } = useUserStore();
-  
+
   return useQuery({
     queryKey: roleKeys.lists(),
-    queryFn: async () => {
+    queryFn: async (): Promise<Role[]> => {
       if (!enterprise?.id) {
         throw new Error("No enterprise ID found");
       }
@@ -50,7 +50,8 @@ export function useRoles() {
       // 1. Get user's enterprise roles
       const { data: userRoles, error: userRolesError } = await supabase
         .from("roles")
-        .select(`
+        .select(
+          `
           id,
           name,
           description,
@@ -60,18 +61,19 @@ export function useRoles() {
           role_permissions (
             permission
           )
-        `)
+        `,
+        )
         .eq("enterprise_id", enterprise.id);
 
       if (userRolesError) throw userRolesError;
 
       // 2. Transform the data to match our Role type
-      return userRoles.map((role) => ({
+      return userRoles.map((role: any) => ({
         id: role.id,
         name: role.name,
         description: role.description || "",
         isSystem: role.is_system,
-        permissions: role.role_permissions.map((rp) => rp.permission),
+        permissions: role.role_permissions.map((rp: any) => rp.permission),
         created_at: role.created_at,
         updated_at: role.updated_at,
       })) as Role[];
@@ -84,14 +86,14 @@ export function useRoles() {
 export function usePermissions() {
   return useQuery({
     queryKey: permissionKeys.lists(),
-    queryFn: async () => {
+    queryFn: async (): Promise<Permission[]> => {
       // Transform enum values into Permission objects
-      const permissions = AVAILABLE_PERMISSIONS.map((permission) => {
+      const permissions = AVAILABLE_PERMISSIONS.map((permission: string) => {
         const [category, action] = permission.split(".");
         const displayName = ACTION_DISPLAY_NAMES[action] || action;
         const formattedCategory = category
           .split("_")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
           .join(" ");
 
         return {
@@ -104,7 +106,7 @@ export function usePermissions() {
 
       // Group permissions by category for better organization
       const groupedPermissions = permissions.reduce(
-        (acc, permission) => {
+        (acc: Record<string, Permission[]>, permission: Permission) => {
           if (!acc[permission.category]) {
             acc[permission.category] = [];
           }
@@ -117,7 +119,7 @@ export function usePermissions() {
       // Sort categories and permissions within each category
       const sortedPermissions = Object.values(groupedPermissions)
         .flat()
-        .sort((a, b) => {
+        .sort((a: Permission, b: Permission) => {
           // First sort by category
           const categoryCompare = a.category.localeCompare(b.category);
           if (categoryCompare !== 0) return categoryCompare;
@@ -139,7 +141,7 @@ export function useCreateRole() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (role: Omit<Role, "id" | "created_at" | "updated_at">) => {
+    mutationFn: async (role: Omit<Role, "id" | "created_at" | "updated_at">): Promise<Role> => {
       // 1. Get the current user's ID
       const {
         data: { user },
@@ -177,7 +179,7 @@ export function useCreateRole() {
       if (role.permissions && role.permissions.length > 0) {
         // Validate that all permissions are valid enum values
         const invalidPermissions = role.permissions.filter(
-          (permission) => !appPermission.enumValues.includes(permission as any),
+          (permission) => !app_permission.enumValues.includes(permission as any),
         );
 
         if (invalidPermissions.length > 0) {

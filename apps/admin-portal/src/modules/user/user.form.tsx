@@ -25,9 +25,9 @@ import {
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useRoles, useSystemRoles } from "../role/role.hooks";
+import { useCustomRoles, useSystemRoles } from "../role/role.hooks";
 import type { Role, RoleWithPermissions } from "../role/role.type";
-import { useCreateUser } from "./user.hooks";
+import type { UserCreateData } from "./user.type";
 import type { UserType } from "./user.table";
 
 // Define the Zod schema for form validation
@@ -45,41 +45,49 @@ type UserFormData = z.infer<typeof userFormSchema>;
 interface UserFormProps {
   onSuccess: () => void;
   id?: string;
+  onSubmitRequest: (data: UserCreateData) => Promise<void>;
+  isSubmitting: boolean;
 }
 
-export function UserForm({ onSuccess, id }: UserFormProps) {
+export function UserForm({ onSuccess, id, onSubmitRequest, isSubmitting }: UserFormProps) {
   const t = useTranslations();
-  const { profile, enterprise } = useUserStore((state) => ({
-    profile: state.profile,
-    enterprise: state.enterprise,
-  }));
-  const createUser = useCreateUser();
-  const {
-    data: enterpriseRoles,
-    isLoading: enterpriseRolesLoading,
-    error: enterpriseRolesError,
-  } = useRoles();
-  const {
-    data: systemRoles,
-    isLoading: systemRolesLoading,
-    error: systemRolesError,
-  } = useSystemRoles();
+  // const { profile, enterprise } = useUserStore((state) => ({
+  //   profile: state.profile,
+  //   enterprise: state.enterprise,
+  // }));
+  const enterprise = null; // Provide dummy value
+  const profile = null; // Provide dummy value
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // // Reinstated hook calls:
+  // const {
+  //   data: customRoles,
+  //   isLoading: customRolesLoading,
+  //   error: customRolesError,
+  // } = useCustomRoles();
+  // const {
+  //   data: systemRoles,
+  //   isLoading: systemRolesLoading,
+  //   error: systemRolesError,
+  // } = useSystemRoles();
+  //
+  // const allRoles = useMemo(() => {
+  //   const combined = new Map<string, RoleWithPermissions>();
+  //   (customRoles ?? []).forEach((role) => combined.set(role.id, role));
+  //   (systemRoles ?? []).forEach((role) => {
+  //     if (!combined.has(role.id)) {
+  //       combined.set(role.id, role);
+  //     }
+  //   });
+  //   return Array.from(combined.values()).sort((a, b) => a.name.localeCompare(b.name));
+  // }, [customRoles, systemRoles]);
+  //
+  // const rolesLoading = customRolesLoading || systemRolesLoading;
+  // const rolesError = customRolesError || systemRolesError;
 
-  const allRoles = useMemo(() => {
-    const combined = new Map<string, RoleWithPermissions>();
-    (enterpriseRoles || []).forEach((role) => combined.set(role.id, role));
-    (systemRoles || []).forEach((role) => {
-      if (!combined.has(role.id)) {
-        combined.set(role.id, role);
-      }
-    });
-    return Array.from(combined.values());
-  }, [enterpriseRoles, systemRoles]);
-
-  const rolesLoading = enterpriseRolesLoading || systemRolesLoading;
-  const rolesError = enterpriseRolesError || systemRolesError;
+  // Provide default values since hooks are commented out
+  const allRoles: RoleWithPermissions[] = [];
+  const rolesLoading = false;
+  const rolesError = null;
 
   const form = useForm<UserFormData>({
     resolver: zodResolver(userFormSchema),
@@ -92,29 +100,34 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
     },
   });
 
-  const currentRoleValue = form.watch("role");
-
   useEffect(() => {
-    if (allRoles && allRoles.length > 0 && currentRoleValue) {
-      const isValidRole = allRoles.some((role) => role.name === currentRoleValue);
-      if (!isValidRole) {
-        form.setValue("role", "");
+    if (!rolesLoading && allRoles.length > 0) {
+      const currentSelectedRoleName = form.getValues("role");
+      if (currentSelectedRoleName) {
+        const isValidRole = allRoles.some((role) => role.name === currentSelectedRoleName);
+        if (!isValidRole) {
+          console.log(
+            "Resetting role because current selection is invalid:",
+            currentSelectedRoleName,
+          );
+          // form.resetField("role", { defaultValue: "" }); // Temporarily comment out
+        }
       }
     }
-  }, [allRoles, currentRoleValue, form.setValue]);
+  }, [allRoles, rolesLoading]); // Keep dependencies minimal
 
   const onSubmit = async (values: UserFormData) => {
-    if (!enterprise?.id) {
-      toast.error("Cannot create user: Enterprise information missing.");
-      return;
-    }
+    // if (!enterprise?.id) { // Temporarily comment out check
+    //   toast.error("Cannot create user: Enterprise information missing.");
+    //   return;
+    // }
 
-    setIsSubmitting(true);
     try {
-      await createUser.mutateAsync({
+      await onSubmitRequest({
         email: values.email,
         role: values.role,
-        enterprise_id: enterprise.id,
+        // enterprise_id: enterprise.id, // No enterprise available
+        enterprise_id: "dummy-enterprise-id", // Provide dummy ID
         first_name: values.first_name,
         last_name: values.last_name,
         password: values.password,
@@ -122,11 +135,11 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
       form.reset();
       onSuccess();
     } catch (error) {
-      console.error("Submit Error in form:", error);
-    } finally {
-      setIsSubmitting(false);
+      console.error("Submit Error in UserForm when calling onSubmitRequest:", error);
     }
   };
+
+  const isFormSubmitting = isSubmitting;
 
   return (
     <Form {...form}>
@@ -139,7 +152,7 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
               <FormItem>
                 <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="John" {...field} disabled={isSubmitting} />
+                  <Input placeholder="John" {...field} disabled={isFormSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -152,7 +165,7 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Doe" {...field} disabled={isSubmitting} />
+                  <Input placeholder="Doe" {...field} disabled={isFormSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -170,7 +183,7 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
                   type="email"
                   placeholder="user@example.com"
                   {...field}
-                  disabled={isSubmitting}
+                  disabled={isFormSubmitting}
                 />
               </FormControl>
               <FormMessage />
@@ -184,7 +197,12 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="********" {...field} disabled={isSubmitting} />
+                <Input
+                  type="password"
+                  placeholder="********"
+                  {...field}
+                  disabled={isFormSubmitting}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -199,29 +217,31 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
               <Select
                 onValueChange={field.onChange}
                 value={field.value}
-                disabled={rolesLoading || !!rolesError || isSubmitting}
+                disabled={rolesLoading || isFormSubmitting}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue
-                      placeholder={rolesLoading ? "Loading roles..." : "Select a role"}
-                    />
+                    <SelectValue placeholder="Select a role" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {rolesError ? (
-                    <SelectItem value="error" disabled>
-                      Error: {rolesError.message}
+                  {rolesLoading ? (
+                    <SelectItem value="loading" disabled>
+                      Loading roles...
                     </SelectItem>
-                  ) : allRoles && allRoles.length > 0 ? (
-                    allRoles.map((role: Role) => (
+                  ) : rolesError ? (
+                    <SelectItem value="error" disabled>
+                      Error loading roles
+                    </SelectItem>
+                  ) : allRoles.length > 0 ? (
+                    allRoles.map((role) => (
                       <SelectItem key={role.id} value={role.name}>
                         {role.name}
                       </SelectItem>
                     ))
                   ) : (
-                    <SelectItem value="loading" disabled>
-                      {rolesLoading ? "Loading..." : "No roles available"}
+                    <SelectItem value="no-roles" disabled>
+                      No roles available
                     </SelectItem>
                   )}
                 </SelectContent>

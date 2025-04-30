@@ -52,22 +52,22 @@ export function useUser(id: string) {
 export function useCreateUser() {
   const queryClient = useQueryClient();
   const t = useTranslations();
-  const setIsLoading = useEnterpriseUserStore((state: any) => state.setIsLoading);
 
   return useMutation({
     mutationFn: (data: UserCreateData) => createUser(data),
-    onMutate: () => {
-      setIsLoading(true);
-    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       toast.success(t("Users.success.created"));
-      setIsLoading(false);
     },
     onError: (error) => {
       console.error("Error creating user:", error);
-      toast.error(t("Users.error.creating"));
-      setIsLoading(false);
+      const defaultError = t("Users.error.creating");
+      const message = (error as any)?.message || defaultError;
+      if ((error as any)?.code === '23505') {
+        toast.error(t("Users.error.email_exists"));
+      } else {
+        toast.error(`${defaultError}: ${message}`);
+      }
     },
   });
 }

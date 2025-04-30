@@ -2,6 +2,8 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 import PageTitle from "@/ui/page-title";
 
@@ -10,29 +12,32 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { generateDummyData } from "@/lib/dummy-generator";
 
 import { UserForm } from "@/modules/user/user.form";
-import useEnterpriseUserStore from "@/modules/user/user.store";
+import { useCreateUser } from "@/modules/user/user.hooks";
+import type { UserCreateData } from "@/modules/user/user.type";
 
 export default function AddUserPage() {
   const t = useTranslations();
   const router = useRouter();
-
-  const setIsLoading = useEnterpriseUserStore((state) => state.setIsLoading);
-  const isLoading = useEnterpriseUserStore((state) => state.isLoading);
+  // const createUser = useCreateUser(); // Temporarily comment out
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
-    const form = (window as any).userForm;
+    const form = (window as any).userForm as ReturnType<typeof useForm> | undefined;
     if (form) {
       form.setValue("email", dummyData.email);
-      form.setValue("role", "user");
+      form.setValue("first_name", dummyData.first_name);
+      form.setValue("last_name", dummyData.last_name);
+      form.setValue("password", "password123");
+      form.setValue("role", "viewer");
     }
   };
 
   const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Users.success.created"),
-    });
     router.push("/users");
+  };
+
+  const handleFormSubmit = async (data: UserCreateData) => {
+    // await createUser.mutateAsync(data);
   };
 
   return (
@@ -41,7 +46,7 @@ export default function AddUserPage() {
       <PageTitle
         formButtons
         formId="user-form"
-        loading={isLoading}
+        loading={false}
         onCancel={() => router.push("/users")}
         dummyButton={handleDummyData}
         texts={{
@@ -51,7 +56,12 @@ export default function AddUserPage() {
         }}
       />
       <div className="mx-auto max-w-2xl p-4">
-        <UserForm id="user-form" onSuccess={onAddSuccess} />
+        <UserForm
+          id="user-form"
+          onSuccess={onAddSuccess}
+          onSubmitRequest={async (data) => { console.log("Dummy Submit:", data); await Promise.resolve(); }}
+          isSubmitting={false}
+        />
       </div>
     </div>
   );
