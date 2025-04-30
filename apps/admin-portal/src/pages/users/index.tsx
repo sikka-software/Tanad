@@ -121,7 +121,7 @@ export default function UsersPage() {
             title={t("Users.title")}
             onAddClick={handleAddClick}
             createLabel={t("Users.add_new")}
-            searchPlaceholder={t("Users.search_users")}
+            searchPlaceholder={t("Users.search_placeholder")}
           />
         )}
 

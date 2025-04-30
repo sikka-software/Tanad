@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
-import { useState, useEffect, useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { ComboboxAdd } from "@/components/ui/combobox-add";
 import {
   Form,
   FormControl,
@@ -14,20 +15,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { FormDialog } from "@/components/ui/form-dialog";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { RoleForm } from "../role/role.form";
 // Import store for loading state
 
 import { useCustomRoles, useSystemRoles } from "../role/role.hooks";
+import { predefinedRoles } from "../role/role.options";
+import useRoleStore from "../role/role.store";
 import type { Role, RoleWithPermissions } from "../role/role.type";
 // Import hooks for create/update
 import { useCreateUser, useUpdateUser } from "./user.hooks";
@@ -35,6 +33,8 @@ import useEnterpriseUsersStore from "./user.store";
 // Add User type
 import type { UserType } from "./user.table";
 import type { UserCreateData, UserUpdateData, User } from "./user.type";
+
+// Import RoleForm
 
 // Adjust schema: make password optional for updates
 const baseUserFormSchema = z.object({
@@ -69,12 +69,15 @@ interface UserFormProps {
 
 export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const enterprise = useUserStore((state) => state.enterprise);
   const setIsLoading = useEnterpriseUsersStore((state) => state.setIsLoading);
+  const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false); // State for RoleForm dialog
   // Hooks for mutations
   const { mutateAsync: createUser, isPending: isCreating } = useCreateUser();
   const { mutateAsync: updateUser, isPending: isUpdating } = useUpdateUser();
-
+  const setSavingRole = useRoleStore((state) => state.setIsLoading);
+  const isSavingRole = useRoleStore((state) => state.isLoading);
   // State for roles
   const {
     data: customRoles,
@@ -123,42 +126,59 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
 
   const form = useForm<UserFormData>({
     resolver: zodResolver(currentSchema),
-    defaultValues: useMemo(
-      () => {
-        // Use full_name as it's available according to TS error
-        const [firstName = "", lastName = ""] = (initialData?.full_name || "").split(" ", 2); // Split only once
-        return {
-          first_name: firstName,
-          last_name: lastName,
-          email: initialData?.email || "",
-          password: "",
-          // Default role will be empty string
-          role: allRoles.initialRoleName,
-        };
-      },
-      // Depend only on properties known to exist on initialData and roles
-      [initialData?.id, initialData?.full_name, initialData?.email, allRoles.initialRoleName],
-    ),
+    defaultValues: useMemo(() => {
+      // Revert to splitting full_name
+      const [firstName = "", lastName = ""] = (initialData?.full_name || "").split(" ", 2);
+      // Cannot reliably determine initial role name from initialData type
+      return {
+        first_name: firstName,
+        last_name: lastName,
+        email: initialData?.email || "",
+        password: "",
+        role: "", // Default role to empty string
+      };
+    }, [initialData?.id, initialData?.full_name, initialData?.email]), // Revert dependencies
   });
 
   // Reset form
   useEffect(() => {
+    // Revert to splitting full_name
     const [firstName = "", lastName = ""] = (initialData?.full_name || "").split(" ", 2);
+
     form.reset({
       first_name: firstName,
       last_name: lastName,
       email: initialData?.email || "",
       password: "",
-      role: allRoles.initialRoleName, // Keep reset consistent
+      role: "", // Default role to empty string
     });
     // Update dependencies to match defaultValues
   }, [
     initialData?.id,
-    initialData?.full_name,
+    initialData?.full_name, // Revert dependencies
     initialData?.email,
-    allRoles.initialRoleName,
     form.reset,
   ]);
+
+  // Handler for RoleForm success
+  const handleRoleCreated = useCallback(
+    (newRole?: Role) => {
+      setSavingRole(true);
+      // Adjust type if needed
+      // Close the dialog
+      setIsRoleDialogOpen(false);
+      // Refetch roles - React Query handles this via hook re-render if keys are correct
+      toast.success(t("General.successful_operation"), {
+        description: t("Roles.success.created"), // Use Role success message
+      });
+      // Cannot reliably set value without knowing the new role name from RoleForm onSuccess
+      // if (newRole?.name) {
+      //   form.setValue("role", newRole.name);
+      // }
+      setSavingRole(false);
+    },
+    [t, setIsRoleDialogOpen, form],
+  );
 
   const onSubmit = async (values: UserFormData) => {
     if (!enterprise?.id) {
@@ -168,11 +188,15 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
 
     setIsLoading(true);
 
+    // Find the role ID based on the selected role name
+    const selectedRole = allRoles.roles.find((role) => role.name === values.role);
+    const roleId = selectedRole?.id;
+
     // Construct mutation data based on form values
     const mutationDataBase = {
       first_name: values.first_name,
       last_name: values.last_name,
-      email: values.email,
+      email: values.email.toLowerCase(), // Ensure email is lowercase
       role: values.role,
       enterprise_id: enterprise.id,
     };
@@ -184,7 +208,10 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
 
     try {
       if (isEditing && initialData) {
-        await updateUser({ id: initialData.id, data: mutationData as UserUpdateData });
+        await updateUser({
+          id: initialData.id,
+          data: { ...mutationData, role_id: roleId } as UserUpdateData,
+        });
         toast.success(t("General.successful_operation"), {
           description: t("Users.success.updated"),
         });
@@ -195,7 +222,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
           setIsLoading(false);
           return;
         }
-        await createUser(mutationData as UserCreateData);
+        await createUser({ ...mutationData, role_id: roleId } as UserCreateData);
         toast.success(t("General.successful_operation"), {
           description: t("Users.success.created"),
         });
@@ -270,6 +297,8 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
               <FormLabel>{t("Users.form.email.label")}</FormLabel>
               <FormControl>
                 <Input
+                  dir="ltr"
+                  className="text-start"
                   type="email"
                   placeholder={t("Users.form.email.placeholder")}
                   {...field}
@@ -310,47 +339,50 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
           control={form.control}
           name="role"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex flex-col">
               <FormLabel>{t("Users.form.role.label")}</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value} // This should be the role name
-                disabled={rolesLoading || isFormSubmitting}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t("Users.form.role.placeholder")} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {rolesLoading ? (
-                    <SelectItem value="loading" disabled>
-                      {t("General.loading")}
-                    </SelectItem>
-                  ) : rolesError ? (
-                    <SelectItem value="error" disabled>
-                      {t("General.error_loading")}
-                    </SelectItem>
-                  ) : allRoles.roles.length > 0 ? (
-                    allRoles.roles.map((role) => (
-                      <SelectItem key={role.id} value={role.name}>
-                        {" "}
-                        {/* Value is role name */}
-                        {role.name}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="no-roles" disabled>
-                      {t("Roles.no_roles_available")}
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <ComboboxAdd
+                  direction={locale === "ar" ? "rtl" : "ltr"}
+                  // Use role name as value, consistent with previous Select
+                  data={allRoles.roles.map((role) => ({
+                    label: predefinedRoles(t, role.name)?.name || role.name, // Pass role.name to predefinedRoles
+                    value: role.name, // Form value
+                  }))}
+                  isLoading={rolesLoading}
+                  defaultValue={field.value} // Current form value (role name)
+                  onChange={(value) => field.onChange(value || null)} // Update form value
+                  texts={{
+                    placeholder: t("Users.form.role.placeholder"),
+                    searchPlaceholder: t("Users.form.role.search_placeholder"),
+                    noItems: t("Roles.no_roles_available"),
+                  }}
+                  addText={t("Roles.add_new")} // Use Role translation
+                  onAddClick={() => setIsRoleDialogOpen(true)} // Open dialog
+                  disabled={isFormSubmitting}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
       </form>
+
+      {/* Role Creation Dialog */}
+      <FormDialog
+        open={isRoleDialogOpen}
+        onOpenChange={setIsRoleDialogOpen}
+        title={t("Roles.add_new")} // Use Role translation
+        formId="role-form" // ID for the RoleForm inside
+        cancelText={t("General.cancel")}
+        submitText={t("General.save")}
+        loadingSave={isSavingRole}
+      >
+        <RoleForm
+          formId="role-form" // Match the FormDialog's formId
+          onSuccess={handleRoleCreated} // Callback on successful creation
+        />
+      </FormDialog>
     </Form>
   );
 }
