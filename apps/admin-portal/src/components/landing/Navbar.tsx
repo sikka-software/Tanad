@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { AtSign, Menu } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { AtSign, Menu } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
+// Components
+import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
+import MobileNavMenuItem from "@/components/landing/MobileNavMenuItem";
 // UI
 import { Button } from "@/components/ui/button";
 import {
@@ -16,21 +19,20 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import LanguageSwitcher from "@/components/ui/language-switcher";
 import { Logos } from "@/components/ui/logos";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import ThemeSwitcher from "@/components/ui/theme-switcher";
 
-// Components
-import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
-import MobileNavMenuItem from "@/components/landing/MobileNavMenuItem";
 // Types
 import { IconComponents } from "@/lib/types";
-// Hooks
-import { useWindowSize } from "@/hooks/use-window-size";
 // Utils
 import { navigationMenuTriggerStyle, cn } from "@/lib/utils";
+
+// Hooks
+import { useWindowSize } from "@/hooks/use-window-size";
+
 import settings from "../../../landing.config";
-import LanguageSwitcher from "@/components/ui/language-switcher";
-import ThemeSwitcher from "@/components/ui/theme-switcher";
 
 export const contactIcons: IconComponents = {
   whatsapp: <Logos.whatsapp className="h-4 w-4" />,
@@ -92,9 +94,9 @@ export default function Navigation(props: any) {
     // },
   ];
 
-  const logoSrc = `/assets/pukla-logo-full-${
-    !isMounted || resolvedTheme === "dark" ? "green" : "purple"
-  }${lang === "en" ? "-en" : ""}.png`;
+  const logoSrc = `https://sikka-images.s3.ap-southeast-1.amazonaws.com/products/tanad/tanad_symbol_${
+    !isMounted || resolvedTheme === "dark" ? "white" : "black"
+  }.png`;
 
   if (!isMounted) {
     return null; // or a loading skeleton
@@ -105,43 +107,37 @@ export default function Navigation(props: any) {
       className={cn(
         "sticky top-0 z-50",
         "flex w-full flex-row items-center justify-center p-4",
-        props.onSticky ? "bg-background border-b" : "bg-transparent"
+        props.onSticky ? "bg-background border-b" : "bg-transparent",
       )}
     >
       <div
         className={cn(
-          "flex w-full flex-row items-center justify-between",
-          !settings.navigation.fullWidth && "max-w-7xl"
+          "bg--300 flex w-full flex-row items-center justify-between",
+          !settings.navigation.fullWidth && "max-w-7xl",
         )}
       >
         <div className="flex flex-row items-center justify-center gap-10">
           <Link href={"/"}>
-          Tanad
-            {/* <Image
+            <Image
               loading="lazy"
               width={512}
               height={512}
               src={logoSrc}
-              className="w-[150px] aspect-auto"
-              alt="Pukla Logo"
-            /> */}
+              className="aspect-auto h-[35px] w-auto"
+              alt="Tanad Logo"
+            />
           </Link>
-          {(size?.width ?? 0) > 800 && (
-            <div className="flex w-full flex-row gap-4 ">
+        </div>
+
+        {(size?.width ?? 0) > 800 ? (
+          <div className="flex max-w-md flex-row gap-2">
+            <div className="bg--400 flex w-fit flex-row gap-2">
               {navigationItems.map((navLink, i) => (
-                <Link
-                  key={i}
-                  href={navLink.path}
-                  className={cn(navigationMenuTriggerStyle())}
-                >
+                <Link key={i} href={navLink.path} className={cn(navigationMenuTriggerStyle())}>
                   {navLink.trigger}
                 </Link>
               ))}
             </div>
-          )}
-        </div>
-        {(size?.width ?? 0) > 800 ? (
-          <div className="flex max-w-md flex-row gap-2">
             <LanguageSwitcher defaultSize={true} />
             <ThemeSwitcher defaultSize={true} />
 
@@ -176,7 +172,7 @@ export default function Navigation(props: any) {
                       </Button>
                     </Link>
                   </div>
-                  <div className=" flex flex-grow flex-col gap-2 overflow-y-auto px-4">
+                  <div className="flex flex-grow flex-col gap-2 overflow-y-auto px-4">
                     {navigationItems.map((n, i) => (
                       <div className="flex flex-col gap-2" key={i}>
                         <MobileNavMenuItem
@@ -194,8 +190,8 @@ export default function Navigation(props: any) {
                       </div>
                     ))}
                   </div>
-                  <div className="flex w-full  flex-row items-center justify-between gap-0 border-t p-4">
-                    <div className="flex h-full flex-row items-center  gap-2">
+                  <div className="flex w-full flex-row items-center justify-between gap-0 border-t p-4">
+                    <div className="flex h-full flex-row items-center gap-2">
                       <CustomMotionDiv delay={0.1}>
                         <ThemeSwitcher defaultSize={true} />
                       </CustomMotionDiv>
@@ -207,29 +203,20 @@ export default function Navigation(props: any) {
                       <DropdownMenu>
                         <DropdownMenuTrigger>
                           <div>
-                            <Button
-                              aria-label="Contact Methods"
-                              variant="outline"
-                              size="icon"
-                            >
+                            <Button aria-label="Contact Methods" variant="outline" size="icon">
                               <AtSign className="h-5 w-5" />
                             </Button>
                           </div>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align={lang === "ar" ? "start" : "end"}
-                        >
+                        <DropdownMenuContent align={lang === "ar" ? "start" : "end"}>
                           {contactMethods.map(
                             (method, index) =>
                               method && (
-                                <DropdownMenuItem
-                                  key={index}
-                                  onClick={method.action}
-                                >
+                                <DropdownMenuItem key={index} onClick={method.action}>
                                   <span className="me-2">{method.icon}</span>
                                   {method.label}
                                 </DropdownMenuItem>
-                              )
+                              ),
                           )}
                         </DropdownMenuContent>
                       </DropdownMenu>

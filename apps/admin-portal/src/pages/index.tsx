@@ -1,7 +1,11 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
+import BottomCTA from "@/components/landing/BottomCTA";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import Features from "@/components/landing/Features";
+import FloatingPuklas from "@/components/landing/FloatingPuklas";
+import HeroSection from "@/components/landing/HeroSection";
 import WaitlistSection from "@/components/landing/waitlist-section";
 
 export default function LandingPage() {
@@ -10,7 +14,24 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col">
       <CustomPageMeta title={t("SEO.landing.title")} description={t("SEO.landing.description")} />
-      <WaitlistSection />
+      <div className="flex flex-col gap-[150px]">
+        <div className="flex flex-col gap-[150px] px-10 py-24 pt-32 md:pt-44">
+          <HeroSection
+            withAction
+            title={t("Landing.hero.title")}
+            subtitle={t("Landing.hero.subtitle")}
+            actionPath="/dashboard"
+          />
+        </div>
+      </div>
+      <FloatingPuklas />
+      <Features />
+      <BottomCTA
+        title={t("Landing.cta.title")}
+        subtitle={t("Landing.cta.subtitle")}
+        primaryActionText={t("Landing.cta.action-1-text")}
+        primaryActionSlug={"/dashboard"}
+      />
     </div>
   );
 }
