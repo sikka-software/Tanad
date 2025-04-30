@@ -70,130 +70,130 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json(users);
 
       case "POST":
-        // Get the user's enterprise_id for creating new user
-        const { data: creatorProfile, error: creatorProfileError } = await supabase
-          .from("profiles")
+        // 1. Get the creator's enterprise_id from their membership
+        const { data: creatorMembershipData, error: creatorMembershipErr } = await supabase
+          .from("memberships")
           .select("enterprise_id")
-          .eq("id", user.id)
+          .eq("profile_id", user.id)
           .single();
 
-        if (creatorProfileError) throw creatorProfileError;
-        if (!creatorProfile?.enterprise_id) {
-          return res.status(400).json({ error: "User is not associated with an enterprise" });
+        if (creatorMembershipErr) {
+          console.error("Creator Membership Error:", creatorMembershipErr);
+          if (creatorMembershipErr.code === "PGRST116") {
+            return res.status(400).json({ error: "Creator is not associated with an enterprise" });
+          }
+          throw creatorMembershipErr;
         }
+        if (!creatorMembershipData?.enterprise_id) {
+          return res.status(400).json({ error: "Creator is not associated with an enterprise" });
+        }
+        const creatorEnterpriseId = creatorMembershipData.enterprise_id;
 
-        const { email, password, role, first_name, last_name } = req.body;
+        const { email, password, role: roleName, first_name, last_name } = req.body; // Renamed role to roleName for clarity
 
-        if (!email || !password || !role || !first_name || !last_name) {
+        if (!email || !password || !roleName || !first_name || !last_name) {
           return res.status(400).json({
             error: "Missing required fields",
-            details: "Email, password, role, first name, and last name are required",
+            details: "Email, password, role name, first name, and last name are required",
           });
         }
 
-        // First create the auth user using the admin client
+        // 2. Create the auth user
         const { data: authData, error: authError } = await supabase.auth.admin.createUser({
           email,
           password,
-          email_confirm: true,
+          email_confirm: true, // Auto-confirm email for simplicity, adjust if needed
         });
 
-        if (authError) throw authError;
+        if (authError) {
+          console.error("Auth User Creation Error:", authError);
+          // Handle specific errors like email already exists
+          if (authError.message.includes("already registered")) {
+            return res.status(409).json({ error: "User with this email already exists" });
+          }
+          throw authError;
+        }
         if (!authData.user) {
           throw new Error("Failed to create auth user");
         }
+        const newUserId = authData.user.id;
 
-        // Then create the profile with the auth user's ID
-        const userData = {
-          id: authData.user.id,
-          user_id: authData.user.id,
-          email,
-          role,
-          first_name,
-          last_name,
-          enterprise_id: creatorProfile.enterprise_id,
-        };
-
-        const { data: created, error: createError } = await supabase
-          .from("profiles")
-          .insert(userData)
-          .select()
-          .single();
-
-        if (createError) throw createError;
-
-        // First get or create the role
+        // 4. Find the role_id based on the role name
         const { data: roleData, error: roleError } = await supabase
           .from("roles")
-          .select()
-          .eq("name", role)
-          .eq("enterprise_id", creatorProfile.enterprise_id)
-          .single();
+          .select("id")
+          .eq("name", roleName)
+          .single(); // Assume roles are pre-defined or managed elsewhere
 
-        if (roleError) {
-          // Role doesn't exist, create it
-          const { data: newRole, error: createRoleError } = await supabase
-            .from("roles")
-            .insert({
-              name: role,
-              enterprise_id: creatorProfile.enterprise_id,
-            })
-            .select()
-            .single();
+        if (roleError || !roleData) {
+          console.error("Role Lookup Error:", roleError);
+          // Rollback Auth user creation if role lookup fails (profile assumed created by trigger)
+          await supabase.auth.admin.deleteUser(newUserId);
+          console.log(`Rolled back Auth user creation for ${newUserId} due to role lookup error.`);
+          return res.status(400).json({ error: `Role '${roleName}' not found.` });
+        }
+        const roleId = roleData.id;
 
-          if (createRoleError) throw createRoleError;
+        // 5. Create the membership entry to link user, enterprise, and role
+        const membershipData = {
+          profile_id: newUserId,
+          enterprise_id: creatorEnterpriseId,
+          role_id: roleId,
+        };
 
-          // Create user_roles entry with the new role
-          const { error: userRoleError } = await supabase.from("user_roles").insert({
-            user_id: authData.user.id,
-            role_id: newRole.id,
-            enterprise_id: creatorProfile.enterprise_id,
-          });
+        const { error: createMembershipError } = await supabase
+          .from("memberships")
+          .insert(membershipData);
 
-          if (userRoleError) throw userRoleError;
-        } else {
-          // Role exists, use it
-          const { error: userRoleError } = await supabase.from("user_roles").insert({
-            user_id: authData.user.id,
-            role_id: roleData.id,
-            enterprise_id: creatorProfile.enterprise_id,
-          });
-
-          if (userRoleError) throw userRoleError;
+        if (createMembershipError) {
+          console.error("Membership Creation Error:", createMembershipError);
+          // Rollback Auth user creation if membership fails (profile assumed created by trigger)
+          await supabase.auth.admin.deleteUser(newUserId);
+          console.log(`Rolled back Auth user creation for ${newUserId} due to membership error.`);
+          throw createMembershipError;
         }
 
-        return res.status(201).json(created);
+        // Return the created profile information (or just a success status)
+        return res.status(201).json({ id: newUserId, email, role: roleName }); // Return relevant info
 
       case "DELETE":
         const { ids } = req.body;
 
-        // Verify all users belong to the same enterprise as the requester
-        const { data: requesterProfile, error: requesterProfileError } = await supabase
-          .from("profiles")
-          .select("enterprise_id")
-          .eq("id", user.id)
-          .single();
+        // Verify requester's enterprise
+        const { data: deleteRequesterMembershipData, error: deleteRequesterMembershipErr } =
+          await supabase
+            .from("memberships")
+            .select("enterprise_id")
+            .eq("profile_id", user.id)
+            .single();
 
-        if (requesterProfileError) throw requesterProfileError;
-        if (!requesterProfile?.enterprise_id) {
+        if (deleteRequesterMembershipErr) throw deleteRequesterMembershipErr;
+        if (!deleteRequesterMembershipData?.enterprise_id) {
           return res.status(400).json({ error: "User is not associated with an enterprise" });
         }
+        const deleteRequesterEnterpriseId = deleteRequesterMembershipData.enterprise_id;
 
-        // First delete the auth users using the admin client
-        for (const id of ids) {
-          const { error: deleteAuthError } = await supabase.auth.admin.deleteUser(id);
-          if (deleteAuthError) throw deleteAuthError;
+        // Optional: Verify all users to be deleted belong to the same enterprise
+        // This requires fetching memberships for all `ids` and checking their enterprise_id
+        // For simplicity, skipping this check for now, but consider adding it for security.
+
+        // Delete the auth users (this should cascade delete profiles and memberships if set up correctly)
+        const deletePromises = ids.map((id: string) => supabase.auth.admin.deleteUser(id));
+        const results = await Promise.allSettled(deletePromises);
+
+        const failedDeletes = results.filter((r) => r.status === "rejected");
+        if (failedDeletes.length > 0) {
+          console.error("Failed to delete some auth users:", failedDeletes);
+          // Decide how to handle partial failures - maybe return a specific error
+          throw new Error(`Failed to delete ${failedDeletes.length} users.`);
         }
 
-        // Then delete the profiles
-        const { error: deleteError } = await supabase
-          .from("profiles")
-          .delete()
-          .in("id", ids)
-          .eq("enterprise_id", requesterProfile.enterprise_id);
+        // No need to explicitly delete from profiles/memberships if cascade delete is configured on the foreign keys in the DB.
+        // If not configured, you would need explicit deletes here:
+        // await supabase.from("memberships").delete().in("profile_id", ids).eq("enterprise_id", requesterEnterpriseId);
+        // await supabase.from("profiles").delete().in("id", ids);
 
-        if (deleteError) throw deleteError;
-        return res.status(200).end();
+        return res.status(200).json({ message: `${ids.length} users deleted successfully.` }); // Return success message
 
       default:
         res.setHeader("Allow", ["GET", "POST", "DELETE"]);

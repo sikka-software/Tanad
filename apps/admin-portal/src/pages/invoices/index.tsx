@@ -1,6 +1,7 @@
 import { Shield } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -19,12 +20,19 @@ import { useInvoices, useBulkDeleteInvoices } from "@/modules/invoice/invoice.ho
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/invoice/invoice.options";
 import useInvoiceStore from "@/modules/invoice/invoice.store";
 import InvoicesTable from "@/modules/invoice/invoice.table";
+import useUserStore from "@/stores/use-user-store";
 
 export default function InvoicesPage() {
   const t = useTranslations();
+  const router = useRouter();
   const { hasPermission: canViewInvoices, isLoading: isCheckingPermission } =
     usePermission("invoices.read");
 
+  const canReadInvoices = useUserStore((state) => state.hasPermission("invoices.read"));
+  const canCreateInvoices = useUserStore((state) => state.hasPermission("invoices.create"));
+
+  console.log("canReadInvoices", canReadInvoices);
+  console.log("canCreateInvoices", canCreateInvoices);
   const viewMode = useInvoiceStore((state) => state.viewMode);
   const isDeleteDialogOpen = useInvoiceStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useInvoiceStore((state) => state.setIsDeleteDialogOpen);
@@ -70,7 +78,7 @@ export default function InvoicesPage() {
     );
   }
 
-  if (!canViewInvoices) {
+  if (!canReadInvoices) {
     return (
       <div className="flex h-screen items-center justify-center p-4">
         <Alert variant="destructive" className="max-w-md">
@@ -99,7 +107,7 @@ export default function InvoicesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Invoices.title")}
-            createHref="/invoices/add"
+            onAddClick={canCreateInvoices ? () => router.push("/invoices/add") : undefined}
             createLabel={t("Invoices.create_invoice")}
             searchPlaceholder={t("Invoices.search_invoices")}
           />

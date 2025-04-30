@@ -18,7 +18,7 @@ import type { UserCreateData } from "@/modules/user/user.type";
 export default function AddUserPage() {
   const t = useTranslations();
   const router = useRouter();
-  // const createUser = useCreateUser(); // Temporarily comment out
+  const createUser = useCreateUser();
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -33,11 +33,21 @@ export default function AddUserPage() {
   };
 
   const onAddSuccess = () => {
+    toast.success(t("General.successful_operation"), {
+      description: t("Users.success.created"),
+    });
     router.push("/users");
   };
 
   const handleFormSubmit = async (data: UserCreateData) => {
-    // await createUser.mutateAsync(data);
+    try {
+      await createUser.mutateAsync(data);
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      toast.error(t("General.error_operation"), {
+        description: t("Users.error.creating"),
+      });
+    }
   };
 
   return (
@@ -46,7 +56,7 @@ export default function AddUserPage() {
       <PageTitle
         formButtons
         formId="user-form"
-        loading={false}
+        loading={createUser.isPending}
         onCancel={() => router.push("/users")}
         dummyButton={handleDummyData}
         texts={{
@@ -59,8 +69,8 @@ export default function AddUserPage() {
         <UserForm
           id="user-form"
           onSuccess={onAddSuccess}
-          onSubmitRequest={async (data) => { console.log("Dummy Submit:", data); await Promise.resolve(); }}
-          isSubmitting={false}
+          onSubmitRequest={handleFormSubmit}
+          isSubmitting={createUser.isPending}
         />
       </div>
     </div>
