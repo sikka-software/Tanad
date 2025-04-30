@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -22,6 +22,7 @@ import OfficesTable from "@/modules/office/office.table";
 
 export default function OfficesPage() {
   const t = useTranslations();
+  const router = useRouter();
   const { hasPermission, isLoading: isCheckingPermission } = usePermission("offices.view");
 
   // If still checking permissions, show loading state
@@ -87,7 +88,7 @@ export default function OfficesPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Offices.title")}
-            createHref="/offices/add"
+            onAddClick={() => router.push("/offices/add")}
             createLabel={t("Offices.add_new")}
             searchPlaceholder={t("Offices.search_offices")}
           />

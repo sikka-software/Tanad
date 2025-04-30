@@ -10,14 +10,6 @@ export function usePermission(requiredPermission: string) {
   const loading = useUserStore((state) => state.loading);
   const permissions = useUserStore((state) => state.permissions);
 
-  console.log('Checking permission:', {
-    requiredPermission,
-    hasPermission,
-    loading,
-    currentPermissions: permissions,
-    profile
-  });
-
   if (!loading && !hasPermission) {
     toast.error("You don't have permission to access this page");
   }

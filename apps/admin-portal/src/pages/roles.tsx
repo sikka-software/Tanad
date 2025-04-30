@@ -1,3 +1,4 @@
+import { Shield } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
@@ -10,10 +11,12 @@ import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { FormDialog } from "@/components/ui/form-dialog";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
+import { usePermission } from "@/hooks/use-permission";
 import RoleCard from "@/modules/role/role.card";
 import { RoleForm } from "@/modules/role/role.form";
 import {
@@ -63,7 +66,8 @@ export default function RolesPage() {
 
   const isLoading = loadingEnterpriseRoles || loadingSystemRoles;
   const error = enterpriseError || systemError;
-
+  const { hasPermission: canViewRoles, isLoading: isCheckingPermission } =
+    usePermission("roles.read");
   const { mutate: duplicateRole } = useDuplicateRole();
   const { mutateAsync: deleteRoles, isPending: isDeleting } = useBulkDeleteRoles();
   const { createDeleteHandler } = useDeleteHandler();
@@ -135,10 +139,14 @@ export default function RolesPage() {
 
   const userRoleName = allRoles.find((role) => role.id === membership?.role_id)?.name;
 
-  if (!enterprise) {
+  if (!canViewRoles) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-lg text-gray-600">{t("General.select_enterprise")}</p>
+      <div className="flex h-screen items-center justify-center p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <Shield className="h-4 w-4" />
+          <AlertTitle>{t("General.no_permission")}</AlertTitle>
+          <AlertDescription>{t("General.no_permission_description")}</AlertDescription>
+        </Alert>
       </div>
     );
   }
