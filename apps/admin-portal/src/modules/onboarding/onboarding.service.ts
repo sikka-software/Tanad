@@ -29,13 +29,13 @@ export class OnboardingService {
 
     if (updateError) throw updateError;
 
-    // Create user_enterprises entry
+    // Create user_enterprises entry with superadmin role
     const { error: userEnterpriseError } = await supabase
       .from("user_enterprises")
       .insert({
         user_id: user.id,
         enterprise_id: enterprise.id,
-        role: "owner",
+        role: "superadmin"
       });
 
     if (userEnterpriseError) throw userEnterpriseError;
