@@ -2,7 +2,7 @@ import { Salary, SalaryCreateData } from "@/modules/salary/salary.type";
 
 export async function fetchSalaries(): Promise<Salary[]> {
   try {
-    const response = await fetch("/api/salaries");
+    const response = await fetch("/api/resource/salaries");
     if (!response.ok) {
       throw new Error("Failed to fetch salaries");
     }
@@ -15,7 +15,7 @@ export async function fetchSalaries(): Promise<Salary[]> {
 
 export async function fetchSalaryById(id: string): Promise<Salary> {
   try {
-    const response = await fetch(`/api/salaries/${id}`);
+    const response = await fetch(`/api/resource/salaries/${id}`);
     if (!response.ok) {
       throw new Error(`Salary with id ${id} not found`);
     }
@@ -28,7 +28,7 @@ export async function fetchSalaryById(id: string): Promise<Salary> {
 
 export async function createSalary(data: SalaryCreateData): Promise<Salary> {
   try {
-    const response = await fetch("/api/salaries", {
+    const response = await fetch("/api/resource/salaries", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export async function createSalary(data: SalaryCreateData): Promise<Salary> {
 
 export async function updateSalary(id: string, data: Partial<Salary>): Promise<Salary> {
   try {
-    const response = await fetch(`/api/salaries/${id}`, {
+    const response = await fetch(`/api/resource/salaries/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export async function updateSalary(id: string, data: Partial<Salary>): Promise<S
 
 export async function deleteSalary(id: string): Promise<void> {
   try {
-    const response = await fetch(`/api/salaries/${id}`, {
+    const response = await fetch(`/api/resource/salaries/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -80,7 +80,7 @@ export async function deleteSalary(id: string): Promise<void> {
 
 export async function bulkDeleteSalaries(ids: string[]): Promise<void> {
   try {
-    const response = await fetch("/api/salaries/bulk-delete", {
+    const response = await fetch("/api/resource/salaries/bulk-delete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

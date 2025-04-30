@@ -31,6 +31,7 @@ const modelMap: Record<string, ModelConfig> = {
     query: db.query.department_locations,
     idField: "id",
   },
+  salaries: { table: schema.salaries, query: db.query.salaries, idField: "id" },
   offices: { table: schema.offices, query: db.query.offices, idField: "id" },
   warehouses: { table: schema.warehouses, query: db.query.warehouses, idField: "id" },
   employees: { table: schema.employees, query: db.query.employees, idField: "id" },

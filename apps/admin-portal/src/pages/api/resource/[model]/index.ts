@@ -1,14 +1,17 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { NextApiRequest, NextApiResponse } from "next";
 
 import { createApiHandler } from "@/lib/api-handler";
-
-import { createClient } from "@/utils/supabase/server-props";
 
 type ModelConfig = {
   tableName: string;
   customHandlers?: {
-    POST?: (supabase: SupabaseClient, user_id: string, enterprise_id: string, req: NextApiRequest) => Promise<any>;
+    POST?: (
+      supabase: SupabaseClient,
+      user_id: string,
+      enterprise_id: string,
+      req: NextApiRequest,
+    ) => Promise<any>;
     GET?: (supabase: SupabaseClient, user_id: string, req: NextApiRequest) => Promise<any>;
     DELETE?: (supabase: SupabaseClient, user_id: string, req: NextApiRequest) => Promise<any>;
   };
@@ -21,10 +24,17 @@ const modelMap: Record<string, ModelConfig> = {
   clients: { tableName: "clients" },
   expenses: { tableName: "expenses" },
   departments: { tableName: "departments" },
+  salaries: { tableName: "salaries" },
+
   department_locations: {
     tableName: "department_locations",
     customHandlers: {
-      POST: async (supabase: SupabaseClient, user_id: string, enterprise_id: string, req: NextApiRequest) => {
+      POST: async (
+        supabase: SupabaseClient,
+        user_id: string,
+        enterprise_id: string,
+        req: NextApiRequest,
+      ) => {
         const locations = Array.isArray(req.body) ? req.body : [req.body];
 
         console.log("Locations in custom handler:", locations);
@@ -53,7 +63,7 @@ const modelMap: Record<string, ModelConfig> = {
           console.error("Error in custom department_locations POST:", error);
           throw error;
         }
-        
+
         console.log("Custom department_locations POST successful:", created);
         return created;
       },
@@ -66,12 +76,17 @@ const modelMap: Record<string, ModelConfig> = {
   invoices: {
     tableName: "invoices",
     customHandlers: {
-      POST: async (supabase: SupabaseClient, user_id: string, enterprise_id: string, req: NextApiRequest) => {
+      POST: async (
+        supabase: SupabaseClient,
+        user_id: string,
+        enterprise_id: string,
+        req: NextApiRequest,
+      ) => {
         console.log(">>> Custom invoice POST handler invoked (Supabase version) <<<");
         console.log("Original req.body:", req.body);
-        
+
         const { items, ...invoiceData } = req.body;
-        
+
         console.log("Invoice Data (excluding items):", invoiceData);
         console.log("Items received:", items);
 
@@ -85,21 +100,21 @@ const modelMap: Record<string, ModelConfig> = {
           enterprise_id: enterprise_id,
         };
         console.log("Final invoice values being inserted:", valuesToInsert);
-        
+
         const { data: createdInvoice, error: invoiceError } = await supabase
           .from("invoices")
           .insert(valuesToInsert)
           .select()
           .single();
-          
+
         if (invoiceError) {
-            console.error("Error inserting invoice:", invoiceError);
-            throw invoiceError;
+          console.error("Error inserting invoice:", invoiceError);
+          throw invoiceError;
         }
 
         if (!createdInvoice || !createdInvoice.id) {
-            console.error("Failed to create invoice or get ID");
-            throw new Error("Failed to create invoice record.");
+          console.error("Failed to create invoice or get ID");
+          throw new Error("Failed to create invoice record.");
         }
 
         console.log(">>> Invoice created successfully (Supabase version) <<<", createdInvoice);
@@ -119,8 +134,8 @@ const modelMap: Record<string, ModelConfig> = {
           .insert(invoiceItemsToInsert);
 
         if (itemsError) {
-            console.error("Error inserting invoice items:", itemsError);
-            throw new Error(`Failed to insert invoice items: ${itemsError.message}`);
+          console.error("Error inserting invoice items:", itemsError);
+          throw new Error(`Failed to insert invoice items: ${itemsError.message}`);
         }
 
         console.log(">>> Invoice items inserted successfully <<<");
@@ -141,10 +156,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const config = modelMap[model as keyof typeof modelMap];
-  
+
   if (!config) {
-      console.error(`>>> [${model}] Error: No configuration found in modelMap <<<`);
-      return res.status(500).json({ message: "Internal server configuration error" });
+    console.error(`>>> [${model}] Error: No configuration found in modelMap <<<`);
+    return res.status(500).json({ message: "Internal server configuration error" });
   }
 
   const { tableName, customHandlers } = config;

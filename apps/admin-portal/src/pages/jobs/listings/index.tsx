@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -20,7 +21,7 @@ import { JobListing } from "@/modules/job-listing/job-listing.type";
 
 export default function JobListingsPage() {
   const t = useTranslations();
-
+  const router = useRouter();
   const viewMode = useJobListingsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useJobListingsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useJobListingsStore((state) => state.setIsDeleteDialogOpen);
@@ -57,6 +58,10 @@ export default function JobListingsPage() {
     return getSortedJobListings(filteredListings);
   }, [filteredListings, sortRules, sortCaseSensitive, sortNullsFirst]);
 
+  const handleCreateClick = () => {
+    router.push("/jobs/listings/add");
+  };
+
   return (
     <div>
       <CustomPageMeta title={t("JobListings.title")} />
@@ -74,7 +79,7 @@ export default function JobListingsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("JobListings.title")}
-            createHref="/jobs/listings/add"
+            onAddClick={handleCreateClick}
             createLabel={t("JobListings.create_listing")}
             searchPlaceholder={t("JobListings.search_listings")}
           />
