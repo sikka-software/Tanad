@@ -27,10 +27,6 @@ export default function SalariesPage() {
   const canReadSalaries = useUserStore((state) => state.hasPermission("salaries.read"));
   const canCreateSalaries = useUserStore((state) => state.hasPermission("salaries.create"));
 
-  if (!canReadSalaries) {
-    return <NoPermission />;
-  }
-
   const viewMode = useSalaryStore((state) => state.viewMode);
   const isDeleteDialogOpen = useSalaryStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useSalaryStore((state) => state.setIsDeleteDialogOpen);
@@ -66,6 +62,10 @@ export default function SalariesPage() {
   const sortedSalaries = useMemo(() => {
     return getSortedSalaries(filteredSalaries);
   }, [filteredSalaries, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canReadSalaries) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

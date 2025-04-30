@@ -38,10 +38,6 @@ export default function EmployeeRequestsPage() {
     state.hasPermission("employee-requests.create"),
   );
 
-  if (!canReadEmployeeRequests) {
-    return <NoPermission />;
-  }
-
   const viewMode = useEmployeeRequestsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEmployeeRequestsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useEmployeeRequestsStore((state) => state.setIsDeleteDialogOpen);
@@ -79,6 +75,9 @@ export default function EmployeeRequestsPage() {
     return getSortedEmployeeRequests(filteredEmployeeRequests);
   }, [filteredEmployeeRequests, sortRules, sortCaseSensitive, sortNullsFirst]);
 
+  if (!canReadEmployeeRequests) {
+    return <NoPermission />;
+  }
   return (
     <div>
       <CustomPageMeta

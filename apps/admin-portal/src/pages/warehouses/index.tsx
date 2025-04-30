@@ -28,10 +28,6 @@ export default function WarehousesPage() {
   const canReadWarehouses = useUserStore((state) => state.hasPermission("warehouses.read"));
   const canCreateWarehouses = useUserStore((state) => state.hasPermission("warehouses.create"));
 
-  if (!canReadWarehouses) {
-    return <NoPermission />;
-  }
-
   const viewMode = useWarehouseStore((state) => state.viewMode);
   const isDeleteDialogOpen = useWarehouseStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useWarehouseStore((state) => state.setIsDeleteDialogOpen);
@@ -68,6 +64,10 @@ export default function WarehousesPage() {
   const sortedWarehouses = useMemo(() => {
     return getSortedWarehouses(filteredWarehouses);
   }, [filteredWarehouses, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canReadWarehouses) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

@@ -12,6 +12,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import UserCard from "@/modules/user/user.card";
@@ -21,10 +22,14 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/user/user.options
 import useEnterpriseUsersStore from "@/modules/user/user.store";
 import UsersTable, { UserType } from "@/modules/user/user.table";
 import { User, UserUpdateData } from "@/modules/user/user.type";
+import useUserStore from "@/stores/use-user-store";
 
 export default function UsersPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const canReadUsers = useUserStore((state) => state.hasPermission("users.read"));
+  const canCreateUsers = useUserStore((state) => state.hasPermission("users.create"));
 
   const loadingSaveUser = useEnterpriseUsersStore((state) => state.isLoading);
   const setLoadingSaveUser = useEnterpriseUsersStore((state) => state.setIsLoading);
@@ -79,6 +84,10 @@ export default function UsersPage() {
       setIsDeleteDialogOpen(true);
     }
   };
+
+  if (!canReadUsers) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

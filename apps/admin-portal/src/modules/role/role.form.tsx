@@ -31,6 +31,7 @@ import { usePermissions } from "../permission/permission.hooks";
 import { useCreateRole, useUpdateRole } from "./role.hooks";
 // Assuming Permission type looks like { id: string; name: string }
 // import type { Permission } from "../permission/permission.type";
+import type { Permission } from "../permission/permission.hooks"; // Import the correct type
 import type { RoleCreateData, RoleUpdateData } from "./role.type";
 
 const formSchema = z.object({
@@ -69,19 +70,17 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
     defaultValues?.permissions || [],
   );
 
-  // Group permissions by inferred module (last word of the name)
+  // Group permissions by resource (first part of 'resource.action' from permission.id)
   const permissionsByCategory = permissions.reduce<
-    Record<string, Array<(typeof permissions)[number]>> // Infer type from permissions array
+    Record<string, Array<Permission>> // Use the imported Permission type
   >((acc, permission) => {
-    const nameParts = permission.name.trim().split(" ");
-    // Use the last word as the category/module key
-    const categoryKey = nameParts.length > 1 ? nameParts[nameParts.length - 1] : permission.name;
-    // Capitalize the first letter for display
-    const displayCategory = categoryKey.charAt(0).toUpperCase() + categoryKey.slice(1);
+    // Use permission.category which is already derived in the hook
+    const displayCategory = permission.category;
 
     if (!acc[displayCategory]) {
       acc[displayCategory] = [];
     }
+    // Push the *entire permission object*
     acc[displayCategory].push(permission);
     return acc;
   }, {});
@@ -91,41 +90,45 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
     defaultValues: {
       name: defaultValues?.name || "",
       description: defaultValues?.description || null,
-      permissions: defaultValues?.permissions || [],
+      permissions: [], // form field itself is not directly used for permission state
     },
   });
 
-  // Toggle permission selection
-  const togglePermission = (permission: string) => {
+  // Toggle permission selection (expects permission id in resource.action format)
+  const togglePermission = (permissionId: string) => {
     setSelectedPermissions((current) => {
-      if (current.includes(permission)) {
-        return current.filter((p) => p !== permission);
+      if (current.includes(permissionId)) {
+        return current.filter((p) => p !== permissionId);
       } else {
-        return [...current, permission];
+        return [...current, permissionId];
       }
     });
   };
 
-  // Toggle all permissions in a category
+  // Toggle all permissions in a category (expects display category name)
   const toggleCategoryPermissions = (category: string) => {
     const categoryPermissions = permissionsByCategory[category] || [];
-    const allSelected = categoryPermissions.every((p) => selectedPermissions.includes(p.name));
+    // Check selection status based on permission.id (resource.action string)
+    const allSelected = categoryPermissions.every((p) => selectedPermissions.includes(p.id));
 
     setSelectedPermissions((current) => {
       if (allSelected) {
-        // Filter out permissions belonging to this category
-        return current.filter((pName) => !categoryPermissions.some((cp) => cp.name === pName));
+        // Filter out permissions belonging to this category (using permission.id)
+        return current.filter((pId) => !categoryPermissions.some((cp) => cp.id === pId));
       } else {
-        // Add permissions from this category that are not already selected
+        // Add permissions from this category that are not already selected (using permission.id)
         const toAdd = categoryPermissions
-          .filter((p) => !current.includes(p.name))
-          .map((p) => p.name);
+          .filter((p) => !current.includes(p.id))
+          .map((p) => p.id); // Add the resource.action string (permission.id)
         return [...current, ...toAdd];
       }
     });
   };
 
   const onSubmit = async (formData: FormData) => {
+    // Directly use the selectedPermissions state which holds the correct format
+    const permissionsToSubmit = selectedPermissions;
+
     try {
       if (editMode && id) { // Ensure id exists for edit mode
         await updateRole({
@@ -133,7 +136,7 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
           data: {
             name: formData.name,
             description: formData.description,
-            permissions: selectedPermissions,
+            permissions: permissionsToSubmit, // Submit correct format
             // Note: enterprise_id cannot be updated for a role
           },
         });
@@ -141,7 +144,7 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
         await createRole({
           name: formData.name,
           description: formData.description,
-          permissions: selectedPermissions,
+          permissions: permissionsToSubmit, // Submit correct format
           enterprise_id: enterpriseId, // Pass enterpriseId
         });
       } else {
@@ -210,14 +213,16 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
                       <span>{category}</span>
                       <div className="flex items-center space-x-2">
                         <Checkbox
-                          // Check if all permissions in this category are selected by name
-                          checked={perms.every((p) => selectedPermissions.includes(p.name))}
-                          onCheckedChange={() => toggleCategoryPermissions(category)} // Still pass category name
+                          // Check if all permissions in this category are selected by permission.id
+                          checked={perms.every((p) => selectedPermissions.includes(p.id))}
+                          // Pass the display category name (e.g., "Companies")
+                          onCheckedChange={() => toggleCategoryPermissions(category)}
                           onClick={(e) => e.stopPropagation()}
+                          // Add an id for accessibility if needed, e.g., `category-${category}-select-all`
                         />
                         <span className="text-muted-foreground text-xs">
-                          {/* Count selected permissions in this category by name */}
-                          {perms.filter((p) => selectedPermissions.includes(p.name)).length}/
+                          {/* Count selected permissions in this category by permission.id */}
+                          {perms.filter((p) => selectedPermissions.includes(p.id)).length}/
                           {perms.length}
                         </span>
                       </div>
@@ -226,32 +231,28 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
                   <AccordionContent>
                     <div className="space-y-2 ps-4 pt-2">
                       {perms.map((permission) => {
-                        // Extract action part (e.g., "Read" from "Read expenses")
-                        const nameParts = permission.name.trim().split(" ");
-                        const actionName =
-                          nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : permission.name;
+                        // Extract action part (e.g., "create" from "companies.create")
+                        const nameParts = permission.id.split("."); // Split permission.id
+                        const actionName = nameParts.length > 1 ? nameParts[1] : permission.id;
+                        // Capitalize action for display
+                        const displayActionName = actionName.charAt(0).toUpperCase() + actionName.slice(1);
 
                         return (
                           <div key={permission.id} className="flex items-start space-x-2">
-                            {" "}
-                            {/* Use id for key */}
                             <Checkbox
-                              // Use unique id for the checkbox element
-                              id={`permission-${permission.id}`}
-                              // Check selection state using the full name
-                              checked={selectedPermissions.includes(permission.name)}
-                              // Toggle selection state using the full name
-                              onCheckedChange={() => togglePermission(permission.name)}
+                              // Check based on resource.action string (permission.id)
+                              checked={selectedPermissions.includes(permission.id)}
+                              // Pass resource.action string (permission.id)
+                              onCheckedChange={() => togglePermission(permission.id)}
+                              id={`permission-${permission.id}`} // Unique ID for the checkbox using the action string
                             />
-                            <div className="space-y-1">
-                              <label
-                                htmlFor={`permission-${permission.id}`} // Match checkbox id
-                                className="cursor-pointer font-medium" // Add cursor-pointer
-                              >
-                                {/* Display only the action part */}
-                                {actionName}
-                              </label>
-                            </div>
+                             <label
+                              htmlFor={`permission-${permission.id}`} // Associate label with checkbox
+                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {/* Display the capitalized action name (e.g., Create, Read) */}
+                              {displayActionName}
+                            </label>
                           </div>
                         );
                       })}

@@ -2,7 +2,7 @@ import { desc, eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { db } from "@/db/drizzle";
-import { employeeRequests } from "@/db/schema";
+import { employee_requests } from "@/db/schema";
 import { createClient } from "@/utils/supabase/server-props";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -25,9 +25,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const requestsList = await db
       .select()
-      .from(employeeRequests)
-      .where(eq(employeeRequests.user_id, user?.id))
-      .orderBy(desc(employeeRequests.created_at));
+      .from(employee_requests)
+      .where(eq(employee_requests.user_id, user?.id))
+      .orderBy(desc(employee_requests.created_at));
 
     return res.status(200).json({ requests: requestsList });
   } catch (error) {

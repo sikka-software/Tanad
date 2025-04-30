@@ -27,10 +27,6 @@ export default function ProductsPage() {
   const canReadProducts = useUserStore((state) => state.hasPermission("products.read"));
   const canCreateProducts = useUserStore((state) => state.hasPermission("products.create"));
 
-  if (!canReadProducts) {
-    return <NoPermission />;
-  }
-
   const viewMode = useProductStore((state) => state.viewMode);
   const isDeleteDialogOpen = useProductStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useProductStore((state) => state.setIsDeleteDialogOpen);
@@ -66,6 +62,10 @@ export default function ProductsPage() {
   const sortedProducts = useMemo(() => {
     return getSortedProducts(filteredProducts);
   }, [filteredProducts, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canReadProducts) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

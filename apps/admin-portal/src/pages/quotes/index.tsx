@@ -28,10 +28,6 @@ export default function QuotesPage() {
   const canReadQuotes = useUserStore((state) => state.hasPermission("quotes.read"));
   const canCreateQuotes = useUserStore((state) => state.hasPermission("quotes.create"));
 
-  if (!canReadQuotes) {
-    return <NoPermission />;
-  }
-
   const viewMode = useQuotesStore((state) => state.viewMode);
   const isDeleteDialogOpen = useQuotesStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useQuotesStore((state) => state.setIsDeleteDialogOpen);
@@ -67,6 +63,10 @@ export default function QuotesPage() {
   const sortedQuotes = useMemo(() => {
     return getSortedQuotes(filteredQuotes);
   }, [filteredQuotes, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canReadQuotes) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

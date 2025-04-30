@@ -28,10 +28,6 @@ export default function OfficesPage() {
   const canReadOffices = useUserStore((state) => state.hasPermission("offices.read"));
   const canCreateOffices = useUserStore((state) => state.hasPermission("offices.create"));
 
-  if (!canReadOffices) {
-    return <NoPermission />;
-  }
-
   const viewMode = useOfficeStore((state) => state.viewMode);
   const isDeleteDialogOpen = useOfficeStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useOfficeStore((state) => state.setIsDeleteDialogOpen);
@@ -67,6 +63,10 @@ export default function OfficesPage() {
   const sortedOffices = useMemo(() => {
     return getSortedOffices(filteredOffices);
   }, [filteredOffices, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canReadOffices) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

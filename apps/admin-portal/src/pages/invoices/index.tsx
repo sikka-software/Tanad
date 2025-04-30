@@ -29,10 +29,6 @@ export default function InvoicesPage() {
   const canReadInvoices = useUserStore((state) => state.hasPermission("invoices.read"));
   const canCreateInvoices = useUserStore((state) => state.hasPermission("invoices.create"));
 
-  if (!canReadInvoices) {
-    return <NoPermission />;
-  }
-
   const viewMode = useInvoiceStore((state) => state.viewMode);
   const isDeleteDialogOpen = useInvoiceStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useInvoiceStore((state) => state.setIsDeleteDialogOpen);
@@ -70,6 +66,9 @@ export default function InvoicesPage() {
     return getSortedInvoices(filteredInvoices);
   }, [filteredInvoices, sortRules, sortCaseSensitive, sortNullsFirst]);
 
+  if (!canReadInvoices) {
+    return <NoPermission />;
+  }
   return (
     <div>
       <CustomPageMeta title={t("Invoices.title")} description={t("Invoices.description")} />

@@ -28,10 +28,6 @@ export default function VendorsPage() {
   const canReadVendors = useUserStore((state) => state.hasPermission("vendors.read"));
   const canCreateVendors = useUserStore((state) => state.hasPermission("vendors.create"));
 
-  if (!canReadVendors) {
-    return <NoPermission />;
-  }
-
   const viewMode = useVendorsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useVendorsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useVendorsStore((state) => state.setIsDeleteDialogOpen);
@@ -68,6 +64,10 @@ export default function VendorsPage() {
   const sortedVendors = useMemo(() => {
     return getSortedVendors(filteredVendors);
   }, [filteredVendors, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canReadVendors) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

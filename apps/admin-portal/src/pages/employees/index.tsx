@@ -28,10 +28,6 @@ export default function EmployeesPage() {
   const canReadEmployees = useUserStore((state) => state.hasPermission("employees.read"));
   const canCreateEmployees = useUserStore((state) => state.hasPermission("employees.create"));
 
-  if (!canReadEmployees) {
-    return <NoPermission />;
-  }
-
   const viewMode = useEmployeesStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEmployeesStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useEmployeesStore((state) => state.setIsDeleteDialogOpen);
@@ -67,6 +63,10 @@ export default function EmployeesPage() {
   const sortedEmployees = useMemo(() => {
     return getSortedEmployees(filteredEmployees);
   }, [filteredEmployees, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  if (!canReadEmployees) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

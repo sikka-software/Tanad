@@ -35,10 +35,6 @@ export default function ExpensesPage() {
   const canReadExpenses = useUserStore((state) => state.hasPermission("expenses.read"));
   const canCreateExpenses = useUserStore((state) => state.hasPermission("expenses.create"));
 
-  if (!canReadExpenses) {
-    return <NoPermission />;
-  }
-
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableExpense, setActionableExpense] = useState<ExpenseUpdateData | null>(null);
 
@@ -114,6 +110,9 @@ export default function ExpensesPage() {
       });
     }
   };
+  if (!canReadExpenses) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

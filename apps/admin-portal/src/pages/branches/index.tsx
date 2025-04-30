@@ -34,10 +34,6 @@ export default function BranchesPage() {
   const canReadBranches = useUserStore((state) => state.hasPermission("branches.read"));
   const canCreateBranches = useUserStore((state) => state.hasPermission("branches.create"));
 
-  if (!canReadBranches) {
-    return <NoPermission />;
-  }
-
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
 
@@ -115,6 +111,9 @@ export default function BranchesPage() {
     }
   };
 
+  if (!canReadBranches) {
+    return <NoPermission />;
+  }
   return (
     <div>
       <CustomPageMeta title={t("Branches.title")} description={t("Branches.description")} />

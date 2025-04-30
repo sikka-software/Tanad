@@ -35,10 +35,6 @@ export default function DepartmentsPage() {
   const canReadDepartments = useUserStore((state) => state.hasPermission("departments.read"));
   const canCreateDepartments = useUserStore((state) => state.hasPermission("departments.create"));
 
-  if (!canReadDepartments) {
-    return <NoPermission />;
-  }
-
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableDepartment, setActionableDepartment] = useState<Department | null>(null);
 
@@ -116,6 +112,10 @@ export default function DepartmentsPage() {
       });
     }
   };
+
+  if (!canReadDepartments) {
+    return <NoPermission />;
+  }
 
   return (
     <div>

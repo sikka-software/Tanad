@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -11,6 +12,7 @@ import SelectionMode from "@/ui/selection-mode";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
+import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import { CompanyForm } from "@/modules/company/company.form";
@@ -21,10 +23,15 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/job/job.options";
 import useJobsStore from "@/modules/job/job.store";
 import JobTable from "@/modules/job/job.table";
 import { JobUpdateData } from "@/modules/job/job.type";
+import useUserStore from "@/stores/use-user-store";
 import { createActions, withMutation } from "@/utils/action-utils";
 
 export default function JobsPage() {
   const t = useTranslations();
+  const router = useRouter();
+
+  const canReadJobs = useUserStore((state) => state.hasPermission("jobs.read"));
+  const canCreateJobs = useUserStore((state) => state.hasPermission("jobs.create"));
 
   const isLoading = useJobsStore((state) => state.isLoading);
   const setIsLoading = useJobsStore((state) => state.setIsLoading);
@@ -96,6 +103,9 @@ export default function JobsPage() {
     return getSortedJobs(filteredJobs);
   }, [filteredJobs, sortRules, sortCaseSensitive, sortNullsFirst]);
 
+  if (!canReadJobs) {
+    return <NoPermission />;
+  }
   return (
     <div>
       <CustomPageMeta title={t("Jobs.title")} description={t("Jobs.description")} />
@@ -113,7 +123,7 @@ export default function JobsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Jobs.title")}
-            createHref="/jobs/add"
+            onAddClick={canCreateJobs ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Jobs.create_job")}
             searchPlaceholder={t("Jobs.search_jobs")}
           />

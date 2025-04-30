@@ -35,9 +35,6 @@ export default function CompaniesPage() {
   const canReadCompanies = useUserStore((state) => state.hasPermission("companies.read"));
   const canCreateCompanies = useUserStore((state) => state.hasPermission("companies.create"));
 
-  if (!canReadCompanies) {
-    return <NoPermission />;
-  }
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableCompany, setActionableCompany] = useState<CompanyUpdateData | null>(null);
 
@@ -114,6 +111,9 @@ export default function CompaniesPage() {
     }
   };
 
+  if (!canReadCompanies) {
+    return <NoPermission />;
+  }
   return (
     <div>
       <CustomPageMeta title={t("Companies.title")} description={t("Companies.description")} />
