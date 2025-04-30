@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
+
+// Import the user store
 
 import type { Role, RoleWithPermissions, RoleCreateData, RoleUpdateData } from "./role.type";
 
@@ -11,52 +14,74 @@ const supabase = createClient();
 export const roleKeys = {
   all: ["roles"] as const,
   lists: () => [...roleKeys.all, "list"] as const,
-  list: (filters: string) => [...roleKeys.lists(), { filters }] as const,
+  list: (enterpriseId: string | undefined) => [...roleKeys.lists(), { enterpriseId }] as const, // Add enterpriseId to list key
   details: () => [...roleKeys.all, "detail"] as const,
   detail: (id: string) => [...roleKeys.details(), id] as const,
   systemRoles: () => [...roleKeys.all, "list", "system"] as const,
 };
 
 // Fetch roles hook - Returns RoleWithPermissions[]
+// Fetches all roles (system and custom) that are assigned to ANY user within the CURRENT enterprise.
 export function useRoles() {
+  const { enterprise } = useUserStore(); // Get current enterprise
+  const enterpriseId = enterprise?.id;
+
   return useQuery<RoleWithPermissions[], Error>({
-    queryKey: roleKeys.lists(), // Consider adding enterprise_id to key if filtering
+    // Update queryKey to include enterpriseId for caching and refetching
+    queryKey: roleKeys.list(enterpriseId),
     queryFn: async () => {
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error("No user found");
+      if (!enterpriseId) {
+        // If no enterprise is selected, maybe return empty or system roles only?
+        // Returning empty for now to avoid showing roles from other enterprises.
+        console.warn("useRoles: No enterprise selected, returning empty array.");
+        return [];
+      }
 
-      // TODO: This hook currently fetches ALL roles the user *could* have via any enterprise membership.
-      // It should likely be filtered by the *currently selected* enterprise from useUserStore.
-      // For now, fetch all roles associated with the user across all their memberships.
-
-      // 1. Get role IDs the user has access to via their memberships
+      // 1. Get all unique role IDs assigned within the current enterprise
       const { data: memberships, error: membershipError } = await supabase
         .from("memberships")
         .select("role_id")
-        .eq("profile_id", user.user.id);
+        .eq("enterprise_id", enterpriseId); // Filter by current enterprise_id
 
       if (membershipError) throw membershipError;
 
-      const roleIds = memberships?.map((m) => m.role_id).filter(Boolean) || [];
+      // Get unique role IDs from memberships within this enterprise
+      const enterpriseRoleIds = [
+        ...new Set(memberships?.map((m) => m.role_id).filter(Boolean) || []),
+      ];
+
+      // Optionally: Fetch system roles separately if you always want them listed
+      // regardless of assignment in the current enterprise.
+      // const { data: systemRolesData, error: systemRolesError } = await supabase
+      //   .from("roles")
+      //   .select("id")
+      //   .eq("is_system", true);
+      // if (systemRolesError) throw systemRolesError;
+      // const systemRoleIds = systemRolesData?.map(r => r.id) || [];
+
+      // Combine the role IDs (adjust logic based on whether system roles should always show)
+      // For now, we only show roles explicitly assigned in this enterprise.
+      const roleIds = enterpriseRoleIds;
 
       if (roleIds.length === 0) {
-        return []; // Return empty if user has no roles in any enterprise
+        // No roles assigned in this enterprise yet
+        return [];
       }
 
-      // 2. Fetch the details for these roles
+      // 2. Fetch the details for these specific roles
       const { data: rolesData, error: rolesError } = await supabase
         .from("roles")
         .select("*") // Select all columns: id, name, description, is_system
-        .in("id", roleIds);
+        .in("id", roleIds); // Filter by the unique IDs found
 
       if (rolesError) throw rolesError;
-      const roles = (rolesData || []) as Role[]; // Cast to base Role type
+      const roles = (rolesData || []) as Role[];
 
-      // 3. Fetch permissions for these roles from the correct table
+      // 3. Fetch permissions for these roles
       const { data: permissionsData, error: permissionsError } = await supabase
-        .from("permissions") // Query the actual permissions table
-        .select("role_id, permission") // Select the role_id and the permission string
-        .in("role_id", roleIds);
+        .from("permissions")
+        .select("role_id, permission")
+        .in("role_id", roleIds); // Filter by the same role IDs
 
       if (permissionsError) throw permissionsError;
 
@@ -78,6 +103,7 @@ export function useRoles() {
 
       return rolesWithPermissions;
     },
+    enabled: !!enterpriseId, // Only run the query if an enterpriseId is available
   });
 }
 

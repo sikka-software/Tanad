@@ -24,6 +24,7 @@ import {
   useSystemRoles,
   useBulkDeleteRoles,
   useDuplicateRole,
+  useCustomRoles,
 } from "@/modules/role/role.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/role/role.options";
 import useRoleStore from "@/modules/role/role.store";
@@ -51,21 +52,21 @@ export default function RolesPage() {
   const getFilteredRoles = useRoleStore((state) => state.getFilteredData);
 
   const {
-    data: enterpriseRoles,
-    isLoading: loadingEnterpriseRoles,
-    error: enterpriseError,
-  } = useRoles();
+    data: customRoles,
+    isLoading: loadingCustomRoles,
+    error: customError,
+  } = useCustomRoles();
   const { data: systemRoles, isLoading: loadingSystemRoles, error: systemError } = useSystemRoles();
 
   const allRoles = useMemo(() => {
     const combined = new Map<string, RoleWithPermissions>();
-    (enterpriseRoles || []).forEach((role) => combined.set(role.id, role));
+    (customRoles || []).forEach((role) => combined.set(role.id, role));
     (systemRoles || []).forEach((role) => combined.set(role.id, role));
     return Array.from(combined.values());
-  }, [enterpriseRoles, systemRoles]);
+  }, [customRoles, systemRoles]);
 
-  const isLoading = loadingEnterpriseRoles || loadingSystemRoles;
-  const error = enterpriseError || systemError;
+  const isLoading = loadingCustomRoles || loadingSystemRoles;
+  const error = customError || systemError;
   const { hasPermission: canViewRoles, isLoading: isCheckingPermission } =
     usePermission("roles.read");
   const { mutate: duplicateRole } = useDuplicateRole();
