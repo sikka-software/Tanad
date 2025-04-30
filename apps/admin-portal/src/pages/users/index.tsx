@@ -106,7 +106,7 @@ export default function UsersPage() {
         <div>
           {viewMode === "table" ? (
             <UsersTable
-              users={sortedUsers as UserType[]}
+              users={sortedUsers as unknown as UserType[]}
               isLoading={isLoading}
               error={error as Error | null}
               onActionClicked={onActionClicked}

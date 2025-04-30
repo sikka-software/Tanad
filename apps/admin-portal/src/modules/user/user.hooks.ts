@@ -13,6 +13,7 @@ import {
   bulkDeleteUsers,
   getUserPermissions,
 } from "./user.service";
+import useEnterpriseUserStore from "./user.store";
 import { User, UserCreateData, UserUpdateData } from "./user.type";
 
 // Query keys
@@ -51,16 +52,22 @@ export function useUser(id: string) {
 export function useCreateUser() {
   const queryClient = useQueryClient();
   const t = useTranslations();
+  const setIsLoading = useEnterpriseUserStore((state: any) => state.setIsLoading);
 
   return useMutation({
     mutationFn: (data: UserCreateData) => createUser(data),
+    onMutate: () => {
+      setIsLoading(true);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       toast.success(t("Users.success.created"));
+      setIsLoading(false);
     },
     onError: (error) => {
       console.error("Error creating user:", error);
       toast.error(t("Users.error.creating"));
+      setIsLoading(false);
     },
   });
 }

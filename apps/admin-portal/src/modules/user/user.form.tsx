@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -24,10 +24,9 @@ import {
 } from "@/components/ui/select";
 
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
-import { useRoles } from "../role/role.hooks";
-import type { Role } from "../role/role.type";
+import { useRoles, useSystemRoles } from "../role/role.hooks";
+import type { Role, RoleWithPermissions } from "../role/role.type";
 import { useCreateUser } from "./user.hooks";
 import type { UserType } from "./user.table";
 
@@ -44,16 +43,43 @@ const userFormSchema = z.object({
 type UserFormData = z.infer<typeof userFormSchema>;
 
 interface UserFormProps {
-  onSuccess: () => void; // Callback to close the dialog/form
+  onSuccess: () => void;
   id?: string;
 }
 
 export function UserForm({ onSuccess, id }: UserFormProps) {
   const t = useTranslations();
-  const profile = useUserStore((state) => state.profile);
+  const { profile, enterprise } = useUserStore((state) => ({
+    profile: state.profile,
+    enterprise: state.enterprise,
+  }));
   const createUser = useCreateUser();
-  const { data: roles, isLoading: rolesLoading, error: rolesError } = useRoles(profile?.enterprise_id);
+  const {
+    data: enterpriseRoles,
+    isLoading: enterpriseRolesLoading,
+    error: enterpriseRolesError,
+  } = useRoles();
+  const {
+    data: systemRoles,
+    isLoading: systemRolesLoading,
+    error: systemRolesError,
+  } = useSystemRoles();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const allRoles = useMemo(() => {
+    const combined = new Map<string, RoleWithPermissions>();
+    (enterpriseRoles || []).forEach((role) => combined.set(role.id, role));
+    (systemRoles || []).forEach((role) => {
+      if (!combined.has(role.id)) {
+        combined.set(role.id, role);
+      }
+    });
+    return Array.from(combined.values());
+  }, [enterpriseRoles, systemRoles]);
+
+  const rolesLoading = enterpriseRolesLoading || systemRolesLoading;
+  const rolesError = enterpriseRolesError || systemRolesError;
 
   const form = useForm<UserFormData>({
     resolver: zodResolver(userFormSchema),
@@ -66,18 +92,19 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
     },
   });
 
+  const currentRoleValue = form.watch("role");
+
   useEffect(() => {
-    if (roles && roles.length > 0) {
-      const currentRoleValue = form.getValues("role");
-      const isValidRole = roles.some((role: Role) => role.name === currentRoleValue);
-      if (!isValidRole && currentRoleValue) {
+    if (allRoles && allRoles.length > 0 && currentRoleValue) {
+      const isValidRole = allRoles.some((role) => role.name === currentRoleValue);
+      if (!isValidRole) {
         form.setValue("role", "");
       }
     }
-  }, [roles, form]);
+  }, [allRoles, currentRoleValue, form.setValue]);
 
   const onSubmit = async (values: UserFormData) => {
-    if (!profile?.enterprise_id) {
+    if (!enterprise?.id) {
       toast.error("Cannot create user: Enterprise information missing.");
       return;
     }
@@ -87,21 +114,15 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
       await createUser.mutateAsync({
         email: values.email,
         role: values.role,
-        enterprise_id: profile.enterprise_id,
+        enterprise_id: enterprise.id,
         first_name: values.first_name,
         last_name: values.last_name,
         password: values.password,
       });
-      toast.success(t("General.successful_operation"), {
-        description: t("Users.messages.created"),
-      });
       form.reset();
       onSuccess();
     } catch (error) {
-      console.error("Error creating user:", error);
-      toast.error("Failed to create user", {
-        description: error instanceof Error ? error.message : "An unknown error occurred.",
-      });
+      console.error("Submit Error in form:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -190,10 +211,10 @@ export function UserForm({ onSuccess, id }: UserFormProps) {
                 <SelectContent>
                   {rolesError ? (
                     <SelectItem value="error" disabled>
-                      Error loading roles
+                      Error: {rolesError.message}
                     </SelectItem>
-                  ) : roles && roles.length > 0 ? (
-                    roles.map((role: Role) => (
+                  ) : allRoles && allRoles.length > 0 ? (
+                    allRoles.map((role: Role) => (
                       <SelectItem key={role.id} value={role.name}>
                         {role.name}
                       </SelectItem>

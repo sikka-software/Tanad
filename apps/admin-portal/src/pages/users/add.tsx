@@ -33,7 +33,6 @@ export default function AddUserPage() {
       description: t("Users.success.created"),
     });
     router.push("/users");
-    setIsLoading(false);
   };
 
   return (
