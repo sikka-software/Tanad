@@ -227,7 +227,7 @@ export function AppSidebar() {
           {process.env.NODE_ENV === "development" && state === "expanded" && (
             <span className="text-center text-xs font-medium">
               {enterprise?.name} <br />
-              {profile?.enterprise_id}
+              {enterprise?.id}
             </span>
           )}
         </div>
