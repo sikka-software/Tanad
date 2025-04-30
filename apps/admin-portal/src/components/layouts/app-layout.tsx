@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import { Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "sonner";
@@ -15,6 +16,7 @@ import ThemeSwitcher from "@/components/ui/theme-switcher";
 import { UserDropdown } from "@/components/ui/user-dropdown";
 
 import { useMainStore } from "@/hooks/main.store";
+import useUserStore from "@/stores/use-user-store";
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const t = useTranslations();
@@ -22,6 +24,16 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const defaultOpen = Cookies.get("sidebar_state") === "true";
   const { setOpenCommandMenu } = useMainStore();
   const { theme } = useTheme();
+  const { loading: isUserDataLoading, user } = useUserStore();
+
+  if (isUserDataLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <Loader2 className="text-primary size-16 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <ProtectedRoute>
       <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
