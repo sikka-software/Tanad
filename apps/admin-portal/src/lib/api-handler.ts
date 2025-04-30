@@ -23,17 +23,17 @@ type Options<T extends UserOwnedTable> = {
 };
 
 async function getUserEnterpriseId(supabase: any, user_id: string): Promise<string> {
-  const { data: profile } = await supabase
-    .from("profiles")
+  const { data: membership } = await supabase
+    .from("memberships")
     .select("enterprise_id")
-    .eq("id", user_id)
+    .eq("profile_id", user_id)
     .single();
 
-  if (!profile?.enterprise_id) {
+  if (!membership?.enterprise_id) {
     throw new Error("User is not associated with an enterprise");
   }
 
-  return profile.enterprise_id;
+  return membership.enterprise_id;
 }
 
 export function createApiHandler<T extends UserOwnedTable>({
