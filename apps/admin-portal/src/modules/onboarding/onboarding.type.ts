@@ -8,6 +8,7 @@ export type Enterprise = {
   email: string;
   industry: string;
   size: string;
+  created_at: string;
 };
 
 export type EnterpriseCreateData = Pick<

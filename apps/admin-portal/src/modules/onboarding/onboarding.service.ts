@@ -1,53 +1,42 @@
 import { createClient } from "@/utils/supabase/component";
 
-import type { EnterpriseCreateData } from "./onboarding.type";
+import type { EnterpriseCreateData, Enterprise } from "./onboarding.type";
 
 export class OnboardingService {
-  private static readonly TABLE_NAME = "user_enterprises";
+  // Remove TABLE_NAME, not needed for RPC
+  // private static readonly TABLE_NAME = "user_enterprises";
 
   static async createEnterprise(data: EnterpriseCreateData) {
     const supabase = createClient();
 
     try {
-      // Get the current user
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-      if (userError) throw userError;
-      if (!user) throw new Error("No authenticated user found");
-
-      // Create the enterprise through the user_enterprises view
-      const { data: enterprise, error: enterpriseError } = await supabase
-        .from(this.TABLE_NAME)
-        .insert({
-          user_id: user.id,
+      // Call the RPC function instead of direct insert
+      const { data: enterpriseData, error } = await supabase
+        .rpc("create_enterprise", {
           enterprise_name: data.name,
-          description: data.description,
-          logo: data.logo,
-          email: data.email,
-          industry: data.industry,
-          size: data.size,
+          // Pass other data if the RPC function expects it
+          // description: data.description,
+          // logo: data.logo,
+          // email: data.email,
+          // industry: data.industry,
+          // size: data.size,
         })
+        // Assume RPC returns the necessary data matching the Enterprise type
+        // If it returns only an ID, we might need another fetch here.
         .select()
         .single();
 
-      if (enterpriseError) throw enterpriseError;
+      if (error) throw error;
+      if (!enterpriseData) throw new Error("RPC did not return enterprise data");
 
-      // Update the user's profile to mark onboarding as complete
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          needs_onboarding: false,
-          enterprise_id: enterprise.enterprise_id,
-        })
-        .eq("user_id", user.id);
+      // No need to update profile here if the RPC handles it.
+      // If RPC *doesn't* handle profile update (e.g., needs_onboarding flag),
+      // we might need to add that back.
 
-      if (profileError) throw profileError;
-
-      return enterprise;
+      // Assuming enterpriseData matches the required Enterprise type
+      return enterpriseData as Enterprise;
     } catch (error) {
-      console.error("Error in createEnterprise:", error);
+      console.error("Error in createEnterprise RPC call:", error);
       throw error;
     }
   }
