@@ -31,6 +31,8 @@ export default function UsersPage() {
   const canReadUsers = useUserStore((state) => state.hasPermission("users.read"));
   const canCreateUsers = useUserStore((state) => state.hasPermission("users.create"));
 
+  const loadingSaveUser = useEnterpriseUsersStore((state) => state.isLoading);
+  const setLoadingSaveUser = useEnterpriseUsersStore((state) => state.setIsLoading);
   const viewMode = useEnterpriseUsersStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEnterpriseUsersStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useEnterpriseUsersStore((state) => state.setIsDeleteDialogOpen);
@@ -150,6 +152,7 @@ export default function UsersPage() {
           onOpenChange={setIsFormDialogOpen}
           title={formDialogTitle}
           formId="user-form"
+          loadingSave={loadingSaveUser}
         >
           <UserForm
             id="user-form"
@@ -158,6 +161,7 @@ export default function UsersPage() {
               setIsFormDialogOpen(false);
               setActionableUser(null);
               refetchUsers();
+              setLoadingSaveUser(false);
             }}
           />
         </FormDialog>

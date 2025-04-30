@@ -57,13 +57,12 @@ export function useCreateUser() {
     mutationFn: (data: UserCreateData) => createUser(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      toast.success(t("Users.success.created"));
     },
     onError: (error) => {
       console.error("Error creating user:", error);
       const defaultError = t("Users.error.creating");
       const message = (error as any)?.message || defaultError;
-      if ((error as any)?.code === '23505') {
+      if ((error as any)?.code === "23505") {
         toast.error(t("Users.error.email_exists"));
       } else {
         toast.error(`${defaultError}: ${message}`);
@@ -81,7 +80,6 @@ export function useUpdateUser() {
     mutationFn: ({ id, data }: { id: string; data: UserUpdateData }) => updateUser(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      toast.success(t("Users.success.updated"));
     },
     onError: (error) => {
       console.error("Error updating user:", error);
@@ -99,7 +97,6 @@ export function useDeleteUser() {
     mutationFn: (id: string) => deleteUser(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      toast.success(t("Users.success.deleted"));
     },
     onError: (error) => {
       console.error("Error deleting user:", error);
@@ -117,7 +114,6 @@ export function useBulkDeleteUsers() {
     mutationFn: (ids: string[]) => bulkDeleteUsers(ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      toast.success(t("Users.success.bulk_deleted"));
     },
     onError: (error) => {
       console.error("Error bulk deleting users:", error);

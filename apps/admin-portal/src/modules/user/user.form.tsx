@@ -70,8 +70,7 @@ interface UserFormProps {
 export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
   const t = useTranslations();
   const enterprise = useUserStore((state) => state.enterprise);
-  const setLoadingSaveUser = useEnterpriseUsersStore((state) => state.setIsLoading); // Use store action
-
+  const setIsLoading = useEnterpriseUsersStore((state) => state.setIsLoading);
   // Hooks for mutations
   const { mutateAsync: createUser, isPending: isCreating } = useCreateUser();
   const { mutateAsync: updateUser, isPending: isUpdating } = useUpdateUser();
@@ -167,7 +166,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
       return;
     }
 
-    setLoadingSaveUser(true);
+    setIsLoading(true);
 
     // Construct mutation data based on form values
     const mutationDataBase = {
@@ -193,7 +192,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
         // Ensure password exists for creation, handled by schema but double-check
         if (!values.password) {
           toast.error(t("Validation.password_required"));
-          setLoadingSaveUser(false);
+          setIsLoading(false);
           return;
         }
         await createUser(mutationData as UserCreateData);
@@ -216,8 +215,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
         description:
           error?.message || t(isEditing ? "Users.error.updating" : "Users.error.creating"),
       });
-    } finally {
-      setLoadingSaveUser(false);
+      setIsLoading(false);
     }
   };
 

@@ -219,6 +219,7 @@ export default function RolesPage() {
               });
             }}
             editMode={!!actionableRole?.id}
+            id={actionableRole?.id}
             defaultValues={
               actionableRole
                 ? {

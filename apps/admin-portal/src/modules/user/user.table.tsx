@@ -92,7 +92,17 @@ export default function UsersTable({ users, isLoading, error, onActionClicked }:
 
   const columns: ExtendedColumnDef<UserType>[] = [
     { accessorKey: "email", header: t("Users.form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "role", header: t("Users.form.role.label"), validationSchema: roleSchema },
+    {
+      accessorKey: "role",
+      header: t("Users.form.role.label"),
+      cell: ({ row }) => {
+        const role = row.original.role;
+        console.log("role is", role);
+        return <Badge variant="outline">{role}</Badge>;
+        // return <Badge variant="outline">{t(`Roles.predefined.${role.toLowerCase()}.title`)}</Badge>;
+      },
+      validationSchema: roleSchema,
+    },
     {
       accessorKey: "created_at",
       header: t("Users.form.created_at.label"),
