@@ -1,9 +1,8 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { toast } from "sonner";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import PageTitle from "@/ui/page-title";
 
@@ -13,7 +12,6 @@ import { generateDummyData } from "@/lib/dummy-generator";
 
 import { UserForm } from "@/modules/user/user.form";
 import { useCreateUser } from "@/modules/user/user.hooks";
-import type { UserCreateData } from "@/modules/user/user.type";
 
 export default function AddUserPage() {
   const t = useTranslations();
@@ -39,17 +37,6 @@ export default function AddUserPage() {
     router.push("/users");
   };
 
-  const handleFormSubmit = async (data: UserCreateData) => {
-    try {
-      await createUser.mutateAsync(data);
-    } catch (error) {
-      console.error("Failed to create user:", error);
-      toast.error(t("General.error_operation"), {
-        description: t("Users.error.creating"),
-      });
-    }
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Users.add_new")} />
@@ -66,12 +53,7 @@ export default function AddUserPage() {
         }}
       />
       <div className="mx-auto max-w-2xl p-4">
-        <UserForm
-          id="user-form"
-          onSuccess={onAddSuccess}
-          onSubmitRequest={handleFormSubmit}
-          isSubmitting={createUser.isPending}
-        />
+        <UserForm id="user-form" onSuccess={onAddSuccess} />
       </div>
     </div>
   );

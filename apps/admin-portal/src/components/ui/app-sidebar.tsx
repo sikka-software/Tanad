@@ -1,7 +1,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { CreditCard, LogOut, MessageSquareWarning, Search, User2 } from "lucide-react";
+import { Asterisk, CreditCard, LogOut, MessageSquareWarning, Search, User2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -34,6 +34,7 @@ import { applyCustomMenuOrder, getMenuList, type SidebarMenuGroupProps } from "@
 import useUserStore from "@/stores/use-user-store";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
+import { EnterpriseSwitcher } from "./enterprise-switcher";
 import { NavMain } from "./sidebar-menu";
 
 type Menu = {
@@ -226,7 +227,6 @@ export function AppSidebar() {
             );
           });
 
-          
           if (matchesTitle) return item;
 
           if (item.items) {
@@ -273,12 +273,9 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"} className="z-50">
       <SidebarHeader>
         <div className="flex items-center gap-2">
-          {process.env.NODE_ENV === "development" && state === "expanded" && (
-            <span className="text-center text-xs font-medium">
-              {enterprise?.name} <br />
-              {membership?.enterprise_id}
-            </span>
-          )}
+          <EnterpriseSwitcher
+            enterprises={[{ name: enterprise?.name || "", logo: Asterisk, plan: "" }]}
+          />
         </div>
       </SidebarHeader>
       {state === "expanded" && (
