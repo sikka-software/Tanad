@@ -113,8 +113,7 @@ export function useUpdateProfile() {
         // and overriding with new data
         const updatedProfile = {
           ...userStore.profile,
-          full_name:
-            data.full_name || userStore.profile.first_name + " " + userStore.profile.last_name,
+          full_name: data.full_name || userStore.profile.full_name,
           avatar_url: data.avatar_url || userStore.profile.avatar_url,
           address: data.address || userStore.profile.address,
           email: data.email || userStore.profile.email,

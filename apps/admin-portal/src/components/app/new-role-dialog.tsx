@@ -60,16 +60,86 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-import { Role, Permission } from "@/types/rbac";
+import { Permission, Role } from "@/types/rbac";
 
+import { app_permission } from "@/db/schema";
+// Keep using this for component's internal Permission structure
+
+import { useRoles, useCreateRole, useUpdateRole, useDeleteRole } from "@/modules/role/role.hooks";
+// Import user store
 import {
-  useRoles,
-  usePermissions,
-  useCreateRole,
-  useUpdateRole,
-  useDeleteRole,
-  useUpdateRolePermissions,
-} from "@/hooks/use-roles";
+  RoleWithPermissions,
+  // Use RoleWithPermissions from new hooks
+  RoleUpdateData, // Import type for update hook
+} from "@/modules/role/role.type";
+// Import permission enum
+import useUserStore from "@/stores/use-user-store";
+
+// Updated import path, removed unused hooks
+
+// Define ACTION_DISPLAY_NAMES locally or import from a constants file
+const ACTION_DISPLAY_NAMES: Record<string, string> = {
+  create: "Create",
+  read: "View",
+  update: "Edit",
+  delete: "Delete",
+  export: "Export",
+  duplicate: "Duplicate",
+  invite: "Invite",
+  assign: "Assign",
+};
+
+// Helper function to generate permissions list (moved from old usePermissions hook)
+const generatePermissionsList = (): Permission[] => {
+  const permissions = app_permission.enumValues.map((permission: string) => {
+    const [category, action] = permission.split(".");
+    const displayName = ACTION_DISPLAY_NAMES[action] || action;
+    const formattedCategory = category
+      .split("_")
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    return {
+      id: permission,
+      name: `${displayName} ${formattedCategory}`,
+      description: `Permission to ${action} ${formattedCategory.toLowerCase()}`,
+      category: formattedCategory,
+    };
+  });
+
+  const groupedPermissions = permissions.reduce(
+    (acc: Record<string, Permission[]>, permission: Permission) => {
+      if (!acc[permission.category]) {
+        acc[permission.category] = [];
+      }
+      acc[permission.category].push(permission);
+      return acc;
+    },
+    {},
+  );
+
+  const sortedPermissions = Object.values(groupedPermissions)
+    .flat()
+    .sort((a: Permission, b: Permission) => {
+      const categoryCompare = a.category.localeCompare(b.category);
+      if (categoryCompare !== 0) return categoryCompare;
+      const actionOrder = [
+        "create",
+        "read",
+        "update",
+        "delete",
+        "export",
+        "duplicate",
+        "invite",
+        "assign",
+      ];
+      const aAction = a.id.split(".")[1];
+      const bAction = b.id.split(".")[1];
+      return actionOrder.indexOf(aAction) - actionOrder.indexOf(bAction);
+    });
+
+  return sortedPermissions;
+};
 
 // Add this new component before the main RolesList component
 const PermissionsSection = React.memo(function PermissionsSection({
@@ -88,7 +158,7 @@ const PermissionsSection = React.memo(function PermissionsSection({
   const areAllPermissionsSelected = useCallback(
     (category: string) => {
       const categoryPermissions = permissionsByCategory[category] || [];
-      return categoryPermissions.every((p) => selectedPermissions.includes(p.id));
+      return categoryPermissions.every((p: Permission) => selectedPermissions.includes(p.id));
     },
     [permissionsByCategory, selectedPermissions],
   );
@@ -96,7 +166,8 @@ const PermissionsSection = React.memo(function PermissionsSection({
   const countPermissionsByCategory = useCallback(
     (category: string) => {
       const categoryPermissions = permissionsByCategory[category] || [];
-      return categoryPermissions.filter((p) => selectedPermissions.includes(p.id)).length;
+      return categoryPermissions.filter((p: Permission) => selectedPermissions.includes(p.id))
+        .length;
     },
     [permissionsByCategory, selectedPermissions],
   );
@@ -126,7 +197,7 @@ const PermissionsSection = React.memo(function PermissionsSection({
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-2 ps-4 pt-2">
-                    {categoryPermissions.map((permission) => (
+                    {categoryPermissions.map((permission: Permission) => (
                       <div key={permission.id} className="flex items-start space-x-2">
                         <Checkbox
                           id={`permission-${permission.id}`}
@@ -158,43 +229,49 @@ export default function RolesList() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-  const [newRole, setNewRole] = useState<Partial<Role>>({
+  const [selectedRole, setSelectedRole] = useState<RoleWithPermissions | null>(null);
+  const [newRole, setNewRole] = useState<Partial<RoleWithPermissions>>({
     name: "",
     description: "",
     permissions: [],
-    isSystem: false,
+    is_system: false,
   });
+
+  const { enterprise } = useUserStore(); // Get enterprise from store
+
+  // Generate permissions list
+  const permissions = useMemo(() => generatePermissionsList(), []);
+  const isLoadingPermissions = false; // Placeholder, as it's now synchronous
 
   // Fetch data using hooks
   const { data: roles = [], isLoading: isLoadingRoles } = useRoles();
-  const { data: permissions = [], isLoading: isLoadingPermissions } = usePermissions();
   const createRole = useCreateRole();
   const updateRole = useUpdateRole();
   const deleteRole = useDeleteRole();
-  const updateRolePermissions = useUpdateRolePermissions();
 
   // Group permissions by category
-  const permissionsByCategory = permissions.reduce(
-    (acc, permission) => {
-      if (!acc[permission.category]) {
-        acc[permission.category] = [];
-      }
-      acc[permission.category].push(permission);
-      return acc;
-    },
-    {} as Record<string, Permission[]>,
-  );
+  const permissionsByCategory = useMemo(() => {
+    return permissions.reduce(
+      (acc: Record<string, Permission[]>, permission: Permission) => {
+        if (!acc[permission.category]) {
+          acc[permission.category] = [];
+        }
+        acc[permission.category].push(permission);
+        return acc;
+      },
+      {} as Record<string, Permission[]>,
+    );
+  }, [permissions]);
 
   // Filter roles based on search query
   const filteredRoles = roles.filter(
-    (role) =>
+    (role: RoleWithPermissions) =>
       role.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      role.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      (role.description && role.description.toLowerCase().includes(searchQuery.toLowerCase())),
   );
 
   // Handle opening edit dialog
-  const handleEditRole = (role: Role) => {
+  const handleEditRole = (role: RoleWithPermissions) => {
     setSelectedRole(role);
     setNewRole({
       name: role.name,
@@ -205,21 +282,34 @@ export default function RolesList() {
   };
 
   // Handle opening delete dialog
-  const openDeleteDialog = (role: Role) => {
+  const openDeleteDialog = (role: RoleWithPermissions) => {
     setSelectedRole(role);
     setIsDeleteDialogOpen(true);
   };
 
   // Create new role
   const handleCreateRole = async () => {
-    if (!newRole.name) return;
+    if (!newRole.name) {
+      toast.error("Role name cannot be empty.");
+      return;
+    }
+    if (!enterprise?.id) {
+      toast.error("Cannot create role: No enterprise selected.");
+      return;
+    }
+
+    // Validate role name format (lowercase, numbers, underscores)
+    if (!/^[a-z0-9_]+$/.test(newRole.name)) {
+      toast.error("Role name must contain only lowercase letters, numbers, and underscores.");
+      return;
+    }
 
     try {
       await createRole.mutateAsync({
         name: newRole.name,
         description: newRole.description || "",
         permissions: newRole.permissions || [],
-        isSystem: false,
+        enterprise_id: enterprise.id,
       });
 
       // Reset form and close dialog
@@ -227,7 +317,7 @@ export default function RolesList() {
         name: "",
         description: "",
         permissions: [],
-        isSystem: false,
+        is_system: false,
       });
       setIsCreateDialogOpen(false);
     } catch (error) {
@@ -239,12 +329,17 @@ export default function RolesList() {
   const handleUpdateRole = async () => {
     if (!selectedRole || !newRole.name) return;
 
+    // Prepare update data according to RoleUpdateData structure
+    const updateData: RoleUpdateData = {
+      name: newRole.name,
+      description: newRole.description || undefined,
+      permissions: newRole.permissions || [],
+    };
+
     try {
       await updateRole.mutateAsync({
-        ...selectedRole,
-        name: newRole.name,
-        description: newRole.description || "",
-        permissions: newRole.permissions || [],
+        id: selectedRole.id,
+        data: updateData,
       });
 
       setIsEditDialogOpen(false);
@@ -265,46 +360,43 @@ export default function RolesList() {
     }
   };
 
-  // Update role permissions
-  const handleUpdateRolePermissions = async (roleId: string, permissions: string[]) => {
-    try {
-      await updateRolePermissions.mutateAsync({ roleId, permissions });
-    } catch (error) {
-      console.error("Error updating role permissions:", error);
-    }
-  };
-
   // Toggle permission selection
-  const togglePermission = (permissionId: string, rolePermissions: string[]) => {
-    if (rolePermissions.includes(permissionId)) {
-      return rolePermissions.filter((id) => id !== permissionId);
+  const togglePermission = (permissionId: string, currentPermissions: string[]) => {
+    // Ensure currentPermissions is an array
+    const permissionsArray = Array.isArray(currentPermissions) ? currentPermissions : [];
+    if (permissionsArray.includes(permissionId)) {
+      return permissionsArray.filter((id) => id !== permissionId);
     } else {
-      return [...rolePermissions, permissionId];
+      return [...permissionsArray, permissionId];
     }
   };
 
   // Toggle all permissions in a category
-  const toggleCategoryPermissions = (category: string, rolePermissions: string[]) => {
+  const toggleCategoryPermissions = (category: string, currentPermissions: string[]) => {
     const categoryPermissions = permissionsByCategory[category] || [];
+    const categoryPermissionIds = categoryPermissions.map((p: Permission) => p.id);
+    const permissionsArray = Array.isArray(currentPermissions) ? currentPermissions : [];
 
-    if (rolePermissions.every((p) => categoryPermissions.some((cp) => cp.id === p))) {
+    // Check if *all* permissions in this category are currently selected
+    const allSelected = categoryPermissionIds.every((id) => permissionsArray.includes(id));
+
+    if (allSelected) {
       // Remove all permissions in this category
-      return rolePermissions.filter(
-        (id) => !categoryPermissions.some((p: Permission) => p.id === id),
-      );
+      return permissionsArray.filter((id) => !categoryPermissionIds.includes(id));
     } else {
-      // Add all permissions in this category
-      const permissionsToAdd = categoryPermissions
-        .filter((p: Permission) => !rolePermissions.includes(p.id))
-        .map((p: Permission) => p.id);
-      return [...rolePermissions, ...permissionsToAdd];
+      // Add all permissions in this category (only those not already present)
+      const permissionsToAdd = categoryPermissionIds.filter((id) => !permissionsArray.includes(id));
+      return [...permissionsArray, ...permissionsToAdd];
     }
   };
 
   // Helper function to count permissions in a category
-  const countPermissionsInCategory = (permissions: string[], category: string) => {
-    return permissions.filter((p) => permissionsByCategory[category]?.some((cp) => cp.id === p))
-      .length;
+  const countPermissionsInCategory = (rolePermissions: string[], category: string) => {
+    const permissionsArray = Array.isArray(rolePermissions) ? rolePermissions : [];
+    const categoryPermissionIds = (permissionsByCategory[category] || []).map(
+      (p: Permission) => p.id,
+    );
+    return permissionsArray.filter((id) => categoryPermissionIds.includes(id)).length;
   };
 
   // Add this constant at the top of the component
@@ -333,14 +425,14 @@ export default function RolesList() {
         </Button>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredRoles.map((role) => (
+        {filteredRoles.map((role: RoleWithPermissions) => (
           <Card key={role.id} className="overflow-hidden">
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div>
                   <CardTitle className="flex items-center">
                     {role.name}
-                    {role.isSystem && (
+                    {role.is_system && (
                       <Badge variant="secondary" className="ms-2 px-1.5">
                         <Lock className="me-1 h-3 w-3" />
                         System
@@ -363,7 +455,7 @@ export default function RolesList() {
                       <Edit className="me-2 h-4 w-4" />
                       Edit Role
                     </DropdownMenuItem>
-                    {!role.isSystem && (
+                    {!role.is_system && (
                       <DropdownMenuItem
                         onClick={() => openDeleteDialog(role)}
                         className="text-red-600 focus:text-red-600"
@@ -381,14 +473,16 @@ export default function RolesList() {
                 <div className="flex items-center text-sm">
                   <Shield className="text-muted-foreground me-2 h-4 w-4" />
                   <span className="text-muted-foreground">
-                    {role.permissions.length} permissions
+                    {role.permissions?.length} permissions
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {Object.keys(permissionsByCategory).map(
                     (category) =>
-                      role.permissions.some(
-                        (p) => permissions.find((perm) => perm.id === p)?.category === category,
+                      role.permissions?.some(
+                        (p_id: string) =>
+                          permissions.find((perm: Permission) => perm.id === p_id)?.category ===
+                          category,
                       ) && (
                         <Badge key={category} variant="outline" className="text-xs">
                           {category}: {countPermissionsInCategory(role.permissions, category)}/
@@ -445,7 +539,7 @@ export default function RolesList() {
                   <Input
                     id="name"
                     placeholder="Or enter custom role name (lowercase, numbers, underscores only)"
-                    value={newRole.name}
+                    value={newRole.name || ""}
                     onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
                     className="ps-2"
                   />
@@ -463,7 +557,7 @@ export default function RolesList() {
               <Textarea
                 id="description"
                 placeholder="Describe what this role is for..."
-                value={newRole.description}
+                value={newRole.description || ""}
                 onChange={(e) => setNewRole({ ...newRole, description: e.target.value })}
               />
             </div>
@@ -511,11 +605,11 @@ export default function RolesList() {
               <Input
                 id="edit-name"
                 placeholder="e.g., Content Manager"
-                value={newRole.name}
+                value={newRole.name || ""}
                 onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
-                disabled={selectedRole?.isSystem}
+                disabled={selectedRole?.is_system}
               />
-              {selectedRole?.isSystem && (
+              {selectedRole?.is_system && (
                 <p className="text-muted-foreground text-xs">
                   System role names cannot be changed.
                 </p>
@@ -527,9 +621,9 @@ export default function RolesList() {
               <Textarea
                 id="edit-description"
                 placeholder="Describe what this role is for..."
-                value={newRole.description}
+                value={newRole.description || ""}
                 onChange={(e) => setNewRole({ ...newRole, description: e.target.value })}
-                disabled={selectedRole?.isSystem}
+                disabled={selectedRole?.is_system}
               />
             </div>
 
@@ -539,18 +633,18 @@ export default function RolesList() {
                 permissionsByCategory={permissionsByCategory}
                 selectedPermissions={newRole.permissions || []}
                 onPermissionChange={(permissionId) => {
-                  setNewRole({
-                    ...newRole,
-                    permissions: togglePermission(permissionId, newRole.permissions || []),
-                  });
+                  setNewRole((prev) => ({
+                    ...prev,
+                    permissions: togglePermission(permissionId, prev.permissions || []),
+                  }));
                 }}
                 onCategoryToggle={(category) => {
-                  setNewRole({
-                    ...newRole,
-                    permissions: toggleCategoryPermissions(category, newRole.permissions || []),
-                  });
+                  setNewRole((prev) => ({
+                    ...prev,
+                    permissions: toggleCategoryPermissions(category, prev.permissions || []),
+                  }));
                 }}
-                isDisabled={selectedRole?.isSystem}
+                isDisabled={selectedRole?.is_system}
               />
             </div>
           </div>

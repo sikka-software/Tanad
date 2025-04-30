@@ -8,6 +8,10 @@ interface ProfileType {
   email: string;
   full_name: string | null;
   created_at: string;
+  stripe_customer_id: string | null;
+  avatar_url: string | null;
+  address: string | null;
+  username: string | null;
   user_settings: {
     currency: string;
     calendar_type: string;
