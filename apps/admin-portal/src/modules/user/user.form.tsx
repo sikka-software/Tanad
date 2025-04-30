@@ -51,43 +51,34 @@ interface UserFormProps {
 
 export function UserForm({ onSuccess, id, onSubmitRequest, isSubmitting }: UserFormProps) {
   const t = useTranslations();
-  // const { profile, enterprise } = useUserStore((state) => ({
-  //   profile: state.profile,
-  //   enterprise: state.enterprise,
-  // }));
-  const enterprise = null; // Provide dummy value
-  const profile = null; // Provide dummy value
+  const profile = useUserStore((state) => state.profile);
+  const enterprise = useUserStore((state) => state.enterprise);
 
-  // // Reinstated hook calls:
-  // const {
-  //   data: customRoles,
-  //   isLoading: customRolesLoading,
-  //   error: customRolesError,
-  // } = useCustomRoles();
-  // const {
-  //   data: systemRoles,
-  //   isLoading: systemRolesLoading,
-  //   error: systemRolesError,
-  // } = useSystemRoles();
-  //
-  // const allRoles = useMemo(() => {
-  //   const combined = new Map<string, RoleWithPermissions>();
-  //   (customRoles ?? []).forEach((role) => combined.set(role.id, role));
-  //   (systemRoles ?? []).forEach((role) => {
-  //     if (!combined.has(role.id)) {
-  //       combined.set(role.id, role);
-  //     }
-  //   });
-  //   return Array.from(combined.values()).sort((a, b) => a.name.localeCompare(b.name));
-  // }, [customRoles, systemRoles]);
-  //
-  // const rolesLoading = customRolesLoading || systemRolesLoading;
-  // const rolesError = customRolesError || systemRolesError;
+  // Reinstated hook calls:
+  const {
+    data: customRoles,
+    isLoading: customRolesLoading,
+    error: customRolesError,
+  } = useCustomRoles();
+  const {
+    data: systemRoles,
+    isLoading: systemRolesLoading,
+    error: systemRolesError,
+  } = useSystemRoles();
 
-  // Provide default values since hooks are commented out
-  const allRoles: RoleWithPermissions[] = [];
-  const rolesLoading = false;
-  const rolesError = null;
+  const allRoles = useMemo(() => {
+    const combined = new Map<string, RoleWithPermissions>();
+    (customRoles ?? []).forEach((role) => combined.set(role.id, role));
+    (systemRoles ?? []).forEach((role) => {
+      if (!combined.has(role.id)) {
+        combined.set(role.id, role);
+      }
+    });
+    return Array.from(combined.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [customRoles, systemRoles]);
+
+  const rolesLoading = customRolesLoading || systemRolesLoading;
+  const rolesError = customRolesError || systemRolesError;
 
   const form = useForm<UserFormData>({
     resolver: zodResolver(userFormSchema),
@@ -117,17 +108,16 @@ export function UserForm({ onSuccess, id, onSubmitRequest, isSubmitting }: UserF
   }, [allRoles, rolesLoading]); // Keep dependencies minimal
 
   const onSubmit = async (values: UserFormData) => {
-    // if (!enterprise?.id) { // Temporarily comment out check
-    //   toast.error("Cannot create user: Enterprise information missing.");
-    //   return;
-    // }
+    if (!enterprise?.id) { // Restore check
+      toast.error("Cannot create user: Enterprise information missing.");
+      return;
+    }
 
     try {
       await onSubmitRequest({
         email: values.email,
         role: values.role,
-        // enterprise_id: enterprise.id, // No enterprise available
-        enterprise_id: "dummy-enterprise-id", // Provide dummy ID
+        enterprise_id: enterprise.id, // Restore using enterprise.id
         first_name: values.first_name,
         last_name: values.last_name,
         password: values.password,
