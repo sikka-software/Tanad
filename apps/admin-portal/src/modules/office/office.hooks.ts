@@ -56,7 +56,7 @@ export function useCreateOffice() {
 export function useUpdateOffice() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: OfficeUpdateData }) => updateOffice(id, data),
+    mutationFn: ({ id, office }: { id: string; office: OfficeUpdateData }) => updateOffice(id, office),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });

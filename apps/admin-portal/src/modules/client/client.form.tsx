@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -12,11 +11,10 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { Client, ClientCreateData, ClientUpdateData } from "@/modules/client/client.type";
-import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
+import { ClientUpdateData } from "@/modules/client/client.type";
+import { CompanyForm } from "@/modules/company/company.form";
 import { useCompanies } from "@/modules/company/company.hooks";
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 import { useCreateClient, useUpdateClient } from "./client.hooks";
 import useClientStore from "./client.store";
@@ -55,12 +53,11 @@ export function ClientForm({
   editMode = false,
 }: ClientFormProps) {
   const t = useTranslations();
-  const { locale } = useRouter();
-  const user = useUserStore((state) => state.user);
-  const profile = useUserStore((state) => state.profile);
+  const locale = useLocale();
+  const { profile, membership } = useUserStore();
   const { data: companies, isLoading: companiesLoading } = useCompanies();
-  const { mutate: createClient } = useCreateClient();
-  const { mutate: updateClient } = useUpdateClient();
+  const { mutateAsync: createClient, isPending: isCreating } = useCreateClient();
+  const { mutateAsync: updateClient, isPending: isUpdating } = useUpdateClient();
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
 
   const isLoading = useClientStore((state) => state.isLoading);
@@ -95,7 +92,7 @@ export function ClientForm({
 
   const handleSubmit = async (data: ClientFormValues) => {
     setIsLoading(true);
-    if (!user?.id) {
+    if (!profile?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
@@ -103,10 +100,10 @@ export function ClientForm({
     }
 
     try {
-      if (editMode) {
+      if (editMode && defaultValues) {
         await updateClient(
           {
-            id: defaultValues?.id || "",
+            id: defaultValues.id,
             client: {
               name: data.name.trim(),
               email: data.email.trim(),
@@ -120,7 +117,7 @@ export function ClientForm({
             },
           },
           {
-            onSuccess: async (response) => {
+            onSuccess: async () => {
               if (onSuccess) {
                 onSuccess();
               }
@@ -139,7 +136,7 @@ export function ClientForm({
             state: data.state.trim(),
             zip_code: data.zip_code.trim(),
             notes: data.notes?.trim() || null,
-            enterprise_id: profile?.enterprise_id || "",
+            enterprise_id: membership?.enterprise_id || "",
           },
           {
             onSuccess: async (response) => {

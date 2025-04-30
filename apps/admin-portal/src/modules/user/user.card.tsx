@@ -19,10 +19,11 @@ export default function UserCard({ user }: UserCardProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          {/* Remove Role display as user type doesn't contain role */}
+          {/* <div className="flex items-center justify-between">
             <span className="text-muted-foreground text-sm">{t("Users.form.role.label")}</span>
             <Badge variant="outline">{user.role}</Badge>
-          </div>
+          </div> */}
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground text-sm">
               {t("Users.form.created_at.label")}

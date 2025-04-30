@@ -11,6 +11,7 @@ interface ProfileType {
   stripe_customer_id: string | null;
   avatar_url: string | null;
   address: string | null;
+  subscribed_to?: string;
   username: string | null;
   user_settings: {
     currency: string;

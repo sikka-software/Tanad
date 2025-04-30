@@ -117,7 +117,7 @@ export class RoleService {
     const original = await this.get(id);
 
     // 2. Remove unique fields and create new role
-    const { id: _, created_at: __, updated_at: ___, ...duplicateData } = original;
+    const { id: _, ...duplicateData } = original;
 
     // 3. Create the duplicate with the specified enterprise_id
     return this.create({ ...duplicateData, enterprise_id } as RoleCreateData);

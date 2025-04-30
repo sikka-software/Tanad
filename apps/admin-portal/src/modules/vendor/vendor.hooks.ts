@@ -60,8 +60,8 @@ export function useUpdateVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Vendor, "id" | "created_at">> }) =>
-      updateVendor(id, data),
+    mutationFn: ({ id, vendor }: { id: string; vendor: Partial<Omit<Vendor, "id" | "created_at">> }) =>
+      updateVendor(id, vendor),
     onSuccess: (data) => {
       // Invalidate both the specific detail and the list queries
       queryClient.invalidateQueries({ queryKey: vendorKeys.detail(data.id) });

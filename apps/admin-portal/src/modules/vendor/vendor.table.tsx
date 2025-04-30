@@ -50,7 +50,7 @@ const VendorsTable = ({ data, isLoading, error }: VendorsTableProps) => {
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateVendor({ id: rowId, data: { [columnId]: value } });
+    await updateVendor({ id: rowId, vendor: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

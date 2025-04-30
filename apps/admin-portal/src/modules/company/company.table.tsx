@@ -99,7 +99,7 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: CompaniesTa
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateCompany({ id: rowId, data: { [columnId]: value } });
+    await updateCompany({ id: rowId, company: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

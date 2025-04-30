@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
+import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
@@ -15,10 +16,10 @@ import { DocumentFile, DocumentUploader } from "@/components/ui/documents-upload
 import { uploadDocument } from "@/services/documents";
 
 import useCompanyStore from "@/modules/company/company.store";
+import { Company, CompanyUpdateData } from "@/modules/company/company.type";
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateCompany, useUpdateCompany } from "./company.hooks";
-import { CompanyUpdateData } from "./company.type";
 
 export const createCompanySchema = (t: (key: string) => string) =>
   z.object({
@@ -44,16 +45,23 @@ export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
 interface CompanyFormProps {
   id?: string;
   onSuccess?: () => void;
+  loading?: boolean;
   defaultValues?: CompanyUpdateData | null;
   editMode?: boolean;
 }
 
-export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: CompanyFormProps) {
+export function CompanyForm({
+  id,
+  onSuccess,
+  loading = false,
+  defaultValues,
+  editMode = false,
+}: CompanyFormProps) {
   const t = useTranslations();
-  const user = useUserStore((state) => state.user);
-  const profile = useUserStore((state) => state.profile);
-  const { mutate: createCompany } = useCreateCompany();
-  const { mutate: updateCompany } = useUpdateCompany();
+  const { locale } = useRouter();
+  const { profile, membership } = useUserStore();
+  const { mutateAsync: createCompany, isPending: isCreating } = useCreateCompany();
+  const { mutateAsync: updateCompany, isPending: isUpdating } = useUpdateCompany();
   const [pendingDocuments, setPendingDocuments] = useState<DocumentFile[]>([]);
 
   const isLoading = useCompanyStore((state) => state.isLoading);
@@ -111,7 +119,7 @@ export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: 
 
   const handleSubmit = async (data: CompanyFormValues) => {
     setIsLoading(true);
-    if (!user?.id) {
+    if (!profile?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
@@ -119,31 +127,30 @@ export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: 
     }
 
     try {
-      if (editMode) {
+      if (editMode && defaultValues) {
+        if (!defaultValues.id) {
+          console.error("Company ID missing in edit mode");
+          toast.error(t("Companies.error.missing_id"));
+          setIsLoading(false);
+          return;
+        }
         await updateCompany(
           {
-            id: defaultValues?.id || "",
-            data: {
+            id: defaultValues.id,
+            company: {
               name: data.name.trim(),
               email: data.email.trim(),
               phone: data.phone?.trim() || undefined,
-              website: data.website?.trim() || undefined,
               address: data.address?.trim() || undefined,
               city: data.city?.trim() || undefined,
               state: data.state?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
-              industry: data.industry?.trim() || undefined,
-              size: data.size?.trim() || undefined,
+              website: data.website?.trim() || undefined,
               notes: data.notes?.trim() || undefined,
-              is_active: data.is_active || true,
             },
           },
           {
-            onSuccess: async (response) => {
-              // Upload documents after company is created
-              if (response?.id) {
-                await uploadDocuments(response.id);
-              }
+            onSuccess: async () => {
               if (onSuccess) {
                 onSuccess();
               }
@@ -153,20 +160,18 @@ export function CompanyForm({ id, onSuccess, defaultValues, editMode = false }: 
       } else {
         await createCompany(
           {
-            enterprise_id: profile?.enterprise_id || "",
+            enterprise_id: membership?.enterprise_id || "",
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
-            website: data.website?.trim() || undefined,
             address: data.address?.trim() || undefined,
             city: data.city?.trim() || undefined,
             state: data.state?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
-            industry: data.industry?.trim() || undefined,
-            size: data.size?.trim() || undefined,
+            website: data.website?.trim() || undefined,
             notes: data.notes?.trim() || undefined,
-            is_active: data.is_active || true,
-            user_id: user?.id,
+            is_active: true,
+            user_id: profile?.id || "",
           },
           {
             onSuccess: async (response) => {

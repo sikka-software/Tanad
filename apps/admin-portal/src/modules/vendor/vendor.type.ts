@@ -3,7 +3,7 @@ export interface Vendor {
   name: string;
   email: string;
   phone: string;
-  company: string;
+  company?: string;
   address: string;
   city: string;
   state: string;

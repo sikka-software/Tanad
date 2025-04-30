@@ -57,7 +57,7 @@ const OfficesTable = ({ data, isLoading, error }: OfficesTableProps) => {
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "office_id") return;
-    await updateOffice({ id: rowId, data: { [columnId]: value } });
+    await updateOffice({ id: rowId, office: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

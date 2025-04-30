@@ -12,15 +12,15 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { CompanyForm, type CompanyFormValues } from "@/modules/company/company.form";
+import { CompanyForm, type CompanyFormValues as CompanyFormValuesType } from "@/modules/company/company.form";
 import { useCompanies } from "@/modules/company/company.hooks";
-import { fetchVendorById } from "@/modules/vendor/vendor.service";
+import type { Company } from "@/modules/company/company.type";
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
-import { useCreateVendor } from "./vendor.hooks";
+import { useCreateVendor, useUpdateVendor } from "./vendor.hooks";
 import useVendorStore from "./vendor.store";
-import { Vendor, VendorUpdateData } from "./vendor.type";
+import type { VendorUpdateData } from "./vendor.type";
 
 export const createVendorSchema = (t: (key: string) => string) =>
   z.object({
@@ -49,13 +49,12 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
   const t = useTranslations();
   const locale = useLocale();
 
-  const user = useUserStore((state) => state.user);
-  const profile = useUserStore((state) => state.profile);
-  const { mutate: createVendor } = useCreateVendor();
+  const { profile, membership } = useUserStore();
+  const { mutateAsync: createVendor, isPending: isCreating } = useCreateVendor();
+  const { mutateAsync: updateVendor, isPending: isUpdating } = useUpdateVendor();
   const isLoading = useVendorStore((state) => state.isLoading);
   const setIsLoading = useVendorStore((state) => state.setIsLoading);
 
-  // const [loadingCompanies, setLoadingCompanies] = useState(false);
   const [isCompanyDialogOpen, setIsCompanyDialogOpen] = useState(false);
   const { data: companies, isLoading: companiesLoading } = useCompanies();
 
@@ -81,15 +80,15 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
 
   // Format companies for ComboboxAdd
   const companyOptions =
-    companies?.map((company) => ({
+    companies?.map((company: Company) => ({
       label: company.name,
       value: company.id,
     })) || [];
 
-  const handleCompanySubmit = async (data: CompanyFormValues) => {
+  const handleCompanySubmit = async (data: CompanyFormValuesType) => {
     try {
       // Check if user ID is available
-      if (!user?.id) {
+      if (!profile?.id) {
         throw new Error(t("error.not_authenticated"));
       }
 
@@ -109,7 +108,7 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
             size: data.size?.trim() || null,
             notes: data.notes?.trim() || null,
             is_active: data.is_active,
-            user_id: user?.id,
+            user_id: profile.id,
           },
         ])
         .select()
@@ -138,26 +137,62 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
   const handleSubmit = async (data: VendorFormValues) => {
     setIsLoading(true);
     try {
-      if (editMode) {
-      } else {
-        await createVendor({
-          user_id: user?.id || "",
-          updated_at: new Date().toISOString(),
-          name: data.name.trim(),
-          email: data.email.trim(),
-          phone: data.phone.trim(),
-          company: data.company?.trim() || "",
-          address: data.address.trim(),
-          city: data.city.trim(),
-          state: data.state.trim(),
-          zip_code: data.zip_code.trim(),
-          notes: data.notes?.trim() || null,
-          enterprise_id: profile?.enterprise_id || "",
-        });
-
-        if (onSuccess) {
-          onSuccess();
+      if (editMode && defaultValues) {
+        if (!defaultValues.id) {
+          console.error("Vendor ID missing in edit mode");
+          toast.error(t("Vendors.error.missing_id"));
+          setIsLoading(false);
+          return;
         }
+        // Update vendor logic
+        await updateVendor(
+          {
+            id: defaultValues.id,
+            vendor: {
+              name: data.name.trim(),
+              email: data.email.trim(),
+              phone: data.phone.trim(),
+              company: data.company || undefined,
+              address: data.address.trim(),
+              city: data.city.trim(),
+              state: data.state.trim(),
+              zip_code: data.zip_code.trim(),
+              notes: data.notes?.trim() || null,
+            },
+          },
+          {
+            onSuccess: async () => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      } else {
+        // Create vendor logic
+        await createVendor(
+          {
+            name: data.name.trim(),
+            email: data.email.trim(),
+            phone: data.phone.trim(),
+            company: data.company || undefined,
+            address: data.address.trim(),
+            city: data.city.trim(),
+            state: data.state.trim(),
+            zip_code: data.zip_code.trim(),
+            notes: data.notes?.trim() || null,
+            enterprise_id: membership?.enterprise_id || "",
+            user_id: profile?.id || "",
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onSuccess: async () => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
       }
     } catch (error) {
       setIsLoading(false);

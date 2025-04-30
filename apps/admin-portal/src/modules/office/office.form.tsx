@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { Combobox } from "@/ui/combobox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
@@ -35,9 +36,9 @@ interface OfficeFormProps {
 
 export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFormProps) {
   const t = useTranslations();
-  const { mutate: createOffice } = useCreateOffice();
-  const { mutate: updateOffice } = useUpdateOffice();
-  const { profile } = useUserStore();
+  const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();
+  const { mutateAsync: updateOffice, isPending: isUpdating } = useUpdateOffice();
+  const { profile, membership } = useUserStore();
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
 
@@ -57,52 +58,56 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
   const handleSubmit = async (data: OfficeFormValues) => {
     setIsLoading(true);
     try {
-      if (editMode) {
-        await updateOffice({
-          id: defaultValues?.id || "",
-          data: {
-            name: data.name.trim(),
-            email: data.email?.trim(),
-            phone: data.phone?.trim(),
-            address: data.address.trim(),
-            city: data.city.trim(),
-            state: data.state.trim(),
-            zip_code: data.zip_code.trim(),
-            is_active: true,
+      if (editMode && defaultValues) {
+        if (!defaultValues.id) {
+          console.error("Office ID missing in edit mode");
+          toast.error(t("Offices.error.missing_id"));
+          setIsLoading(false);
+          return;
+        }
+        await updateOffice(
+          {
+            id: defaultValues.id,
+            office: {
+              name: data.name.trim(),
+              address: data.address?.trim() || undefined,
+              city: data.city?.trim() || undefined,
+              state: data.state?.trim() || undefined,
+              zip_code: data.zip_code?.trim() || undefined,
+            },
           },
-        });
-        toast.success(t("General.successful_operation"), {
-          description: t("Offices.success.updated"),
-        });
-        onSuccess?.();
+          {
+            onSuccess: async () => {
+              if (onSuccess) onSuccess();
+            },
+          },
+        );
       } else {
-        const currentProfile = profile || useUserStore.getState().profile;
-        if (!currentProfile?.enterprise_id) {
+        if (!membership?.enterprise_id) {
           toast.error(t("General.error_operation"), {
-            description: "No enterprise found. Please try logging out and back in.",
+            description: t("Offices.error.no_enterprise"),
           });
           setIsLoading(false);
           return;
         }
 
-        await createOffice({
-          name: data.name.trim(),
-          email: data.email?.trim(),
-          phone: data.phone?.trim(),
-          address: data.address.trim(),
-          city: data.city.trim(),
-          state: data.state.trim(),
-          zip_code: data.zip_code.trim(),
-          is_active: true,
-          enterprise_id: currentProfile.enterprise_id,
-          updated_at: new Date().toISOString(),
-        });
-        toast.success(t("General.successful_operation"), {
-          description: t("Offices.success.created"),
-        });
-        if (onSuccess) {
-          onSuccess();
-        }
+        await createOffice(
+          {
+            name: data.name.trim(),
+            address: data.address?.trim() || undefined,
+            city: data.city?.trim() || undefined,
+            state: data.state?.trim() || undefined,
+            zip_code: data.zip_code?.trim() || undefined,
+            enterprise_id: membership.enterprise_id,
+            is_active: true,
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) onSuccess();
+            },
+          },
+        );
       }
     } catch (error) {
       console.error("Error in office form:", error);
