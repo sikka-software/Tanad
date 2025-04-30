@@ -11,27 +11,15 @@ import PageTitle from "@/ui/page-title";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { InvoiceForm, type InvoiceFormValues } from "@/modules/invoice/invoice.form";
-import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 export default function AddInvoicePage() {
-  const supabase = createClient();
   const t = useTranslations();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const { user, enterprise } = useUserStore();
 
   const handleSubmit = async (data: InvoiceFormValues) => {
     setLoading(true);
     try {
-      if (!user?.id) {
-        throw new Error("You must be logged in to create an invoice");
-      }
-
-      if (!enterprise?.id) {
-        throw new Error("You must be associated with an enterprise to create an invoice");
-      }
-
       // Calculate final amounts
       const subtotal = data.subtotal;
       const tax_amount = (subtotal * data.tax_rate) / 100;
@@ -41,40 +29,39 @@ export default function AddInvoicePage() {
       const formattedIssueDate = format(data.issue_date, "yyyy-MM-dd");
       const formattedDueDate = format(data.due_date, "yyyy-MM-dd");
 
-      // First create the invoice
-      const { data: invoice, error: invoiceError } = await supabase
-        .from("invoices")
-        .insert([
-          {
-            client_id: data.client_id,
-            invoice_number: data.invoice_number.trim(),
-            issue_date: formattedIssueDate,
-            due_date: formattedDueDate,
-            status: data.status,
-            subtotal: subtotal,
-            tax_rate: data.tax_rate,
-            notes: data.notes?.trim() || null,
-            user_id: user?.id,
-            enterprise_id: enterprise.id,
-          },
-        ])
-        .select()
-        .single();
+      // Prepare data payload for the API
+      const payload = {
+        client_id: data.client_id,
+        invoice_number: data.invoice_number.trim(),
+        issue_date: formattedIssueDate,
+        due_date: formattedDueDate,
+        status: data.status,
+        subtotal: subtotal,
+        tax_rate: data.tax_rate,
+        notes: data.notes?.trim() || null,
+        items: data.items.map(item => ({
+          product_id: item.product_id || null,
+          description: item.description || "",
+          quantity: parseFloat(item.quantity),
+          unit_price: parseFloat(item.unit_price),
+        })),
+      };
 
-      if (invoiceError) throw invoiceError;
+      console.log("Sending payload to /api/resource/invoices:", payload);
 
-      // Then add invoice items
-      const invoiceItems = data.items.map((item) => ({
-        invoice_id: invoice.id,
-        product_id: item.product_id || null,
-        description: item.description || "",
-        quantity: parseFloat(item.quantity),
-        unit_price: parseFloat(item.unit_price),
-      }));
+      // Call the API endpoint
+      const response = await fetch("/api/resource/invoices", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-      const { error: itemsError } = await supabase.from("invoice_items").insert(invoiceItems);
-
-      if (itemsError) throw itemsError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `API Error: ${response.statusText}`);
+      }
 
       toast.success(t("General.successful_operation"), {
         description: t("Invoices.success.created"),
@@ -82,7 +69,7 @@ export default function AddInvoicePage() {
 
       router.push("/invoices");
     } catch (error) {
-      console.error(error);
+      console.error("Error creating invoice:", error);
       toast.error(t("General.error_operation"), {
         description: error instanceof Error ? error.message : t("Invoices.error.create"),
       });
