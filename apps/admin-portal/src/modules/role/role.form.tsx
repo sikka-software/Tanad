@@ -27,7 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { Permission, usePermissions } from "../permission/permission.hooks";
+import { usePermissions } from "../permission/permission.hooks";
 import { useCreateRole, useUpdateRole } from "./role.hooks";
 import type { RoleCreateData, RoleUpdateData } from "./role.type";
 
@@ -39,89 +39,21 @@ const formSchema = z.object({
       message: "Role name must contain only lowercase letters, numbers, and underscores",
     }),
   description: z.string().nullable(),
-  permissions: z.record(z.string(), z.boolean()),
+  permissions: z.array(z.string()),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 interface RoleFormProps {
   id?: string;
-  defaultValues?: RoleUpdateData & { isSystem?: boolean };
+  defaultValues?: {
+    name: string;
+    description: string | null;
+    permissions: string[];
+  };
   onSuccess?: () => void;
   editMode?: boolean;
 }
-
-// Add this component for permissions section
-const PermissionsSection = ({
-  permissionsByCategory,
-  selectedPermissions,
-  onPermissionChange,
-  onCategoryToggle,
-  isDisabled = false,
-}: {
-  permissionsByCategory: Record<string, Permission[]>;
-  selectedPermissions: string[];
-  onPermissionChange: (permissionId: string) => void;
-  onCategoryToggle: (category: string) => void;
-  isDisabled?: boolean;
-}) => {
-  const areAllPermissionsSelected = (category: string) => {
-    const categoryPermissions = permissionsByCategory[category] || [];
-    return categoryPermissions.every((p) => selectedPermissions.includes(p.id));
-  };
-
-  const countPermissionsByCategory = (category: string) => {
-    const categoryPermissions = permissionsByCategory[category] || [];
-    return categoryPermissions.filter((p) => selectedPermissions.includes(p.id)).length;
-  };
-
-  return (
-    <ScrollArea className="h-[300px] pe-4">
-      <Accordion type="multiple" className="w-full">
-        {Object.entries(permissionsByCategory).map(([category, permissions]) => (
-          <AccordionItem key={category} value={category}>
-            <AccordionTrigger className="py-2">
-              <div className="flex w-full items-center justify-between pe-4">
-                <span>{category}</span>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={areAllPermissionsSelected(category)}
-                    onCheckedChange={() => onCategoryToggle(category)}
-                    onClick={(e) => e.stopPropagation()}
-                    disabled={isDisabled}
-                  />
-                  <span className="text-muted-foreground text-xs">
-                    {countPermissionsByCategory(category)}/{permissions.length}
-                  </span>
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-2 ps-4 pt-2">
-                {permissions.map((permission) => (
-                  <div key={permission.id} className="flex items-start space-x-2">
-                    <Checkbox
-                      id={`permission-${permission.id}`}
-                      checked={selectedPermissions.includes(permission.id)}
-                      onCheckedChange={() => onPermissionChange(permission.id)}
-                      disabled={isDisabled}
-                    />
-                    <div className="space-y-1">
-                      <label htmlFor={`permission-${permission.id}`} className="font-medium">
-                        {permission.name}
-                      </label>
-                      <p className="text-muted-foreground text-sm">{permission.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </ScrollArea>
-  );
-};
 
 export function RoleForm({ id, defaultValues, onSuccess, editMode }: RoleFormProps) {
   const t = useTranslations();
@@ -131,16 +63,17 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode }: RoleFormPro
   const { mutateAsync: updateRole, isPending: isUpdating } = useUpdateRole();
   const { data: permissions = [] } = usePermissions();
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>(
-    Array.isArray(defaultValues?.permissions) ? defaultValues.permissions : [],
+    defaultValues?.permissions || [],
   );
 
   // Group permissions by category
-  const permissionsByCategory = permissions.reduce<Record<string, Permission[]>>(
+  const permissionsByCategory = permissions.reduce<Record<string, { id: string; name: string }[]>>(
     (acc, permission) => {
-      if (!acc[permission.category]) {
-        acc[permission.category] = [];
+      const category = permission.name.split('.')[0];
+      if (!acc[category]) {
+        acc[category] = [];
       }
-      acc[permission.category].push(permission);
+      acc[category].push(permission);
       return acc;
     },
     {},
@@ -150,18 +83,18 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode }: RoleFormPro
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: defaultValues?.name || "",
-      description: defaultValues?.description || "",
-      permissions: defaultValues?.permissions || {},
+      description: defaultValues?.description || null,
+      permissions: defaultValues?.permissions || [],
     },
   });
 
   // Toggle permission selection
-  const togglePermission = (permissionId: string) => {
+  const togglePermission = (permission: string) => {
     setSelectedPermissions((current) => {
-      if (current.includes(permissionId)) {
-        return current.filter((id) => id !== permissionId);
+      if (current.includes(permission)) {
+        return current.filter((p) => p !== permission);
       } else {
-        return [...current, permissionId];
+        return [...current, permission];
       }
     });
   };
@@ -169,13 +102,15 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode }: RoleFormPro
   // Toggle all permissions in a category
   const toggleCategoryPermissions = (category: string) => {
     const categoryPermissions = permissionsByCategory[category] || [];
-    const allSelected = categoryPermissions.every((p) => selectedPermissions.includes(p.id));
+    const allSelected = categoryPermissions.every((p) => selectedPermissions.includes(p.name));
 
     setSelectedPermissions((current) => {
       if (allSelected) {
-        return current.filter((id) => !categoryPermissions.some((p) => p.id === id));
+        return current.filter((p) => !categoryPermissions.some((cp) => cp.name === p));
       } else {
-        const toAdd = categoryPermissions.filter((p) => !current.includes(p.id)).map((p) => p.id);
+        const toAdd = categoryPermissions
+          .filter((p) => !current.includes(p.name))
+          .map((p) => p.name);
         return [...current, ...toAdd];
       }
     });
@@ -187,14 +122,16 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode }: RoleFormPro
         await updateRole({
           id,
           data: {
-            ...formData,
+            name: formData.name,
+            description: formData.description,
             permissions: selectedPermissions,
             enterprise_id: enterpriseId,
           },
         });
       } else {
         await createRole({
-          ...formData,
+          name: formData.name,
+          description: formData.description,
           permissions: selectedPermissions,
           enterprise_id: enterpriseId,
         });
@@ -251,13 +188,51 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode }: RoleFormPro
 
         <div className="space-y-4">
           <FormLabel>Permissions</FormLabel>
-          <PermissionsSection
-            permissionsByCategory={permissionsByCategory}
-            selectedPermissions={selectedPermissions}
-            onPermissionChange={togglePermission}
-            onCategoryToggle={toggleCategoryPermissions}
-            isDisabled={editMode && defaultValues?.isSystem}
-          />
+          <ScrollArea className="h-[300px] pe-4">
+            <Accordion type="multiple" className="w-full">
+              {Object.entries(permissionsByCategory).map(([category, perms]) => (
+                <AccordionItem key={category} value={category}>
+                  <AccordionTrigger className="py-2">
+                    <div className="flex w-full items-center justify-between pe-4">
+                      <span>{category}</span>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={perms.every((p) => selectedPermissions.includes(p.name))}
+                          onCheckedChange={() => toggleCategoryPermissions(category)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <span className="text-muted-foreground text-xs">
+                          {perms.filter((p) => selectedPermissions.includes(p.name)).length}/
+                          {perms.length}
+                        </span>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 ps-4 pt-2">
+                      {perms.map((permission) => (
+                        <div key={permission.name} className="flex items-start space-x-2">
+                          <Checkbox
+                            id={`permission-${permission.name}`}
+                            checked={selectedPermissions.includes(permission.name)}
+                            onCheckedChange={() => togglePermission(permission.name)}
+                          />
+                          <div className="space-y-1">
+                            <label
+                              htmlFor={`permission-${permission.name}`}
+                              className="font-medium"
+                            >
+                              {permission.name}
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </ScrollArea>
         </div>
 
         <div className="flex justify-end space-x-2">

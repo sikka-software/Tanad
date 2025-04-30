@@ -5,53 +5,30 @@ import { createClient } from "@/utils/supabase/component";
 
 interface ProfileType {
   id: string;
-  user_id: string;
   email: string;
-  first_name: string | null;
-  last_name: string | null;
-  stripe_customer_id: string | null;
-  subscribed_to: string | null;
-  price_id: string | null;
-  avatar_url: string | null;
-  address: string | null;
-  username: string | null;
-  user_settings: {
-    currency: string;
-    calendar_type: string;
-    timezone: string;
-    notifications?: {
-      email_updates: boolean;
-      email_marketing: boolean;
-      email_security: boolean;
-      app_mentions: boolean;
-      app_comments: boolean;
-      app_tasks: boolean;
-    };
-    navigation?: Record<
-      string,
-      Array<{
-        title: string;
-        translationKey?: string;
-        url?: string;
-        is_active?: boolean;
-        action?: string;
-      }>
-    >;
-    hidden_menu_items?: Record<string, string[]>;
-  };
-  role?: string;
-  enterprise_id?: string;
+  full_name: string | null;
+  created_at: string;
 }
 
 interface EnterpriseType {
   id: string;
   name: string;
+  created_at: string;
+}
+
+interface MembershipType {
+  id: string;
+  profile_id: string;
+  enterprise_id: string;
+  role_id: string;
+  created_at: string;
 }
 
 interface UserState {
   user: User | null;
   profile: ProfileType | null;
   enterprise: EnterpriseType | null;
+  membership: MembershipType | null;
   permissions: string[];
   loading: boolean;
   error: string | null;
@@ -60,6 +37,7 @@ interface UserState {
   setUser: (user: User | null) => void;
   setProfile: (profile: ProfileType | null) => void;
   setEnterprise: (enterprise: EnterpriseType | null) => void;
+  setMembership: (membership: MembershipType | null) => void;
   setPermissions: (permissions: string[]) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -72,6 +50,7 @@ const useUserStore = create<UserState>((set, get) => ({
   user: null,
   profile: null,
   enterprise: null,
+  membership: null,
   permissions: [],
   loading: false,
   error: null,
@@ -79,6 +58,7 @@ const useUserStore = create<UserState>((set, get) => ({
   setUser: (user) => set({ user }),
   setProfile: (profile) => set({ profile }),
   setEnterprise: (enterprise) => set({ enterprise }),
+  setMembership: (membership) => set({ membership }),
   setPermissions: (permissions) => set({ permissions }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
@@ -101,6 +81,7 @@ const useUserStore = create<UserState>((set, get) => ({
         user: null,
         profile: null,
         enterprise: null,
+        membership: null,
         permissions: [],
         loading: false,
         error: null,
@@ -132,6 +113,7 @@ const useUserStore = create<UserState>((set, get) => ({
           user: null,
           profile: null,
           enterprise: null,
+          membership: null,
           permissions: [],
           loading: false,
         });
@@ -153,12 +135,23 @@ const useUserStore = create<UserState>((set, get) => ({
       if (profileData) {
         set({ profile: profileData as ProfileType });
 
-        // Get enterprise data if profile has enterprise_id
-        if (profileData.enterprise_id) {
+        // Get membership data
+        const { data: membershipData } = await supabase
+          .from("memberships")
+          .select("*")
+          .eq("profile_id", session.user.id)
+          .single();
+
+        console.log('Membership data:', membershipData ? 'Found' : 'Not found');
+
+        if (membershipData) {
+          set({ membership: membershipData as MembershipType });
+
+          // Get enterprise data
           const { data: enterpriseData } = await supabase
             .from("enterprises")
             .select("*")
-            .eq("id", profileData.enterprise_id)
+            .eq("id", membershipData.enterprise_id)
             .single();
 
           console.log('Enterprise data:', enterpriseData ? 'Found' : 'Not found');
@@ -167,26 +160,19 @@ const useUserStore = create<UserState>((set, get) => ({
             set({ enterprise: enterpriseData as EnterpriseType });
           }
 
-          // Fetch user's permissions using the get_user_permissions function
-          const { data: permissionsData, error: permissionsError } = await supabase
-            .rpc('get_user_permissions', {
-              user_id: session.user.id,
-              enterprise_id: profileData.enterprise_id
-            }) as { data: string[] | null, error: any };
+          // Get user permissions from the view
+          const { data: permissionsData } = await supabase
+            .from("user_permissions_view")
+            .select("permission")
+            .eq("profile_id", session.user.id)
+            .eq("enterprise_id", membershipData.enterprise_id);
 
-          console.log('Permissions fetch:', {
-            success: !permissionsError,
-            error: permissionsError?.message,
-            data: permissionsData
-          });
+          console.log('Permissions data:', permissionsData ? 'Found' : 'Not found');
 
           if (permissionsData) {
-            // Extract unique permissions
-            const permissions = [...new Set(permissionsData)];
+            const permissions = permissionsData.map(p => p.permission);
             console.log('Setting permissions:', permissions);
             set({ permissions });
-          } else if (permissionsError) {
-            console.error('Error fetching permissions:', permissionsError);
           }
         }
       }
@@ -208,6 +194,7 @@ supabase.auth.onAuthStateChange((event, session) => {
       user: null,
       profile: null,
       enterprise: null,
+      membership: null,
       permissions: [],
       loading: false,
       error: null,

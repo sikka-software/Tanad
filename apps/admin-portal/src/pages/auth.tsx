@@ -83,27 +83,10 @@ export default function Auth() {
 
       if (data.user) {
         // Create the user profile
-        const stripeCustomerId = `cus_${Math.random().toString(36).substring(2, 15)}`;
         const { error: profileError } = await supabase.from("profiles").upsert({
           id: data.user.id,
-          user_id: data.user.id,
           email: data.user.email,
-          first_name: email.split("@")[0], // Placeholder
-          last_name: "", // Placeholder
-          stripe_customer_id: stripeCustomerId,
-          user_settings: {
-            currency: "USD",
-            calendar_type: "gregorian",
-            timezone: "UTC",
-            notifications: {
-              email_updates: true,
-              email_marketing: false,
-              email_security: true,
-              app_mentions: true,
-              app_comments: true,
-              app_tasks: true,
-            },
-          },
+          full_name: email.split("@")[0], // Placeholder
         });
 
         if (profileError) {

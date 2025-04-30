@@ -3,51 +3,52 @@ import { createClient } from "@/utils/supabase/component";
 import type { EnterpriseCreateData } from "./onboarding.type";
 
 export class OnboardingService {
-  private static readonly TABLE_NAME = "enterprises";
+  private static readonly TABLE_NAME = "user_enterprises";
 
   static async createEnterprise(data: EnterpriseCreateData) {
     const supabase = createClient();
 
-    // Create the enterprise
-    const { data: enterprise, error: enterpriseError } = await supabase
-      .from(this.TABLE_NAME)
-      .insert(data)
-      .select()
-      .single();
+    try {
+      // Get the current user
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user) throw new Error("No authenticated user found");
 
-    if (enterpriseError) throw enterpriseError;
+      // Create the enterprise through the user_enterprises view
+      const { data: enterprise, error: enterpriseError } = await supabase
+        .from(this.TABLE_NAME)
+        .insert({
+          user_id: user.id,
+          enterprise_name: data.name,
+          description: data.description,
+          logo: data.logo,
+          email: data.email,
+          industry: data.industry,
+          size: data.size,
+        })
+        .select()
+        .single();
 
-    // Get the current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-    if (!user) throw new Error("No authenticated user found");
+      if (enterpriseError) throw enterpriseError;
 
-    // Update user metadata with enterprise_id
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: { enterprise_id: enterprise.id },
-    });
+      // Update the user's profile to mark onboarding as complete
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({
+          needs_onboarding: false,
+          enterprise_id: enterprise.enterprise_id,
+        })
+        .eq("user_id", user.id);
 
-    if (updateError) throw updateError;
+      if (profileError) throw profileError;
 
-    // Create user_enterprises entry with superadmin role
-    const { error: userEnterpriseError } = await supabase
-      .from("user_enterprises")
-      .insert({
-        user_id: user.id,
-        enterprise_id: enterprise.id,
-        role: "superadmin"
-      });
-
-    if (userEnterpriseError) throw userEnterpriseError;
-
-    // Update user profile with enterprise_id
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({ enterprise_id: enterprise.id })
-      .eq("user_id", user.id);
-
-    if (profileError) throw profileError;
-
-    return enterprise;
+      return enterprise;
+    } catch (error) {
+      console.error("Error in createEnterprise:", error);
+      throw error;
+    }
   }
 }
