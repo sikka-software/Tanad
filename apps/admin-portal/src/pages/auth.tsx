@@ -14,11 +14,10 @@ import { Label } from "@/ui/label";
 import LanguageSwitcher from "@/ui/language-switcher";
 import ThemeSwitcher from "@/ui/theme-switcher";
 
-import { createClient } from "@/utils/supabase/component";
-
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import useUserStore from "@/stores/use-user-store";
+import { createClient } from "@/utils/supabase/component";
 
 export default function Auth() {
   const t = useTranslations();
@@ -78,9 +77,37 @@ export default function Auth() {
 
     setLoading(true);
     try {
+      // Step 1: Create a Stripe customer first
+      const createStripeCustomerResponse = await fetch("/api/stripe/create-customer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          name: email.split("@")[0], // Use part of email as name initially
+        }),
+      });
+
+      if (!createStripeCustomerResponse.ok) {
+        const errorData = await createStripeCustomerResponse.json();
+        throw new Error(errorData.message || "Failed to create Stripe customer");
+      }
+
+      const { customerId } = await createStripeCustomerResponse.json();
+
+      if (!customerId) {
+        throw new Error("No Stripe customer ID returned from API");
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            stripe_customer_id: customerId,
+          },
+        },
       });
 
       if (error) throw error;
