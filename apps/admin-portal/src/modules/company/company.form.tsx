@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -7,17 +6,13 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { DocumentList } from "@/ui/documents-list";
-import { DocumentFile, DocumentUploader } from "@/ui/documents-uploader";
+import { DocumentFile } from "@/ui/documents-uploader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { Badge } from "@/components/ui/badge";
-import IconButton from "@/components/ui/icon-button";
-import NumberInput from "@/components/ui/number-input";
+import { AddressFormSection } from "@/components/forms/address-form-section";
 import PhoneInput from "@/components/ui/phone-input";
-import { Separator } from "@/components/ui/separator";
 
 import { uploadDocument } from "@/services/documents";
 
@@ -328,172 +323,12 @@ export function CompanyForm({
           />
         </div>
 
-        <div>
-          <h1 className="text-lg font-medium">{t("Companies.form.address")}</h1>
-          <Separator className="mb-6" />
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="short_address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Companies.form.short_address.label")}</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        disabled={isLoading}
-                        placeholder={t("Companies.form.short_address.placeholder")}
-                        {...field}
-                      />
-                      <IconButton
-                        size="icon_sm"
-                        buttonType="button"
-                        contentClassName="flex flex-col gap-1 max-w-40"
-                        onClick={(e) => e.preventDefault()}
-                        icon={<MapPin className="size-6" />}
-                        label={
-                          <div className="relative">
-                            <Badge className="absolute -end-4 -top-2 rounded-sm rounded-e-none !rounded-t-none bg-blue-200 p-1 px-2 text-[10px] text-black dark:bg-blue-800 dark:text-white">
-                              {t("General.soon")}
-                            </Badge>
-                            <p className="text-sm font-medium">
-                              {t("Companies.form.short_address.explainer.title")}
-                            </p>
-                            <p className="text-muted-foreground text-xs">
-                              {t("Companies.form.short_address.explainer.description")}
-                            </p>
-                          </div>
-                        }
-                        className="absolute end-0.5 top-0.5"
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <AddressFormSection
+          title={t("Companies.form.address")}
+          control={form.control}
+          isLoading={isLoading}
+        />
 
-            <FormField
-              control={form.control}
-              name="building_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Companies.form.building_number.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder={t("Companies.form.building_number.placeholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="street_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Companies.form.street_name.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder={t("Companies.form.street_name.placeholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Companies.form.city.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder={t("Companies.form.city.placeholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="region"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Companies.form.region.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder={t("Companies.form.region.placeholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Companies.form.country.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={isLoading}
-                      placeholder={t("Companies.form.country.placeholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="zip_code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Companies.form.zip_code.label")}</FormLabel>
-                  <FormControl>
-                    <NumberInput
-                      disabled={isLoading}
-                      placeholder={t("Companies.form.zip_code.placeholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="additional_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Companies.form.additional_number.label")}</FormLabel>
-                  <FormControl>
-                    <NumberInput
-                      disabled={isLoading}
-                      placeholder={t("Companies.form.additional_number.placeholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
         <FormField
           control={form.control}
           name="notes"

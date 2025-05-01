@@ -4,11 +4,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Combobox } from "@/ui/combobox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
-import NumberInput from "@/components/ui/number-input";
+import { AddressFormSection } from "@/components/forms/address-form-section";
 import PhoneInput from "@/components/ui/phone-input";
 
 import useUserStore from "@/stores/use-user-store";
@@ -187,79 +186,11 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
           )}
         />
 
-        <FormField
+        <AddressFormSection
+          title={t("Offices.form.address")}
           control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Offices.form.address.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  disabled={isLoading}
-                  placeholder={t("Offices.form.address.placeholder")}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          isLoading={isLoading}
         />
-
-        <div className="grid grid-cols-3 gap-4">
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.city.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    disabled={isLoading}
-                    placeholder={t("Offices.form.city.placeholder")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.state.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    disabled={isLoading}
-                    placeholder={t("Offices.form.state.placeholder")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="zip_code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.zip_code.label")}</FormLabel>
-                <FormControl>
-                  <NumberInput
-                    {...field}
-                    disabled={isLoading}
-                    placeholder={t("Offices.form.zip_code.placeholder")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
       </form>
     </Form>
   );

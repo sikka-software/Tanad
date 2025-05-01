@@ -11,6 +11,7 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import { AddressFormSection } from "@/components/forms/address-form-section";
 import NumberInput from "@/components/ui/number-input";
 import PhoneInput from "@/components/ui/phone-input";
 
@@ -252,79 +253,11 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
             />
           </div>
 
-          <FormField
+          <AddressFormSection
+            title={t("Companies.form.address")}
             control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Vendors.form.address.label")} *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Vendors.form.address.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            isLoading={isLoading}
           />
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vendors.form.city.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Vendors.form.city.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="state"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vendors.form.state.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Vendors.form.state.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="zip_code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vendors.form.zip_code.label")} *</FormLabel>
-                  <FormControl>
-                    <NumberInput
-                      placeholder={t("Vendors.form.zip_code.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
           <FormField
             control={form.control}
