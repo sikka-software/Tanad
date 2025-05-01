@@ -11,6 +11,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -29,6 +30,7 @@ import useUserStore from "@/stores/use-user-store";
 export default function BranchesPage() {
   const t = useTranslations();
   const router = useRouter();
+
   const canReadBranches = useUserStore((state) => state.hasPermission("branches.read"));
   const canCreateBranches = useUserStore((state) => state.hasPermission("branches.create"));
 
@@ -57,6 +59,16 @@ export default function BranchesPage() {
   const { mutateAsync: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
   const { createDeleteHandler } = useDeleteHandler();
 
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: branches,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableBranch,
+    duplicateMutation: duplicateBranch,
+    moduleName: "Branches",
+  });
+
   const handleConfirmDelete = createDeleteHandler(deleteBranches, {
     loading: "Branches.loading.deleting",
     success: "Branches.success.deleted",
@@ -74,39 +86,6 @@ export default function BranchesPage() {
   const sortedBranches = useMemo(() => {
     return getSortedBranches(filteredBranches);
   }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const onActionClicked = async (action: string, rowId: string) => {
-    if (action === "edit") {
-      setIsFormDialogOpen(true);
-      setActionableBranch(branches?.find((branch) => branch.id === rowId) || null);
-    }
-
-    if (action === "delete") {
-      setSelectedRows([rowId]);
-      setIsDeleteDialogOpen(true);
-    }
-
-    if (action === "duplicate") {
-      const toastId = toast.loading(t("General.loading_operation"), {
-        description: t("Branches.loading.duplicating"),
-      });
-
-      await duplicateBranch(rowId, {
-        onSuccess: () => {
-          toast.success(t("General.successful_operation"), {
-            description: t("Branches.success.duplicated"),
-          });
-          toast.dismiss(toastId);
-        },
-        onError: () => {
-          toast.error(t("General.error_operation"), {
-            description: t("Branches.error.duplicating"),
-          });
-          toast.dismiss(toastId);
-        },
-      });
-    }
-  };
 
   if (!canReadBranches) {
     return <NoPermission />;

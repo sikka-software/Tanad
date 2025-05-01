@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -10,6 +10,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -19,10 +20,12 @@ import EmployeeRequestCard from "@/employee-request/employee-request.card";
 import {
   useEmployeeRequests,
   useBulkDeleteEmployeeRequests,
+  useDuplicateEmployeeRequest,
 } from "@/employee-request/employee-request.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/employee-request/employee-request.options";
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
 import EmployeeRequestsTable from "@/employee-request/employee-request.table";
+import { EmployeeRequestUpdateData } from "@/employee-request/employee-request.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -37,10 +40,15 @@ export default function EmployeeRequestsPage() {
     state.hasPermission("employee-requests.create"),
   );
 
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableEmployeeRequest, setActionableEmployeeRequest] =
+    useState<EmployeeRequestUpdateData | null>(null);
+
   const viewMode = useEmployeeRequestsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEmployeeRequestsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useEmployeeRequestsStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
+  const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
   const clearSelection = useEmployeeRequestsStore((state) => state.clearSelection);
   const sortRules = useEmployeeRequestsStore((state) => state.sortRules);
   const sortCaseSensitive = useEmployeeRequestsStore((state) => state.sortCaseSensitive);
@@ -54,7 +62,18 @@ export default function EmployeeRequestsPage() {
   const { data: requests, isLoading, error } = useEmployeeRequests();
   const { mutateAsync: deleteEmployeeRequests, isPending: isDeleting } =
     useBulkDeleteEmployeeRequests();
+  const { mutate: duplicateEmployeeRequest } = useDuplicateEmployeeRequest();
   const { createDeleteHandler } = useDeleteHandler();
+
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: requests,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableEmployeeRequest,
+    duplicateMutation: duplicateEmployeeRequest,
+    moduleName: "EmployeeRequests",
+  });
 
   const handleConfirmDelete = createDeleteHandler(deleteEmployeeRequests, {
     loading: "EmployeeRequests.loading.deleting",
@@ -110,6 +129,7 @@ export default function EmployeeRequestsPage() {
               data={sortedEmployeeRequests}
               isLoading={isLoading}
               error={error as Error | null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">

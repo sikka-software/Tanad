@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -10,17 +10,23 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import WarehouseCard from "@/warehouse/warehouse.card";
-import { useBulkDeleteWarehouses, useWarehouses } from "@/warehouse/warehouse.hooks";
+import {
+  useBulkDeleteWarehouses,
+  useWarehouses,
+  useDuplicateWarehouse,
+} from "@/warehouse/warehouse.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/warehouse/warehouse.options";
 import useWarehouseStore from "@/warehouse/warehouse.store";
 import WarehouseTable from "@/warehouse/warehouse.table";
 
+import { Warehouse } from "@/modules/warehouse/warehouse.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function WarehousesPage() {
@@ -29,6 +35,9 @@ export default function WarehousesPage() {
 
   const canReadWarehouses = useUserStore((state) => state.hasPermission("warehouses.read"));
   const canCreateWarehouses = useUserStore((state) => state.hasPermission("warehouses.create"));
+
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableWarehouse, setActionableWarehouse] = useState<Warehouse | null>(null);
 
   const viewMode = useWarehouseStore((state) => state.viewMode);
   const isDeleteDialogOpen = useWarehouseStore((state) => state.isDeleteDialogOpen);
@@ -47,7 +56,18 @@ export default function WarehousesPage() {
 
   const { data: warehouses, isLoading, error } = useWarehouses();
   const { mutateAsync: deleteWarehouses, isPending: isDeleting } = useBulkDeleteWarehouses();
+  const { mutate: duplicateWarehouse } = useDuplicateWarehouse();
   const { createDeleteHandler } = useDeleteHandler();
+
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: warehouses,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableWarehouse,
+    duplicateMutation: duplicateWarehouse,
+    moduleName: "Warehouses",
+  });
 
   const handleConfirmDelete = createDeleteHandler(deleteWarehouses, {
     loading: "Warehouses.loading.deleting",
@@ -102,6 +122,7 @@ export default function WarehousesPage() {
               data={sortedWarehouses}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">

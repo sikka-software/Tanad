@@ -11,6 +11,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -52,11 +53,20 @@ export default function OfficesPage() {
   const getFilteredOffices = useOfficeStore((state) => state.getFilteredData);
   const getSortedOffices = useOfficeStore((state) => state.getSortedData);
 
-  const { mutate: duplicateOffice } = useDuplicateOffice();
-
   const { data: offices, isLoading, error } = useOffices();
   const { mutateAsync: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
+  const { mutate: duplicateOffice } = useDuplicateOffice();
   const { createDeleteHandler } = useDeleteHandler();
+
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: offices,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableOffice,
+    duplicateMutation: duplicateOffice,
+    moduleName: "Offices",
+  });
 
   const handleConfirmDelete = createDeleteHandler(deleteOffices, {
     loading: "Offices.loading.deleting",
@@ -75,38 +85,6 @@ export default function OfficesPage() {
   const sortedOffices = useMemo(() => {
     return getSortedOffices(filteredOffices);
   }, [filteredOffices, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const onActionClicked = async (action: string, rowId: string) => {
-    if (action === "edit") {
-      setIsFormDialogOpen(true);
-      setActionableOffice(offices?.find((office) => office.id === rowId) || null);
-    }
-
-    if (action === "delete") {
-      setSelectedRows([rowId]);
-      setIsDeleteDialogOpen(true);
-    }
-
-    if (action === "duplicate") {
-      const toastId = toast.loading(t("General.loading_operation"), {
-        description: t("Offices.loading.duplicating"),
-      });
-      await duplicateOffice(rowId, {
-        onSuccess: () => {
-          toast.success(t("General.successful_operation"), {
-            description: t("Offices.success.duplicated"),
-          });
-          toast.dismiss(toastId);
-        },
-        onError: () => {
-          toast.error(t("General.error_operation"), {
-            description: t("Offices.error.duplicating"),
-          });
-          toast.dismiss(toastId);
-        },
-      });
-    }
-  };
 
   if (!canReadOffices) {
     return <NoPermission />;

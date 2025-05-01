@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -11,8 +11,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import { createActions, withMutation } from "@/utils/action-utils";
-
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -34,6 +33,8 @@ export default function JobsPage() {
 
   const canReadJobs = useUserStore((state) => state.hasPermission("jobs.read"));
   const canCreateJobs = useUserStore((state) => state.hasPermission("jobs.create"));
+
+  const [actionableJob, setActionableJob] = useState<JobUpdateData | null>(null);
 
   const isLoading = useJobsStore((state) => state.isLoading);
   const setIsLoading = useJobsStore((state) => state.setIsLoading);
@@ -62,6 +63,16 @@ export default function JobsPage() {
   const { mutateAsync: deleteJobs, isPending: isDeleting } = useBulkDeleteJobs();
   const { createDeleteHandler } = useDeleteHandler();
 
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: jobs,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableJob,
+    duplicateMutation: duplicateJob,
+    moduleName: "Jobs",
+  });
+
   const handleConfirmDelete = createDeleteHandler(deleteJobs, {
     loading: "Jobs.loading.deleting",
     success: "Jobs.success.deleted",
@@ -71,31 +82,6 @@ export default function JobsPage() {
       setIsDeleteDialogOpen(false);
     },
   });
-
-  // Define actions once (can be moved to separate file)
-  const jobActions = createActions<JobUpdateData & { id: string }>({
-    edit: ({ id, data }) => {
-      setIsFormDialogOpen(true);
-      setActionableItem(jobs?.find((c) => c.id === id) || null);
-    },
-    delete: ({ id }) => {
-      setSelectedRows([id]);
-      setIsDeleteDialogOpen(true);
-    },
-    duplicate: withMutation(
-      { mutateAsync: duplicateJob },
-      {
-        loading: "Jobs.loading.duplicating",
-        success: "Jobs.success.duplicated",
-        error: "Jobs.error.duplicating",
-      },
-    ),
-  });
-
-  // In your component
-  const onActionClicked = (action: string, id: string) => {
-    jobActions(action, id, { t, data: jobs });
-  };
 
   const filteredJobs = useMemo(() => {
     return getFilteredJobs(jobs || []);

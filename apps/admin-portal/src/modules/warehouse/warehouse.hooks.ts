@@ -6,6 +6,7 @@ import {
   fetchWarehouseById,
   fetchWarehouses,
   updateWarehouse,
+  duplicateWarehouse,
 } from "@/warehouse/warehouse.service";
 import type { Warehouse, WarehouseCreateData } from "@/warehouse/warehouse.type";
 
@@ -51,6 +52,13 @@ export function useCreateWarehouse() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
     },
+  });
+}
+
+export function useDuplicateWarehouse() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateWarehouse(id),
   });
 }
 

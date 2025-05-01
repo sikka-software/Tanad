@@ -10,6 +10,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -55,6 +56,16 @@ export default function VendorsPage() {
 
   const { createDeleteHandler } = useDeleteHandler();
 
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: vendors,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableVendor,
+    duplicateMutation: duplicateVendor,
+    moduleName: "Vendors",
+  });
+
   const handleConfirmDelete = createDeleteHandler(deleteVendors, {
     loading: "Vendors.loading.deleting",
     success: "Vendors.success.deleted",
@@ -64,38 +75,6 @@ export default function VendorsPage() {
       setIsDeleteDialogOpen(false);
     },
   });
-
-  const onActionClicked = async (action: string, rowId: string) => {
-    if (action === "edit") {
-      setIsFormDialogOpen(true);
-      setActionableVendor(vendors?.find((vendor) => vendor.id === rowId) || null);
-    }
-
-    if (action === "delete") {
-      setSelectedRows([rowId]);
-      setIsDeleteDialogOpen(true);
-    }
-
-    if (action === "duplicate") {
-      const toastId = toast.loading(t("General.loading_operation"), {
-        description: t("Vendors.loading.duplicating"),
-      });
-      await duplicateVendor(rowId, {
-        onSuccess: () => {
-          toast.success(t("General.successful_operation"), {
-            description: t("Vendors.success.duplicated"),
-          });
-          toast.dismiss(toastId);
-        },
-        onError: () => {
-          toast.error(t("General.error_operation"), {
-            description: t("Vendors.error.duplicating"),
-          });
-          toast.dismiss(toastId);
-        },
-      });
-    }
-  };
 
   const filteredVendors = useMemo(() => {
     return getFilteredVendors(vendors || []);

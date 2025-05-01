@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -9,17 +9,19 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import InvoiceCard from "@/invoice/invoice.card";
-import { useInvoices, useBulkDeleteInvoices } from "@/invoice/invoice.hooks";
+import { useInvoices, useBulkDeleteInvoices, useDuplicateInvoice } from "@/invoice/invoice.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
 import useInvoiceStore from "@/invoice/invoice.store";
 import InvoicesTable from "@/invoice/invoice.table";
 
+import { Invoice } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function InvoicesPage() {
@@ -28,6 +30,9 @@ export default function InvoicesPage() {
 
   const canReadInvoices = useUserStore((state) => state.hasPermission("invoices.read"));
   const canCreateInvoices = useUserStore((state) => state.hasPermission("invoices.create"));
+
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableInvoice, setActionableInvoice] = useState<Invoice | null>(null);
 
   const viewMode = useInvoiceStore((state) => state.viewMode);
   const isDeleteDialogOpen = useInvoiceStore((state) => state.isDeleteDialogOpen);
@@ -46,7 +51,18 @@ export default function InvoicesPage() {
 
   const { data: invoices, isLoading, error } = useInvoices();
   const { mutateAsync: deleteInvoices, isPending: isDeleting } = useBulkDeleteInvoices();
+  const { mutate: duplicateInvoice } = useDuplicateInvoice();
   const { createDeleteHandler } = useDeleteHandler();
+
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: invoices,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableInvoice,
+    duplicateMutation: duplicateInvoice,
+    moduleName: "Invoices",
+  });
 
   const handleConfirmDelete = createDeleteHandler(deleteInvoices, {
     loading: "Invoices.loading.deleting",
@@ -98,6 +114,7 @@ export default function InvoicesPage() {
               data={sortedInvoices}
               isLoading={isLoading}
               error={error as Error | null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">

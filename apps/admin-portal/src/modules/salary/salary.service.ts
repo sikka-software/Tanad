@@ -45,6 +45,21 @@ export async function createSalary(data: SalaryCreateData): Promise<Salary> {
   }
 }
 
+export async function duplicateSalary(id: string): Promise<Salary> {
+  try {
+    const response = await fetch(`/api/resource/salaries/${id}/duplicate`, {
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to duplicate salary");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error duplicating salary:", error);
+    throw new Error("Failed to duplicate salary");
+  }
+}
+
 export async function updateSalary(id: string, data: Partial<Salary>): Promise<Salary> {
   try {
     const response = await fetch(`/api/resource/salaries/${id}`, {

@@ -11,6 +11,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -58,6 +59,16 @@ export default function CompaniesPage() {
   const { mutateAsync: deleteCompanies, isPending: isDeleting } = useBulkDeleteCompanies();
   const { createDeleteHandler } = useDeleteHandler();
 
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: companies,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableCompany,
+    duplicateMutation: duplicateCompany,
+    moduleName: "Companies",
+  });
+
   const handleConfirmDelete = createDeleteHandler(deleteCompanies, {
     loading: "Companies.loading.deleting",
     success: "Companies.success.deleted",
@@ -75,38 +86,6 @@ export default function CompaniesPage() {
   const sortedCompanies = useMemo(() => {
     return getSortedCompanies(filteredCompanies);
   }, [filteredCompanies, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const onActionClicked = async (action: string, rowId: string) => {
-    if (action === "edit") {
-      setIsFormDialogOpen(true);
-      setActionableCompany(companies?.find((company) => company.id === rowId) || null);
-    }
-
-    if (action === "delete") {
-      setSelectedRows([rowId]);
-      setIsDeleteDialogOpen(true);
-    }
-
-    if (action === "duplicate") {
-      const toastId = toast.loading(t("General.loading_operation"), {
-        description: t("Companies.loading.duplicating"),
-      });
-      await duplicateCompany(rowId, {
-        onSuccess: () => {
-          toast.success(t("General.successful_operation"), {
-            description: t("Companies.success.duplicated"),
-          });
-          toast.dismiss(toastId);
-        },
-        onError: () => {
-          toast.error(t("General.error_operation"), {
-            description: t("Companies.error.duplicating"),
-          });
-          toast.dismiss(toastId);
-        },
-      });
-    }
-  };
 
   if (!canReadCompanies) {
     return <NoPermission />;

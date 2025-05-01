@@ -5,6 +5,7 @@ import { departmentKeys } from "@/department/department.hooks";
 import {
   createEmployee,
   deleteEmployee,
+  duplicateEmployee,
   fetchEmployeeById,
   fetchEmployees,
   updateEmployee,
@@ -34,6 +35,29 @@ export const useEmployee = (id: string) => {
     queryKey: employeeKeys.detail(id),
     queryFn: () => fetchEmployeeById(id),
     enabled: !!id,
+  });
+};
+
+// Hook for adding a new employee
+export const useCreateEmployee = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (employee: EmployeeCreateData) => createEmployee(employee),
+    onSuccess: (newEmployee) => {
+      const previousEmployees = queryClient.getQueryData(employeeKeys.lists()) || [];
+      queryClient.setQueryData(employeeKeys.lists(), [
+        ...(Array.isArray(previousEmployees) ? previousEmployees : []),
+        newEmployee,
+      ]);
+    },
+  });
+};
+
+// Hook for duplicating an employee
+export const useDuplicateEmployee = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateEmployee(id),
   });
 };
 
@@ -118,21 +142,6 @@ export const useUpdateEmployee = () => {
       }
     },
     // Don't invalidate queries on settle - we're manually updating the cache
-  });
-};
-
-// Hook for adding a new employee
-export const useCreateEmployee = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (employee: EmployeeCreateData) => createEmployee(employee),
-    onSuccess: (newEmployee) => {
-      const previousEmployees = queryClient.getQueryData(employeeKeys.lists()) || [];
-      queryClient.setQueryData(employeeKeys.lists(), [
-        ...(Array.isArray(previousEmployees) ? previousEmployees : []),
-        newEmployee,
-      ]);
-    },
   });
 };
 

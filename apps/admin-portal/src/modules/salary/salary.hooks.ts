@@ -7,6 +7,7 @@ import {
   fetchSalaries,
   updateSalary,
   bulkDeleteSalaries,
+  duplicateSalary,
 } from "@/salary/salary.service";
 import type { Salary, SalaryUpdateData } from "@/salary/salary.type";
 
@@ -41,6 +42,18 @@ export function useCreateSalary() {
 
   return useMutation({
     mutationFn: createSalary,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
+    },
+  });
+}
+
+// Hook for duplicating a salary
+export function useDuplicateSalary() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => duplicateSalary(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: salaryKeys.lists() });
     },

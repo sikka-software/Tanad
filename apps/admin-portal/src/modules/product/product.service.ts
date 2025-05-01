@@ -35,6 +35,16 @@ export async function createProduct(product: Omit<Product, "id" | "created_at">)
   }
 }
 
+export async function duplicateProduct(id: string): Promise<Product> {
+  const response = await fetch(`/api/resources/products/${id}/duplicate`, {
+    method: "POST",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to duplicate product");
+  }
+  return response.json();
+}
+
 export async function updateProduct(
   id: string,
   product: Partial<Omit<Product, "id" | "created_at">>,

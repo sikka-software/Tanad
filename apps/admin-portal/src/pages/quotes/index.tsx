@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -10,17 +10,19 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import QuoteCard from "@/quote/quote.card";
-import { useQuotes, useBulkDeleteQuotes } from "@/quote/quote.hooks";
+import { useQuotes, useBulkDeleteQuotes, useDuplicateQuote } from "@/quote/quote.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/quote/quote.options";
 import useQuotesStore from "@/quote/quote.store";
 import QuotesTable from "@/quote/quote.table";
 
+import { Quote } from "@/modules/quote/quote.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function QuotesPage() {
@@ -30,10 +32,14 @@ export default function QuotesPage() {
   const canReadQuotes = useUserStore((state) => state.hasPermission("quotes.read"));
   const canCreateQuotes = useUserStore((state) => state.hasPermission("quotes.create"));
 
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableQuote, setActionableQuote] = useState<Quote | null>(null);
+
   const viewMode = useQuotesStore((state) => state.viewMode);
   const isDeleteDialogOpen = useQuotesStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useQuotesStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useQuotesStore((state) => state.selectedRows);
+  const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
   const clearSelection = useQuotesStore((state) => state.clearSelection);
   const sortRules = useQuotesStore((state) => state.sortRules);
   const sortCaseSensitive = useQuotesStore((state) => state.sortCaseSensitive);
@@ -46,7 +52,19 @@ export default function QuotesPage() {
 
   const { data: quotes, isLoading, error } = useQuotes();
   const { mutateAsync: deleteQuotes, isPending: isDeleting } = useBulkDeleteQuotes();
+  const { mutate: duplicateQuote } = useDuplicateQuote();
+
   const { createDeleteHandler } = useDeleteHandler();
+
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: quotes,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableQuote,
+    duplicateMutation: duplicateQuote,
+    moduleName: "Quotes",
+  });
 
   const handleConfirmDelete = createDeleteHandler(deleteQuotes, {
     loading: "Quotes.loading.deleting",
@@ -95,7 +113,12 @@ export default function QuotesPage() {
 
         <div>
           {viewMode === "table" ? (
-            <QuotesTable data={sortedQuotes} isLoading={isLoading} error={error as Error | null} />
+            <QuotesTable
+              data={sortedQuotes}
+              isLoading={isLoading}
+              error={error as Error | null}
+              onActionClicked={onActionClicked}
+            />
           ) : (
             <div className="p-4">
               <DataModelList

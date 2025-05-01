@@ -11,6 +11,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -62,6 +63,16 @@ export default function DepartmentsPage() {
   const { mutateAsync: deleteDepartments, isPending: isDeleting } = useBulkDeleteDepartments();
   const { createDeleteHandler } = useDeleteHandler();
 
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: departments,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableDepartment,
+    duplicateMutation: duplicateDepartment,
+    moduleName: "Departments",
+  });
+
   const handleConfirmDelete = createDeleteHandler(deleteDepartments, {
     loading: "Departments.loading.deleting",
     success: "Departments.success.deleted",
@@ -79,39 +90,6 @@ export default function DepartmentsPage() {
   const sortedDepartments = useMemo(() => {
     return getSortedDepartments(filteredDepartments);
   }, [filteredDepartments, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const onActionClicked = async (action: string, rowId: string) => {
-    if (action === "edit") {
-      setIsFormDialogOpen(true);
-      setActionableDepartment(departments?.find((department) => department.id === rowId) || null);
-    }
-
-    if (action === "delete") {
-      setSelectedRows([rowId]);
-      setIsDeleteDialogOpen(true);
-    }
-
-    if (action === "duplicate") {
-      const toastId = toast.loading(t("General.loading_operation"), {
-        description: t("Departments.loading.duplicating"),
-      });
-
-      await duplicateDepartment(rowId, {
-        onSuccess: () => {
-          toast.success(t("General.successful_operation"), {
-            description: t("Departments.success.duplicated"),
-          });
-          toast.dismiss(toastId);
-        },
-        onError: () => {
-          toast.error(t("General.error_operation"), {
-            description: t("Departments.error.duplicating"),
-          });
-          toast.dismiss(toastId);
-        },
-      });
-    }
-  };
 
   if (!canReadDepartments) {
     return <NoPermission />;

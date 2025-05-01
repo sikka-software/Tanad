@@ -46,6 +46,16 @@ export async function createEmployeeRequest(
   }
 }
 
+export async function duplicateEmployeeRequest(id: string): Promise<EmployeeRequest> {
+  const response = await fetch(`/api/employee-requests/${id}/duplicate`, {
+    method: "POST",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to duplicate employee request");
+  }
+  return response.json();
+}
+
 export async function updateEmployeeRequest(
   id: string,
   updates: Partial<EmployeeRequest>,

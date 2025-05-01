@@ -11,6 +11,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -58,6 +59,16 @@ export default function ExpensesPage() {
   const { mutate: duplicateExpense } = useDuplicateExpense();
   const { createDeleteHandler } = useDeleteHandler();
 
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: expenses,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableExpense,
+    duplicateMutation: duplicateExpense,
+    moduleName: "Expenses",
+  });
+
   const handleConfirmDelete = createDeleteHandler(deleteExpenses, {
     loading: "Expenses.loading.deleting",
     success: "Expenses.success.deleted",
@@ -76,37 +87,6 @@ export default function ExpensesPage() {
     return getSortedExpenses(filteredExpenses);
   }, [filteredExpenses, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  const onActionClicked = async (action: string, rowId: string) => {
-    if (action === "edit") {
-      setIsFormDialogOpen(true);
-      setActionableExpense(expenses?.find((expense) => expense.id === rowId) || null);
-    }
-
-    if (action === "delete") {
-      setSelectedRows([rowId]);
-      setIsDeleteDialogOpen(true);
-    }
-
-    if (action === "duplicate") {
-      const toastId = toast.loading(t("General.loading_operation"), {
-        description: t("Expenses.loading.duplicating"),
-      });
-      await duplicateExpense(rowId, {
-        onSuccess: () => {
-          toast.success(t("General.successful_operation"), {
-            description: t("Expenses.success.duplicated"),
-          });
-          toast.dismiss(toastId);
-        },
-        onError: () => {
-          toast.error(t("General.error_operation"), {
-            description: t("Expenses.error.duplicating"),
-          });
-          toast.dismiss(toastId);
-        },
-      });
-    }
-  };
   if (!canReadExpenses) {
     return <NoPermission />;
   }

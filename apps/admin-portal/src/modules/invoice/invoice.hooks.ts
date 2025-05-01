@@ -7,8 +7,9 @@ import {
   fetchInvoiceById,
   fetchInvoices,
   updateInvoice,
+  duplicateInvoice,
 } from "@/invoice/invoice.service";
-import { Invoice, InvoiceCreateData } from "@/invoice/invoice.type";
+import { Invoice } from "@/invoice/invoice.type";
 
 // Query keys
 export const invoiceKeys = {
@@ -40,6 +41,17 @@ export function useCreateInvoice() {
 
   return useMutation({
     mutationFn: createInvoice,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
+    },
+  });
+}
+
+export function useDuplicateInvoice() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: duplicateInvoice,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
     },

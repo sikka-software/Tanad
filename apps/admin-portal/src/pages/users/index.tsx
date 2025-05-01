@@ -11,6 +11,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -18,7 +19,7 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import UserCard from "@/user/user.card";
 import { UserForm } from "@/user/user.form";
-import { useUsers, useBulkDeleteUsers } from "@/user/user.hooks";
+import { useUsers, useBulkDeleteUsers, useDuplicateUser } from "@/user/user.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/user/user.options";
 import useEnterpriseUsersStore from "@/user/user.store";
 import UsersTable from "@/user/user.table";
@@ -32,6 +33,9 @@ export default function UsersPage() {
 
   const canReadUsers = useUserStore((state) => state.hasPermission("users.read"));
   const canCreateUsers = useUserStore((state) => state.hasPermission("users.create"));
+
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableUser, setActionableUser] = useState<UserType | null>(null);
 
   const loadingSaveUser = useEnterpriseUsersStore((state) => state.isLoading);
   const setLoadingSaveUser = useEnterpriseUsersStore((state) => state.setIsLoading);
@@ -53,9 +57,17 @@ export default function UsersPage() {
   const { data: users, isLoading, error, refetch: refetchUsers } = useUsers();
   const { mutateAsync: deleteUsers, isPending: isDeleting } = useBulkDeleteUsers();
   const { createDeleteHandler } = useDeleteHandler();
+  const { mutate: duplicateUser } = useDuplicateUser();
 
-  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableUser, setActionableUser] = useState<UserType | null>(null);
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: users,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableUser,
+    duplicateMutation: duplicateUser,
+    moduleName: "Users",
+  });
 
   const handleConfirmDelete = createDeleteHandler(deleteUsers, {
     loading: "Users.loading.deleting",
@@ -75,19 +87,6 @@ export default function UsersPage() {
   const sortedUsers = useMemo(() => {
     return getSortedUsers(filteredUsers);
   }, [filteredUsers, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const onActionClicked = async (action: string, rowId: string) => {
-    const userToActOn = users?.find((user) => user.id === rowId) || null;
-    if (action === "edit") {
-      setActionableUser(userToActOn as UserType | null);
-      setIsFormDialogOpen(true);
-    }
-
-    if (action === "delete") {
-      setSelectedRows([rowId]);
-      setIsDeleteDialogOpen(true);
-    }
-  };
 
   const handleAddClick = () => {
     if (canCreateUsers) {

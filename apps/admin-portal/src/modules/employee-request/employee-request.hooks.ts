@@ -8,6 +8,7 @@ import {
   fetchEmployeeRequests,
   updateEmployeeRequest,
   bulkDeleteEmployeeRequests,
+  duplicateEmployeeRequest,
 } from "./employee-request.service";
 import { EmployeeRequest } from "./employee-request.type";
 
@@ -41,6 +42,13 @@ export function useCreateEmployeeRequest() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
     },
+  });
+}
+
+export function useDuplicateEmployeeRequest() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateEmployeeRequest(id),
   });
 }
 

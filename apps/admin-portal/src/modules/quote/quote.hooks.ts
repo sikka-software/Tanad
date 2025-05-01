@@ -7,6 +7,7 @@ import {
   fetchQuotes,
   updateQuote,
   bulkDeleteQuotes,
+  duplicateQuote,
 } from "@/quote/quote.service";
 import { Quote } from "@/quote/quote.type";
 
@@ -41,6 +42,18 @@ export function useCreateQuote() {
 
   return useMutation({
     mutationFn: (newQuote: Omit<Quote, "id" | "created_at">) => createQuote(newQuote),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
+    },
+  });
+}
+
+// Hook for duplicating a quote
+export function useDuplicateQuote() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => duplicateQuote(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
     },

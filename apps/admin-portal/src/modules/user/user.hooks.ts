@@ -12,6 +12,7 @@ import {
   deleteUser,
   bulkDeleteUsers,
   getUserPermissions,
+  duplicateUser,
 } from "./user.service";
 import { UserCreateData, UserUpdateData } from "./user.type";
 
@@ -70,6 +71,21 @@ export function useCreateUser() {
   });
 }
 
+export function useDuplicateUser() {
+  const queryClient = useQueryClient();
+  const t = useTranslations();
+
+  return useMutation({
+    mutationFn: (id: string) => duplicateUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: userKeys.lists() });
+    },
+    onError: (error) => {
+      console.error("Error duplicating user:", error);
+      toast.error(t("Users.error.duplicating"));
+    },
+  });
+}
 // Hook to update a user
 export function useUpdateUser() {
   const queryClient = useQueryClient();

@@ -7,6 +7,7 @@ import {
   fetchProductById,
   fetchProducts,
   updateProduct,
+  duplicateProduct,
 } from "@/product/product.service";
 import type { Product } from "@/product/product.type";
 
@@ -46,6 +47,18 @@ export function useCreateProduct() {
     },
     onSuccess: () => {
       // Invalidate the list query to refetch
+      queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+    },
+  });
+}
+
+// Hook for duplicating a product
+export function useDuplicateProduct() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => duplicateProduct(id),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
     },
   });

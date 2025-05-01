@@ -11,6 +11,7 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -58,6 +59,16 @@ export default function ClientsPage() {
   const { mutateAsync: deleteClients, isPending: isDeleting } = useBulkDeleteClients();
   const { createDeleteHandler } = useDeleteHandler();
 
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: clients,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableClient,
+    duplicateMutation: duplicateClient,
+    moduleName: "Clients",
+  });
+
   const handleConfirmDelete = createDeleteHandler(deleteClients, {
     loading: "Clients.loading.deleting",
     success: "Clients.success.deleted",
@@ -75,39 +86,6 @@ export default function ClientsPage() {
   const sortedClients = useMemo(() => {
     return getSortedClients(filteredClients);
   }, [filteredClients, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const onActionClicked = async (action: string, rowId: string) => {
-    if (action === "edit") {
-      setIsFormDialogOpen(true);
-      setActionableClient(clients?.find((client) => client.id === rowId) || null);
-    }
-
-    if (action === "delete") {
-      setSelectedRows([rowId]);
-      setIsDeleteDialogOpen(true);
-    }
-
-    if (action === "duplicate") {
-      const toastId = toast.loading(t("General.loading_operation"), {
-        description: t("Clients.loading.duplicating"),
-      });
-
-      await duplicateClient(rowId, {
-        onSuccess: () => {
-          toast.success(t("General.successful_operation"), {
-            description: t("Clients.success.duplicated"),
-          });
-          toast.dismiss(toastId);
-        },
-        onError: () => {
-          toast.error(t("General.error_operation"), {
-            description: t("Clients.error.duplicating"),
-          });
-          toast.dismiss(toastId);
-        },
-      });
-    }
-  };
 
   if (!canReadClients) {
     return <NoPermission />;

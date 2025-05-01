@@ -177,6 +177,16 @@ export async function createEmployee(newEmployee: EmployeeCreateData): Promise<E
   }
 }
 
+export async function duplicateEmployee(id: string): Promise<Employee> {
+  const response = await fetch(`/api/employees/${id}/duplicate`, {
+    method: "POST",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to duplicate employee");
+  }
+  return response.json();
+}
+
 // export async function createEmployee(
 //   employee: Omit<Employee, "id" | "created_at" | "updated_at">,
 // ): Promise<Employee> {

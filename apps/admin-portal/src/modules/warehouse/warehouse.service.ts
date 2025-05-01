@@ -49,6 +49,23 @@ export async function createWarehouse(warehouse: WarehouseCreateData): Promise<W
   }
 }
 
+export async function duplicateWarehouse(id: string): Promise<Warehouse> {
+  try {
+    const response = await fetch(`/api/warehouses/${id}/duplicate`, {
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to duplicate warehouse with id ${id}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error(`Error duplicating warehouse ${id}:`, error);
+    throw error;
+  }
+}
+
 // Update operation
 export async function updateWarehouse(id: string, updates: Partial<Warehouse>): Promise<Warehouse> {
   try {

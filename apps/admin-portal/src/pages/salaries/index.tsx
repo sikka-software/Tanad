@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -9,17 +9,19 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import SalaryCard from "@/salary/salary.card";
-import { useSalaries, useBulkDeleteSalaries } from "@/salary/salary.hooks";
+import { useSalaries, useBulkDeleteSalaries, useDuplicateSalary } from "@/salary/salary.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/salary/salary.options";
 import useSalaryStore from "@/salary/salary.store";
 import SalariesTable from "@/salary/salary.table";
 
+import { Salary } from "@/modules/salary/salary.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function SalariesPage() {
@@ -29,10 +31,14 @@ export default function SalariesPage() {
   const canReadSalaries = useUserStore((state) => state.hasPermission("salaries.read"));
   const canCreateSalaries = useUserStore((state) => state.hasPermission("salaries.create"));
 
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableSalary, setActionableSalary] = useState<Salary | null>(null);
+
   const viewMode = useSalaryStore((state) => state.viewMode);
   const isDeleteDialogOpen = useSalaryStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useSalaryStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useSalaryStore((state) => state.selectedRows);
+  const setSelectedRows = useSalaryStore((state) => state.setSelectedRows);
   const clearSelection = useSalaryStore((state) => state.clearSelection);
   const sortRules = useSalaryStore((state) => state.sortRules);
   const sortCaseSensitive = useSalaryStore((state) => state.sortCaseSensitive);
@@ -46,6 +52,17 @@ export default function SalariesPage() {
   const { data: salaries, isLoading, error } = useSalaries();
   const { mutateAsync: deleteSalaries, isPending: isDeleting } = useBulkDeleteSalaries();
   const { createDeleteHandler } = useDeleteHandler();
+  const { mutate: duplicateSalary } = useDuplicateSalary();
+
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: salaries,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableSalary,
+    duplicateMutation: duplicateSalary,
+    moduleName: "Salaries",
+  });
 
   const handleConfirmDelete = createDeleteHandler(deleteSalaries, {
     loading: "Salaries.loading.deleting",
@@ -97,6 +114,7 @@ export default function SalariesPage() {
               data={sortedSalaries}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
