@@ -368,18 +368,14 @@ export function AppSidebar() {
                 <DropdownMenuItem
                   className="cursor-pointer"
                   onClick={async () => {
-                    console.log("[AppSidebar] Sign out clicked");
-
                     // Clean up local storage
                     if (user?.id) {
-                      console.log("[AppSidebar] Removing cache for user:", user.id);
                       localStorage.removeItem(CACHE_KEY(user.id));
                     }
                     localStorage.removeItem("analytics_date_range");
 
                     try {
                       await signOut();
-                      console.log("[AppSidebar] Sign out complete, redirecting to /auth");
                       router.replace("/auth");
                     } catch (error) {
                       console.error("[AppSidebar] Error signing out:", error);

@@ -78,7 +78,6 @@ export default function BranchesPage() {
   }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const onActionClicked = async (action: string, rowId: string) => {
-    console.log(action, rowId);
     if (action === "edit") {
       setIsFormDialogOpen(true);
       setActionableBranch(branches?.find((branch) => branch.id === rowId) || null);

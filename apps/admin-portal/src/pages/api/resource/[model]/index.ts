@@ -37,8 +37,6 @@ const modelMap: Record<string, ModelConfig> = {
       ) => {
         const locations = Array.isArray(req.body) ? req.body : [req.body];
 
-        console.log("Locations in custom handler:", locations);
-
         const validTypes = ["office", "branch", "warehouse"];
         for (const location of locations) {
           if (!location.type || !validTypes.includes(location.type)) {
@@ -64,7 +62,6 @@ const modelMap: Record<string, ModelConfig> = {
           throw error;
         }
 
-        console.log("Custom department_locations POST successful:", created);
         return created;
       },
     },
@@ -82,13 +79,7 @@ const modelMap: Record<string, ModelConfig> = {
         enterprise_id: string,
         req: NextApiRequest,
       ) => {
-        console.log(">>> Custom invoice POST handler invoked (Supabase version) <<<");
-        console.log("Original req.body:", req.body);
-
         const { items, ...invoiceData } = req.body;
-
-        console.log("Invoice Data (excluding items):", invoiceData);
-        console.log("Items received:", items);
 
         if (!Array.isArray(items) || items.length === 0) {
           throw new Error("Invoice must contain at least one item.");
@@ -99,7 +90,6 @@ const modelMap: Record<string, ModelConfig> = {
           created_by: user_id,
           enterprise_id: enterprise_id,
         };
-        console.log("Final invoice values being inserted:", valuesToInsert);
 
         const { data: createdInvoice, error: invoiceError } = await supabase
           .from("invoices")
@@ -117,8 +107,6 @@ const modelMap: Record<string, ModelConfig> = {
           throw new Error("Failed to create invoice record.");
         }
 
-        console.log(">>> Invoice created successfully (Supabase version) <<<", createdInvoice);
-
         const invoiceItemsToInsert = items.map((item: any) => ({
           invoice_id: createdInvoice.id,
           product_id: item.product_id || null,
@@ -126,8 +114,6 @@ const modelMap: Record<string, ModelConfig> = {
           quantity: item.quantity,
           unit_price: item.unit_price,
         }));
-
-        console.log("Invoice items to insert:", invoiceItemsToInsert);
 
         const { error: itemsError } = await supabase
           .from("invoice_items")
@@ -137,8 +123,6 @@ const modelMap: Record<string, ModelConfig> = {
           console.error("Error inserting invoice items:", itemsError);
           throw new Error(`Failed to insert invoice items: ${itemsError.message}`);
         }
-
-        console.log(">>> Invoice items inserted successfully <<<");
 
         return createdInvoice;
       },
@@ -163,11 +147,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { tableName, customHandlers } = config;
-
-  console.log(`>>> [${model}] Passing to createApiHandler: <<<`);
-  console.log("TableName:", tableName);
-  console.log("Custom Handlers defined:", !!customHandlers);
-  console.log("Custom POST defined:", !!customHandlers?.POST);
 
   return createApiHandler({ tableName, customHandlers })(req, res);
 }

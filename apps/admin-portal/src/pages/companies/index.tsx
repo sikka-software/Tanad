@@ -79,7 +79,6 @@ export default function CompaniesPage() {
   }, [filteredCompanies, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const onActionClicked = async (action: string, rowId: string) => {
-    console.log(action, rowId);
     if (action === "edit") {
       setIsFormDialogOpen(true);
       setActionableCompany(companies?.find((company) => company.id === rowId) || null);

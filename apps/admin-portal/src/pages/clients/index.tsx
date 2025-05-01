@@ -79,7 +79,6 @@ export default function ClientsPage() {
   }, [filteredClients, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const onActionClicked = async (action: string, rowId: string) => {
-    console.log(action, rowId);
     if (action === "edit") {
       setIsFormDialogOpen(true);
       setActionableClient(clients?.find((client) => client.id === rowId) || null);

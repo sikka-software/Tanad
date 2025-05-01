@@ -31,7 +31,6 @@ export default function AddEmployeeRequestPage() {
   const { user } = useUserStore();
 
   const handleSubmit = async (data: EmployeeRequestFormValues) => {
-    console.log(data);
     try {
       setLoadingSave(true);
       // Check if user ID is available

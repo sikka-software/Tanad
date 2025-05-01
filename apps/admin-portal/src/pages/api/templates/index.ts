@@ -31,15 +31,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const { name, type, content, is_default, user_id, enterprise_id } = req.body;
 
-      // Log request body for debugging
-      console.log("Template creation request:", {
-        name,
-        type,
-        contentType: typeof content,
-        is_default,
-        user_id,
-      });
-
       // Validate required fields
       if (!name || !type || !content || !user_id) {
         return res.status(400).json({

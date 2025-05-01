@@ -42,8 +42,7 @@ const allPermissionsByCategory = getAllPermissionsByCategory();
 export default function RoleCard({ role, onActionClick, disableActions = false }: RoleCardProps) {
   const t = useTranslations();
   const locale = useLocale();
-  console.log("app permissions", app_permission);
-  
+
   const canUpdateRoles = useUserStore((state) => state.hasPermission("roles.update"));
   const canDuplicateRoles = useUserStore((state) => state.hasPermission("roles.duplicate"));
   const canDeleteRoles = useUserStore((state) => state.hasPermission("roles.delete"));

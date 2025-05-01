@@ -1,11 +1,5 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import React from "react";
-
-import { useLocale, useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
-
 import {
   DndContext,
   closestCenter,
@@ -24,14 +18,18 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import { useState, useEffect, useCallback, useRef } from "react";
+import React from "react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 
 import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
-import useUserStore from "@/stores/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+import useUserStore from "@/stores/use-user-store";
 
 interface SortableItemProps {
   item: SidebarMenuGroupProps["items"][number];
@@ -52,14 +50,13 @@ const SortableItem = ({ item, title, enabled, onToggle }: SortableItemProps) => 
   };
 
   const handleSwitchChange = (checked: boolean) => {
-    console.log(`Switch toggled for ${item.title}: ${checked}`);
     onToggle(checked);
   };
 
   // Switch component with stopPropagation to prevent drag conflicts
   const SwitchControl = () => (
     <div
-      className="relative z-10 flex items-center cursor-pointer"
+      className="relative z-10 flex cursor-pointer items-center"
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
@@ -160,11 +157,6 @@ const SidebarSettings = ({
 
   // Load menu configuration from profile if available
   useEffect(() => {
-    console.log("Profile or pathname changed, updating menu configuration");
-
-    // Add debugging on each render to see the profile structure
-    console.log("Current profile in SidebarSettings:", profile);
-
     if (!profile) {
       console.log("No profile available yet, skipping menu configuration");
       return;
@@ -206,7 +198,6 @@ const SidebarSettings = ({
     const newEnabledItemsString = JSON.stringify(initialEnabledState);
 
     if (currentEnabledItemsString !== newEnabledItemsString) {
-      console.log("Updating enabledItems state");
       setEnabledItems(initialEnabledState);
     }
 
@@ -225,7 +216,6 @@ const SidebarSettings = ({
         const newMenuString = JSON.stringify(orderedMenu);
 
         if (currentMenuString !== newMenuString) {
-          console.log("Updating menuList state");
           setMenuList(orderedMenu);
         }
       } catch (error) {
@@ -256,15 +246,9 @@ const SidebarSettings = ({
   // Handler for toggling item visibility
   const handleToggleItem = useCallback(
     (groupName: string, itemTitle: string, enabled: boolean) => {
-      console.log(`Toggle item: ${groupName} / ${itemTitle} to ${enabled}`);
-
-      // Check if the value is actually changing before updating state
       if (enabledItemsRef.current[groupName]?.[itemTitle] === enabled) {
-        console.log("Value didn't change, skipping update");
         return;
       }
-
-      // Create deep copy to ensure state update
       const newEnabledItems = { ...enabledItemsRef.current };
 
       // Initialize group if it doesn't exist
@@ -275,7 +259,6 @@ const SidebarSettings = ({
       // Update the specific item's enabled state
       newEnabledItems[groupName][itemTitle] = enabled;
 
-      console.log("New enabled items state:", newEnabledItems);
       setEnabledItems(newEnabledItems);
 
       // Mark form as dirty to enable the save button
@@ -319,10 +302,6 @@ const SidebarSettings = ({
           delete hiddenMenuItems[groupName];
         }
       });
-
-      console.log("Saving navigation settings:", simplifiedMenuList);
-      console.log("Saving hidden menu items:", hiddenMenuItems);
-
       // Get current user settings to ensure we're not overwriting anything
       const currentUserSettings = profile?.user_settings || {};
 
@@ -338,7 +317,6 @@ const SidebarSettings = ({
         },
       });
 
-      console.log("Navigation settings saved successfully. Updated profile:", result);
       setIsDirty(false);
       if (onSaveComplete) onSaveComplete();
     } catch (error) {
@@ -371,9 +349,6 @@ const SidebarSettings = ({
                     {items.map((item) => {
                       // Get the enabled state for this item, defaulting to true if not defined
                       const isEnabled = enabledItems[groupName]?.[item.title] ?? true;
-                      console.log(
-                        `Rendering item ${groupName}/${item.title} with enabled=${isEnabled}`,
-                      );
 
                       return (
                         <SortableItem

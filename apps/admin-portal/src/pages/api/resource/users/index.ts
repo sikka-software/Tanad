@@ -1,5 +1,5 @@
+import { PostgrestError } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
-import { PostgrestError } from '@supabase/supabase-js';
 
 import { createClient } from "@/utils/supabase/server-admin";
 
@@ -34,7 +34,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  console.log("user", user);
   try {
     switch (req.method) {
       case "GET":
@@ -71,14 +70,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             roles:roles!inner (name)
           `,
           )
-          .eq("enterprise_id", enterpriseId)) as { data: MembershipWithDetails[] | null; error: PostgrestError | null };
+          .eq("enterprise_id", enterpriseId)) as {
+          data: MembershipWithDetails[] | null;
+          error: PostgrestError | null;
+        };
 
         // Use the correctly typed 'data' variable
         const membershipsWithDetails = data;
-
-        console.log(
-          `Fetched ${membershipsWithDetails?.length ?? 0} memberships for enterprise ${enterpriseId}`,
-        );
 
         if (fetchError) {
           console.error("Fetch Memberships with Details Error:", fetchError);
@@ -102,7 +100,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               // role_id: m.role_id
             })) || [];
 
-        console.log(`Transformed ${users.length} users data`);
         // Finally, fetch the profiles for these IDs
         /*
         const { data: users, error: fetchError } = await supabase
@@ -111,7 +108,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .in("id", profileIds) // Use 'in' operator with the list of profile IDs
           .order("created_at", { ascending: false });
 
-        console.log(`Fetched ${users?.length ?? 0} users for enterprise ${enterpriseId}`);
         if (fetchError) {
           console.error("Fetch Profiles Error:", fetchError);
           throw fetchError;
@@ -179,7 +175,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.error("Role Lookup Error:", roleError);
           // Rollback Auth user creation if role lookup fails (profile assumed created by trigger)
           await supabase.auth.admin.deleteUser(newUserId);
-          console.log(`Rolled back Auth user creation for ${newUserId} due to role lookup error.`);
           return res.status(400).json({ error: `Role '${roleName}' not found.` });
         }
         const roleId = roleData.id;
@@ -199,7 +194,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.error("Membership Creation Error:", createMembershipError);
           // Rollback Auth user creation if membership fails (profile assumed created by trigger)
           await supabase.auth.admin.deleteUser(newUserId);
-          console.log(`Rolled back Auth user creation for ${newUserId} due to membership error.`);
           throw createMembershipError;
         }
 

@@ -1,9 +1,9 @@
+import { format } from "date-fns";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { format } from "date-fns";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
@@ -39,15 +39,13 @@ export default function AddInvoicePage() {
         subtotal: subtotal,
         tax_rate: data.tax_rate,
         notes: data.notes?.trim() || null,
-        items: data.items.map(item => ({
+        items: data.items.map((item) => ({
           product_id: item.product_id || null,
           description: item.description || "",
           quantity: parseFloat(item.quantity),
           unit_price: parseFloat(item.unit_price),
         })),
       };
-
-      console.log("Sending payload to /api/resource/invoices:", payload);
 
       // Call the API endpoint
       const response = await fetch("/api/resource/invoices", {

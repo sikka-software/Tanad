@@ -25,7 +25,6 @@ export async function fetchRoles(): Promise<Role[]> {
       throw new Error(errorMessage);
     }
 
-    console.log("Service: Received roles from API:", result);
     return result as Role[]; // Type assertion based on API contract
   } catch (error) {
     console.error("Error in fetchRoles service function:", error);

@@ -15,9 +15,6 @@ import { LoadingBar } from "@/components/ui/loading-bar";
 import { QueryProvider } from "@/providers/QueryProvider";
 import "@/styles/globals.css";
 
-// App component - gradually building up authentication
-console.log("[_app] Component loaded");
-
 const arabicFont = IBM_Plex_Sans_Arabic({
   weight: ["100", "200", "300", "400", "500", "600", "700"],
   subsets: ["arabic"],

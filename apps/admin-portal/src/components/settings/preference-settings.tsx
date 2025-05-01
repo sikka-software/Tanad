@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-
-import { useLocale, useTranslations } from "next-intl";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DollarSign, Euro, PoundSterling, SaudiRiyal, JapaneseYen, Flag } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Card, CardTitle, CardHeader, CardDescription, CardContent } from "@/ui/card";
@@ -14,8 +12,8 @@ import { Separator } from "@/ui/separator";
 import { Skeleton } from "@/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
-import useUserStore from "@/stores/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+import useUserStore from "@/stores/use-user-store";
 
 import BetaFlag from "../ui/beta-flag";
 
@@ -76,10 +74,6 @@ const PreferenceSettings = ({
   // Reset form when profile data is loaded
   useEffect(() => {
     if (profile) {
-      console.log("Profile loaded for preferences:", profile);
-      console.log("User settings:", profile.user_settings);
-
-      // Get preference values from user_settings, with fallbacks
       const currency = profile.user_settings?.currency || "usd";
       const calendar = profile.user_settings?.calendar || "month";
       const dateFormat = profile.user_settings?.date_format || "mdy";
@@ -97,9 +91,6 @@ const PreferenceSettings = ({
         dateFormat,
         timeFormat,
       };
-
-      console.log("Setting preference form values:", formValues);
-
       // Use a timeout to ensure the form reset happens after React has processed state updates
       setTimeout(() => {
         form.reset(formValues);
@@ -109,9 +100,6 @@ const PreferenceSettings = ({
         form.setValue("calendar", calendar);
         form.setValue("dateFormat", dateFormat);
         form.setValue("timeFormat", timeFormat);
-
-        // Verify the form state after reset
-        console.log("Preference form values after reset:", form.getValues());
       }, 0);
     }
   }, [profile, form]);
@@ -127,10 +115,6 @@ const PreferenceSettings = ({
   const onSubmit = async (data: FormValues) => {
     if (onSave) onSave();
     try {
-      // Log the current data
-      console.log("Submitting preference form data:", data);
-      console.log("Current profile:", profile);
-
       await updateProfileMutation.mutateAsync({
         profile_id,
         data: {
@@ -191,7 +175,6 @@ const PreferenceSettings = ({
                         <Select
                           disabled={isSaving}
                           onValueChange={(val) => {
-                            console.log("Currency changed to:", val);
                             field.onChange(val);
                             setSelectedCurrency(val);
                           }}
@@ -257,7 +240,6 @@ const PreferenceSettings = ({
                             disabled
                             // disabled={isSaving}
                             onValueChange={(val) => {
-                              console.log("Calendar changed to:", val);
                               field.onChange(val);
                               setSelectedCalendar(val);
                             }}
@@ -301,7 +283,6 @@ const PreferenceSettings = ({
                         <Select
                           disabled={isSaving}
                           onValueChange={(val) => {
-                            console.log("Date format changed to:", val);
                             field.onChange(val);
                             setSelectedDateFormat(val);
                           }}
@@ -335,7 +316,6 @@ const PreferenceSettings = ({
                         <Select
                           disabled={isSaving}
                           onValueChange={(val) => {
-                            console.log("Time format changed to:", val);
                             field.onChange(val);
                             setSelectedTimeFormat(val);
                           }}

@@ -261,7 +261,6 @@ export default function DepartmentForm({
                   dir={locale === "ar" ? "rtl" : "ltr"}
                   options={locationOptions}
                   onValueChange={(values) => {
-                    console.log("values", values);
                     field.onChange(values);
                   }}
                   defaultValue={field.value}

@@ -1,11 +1,9 @@
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-
-import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Flag } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/ui/card";
@@ -16,8 +14,8 @@ import { Separator } from "@/ui/separator";
 import { Skeleton } from "@/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
-import useUserStore from "@/stores/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+import useUserStore from "@/stores/use-user-store";
 
 import BetaFlag from "../ui/beta-flag";
 
@@ -77,12 +75,7 @@ const GeneralSettings = ({
   // Reset form when profile data is loaded
   React.useEffect(() => {
     if (profile) {
-      console.log("Profile loaded:", profile);
-      console.log("User settings:", profile.user_settings);
-
-      // Get timezone value, ensuring it's not undefined
       const timezone = profile.user_settings?.timezone || "UTC";
-      console.log("Setting timezone to:", timezone);
 
       // Set the selected timezone state
       setSelectedTimezone(timezone);
@@ -99,8 +92,6 @@ const GeneralSettings = ({
         timezone: timezone, // Ensure timezone is explicitly set and not lost
       };
 
-      console.log("Setting form values:", formValues);
-
       // Use a timeout to ensure the form reset happens after React has processed state updates
       setTimeout(() => {
         form.reset(formValues);
@@ -108,9 +99,6 @@ const GeneralSettings = ({
         // Force set the field values explicitly
         form.setValue("timezone", timezone);
         form.setValue("language", language);
-
-        // Verify the form state after reset
-        console.log("Form values after reset:", form.getValues());
       }, 0);
     }
   }, [profile, user, lang, form]);
@@ -124,10 +112,6 @@ const GeneralSettings = ({
   const onSubmit = async (data: FormValues) => {
     onSave();
     try {
-      // Log the current data
-      console.log("Submitting form data:", data);
-      console.log("Current profile:", profile);
-
       await updateProfileMutation.mutateAsync({
         profile_id,
         data: {
@@ -152,8 +136,6 @@ const GeneralSettings = ({
 
       // Check if language has changed and then switch the language
       if (data.language !== lang) {
-        console.log("Switching language to:", data.language);
-        // Use the same approach as in the language-switcher component
         router.replace(router.pathname, router.asPath, {
           locale: data.language,
         });
@@ -245,7 +227,6 @@ const GeneralSettings = ({
                         <Select
                           disabled={isSaving}
                           onValueChange={(val) => {
-                            console.log("Language changed to:", val);
                             field.onChange(val);
                             setSelectedLanguage(val);
                           }}
@@ -274,9 +255,6 @@ const GeneralSettings = ({
                   control={form.control}
                   name="timezone"
                   render={({ field }) => {
-                    // Add logging to debug the field value during render
-                    console.log("Rendering timezone field with value:", field.value);
-
                     return (
                       <FormItem>
                         <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
@@ -290,7 +268,6 @@ const GeneralSettings = ({
                             <Select
                               disabled={isSaving}
                               onValueChange={(val) => {
-                                console.log("Timezone changed to:", val);
                                 field.onChange(val);
                                 setSelectedTimezone(val);
                               }}

@@ -1,17 +1,15 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-
-import { useLocale, useTranslations } from "next-intl";
-
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/ui/form";
 import { Switch } from "@/ui/switch";
 
-import useUserStore from "@/stores/use-user-store";
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+import useUserStore from "@/stores/use-user-store";
 
 const formSchema = z.object({
   email_updates: z.boolean(),
@@ -73,10 +71,6 @@ const NotificationSettings = ({
   // Reset form when profile data is loaded
   useEffect(() => {
     if (profile) {
-      console.log("Profile loaded for notifications:", profile);
-      console.log("User settings:", profile.user_settings);
-
-      // Get notification values from user_settings, with fallbacks
       const formValues = {
         email_updates: profile.user_settings?.notifications?.email_updates ?? false,
         email_marketing: profile.user_settings?.notifications?.email_marketing ?? false,
@@ -85,10 +79,6 @@ const NotificationSettings = ({
         app_comments: profile.user_settings?.notifications?.app_comments ?? false,
         app_tasks: profile.user_settings?.notifications?.app_tasks ?? false,
       };
-
-      console.log("Setting notification form values:", formValues);
-
-      // Use a timeout to ensure the form reset happens after React has processed state updates
       setTimeout(() => {
         form.reset(formValues);
       }, 0);
@@ -104,10 +94,6 @@ const NotificationSettings = ({
   const onSubmit = async (data: FormValues) => {
     onSave();
     try {
-      // Log the current data
-      console.log("Submitting notification form data:", data);
-      console.log("Current profile:", profile);
-
       await updateProfileMutation.mutateAsync({
         profile_id,
         data: {

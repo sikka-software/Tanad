@@ -10,7 +10,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  console.log("req.body", req.body);
   const supabase = createClient({
     req,
     res,
@@ -59,8 +58,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         notes,
       })
       .returning();
-
-    console.log(employee);
 
     return res.status(201).json(employee);
   } catch (error) {

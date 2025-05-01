@@ -79,7 +79,6 @@ export default function ExpensesPage() {
   }, [filteredExpenses, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const onActionClicked = async (action: string, rowId: string) => {
-    console.log(action, rowId);
     if (action === "edit") {
       setIsFormDialogOpen(true);
       setActionableExpense(expenses?.find((expense) => expense.id === rowId) || null);

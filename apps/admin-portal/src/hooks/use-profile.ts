@@ -25,7 +25,6 @@ const fetchProfile = async (profile_id: string): Promise<ProfileData> => {
     throw new Error("Profile ID is required");
   }
 
-  console.log("[fetchProfile] Fetching profile for ID:", profile_id);
   const response = await fetch(`/api/profile/info?profile_id=${profile_id}`);
 
   if (!response.ok) {
@@ -34,7 +33,6 @@ const fetchProfile = async (profile_id: string): Promise<ProfileData> => {
   }
 
   const data = await response.json();
-  console.log("[fetchProfile] Profile data received:", data.profile);
   return data.profile;
 };
 
@@ -50,9 +48,6 @@ const updateProfile = async ({
     throw new Error("Profile ID is required");
   }
 
-  console.log("[updateProfile] Updating profile for ID:", profile_id);
-  console.log("[updateProfile] Update data:", data);
-
   const response = await fetch(`/api/profile/update?profile_id=${profile_id}`, {
     method: "PATCH",
     headers: {
@@ -67,7 +62,6 @@ const updateProfile = async ({
   }
 
   const responseData = await response.json();
-  console.log("[updateProfile] Updated profile data:", responseData.profile);
   return responseData.profile;
 };
 
@@ -134,7 +128,6 @@ export function useUpdateProfile() {
           },
         };
 
-        console.log("[useUpdateProfile] Updating profile with:", updatedProfile);
         userStore.setProfile(updatedProfile);
       }
 

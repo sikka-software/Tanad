@@ -94,11 +94,6 @@ const useUserStore = create<UserState>((set, get) => ({
 
   hasPermission: (permission) => {
     const permissions = get().permissions;
-    // console.log("Checking permission in store:", {
-    //   requestedPermission: permission,
-    //   availablePermissions: permissions,
-    //   hasPermission: permissions.includes(permission),
-    // });
     return permissions.includes(permission);
   },
 
@@ -128,14 +123,11 @@ const useUserStore = create<UserState>((set, get) => ({
 
     try {
       set({ loading: true, error: null });
-      console.log("Starting fetchUserAndProfile...");
 
       // Get the current session
       const {
         data: { session },
       } = await supabase.auth.getSession();
-
-      console.log("Session:", session ? "Found" : "Not found");
 
       if (!session) {
         set({
@@ -159,8 +151,6 @@ const useUserStore = create<UserState>((set, get) => ({
         .eq("id", session.user.id)
         .single();
 
-      console.log("Profile data:", profileData ? "Found" : "Not found");
-
       if (profileData) {
         set({ profile: profileData as ProfileType });
 
@@ -171,8 +161,6 @@ const useUserStore = create<UserState>((set, get) => ({
           .eq("profile_id", session.user.id)
           .single();
 
-        console.log("Membership data:", membershipData ? "Found" : "Not found");
-
         if (membershipData) {
           set({ membership: membershipData as MembershipType });
 
@@ -182,8 +170,6 @@ const useUserStore = create<UserState>((set, get) => ({
             .select("*")
             .eq("id", membershipData.enterprise_id)
             .single();
-
-          console.log("Enterprise data:", enterpriseData ? "Found" : "Not found");
 
           if (enterpriseData) {
             set({ enterprise: enterpriseData as EnterpriseType });
@@ -196,11 +182,8 @@ const useUserStore = create<UserState>((set, get) => ({
             .eq("profile_id", session.user.id)
             .eq("enterprise_id", membershipData.enterprise_id);
 
-          console.log("Permissions data:", permissionsData ? "Found" : "Not found");
-
           if (permissionsData) {
             const permissions = permissionsData.map((p) => p.permission);
-            console.log("Setting permissions:", permissions);
             set({ permissions });
           }
         }

@@ -10,7 +10,6 @@ export async function fetchEmployees(): Promise<Employee[]> {
     throw new Error("No authenticated user");
   }
 
-  console.log("Fetching employees for user:", user.id);
   const { data, error } = await supabase
     .from("employees")
     .select(
@@ -27,8 +26,6 @@ export async function fetchEmployees(): Promise<Employee[]> {
     console.error("Error fetching employees:", error);
     throw error;
   }
-
-  console.log("Fetched employees data:", data);
 
   // Transform the data to match our Employee type
   return data.map((employee: any) => ({
@@ -221,7 +218,6 @@ export async function createEmployee(newEmployee: EmployeeCreateData): Promise<E
 //   // Add the user_id to the employee data
 //   employeeData.user_id = user.id;
 
-//   console.log("Creating employee with data:", employeeData);
 
 //   const { data, error } = await supabase
 //     .from("employees")

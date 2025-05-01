@@ -54,7 +54,6 @@ export default function DirectoryPage() {
           .eq("is_public", true)
           .order("created_at", { ascending: false });
 
-        console.log("puklas are ", query);
         if (debouncedSearchQuery) {
           query = query.or(
             `title.ilike.%${debouncedSearchQuery}%,bio.ilike.%${debouncedSearchQuery}%`,

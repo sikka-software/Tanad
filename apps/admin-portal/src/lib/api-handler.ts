@@ -82,17 +82,11 @@ export function createApiHandler({ tableName, customHandlers = {} }: Options) {
           return res.status(200).json(listData);
 
         case "POST":
-          console.log(`>>> createApiHandler POST for table: ${tableName} <<<`);
-          console.log("Received customHandlers:", customHandlers);
-          console.log("Does customHandlers.POST exist?", !!customHandlers.POST);
-
           if (customHandlers.POST) {
-            console.log(">>> createApiHandler: Using custom POST handler <<<");
             const data = await customHandlers.POST(supabase, user_id, enterprise_id, req);
             return res.status(201).json(data);
           }
 
-          console.log(">>> createApiHandler: Using DEFAULT POST handler <<<");
           const { data: createdData, error: createError } = await supabase
             .from(tableName)
             .insert({

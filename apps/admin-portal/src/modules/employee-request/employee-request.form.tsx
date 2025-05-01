@@ -90,9 +90,6 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // errors
-    console.log("errors are ", form.formState.errors);
-    console.log("form values are ", form.getValues("employee_id"));
     try {
       setIsLoadingSave(true);
       const isValid = await form.trigger();
@@ -121,21 +118,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
   return (
     <>
       <Form {...form}>
-        <form
-          id={id || "employee-request-form"}
-          onSubmit={handleSubmit}
-          // Debugging
-          // onSubmit={(e) => {
-          //   e.preventDefault();
-          //   console.log("Form submitted");
-          //   // see if any form erros
-          //   const errors = form.formState.errors;
-          //   console.log("errors ", errors);
-          //   console.log("form values ", form.getValues());
-          // }}
-          className="space-y-4"
-        >
-          {/* <input type="hidden" {...form.register("employee_id")} /> */}
+        <form id={id || "employee-request-form"} onSubmit={handleSubmit} className="space-y-4">
           <FormField
             control={form.control}
             name="employee_id"
@@ -151,7 +134,6 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                     defaultValue={field.value}
                     valueKey={"id"}
                     onChange={(value) => {
-                      console.log(value);
                       field.onChange(value || null);
                     }}
                     renderOption={(item) => {
