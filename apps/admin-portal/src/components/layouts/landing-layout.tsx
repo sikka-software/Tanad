@@ -20,7 +20,7 @@ const LandingLayout: React.FC<LayoutType> = ({ children }) => {
     <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
       <main className="flex min-h-screen flex-col" dir={lang === "ar" ? "rtl" : "ltr"}>
         <GridBG className="-z-10" />
-        <Navigation onSticky={isSticky} />
+        <Navigation />
         <div className="w-full flex-1 flex-col justify-center">
           <LoadingBar />
           {children}
