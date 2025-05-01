@@ -37,3 +37,10 @@ export interface FilterableField {
   type: "text" | "number" | "date";
   translationKey: string;
 }
+
+export interface ModuleTableProps<T> {
+  data: T[];
+  isLoading?: boolean;
+  error?: Error | null;
+  onActionClicked: (action: string, rowId: string) => void;
+}

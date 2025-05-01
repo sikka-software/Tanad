@@ -100,7 +100,6 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
             zip_code: data.zip_code?.trim() || undefined,
             enterprise_id: membership.enterprise_id,
             is_active: true,
-            updated_at: new Date().toISOString(),
           },
           {
             onSuccess: async (response) => {

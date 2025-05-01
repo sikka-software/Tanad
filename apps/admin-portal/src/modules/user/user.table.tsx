@@ -1,20 +1,8 @@
 "use client";
 
-import {
-  MoreHorizontal,
-  Search,
-  UserCog,
-  Shield,
-  User,
-  UserX,
-  Trash2,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useCallback } from "react";
 import React from "react";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -22,69 +10,30 @@ import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
+import { ModuleTableProps } from "@/types/common.type";
+
+import useUserStore from "@/stores/use-user-store";
 
 import { predefinedRoles } from "../role/role.options";
-import { UserForm } from "./user.form";
-import { useDeleteUser, useUpdateUser, useUsers } from "./user.hooks";
+import { useUpdateUser } from "./user.hooks";
 import useEnterpriseUsersStore from "./user.store";
+import { UserType } from "./user.type";
 
-// Define user types
-export type UserType = {
-  id: string;
-  email: string;
-  role: string;
-  enterprise_id: string;
-  created_at: string;
-};
-
-interface UsersTableProps {
-  users: UserType[];
-  isLoading?: boolean;
-  error?: Error | null;
-  onActionClicked: (action: string, rowId: string) => void;
-}
-
-const emailSchema = z.string().email("Invalid email").min(1, "Required");
-const roleSchema = z.string().min(1, "Required");
-
-export default function UsersTable({ users, isLoading, error, onActionClicked }: UsersTableProps) {
+export default function UsersTable({
+  data,
+  isLoading,
+  error,
+  onActionClicked,
+}: ModuleTableProps<UserType>) {
   const t = useTranslations();
+  const { mutate: updateUser } = useUpdateUser();
+
+  const canEditUser = useUserStore((state) => state.hasPermission("users.update"));
+  const canDuplicateUser = useUserStore((state) => state.hasPermission("users.duplicate"));
+  const canViewUser = useUserStore((state) => state.hasPermission("users.view"));
+  const canArchiveUser = useUserStore((state) => state.hasPermission("users.archive"));
+  const canDeleteUser = useUserStore((state) => state.hasPermission("users.delete"));
 
   const selectedRows = useEnterpriseUsersStore((state) => state.selectedRows);
   const setSelectedRows = useEnterpriseUsersStore((state) => state.setSelectedRows);
@@ -92,7 +41,14 @@ export default function UsersTable({ users, isLoading, error, onActionClicked }:
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<UserType>[] = [
-    { accessorKey: "email", header: t("Users.form.email.label"), validationSchema: emailSchema },
+    {
+      accessorKey: "email",
+      header: t("Users.form.email.label"),
+      validationSchema: z
+        .string()
+        .email(t("Users.form.email.invalid"))
+        .min(1, t("Users.form.email.required")),
+    },
     {
       accessorKey: "role",
       header: t("Users.form.role.label"),
@@ -100,7 +56,7 @@ export default function UsersTable({ users, isLoading, error, onActionClicked }:
         const role = row.original.role;
         return <Badge variant="outline">{predefinedRoles(t, role)?.name || role}</Badge>;
       },
-      validationSchema: roleSchema,
+      validationSchema: z.string().min(1, t("Users.form.role.required")),
     },
     {
       accessorKey: "created_at",
@@ -113,6 +69,21 @@ export default function UsersTable({ users, isLoading, error, onActionClicked }:
     },
   ];
 
+  const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
+    await updateUser({ id: rowId, data: { [columnId]: value } });
+  };
+
+  const handleRowSelectionChange = useCallback(
+    (rows: UserType[]) => {
+      const newSelectedIds = rows.map((row) => row.id);
+      // Only update if the selection has actually changed
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
+        setSelectedRows(newSelectedIds);
+      }
+    },
+    [selectedRows, setSelectedRows],
+  );
+
   if (isLoading) {
     return (
       <TableSkeleton columns={columns.map((column) => column.accessorKey as string)} rows={5} />
@@ -123,7 +94,7 @@ export default function UsersTable({ users, isLoading, error, onActionClicked }:
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  const tableOptions = {
+  const userTableOptions = {
     state: {
       rowSelection,
     },
@@ -132,7 +103,7 @@ export default function UsersTable({ users, isLoading, error, onActionClicked }:
     getRowId: (row: UserType) => row.id!,
     onRowSelectionChange: (updater: any) => {
       const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-      const selectedRows = users.filter((row) => newSelection[row.id!]);
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
       setSelectedRows(selectedRows.map((row) => row.id!));
     },
   };
@@ -140,12 +111,18 @@ export default function UsersTable({ users, isLoading, error, onActionClicked }:
   return (
     <SheetTable
       columns={columns}
-      data={users}
+      data={data}
+      onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
-      onRowSelectionChange={(rows: UserType[]) => setSelectedRows(rows.map((row) => row.id!))}
-      tableOptions={tableOptions}
+      canEditAction={canEditUser}
+      canDuplicateAction={canDuplicateUser}
+      canViewAction={canViewUser}
+      canArchiveAction={canArchiveUser}
+      canDeleteAction={canDeleteUser}
+      onRowSelectionChange={handleRowSelectionChange}
+      tableOptions={userTableOptions}
       onActionClicked={onActionClicked}
       texts={{
         actions: t("General.actions"),

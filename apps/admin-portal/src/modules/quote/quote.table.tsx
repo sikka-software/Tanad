@@ -8,27 +8,25 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useQuotesStore from "@/modules/quote/quote.store";
 import { Quote } from "@/modules/quote/quote.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateQuote } from "./quote.hooks";
 
-const quoteNumberSchema = z.string().min(1, "Required");
-const statusSchema = z.enum(["draft", "sent", "accepted", "rejected", "expired"]);
-const subtotalSchema = z.number().min(0, "Must be >= 0");
-const tax_rateSchema = z.number().min(0, "Must be >= 0").max(100, "Must be <= 100");
-
-interface QuotesTableProps {
-  data: Quote[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
-
-const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
+const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Quote>) => {
   const t = useTranslations();
   const { mutateAsync: updateQuote } = useUpdateQuote();
   const setSelectedRows = useQuotesStore((state) => state.setSelectedRows);
   const selectedRows = useQuotesStore((state) => state.selectedRows);
+
+  const canEditQuote = useUserStore((state) => state.hasPermission("quotes.update"));
+  const canDuplicateQuote = useUserStore((state) => state.hasPermission("quotes.duplicate"));
+  const canViewQuote = useUserStore((state) => state.hasPermission("quotes.view"));
+  const canArchiveQuote = useUserStore((state) => state.hasPermission("quotes.archive"));
+  const canDeleteQuote = useUserStore((state) => state.hasPermission("quotes.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
@@ -36,7 +34,7 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
     {
       accessorKey: "quote_number",
       header: t("Quotes.quote_number"),
-      validationSchema: quoteNumberSchema,
+      validationSchema: z.string().min(1, t("Quotes.quote_number.required")),
     },
     {
       accessorKey: "client_id",
@@ -50,7 +48,7 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
         try {
           return format(new Date(props.row.original.issue_date), "MMM dd, yyyy");
         } catch (e) {
-          return "Invalid Date";
+          return t("General.invalid_date");
         }
       },
     },
@@ -61,26 +59,26 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
         try {
           return format(new Date(props.row.original.expiry_date), "MMM dd, yyyy");
         } catch (e) {
-          return "Invalid Date";
+          return t("General.invalid_date");
         }
       },
     },
     {
       accessorKey: "status",
       header: t("Quotes.status.title"),
-      validationSchema: statusSchema,
+      validationSchema: z.enum(["draft", "sent", "accepted", "rejected", "expired"]),
     },
     {
       accessorKey: "subtotal",
       header: t("Quotes.subtotal"),
-      validationSchema: subtotalSchema,
+      validationSchema: z.number().min(0, t("Quotes.subtotal.required")),
       cell: (props: CellContext<Quote, unknown>) =>
         `$${Number(props.row.original.subtotal || 0).toFixed(2)}`,
     },
     {
       accessorKey: "tax_rate",
       header: t("Quotes.tax_rate"),
-      validationSchema: tax_rateSchema,
+      validationSchema: z.number().min(0, t("Quotes.tax_rate.required")),
       cell: (props: CellContext<Quote, unknown>) => `${props.row.original.tax_rate || 0}%`,
     },
   ];
@@ -135,8 +133,23 @@ const QuotesTable = ({ data, isLoading, error }: QuotesTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditQuote}
+      canDuplicateAction={canDuplicateQuote}
+      canViewAction={canViewQuote}
+      canArchiveAction={canArchiveQuote}
+      canDeleteAction={canDeleteQuote}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={quoteTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

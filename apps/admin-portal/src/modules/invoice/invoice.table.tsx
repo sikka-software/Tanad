@@ -9,39 +9,36 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useInvoiceStore from "@/modules/invoice/invoice.store";
 import { Invoice } from "@/modules/invoice/invoice.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateInvoice } from "./invoice.hooks";
-
-const invoice_numberSchema = z.string().min(1, "Required");
-const issue_dateSchema = z.date();
-const due_dateSchema = z.date();
-const totalSchema = z.number().min(0, "Must be >= 0");
-const statusSchema = z.enum(["paid", "pending", "overdue"]);
-
-interface InvoicesTableProps {
-  data: Invoice[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
 
 const formatDate = (dateStr: string) => {
   try {
     // If the date includes time information, take only the date part
-    const datePart = dateStr.split('T')[0];
+    const datePart = dateStr.split("T")[0];
     return format(parseISO(datePart), "MMM dd, yyyy");
   } catch (error) {
-    console.error('Error formatting date:', dateStr, error);
-    return 'Invalid Date';
+    console.error("Error formatting date:", dateStr, error);
+    return "Invalid Date";
   }
 };
 
-const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
+const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Invoice>) => {
   const t = useTranslations("Invoices");
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
   const selectedRows = useInvoiceStore((state) => state.selectedRows);
   const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
+
+  const canEditInvoice = useUserStore((state) => state.hasPermission("invoices.update"));
+  const canDuplicateInvoice = useUserStore((state) => state.hasPermission("invoices.duplicate"));
+  const canViewInvoice = useUserStore((state) => state.hasPermission("invoices.view"));
+  const canArchiveInvoice = useUserStore((state) => state.hasPermission("invoices.archive"));
+  const canDeleteInvoice = useUserStore((state) => state.hasPermission("invoices.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
@@ -49,7 +46,7 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
     {
       accessorKey: "invoice_number",
       header: t("form.invoice_number.label"),
-      validationSchema: invoice_numberSchema,
+      validationSchema: z.string().min(1, t("Invoices.form.invoice_number.required")),
     },
     {
       accessorKey: "client.company",
@@ -59,30 +56,31 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
     {
       accessorKey: "issue_date",
       header: t("form.issue_date.label"),
-      validationSchema: issue_dateSchema,
+      validationSchema: z.string().min(1, t("Invoices.form.issue_date.required")),
       cell: ({ row }) => formatDate(row.original.issue_date),
     },
     {
       accessorKey: "due_date",
       header: t("form.due_date.label"),
-      validationSchema: due_dateSchema,
+      validationSchema: z.string().min(1, t("Invoices.form.due_date.required")),
       cell: ({ row }) => formatDate(row.original.due_date),
     },
     {
       accessorKey: "total",
       header: t("form.total.label"),
-      validationSchema: totalSchema,
+      validationSchema: z.number().min(0, t("Invoices.form.total.required")),
       cell: ({ row }) => {
-        const total = typeof row.original.total === 'string' 
-          ? parseFloat(row.original.total) 
-          : row.original.total;
+        const total =
+          typeof row.original.total === "string"
+            ? parseFloat(row.original.total)
+            : row.original.total;
         return `$${Number(total).toFixed(2)}`;
       },
     },
     {
       accessorKey: "status",
       header: t("form.status.label"),
-      validationSchema: statusSchema,
+      validationSchema: z.string().min(1, t("Invoices.form.status.required")),
     },
     {
       id: "actions",
@@ -153,7 +151,24 @@ const InvoicesTable = ({ data, isLoading, error }: InvoicesTableProps) => {
       data={data}
       onEdit={handleEdit}
       showHeader={true}
+      enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditInvoice}
+      canDuplicateAction={canDuplicateInvoice}
+      canViewAction={canViewInvoice}
+      canArchiveAction={canArchiveInvoice}
+      canDeleteAction={canDeleteInvoice}
+      onRowSelectionChange={handleRowSelectionChange}
       tableOptions={invoiceTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

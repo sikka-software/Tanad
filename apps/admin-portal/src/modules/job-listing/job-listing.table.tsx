@@ -6,26 +6,32 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
+import useUserStore from "@/stores/use-user-store";
+
 import { useUpdateJobListing } from "./job-listing.hooks";
 import useJobListingsStore from "./job-listing.store";
 import { JobListing } from "./job-listing.type";
 
-const titleSchema = z.string().min(1, "Required");
-const descriptionSchema = z.string().min(1, "Required");
-const is_activeSchema = z.boolean();
-const slugSchema = z.string().min(1, "Required");
-
-interface JobListingsTableProps {
-  data: JobListing[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
-
-const JobListingsTable = ({ data, isLoading, error }: JobListingsTableProps) => {
+const JobListingsTable = ({
+  data,
+  isLoading,
+  error,
+  onActionClicked,
+}: ModuleTableProps<JobListing>) => {
   const t = useTranslations();
   const { mutate: updateJobListing } = useUpdateJobListing();
   const selectedRows = useJobListingsStore((state) => state.selectedRows);
   const setSelectedRows = useJobListingsStore((state) => state.setSelectedRows);
+
+  const canEditJobListing = useUserStore((state) => state.hasPermission("job-listings.update"));
+  const canDuplicateJobListing = useUserStore((state) =>
+    state.hasPermission("job-listings.duplicate"),
+  );
+  const canViewJobListing = useUserStore((state) => state.hasPermission("job-listings.view"));
+  const canArchiveJobListing = useUserStore((state) => state.hasPermission("job-listings.archive"));
+  const canDeleteJobListing = useUserStore((state) => state.hasPermission("job-listings.delete"));
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
@@ -34,19 +40,23 @@ const JobListingsTable = ({ data, isLoading, error }: JobListingsTableProps) => 
     {
       accessorKey: "title",
       header: t("JobListings.form.title.label"),
-      validationSchema: titleSchema,
+      validationSchema: z.string().min(1, t("JobListings.form.title.required")),
     },
     {
       accessorKey: "description",
       header: t("JobListings.form.description.label"),
-      validationSchema: descriptionSchema,
+      validationSchema: z.string().min(1, t("JobListings.form.description.required")),
     },
     {
       accessorKey: "is_active",
       header: t("JobListings.form.is_active.label"),
-      validationSchema: is_activeSchema,
+      validationSchema: z.boolean(),
     },
-    { accessorKey: "slug", header: t("JobListings.form.slug.label"), validationSchema: slugSchema },
+    {
+      accessorKey: "slug",
+      header: t("JobListings.form.slug.label"),
+      validationSchema: z.string().min(1, t("JobListings.form.slug.required")),
+    },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
@@ -96,8 +106,23 @@ const JobListingsTable = ({ data, isLoading, error }: JobListingsTableProps) => 
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditJobListing}
+      canDuplicateAction={canDuplicateJobListing}
+      canViewAction={canViewJobListing}
+      canArchiveAction={canArchiveJobListing}
+      canDeleteAction={canDeleteJobListing}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={jobListingTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

@@ -6,31 +6,32 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import { useDepartments } from "@/modules/department/department.hooks";
 import { useUpdateEmployee } from "@/modules/employee/employee.hooks";
 import useEmployeeStore from "@/modules/employee/employee.store";
 import { Employee } from "@/modules/employee/employee.types";
+import useUserStore from "@/stores/use-user-store";
 
-const nameSchema = z.string().min(1, "Required");
-const emailSchema = z.string().email("Invalid email");
-const phoneSchema = z.string().optional();
-const positionSchema = z.string().min(1, "Required");
-const departmentSchema = z.string().optional();
-const statusSchema = z.enum(["active", "inactive", "on_leave"]);
-
-interface EmployeesTableProps {
-  data: Employee[];
-  isLoading?: boolean;
-  error?: Error | null;
-  onSelectedRowsChange?: (selectedRows: Employee[]) => void;
-}
-
-const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: EmployeesTableProps) => {
+const EmployeesTable = ({
+  data,
+  isLoading,
+  error,
+  onActionClicked,
+}: ModuleTableProps<Employee>) => {
   const t = useTranslations();
   const { data: departments } = useDepartments();
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
   const selectedRows = useEmployeeStore((state) => state.selectedRows);
   const setSelectedRows = useEmployeeStore((state) => state.setSelectedRows);
+
+  const canEditEmployee = useUserStore((state) => state.hasPermission("employees.update"));
+  const canDuplicateEmployee = useUserStore((state) => state.hasPermission("employees.duplicate"));
+  const canViewEmployee = useUserStore((state) => state.hasPermission("employees.view"));
+  const canArchiveEmployee = useUserStore((state) => state.hasPermission("employees.archive"));
+  const canDeleteEmployee = useUserStore((state) => state.hasPermission("employees.delete"));
+
   const [currentData, setCurrentData] = useState<Employee[]>(data);
   const [pendingUpdates, setPendingUpdates] = useState<Record<string, Partial<Employee>>>({});
 
@@ -40,32 +41,32 @@ const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: Employ
     {
       accessorKey: "first_name",
       header: t("Employees.form.first_name.label"),
-      validationSchema: nameSchema,
+      validationSchema: z.string().min(1, t("Employees.form.first_name.required")),
     },
     {
       accessorKey: "last_name",
       header: t("Employees.form.last_name.label"),
-      validationSchema: nameSchema,
+      validationSchema: z.string().min(1, t("Employees.form.last_name.required")),
     },
     {
       accessorKey: "email",
       header: t("Employees.form.email.label"),
-      validationSchema: emailSchema,
+      validationSchema: z.string().email(t("Employees.form.email.invalid")),
     },
     {
       accessorKey: "phone",
       header: t("Employees.form.phone.label"),
-      validationSchema: phoneSchema,
+      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "position",
       header: t("Employees.form.position.label"),
-      validationSchema: positionSchema,
+      validationSchema: z.string().min(1, t("Employees.form.position.required")),
     },
     {
       accessorKey: "department_id",
       header: t("Employees.form.department.label"),
-      validationSchema: departmentSchema,
+      validationSchema: z.string().optional(),
       cellType: "select",
       options: departments?.map((department) => ({
         label: department.name,
@@ -79,7 +80,7 @@ const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: Employ
     {
       accessorKey: "status",
       header: t("Employees.form.status.label"),
-      validationSchema: statusSchema,
+      validationSchema: z.enum(["active", "inactive", "on_leave", "terminated"]),
       cellType: "select",
       options: [
         { label: t("Employees.form.status.active"), value: "active" },
@@ -96,22 +97,12 @@ const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: Employ
 
   const handleRowSelectionChange = useCallback(
     (rows: Employee[]) => {
-      const newSelectedIds = rows.map((row) => row.id!);
-      // Only update if the selection has actually changed
-      const currentSelection = new Set(selectedRows);
-      const newSelection = new Set(newSelectedIds);
-
-      if (
-        newSelection.size !== currentSelection.size ||
-        !Array.from(newSelection).every((id) => currentSelection.has(id))
-      ) {
+      const newSelectedIds = rows.map((row) => row.id);
+      if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
         setSelectedRows(newSelectedIds);
-        if (onSelectedRowsChange) {
-          onSelectedRowsChange(rows);
-        }
       }
     },
-    [selectedRows, setSelectedRows, onSelectedRowsChange],
+    [selectedRows, setSelectedRows],
   );
 
   // Create a memoized handleEdit function
@@ -213,12 +204,27 @@ const EmployeesTable = ({ data, isLoading, error, onSelectedRowsChange }: Employ
   return (
     <SheetTable
       columns={columns}
-      data={currentData.length > 0 ? currentData : data}
+      data={data}
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditEmployee}
+      canDuplicateAction={canDuplicateEmployee}
+      canViewAction={canViewEmployee}
+      canArchiveAction={canArchiveEmployee}
+      canDeleteAction={canDeleteEmployee}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={employeeTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

@@ -6,44 +6,53 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useProductStore from "@/modules/product/product.store";
 import { Product } from "@/modules/product/product.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateProduct } from "./product.hooks";
 
-const nameSchema = z.string().min(1, "Required");
-const descriptionSchema = z.string().optional();
-const priceSchema = z.number().min(0, "Must be >= 0");
-const skuSchema = z.string().optional();
-const stockQuantitySchema = z.number().min(0, "Must be >= 0").optional();
-
-interface ProductsTableProps {
-  data: Product[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
-
-const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
+const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Product>) => {
   const t = useTranslations();
   const selectedRows = useProductStore((state) => state.selectedRows);
   const setSelectedRows = useProductStore((state) => state.setSelectedRows);
   const { mutateAsync: updateProduct } = useUpdateProduct();
 
+  const canEditProduct = useUserStore((state) => state.hasPermission("products.update"));
+  const canDuplicateProduct = useUserStore((state) => state.hasPermission("products.duplicate"));
+  const canViewProduct = useUserStore((state) => state.hasPermission("products.view"));
+  const canArchiveProduct = useUserStore((state) => state.hasPermission("products.archive"));
+  const canDeleteProduct = useUserStore((state) => state.hasPermission("products.delete"));
+
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Product>[] = [
-    { accessorKey: "name", header: t("Products.form.name.label"), validationSchema: nameSchema },
+    {
+      accessorKey: "name",
+      header: t("Products.form.name.label"),
+      validationSchema: z.string().min(1, t("Products.form.name.required")),
+    },
     {
       accessorKey: "description",
       header: t("Products.form.description.label"),
-      validationSchema: descriptionSchema,
+      validationSchema: z.string().optional(),
     },
-    { accessorKey: "price", header: t("Products.form.price.label"), validationSchema: priceSchema },
-    { accessorKey: "sku", header: t("Products.form.sku.label"), validationSchema: skuSchema },
+    {
+      accessorKey: "price",
+      header: t("Products.form.price.label"),
+      validationSchema: z.number().min(0, t("Products.form.price.required")),
+    },
+    {
+      accessorKey: "sku",
+      header: t("Products.form.sku.label"),
+      validationSchema: z.string().optional(),
+    },
     {
       accessorKey: "stock_quantity",
       header: t("Products.form.stock_quantity.label"),
-      validationSchema: stockQuantitySchema,
+      validationSchema: z.number().min(0, t("Products.form.stock_quantity.required")),
     },
   ];
 
@@ -99,8 +108,23 @@ const ProductsTable = ({ data, isLoading, error }: ProductsTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditProduct}
+      canDuplicateAction={canDuplicateProduct}
+      canViewAction={canViewProduct}
+      canArchiveAction={canArchiveProduct}
+      canDeleteAction={canDeleteProduct}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={productTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

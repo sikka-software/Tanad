@@ -6,57 +6,69 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useClientStore from "@/modules/client/client.store";
 import { Client } from "@/modules/client/client.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateClient } from "./client.hooks";
 
-const nameSchema = z.string().min(1, "Required");
-const emailSchema = z.string().email("Invalid email");
-const phoneSchema = z.string().min(1, "Required");
-const addressSchema = z.string().min(1, "Required");
-const citySchema = z.string().min(1, "Required");
-const stateSchema = z.string().min(1, "Required");
-const zipCodeSchema = z.string().min(1, "Required");
-const notesSchema = z.string().optional();
-
-interface ClientsTableProps {
-  data: Client[];
-  isLoading?: boolean;
-  error?: Error | null;
-  onActionClicked: (action: string, rowId: string) => void;
-}
-
-const ClientsTable = ({
-  data: unsortedData,
-  isLoading,
-  error,
-  onActionClicked,
-}: ClientsTableProps) => {
+const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Client>) => {
   const t = useTranslations();
   const { mutate: updateClient } = useUpdateClient();
   const selectedRows = useClientStore((state) => state.selectedRows);
   const setSelectedRows = useClientStore((state) => state.setSelectedRows);
 
+  const canEditClient = useUserStore((state) => state.hasPermission("clients.update"));
+  const canDuplicateClient = useUserStore((state) => state.hasPermission("clients.duplicate"));
+  const canViewClient = useUserStore((state) => state.hasPermission("clients.view"));
+  const canArchiveClient = useUserStore((state) => state.hasPermission("clients.archive"));
+  const canDeleteClient = useUserStore((state) => state.hasPermission("clients.delete"));
+
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Client>[] = [
-    { accessorKey: "name", header: t("Clients.form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "email", header: t("Clients.form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "phone", header: t("Clients.form.phone.label"), validationSchema: phoneSchema },
+    {
+      accessorKey: "name",
+      header: t("Clients.form.name.label"),
+      validationSchema: z.string().min(1, t("Clients.form.name.required")),
+    },
+    {
+      accessorKey: "email",
+      header: t("Clients.form.email.label"),
+      validationSchema: z.string().email(t("Clients.form.email.invalid")),
+    },
+    {
+      accessorKey: "phone",
+      header: t("Clients.form.phone.label"),
+      validationSchema: z.string().min(1, t("Clients.form.phone.required")),
+    },
     {
       accessorKey: "address",
       header: t("Clients.form.address.label"),
-      validationSchema: addressSchema,
+      validationSchema: z.string().min(1, t("Clients.form.address.required")),
     },
-    { accessorKey: "city", header: t("Clients.form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("Clients.form.state.label"), validationSchema: stateSchema },
+    {
+      accessorKey: "city",
+      header: t("Clients.form.city.label"),
+      validationSchema: z.string().min(1, t("Clients.form.city.required")),
+    },
+    {
+      accessorKey: "state",
+      header: t("Clients.form.state.label"),
+      validationSchema: z.string().min(1, t("Clients.form.state.required")),
+    },
     {
       accessorKey: "zip_code",
       header: t("Clients.form.zip_code.label"),
-      validationSchema: zipCodeSchema,
+      validationSchema: z.string().min(1, t("Clients.form.zip_code.required")),
     },
-    { accessorKey: "notes", header: t("Clients.form.notes.label"), validationSchema: notesSchema },
+    {
+      accessorKey: "notes",
+      header: t("Clients.form.notes.label"),
+      validationSchema: z.string().optional(),
+    },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
@@ -89,7 +101,7 @@ const ClientsTable = ({
     getRowId: (row: Client) => row.id!,
     onRowSelectionChange: (updater: any) => {
       const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
-      const selectedRows = unsortedData.filter((row) => newSelection[row.id!]);
+      const selectedRows = data.filter((row) => newSelection[row.id!]);
       handleRowSelectionChange(selectedRows);
     },
   };
@@ -101,14 +113,19 @@ const ClientsTable = ({
   return (
     <SheetTable
       columns={columns}
-      data={unsortedData}
+      data={data}
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
-      onActionClicked={onActionClicked}
+      canEditAction={canEditClient}
+      canDuplicateAction={canDuplicateClient}
+      canViewAction={canViewClient}
+      canArchiveAction={canArchiveClient}
+      canDeleteAction={canDeleteClient}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={clientTableOptions}
+      onActionClicked={onActionClicked}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

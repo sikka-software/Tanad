@@ -8,7 +8,7 @@ export async function fetchJobListings(): Promise<JobListing[]> {
       throw new Error("User ID is required");
     }
 
-    const response = await fetch("/api/jobs/listings", {
+    const response = await fetch("/api/resources/job-listings", {
       headers: {
         "x-user-id": user.id,
       },
@@ -32,7 +32,7 @@ export async function bulkDeleteJobListings(ids: string[]): Promise<void> {
       throw new Error("User ID is required");
     }
 
-    const response = await fetch("/api/jobs/listings/bulk-delete", {
+    const response = await fetch("/api/resources/job-listings/bulk-delete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -63,7 +63,7 @@ export async function createJobListing(
       throw new Error("User ID is required");
     }
 
-    const response = await fetch("/api/jobs/listings/create", {
+    const response = await fetch("/api/resources/job-listings/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -88,7 +88,7 @@ export async function createJobListing(
 
 export async function updateJobListing(id: string, jobListing: Partial<JobListing>) {
   try {
-    const response = await fetch(`/api/jobs/listings/${id}`, {
+    const response = await fetch(`/api/resources/job-listings/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

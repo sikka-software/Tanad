@@ -6,8 +6,11 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useSalaryStore from "@/modules/salary/salary.store";
 import { Salary } from "@/modules/salary/salary.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateSalary } from "./salary.hooks";
 
@@ -19,17 +22,17 @@ const payPeriodStartSchema = z.string().min(1, "Required");
 const payPeriodEndSchema = z.string().min(1, "Required");
 const notesSchema = z.string().optional();
 
-interface SalariesTableProps {
-  data: Salary[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
-
-const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
+const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Salary>) => {
   const t = useTranslations();
   const { mutateAsync: updateSalary } = useUpdateSalary();
   const selectedRows = useSalaryStore((state) => state.selectedRows);
   const setSelectedRows = useSalaryStore((state) => state.setSelectedRows);
+
+  const canEditSalary = useUserStore((state) => state.hasPermission("salaries.update"));
+  const canDuplicateSalary = useUserStore((state) => state.hasPermission("salaries.duplicate"));
+  const canViewSalary = useUserStore((state) => state.hasPermission("salaries.view"));
+  const canArchiveSalary = useUserStore((state) => state.hasPermission("salaries.archive"));
+  const canDeleteSalary = useUserStore((state) => state.hasPermission("salaries.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
@@ -138,8 +141,23 @@ const SalariesTable = ({ data, isLoading, error }: SalariesTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditSalary}
+      canDuplicateAction={canDuplicateSalary}
+      canViewAction={canViewSalary}
+      canArchiveAction={canArchiveSalary}
+      canDeleteAction={canDeleteSalary}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={salaryTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

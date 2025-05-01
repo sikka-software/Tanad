@@ -10,12 +10,13 @@ const models = [
   "employee-requests",
   "salaries",
   "jobs",
+
   "companies",
   "departments",
-  "jobListings",
+  "job-listings",
   "expenses",
   "purchases",
-  "quotes", 
+  "quotes",
   "roles",
   "users",
 ];

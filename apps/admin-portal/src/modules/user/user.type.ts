@@ -1,9 +1,13 @@
-import type { InferModel } from "drizzle-orm";
-
-import type { profiles } from "@/db/schema";
+import { Profile } from "@/lib/types";
 
 // Base type from schema
-export type User = InferModel<typeof profiles>;
+export type UserType = {
+  id: string;
+  email: string;
+  role: string;
+  enterprise_id: string;
+  created_at: string;
+};
 
 // Create data type - Define properties explicitly
 export interface UserCreateData {

@@ -6,53 +6,71 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useOfficeStore from "@/modules/office/office.store";
 import { Office } from "@/modules/office/office.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateOffice } from "./office.hooks";
 
-const nameSchema = z.string().min(1, "Required");
-const emailSchema = z.string().email("Invalid email");
-const phoneSchema = z.string().min(1, "Required");
-const addressSchema = z.string().min(1, "Required");
-const citySchema = z.string().min(1, "Required");
-const stateSchema = z.string().min(1, "Required");
-const zipCodeSchema = z.string().min(1, "Required");
-const notesSchema = z.string().optional();
-
-interface OfficesTableProps {
-  data: Office[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
-
-const OfficesTable = ({ data, isLoading, error }: OfficesTableProps) => {
+const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Office>) => {
   const t = useTranslations();
   const { mutate: updateOffice } = useUpdateOffice();
 
   const selectedRows = useOfficeStore((state) => state.selectedRows);
   const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
 
+  const canEditOffice = useUserStore((state) => state.hasPermission("offices.update"));
+  const canDuplicateOffice = useUserStore((state) => state.hasPermission("offices.duplicate"));
+  const canViewOffice = useUserStore((state) => state.hasPermission("offices.view"));
+  const canArchiveOffice = useUserStore((state) => state.hasPermission("offices.archive"));
+  const canDeleteOffice = useUserStore((state) => state.hasPermission("offices.delete"));
+
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Office>[] = [
-    { accessorKey: "name", header: t("Offices.form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "email", header: t("Offices.form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "phone", header: t("Offices.form.phone.label"), validationSchema: phoneSchema },
+    {
+      accessorKey: "name",
+      header: t("Offices.form.name.label"),
+      validationSchema: z.string().min(1, t("Offices.form.name.required")),
+    },
+    {
+      accessorKey: "email",
+      header: t("Offices.form.email.label"),
+      validationSchema: z.string().email(t("Offices.form.email.invalid")),
+    },
+    {
+      accessorKey: "phone",
+      header: t("Offices.form.phone.label"),
+      validationSchema: z.string().min(1, t("Offices.form.phone.required")),
+    },
     {
       accessorKey: "address",
       header: t("Offices.form.address.label"),
-      validationSchema: addressSchema,
+      validationSchema: z.string().min(1, t("Offices.form.address.required")),
     },
-    { accessorKey: "city", header: t("Offices.form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("Offices.form.state.label"), validationSchema: stateSchema },
+    {
+      accessorKey: "city",
+      header: t("Offices.form.city.label"),
+      validationSchema: z.string().min(1, t("Offices.form.city.required")),
+    },
+    {
+      accessorKey: "state",
+      header: t("Offices.form.state.label"),
+      validationSchema: z.string().min(1, t("Offices.form.state.required")),
+    },
     {
       accessorKey: "zip_code",
       header: t("Offices.form.zip_code.label"),
-      validationSchema: zipCodeSchema,
+      validationSchema: z.string().min(1, t("Offices.form.zip_code.required")),
     },
-    { accessorKey: "notes", header: t("Offices.form.notes.label"), validationSchema: notesSchema },
+    {
+      accessorKey: "notes",
+      header: t("Offices.form.notes.label"),
+      validationSchema: z.string().optional(),
+    },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
@@ -102,8 +120,23 @@ const OfficesTable = ({ data, isLoading, error }: OfficesTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditOffice}
+      canDuplicateAction={canDuplicateOffice}
+      canViewAction={canViewOffice}
+      canArchiveAction={canArchiveOffice}
+      canDeleteAction={canDeleteOffice}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={officeTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

@@ -11,6 +11,7 @@
     "inactive": "غير نشط",
     "archive": "أرشيف",
     "enterprises": "المؤسسات",
+    "invalid_date": "تاريخ غير صالح",
     "add_enterprise": "إضافة مؤسسة",
     "view": "عرض",
     "actions": "العمليات",
@@ -2550,7 +2551,8 @@
       },
       "department": {
         "label": "القسم",
-        "placeholder": "أدخل القسم"
+        "placeholder": "أدخل القسم",
+        "required": "القسم مطلوب"
       },
       "type": {
         "label": "نوع الوظيفة",
@@ -2559,11 +2561,13 @@
         "part_time": "دوام جزئي",
         "contract": "عقد",
         "internship": "تدريب",
-        "temporary": "مؤقت"
+        "temporary": "مؤقت",
+        "required": "نوع الوظيفة مطلوب"
       },
       "salary": {
         "label": "الراتب",
-        "placeholder": "أدخل الراتب"
+        "placeholder": "أدخل الراتب",
+        "required": "الراتب مطلوب"
       },
       "status": {
         "label": "الحالة",

@@ -6,62 +6,75 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useWarehouseStore from "@/modules/warehouse/warehouse.store";
 import { Warehouse } from "@/modules/warehouse/warehouse.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateWarehouse } from "./warehouse.hooks";
 
-const nameSchema = z.string().min(1, "Required");
-const codeSchema = z.string().min(1, "Required");
-const addressSchema = z.string().min(1, "Required");
-const citySchema = z.string().min(1, "Required");
-const stateSchema = z.string().min(1, "Required");
-const zipCodeSchema = z.string().min(1, "Required");
-const capacitySchema = z.number().min(0, "Must be >= 0").optional();
-const notesSchema = z.string().optional();
-
-interface WarehouseTableProps {
-  data: Warehouse[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
-
-const WarehouseTable = ({ data, isLoading, error }: WarehouseTableProps) => {
+const WarehouseTable = ({
+  data,
+  isLoading,
+  error,
+  onActionClicked,
+}: ModuleTableProps<Warehouse>) => {
   const t = useTranslations();
   const { mutateAsync: updateWarehouse } = useUpdateWarehouse();
   const selectedRows = useWarehouseStore((state) => state.selectedRows);
   const setSelectedRows = useWarehouseStore((state) => state.setSelectedRows);
 
+  const canEditWarehouse = useUserStore((state) => state.hasPermission("warehouses.update"));
+  const canDuplicateWarehouse = useUserStore((state) =>
+    state.hasPermission("warehouses.duplicate"),
+  );
+  const canViewWarehouse = useUserStore((state) => state.hasPermission("warehouses.view"));
+  const canArchiveWarehouse = useUserStore((state) => state.hasPermission("warehouses.archive"));
+  const canDeleteWarehouse = useUserStore((state) => state.hasPermission("warehouses.delete"));
+
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Warehouse>[] = [
-    { accessorKey: "name", header: t("Warehouses.form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "code", header: t("Warehouses.form.code.label"), validationSchema: codeSchema },
+    {
+      accessorKey: "name",
+      header: t("Warehouses.form.name.label"),
+      validationSchema: z.string().min(1, t("Warehouses.form.name.required")),
+    },
+    {
+      accessorKey: "code",
+      header: t("Warehouses.form.code.label"),
+      validationSchema: z.string().min(1, t("Warehouses.form.code.required")),
+    },
     {
       accessorKey: "address",
       header: t("Warehouses.form.address.label"),
-      validationSchema: addressSchema,
+      validationSchema: z.string().min(1, t("Warehouses.form.address.required")),
     },
-    { accessorKey: "city", header: t("Warehouses.form.city.label"), validationSchema: citySchema },
+    {
+      accessorKey: "city",
+      header: t("Warehouses.form.city.label"),
+      validationSchema: z.string().min(1, t("Warehouses.form.city.required")),
+    },
     {
       accessorKey: "state",
       header: t("Warehouses.form.state.label"),
-      validationSchema: stateSchema,
+      validationSchema: z.string().min(1, t("Warehouses.form.state.required")),
     },
     {
       accessorKey: "zip_code",
       header: t("Warehouses.form.zip_code.label"),
-      validationSchema: zipCodeSchema,
+      validationSchema: z.string().min(1, t("Warehouses.form.zip_code.required")),
     },
     {
       accessorKey: "capacity",
       header: t("Warehouses.form.capacity.label"),
-      validationSchema: capacitySchema,
+      validationSchema: z.number().min(0, t("Warehouses.form.capacity.invalid")),
     },
     {
       accessorKey: "notes",
       header: t("Warehouses.form.notes.label"),
-      validationSchema: notesSchema,
+      validationSchema: z.string().optional(),
     },
   ];
 
@@ -113,8 +126,23 @@ const WarehouseTable = ({ data, isLoading, error }: WarehouseTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditWarehouse}
+      canDuplicateAction={canDuplicateWarehouse}
+      canViewAction={canViewWarehouse}
+      canArchiveAction={canArchiveWarehouse}
+      canDeleteAction={canDeleteWarehouse}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={warehouseTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

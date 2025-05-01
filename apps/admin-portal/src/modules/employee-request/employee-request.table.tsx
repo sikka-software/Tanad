@@ -8,26 +8,40 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
 import { EmployeeRequest } from "@/modules/employee-request/employee-request.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateEmployeeRequest } from "./employee-request.hooks";
 
-const titleSchema = z.string().min(1, "Required");
-const descriptionSchema = z.string().optional();
-const notesSchema = z.string().optional();
-
-interface EmployeeRequestsTableProps {
-  data: EmployeeRequest[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
-
-const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTableProps) => {
+const EmployeeRequestsTable = ({
+  data,
+  isLoading,
+  error,
+  onActionClicked,
+}: ModuleTableProps<EmployeeRequest>) => {
   const t = useTranslations();
   const { mutate: updateEmployeeRequest } = useUpdateEmployeeRequest();
   const setSelectedRows = useEmployeeRequestsStore((state) => state.setSelectedRows);
   const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
+
+  const canEditEmployeeRequest = useUserStore((state) =>
+    state.hasPermission("employee-requests.update"),
+  );
+  const canDuplicateEmployeeRequest = useUserStore((state) =>
+    state.hasPermission("employee-requests.duplicate"),
+  );
+  const canViewEmployeeRequest = useUserStore((state) =>
+    state.hasPermission("employee-requests.view"),
+  );
+  const canArchiveEmployeeRequest = useUserStore((state) =>
+    state.hasPermission("employee-requests.archive"),
+  );
+  const canDeleteEmployeeRequest = useUserStore((state) =>
+    state.hasPermission("employee-requests.delete"),
+  );
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
@@ -44,7 +58,7 @@ const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTable
     {
       accessorKey: "title",
       header: t("EmployeeRequests.form.title.label"),
-      validationSchema: titleSchema,
+      validationSchema: z.string().min(1, t("EmployeeRequests.form.title.required")),
     },
     {
       accessorKey: "status",
@@ -84,12 +98,12 @@ const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTable
     {
       accessorKey: "description",
       header: t("EmployeeRequests.form.description.label"),
-      validationSchema: descriptionSchema,
+      validationSchema: z.string().nullable(),
     },
     {
       accessorKey: "notes",
       header: t("EmployeeRequests.form.notes.label"),
-      validationSchema: notesSchema,
+      validationSchema: z.string().nullable(),
     },
   ];
 
@@ -137,14 +151,28 @@ const EmployeeRequestsTable = ({ data, isLoading, error }: EmployeeRequestsTable
 
   return (
     <SheetTable
-      id="employee-request-table"
       columns={columns}
       data={data}
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditEmployeeRequest}
+      canDuplicateAction={canDuplicateEmployeeRequest}
+      canViewAction={canViewEmployeeRequest}
+      canArchiveAction={canArchiveEmployeeRequest}
+      canDeleteAction={canDeleteEmployeeRequest}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={employeeRequestTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

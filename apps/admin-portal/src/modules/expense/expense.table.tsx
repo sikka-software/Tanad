@@ -6,32 +6,25 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useExpenseStore from "@/modules/expense/expense.store";
 import { Expense } from "@/modules/expense/expense.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateExpense } from "./expense.hooks";
 
-const expense_numberSchema = z.string().min(1, "Required");
-const issue_dateSchema = z.string().min(1, "Required");
-const due_dateSchema = z.string().min(1, "Required");
-const statusSchema = z.enum(["pending", "paid", "overdue"]);
-const amountSchema = z.number().min(0, "Required");
-const categorySchema = z.string().min(1, "Required");
-const notesSchema = z.string().nullable();
-const clientIdSchema = z.string().min(1, "Required");
-
-interface ExpensesTableProps {
-  data: Expense[];
-  isLoading?: boolean;
-  error?: Error | null;
-  onActionClicked: (action: string, rowId: string) => void;
-}
-
-const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ExpensesTableProps) => {
+const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Expense>) => {
   const t = useTranslations();
   const { mutate: updateExpense } = useUpdateExpense();
   const selectedRows = useExpenseStore((state) => state.selectedRows);
   const setSelectedRows = useExpenseStore((state) => state.setSelectedRows);
+
+  const canEditExpense = useUserStore((state) => state.hasPermission("expenses.update"));
+  const canDuplicateExpense = useUserStore((state) => state.hasPermission("expenses.duplicate"));
+  const canViewExpense = useUserStore((state) => state.hasPermission("expenses.view"));
+  const canArchiveExpense = useUserStore((state) => state.hasPermission("expenses.archive"));
+  const canDeleteExpense = useUserStore((state) => state.hasPermission("expenses.delete"));
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
@@ -40,28 +33,28 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ExpensesTabl
     {
       accessorKey: "expense_number",
       header: t("Expenses.form.expense_number.label"),
-      validationSchema: expense_numberSchema,
+      validationSchema: z.string().min(1, t("Expenses.form.expense_number.required")),
     },
     {
       accessorKey: "issue_date",
       header: t("Expenses.form.issue_date.label"),
-      validationSchema: issue_dateSchema,
+      validationSchema: z.string().min(1, t("Expenses.form.issue_date.required")),
     },
     {
       accessorKey: "due_date",
       header: t("Expenses.form.due_date.label"),
-      validationSchema: due_dateSchema,
+      validationSchema: z.string().min(1, t("Expenses.form.due_date.required")),
     },
     {
       accessorKey: "status",
       header: t("Expenses.form.status.label"),
-      validationSchema: statusSchema,
+      validationSchema: z.string().min(1, t("Expenses.form.status.required")),
       cell: ({ row }) => t(`Expenses.form.status.${row.getValue("status")}`),
     },
     {
       accessorKey: "amount",
       header: t("Expenses.form.amount.label"),
-      validationSchema: amountSchema,
+      validationSchema: z.number().min(0, t("Expenses.form.amount.required")),
       cell: ({ row }) => {
         const amount = row.getValue("amount");
         return new Intl.NumberFormat("en-US", {
@@ -73,17 +66,17 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ExpensesTabl
     {
       accessorKey: "category",
       header: t("Expenses.form.category.label"),
-      validationSchema: categorySchema,
+      validationSchema: z.string().min(1, t("Expenses.form.category.required")),
     },
     {
       accessorKey: "notes",
       header: t("Expenses.form.notes.label"),
-      validationSchema: notesSchema,
+      validationSchema: z.string().nullable(),
     },
     {
       accessorKey: "client_id",
       header: t("Expenses.form.client_id.label"),
-      validationSchema: clientIdSchema,
+      validationSchema: z.string().min(1, t("Expenses.form.client_id.required")),
     },
   ];
 
@@ -135,9 +128,22 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ExpensesTabl
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      canEditAction={canEditExpense}
+      canDuplicateAction={canDuplicateExpense}
+      canViewAction={canViewExpense}
+      canArchiveAction={canArchiveExpense}
+      canDeleteAction={canDeleteExpense}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={expenseTableOptions}
       onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

@@ -13,7 +13,7 @@ export interface Office {
   enterprise_id: string;
 }
 
-export type OfficeCreateData = Omit<Office, "id" | "created_at"> & {
+export type OfficeCreateData = Omit<Office, "id" | "created_at" | "updated_at"> & {
   user_id?: string;
 };
 

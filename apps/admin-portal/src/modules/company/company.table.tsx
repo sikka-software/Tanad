@@ -6,33 +6,15 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useCompanyStore from "@/modules/company/company.store";
 import { Company } from "@/modules/company/company.type";
 import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateCompany } from "./company.hooks";
 
-const nameSchema = z.string().min(1, "Required");
-const industrySchema = z.string().optional();
-const emailSchema = z.string().email("Invalid email").min(1, "Required");
-const phoneSchema = z.string().optional();
-const websiteSchema = z.string().url("Invalid URL").optional();
-const addressSchema = z.string().optional();
-const citySchema = z.string().optional();
-const stateSchema = z.string().optional();
-const zipCodeSchema = z.string().optional();
-const sizeSchema = z.number().min(0, "Must be >= 0").optional();
-const is_activeSchema = z.boolean();
-const notesSchema = z.string().optional();
-
-interface CompaniesTableProps {
-  data: Company[];
-  isLoading?: boolean;
-  error?: Error | null;
-  onActionClicked: (action: string, rowId: string) => void;
-}
-
-const CompaniesTable = ({ data, isLoading, error, onActionClicked }: CompaniesTableProps) => {
+const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Company>) => {
   const t = useTranslations();
   const { mutate: updateCompany } = useUpdateCompany();
 
@@ -48,53 +30,65 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: CompaniesTa
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Company>[] = [
-    { accessorKey: "name", header: t("Companies.form.name.label"), validationSchema: nameSchema },
+    {
+      accessorKey: "name",
+      header: t("Companies.form.name.label"),
+      validationSchema: z.string().min(1, t("Companies.form.name.required")),
+    },
     {
       accessorKey: "industry",
       header: t("Companies.form.industry.label"),
-      validationSchema: industrySchema,
+      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "email",
       header: t("Companies.form.email.label"),
-      validationSchema: emailSchema,
+      validationSchema: z.string().email(t("Companies.form.email.invalid")),
     },
     {
       accessorKey: "phone",
       header: t("Companies.form.phone.label"),
-      validationSchema: phoneSchema,
+      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "website",
       header: t("Companies.form.website.label"),
-      validationSchema: websiteSchema,
+      validationSchema: z.string().url(t("Companies.form.website.invalid")),
     },
     {
       accessorKey: "address",
       header: t("Companies.form.address.label"),
-      validationSchema: addressSchema,
+      validationSchema: z.string().optional(),
     },
-    { accessorKey: "city", header: t("Companies.form.city.label"), validationSchema: citySchema },
+    {
+      accessorKey: "city",
+      header: t("Companies.form.city.label"),
+      validationSchema: z.string().optional(),
+    },
     {
       accessorKey: "state",
       header: t("Companies.form.state.label"),
-      validationSchema: stateSchema,
+      validationSchema: z.string().optional(),
     },
     {
       accessorKey: "zip_code",
       header: t("Companies.form.zip_code.label"),
-      validationSchema: zipCodeSchema,
+      validationSchema: z.string().optional(),
     },
-    { accessorKey: "size", header: t("Companies.form.size.label"), validationSchema: sizeSchema },
+    {
+      accessorKey: "size",
+      header: t("Companies.form.size.label"),
+      validationSchema: z.number().min(0, t("Companies.form.size.invalid")),
+    },
     {
       accessorKey: "is_active",
       header: t("Companies.form.is_active.label"),
-      validationSchema: is_activeSchema,
+      validationSchema: z.boolean(),
     },
     {
       accessorKey: "notes",
       header: t("Companies.form.notes.label"),
-      validationSchema: notesSchema,
+      validationSchema: z.string().optional(),
     },
   ];
 

@@ -6,47 +6,79 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import useVendorsStore from "@/modules/vendor/vendor.store";
-import { Vendor } from "@/modules/vendor/vendor.type";
+import { ModuleTableProps } from "@/types/common.type";
+
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateVendor } from "./vendor.hooks";
+import useVendorsStore from "./vendor.store";
+import { Vendor } from "./vendor.type";
 
-const nameSchema = z.string().min(1, "Required");
-const companySchema = z.string().optional();
-const emailSchema = z.string().email("Invalid email").min(1, "Required");
-const phoneSchema = z.string().min(1, "Required");
-const addressSchema = z.string().min(1, "Required");
-const citySchema = z.string().min(1, "Required");
-const stateSchema = z.string().min(1, "Required");
-const zipCodeSchema = z.string().min(1, "Required");
-const productsSchema = z.string().optional();
-const notesSchema = z.string().optional();
-
-interface VendorsTableProps {
-  data: Vendor[];
-  isLoading?: boolean;
-  error?: Error | null;
-}
-
-const VendorsTable = ({ data, isLoading, error }: VendorsTableProps) => {
+const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Vendor>) => {
   const t = useTranslations("Vendors");
   const { mutateAsync: updateVendor } = useUpdateVendor();
   const selectedRows = useVendorsStore((state) => state.selectedRows);
   const setSelectedRows = useVendorsStore((state) => state.setSelectedRows);
 
+  const canEditVendor = useUserStore((state) => state.hasPermission("vendors.update"));
+  const canDuplicateVendor = useUserStore((state) => state.hasPermission("vendors.duplicate"));
+  const canViewVendor = useUserStore((state) => state.hasPermission("vendors.view"));
+  const canArchiveVendor = useUserStore((state) => state.hasPermission("vendors.archive"));
+  const canDeleteVendor = useUserStore((state) => state.hasPermission("vendors.delete"));
+
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Vendor>[] = [
-    { accessorKey: "name", header: t("form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "company", header: t("form.company.label"), validationSchema: companySchema },
-    { accessorKey: "email", header: t("form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "phone", header: t("form.phone.label"), validationSchema: phoneSchema },
-    { accessorKey: "address", header: t("form.address.label"), validationSchema: addressSchema },
-    { accessorKey: "city", header: t("form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("form.state.label"), validationSchema: stateSchema },
-    { accessorKey: "zip_code", header: t("form.zip_code.label"), validationSchema: zipCodeSchema },
-    { accessorKey: "products", header: t("form.products.label"), validationSchema: productsSchema },
-    { accessorKey: "notes", header: t("form.notes.label"), validationSchema: notesSchema },
+    {
+      accessorKey: "name",
+      header: t("form.name.label"),
+      validationSchema: z.string().min(1, t("form.name.required")),
+    },
+    {
+      accessorKey: "company",
+      header: t("form.company.label"),
+      validationSchema: z.string().optional(),
+    },
+    {
+      accessorKey: "email",
+      header: t("form.email.label"),
+      validationSchema: z.string().email(t("form.email.invalid")).min(1, t("form.email.required")),
+    },
+    {
+      accessorKey: "phone",
+      header: t("form.phone.label"),
+      validationSchema: z.string().optional(),
+    },
+    {
+      accessorKey: "address",
+      header: t("form.address.label"),
+      validationSchema: z.string().min(1, t("form.address.required")),
+    },
+    {
+      accessorKey: "city",
+      header: t("form.city.label"),
+      validationSchema: z.string().min(1, t("form.city.required")),
+    },
+    {
+      accessorKey: "state",
+      header: t("form.state.label"),
+      validationSchema: z.string().min(1, t("form.state.required")),
+    },
+    {
+      accessorKey: "zip_code",
+      header: t("form.zip_code.label"),
+      validationSchema: z.string().min(1, t("form.zip_code.required")),
+    },
+    {
+      accessorKey: "products",
+      header: t("form.products.label"),
+      validationSchema: z.string().optional(),
+    },
+    {
+      accessorKey: "notes",
+      header: t("form.notes.label"),
+      validationSchema: z.string().optional(),
+    },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
@@ -94,8 +126,23 @@ const VendorsTable = ({ data, isLoading, error }: VendorsTableProps) => {
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
+      enableRowActions={true}
+      canEditAction={canEditVendor}
+      canDuplicateAction={canDuplicateVendor}
+      canViewAction={canViewVendor}
+      canArchiveAction={canArchiveVendor}
+      canDeleteAction={canDeleteVendor}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={vendorTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

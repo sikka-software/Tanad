@@ -1,4 +1,4 @@
-import { Office } from "@/modules/office/office.type";
+import { Office, OfficeCreateData } from "@/modules/office/office.type";
 
 export async function fetchOffices(): Promise<Office[]> {
   try {
@@ -27,7 +27,7 @@ export async function fetchOfficeById(id: string): Promise<Office> {
   }
 }
 
-export async function createOffice(office: Omit<Office, "id" | "created_at">): Promise<Office> {
+export async function createOffice(office: OfficeCreateData): Promise<Office> {
   try {
     const response = await fetch("/api/resource/offices", {
       method: "POST",

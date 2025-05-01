@@ -21,12 +21,7 @@ import useDepartmentStore from "@/modules/department/department.store";
 import { Department } from "@/modules/department/department.type";
 import { useOffices } from "@/modules/office/office.hooks";
 import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
-
-const nameSchema = z.string().min(1, "Required");
-const descriptionSchema = z.string().min(1, "Required");
-const locationSchema = z.string().min(1, "Required");
-const created_atSchema = z.string().min(1, "Required");
-const updated_atSchema = z.string().min(1, "Required");
+import useUserStore from "@/stores/use-user-store";
 
 interface DepartmentsTableProps {
   data: Department[];
@@ -43,6 +38,14 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
   const { data: branches } = useBranches();
   const { data: warehouses } = useWarehouses();
 
+  const canEditDepartment = useUserStore((state) => state.hasPermission("departments.update"));
+  const canDuplicateDepartment = useUserStore((state) =>
+    state.hasPermission("departments.duplicate"),
+  );
+  const canViewDepartment = useUserStore((state) => state.hasPermission("departments.view"));
+  const canArchiveDepartment = useUserStore((state) => state.hasPermission("departments.archive"));
+  const canDeleteDepartment = useUserStore((state) => state.hasPermission("departments.delete"));
+
   const selectedRows = useDepartmentStore((state) => state.selectedRows);
   const setSelectedRows = useDepartmentStore((state) => state.setSelectedRows);
 
@@ -52,19 +55,19 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
     {
       accessorKey: "name",
       header: t("Departments.form.name.label"),
-      validationSchema: nameSchema,
+      validationSchema: z.string().min(1, t("Departments.form.name.required")),
       className: "min-w-[200px]",
     },
     {
       accessorKey: "description",
       header: t("Departments.form.description.label"),
-      validationSchema: descriptionSchema,
+      validationSchema: z.string().min(1, t("Departments.form.description.required")),
       className: "min-w-[250px]",
     },
     {
       accessorKey: "locations",
       header: t("Departments.form.locations.label"),
-      validationSchema: locationSchema,
+      validationSchema: z.array(z.string()).min(1, t("Departments.form.locations.required")),
       className: "min-w-[200px]",
       cell: ({ row }) => {
         const locations = row.original.locations || [];
@@ -107,13 +110,13 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
     {
       accessorKey: "created_at",
       header: t("Departments.form.created_at.label"),
-      validationSchema: created_atSchema,
+      validationSchema: z.string().min(1, t("Departments.form.created_at.required")),
       className: "min-w-[180px]",
     },
     {
       accessorKey: "updated_at",
       header: t("Departments.form.updated_at.label"),
-      validationSchema: updated_atSchema,
+      validationSchema: z.string().min(1, t("Departments.form.updated_at.required")),
       className: "min-w-[180px]",
     },
   ];
@@ -179,13 +182,18 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
     <SheetTable
       columns={columns}
       data={data}
+      onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
-      onEdit={handleEdit}
-      onActionClicked={onActionClicked}
+      canEditAction={canEditDepartment}
+      canDuplicateAction={canDuplicateDepartment}
+      canViewAction={canViewDepartment}
+      canArchiveAction={canArchiveDepartment}
+      canDeleteAction={canDeleteDepartment}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={departmentTableOptions}
+      onActionClicked={onActionClicked}
       texts={{
         actions: t("General.actions"),
         edit: t("General.edit"),

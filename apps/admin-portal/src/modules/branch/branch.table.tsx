@@ -6,8 +6,11 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useBranchStore from "@/modules/branch/branch.store";
 import { Branch } from "@/modules/branch/branch.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateBranch } from "./branch.hooks";
 
@@ -22,18 +25,17 @@ const emailSchema = z.string().email().nullable();
 const managerSchema = z.string().nullable();
 const isActiveSchema = z.boolean();
 
-interface BranchesTableProps {
-  data: Branch[];
-  isLoading?: boolean;
-  error?: Error | null;
-  onActionClicked: (action: string, rowId: string) => void;
-}
-
-const BranchesTable = ({ data, isLoading, error, onActionClicked }: BranchesTableProps) => {
+const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Branch>) => {
   const t = useTranslations();
   const { mutate: updateBranch } = useUpdateBranch();
   const selectedRows = useBranchStore((state) => state.selectedRows);
   const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
+
+  const canEditBranch = useUserStore((state) => state.hasPermission("branches.update"));
+  const canDuplicateBranch = useUserStore((state) => state.hasPermission("branches.duplicate"));
+  const canViewBranch = useUserStore((state) => state.hasPermission("branches.view"));
+  const canArchiveBranch = useUserStore((state) => state.hasPermission("branches.archive"));
+  const canDeleteBranch = useUserStore((state) => state.hasPermission("branches.delete"));
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
@@ -115,6 +117,11 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: BranchesTabl
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      canEditAction={canEditBranch}
+      canDuplicateAction={canDuplicateBranch}
+      canViewAction={canViewBranch}
+      canArchiveAction={canArchiveBranch}
+      canDeleteAction={canDeleteBranch}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={branchTableOptions}
       onActionClicked={onActionClicked}

@@ -7,30 +7,25 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { ModuleTableProps } from "@/types/common.type";
+
 import useJobsStore from "@/modules/job/job.store";
 import { Job } from "@/modules/job/job.type";
+import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateJob } from "./job.hooks";
 
-const titleSchema = z.string().min(1, "Required");
-const typeSchema = z.string().min(1, "Required");
-const departmentSchema = z.string().min(1, "Required");
-const locationSchema = z.string().min(1, "Required");
-const salarySchema = z.number().min(0, "Salary must be positive");
-const is_activeSchema = z.boolean();
-
-interface JobTableProps {
-  data: Job[];
-  isLoading?: boolean;
-  error?: Error | null;
-  onActionClicked: (action: string, rowId: string) => void;
-}
-
-const JobTable = ({ data, isLoading, error, onActionClicked }: JobTableProps) => {
+const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Job>) => {
   const t = useTranslations();
   const { mutateAsync: updateJob } = useUpdateJob();
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const selectedRows = useJobsStore((state) => state.selectedRows);
+
+  const canEditJob = useUserStore((state) => state.hasPermission("jobs.update"));
+  const canDuplicateJob = useUserStore((state) => state.hasPermission("jobs.duplicate"));
+  const canViewJob = useUserStore((state) => state.hasPermission("jobs.view"));
+  const canArchiveJob = useUserStore((state) => state.hasPermission("jobs.archive"));
+  const canDeleteJob = useUserStore((state) => state.hasPermission("jobs.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
@@ -38,34 +33,34 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: JobTableProps) =>
     {
       accessorKey: "title",
       header: t("Jobs.form.title.label"),
-      validationSchema: titleSchema,
+      validationSchema: z.string().min(1, t("Jobs.form.title.required")),
     },
     {
       accessorKey: "type",
       header: t("Jobs.form.type.label"),
-      validationSchema: typeSchema,
+      validationSchema: z.string().min(1, t("Jobs.form.type.required")),
     },
     {
       accessorKey: "department",
       header: t("Jobs.form.department.label"),
-      validationSchema: departmentSchema,
+      validationSchema: z.string().min(1, t("Jobs.form.department.required")),
     },
     {
       accessorKey: "location",
       header: t("Jobs.form.location.label"),
-      validationSchema: locationSchema,
+      validationSchema: z.string().min(1, t("Jobs.form.location.required")),
     },
     {
       accessorKey: "salary",
       header: t("Jobs.form.salary.label"),
-      validationSchema: salarySchema,
+      validationSchema: z.number().min(0, t("Jobs.form.salary.required")),
       cell: (props: CellContext<Job, unknown>) =>
         props.row.original.salary ? `$${Number(props.row.original.salary).toFixed(2)}` : "N/A",
     },
     {
       accessorKey: "is_active",
       header: t("Jobs.form.is_active.label"),
-      validationSchema: is_activeSchema,
+      validationSchema: z.boolean(),
       cell: (props: CellContext<Job, unknown>) => (props.row.original.is_active ? "Yes" : "No"),
     },
   ];
@@ -114,16 +109,28 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: JobTableProps) =>
 
   return (
     <SheetTable
-      id="job-table"
       columns={columns}
       data={data}
       onEdit={handleEdit}
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
-      onActionClicked={onActionClicked}
+      canEditAction={canEditJob}
+      canDuplicateAction={canDuplicateJob}
+      canViewAction={canViewJob}
+      canArchiveAction={canArchiveJob}
+      canDeleteAction={canDeleteJob}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={jobTableOptions}
+      onActionClicked={onActionClicked}
+      texts={{
+        actions: t("General.actions"),
+        edit: t("General.edit"),
+        duplicate: t("General.duplicate"),
+        view: t("General.view"),
+        archive: t("General.archive"),
+        delete: t("General.delete"),
+      }}
     />
   );
 };

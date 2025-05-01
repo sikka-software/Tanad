@@ -1,23 +1,31 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import NoPermission from "@/components/ui/no-permission";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import OfficeCard from "@/modules/office/office.card";
-import { useOffices, useBulkDeleteOffices } from "@/modules/office/office.hooks";
+import { OfficeForm } from "@/modules/office/office.form";
+import {
+  useOffices,
+  useBulkDeleteOffices,
+  useDuplicateOffice,
+} from "@/modules/office/office.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/office/office.options";
 import useOfficeStore from "@/modules/office/office.store";
 import OfficesTable from "@/modules/office/office.table";
+import { OfficeUpdateData } from "@/modules/office/office.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function OfficesPage() {
@@ -26,10 +34,16 @@ export default function OfficesPage() {
   const canReadOffices = useUserStore((state) => state.hasPermission("offices.read"));
   const canCreateOffices = useUserStore((state) => state.hasPermission("offices.create"));
 
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableOffice, setActionableOffice] = useState<OfficeUpdateData | null>(null);
+
+  const loadingSaveOffice = useOfficeStore((state) => state.isLoading);
+  const setLoadingSaveOffice = useOfficeStore((state) => state.setIsLoading);
   const viewMode = useOfficeStore((state) => state.viewMode);
   const isDeleteDialogOpen = useOfficeStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useOfficeStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useOfficeStore((state) => state.selectedRows);
+  const setSelectedRows = useOfficeStore((state) => state.setSelectedRows);
   const clearSelection = useOfficeStore((state) => state.clearSelection);
   const sortRules = useOfficeStore((state) => state.sortRules);
   const sortCaseSensitive = useOfficeStore((state) => state.sortCaseSensitive);
@@ -39,6 +53,8 @@ export default function OfficesPage() {
   const filterCaseSensitive = useOfficeStore((state) => state.filterCaseSensitive);
   const getFilteredOffices = useOfficeStore((state) => state.getFilteredData);
   const getSortedOffices = useOfficeStore((state) => state.getSortedData);
+
+  const { mutate: duplicateOffice } = useDuplicateOffice();
 
   const { data: offices, isLoading, error } = useOffices();
   const { mutateAsync: deleteOffices, isPending: isDeleting } = useBulkDeleteOffices();
@@ -61,6 +77,38 @@ export default function OfficesPage() {
   const sortedOffices = useMemo(() => {
     return getSortedOffices(filteredOffices);
   }, [filteredOffices, sortRules, sortCaseSensitive, sortNullsFirst]);
+
+  const onActionClicked = async (action: string, rowId: string) => {
+    if (action === "edit") {
+      setIsFormDialogOpen(true);
+      setActionableOffice(offices?.find((office) => office.id === rowId) || null);
+    }
+
+    if (action === "delete") {
+      setSelectedRows([rowId]);
+      setIsDeleteDialogOpen(true);
+    }
+
+    if (action === "duplicate") {
+      const toastId = toast.loading(t("General.loading_operation"), {
+        description: t("Offices.loading.duplicating"),
+      });
+      await duplicateOffice(rowId, {
+        onSuccess: () => {
+          toast.success(t("General.successful_operation"), {
+            description: t("Offices.success.duplicated"),
+          });
+          toast.dismiss(toastId);
+        },
+        onError: () => {
+          toast.error(t("General.error_operation"), {
+            description: t("Offices.error.duplicating"),
+          });
+          toast.dismiss(toastId);
+        },
+      });
+    }
+  };
 
   if (!canReadOffices) {
     return <NoPermission />;
@@ -95,6 +143,7 @@ export default function OfficesPage() {
               data={sortedOffices}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
@@ -109,6 +158,28 @@ export default function OfficesPage() {
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Offices.add_new")}
+          formId="office-form"
+          loadingSave={loadingSaveOffice}
+        >
+          <OfficeForm
+            id={"office-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableOffice(null);
+              setLoadingSaveOffice(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("Offices.success.updated"),
+              });
+            }}
+            defaultValues={actionableOffice}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

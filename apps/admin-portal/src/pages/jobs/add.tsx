@@ -15,12 +15,14 @@ import { generateDummyData } from "@/lib/dummy-generator";
 import { JobForm, type JobFormValues } from "@/modules/job/job.form";
 import { jobKeys } from "@/modules/job/job.hooks";
 import { createJob } from "@/modules/job/job.service";
+import useJobStore from "@/modules/job/job.store";
 
 export default function AddJobPage() {
   const t = useTranslations();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const queryClient = useQueryClient();
+
+  const isLoading = useJobStore((state) => state.isLoading);
+  const setIsLoading = useJobStore((state) => state.setIsLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -45,24 +47,27 @@ export default function AddJobPage() {
       <PageTitle
         formButtons
         formId="job-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/jobs")}
         texts={{
           title: t("Jobs.add_new"),
           submit_form: t("Jobs.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
+        dummyButton={handleDummyData}
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <JobForm id="job-form" />
+        <JobForm
+          id="job-form"
+          onSuccess={() => {
+            setIsLoading(false);
+            router.push("/jobs");
+            toast.success(t("General.successful_operation"), {
+              description: t("Jobs.success.created"),
+            });
+          }}
+        />
       </div>
     </div>
   );
