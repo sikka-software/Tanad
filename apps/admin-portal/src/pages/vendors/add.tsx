@@ -50,19 +50,17 @@ export default function AddVendorPage() {
         dummyButton={handleDummyData}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <VendorForm
-          id="vendor-form"
-          onSuccess={() => {
-            router.push("/vendors").then(() => {
-              setIsLoading(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Vendors.success.created"),
-              });
+      <VendorForm
+        id="vendor-form"
+        onSuccess={() => {
+          router.push("/vendors").then(() => {
+            setIsLoading(false);
+            toast.success(t("General.successful_operation"), {
+              description: t("Vendors.success.created"),
             });
-          }}
-        />
-      </div>
+          });
+        }}
+      />
     </div>
   );
 }

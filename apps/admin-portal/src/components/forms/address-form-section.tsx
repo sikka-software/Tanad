@@ -34,9 +34,11 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
 
   return (
     <div>
-      <h1 className="text-lg font-medium">{title}</h1>
-      <Separator className="mb-6" />
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="bg-muted top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
+        <h2 className="ms-2 text-xl font-bold">{title}</h2>
+      </div>
+
+      <div className="mx-auto grid max-w-2xl grid-cols-1 gap-4 p-4 md:grid-cols-2">
         <FormField
           control={control}
           name="short_address"

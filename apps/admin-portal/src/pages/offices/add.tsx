@@ -47,16 +47,14 @@ export default function AddOfficePage() {
         dummyButton={handleDummyData}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <OfficeForm
-          id="office-form"
-          onSuccess={() =>
-            router.push("/offices").then(() => {
-              setIsLoading(false);
-            })
-          }
-        />
-      </div>
+      <OfficeForm
+        id="office-form"
+        onSuccess={() =>
+          router.push("/offices").then(() => {
+            setIsLoading(false);
+          })
+        }
+      />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { Input } from "@/ui/input";
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
 import PhoneInput from "@/components/ui/phone-input";
+import { Textarea } from "@/components/ui/textarea";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -22,6 +23,7 @@ const createOfficeSchema = (t: (key: string) => string) => {
     name: z.string().min(1, t("Offices.form.name.required")),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
+    notes: z.string().optional().or(z.literal("")),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -137,66 +139,81 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
 
   return (
     <Form {...form}>
-      <form
-        id={id || "office-form"}
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-4"
-      >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Offices.form.name.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  disabled={isLoading}
-                  placeholder={t("Offices.form.name.placeholder")}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form id={id || "office-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Offices.form.name.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    disabled={isLoading}
+                    placeholder={t("Offices.form.name.placeholder")}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Offices.form.email.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  dir="ltr"
-                  {...field}
-                  type="email"
-                  disabled={isLoading}
-                  placeholder={t("Offices.form.email.placeholder")}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Offices.form.email.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    dir="ltr"
+                    {...field}
+                    type="email"
+                    disabled={isLoading}
+                    placeholder={t("Offices.form.email.placeholder")}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
-              <FormControl>
-                <PhoneInput
-                  value={field.value || ""}
-                  onChange={(value) => field.onChange(value || null)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
+                <FormControl>
+                  <PhoneInput
+                    value={field.value || ""}
+                    onChange={(value) => field.onChange(value || null)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Vendors.form.notes.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={t("Vendors.form.notes.placeholder")}
+                    {...field}
+                    value={field.value ?? ""}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <AddressFormSection
           title={t("Offices.form.address")}
           control={form.control}

@@ -81,6 +81,14 @@ export function CompanyForm({
       size: defaultValues?.size || "",
       notes: defaultValues?.notes || "",
       is_active: defaultValues?.is_active || true,
+      short_address: defaultValues?.short_address || "",
+      additional_number: defaultValues?.additional_number || "",
+      building_number: defaultValues?.building_number || "",
+      street_name: defaultValues?.street_name || "",
+      city: defaultValues?.city || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
+      zip_code: defaultValues?.zip_code || "",
     },
   });
 
@@ -212,103 +220,122 @@ export function CompanyForm({
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.name.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.name.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.email.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    dir="ltr"
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.email.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.phone.label")}</FormLabel>
-                <FormControl>
-                  <PhoneInput value={field.value || ""} onChange={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="website"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.website.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    dir="ltr"
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.website.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <form id={id} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.name.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.name.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.email.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      dir="ltr"
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.email.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.phone.label")}</FormLabel>
+                  <FormControl>
+                    <PhoneInput value={field.value || ""} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="website"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.website.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      dir="ltr"
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.website.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
+            <FormField
+              control={form.control}
+              name="industry"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.industry.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.industry.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="size"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.size.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.size.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
-            name="industry"
+            name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Companies.form.industry.label")}</FormLabel>
+                <FormLabel>{t("Companies.form.notes.label")}</FormLabel>
                 <FormControl>
-                  <Input
+                  <Textarea
                     disabled={isLoading}
-                    placeholder={t("Companies.form.industry.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="size"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.size.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.size.placeholder")}
+                    placeholder={t("Companies.form.notes.placeholder")}
                     {...field}
                   />
                 </FormControl>
@@ -322,24 +349,6 @@ export function CompanyForm({
           title={t("Companies.form.address")}
           control={form.control}
           isLoading={isLoading}
-        />
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Companies.form.notes.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  disabled={isLoading}
-                  placeholder={t("Companies.form.notes.placeholder")}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
         />
       </form>
     </Form>

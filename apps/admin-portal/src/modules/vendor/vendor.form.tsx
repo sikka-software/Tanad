@@ -12,7 +12,7 @@ import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
-import NumberInput from "@/components/ui/number-input";
+import { createAddressSchema } from "@/components/forms/address-schema";
 import PhoneInput from "@/components/ui/phone-input";
 
 import {
@@ -28,18 +28,19 @@ import type { VendorUpdateData } from "@/vendor/vendor.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-export const createVendorSchema = (t: (key: string) => string) =>
-  z.object({
+export const createVendorSchema = (t: (key: string) => string) => {
+  const baseVendorSchema = z.object({
     name: z.string().min(1, t("Vendors.form.name.required")),
     email: z.string().email(t("Vendors.form.email.invalid")),
     phone: z.string().min(1, t("Vendors.form.phone.required")),
     company: z.string().optional(),
-    address: z.string().min(1, t("Vendors.form.address.required")),
-    city: z.string().min(1, t("Vendors.form.city.required")),
-    state: z.string().min(1, t("Vendors.form.state.required")),
-    zip_code: z.string().min(5, t("Vendors.form.zip_code.required")),
     notes: z.string().nullable(),
   });
+
+  const addressSchema = createAddressSchema(t);
+
+  return baseVendorSchema.merge(addressSchema);
+};
 
 export type VendorFormValues = z.input<ReturnType<typeof createVendorSchema>>;
 
@@ -70,9 +71,12 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
       email: "",
       phone: "",
       company: "",
-      address: "",
+      short_address: "",
+      building_number: "",
+      street_name: "",
       city: "",
-      state: "",
+      region: "",
+      country: "",
       zip_code: "",
       notes: "",
     },
@@ -109,10 +113,13 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
               email: data.email.trim(),
               phone: data.phone.trim(),
               company: data.company || undefined,
-              address: data.address.trim(),
-              city: data.city.trim(),
-              state: data.state.trim(),
-              zip_code: data.zip_code.trim(),
+              short_address: data.short_address?.trim() || undefined,
+              building_number: data.building_number?.trim() || undefined,
+              street_name: data.street_name?.trim() || undefined,
+              city: data.city?.trim() || undefined,
+              region: data.region?.trim() || undefined,
+              country: data.country?.trim() || undefined,
+              zip_code: data.zip_code?.trim() || undefined,
               notes: data.notes?.trim() || null,
             },
           },
@@ -132,10 +139,13 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
             email: data.email.trim(),
             phone: data.phone.trim(),
             company: data.company || undefined,
-            address: data.address.trim(),
-            city: data.city.trim(),
-            state: data.state.trim(),
-            zip_code: data.zip_code.trim(),
+            short_address: data.short_address?.trim() || undefined,
+            building_number: data.building_number?.trim() || undefined,
+            street_name: data.street_name?.trim() || undefined,
+            city: data.city?.trim() || undefined,
+            region: data.region?.trim() || undefined,
+            country: data.country?.trim() || undefined,
+            zip_code: data.zip_code?.trim() || undefined,
             notes: data.notes?.trim() || null,
             enterprise_id: membership?.enterprise_id || "",
             user_id: profile?.id || "",
@@ -162,89 +172,106 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
   return (
     <>
       <Form {...form}>
-        <form
-          id={id || "vendor-form"}
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-4"
-        >
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <form id={id || "vendor-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Vendors.form.name.label")} *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t("Vendors.form.name.placeholder")}
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="company"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Vendors.form.company.label")}</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        data={companyOptions.map((opt) => ({ ...opt, value: opt.label }))}
+                        isLoading={companiesLoading}
+                        defaultValue={field.value}
+                        onChange={(value) => field.onChange(value || null)}
+                        texts={{
+                          placeholder: t("Vendors.form.company.placeholder"),
+                          searchPlaceholder: t("Companies.search_companies"),
+                          noItems: t("Companies.no_companies_found"),
+                        }}
+                        addText={t("Companies.add_new")}
+                        onAddClick={() => setIsCompanyDialogOpen(true)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Vendors.form.email.label")} *</FormLabel>
+                    <FormControl>
+                      <Input
+                        dir="ltr"
+                        type="email"
+                        placeholder={t("Vendors.form.email.placeholder")}
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Vendors.form.phone.label")} *</FormLabel>
+                    <FormControl>
+                      <PhoneInput
+                        value={field.value || ""}
+                        onChange={(value) => field.onChange(value || null)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="name"
+              name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Vendors.form.name.label")} *</FormLabel>
+                  <FormLabel>{t("Vendors.form.notes.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("Vendors.form.name.placeholder")}
+                    <Textarea
+                      placeholder={t("Vendors.form.notes.placeholder")}
                       {...field}
+                      value={field.value ?? ""}
                       disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="company"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vendors.form.company.label")}</FormLabel>
-                  <FormControl>
-                    <ComboboxAdd
-                      direction={locale === "ar" ? "rtl" : "ltr"}
-                      data={companyOptions.map((opt) => ({ ...opt, value: opt.label }))}
-                      isLoading={companiesLoading}
-                      defaultValue={field.value}
-                      onChange={(value) => field.onChange(value || null)}
-                      texts={{
-                        placeholder: t("Vendors.form.company.placeholder"),
-                        searchPlaceholder: t("Companies.search_companies"),
-                        noItems: t("Companies.no_companies_found"),
-                      }}
-                      addText={t("Companies.add_new")}
-                      onAddClick={() => setIsCompanyDialogOpen(true)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vendors.form.email.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      dir="ltr"
-                      type="email"
-                      placeholder={t("Vendors.form.email.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vendors.form.phone.label")} *</FormLabel>
-                  <FormControl>
-                    <PhoneInput
-                      value={field.value || ""}
-                      onChange={(value) => field.onChange(value || null)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -254,28 +281,9 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
           </div>
 
           <AddressFormSection
-            title={t("Companies.form.address")}
+            title={t("Vendors.form.address.label")}
             control={form.control}
             isLoading={isLoading}
-          />
-
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Vendors.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Vendors.form.notes.placeholder")}
-                    {...field}
-                    value={field.value ?? ""}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
           />
         </form>
       </Form>

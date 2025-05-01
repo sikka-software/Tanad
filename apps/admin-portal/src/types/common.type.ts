@@ -53,4 +53,5 @@ export interface AddressProps {
   region?: string;
   country?: string;
   zip_code?: string;
+  additional_number?: string;
 }

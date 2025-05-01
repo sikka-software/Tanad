@@ -60,9 +60,7 @@ export default function AddCompanyPage() {
           cancel: t("General.cancel"),
         }}
       />
-      <div className="mx-auto max-w-2xl p-4">
-        <CompanyForm id="company-form" onSuccess={onAddSuccess} />
-      </div>
+      <CompanyForm id="company-form" onSuccess={onAddSuccess} />
     </div>
   );
 }
