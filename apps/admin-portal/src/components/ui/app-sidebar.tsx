@@ -272,17 +272,15 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" side={lang === "ar" ? "right" : "left"} className="z-50">
-      <SidebarHeader>
+      <SidebarHeader className="border-b">
         <div className="flex items-center gap-2">
           <EnterpriseSwitcher
             enterprises={[{ name: enterprise?.name || "", logo: Asterisk, plan: "" }]}
           />
         </div>
-      </SidebarHeader>
-      {state === "expanded" && (
-        <SidebarHeader className="px-2 py-2">
-          <div className="relative flex items-center gap-2 px-1.5">
-            <Search className="text-muted-foreground absolute start-4 size-4" />
+        {state === "expanded" && (
+          <div className="relative flex items-center gap-2">
+            <Search className="text-muted-foreground absolute start-2 size-4" />
             <Input
               type="text"
               placeholder={t("General.sidebar_search")}
@@ -291,8 +289,8 @@ export function AppSidebar() {
               className="h-8 ps-8"
             />
           </div>
-        </SidebarHeader>
-      )}
+        )}
+      </SidebarHeader>
       <SidebarContent>
         {searchableMenuGroups.Administration && searchableMenuGroups.Administration.length > 0 && (
           <NavMain title={t("Administration.title")} items={searchableMenuGroups.Administration} />
@@ -307,7 +305,7 @@ export function AppSidebar() {
           <NavMain title={t("Settings.title")} items={searchableMenuGroups.Settings} />
         )}
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="border-t">
         <SidebarUserFooter user={profile as ProfileType} />
       </SidebarFooter>
       <SidebarRail />

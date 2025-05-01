@@ -393,20 +393,20 @@ function getSettingsMenus(pathname: string): SidebarMenuGroupProps["items"] {
       url: "/roles",
       is_active: pathname === "/roles",
     },
-    {
-      title: "Billing",
-      translationKey: "Billing.title",
-      icon: CreditCard,
-      url: "/billing",
-      is_active: pathname === "/billing",
-    },
-    {
-      title: "Settings",
-      translationKey: "Settings.title",
-      icon: Settings,
-      url: "/settings",
-      is_active: pathname === "/settings",
-    },
+    // {
+    //   title: "Billing",
+    //   translationKey: "Billing.title",
+    //   icon: CreditCard,
+    //   url: "/billing",
+    //   is_active: pathname === "/billing",
+    // },
+    // {
+    //   title: "Settings",
+    //   translationKey: "Settings.title",
+    //   icon: Settings,
+    //   url: "/settings",
+    //   is_active: pathname === "/settings",
+    // },
   ];
 }
 
