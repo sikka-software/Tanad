@@ -8,6 +8,8 @@ import { useEffect } from "react";
 import { Card, CardContent } from "@/ui/card";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import LanguageSwitcher from "@/components/ui/language-switcher";
+import ThemeSwitcher from "@/components/ui/theme-switcher";
 
 import { OnboardingForm } from "@/modules/onboarding/onboarding.form";
 
@@ -35,7 +37,7 @@ export default function OnboardingPage() {
           src={`https://sikka-images.s3.ap-southeast-1.amazonaws.com/products/tanad/tanad_symbol_${
             !isMounted || resolvedTheme === "dark" ? "white" : "black"
           }.png`}
-          className="aspect-auto h-[30px] w-auto mb-4"
+          className="mb-4 aspect-auto h-[30px] w-auto"
           alt="Tanad Logo"
         />
         <h1 className="text-2xl font-semibold tracking-tight">{t("OnBoarding.title")}</h1>
@@ -49,6 +51,10 @@ export default function OnboardingPage() {
             <OnboardingForm />
           </CardContent>
         </Card>
+        <div className="flex flex-row justify-between">
+          <LanguageSwitcher />
+          <ThemeSwitcher />
+        </div>
       </div>
     </div>
   );

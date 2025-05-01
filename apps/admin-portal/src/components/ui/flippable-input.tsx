@@ -1,9 +1,11 @@
-import { PilcrowLeft } from "lucide-react";
+import { PilcrowLeft, PilcrowRight } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useLocale, useTranslations } from "next-intl";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-import { Button } from "./button";
+import IconButton from "./icon-button";
 
 function FlippableInput({
   className,
@@ -11,15 +13,45 @@ function FlippableInput({
   type,
   ...props
 }: React.ComponentProps<"input"> & { canFlipDirection?: boolean }) {
-  const [isFlipped, setIsFlipped] = React.useState(false);
+  const locale = useLocale();
+  const [isFlipped, setIsFlipped] = React.useState(locale === "ar");
+  const [isHovering, setIsHovering] = React.useState(false);
+  const t = useTranslations();
 
   return (
-    <div className="relative">
-      <div className={cn("absolute top-0.5 h-10 w-10", isFlipped ? "-end-1.5" : "start-0.5")}>
-        <Button variant="outline" size="icon_sm" onClick={() => setIsFlipped(!isFlipped)}>
-          <PilcrowLeft className="text-muted-foreground" />
-        </Button>
-      </div>
+    <div
+      className="relative"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      <AnimatePresence>
+        {canFlipDirection && isHovering && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.15, delay: 0.3 }}
+            className={cn(
+              "absolute top-0.5 h-10 w-10",
+              isFlipped ? "start-0.5 rtl:-end-1.5" : "-end-1.5 rtl:start-0.5",
+            )}
+          >
+            <IconButton
+              variant="ghost"
+              icon={
+                isFlipped ? (
+                  <PilcrowRight className="text-muted-foreground size-4" />
+                ) : (
+                  <PilcrowLeft className="text-muted-foreground size-4" />
+                )
+              }
+              label={!isFlipped ? t("General.switch_to_ltr") : t("General.switch_to_rtl")}
+              onClick={() => setIsFlipped(!isFlipped)}
+              className="size-8"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <input
         dir={isFlipped ? "rtl" : "ltr"}
         type={type}
