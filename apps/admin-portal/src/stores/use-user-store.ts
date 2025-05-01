@@ -1,4 +1,4 @@
-import { User } from "@supabase/supabase-js";
+import { Session, User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
 import { createClient } from "@/utils/supabase/component";
@@ -197,9 +197,17 @@ const useUserStore = create<UserState>((set, get) => ({
   },
 }));
 
+let session: Session | null = null;
+
+supabase.auth.getSession().then(async ({ data }) => {
+  if (data.session) {
+    session = data.session;
+  }
+});
+
 // Setup auth state change listener
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_IN") {
+supabase.auth.onAuthStateChange((event, _session) => {
+  if (event === "SIGNED_IN" && !session && _session) {
     useUserStore.getState().fetchUserAndProfile();
   } else if (event === "SIGNED_OUT") {
     useUserStore.setState({
