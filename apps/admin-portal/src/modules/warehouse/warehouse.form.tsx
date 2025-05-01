@@ -13,6 +13,7 @@ import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import CodeInput from "@/components/ui/code-input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -197,44 +198,29 @@ export function WarehouseForm({
                 <FormItem>
                   <FormLabel>{t("Warehouses.form.code.label")} *</FormLabel>
                   <FormControl>
-                    <div className="relative">
+                    <CodeInput
+                      onSerial={() => {
+                        const nextNumber = (warehouses?.length || 0) + 1;
+                        const paddedNumber = String(nextNumber).padStart(4, "0");
+                        form.setValue("code", `WH-${paddedNumber}`);
+                      }}
+                      onRandom={() => {
+                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        let randomCode = "";
+                        for (let i = 0; i < 5; i++) {
+                          randomCode += randomChars.charAt(
+                            Math.floor(Math.random() * randomChars.length),
+                          );
+                        }
+                        form.setValue("code", `WH-${randomCode}`);
+                      }}
+                    >
                       <Input
                         placeholder={t("Warehouses.form.code.placeholder")}
                         {...field}
                         disabled={loading}
                       />
-                      <DropdownMenu dir={locale === "ar" ? "rtl" : "ltr"}>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            size="icon_sm"
-                            type="button"
-                            variant="ghost"
-                            className="absolute end-0.5 top-0.5"
-                          >
-                            <Hash className="size-6" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              form.setValue("code", "WH-" + warehouses?.length);
-                            }}
-                          >
-                            <DiamondPlus /> {t("General.next_number")}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={(e) => {
-                              form.setValue(
-                                "code",
-                                "WH-" + Math.random().toString(36).substring(2, 15),
-                              );
-                            }}
-                          >
-                            <Shuffle /> {t("General.random_number")}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    </CodeInput>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

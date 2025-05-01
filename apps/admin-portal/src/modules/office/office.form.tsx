@@ -9,18 +9,20 @@ import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
+import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
 import { Textarea } from "@/components/ui/textarea";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateOffice, useUpdateOffice } from "./office.hooks";
+import { useCreateOffice, useOffices, useUpdateOffice } from "./office.hooks";
 import useOfficeStore from "./office.store";
 import { OfficeUpdateData } from "./office.type";
 
 const createOfficeSchema = (t: (key: string) => string) => {
   const baseOfficeSchema = z.object({
     name: z.string().min(1, t("Offices.form.name.required")),
+    code: z.string().min(1, t("Offices.form.code.required")),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
     notes: z.string().optional().or(z.literal("")),
@@ -42,6 +44,7 @@ interface OfficeFormProps {
 
 export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFormProps) {
   const t = useTranslations();
+  const { data: offices } = useOffices();
   const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();
   const { mutateAsync: updateOffice, isPending: isUpdating } = useUpdateOffice();
   const membership = useUserStore((state) => state.membership);
@@ -52,6 +55,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
     resolver: zodResolver(createOfficeSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
+      code: defaultValues?.code || "",
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
       short_address: defaultValues?.short_address || "",
@@ -79,6 +83,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
             id: defaultValues.id,
             office: {
               name: data.name.trim(),
+              code: data.code.trim(),
               short_address: data.short_address?.trim() || undefined,
               building_number: data.building_number?.trim() || undefined,
               street_name: data.street_name?.trim() || undefined,
@@ -106,6 +111,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
         await createOffice(
           {
             name: data.name.trim(),
+            code: data.code.trim(),
             short_address: data.short_address?.trim() || undefined,
             building_number: data.building_number?.trim() || undefined,
             street_name: data.street_name?.trim() || undefined,
@@ -141,24 +147,61 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
     <Form {...form}>
       <form id={id || "office-form"} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.name.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    disabled={isLoading}
-                    placeholder={t("Offices.form.name.placeholder")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Offices.form.name.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      disabled={isLoading}
+                      placeholder={t("Offices.form.name.placeholder")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Offices.form.code.label")}</FormLabel>
+                  <FormControl>
+                    <CodeInput
+                      onSerial={() => {
+                        const nextNumber = (offices?.length || 0) + 1;
+                        const paddedNumber = String(nextNumber).padStart(4, "0");
+                        form.setValue("code", `OF-${paddedNumber}`);
+                      }}
+                      onRandom={() => {
+                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        let randomCode = "";
+                        for (let i = 0; i < 5; i++) {
+                          randomCode += randomChars.charAt(
+                            Math.floor(Math.random() * randomChars.length),
+                          );
+                        }
+                        form.setValue("code", `OF-${randomCode}`);
+                      }}
+                    >
+                      <Input
+                        {...field}
+                        disabled={isLoading}
+                        placeholder={t("Offices.form.code.placeholder")}
+                      />
+                    </CodeInput>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="email"

@@ -7,7 +7,7 @@
     "language": "اللغة",
     "theme": "طابع الموقع",
     "next_number": "رقم تسلسلي",
-    "random_number": "رقم عشوائي",
+    "random": "عشوائي",
     "soon": "قريباً",
     "active": "نشط",
     "inactive": "غير نشط",
@@ -3070,6 +3070,11 @@
         "label": "الاسم",
         "placeholder": "أدخل اسم المكتب",
         "required": "الاسم مطلوب"
+      },
+      "code": {
+        "label": "الكود",
+        "placeholder": "أدخل الكود",
+        "required": "الكود مطلوب"
       },
       "address": {
         "label": "عنوان المكتب",

@@ -3,6 +3,7 @@ import { AddressProps } from "@/types/common.type";
 export interface OfficeProps {
   id: string;
   name: string;
+  code: string;
   email?: string;
   phone?: string;
   address?: string;

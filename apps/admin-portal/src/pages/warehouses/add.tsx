@@ -1,20 +1,13 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
-import PageTitle from "@/ui/page-title";
-
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import PageTitle from "@/components/ui/page-title";
 
-import { WarehouseForm, type WarehouseFormValues } from "@/warehouse/warehouse.form";
-import { warehouseKeys } from "@/warehouse/warehouse.hooks";
-import { createWarehouse } from "@/warehouse/warehouse.service";
-import useWarehouseStore from "@/warehouse/warehouse.store";
-import type { Warehouse, WarehouseCreateData } from "@/warehouse/warehouse.type";
+import { WarehouseForm } from "@/modules/warehouse/warehouse.form";
+import useWarehouseStore from "@/modules/warehouse/warehouse.store";
 
 export default function AddWarehousePage() {
   const t = useTranslations();
@@ -41,9 +34,9 @@ export default function AddWarehousePage() {
 
   const onAddSuccess = () => {
     toast.success(t("General.successful_operation"), {
-      description: t("Companies.success.created"),
+      description: t("Warehouses.success.created"),
     });
-    router.push("/companies");
+    router.push("/warehouses");
     setIsLoading(false);
   };
 
