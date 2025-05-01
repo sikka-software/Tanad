@@ -8,6 +8,9 @@ import { Combobox } from "@/ui/combobox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
+import NumberInput from "@/components/ui/number-input";
+import PhoneInput from "@/components/ui/phone-input";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateOffice, useUpdateOffice } from "./office.hooks";
@@ -136,7 +139,11 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
             <FormItem>
               <FormLabel>{t("Offices.form.name.label")}</FormLabel>
               <FormControl>
-                <Input {...field} disabled={isLoading} />
+                <Input
+                  {...field}
+                  disabled={isLoading}
+                  placeholder={t("Offices.form.name.placeholder")}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -150,7 +157,13 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
             <FormItem>
               <FormLabel>{t("Offices.form.email.label")}</FormLabel>
               <FormControl>
-                <Input {...field} type="email" disabled={isLoading} />
+                <Input
+                  dir="ltr"
+                  {...field}
+                  type="email"
+                  disabled={isLoading}
+                  placeholder={t("Offices.form.email.placeholder")}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -164,7 +177,10 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
             <FormItem>
               <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
               <FormControl>
-                <Input {...field} type="tel" disabled={isLoading} />
+                <PhoneInput
+                  value={field.value || ""}
+                  onChange={(value) => field.onChange(value || null)}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -178,7 +194,11 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
             <FormItem>
               <FormLabel>{t("Offices.form.address.label")}</FormLabel>
               <FormControl>
-                <Input {...field} disabled={isLoading} />
+                <Input
+                  {...field}
+                  disabled={isLoading}
+                  placeholder={t("Offices.form.address.placeholder")}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -193,7 +213,11 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
               <FormItem>
                 <FormLabel>{t("Offices.form.city.label")}</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={isLoading} />
+                  <Input
+                    {...field}
+                    disabled={isLoading}
+                    placeholder={t("Offices.form.city.placeholder")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -207,7 +231,11 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
               <FormItem>
                 <FormLabel>{t("Offices.form.state.label")}</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={isLoading} />
+                  <Input
+                    {...field}
+                    disabled={isLoading}
+                    placeholder={t("Offices.form.state.placeholder")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -221,7 +249,11 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
               <FormItem>
                 <FormLabel>{t("Offices.form.zip_code.label")}</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={isLoading} />
+                  <NumberInput
+                    {...field}
+                    disabled={isLoading}
+                    placeholder={t("Offices.form.zip_code.placeholder")}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
