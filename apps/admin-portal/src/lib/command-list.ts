@@ -11,6 +11,12 @@ export const commandList = [
         href: ModulesOptions.dashboard.url,
       },
       {
+        icon: ModulesOptions.companies.icon,
+        label: ModulesOptions.companies.label,
+        shortcut: "⌘C",
+        href: ModulesOptions.companies.url,
+      },
+      {
         icon: ModulesOptions.clients.icon,
         label: ModulesOptions.clients.label,
         shortcut: "⌘C",

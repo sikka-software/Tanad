@@ -12,6 +12,7 @@ import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
+import { createAddressSchema } from "@/components/forms/address-schema";
 import PhoneInput from "@/components/ui/phone-input";
 
 import { uploadDocument } from "@/services/documents";
@@ -22,8 +23,8 @@ import { CompanyUpdateData } from "@/company/company.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-export const createCompanySchema = (t: (key: string) => string) =>
-  z.object({
+export const createCompanySchema = (t: (key: string) => string) => {
+  const baseCompanySchema = z.object({
     name: z.string().min(1, t("Companies.form.validation.name_required")),
     email: z
       .string()
@@ -31,19 +32,16 @@ export const createCompanySchema = (t: (key: string) => string) =>
       .email(t("Companies.form.validation.email_invalid")),
     phone: z.string().optional(),
     website: z.string().optional(),
-    short_address: z.string().optional(),
-    building_number: z.string().optional(),
-    street_name: z.string().optional(),
-    city: z.string().optional(),
-    region: z.string().optional(),
-    country: z.string().optional(),
-    zip_code: z.string().optional(),
-    additional_number: z.string().optional(),
     industry: z.string().optional(),
     size: z.string().optional(),
     notes: z.string().optional(),
     is_active: z.boolean().default(true),
   });
+
+  const addressSchema = createAddressSchema(t);
+
+  return baseCompanySchema.merge(addressSchema);
+};
 
 export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
 
@@ -79,14 +77,8 @@ export function CompanyForm({
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
       website: defaultValues?.website || "",
-      short_address: defaultValues?.short_address || "",
-      building_number: defaultValues?.building_number || "",
-      street_name: defaultValues?.street_name || "",
-      city: defaultValues?.city || "",
-      region: defaultValues?.region || "",
-      country: defaultValues?.country || "",
-      zip_code: defaultValues?.zip_code || "",
-      additional_number: defaultValues?.additional_number || "",
+      industry: defaultValues?.industry || "",
+      size: defaultValues?.size || "",
       notes: defaultValues?.notes || "",
       is_active: defaultValues?.is_active || true,
     },
@@ -148,16 +140,19 @@ export function CompanyForm({
               name: data.name.trim(),
               email: data.email.trim(),
               phone: data.phone?.trim() || undefined,
+              website: data.website?.trim() || undefined,
+              industry: data.industry?.trim() || undefined,
+              size: data.size?.trim() || undefined,
+              notes: data.notes?.trim() || undefined,
+              is_active: data.is_active ?? true,
+              short_address: data.short_address?.trim() || undefined,
               building_number: data.building_number?.trim() || undefined,
               street_name: data.street_name?.trim() || undefined,
               city: data.city?.trim() || undefined,
               region: data.region?.trim() || undefined,
+              country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
               additional_number: data.additional_number?.trim() || undefined,
-              website: data.website?.trim() || undefined,
-              notes: data.notes?.trim() || undefined,
-              short_address: data.short_address?.trim() || undefined,
-              country: data.country?.trim() || undefined,
             },
           },
           {
@@ -175,6 +170,13 @@ export function CompanyForm({
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
+            website: data.website?.trim() || undefined,
+            industry: data.industry?.trim() || undefined,
+            size: data.size?.trim() || undefined,
+            notes: data.notes?.trim() || undefined,
+            is_active: data.is_active ?? true,
+            user_id: profile?.id || "",
+            short_address: data.short_address?.trim() || undefined,
             building_number: data.building_number?.trim() || undefined,
             street_name: data.street_name?.trim() || undefined,
             city: data.city?.trim() || undefined,
@@ -182,15 +184,9 @@ export function CompanyForm({
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
             additional_number: data.additional_number?.trim() || undefined,
-            website: data.website?.trim() || undefined,
-            notes: data.notes?.trim() || undefined,
-            short_address: data.short_address?.trim() || undefined,
-            is_active: true,
-            user_id: profile?.id || "",
           },
           {
             onSuccess: async (response) => {
-              // Upload documents after company is created
               if (response?.id) {
                 await uploadDocuments(response.id);
               }
@@ -210,7 +206,6 @@ export function CompanyForm({
     }
   };
 
-  // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
     (window as any).companyForm = form;
   }
@@ -346,21 +341,6 @@ export function CompanyForm({
             </FormItem>
           )}
         />
-
-        {/* <div className="space-y-4">
-          <DocumentUploader
-            entityType="company"
-            disabled={isLoading}
-            onDocumentsChange={setPendingDocuments}
-          />
-
-          {id && (
-            <div className="mt-4">
-              <h3 className="mb-2 text-sm font-medium">{t("Documents.attached_documents")}</h3>
-              <DocumentList entityId={id} entityType="company" />
-            </div>
-          )}
-        </div> */}
       </form>
     </Form>
   );

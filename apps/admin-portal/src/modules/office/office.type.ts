@@ -1,4 +1,6 @@
-export interface Office {
+import { AddressProps } from "@/types/common.type";
+
+export interface OfficeProps {
   id: string;
   name: string;
   email?: string;
@@ -12,6 +14,8 @@ export interface Office {
   updated_at: string;
   enterprise_id: string;
 }
+
+export interface Office extends OfficeProps, AddressProps {}
 
 export type OfficeCreateData = Omit<Office, "id" | "created_at" | "updated_at"> & {
   user_id?: string;

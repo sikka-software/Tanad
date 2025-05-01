@@ -11,6 +11,9 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import { AddressFormSection } from "@/components/forms/address-form-section";
+import { createAddressSchema } from "@/components/forms/address-schema";
+
 import { useCreateClient, useUpdateClient } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
 import { ClientUpdateData } from "@/client/client.type";
@@ -20,8 +23,8 @@ import { useCompanies } from "@/company/company.hooks";
 
 import useUserStore from "@/stores/use-user-store";
 
-export const createClientSchema = (t: (key: string) => string) =>
-  z.object({
+export const createClientSchema = (t: (key: string) => string) => {
+  const baseClientSchema = z.object({
     name: z.string().min(1, t("Clients.form.validation.name_required")),
     email: z
       .string()
@@ -29,12 +32,13 @@ export const createClientSchema = (t: (key: string) => string) =>
       .email(t("Clients.form.validation.email_invalid")),
     phone: z.string().min(1, t("Clients.form.validation.phone_required")),
     company: z.string().nullish(),
-    address: z.string().min(1, t("Clients.form.validation.address_required")),
-    city: z.string().min(1, t("Clients.form.validation.city_required")),
-    state: z.string().min(1, t("Clients.form.validation.state_required")),
-    zip_code: z.string().min(1, t("Clients.form.validation.zip_code_required")),
     notes: z.string().optional(),
   });
+
+  const addressSchema = createAddressSchema(t);
+
+  return baseClientSchema.merge(addressSchema);
+};
 
 export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
 
@@ -71,9 +75,12 @@ export function ClientForm({
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
       company: defaultValues?.company || undefined,
-      address: defaultValues?.address || "",
+      short_address: defaultValues?.short_address || "",
+      building_number: defaultValues?.building_number || "",
+      street_name: defaultValues?.street_name || "",
       city: defaultValues?.city || "",
-      state: defaultValues?.state || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
       notes: defaultValues?.notes || "",
     },
@@ -110,10 +117,13 @@ export function ClientForm({
               email: data.email.trim(),
               phone: data.phone.trim(),
               company: data.company || undefined,
-              address: data.address.trim(),
-              city: data.city.trim(),
-              state: data.state.trim(),
-              zip_code: data.zip_code.trim(),
+              short_address: data.short_address?.trim() || undefined,
+              building_number: data.building_number?.trim() || undefined,
+              street_name: data.street_name?.trim() || undefined,
+              city: data.city?.trim() || undefined,
+              region: data.region?.trim() || undefined,
+              country: data.country?.trim() || undefined,
+              zip_code: data.zip_code?.trim() || undefined,
               notes: data.notes?.trim() || null,
             },
           },
@@ -132,10 +142,13 @@ export function ClientForm({
             email: data.email.trim(),
             phone: data.phone.trim(),
             company: data.company || undefined,
-            address: data.address.trim(),
-            city: data.city.trim(),
-            state: data.state.trim(),
-            zip_code: data.zip_code.trim(),
+            short_address: data.short_address?.trim() || undefined,
+            building_number: data.building_number?.trim() || undefined,
+            street_name: data.street_name?.trim() || undefined,
+            city: data.city?.trim() || undefined,
+            region: data.region?.trim() || undefined,
+            country: data.country?.trim() || undefined,
+            zip_code: data.zip_code?.trim() || undefined,
             notes: data.notes?.trim() || null,
             enterprise_id: membership?.enterprise_id || "",
           },
@@ -250,63 +263,11 @@ export function ClientForm({
             />
           </div>
 
-          <FormField
+          <AddressFormSection
+            title={t("Clients.form.address")}
             control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Clients.form.address.label")} *</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("Clients.form.address.placeholder")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            isLoading={isLoading}
           />
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Clients.form.city.label")} *</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t("Clients.form.city.placeholder")} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="state"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Clients.form.state.label")} *</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t("Clients.form.state.placeholder")} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="zip_code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Clients.form.zip_code.label")} *</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t("Clients.form.zip_code.placeholder")} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
           <FormField
             control={form.control}

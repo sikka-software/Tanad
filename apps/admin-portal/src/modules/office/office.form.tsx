@@ -8,6 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
+import { createAddressSchema } from "@/components/forms/address-schema";
 import PhoneInput from "@/components/ui/phone-input";
 
 import useUserStore from "@/stores/use-user-store";
@@ -16,16 +17,17 @@ import { useCreateOffice, useUpdateOffice } from "./office.hooks";
 import useOfficeStore from "./office.store";
 import { OfficeUpdateData } from "./office.type";
 
-const createOfficeSchema = (t: (key: string) => string) =>
-  z.object({
+const createOfficeSchema = (t: (key: string) => string) => {
+  const baseOfficeSchema = z.object({
     name: z.string().min(1, t("Offices.form.name.required")),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
-    address: z.string().min(1, t("Offices.form.address.required")),
-    city: z.string().min(1, t("Offices.form.city.required")),
-    state: z.string().min(1, t("Offices.form.state.required")),
-    zip_code: z.string().min(1, t("Offices.form.zip_code.required")),
   });
+
+  const addressSchema = createAddressSchema(t);
+
+  return baseOfficeSchema.merge(addressSchema);
+};
 
 export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
 
@@ -50,9 +52,12 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
       name: defaultValues?.name || "",
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
-      address: defaultValues?.address || "",
+      short_address: defaultValues?.short_address || "",
+      building_number: defaultValues?.building_number || "",
+      street_name: defaultValues?.street_name || "",
       city: defaultValues?.city || "",
-      state: defaultValues?.state || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
     },
   });
@@ -72,9 +77,12 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
             id: defaultValues.id,
             office: {
               name: data.name.trim(),
-              address: data.address?.trim() || undefined,
+              short_address: data.short_address?.trim() || undefined,
+              building_number: data.building_number?.trim() || undefined,
+              street_name: data.street_name?.trim() || undefined,
               city: data.city?.trim() || undefined,
-              state: data.state?.trim() || undefined,
+              region: data.region?.trim() || undefined,
+              country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
             },
           },
@@ -96,9 +104,12 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
         await createOffice(
           {
             name: data.name.trim(),
-            address: data.address?.trim() || undefined,
+            short_address: data.short_address?.trim() || undefined,
+            building_number: data.building_number?.trim() || undefined,
+            street_name: data.street_name?.trim() || undefined,
             city: data.city?.trim() || undefined,
-            state: data.state?.trim() || undefined,
+            region: data.region?.trim() || undefined,
+            country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
             enterprise_id: membership.enterprise_id,
             is_active: true,

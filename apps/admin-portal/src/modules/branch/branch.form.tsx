@@ -10,26 +10,30 @@ import { Input } from "@/ui/input";
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
+import { AddressFormSection } from "@/components/forms/address-form-section";
+import { createAddressSchema } from "@/components/forms/address-schema";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateBranch, useUpdateBranch } from "./branch.hooks";
 import useBranchStore from "./branch.store";
 import { BranchUpdateData } from "./branch.type";
 
-export const createBranchSchema = (t: (key: string) => string) =>
-  z.object({
+export const createBranchSchema = (t: (key: string) => string) => {
+  const baseBranchSchema = z.object({
     name: z.string().min(1, t("Branches.form.name.required")),
     code: z.string().min(1, t("Branches.form.code.required")),
-    address: z.string().min(1, t("Branches.form.address.required")),
-    city: z.string().min(1, t("Branches.form.city.required")),
-    state: z.string().min(1, t("Branches.form.state.required")),
-    zip_code: z.string().min(1, t("Branches.form.zip_code.required")),
     phone: z.string().optional().or(z.literal("")),
     email: z.string().email().optional().or(z.literal("")),
     manager: z.string().optional().or(z.literal("")),
     is_active: z.boolean().default(true),
     notes: z.string().optional().or(z.literal("")),
   });
+
+  const addressSchema = createAddressSchema(t);
+
+  return baseBranchSchema.merge(addressSchema);
+};
 
 export type BranchFormValues = z.input<ReturnType<typeof createBranchSchema>>;
 
@@ -54,9 +58,12 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
     defaultValues: {
       name: defaultValues?.name || "",
       code: defaultValues?.code || "",
-      address: defaultValues?.address || "",
+      short_address: defaultValues?.short_address || "",
+      building_number: defaultValues?.building_number || "",
+      street_name: defaultValues?.street_name || "",
       city: defaultValues?.city || "",
-      state: defaultValues?.state || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
       phone: defaultValues?.phone || "",
       email: defaultValues?.email || "",
@@ -83,10 +90,6 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
             data: {
               name: data.name.trim(),
               code: data.code?.trim() || "",
-              address: data.address?.trim() || "",
-              city: data.city?.trim() || "",
-              state: data.state?.trim() || "",
-              zip_code: data.zip_code?.trim() || "",
               phone: data.phone?.trim() || null,
               email: data.email?.trim() || null,
               manager: data.manager?.trim() || null,
@@ -107,10 +110,6 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
           {
             name: data.name.trim(),
             code: data.code.trim(),
-            address: data.address?.trim() || "",
-            city: data.city?.trim() || "",
-            state: data.state?.trim() || "",
-            zip_code: data.zip_code?.trim() || "",
             phone: data.phone?.trim() || null,
             email: data.email?.trim() || null,
             manager: data.manager?.trim() || null,
@@ -186,80 +185,6 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Branches.form.address.label")} *</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t("Branches.form.address.placeholder")}
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Branches.form.city.label")} *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Branches.form.city.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Branches.form.state.label")} *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Branches.form.state.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="zip_code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Branches.form.zip_code.label")} *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Branches.form.zip_code.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <FormField
             control={form.control}
@@ -318,24 +243,11 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
           />
         </div>
 
-        {/* <FormField
+        <AddressFormSection
+          title={t("Branches.form.address")}
           control={form.control}
-          name="is_active"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">{t("Branches.form.is_active.label")}</FormLabel>
-              </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={isLoading}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        /> */}
+          isLoading={isLoading}
+        />
 
         <FormField
           control={form.control}
