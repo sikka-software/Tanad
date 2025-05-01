@@ -1,0 +1,132 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+### **2. Product Summary**
+**What is Tanad?**  
+Tanad (Arabic: تند) is a modular enterprise management platform designed to serve as the digital backbone for SMEs and large enterprises. It replaces the need for multiple disjointed apps by offering a unified solution for HR, invoicing, payroll, accounting, CRM, fleet management, and more.
+
+**Mission**: To simplify and unify enterprise operations through a localized, extensible, and fully digital system with compliance and localization at its core.  
+**Vision**: To be the most trusted enterprise platform in Saudi Arabia and the broader MENA region.  
+**Target Market**: SMEs and large enterprises in Saudi Arabia initially, with plans to expand to the GCC and MENA regions. Suitable for companies seeking full digitalization and operational unification.
+
+---
+
+### **3. Problem Statement**
+Modern enterprises typically rely on a patchwork of apps for different operational functions — one for HR, another for invoicing, another for expenses, etc. This leads to:
+
+- **Data Silos**: Information is trapped within separate systems (e.g., HR, finance, CRM), making it difficult to obtain a unified view of the business.  
+- **Redundant Manual Work**: Employees often re-enter the same data in different systems, wasting time and increasing the risk of human error.  
+- **Inconsistent Reporting**: Disconnected tools generate fragmented reports, making strategic planning and financial auditing unreliable.  
+- **High Operational Overhead**: Managing, maintaining, and training staff on multiple systems increases costs and complexity.  
+- **Regulatory Compliance Risks**: Siloed systems may fail to adhere to local regulations (e.g., ZATCA), exposing businesses to potential audits, fines, or legal consequences.  
+
+In Saudi Arabia, regulatory compliance (e.g., ZATCA e-invoicing mandates) and digital transformation initiatives are accelerating the need for unified, compliant, and fully digitized enterprise platforms.
+
+---
+
+### **4. Solution Overview: Tanad's Core Proposition**
+Tanad is a fully integrated and modular enterprise management platform designed with the following core principles:
+
+- **Centralization**: A single platform handling all key enterprise functions, eliminating the need for multiple, disconnected software tools. This improves organizational cohesion, data integrity, and management visibility across all departments.  
+- **Modularity**: Businesses can activate only the modules they need, making Tanad cost-efficient and adaptable. This ensures that each enterprise customizes the system based on current needs, with the flexibility to scale up as requirements evolve.  
+- **Interconnected Data**: All modules are interoperable for seamless data flow. For example, data entered in the HR module (e.g., new employee onboarding) automatically syncs with payroll, attendance, and accounting, minimizing duplication and improving accuracy.  
+- **Localization**: Designed specifically for Saudi business practices and regulatory frameworks such as ZATCA compliance and GOSI integration. The UI/UX, language support, tax structures, and official formats are tailored to Saudi and broader GCC expectations.  
+- **Scalability**: Suitable for both SMEs and large enterprises. Tanad can scale horizontally by adding new modules (e.g., inventory, procurement) and vertically by introducing more advanced features in each module (e.g., AI-driven analytics in accounting).
+
+---
+
+### **5. Core Modules and Features**
+#### **5.1 Invoicing**
+- **ZATCA Phase 2 Compliant Invoicing**: Automatically generates electronic invoices that meet Saudi Arabia's Phase 2 e-invoicing regulations, including QR codes, UUIDs, and digital signatures. Ensures legal compliance and audit-readiness.  
+- **Integrated Digital Payments**: Enables customers to pay directly through invoices using various methods such as credit cards, Mada (Saudi debit system), Apple Pay, and bank transfers. Payments are tracked in real-time, improving cash flow visibility.  
+- **Recurring/Subscription Billing**: Supports automated recurring invoices for subscription-based services. Customers are billed on a schedule, and automatic payment collection is possible through pre-authorized payment methods.  
+- **Accounting Integration**: Every invoice action (issue, payment, refund) is instantly reflected in the accounting ledger. This real-time synchronization eliminates manual entries and provides up-to-date financial snapshots.
+
+#### **5.2 HR Management**
+- **Employee Portal with Permissions and Access Control**: A secure, self-service interface where employees can view their profiles, submit requests, and track HR-related activities. Access is controlled based on role, department, or custom permissions to ensure data security and proper workflow delegation.  
+- **Leave and Time-Off Management**: Allows employees to request vacation, sick leave, or custom time-off types. Managers can review, approve, or reject requests, with the system automatically updating attendance records and notifying payroll.  
+- **Automated Onboarding Through Job Applicant Tracking**: New hires move seamlessly from candidate status to active employees with automated onboarding workflows. This includes document collection, initial training assignments, account provisioning, and role-based setup.  
+- **Salary and GOSI Integration** (Planned): Will enable automated salary calculation and submission to GOSI (Saudi Arabia’s social insurance system). Once integrated, the system will also handle GOSI contributions, deductions, and official reports.
+
+#### **5.3 Payroll**
+- **Salary Calculation Based on Attendance, Contracts, and Benefits**: The payroll engine computes salaries dynamically by aggregating inputs such as employee attendance logs, contract terms (fixed, hourly, commission-based), bonuses, and deductions. This ensures precise payouts in line with employee agreements.  
+- **Payslip Generation and Distribution**: Automatically generates detailed, compliant payslips each payroll cycle. Employees are notified through the portal or email and can securely access their payslips, which include breakdowns of earnings, deductions, and net salary.  
+- **Integration with HR and Accounting Modules**: Payroll is tightly integrated with HR for attendance and contract data, and with accounting for financial records and reporting. Salary payments, advances, and deductions are automatically reflected in the general ledger and expense reports.
+
+#### **5.4 Expense Management & Accounting**
+- **Capture, Categorize, and Analyze Expenses**: Allows users to upload receipts, tag expenses by category (e.g., travel, meals, utilities), and assign them to departments or projects. AI-powered categorization helps categorize new expenses based on historical data.  
+- **Automated Syncing with HR, Invoicing, and Payroll**: Reimbursable employee expenses submitted through the HR portal are automatically approved, processed, and reflected in payroll. Business-related costs linked to invoices or projects are automatically associated with the correct client or account in the system.  
+- **Real-Time Financial Reports**: Consolidated dashboards provide up-to-date overviews of spend by category, department, or employee. Monthly and quarterly reports can be exported or scheduled, offering key financial insights for decision-makers.  
+- **Multi-Currency and VAT Handling**: Supports tracking and converting expenses in different currencies with up-to-date exchange rates. Automatically handles VAT calculation and categorization for local and international expenses.  
+- **Approval Workflows and Audit Trails**: Custom approval rules can be configured based on expense type, amount, or department. Every change is logged to maintain audit trails for regulatory compliance and internal accountability.
+
+#### **5.5 CRM**
+- **Customer and Lead Tracking**: Maintain a unified record of customer and lead interactions, including contact details, communication history, and notes from sales representatives. Each lead can be tagged by status, source, and priority.  
+- **Sales Pipeline Management**: Visual sales pipelines allow tracking of leads and deals across custom stages (e.g., contacted, qualified, proposal sent, closed). Team members can assign tasks, set reminders, and update deal statuses in real-time.  
+- **Integration with Invoicing and Support Workflows**: Once a deal is marked as "won," a client record and invoice can be automatically created. Integration with support workflows ensures customer records are shared between sales and customer service for better retention and upselling.  
+- **Activity Logging and Notifications**: All activities such as calls, emails, meetings, and notes are logged per customer. Smart notifications alert team members of next actions or stalled leads.  
+- **Performance Dashboards**: Managers can monitor conversion rates, deal velocity, top-performing agents, and revenue forecasts through intuitive dashboards.
+
+#### **5.6 Attendance Tracking**
+- **Digital Check-In/Check-Out**: Employees can check in and out digitally, using mobile or web interfaces. The system records time stamps and can be optionally configured to track location via GPS for added accuracy, particularly for field workers.  
+- **Shift Scheduling and Overtime Tracking**: Managers can create, modify, and share shift schedules, while employees are notified of any updates or changes. The system automatically calculates overtime based on predefined rules and company policies, reducing errors in manual tracking.  
+- **Leave & Time-Off Requests**: Employees can submit leave requests for vacation, sick days, or personal time off. Managers review and approve requests, with the system syncing leave data automatically into payroll and attendance records.  
+- **Attendance and Payroll Integration**: Attendance data seamlessly integrates with payroll and HR, ensuring employees are paid for actual hours worked, including overtime or shift bonuses. This also aids in compliance with labor laws and company policies.  
+- **Real-Time Attendance Insights**: Dashboards provide real-time insights into employee attendance, punctuality, and shift adherence, allowing HR and management teams to act quickly on any issues (e.g., missed shifts, late arrivals).
+
+#### **5.7 Fleet Management**
+- **Vehicle Inventory and Status Tracking**: Maintain a centralized database of all company vehicles, including details on vehicle type, registration, service history, insurance, and fuel efficiency. Track real-time status and location of each vehicle.  
+- **Driver Assignment and Route History**: Assign vehicles to specific drivers and monitor their usage, including route history, mileage, and driving behavior. This data can be used for route optimization, fuel management, and ensuring drivers adhere to company policies.  
+- **Maintenance Scheduling and Alerts**: Set automatic maintenance reminders based on vehicle usage or time intervals. The system sends notifications when a vehicle is due for service, ensuring that fleet operations remain uninterrupted and compliant with safety regulations.  
+- **Fuel Management**: Track fuel consumption and expenses for each vehicle, analyze efficiency, and detect potential fuel misuse or discrepancies. Integration with the accounting module helps streamline fuel cost reporting and analysis.  
+- **Accident & Incident Reporting**: In the event of an accident or incident, fleet managers can quickly log details, track insurance claims, and coordinate repairs, ensuring minimal downtime. Data on incidents also helps inform future risk management strategies.  
+- **GPS and Geolocation**: Real-time GPS tracking for route monitoring and geofencing to ensure vehicles are operating within approved locations. Geolocation also helps optimize routes for efficiency and safety.
+
+---
+
+### **6. System Architecture**
+Tanad is built on a modern, modular, and extensible architecture optimized for flexibility, security, and deployment versatility. The system is designed to run efficiently in both cloud-hosted and on-premises environments using Docker.
+
+#### **6.1 Architecture Overview**
+- **Frontend & API**: Built with Next.js, the frontend serves both the UI and backend API endpoints, benefiting from fast server-side rendering, edge optimization, and seamless integration between interface and business logic.  
+- **Database & Realtime Backend**: Utilizes Supabase with a PostgreSQL database. Supabase provides authentication, real-time updates, row-level security (RLS), and simple integrations while PostgreSQL ensures robust, ACID-compliant data handling.  
+- **Containerization & Deployment**:  
+  - Packaged as a Docker image: `ghcr.io/sikka-software/tanad:admin`  
+  - Currently deployed via Coolify on a VPS.  
+  - Designed for portability and flexibility — can run on any infrastructure that supports Docker (e.g., AWS, Azure, local data centers).  
+  - Easily scalable by replicating containers and integrating load balancing.
+
+#### **6.2 Scalability**
+- Modular architecture allows horizontal scaling — each module (e.g., invoicing, HR, fleet) can be independently extended or optimized.  
+- Supports multi-tenant setups (planned), allowing different organizations to securely share infrastructure with isolated data.  
+- Supports vertical scaling by adding compute/memory resources per container.
+
+#### **6.3 Security
+
+**
+- Role-Based Access Control (RBAC) allows specific user permissions for each department/module.  
+- Multi-Factor Authentication (MFA) ensures secure login for all users.  
+- End-to-end encryption for all data in transit and at rest, meeting the highest security standards.
+
+---
+
+### **7. Data Flow & Interoperability**
+
+#### **7.1 Data Interoperability**
+Tanad is designed to ensure smooth and secure data flow across modules, reducing the risk of data duplication and errors while enabling better decision-making through interconnected data:
+
+- **HR → Payroll → Accounting**  
+- **CRM → Invoicing → Accounting**  
+- **Attendance → Payroll**  
+- **Expense Management → Accounting → HR**
+
+This ensures consistency and reliability across all modules.
+
+#### **7.2 Data Integrity & Smart Linking**
+Core entities such as employees, clients, products, and transactions are normalized within a relational schema, allowing data to be linked intelligently between modules through primary and foreign key relationships. Data integrity is maintained with strict foreign key constraints, ensuring no orphaned or incomplete records exist.
+
+#### **7.3 Real-Time Updates**
+Data entered in one module automatically syncs with others, thanks to real-time backend synchronization. For instance, when an employee updates their attendance, payroll and HR records are updated automatically.

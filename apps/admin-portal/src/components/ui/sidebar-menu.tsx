@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Collapsible,
   CollapsibleContent,
@@ -82,29 +83,36 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
   if (isCollapsed) {
     return (
       <SidebarMenuItem>
-        <DropdownMenu dir={locale === "ar" ? "rtl" : "ltr"}>
-          <DropdownMenuTrigger asChild>
+        <Popover>
+          <PopoverTrigger asChild>
             <SidebarMenuButton tooltip={t(item.translationKey)}>
               {item.icon && <item.icon />}
               <span>{t(item.translationKey)}</span>
             </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="right" align="start" className="min-w-56">
-            <DropdownMenuLabel>{t(item.translationKey)}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {item.items?.map((subItem) => (
-              <DropdownMenuItem
-                key={subItem.title}
-                asChild
-                className={cn(subItem.is_active && "bg-accent")}
-              >
-                <Link href={subItem.url} className="flex items-center justify-between gap-2">
+          </PopoverTrigger>
+          <PopoverContent
+            dir={locale === "ar" ? "rtl" : "ltr"}
+            side="right"
+            align="start"
+            className="min-w-32 p-0"
+          >
+            <div className="p-2">
+              <div className={cn("px-2 py-1.5 text-sm font-semibold")}>
+                {t(item.translationKey)}
+              </div>
+              <DropdownMenuSeparator className="mx-1" />
+              {item.items?.map((subItem) => (
+                <Link
+                  href={subItem.url}
+                  key={subItem.title}
+                  className="focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground relative flex cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                >
                   <span>{t(subItem.translationKey)}</span>
                   {subItem.action && (
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="!size-5 flex-shrink-0 !p-0"
+                      className="hover:bg-primary hover:text-primary-foreground !size-5 flex-shrink-0 cursor-pointer !p-0"
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -116,10 +124,10 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                     </Button>
                   )}
                 </Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
       </SidebarMenuItem>
     );
   }
