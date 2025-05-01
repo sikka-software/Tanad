@@ -1,12 +1,21 @@
 "use client";
 
 import { ChevronRight, Plus } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Collapsible,
   CollapsibleContent,
@@ -23,17 +32,32 @@ import {
   SidebarMenuSubItem,
   SidebarMenuAction,
   SidebarSeparator,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 import { SidebarMenuGroupProps } from "@/lib/sidebar-list";
 import { cn } from "@/lib/utils";
 
 export function NavMain({ title, items }: SidebarMenuGroupProps) {
+  const { state, isMobile } = useSidebar();
+  const isCollapsed = state === "collapsed" && !isMobile;
+
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{title}</SidebarGroupLabel>
+      <AnimatePresence>
+        {!isCollapsed && (
+          <motion.div
+            key={title}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <SidebarGroupLabel>{title}</SidebarGroupLabel>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <SidebarSeparator className="mb-2" />
-
       <SidebarMenu>
         {items.map((item, i) =>
           item.items ? (
@@ -52,6 +76,53 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
   const locale = useLocale();
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(item.is_active);
+  const { state, isMobile } = useSidebar();
+  const isCollapsed = state === "collapsed" && !isMobile;
+
+  if (isCollapsed) {
+    return (
+      <SidebarMenuItem>
+        <DropdownMenu dir={locale === "ar" ? "rtl" : "ltr"}>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton tooltip={t(item.translationKey)}>
+              {item.icon && <item.icon />}
+              <span>{t(item.translationKey)}</span>
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="right" align="start" className="min-w-56">
+            <DropdownMenuLabel>{t(item.translationKey)}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {item.items?.map((subItem) => (
+              <DropdownMenuItem
+                key={subItem.title}
+                asChild
+                className={cn(subItem.is_active && "bg-accent")}
+              >
+                <Link href={subItem.url} className="flex items-center justify-between gap-2">
+                  <span>{t(subItem.translationKey)}</span>
+                  {subItem.action && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="!size-5 flex-shrink-0 !p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        router.push(subItem.action!);
+                      }}
+                      aria-label={`Add new ${t(subItem.translationKey)}`}
+                    >
+                      <Plus className="!size-3" />
+                    </Button>
+                  )}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    );
+  }
 
   return (
     <Collapsible
@@ -108,23 +179,6 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                     <Plus className="!size-3" />
                     <span className="sr-only">More</span>
                   </SidebarMenuAction>
-
-                  //   <SidebarMenuAction>
-                  //     <Button
-                  //       variant="ghost"
-                  //       size="icon"
-                  //       className="m-auto !size-5 cursor-pointer !p-2 hover:border"
-                  //       onClick={(e) => {
-                  //         e.stopPropagation();
-                  //         e.preventDefault();
-                  //         if (subItem.action) {
-                  //           router.push(subItem.action);
-                  //         }
-                  //       }}
-                  //     >
-                  //       <Plus className="!size-3" />
-                  //     </Button>
-                  //   </SidebarMenuAction>
                 )}
               </SidebarMenuSubItem>
             ))}
