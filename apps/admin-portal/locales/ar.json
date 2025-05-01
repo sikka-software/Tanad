@@ -1371,18 +1371,32 @@
     "description": "أنشئ مؤسستك للبدء",
     "welcome_message": "قم بإعداد مؤسستك وابدأ في إدارة منظمتك بكفاءة.",
     "form": {
-      "enterprise_name": "اسم المؤسسة",
-      "enterprise_name_placeholder": "أدخل اسم مؤسستك",
-      "description": "الوصف",
-      "description_placeholder": "أخبرنا عن مؤسستك",
-      "logo": "رابط الشعار",
-      "logo_placeholder": "أدخل رابط شعار مؤسستك",
-      "email": "البريد الإلكتروني للمؤسسة",
-      "email_placeholder": "أدخل البريد الإلكتروني للمؤسسة",
-      "industry": "المجال",
-      "industry_placeholder": "اختر مجال عمل مؤسستك",
-      "size": "حجم المؤسسة",
-      "size_placeholder": "اختر حجم مؤسستك",
+      "enterprise_name": {
+        "label": "اسم المؤسسة",
+        "placeholder": "أدخل اسم مؤسستك",
+        "required": "اسم المؤسسة مطلوب"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أخبرنا عن مؤسستك"
+      },
+      "logo": {
+        "label": "رابط الشعار",
+        "placeholder": "أدخل رابط شعار مؤسستك"
+      },
+      "email": {
+        "label": "البريد الإلكتروني للمؤسسة",
+        "placeholder": "أدخل البريد الإلكتروني للمؤسسة",
+        "invalid": "البريد الإلكتروني غير صالح"
+      },
+      "industry": {
+        "label": "المجال",
+        "placeholder": "اختر مجال عمل مؤسستك"
+      },
+      "size": {
+        "label": "حجم المؤسسة",
+        "placeholder": "اختر حجم مؤسستك"
+      },
       "create_enterprise": "إنشاء المؤسسة"
     },
     "industry_options": {

@@ -23,7 +23,7 @@ const arabicFont = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
 });
 
-const authPages = ["/auth", "/reset-password"];
+const authPages = ["/auth", "/reset-password", "/onboarding"];
 const landingPages = [
   "/",
   "/features",
@@ -101,22 +101,6 @@ function AppContent({ Component, pageProps, router }: AppProps) {
     );
   }
 
-  // OnBoarding Pages
-  if (router.pathname === "/onboarding") {
-    return (
-      <div className={`${arabicFont.className}`}>
-        <NextIntlClientProvider
-          messages={pageProps.messages}
-          locale={router.locale}
-          timeZone="Asia/Riyadh"
-          now={new Date()}
-        >
-          <Component {...pageProps} />
-        </NextIntlClientProvider>
-      </div>
-    );
-  }
-
   // App Pages
   return (
     <div className={`${arabicFont.className}`}>
@@ -139,7 +123,7 @@ export default function App(props: AppProps) {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryProvider>
         <AppContent {...props} />
-        <DebugTools />
+        {process.env.NODE_ENV === "development" && <DebugTools />}
       </QueryProvider>
     </ThemeProvider>
   );

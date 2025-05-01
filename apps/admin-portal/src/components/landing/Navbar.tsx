@@ -98,20 +98,18 @@ const Navigation = () => {
                 </ul>
               </div>
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-2 sm:space-y-0 md:w-fit">
-          
                 <Button asChild variant="outline" size="sm">
-                  <Link href="#">
+                  <Link href="/auth">
                     <span>{t("Auth.sign_in")}</span>
                   </Link>
                 </Button>
                 <Button asChild size="sm">
-                  <Link href="#">
+                  <Link href="/auth#signup">
                     <span>{t("Auth.sign_up")}</span>
                   </Link>
                 </Button>
                 <ThemeSwitcher />
                 <LanguageSwitcher />
-
               </div>
             </div>
           </div>

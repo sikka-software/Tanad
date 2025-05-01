@@ -2,6 +2,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ import { createClient } from "@/utils/supabase/component";
 
 export default function Auth() {
   const t = useTranslations();
+  const router = useRouter();
   const lang = useLocale();
   const supabase = createClient();
   const { resolvedTheme } = useTheme();
@@ -30,10 +32,10 @@ export default function Auth() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
   const user = useUserStore((state) => state.user);
 
   useEffect(() => {
+    setIsSignUp(router.asPath.includes("#signup"));
     if (user) {
       // Check if there's a redirect path in sessionStorage
       const redirectPath = sessionStorage.getItem("redirectAfterAuth") || "/dashboard";
@@ -151,6 +153,10 @@ export default function Auth() {
     setMounted(true);
   }, []);
 
+  const logoSrc = `https://sikka-images.s3.ap-southeast-1.amazonaws.com/products/tanad/tanad_full_logo_${
+    !mounted || resolvedTheme === "dark" ? "white" : "black"
+  }${lang === "en" ? "_en" : "_ar"}.png`;
+
   // Return null or loading state before client-side mount
   if (!mounted) {
     return null;
@@ -159,11 +165,21 @@ export default function Auth() {
   return (
     <div
       dir={lang === "ar" ? "rtl" : "ltr"}
-      className="bg-background flex min-h-screen flex-col items-center justify-center py-12 sm:px-6 lg:px-8"
+      className="flex h-full flex-col items-center justify-center py-12 sm:px-6 lg:px-8"
     >
       <CustomPageMeta title={t("SEO.auth.title")} description={t("SEO.auth.description")} />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="flex justify-center">Tanad</div>
+        <Image
+          height={512}
+          width={512}
+          loading="lazy"
+          className={"h-10 w-auto"}
+          alt={`Tanad Logo`}
+          src={logoSrc}
+        />
+        <div className="text-muted-foreground w-full pt-4 text-center text-sm md:text-start xl:whitespace-nowrap">
+          {t("Landing.footer.tagline")}
+        </div>
       </div>
       {isForgotPassword ? (
         <div className="mt-8 flex w-full max-w-[90%] flex-col gap-2 sm:mx-auto sm:w-full sm:max-w-md">

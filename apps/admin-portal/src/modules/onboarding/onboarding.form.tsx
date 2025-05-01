@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -14,28 +14,28 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 import { useCreateEnterprise } from "./onboarding.hooks";
 
-const formSchema = z.object({
-  name: z.string().min(1, "Enterprise name is required"),
-  description: z.string(),
-  logo: z.string(),
-  email: z.string().email(),
-  industry: z.string(),
-  size: z.string(),
-});
+export const createEnterpriseSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("OnBoarding.form.enterprise_name.required")),
+    description: z.string(),
+    logo: z.string(),
+    email: z.string().email(t("OnBoarding.form.email.invalid")),
+    industry: z.string(),
+    size: z.string(),
+  });
 
-type FormData = z.infer<typeof formSchema>;
+export type EnterpriseFormValues = z.input<ReturnType<typeof createEnterpriseSchema>>;
 
 export function OnboardingForm() {
   const t = useTranslations();
   const { mutate: createEnterprise, isPending } = useCreateEnterprise();
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<EnterpriseFormValues>({
+    resolver: zodResolver(createEnterpriseSchema(t)),
     defaultValues: {
       name: "",
       description: "",
@@ -46,7 +46,7 @@ export function OnboardingForm() {
     },
   });
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: EnterpriseFormValues) => {
     try {
       await createEnterprise(data);
     } catch (error: any) {
@@ -62,9 +62,13 @@ export function OnboardingForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("OnBoarding.form.enterprise_name")}</FormLabel>
+              <FormLabel>{t("OnBoarding.form.enterprise_name.label")}</FormLabel>
               <FormControl>
-                <Input {...field} placeholder={t("OnBoarding.form.enterprise_name_placeholder")} disabled={isPending} />
+                <Input
+                  {...field}
+                  placeholder={t("OnBoarding.form.enterprise_name.placeholder")}
+                  disabled={isPending}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,9 +80,13 @@ export function OnboardingForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("OnBoarding.form.description")}</FormLabel>
+              <FormLabel>{t("OnBoarding.form.description.label")}</FormLabel>
               <FormControl>
-                <Textarea {...field} placeholder={t("OnBoarding.form.description_placeholder")} disabled={isPending} />
+                <Textarea
+                  {...field}
+                  placeholder={t("OnBoarding.form.description.placeholder")}
+                  disabled={isPending}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,9 +97,13 @@ export function OnboardingForm() {
           name="logo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("OnBoarding.form.logo")}</FormLabel>
+              <FormLabel>{t("OnBoarding.form.logo.label")}</FormLabel>
               <FormControl>
-                <Input {...field} placeholder={t("OnBoarding.form.logo_placeholder")} disabled={isPending} />
+                <Input
+                  {...field}
+                  placeholder={t("OnBoarding.form.logo.placeholder")}
+                  disabled={isPending}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -102,9 +114,14 @@ export function OnboardingForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("OnBoarding.form.email")}</FormLabel>
+              <FormLabel>{t("OnBoarding.form.email.label")}</FormLabel>
               <FormControl>
-                <Input type="email" {...field} placeholder={t("OnBoarding.form.email_placeholder")} disabled={isPending} />
+                <Input
+                  type="email"
+                  {...field}
+                  placeholder={t("OnBoarding.form.email.placeholder")}
+                  disabled={isPending}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -115,9 +132,13 @@ export function OnboardingForm() {
           name="industry"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("OnBoarding.form.industry")}</FormLabel>
+              <FormLabel>{t("OnBoarding.form.industry.label")}</FormLabel>
               <FormControl>
-                <Input {...field} placeholder={t("OnBoarding.form.industry_placeholder")} disabled={isPending} />
+                <Input
+                  {...field}
+                  placeholder={t("OnBoarding.form.industry.placeholder")}
+                  disabled={isPending}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -128,9 +149,13 @@ export function OnboardingForm() {
           name="size"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("OnBoarding.form.size")}</FormLabel>
+              <FormLabel>{t("OnBoarding.form.size.label")}</FormLabel>
               <FormControl>
-                <Input {...field} placeholder={t("OnBoarding.form.size_placeholder")} disabled={isPending} />
+                <Input
+                  {...field}
+                  placeholder={t("OnBoarding.form.size.placeholder")}
+                  disabled={isPending}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
