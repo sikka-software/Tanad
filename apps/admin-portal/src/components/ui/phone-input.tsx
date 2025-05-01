@@ -2,7 +2,7 @@
 
 import { parsePhoneNumber } from "libphonenumber-js/min";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ interface PhoneInputProps {
 
 export default function PhoneInput({ value, defaultValue, onChange }: PhoneInputProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const [open, setOpen] = React.useState(false);
   const [selectedCountry, setSelectedCountry] = React.useState(countries[0]);
 
@@ -107,31 +108,48 @@ export default function PhoneInput({ value, defaultValue, onChange }: PhoneInput
             <CommandList>
               <CommandEmpty>{t("General.no_country_found")}</CommandEmpty>
               <CommandGroup>
-                {countries.map((country) => (
-                  <CommandItem
-                    key={country.value}
-                    value={country.value}
-                    onSelect={handleCountrySelect}
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      <div className="flex flex-row items-center">
-                        <img
-                          src={`https://flagcdn.com/w20/${country.value}.png`}
-                          alt={`${country.label} flag`}
-                          className="mr-2 h-fit w-6"
-                        />
-                        <span>{country.label}</span>
+                {countries.map((country) => {
+                  // Translate the country label if possible (assuming a convention)
+                  // You might need a more robust way to get translated names
+                  // depending on your i18n setup.
+                  // Using a generic key structure for now.
+                  const translatedLabel =
+                    t(`Country.${country.label.replace(/ /g, "_").toLowerCase()}`) || country.label;
+                  const searchValue =
+                    `${country.value} ${country.label} ${translatedLabel} ${country.code}`.toLowerCase();
+
+                  return (
+                    <CommandItem
+                      key={country.value}
+                      // Construct a searchable value including code, names, and value
+                      value={searchValue}
+                      onSelect={() => handleCountrySelect(country.value)} // Use () => to avoid direct call
+                    >
+                      <div className="flex w-full items-center justify-between">
+                        <div className="flex flex-row items-center">
+                          <img
+                            src={`https://flagcdn.com/w20/${country.value}.png`}
+                            alt={`${country.label} flag`}
+                            className="mr-2 h-fit w-6"
+                          />
+                          {/* Display translated name if different and locale is not English */}
+                          <span>
+                            {locale !== "en" && translatedLabel !== country.label
+                              ? translatedLabel
+                              : country.label}
+                          </span>
+                        </div>
+                        <span className="text-muted-foreground text-sm">{country.code}</span>
                       </div>
-                      <span className="text-muted-foreground text-sm">{country.code}</span>
-                    </div>
-                    <Check
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        selectedCountry.value === country.value ? "opacity-100" : "opacity-0",
-                      )}
-                    />
-                  </CommandItem>
-                ))}
+                      <Check
+                        className={cn(
+                          "ml-auto h-4 w-4",
+                          selectedCountry.value === country.value ? "opacity-100" : "opacity-0",
+                        )}
+                      />
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             </CommandList>
           </Command>
