@@ -1,4 +1,5 @@
-import { JobListing } from "@/modules/job-listing/job-listing.type";
+import { JobListing } from "@/job-listing/job-listing.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 export async function fetchJobListings(): Promise<JobListing[]> {

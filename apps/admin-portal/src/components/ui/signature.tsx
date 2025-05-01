@@ -1,12 +1,12 @@
+import { LabelProps } from "@radix-ui/react-label";
 import React, { useRef, useEffect, FC } from "react";
-
-import { cn } from "@/lib/utils";
 import SignaturePad, { Options as SignaturePadOptions } from "signature_pad";
 // @ts-ignore
 import trimCanvas from "trim-canvas";
 
-import { Label } from "@/components/ui/label";
-import { LabelProps } from "@radix-ui/react-label";
+import { Label } from "@/ui/label";
+
+import { cn } from "@/lib/utils";
 
 export interface SignatureCanvasProps extends SignaturePadOptions {
   canvasProps?: React.CanvasHTMLAttributes<HTMLCanvasElement>;
@@ -100,8 +100,7 @@ export const Signature: FC<SignatureCanvasProps> = ({
     sigPadRef.current?.fromDataURL(dataURL, options);
   const toDataURL = (type?: string, encoderOptions?: any) =>
     sigPadRef.current?.toDataURL(type, encoderOptions);
-  const fromData = (pointGroups: any[]) =>
-    sigPadRef.current?.fromData(pointGroups);
+  const fromData = (pointGroups: any[]) => sigPadRef.current?.fromData(pointGroups);
   const toData = () => sigPadRef.current?.toData();
 
   return (
@@ -114,10 +113,7 @@ export const Signature: FC<SignatureCanvasProps> = ({
       <canvas
         ref={canvasRef}
         {...canvasProps}
-        className={cn(
-          "rounded border bg-[var(--constant-background)]",
-          canvasProps?.className
-        )}
+        className={cn("rounded border bg-[var(--constant-background)]", canvasProps?.className)}
       />
 
       <div className="flex flex-row justify-between">
@@ -125,8 +121,8 @@ export const Signature: FC<SignatureCanvasProps> = ({
         {/* {helperText && ( */}
         <p
           className={cn(
-            "my-0 text-start text-xs text-helper-color transition-all",
-            helperText ? "h-4 opacity-100" : "h-0 opacity-0"
+            "text-helper-color my-0 text-start text-xs transition-all",
+            helperText ? "h-4 opacity-100" : "h-0 opacity-0",
           )}
         >
           {helperText}

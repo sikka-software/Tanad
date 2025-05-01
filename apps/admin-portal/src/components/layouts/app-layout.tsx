@@ -5,15 +5,15 @@ import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "sonner";
 
 import ProtectedRoute from "@/components/app/ProtectedRoute";
-import { AppSidebar } from "@/components/ui/app-sidebar";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { CommandMenu } from "@/components/ui/command-menu";
-import LanguageSwitcher from "@/components/ui/language-switcher";
-import { LoadingBar } from "@/components/ui/loading-bar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import ThemeSwitcher from "@/components/ui/theme-switcher";
-import { UserDropdown } from "@/components/ui/user-dropdown";
+import { AppSidebar } from "@/ui/app-sidebar";
+import { Breadcrumb } from "@/ui/breadcrumb";
+import { Button } from "@/ui/button";
+import { CommandMenu } from "@/ui/command-menu";
+import LanguageSwitcher from "@/ui/language-switcher";
+import { LoadingBar } from "@/ui/loading-bar";
+import { SidebarProvider, SidebarTrigger } from "@/ui/sidebar";
+import ThemeSwitcher from "@/ui/theme-switcher";
+import { UserDropdown } from "@/ui/user-dropdown";
 
 import { useMainStore } from "@/hooks/main.store";
 import useUserStore from "@/stores/use-user-store";

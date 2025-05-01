@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 
 import { cn } from "@/lib/utils";
 
@@ -166,17 +166,17 @@ export default Navigation;
 // import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 // import MobileNavMenuItem from "@/components/landing/MobileNavMenuItem";
 // // UI
-// import { Button } from "@/components/ui/button";
+// import { Button } from "@/ui/button";
 // import {
 //   DropdownMenu,
 //   DropdownMenuItem,
 //   DropdownMenuContent,
 //   DropdownMenuTrigger,
-// } from "@/components/ui/dropdown-menu";
-// import LanguageSwitcher from "@/components/ui/language-switcher";
-// import { Logos } from "@/components/ui/logos";
-// import { Sheet, SheetContent } from "@/components/ui/sheet";
-// import ThemeSwitcher from "@/components/ui/theme-switcher";
+// } from "@/ui/dropdown-menu";
+// import LanguageSwitcher from "@/ui/language-switcher";
+// import { Logos } from "@/ui/logos";
+// import { Sheet, SheetContent } from "@/ui/sheet";
+// import ThemeSwitcher from "@/ui/theme-switcher";
 
 // // Types
 // import { IconComponents } from "@/lib/types";

@@ -1,12 +1,11 @@
-import { useTranslations } from "next-intl";
-
 import { format } from "date-fns";
 import { Calendar, DollarSign, MapPin, Building2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/ui/badge";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Job } from "@/modules/job/job.type";
+import { Job } from "@/job/job.type";
 
 const JobCard = ({ job }: { job: Job }) => {
   const t = useTranslations();

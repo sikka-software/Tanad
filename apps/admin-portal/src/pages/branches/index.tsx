@@ -6,26 +6,24 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import BranchCard from "@/modules/branch/branch.card";
-import { BranchForm } from "@/modules/branch/branch.form";
-import {
-  useBranches,
-  useBulkDeleteBranches,
-  useDuplicateBranch,
-} from "@/modules/branch/branch.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/branch/branch.options";
-import useBranchStore from "@/modules/branch/branch.store";
-import BranchesTable from "@/modules/branch/branch.table";
-import { BranchUpdateData } from "@/modules/branch/branch.type";
+import BranchCard from "@/branch/branch.card";
+import { BranchForm } from "@/branch/branch.form";
+import { useBranches, useBulkDeleteBranches, useDuplicateBranch } from "@/branch/branch.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/branch/branch.options";
+import useBranchStore from "@/branch/branch.store";
+import BranchesTable from "@/branch/branch.table";
+import { BranchUpdateData } from "@/branch/branch.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function BranchesPage() {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 // UI
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/ui/skeleton";
 // Utils
 import { cn } from "@/lib/utils";
 

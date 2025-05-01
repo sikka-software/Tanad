@@ -13,17 +13,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { socialLinkOptions } from "@/components/ui/social-platforms";
+} from "@/ui/select";
+import { Input } from "@/ui/input";
+import { Button } from "@/ui/button";
+import { socialLinkOptions } from "@/ui/social-platforms";
 
 // Define the form schema
 const socialLinkSchema = z.object({

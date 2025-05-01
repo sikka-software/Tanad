@@ -4,15 +4,15 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Resolver } from "react-hook-form";
 // UI
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+} from "@/ui/card";
+import { Input } from "@/ui/input";
 import {
   Form,
   FormControl,
@@ -20,8 +20,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/ui/form";
+import { Textarea } from "@/ui/textarea";
 // Utils
 import { cn } from "@/lib/utils";
 // Types

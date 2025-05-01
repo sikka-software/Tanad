@@ -8,11 +8,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useOfficeStore from "@/modules/office/office.store";
-import { Office } from "@/modules/office/office.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateOffice } from "@/office/office.hooks";
+import useOfficeStore from "@/office/office.store";
+import { Office } from "@/office/office.type";
 
-import { useUpdateOffice } from "./office.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Office>) => {
   const t = useTranslations();

@@ -2,15 +2,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 // UI
 import {
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/ui/dialog";
+import { Textarea } from "@/ui/textarea";
 
 import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";

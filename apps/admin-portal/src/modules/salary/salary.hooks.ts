@@ -7,8 +7,8 @@ import {
   fetchSalaries,
   updateSalary,
   bulkDeleteSalaries,
-} from "@/modules/salary/salary.service";
-import type { Salary, SalaryUpdateData } from "@/modules/salary/salary.type";
+} from "@/salary/salary.service";
+import type { Salary, SalaryUpdateData } from "@/salary/salary.type";
 
 export const salaryKeys = {
   all: ["salaries"] as const,

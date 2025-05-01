@@ -5,13 +5,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/ui/dialog";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet";
+} from "@/ui/sheet";
 
 import { SharingStage } from "@/components/app/SharingStage";
 import { useBreakpoint } from "@/hooks/use-breakpoint";

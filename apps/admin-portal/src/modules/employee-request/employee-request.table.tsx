@@ -10,11 +10,10 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
-import { EmployeeRequest } from "@/modules/employee-request/employee-request.type";
+import { useUpdateEmployeeRequest } from "@/employee-request/employee-request.hooks";
+import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
+import { EmployeeRequest } from "@/employee-request/employee-request.type";
 import useUserStore from "@/stores/use-user-store";
-
-import { useUpdateEmployeeRequest } from "./employee-request.hooks";
 
 const EmployeeRequestsTable = ({
   data,

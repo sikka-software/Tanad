@@ -8,11 +8,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useExpenseStore from "@/modules/expense/expense.store";
-import { Expense } from "@/modules/expense/expense.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateExpense } from "@/expense/expense.hooks";
+import useExpenseStore from "@/expense/expense.store";
+import { Expense } from "@/expense/expense.type";
 
-import { useUpdateExpense } from "./expense.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Expense>) => {
   const t = useTranslations();

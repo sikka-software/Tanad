@@ -5,9 +5,9 @@ import {
   Paintbrush,
   MonitorSmartphone,
 } from "lucide-react";
-import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import { BentoCard, BentoGrid } from "@/ui/bento-grid";
 import { FakeChart } from "@/components/landing/FakeChart";
-import { Marquee } from "@/components/ui/marquee";
+import { Marquee } from "@/ui/marquee";
 import ThumbnailImage from "@/components/landing/ThumbnailImage";
 import {
   cn,

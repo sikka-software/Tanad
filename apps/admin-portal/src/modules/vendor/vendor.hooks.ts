@@ -7,8 +7,9 @@ import {
   fetchVendorById,
   fetchVendors,
   updateVendor,
-} from "@/modules/vendor/vendor.service";
-import type { Vendor, VendorCreateData } from "@/modules/vendor/vendor.type";
+  duplicateVendor,
+} from "@/vendor/vendor.service";
+import type { Vendor, VendorCreateData } from "@/vendor/vendor.type";
 
 // Query keys for vendors
 export const vendorKeys = {
@@ -55,13 +56,30 @@ export function useCreateVendor() {
   });
 }
 
+// Hook for duplicating a vendor
+export function useDuplicateVendor() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => duplicateVendor(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
+    },
+  });
+}
+
 // Hook for updating an existing vendor
 export function useUpdateVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, vendor }: { id: string; vendor: Partial<Omit<Vendor, "id" | "created_at">> }) =>
-      updateVendor(id, vendor),
+    mutationFn: ({
+      id,
+      vendor,
+    }: {
+      id: string;
+      vendor: Partial<Omit<Vendor, "id" | "created_at">>;
+    }) => updateVendor(id, vendor),
     onSuccess: (data) => {
       // Invalidate both the specific detail and the list queries
       queryClient.invalidateQueries({ queryKey: vendorKeys.detail(data.id) });

@@ -1,4 +1,4 @@
-import { Invoice } from "@/modules/invoice/invoice.type";
+import { Invoice } from "@/invoice/invoice.type";
 
 export async function fetchInvoices(): Promise<Invoice[]> {
   const response = await fetch("/api/resource/invoices");

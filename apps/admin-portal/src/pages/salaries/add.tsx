@@ -1,21 +1,14 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import PageTitle from "@/components/ui/page-title";
+import { Button } from "@/ui/button";
+import PageTitle from "@/ui/page-title";
 
 import { generateDummySalary } from "@/lib/dummy-factory";
 
-import { SalaryForm, SalaryFormValues } from "@/modules/salary/salary.form";
-import { salaryKeys } from "@/modules/salary/salary.hooks";
-import { createSalary } from "@/modules/salary/salary.service";
-import useSalaryStore from "@/modules/salary/salary.store";
-import { Salary, SalaryCreateData } from "@/modules/salary/salary.type";
-import useUserStore from "@/stores/use-user-store";
+import { SalaryForm } from "@/salary/salary.form";
+import useSalaryStore from "@/salary/salary.store";
 
 export default function AddSalaryPage() {
   const router = useRouter();

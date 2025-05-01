@@ -3,12 +3,13 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { JobListing } from "@/modules/job-listing/job-listing.type";
-import { useJobs } from "@/modules/job/job.hooks";
-import { Job } from "@/modules/job/job.type";
+import { useJobs } from "@/job/job.hooks";
+import { Job } from "@/job/job.type";
+
+import { JobListing } from "@/job-listing/job-listing.type";
 
 export default function JobListingPublicPage() {
   const t = useTranslations("Jobs");

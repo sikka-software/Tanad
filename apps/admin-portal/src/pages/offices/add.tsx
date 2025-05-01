@@ -2,15 +2,14 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { OfficeForm } from "@/modules/office/office.form";
-import useOfficeStore from "@/modules/office/office.store";
+import { OfficeForm } from "@/office/office.form";
+import useOfficeStore from "@/office/office.store";
 
 export default function AddOfficePage() {
   const t = useTranslations();

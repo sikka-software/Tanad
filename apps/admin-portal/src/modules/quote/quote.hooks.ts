@@ -7,8 +7,8 @@ import {
   fetchQuotes,
   updateQuote,
   bulkDeleteQuotes,
-} from "@/modules/quote/quote.service";
-import { Quote } from "@/modules/quote/quote.type";
+} from "@/quote/quote.service";
+import { Quote } from "@/quote/quote.type";
 
 export const quoteKeys = {
   all: ["quotes"] as const,

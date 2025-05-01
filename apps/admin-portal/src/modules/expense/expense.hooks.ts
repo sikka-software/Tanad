@@ -8,8 +8,8 @@ import {
   fetchExpenses,
   updateExpense,
   duplicateExpense,
-} from "@/modules/expense/expense.service";
-import type { Expense, ExpenseCreateData } from "@/modules/expense/expense.type";
+} from "@/expense/expense.service";
+import type { Expense, ExpenseCreateData } from "@/expense/expense.type";
 
 // Query keys for expenses
 export const expenseKeys = {

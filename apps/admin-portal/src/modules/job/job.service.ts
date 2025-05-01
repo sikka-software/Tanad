@@ -1,4 +1,4 @@
-import { Job, JobCreateData } from "@/modules/job/job.type";
+import { Job, JobCreateData } from "@/job/job.type";
 
 export async function fetchJobs(): Promise<Job[]> {
   try {

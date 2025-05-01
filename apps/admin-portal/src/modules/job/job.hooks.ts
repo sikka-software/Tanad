@@ -8,8 +8,8 @@ import {
   deleteJob,
   bulkDeleteJobs,
   duplicateJob,
-} from "@/modules/job/job.service";
-import { Job, JobCreateData } from "@/modules/job/job.type";
+} from "@/job/job.service";
+import { Job, JobCreateData } from "@/job/job.type";
 
 export const jobKeys = {
   all: ["jobs"] as const,

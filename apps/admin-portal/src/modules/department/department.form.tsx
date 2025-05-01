@@ -11,15 +11,17 @@ import { Input } from "@/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
-import { useBranches } from "@/modules/branch/branch.hooks";
-import { useOffices } from "@/modules/office/office.hooks";
-import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
-import useUserStore from "@/stores/use-user-store";
+import { useOffices } from "@/office/office.hooks";
 
-import { useCreateDepartment, useUpdateDepartment } from "./department.hooks";
-import useDepartmentStore from "./department.store";
-import type { DepartmentCreateData } from "./department.type";
-import { DepartmentUpdateData } from "./department.type";
+import { useBranches } from "@/branch/branch.hooks";
+
+import { useCreateDepartment, useUpdateDepartment } from "@/department/department.hooks";
+import useDepartmentStore from "@/department/department.store";
+import { DepartmentCreateData, DepartmentUpdateData } from "@/department/department.type";
+
+import { useWarehouses } from "@/warehouse/warehouse.hooks";
+
+import useUserStore from "@/stores/use-user-store";
 
 type LocationValue = {
   id: string;

@@ -6,11 +6,12 @@ import type { AppProps } from "next/app";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
 import { useEffect, useState } from "react";
 
+import DebugTools from "@/ui/debug-tools";
+import { LoadingBar } from "@/ui/loading-bar";
+
 import AppLayout from "@/components/layouts/app-layout";
 import AuthLayout from "@/components/layouts/auth-layout";
 import LandingLayout from "@/components/layouts/landing-layout";
-import DebugTools from "@/components/ui/debug-tools";
-import { LoadingBar } from "@/components/ui/loading-bar";
 
 import { QueryProvider } from "@/providers/QueryProvider";
 import "@/styles/globals.css";

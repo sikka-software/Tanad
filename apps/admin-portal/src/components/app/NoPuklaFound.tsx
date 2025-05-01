@@ -6,10 +6,10 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 import { useTranslations, useLocale } from "next-intl";
 // UI
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 // Components
-import ThemeSwitcher from "@/components/ui/theme-switcher";
-import LanguageSwitcher from "@/components/ui/language-switcher";
+import ThemeSwitcher from "@/ui/theme-switcher";
+import LanguageSwitcher from "@/ui/language-switcher";
 
 export default function NoPuklaFound() {
   const t = useTranslations("PuklaNotFound");

@@ -8,8 +8,8 @@ import {
   fetchCompanies,
   updateCompany,
   duplicateCompany,
-} from "@/modules/company/company.service";
-import type { Company, CompanyCreateData, CompanyUpdateData } from "@/modules/company/company.type";
+} from "@/company/company.service";
+import type { Company, CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
 
 // Query keys for companies
 export const companyKeys = {

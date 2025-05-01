@@ -8,8 +8,8 @@ import {
   fetchOffices,
   updateOffice,
   duplicateOffice,
-} from "@/modules/office/office.service";
-import type { Office, OfficeCreateData, OfficeUpdateData } from "@/modules/office/office.type";
+} from "@/office/office.service";
+import type { Office, OfficeCreateData, OfficeUpdateData } from "@/office/office.type";
 
 // Query keys for offices
 export const officeKeys = {

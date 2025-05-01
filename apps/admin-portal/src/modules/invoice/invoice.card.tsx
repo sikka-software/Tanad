@@ -1,13 +1,12 @@
+import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
-import { format } from "date-fns";
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-
-import { Invoice } from "@/modules/invoice/invoice.type";
+import { Invoice } from "@/invoice/invoice.type";
 
 function getInvoiceStatusColor(status: string): string {
   switch (status.toLowerCase()) {

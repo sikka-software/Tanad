@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
-
-import { useLocale, useTranslations } from "next-intl";
-
 import { Send, X, AlertTriangle, ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
+import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -17,8 +15,8 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/ui/dialog";
+import { Textarea } from "@/ui/textarea";
 
 interface ErrorComponentProps {
   errorMessage: string;

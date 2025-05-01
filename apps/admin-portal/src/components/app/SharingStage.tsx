@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 
 export const SharingStage = (props: { puklaName: string }) => {
   const t = useTranslations();

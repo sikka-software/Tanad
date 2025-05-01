@@ -10,11 +10,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useQuotesStore from "@/modules/quote/quote.store";
-import { Quote } from "@/modules/quote/quote.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateQuote } from "@/quote/quote.hooks";
+import useQuotesStore from "@/quote/quote.store";
+import { Quote } from "@/quote/quote.type";
 
-import { useUpdateQuote } from "./quote.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Quote>) => {
   const t = useTranslations();

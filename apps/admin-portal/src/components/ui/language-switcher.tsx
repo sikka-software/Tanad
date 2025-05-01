@@ -1,17 +1,19 @@
 "use client";
 
 import { Languages } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/router";
+
 // UI
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useTranslations, useLocale } from "next-intl";
+} from "@/ui/dropdown-menu";
+
 import { cn } from "@/lib/utils";
 
 export default function LanguageSwitcher({
@@ -48,12 +50,8 @@ export default function LanguageSwitcher({
             });
           }}
         >
-          <DropdownMenuRadioItem value="ar">
-            {t("languages.ar")}
-          </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="en">
-            {t("languages.en")}
-          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="ar">{t("languages.ar")}</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="en">{t("languages.en")}</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

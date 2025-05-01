@@ -1,8 +1,8 @@
 import { useTranslations } from "next-intl";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Department } from "@/modules/department/department.type";
+import { Department } from "@/department/department.type";
 
 const DepartmentCard = ({ department }: { department: Department }) => {
   const t = useTranslations();

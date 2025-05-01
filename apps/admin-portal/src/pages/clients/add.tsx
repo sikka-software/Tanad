@@ -9,8 +9,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { ClientForm } from "@/modules/client/client.form";
-import useClientStore from "@/modules/client/client.store";
+import { ClientForm } from "@/client/client.form";
+import useClientStore from "@/client/client.store";
 
 export default function AddClientPage() {
   const router = useRouter();

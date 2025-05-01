@@ -1,5 +1,5 @@
-import { InfiniteSlider } from "@/components/ui/infinite-slider";
-import { ProgressiveBlur } from "@/components/ui/progressive-blur";
+import { InfiniteSlider } from "@/ui/infinite-slider";
+import { ProgressiveBlur } from "@/ui/progressive-blur";
 
 const CustomersSection = () => {
   return (

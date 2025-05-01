@@ -1,4 +1,4 @@
-import { Company } from "@/modules/company/company.type";
+import { Company } from "@/company/company.type";
 
 export interface Client {
   id: string;

@@ -9,8 +9,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { ExpenseForm } from "@/modules/expense/expense.form";
-import useExpenseStore from "@/modules/expense/expense.store";
+import { ExpenseForm } from "@/expense/expense.form";
+import useExpenseStore from "@/expense/expense.store";
 
 export default function AddExpensePage() {
   const t = useTranslations();

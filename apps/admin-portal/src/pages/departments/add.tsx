@@ -10,8 +10,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import DepartmentForm from "@/modules/department/department.form";
-import useDepartmentStore from "@/modules/department/department.store";
+import DepartmentForm from "@/department/department.form";
+import useDepartmentStore from "@/department/department.store";
 
 export default function AddDepartmentPage() {
   const router = useRouter();

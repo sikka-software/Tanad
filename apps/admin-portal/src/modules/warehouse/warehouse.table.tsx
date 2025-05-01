@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import React, { useCallback } from "react";
+import React from "react";
 import { z } from "zod";
 
 import ErrorComponent from "@/ui/error-component";
@@ -8,11 +8,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useWarehouseStore from "@/modules/warehouse/warehouse.store";
-import { Warehouse } from "@/modules/warehouse/warehouse.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateWarehouse } from "@/warehouse/warehouse.hooks";
+import useWarehouseStore from "@/warehouse/warehouse.store";
+import { Warehouse } from "@/warehouse/warehouse.type";
 
-import { useUpdateWarehouse } from "./warehouse.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const WarehouseTable = ({
   data,

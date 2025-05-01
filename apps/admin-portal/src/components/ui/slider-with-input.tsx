@@ -1,18 +1,15 @@
 "use client";
 
-import * as React from "react";
-import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { useSliderWithInput } from "@/hooks/use-slider-with-input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { RotateCcw } from "lucide-react";
+import * as React from "react";
+
+import { Button } from "@/ui/button";
+import { Input } from "@/ui/input";
+import { Label } from "@/ui/label";
+import { Slider } from "@/ui/slider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/tooltip";
+
+import { useSliderWithInput } from "@/hooks/use-slider-with-input";
 
 interface SliderWithInputProps {
   value: number[];
@@ -54,7 +51,7 @@ export default function SliderWithInput({
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
         <label className="text-sm font-medium">{label}</label>
-        <div className="flex items-center gap-2 mb-1">
+        <div className="mb-1 flex items-center gap-2">
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -68,9 +65,7 @@ export default function SliderWithInput({
                   <RotateCcw className="size-4" aria-hidden="true" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent className="px-2 py-1 text-xs">
-                Reset to default
-              </TooltipContent>
+              <TooltipContent className="px-2 py-1 text-xs">Reset to default</TooltipContent>
             </Tooltip>
           </TooltipProvider>
           <Input

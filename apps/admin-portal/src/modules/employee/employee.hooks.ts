@@ -1,14 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { departmentKeys } from "@/modules/department/department.hooks";
+import { departmentKeys } from "@/department/department.hooks";
+
 import {
   createEmployee,
   deleteEmployee,
   fetchEmployeeById,
   fetchEmployees,
   updateEmployee,
-} from "@/modules/employee/employee.service";
-import { Employee, EmployeeCreateData } from "@/modules/employee/employee.types";
+} from "@/employee/employee.service";
+import { Employee, EmployeeCreateData } from "@/employee/employee.types";
 
 export const employeeKeys = {
   all: ["employees"] as const,

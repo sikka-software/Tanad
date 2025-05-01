@@ -1,8 +1,8 @@
 import { useTranslations } from "next-intl";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Employee } from "@/modules/employee/employee.types";
+import { Employee } from "@/employee/employee.types";
 
 const EmployeeCard = ({ employee }: { employee: Employee }) => {
   const t = useTranslations();

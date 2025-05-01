@@ -5,12 +5,7 @@ import { useState, useMemo, useCallback } from "react";
 import React from "react";
 import { toast } from "sonner";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/ui/accordion";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,18 +15,11 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+} from "@/ui/alert-dialog";
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/ui/card";
+import { Checkbox } from "@/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -39,7 +27,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,37 +35,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/ui/dropdown-menu";
+import { Input } from "@/ui/input";
+import { Label } from "@/ui/label";
+import { ScrollArea } from "@/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Textarea } from "@/ui/textarea";
 
-import { Permission, Role } from "@/types/rbac";
+import { Permission } from "@/types/rbac";
+
+import { useRoles, useCreateRole, useUpdateRole, useDeleteRole } from "@/role/role.hooks";
+import { RoleWithPermissions, RoleUpdateData } from "@/role/role.type";
 
 import { app_permission } from "@/db/schema";
-// Keep using this for component's internal Permission structure
-
-import { useRoles, useCreateRole, useUpdateRole, useDeleteRole } from "@/modules/role/role.hooks";
-// Import user store
-import {
-  RoleWithPermissions,
-  // Use RoleWithPermissions from new hooks
-  RoleUpdateData, // Import type for update hook
-} from "@/modules/role/role.type";
-// Import permission enum
 import useUserStore from "@/stores/use-user-store";
 
-// Updated import path, removed unused hooks
-
-// Define ACTION_DISPLAY_NAMES locally or import from a constants file
 const ACTION_DISPLAY_NAMES: Record<string, string> = {
   create: "Create",
   read: "View",

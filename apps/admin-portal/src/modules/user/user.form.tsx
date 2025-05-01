@@ -5,18 +5,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
-import { ComboboxAdd } from "@/components/ui/combobox-add";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { FormDialog } from "@/components/ui/form-dialog";
-import { Input } from "@/components/ui/input";
+import { ComboboxAdd } from "@/ui/combobox-add";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormDialog } from "@/ui/form-dialog";
+import { Input } from "@/ui/input";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -31,8 +23,7 @@ import type { Role, RoleWithPermissions } from "../role/role.type";
 import { useCreateUser, useUpdateUser } from "./user.hooks";
 import useEnterpriseUsersStore from "./user.store";
 // Add User type
-import type { UserType } from "./user.table";
-import type { UserCreateData, UserUpdateData, User } from "./user.type";
+import type { UserCreateData, UserUpdateData, UserType } from "./user.type";
 
 // Import RoleForm
 
@@ -64,7 +55,7 @@ interface UserFormProps {
   onSuccess: () => void;
   id?: string;
   // Revert to User type, assuming it has first_name, last_name, and role (ID/key)
-  initialData?: User | null;
+  initialData?: UserType | null;
 }
 
 export function UserForm({ onSuccess, id, initialData }: UserFormProps) {

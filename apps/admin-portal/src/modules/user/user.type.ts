@@ -1,5 +1,3 @@
-import { Profile } from "@/lib/types";
-
 // Base type from schema
 export type UserType = {
   id: string;
@@ -7,6 +5,10 @@ export type UserType = {
   role: string;
   enterprise_id: string;
   created_at: string;
+  first_name?: string; // Make names optional based on previous context
+  last_name?: string; // Make names optional based on previous context
+  full_name?: string; // Add full_name if needed for profile creation
+  role_id: string; // Assuming role is passed as ID
 };
 
 // Create data type - Define properties explicitly

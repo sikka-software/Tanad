@@ -3,11 +3,12 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import PageTitle from "@/ui/page-title";
 
-import { VendorForm } from "@/modules/vendor/vendor.form";
+import { VendorForm } from "@/vendor/vendor.form";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function EditVendorPage() {

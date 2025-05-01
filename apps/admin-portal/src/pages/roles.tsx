@@ -1,34 +1,33 @@
-import { Shield } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 
+import { Badge } from "@/ui/badge";
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { FormDialog } from "@/components/ui/form-dialog";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import RoleCard from "@/modules/role/role.card";
-import { RoleForm } from "@/modules/role/role.form";
+import RoleCard from "@/role/role.card";
+import { RoleForm } from "@/role/role.form";
 import {
-  useRoles,
   useSystemRoles,
   useBulkDeleteRoles,
   useDuplicateRole,
   useCustomRoles,
-} from "@/modules/role/role.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/role/role.options";
-import useRoleStore from "@/modules/role/role.store";
-import { Role, RoleUpdateData, RoleWithPermissions } from "@/modules/role/role.type";
+} from "@/role/role.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/role/role.options";
+import useRoleStore from "@/role/role.store";
+import { RoleUpdateData, RoleWithPermissions } from "@/role/role.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function RolesPage() {

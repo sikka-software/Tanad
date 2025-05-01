@@ -3,9 +3,9 @@ import { useTranslations, useLocale } from "next-intl";
 import React from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 // UI
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/ui/dialog";
 
 import { createClient } from "@/utils/supabase/component";
 

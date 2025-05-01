@@ -1,8 +1,8 @@
 import { Mail, Phone, MapPin, Building2 } from "lucide-react";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Office } from "@/modules/office/office.type";
+import { Office } from "@/office/office.type";
 
 const OfficeCard = ({ office }: { office: Office }) => {
   return (

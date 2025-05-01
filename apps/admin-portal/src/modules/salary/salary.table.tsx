@@ -8,11 +8,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useSalaryStore from "@/modules/salary/salary.store";
-import { Salary } from "@/modules/salary/salary.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateSalary } from "@/salary/salary.hooks";
+import useSalaryStore from "@/salary/salary.store";
+import { Salary } from "@/salary/salary.type";
 
-import { useUpdateSalary } from "./salary.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const employeeNameSchema = z.string().min(1, "Required");
 const grossAmountSchema = z.number().min(0, "Must be positive");

@@ -1,11 +1,10 @@
+import { Mail, MapPin, Phone, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Mail, MapPin, Phone, User } from "lucide-react";
+import { Badge } from "@/ui/badge";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-
-import { Branch } from "@/modules/branch/branch.type";
+import { Branch } from "@/branch/branch.type";
 
 const BranchCard = ({ branch }: { branch: Branch }) => {
   const t = useTranslations("Branches");

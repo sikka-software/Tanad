@@ -7,16 +7,18 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import { Input } from "@/ui/input";
+import { Label } from "@/ui/label";
+import LanguageSwitcher from "@/ui/language-switcher";
+import ThemeSwitcher from "@/ui/theme-switcher";
+
+import { createClient } from "@/utils/supabase/component";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import LanguageSwitcher from "@/components/ui/language-switcher";
-import ThemeSwitcher from "@/components/ui/theme-switcher";
 
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 export default function Auth() {
   const t = useTranslations();

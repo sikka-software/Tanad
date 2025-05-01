@@ -1,11 +1,10 @@
+import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 
-import { format } from "date-fns";
+import { Badge } from "@/ui/badge";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-
-import { Quote } from "@/modules/quote/quote.type";
+import { Quote } from "@/quote/quote.type";
 
 function getQuoteStatusColor(status: string): string {
   switch (status.toLowerCase()) {

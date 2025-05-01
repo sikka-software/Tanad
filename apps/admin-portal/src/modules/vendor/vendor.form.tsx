@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -12,15 +11,20 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { CompanyForm, type CompanyFormValues as CompanyFormValuesType } from "@/modules/company/company.form";
-import { useCompanies } from "@/modules/company/company.hooks";
-import type { Company } from "@/modules/company/company.type";
-import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
-import { useCreateVendor, useUpdateVendor } from "./vendor.hooks";
-import useVendorStore from "./vendor.store";
-import type { VendorUpdateData } from "./vendor.type";
+import {
+  CompanyForm,
+  type CompanyFormValues as CompanyFormValuesType,
+} from "@/company/company.form";
+import { useCompanies } from "@/company/company.hooks";
+import type { Company } from "@/company/company.type";
+
+import { useCreateVendor, useUpdateVendor } from "@/vendor/vendor.hooks";
+import useVendorStore from "@/vendor/vendor.store";
+import type { VendorUpdateData } from "@/vendor/vendor.type";
+
+import useUserStore from "@/stores/use-user-store";
 
 export const createVendorSchema = (t: (key: string) => string) =>
   z.object({

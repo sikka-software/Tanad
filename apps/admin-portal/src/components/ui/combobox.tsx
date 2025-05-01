@@ -10,11 +10,11 @@ import {
   //   CommandInputProps,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-// import { HelperText } from "@/components/ui/helper-text";
-import { Label } from "@/components/ui/label";
-import { PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@/ui/command";
+// import { HelperText } from "@/ui/helper-text";
+import { Label } from "@/ui/label";
+import { PopoverContent, PopoverTrigger } from "@/ui/popover";
+import { Skeleton } from "@/ui/skeleton";
 
 import { cn } from "@/lib/utils";
 

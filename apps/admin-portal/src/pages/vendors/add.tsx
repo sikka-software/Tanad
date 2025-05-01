@@ -10,8 +10,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { VendorForm, type VendorFormValues } from "@/modules/vendor/vendor.form";
-import useVendorStore from "@/modules/vendor/vendor.store";
+import { VendorForm, type VendorFormValues } from "@/vendor/vendor.form";
+import useVendorStore from "@/vendor/vendor.store";
 
 export default function AddVendorPage() {
   const t = useTranslations();

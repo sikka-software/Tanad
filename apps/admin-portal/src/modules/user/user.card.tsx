@@ -1,12 +1,12 @@
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 
-import { User } from "./user.type";
+import { UserType } from "./user.type";
 
 interface UserCardProps {
-  user: User;
+  user: UserType;
 }
 
 export default function UserCard({ user }: UserCardProps) {

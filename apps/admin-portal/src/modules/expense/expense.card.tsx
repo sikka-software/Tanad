@@ -1,10 +1,10 @@
-import { Calendar, DollarSign, FileText, Tag, User } from "lucide-react";
+import { Calendar, DollarSign, FileText, Tag } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/ui/badge";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Expense } from "@/modules/expense/expense.type";
+import { Expense } from "@/expense/expense.type";
 
 const ExpenseCard = ({ expense }: { expense: Expense }) => {
   const t = useTranslations();

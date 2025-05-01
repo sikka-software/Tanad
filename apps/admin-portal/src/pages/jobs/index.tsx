@@ -6,25 +6,27 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
-import NoPermission from "@/components/ui/no-permission";
+import { createActions, withMutation } from "@/utils/action-utils";
 
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import { CompanyForm } from "@/modules/company/company.form";
-import JobCard from "@/modules/job/job.card";
-import { JobForm } from "@/modules/job/job.form";
-import { useJobs, useBulkDeleteJobs, useDuplicateJob } from "@/modules/job/job.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/job/job.options";
-import useJobsStore from "@/modules/job/job.store";
-import JobTable from "@/modules/job/job.table";
-import { JobUpdateData } from "@/modules/job/job.type";
+
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import DataPageLayout from "@/components/layouts/data-page-layout";
+
+import JobCard from "@/job/job.card";
+import { JobForm } from "@/job/job.form";
+import { useJobs, useBulkDeleteJobs, useDuplicateJob } from "@/job/job.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/job/job.options";
+import useJobsStore from "@/job/job.store";
+import JobTable from "@/job/job.table";
+import { JobUpdateData } from "@/job/job.type";
+
 import useUserStore from "@/stores/use-user-store";
-import { createActions, withMutation } from "@/utils/action-utils";
 
 export default function JobsPage() {
   const t = useTranslations();

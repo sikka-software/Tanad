@@ -1,6 +1,6 @@
 import { Mail, Phone, Building2, MapPin } from "lucide-react";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
 import { Client } from "./client.type";
 

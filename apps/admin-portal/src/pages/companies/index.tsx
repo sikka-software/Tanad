@@ -6,26 +6,24 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import CompanyCard from "@/modules/company/company.card";
-import { CompanyForm } from "@/modules/company/company.form";
-import {
-  useCompanies,
-  useBulkDeleteCompanies,
-  useDuplicateCompany,
-} from "@/modules/company/company.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/company/company.options";
-import useCompanyStore from "@/modules/company/company.store";
-import CompaniesTable from "@/modules/company/company.table";
-import { CompanyUpdateData } from "@/modules/company/company.type";
+import CompanyCard from "@/company/company.card";
+import { CompanyForm } from "@/company/company.form";
+import { useCompanies, useBulkDeleteCompanies, useDuplicateCompany } from "@/company/company.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/company/company.options";
+import useCompanyStore from "@/company/company.store";
+import CompaniesTable from "@/company/company.table";
+import { CompanyUpdateData } from "@/company/company.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function CompaniesPage() {

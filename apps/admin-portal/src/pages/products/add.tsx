@@ -10,10 +10,11 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { ProductForm, ProductFormValues } from "@/modules/product/product.form";
-import { productKeys } from "@/modules/product/product.hooks";
-import { createProduct } from "@/modules/product/product.service";
-import type { Product, ProductCreateData } from "@/modules/product/product.type";
+import { ProductForm, ProductFormValues } from "@/product/product.form";
+import { productKeys } from "@/product/product.hooks";
+import { createProduct } from "@/product/product.service";
+import type { Product, ProductCreateData } from "@/product/product.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddProductPage() {

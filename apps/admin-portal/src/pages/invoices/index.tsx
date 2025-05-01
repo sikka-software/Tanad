@@ -5,19 +5,21 @@ import { useMemo } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import InvoiceCard from "@/modules/invoice/invoice.card";
-import { useInvoices, useBulkDeleteInvoices } from "@/modules/invoice/invoice.hooks";
-import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/invoice/invoice.options";
-import useInvoiceStore from "@/modules/invoice/invoice.store";
-import InvoicesTable from "@/modules/invoice/invoice.table";
+import InvoiceCard from "@/invoice/invoice.card";
+import { useInvoices, useBulkDeleteInvoices } from "@/invoice/invoice.hooks";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
+import useInvoiceStore from "@/invoice/invoice.store";
+import InvoicesTable from "@/invoice/invoice.table";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function InvoicesPage() {

@@ -11,13 +11,14 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { ClientUpdateData } from "@/modules/client/client.type";
-import { CompanyForm } from "@/modules/company/company.form";
-import { useCompanies } from "@/modules/company/company.hooks";
-import useUserStore from "@/stores/use-user-store";
+import { useCreateClient, useUpdateClient } from "@/client/client.hooks";
+import useClientStore from "@/client/client.store";
+import { ClientUpdateData } from "@/client/client.type";
 
-import { useCreateClient, useUpdateClient } from "./client.hooks";
-import useClientStore from "./client.store";
+import { CompanyForm } from "@/company/company.form";
+import { useCompanies } from "@/company/company.hooks";
+
+import useUserStore from "@/stores/use-user-store";
 
 export const createClientSchema = (t: (key: string) => string) =>
   z.object({

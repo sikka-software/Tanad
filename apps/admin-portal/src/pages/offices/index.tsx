@@ -11,21 +11,19 @@ import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import OfficeCard from "@/modules/office/office.card";
-import { OfficeForm } from "@/modules/office/office.form";
-import {
-  useOffices,
-  useBulkDeleteOffices,
-  useDuplicateOffice,
-} from "@/modules/office/office.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/office/office.options";
-import useOfficeStore from "@/modules/office/office.store";
-import OfficesTable from "@/modules/office/office.table";
-import { OfficeUpdateData } from "@/modules/office/office.type";
+import OfficeCard from "@/office/office.card";
+import { OfficeForm } from "@/office/office.form";
+import { useOffices, useBulkDeleteOffices, useDuplicateOffice } from "@/office/office.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/office/office.options";
+import useOfficeStore from "@/office/office.store";
+import OfficesTable from "@/office/office.table";
+import { OfficeUpdateData } from "@/office/office.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function OfficesPage() {

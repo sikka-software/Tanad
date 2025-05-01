@@ -6,20 +6,19 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { DocumentList } from "@/ui/documents-list";
+import { DocumentFile, DocumentUploader } from "@/ui/documents-uploader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { DocumentList } from "@/components/ui/documents-list";
-import { DocumentFile, DocumentUploader } from "@/components/ui/documents-uploader";
-
 import { uploadDocument } from "@/services/documents";
 
-import useCompanyStore from "@/modules/company/company.store";
-import { Company, CompanyUpdateData } from "@/modules/company/company.type";
-import useUserStore from "@/stores/use-user-store";
+import { useCreateCompany, useUpdateCompany } from "@/company/company.hooks";
+import useCompanyStore from "@/company/company.store";
+import { CompanyUpdateData } from "@/company/company.type";
 
-import { useCreateCompany, useUpdateCompany } from "./company.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 export const createCompanySchema = (t: (key: string) => string) =>
   z.object({

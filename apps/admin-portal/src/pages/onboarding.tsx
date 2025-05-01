@@ -1,8 +1,9 @@
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 
+import { Card, CardContent } from "@/ui/card";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { OnboardingForm } from "@/modules/onboarding/onboarding.form";
 

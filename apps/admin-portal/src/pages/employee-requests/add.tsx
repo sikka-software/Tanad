@@ -7,18 +7,21 @@ import { toast } from "sonner";
 
 import PageTitle from "@/ui/page-title";
 
+import { createClient } from "@/utils/supabase/component";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
+import { employeeKeys } from "@/employee/employee.hooks";
+
 import EmployeeRequestForm, {
   type EmployeeRequestFormValues,
-} from "@/modules/employee-request/employee-request.form";
-import { createEmployeeRequest } from "@/modules/employee-request/employee-request.service";
-import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
-import { employeeKeys } from "@/modules/employee/employee.hooks";
+} from "@/employee-request/employee-request.form";
+import { createEmployeeRequest } from "@/employee-request/employee-request.service";
+import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
+
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 export default function AddEmployeeRequestPage() {
   const supabase = createClient();

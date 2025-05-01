@@ -1,4 +1,4 @@
-import { Salary, SalaryCreateData } from "@/modules/salary/salary.type";
+import { Salary, SalaryCreateData } from "@/salary/salary.type";
 
 export async function fetchSalaries(): Promise<Salary[]> {
   try {

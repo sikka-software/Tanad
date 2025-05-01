@@ -1,17 +1,13 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import ProtectedRoute from "@/components/app/ProtectedRoute";
-import TemplateEditor from "@/components/app/TemplateEditor";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,33 +15,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableCell,
-  TableBody,
-} from "@/components/ui/table";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { Input } from "@/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
+import { Switch } from "@/ui/switch";
+import { Table, TableHeader, TableRow, TableHead, TableCell, TableBody } from "@/ui/table";
+import { Textarea } from "@/ui/textarea";
+
+import ProtectedRoute from "@/components/app/ProtectedRoute";
+import TemplateEditor from "@/components/app/TemplateEditor";
 
 import useUserStore from "@/stores/use-user-store";
 

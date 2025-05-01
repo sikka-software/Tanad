@@ -4,7 +4,7 @@ import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { type HTMLMotionProps, type Transition, motion } from "motion/react";
 import * as React from "react";
 
-import { MotionHighlight, MotionHighlightItem } from "@/components/ui/motion-highlight";
+import { MotionHighlight, MotionHighlightItem } from "@/ui/motion-highlight";
 
 import { cn } from "@/lib/utils";
 

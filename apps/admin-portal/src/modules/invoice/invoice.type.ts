@@ -1,4 +1,4 @@
-import { Client } from "@/modules/client/client.type";
+import { Client } from "@/client/client.type";
 
 export type Invoice = {
   id: string;

@@ -1,6 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { CircleAlert, Loader2 } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
+import { useEffect, useId, useState } from "react";
+
+import { Button } from "@/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -10,12 +14,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { CircleAlert, Loader2 } from "lucide-react";
-import { useEffect, useId, useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
+} from "@/ui/dialog";
+import { Input } from "@/ui/input";
+import { Label } from "@/ui/label";
 
 export default function Component({
   onConfirm,
@@ -46,15 +47,13 @@ export default function Component({
       <DialogContent dir={lang === "ar" ? "rtl" : "ltr"}>
         <div className="flex flex-col items-center gap-2">
           <div
-            className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border"
+            className="border-border flex size-9 shrink-0 items-center justify-center rounded-full border"
             aria-hidden="true"
           >
             <CircleAlert className="opacity-80" size={16} strokeWidth={2} />
           </div>
           <DialogHeader>
-            <DialogTitle className="sm:text-center">
-              {t("MyPuklas.delete_pukla")}
-            </DialogTitle>
+            <DialogTitle className="sm:text-center">{t("MyPuklas.delete_pukla")}</DialogTitle>
             <DialogDescription className="sm:text-center">
               {t("MyPuklas.delete_pukla_description", {
                 pukla_name: pukla?.title,
@@ -86,16 +85,8 @@ export default function Component({
                 {t("General.cancel")}
               </Button>
             </DialogClose>
-            <Button
-              type="submit"
-              className="flex-1"
-              disabled={inputValue !== pukla?.title}
-            >
-              {loadingDelete ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                t("General.delete")
-              )}
+            <Button type="submit" className="flex-1" disabled={inputValue !== pukla?.title}>
+              {loadingDelete ? <Loader2 className="size-4 animate-spin" /> : t("General.delete")}
             </Button>
           </DialogFooter>
         </form>

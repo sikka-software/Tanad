@@ -3,11 +3,12 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
+import PageTitle from "@/ui/page-title";
 
-import { JobListingForm, type JobListingFormValues } from "@/modules/job-listing/job-listing.form";
-import { useJobListings } from "@/modules/job-listing/job-listing.hooks";
+import { JobListingForm, type JobListingFormValues } from "@/job-listing/job-listing.form";
+import { useJobListings } from "@/job-listing/job-listing.hooks";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddJobListingPage() {

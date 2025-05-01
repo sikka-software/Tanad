@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,13 +15,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/radix-collapsible";
+} from "@/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/ui/radix-collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -34,7 +30,7 @@ import {
   SidebarMenuAction,
   SidebarSeparator,
   useSidebar,
-} from "@/components/ui/sidebar";
+} from "@/ui/sidebar";
 
 import { SidebarMenuGroupProps } from "@/lib/sidebar-list";
 import { cn } from "@/lib/utils";

@@ -6,26 +6,24 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import ExpenseCard from "@/modules/expense/expense.card";
-import { ExpenseForm } from "@/modules/expense/expense.form";
-import {
-  useExpenses,
-  useBulkDeleteExpenses,
-  useDuplicateExpense,
-} from "@/modules/expense/expense.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/expense/expense.options";
-import useExpenseStore from "@/modules/expense/expense.store";
-import ExpensesTable from "@/modules/expense/expense.table";
-import { ExpenseUpdateData } from "@/modules/expense/expense.type";
+import ExpenseCard from "@/expense/expense.card";
+import { ExpenseForm } from "@/expense/expense.form";
+import { useExpenses, useBulkDeleteExpenses, useDuplicateExpense } from "@/expense/expense.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/expense/expense.options";
+import useExpenseStore from "@/expense/expense.store";
+import ExpensesTable from "@/expense/expense.table";
+import { ExpenseUpdateData } from "@/expense/expense.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function ExpensesPage() {

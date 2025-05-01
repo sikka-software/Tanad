@@ -3,8 +3,8 @@ import { ThemeProvider } from "next-themes";
 
 import Footer from "@/components/landing/Footer";
 import Navigation from "@/components/landing/Navbar";
-import GridBG from "@/components/ui/grid-bg";
-import { LoadingBar } from "@/components/ui/loading-bar";
+import GridBG from "@/ui/grid-bg";
+import { LoadingBar } from "@/ui/loading-bar";
 
 import useStickyHeader from "@/hooks/use-sticky-header";
 

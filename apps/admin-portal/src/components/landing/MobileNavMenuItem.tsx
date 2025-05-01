@@ -7,7 +7,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/ui/accordion";
 
 type CustomMotionDivProps = MotionProps &
   React.HTMLAttributes<HTMLDivElement> & {

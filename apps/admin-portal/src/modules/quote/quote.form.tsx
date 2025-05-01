@@ -19,10 +19,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 import { Textarea } from "@/ui/textarea";
 
-import { ClientForm, type ClientFormValues } from "@/modules/client/client.form";
-import { Client } from "@/modules/client/client.type";
-import { Product } from "@/modules/product/product.type";
 import { createClient } from "@/utils/supabase/component";
+
+import { ClientForm, type ClientFormValues } from "@/client/client.form";
+import { Client } from "@/client/client.type";
+
+import { Product } from "@/product/product.type";
 
 export interface QuoteItem {
   product_id?: string;

@@ -7,9 +7,9 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useDebounce } from "use-debounce";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/ui/card";
+import { Input } from "@/ui/input";
+import { Skeleton } from "@/ui/skeleton";
 
 import { createClient } from "@/utils/supabase/component";
 

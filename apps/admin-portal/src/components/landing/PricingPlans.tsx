@@ -1,8 +1,8 @@
 import React, { FC, InputHTMLAttributes, useId } from "react";
 // UI
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PricingCard } from "@/components/ui/pricing-card";
-import { PricingCardProps } from "@/components/ui/pricing-card";
+import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
+import { PricingCard } from "@/ui/pricing-card";
+import { PricingCardProps } from "@/ui/pricing-card";
 import { useTranslations } from "next-intl";
 
 type PricingPlansTypes = {

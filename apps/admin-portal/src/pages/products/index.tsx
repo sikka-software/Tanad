@@ -5,19 +5,21 @@ import { useMemo } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import ProductCard from "@/modules/product/product.card";
-import { useProducts, useBulkDeleteProducts } from "@/modules/product/product.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/product/product.options";
-import useProductStore from "@/modules/product/product.store";
-import ProductsTable from "@/modules/product/product.table";
+import ProductCard from "@/product/product.card";
+import { useProducts, useBulkDeleteProducts } from "@/product/product.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/product/product.options";
+import useProductStore from "@/product/product.store";
+import ProductsTable from "@/product/product.table";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function ProductsPage() {

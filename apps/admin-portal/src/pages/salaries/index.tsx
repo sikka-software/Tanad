@@ -5,19 +5,21 @@ import { useMemo } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import SalaryCard from "@/modules/salary/salary.card";
-import { useSalaries, useBulkDeleteSalaries } from "@/modules/salary/salary.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/salary/salary.options";
-import useSalaryStore from "@/modules/salary/salary.store";
-import SalariesTable from "@/modules/salary/salary.table";
+import SalaryCard from "@/salary/salary.card";
+import { useSalaries, useBulkDeleteSalaries } from "@/salary/salary.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/salary/salary.options";
+import useSalaryStore from "@/salary/salary.store";
+import SalariesTable from "@/salary/salary.table";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function SalariesPage() {

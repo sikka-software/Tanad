@@ -3,10 +3,11 @@ import { CreditCard, Package, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
+import PageTitle from "@/ui/page-title";
+import { Skeleton } from "@/ui/skeleton";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import PageTitle from "@/components/ui/page-title";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import useUserStore from "@/stores/use-user-store";
 

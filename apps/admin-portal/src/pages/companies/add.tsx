@@ -9,8 +9,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { CompanyForm } from "@/modules/company/company.form";
-import useCompanyStore from "@/modules/company/company.store";
+import { CompanyForm } from "@/company/company.form";
+import useCompanyStore from "@/company/company.store";
 
 export default function AddCompanyPage() {
   const t = useTranslations();

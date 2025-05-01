@@ -1,6 +1,8 @@
-import { Employee, EmployeeCreateData } from "@/modules/employee/employee.types";
-import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
+
+import { Employee, EmployeeCreateData } from "@/employee/employee.types";
+
+import useUserStore from "@/stores/use-user-store";
 
 export async function fetchEmployees(): Promise<Employee[]> {
   const supabase = createClient();
@@ -217,7 +219,6 @@ export async function createEmployee(newEmployee: EmployeeCreateData): Promise<E
 
 //   // Add the user_id to the employee data
 //   employeeData.user_id = user.id;
-
 
 //   const { data, error } = await supabase
 //     .from("employees")

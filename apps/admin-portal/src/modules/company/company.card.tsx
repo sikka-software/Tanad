@@ -1,10 +1,10 @@
 import { Mail, Phone, Globe, MapPin, Building2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/ui/badge";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Company } from "@/modules/company/company.type";
+import { Company } from "@/company/company.type";
 
 const CompanyCard = ({ company }: { company: Company }) => {
   const t = useTranslations();

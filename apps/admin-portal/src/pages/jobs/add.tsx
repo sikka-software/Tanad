@@ -12,10 +12,10 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { JobForm, type JobFormValues } from "@/modules/job/job.form";
-import { jobKeys } from "@/modules/job/job.hooks";
-import { createJob } from "@/modules/job/job.service";
-import useJobStore from "@/modules/job/job.store";
+import { JobForm } from "@/job/job.form";
+import { jobKeys } from "@/job/job.hooks";
+import { createJob } from "@/job/job.service";
+import useJobStore from "@/job/job.store";
 
 export default function AddJobPage() {
   const t = useTranslations();

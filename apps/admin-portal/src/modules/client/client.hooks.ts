@@ -8,9 +8,8 @@ import {
   updateClient,
   bulkDeleteClients,
   duplicateClient,
-} from "@/modules/client/client.service";
-
-import { Client, ClientCreateData } from "./client.type";
+} from "@/client/client.service";
+import { Client, ClientCreateData } from "@/client/client.type";
 
 export const clientKeys = {
   all: ["clients"] as const,

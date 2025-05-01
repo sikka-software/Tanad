@@ -8,8 +8,9 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useBranchStore from "@/modules/branch/branch.store";
-import { Branch } from "@/modules/branch/branch.type";
+import useBranchStore from "@/branch/branch.store";
+import { Branch } from "@/branch/branch.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateBranch } from "./branch.hooks";

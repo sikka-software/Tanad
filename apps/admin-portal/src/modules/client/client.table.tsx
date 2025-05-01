@@ -8,11 +8,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useClientStore from "@/modules/client/client.store";
-import { Client } from "@/modules/client/client.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateClient } from "@/client/client.hooks";
+import useClientStore from "@/client/client.store";
+import { Client } from "@/client/client.type";
 
-import { useUpdateClient } from "./client.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Client>) => {
   const t = useTranslations();

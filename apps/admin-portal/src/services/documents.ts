@@ -1,4 +1,4 @@
-import { DocumentFile } from "@/components/ui/documents-uploader";
+import { DocumentFile } from "@/ui/documents-uploader";
 
 import { createClient } from "@/utils/supabase/component";
 

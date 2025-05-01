@@ -10,10 +10,10 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { WarehouseForm, type WarehouseFormValues } from "@/modules/warehouse/warehouse.form";
-import { warehouseKeys } from "@/modules/warehouse/warehouse.hooks";
-import { createWarehouse } from "@/modules/warehouse/warehouse.service";
-import type { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
+import { WarehouseForm, type WarehouseFormValues } from "@/warehouse/warehouse.form";
+import { warehouseKeys } from "@/warehouse/warehouse.hooks";
+import { createWarehouse } from "@/warehouse/warehouse.service";
+import type { Warehouse, WarehouseCreateData } from "@/warehouse/warehouse.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddWarehousePage() {

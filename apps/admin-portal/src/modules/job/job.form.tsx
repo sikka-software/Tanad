@@ -12,12 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
-import { JobUpdateData } from "@/modules/job/job.type";
-import useUserStore from "@/stores/use-user-store";
+import { useCreateJob, useUpdateJob } from "@/job/job.hooks";
+import useJobStore from "@/job/job.store";
+import { JobUpdateData } from "@/job/job.type";
 
-import { CompanyFormValues } from "../company/company.form";
-import { useCreateJob, useUpdateJob } from "./job.hooks";
-import useJobStore from "./job.store";
+import useUserStore from "@/stores/use-user-store";
 
 interface JobFormProps {
   id?: string;

@@ -1,55 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import React from "react";
-
+import { ChevronsUpDown, Mail, Save, User, Loader2, Sidebar } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import React from "react";
 
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import {
-  ChevronsUpDown,
-  CreditCard,
-  GripVertical,
-  Mail,
-  Save,
-  SettingsIcon,
-  User,
-  Loader2,
-  Sidebar,
-} from "lucide-react";
+import { Button } from "@/ui/button";
+import { Card, CardContent } from "@/ui/card";
+import PageTitle from "@/ui/page-title";
+import { ScrollArea } from "@/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import GeneralSettings from "@/components/settings/general-settings";
 import NotificationSettings from "@/components/settings/notification-settings";
 import PreferenceSettings from "@/components/settings/preference-settings";
 import SidebarSettings from "@/components/settings/sidebar-settings";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import PageTitle from "@/components/ui/page-title";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
+import { getMenuList } from "@/lib/sidebar-list";
 
 // Valid tab names for type safety
 const validTabs = ["general", "navigation", "preferences", "notifications", "billing"] as const;

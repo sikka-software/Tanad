@@ -10,10 +10,10 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import { Label } from "@/components/ui/label";
-import { PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@/ui
+import { Label } from "@/ui
+import { PopoverContent, PopoverTrigger } from "@/ui
+import { Skeleton } from "@/ui
 
 import { cn } from "@/lib/utils";
 

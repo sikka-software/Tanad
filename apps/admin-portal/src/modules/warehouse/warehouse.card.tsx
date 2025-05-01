@@ -1,10 +1,10 @@
 import { MapPin, Code, LayoutGrid, NotebookText } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/ui/badge";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Warehouse } from "@/modules/warehouse/warehouse.type";
+import { Warehouse } from "@/warehouse/warehouse.type";
 
 const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
   const t = useTranslations("Warehouses");

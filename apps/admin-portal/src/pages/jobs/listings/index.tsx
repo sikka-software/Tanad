@@ -8,16 +8,17 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import JobListingCard from "@/modules/job-listing/job-listing.card";
-import { useJobListings, useBulkDeleteJobListings } from "@/modules/job-listing/job-listing.hooks";
-import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/job-listing/job-listing.options";
-import useJobListingsStore from "@/modules/job-listing/job-listing.store";
-import JobListingsTable from "@/modules/job-listing/job-listing.table";
-import { JobListing } from "@/modules/job-listing/job-listing.type";
+import JobListingCard from "@/job-listing/job-listing.card";
+import { useJobListings, useBulkDeleteJobListings } from "@/job-listing/job-listing.hooks";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/job-listing/job-listing.options";
+import useJobListingsStore from "@/job-listing/job-listing.store";
+import JobListingsTable from "@/job-listing/job-listing.table";
+import { JobListing } from "@/job-listing/job-listing.type";
 
 export default function JobListingsPage() {
   const t = useTranslations();

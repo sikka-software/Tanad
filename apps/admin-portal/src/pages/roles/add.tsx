@@ -2,13 +2,13 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
-import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Button } from "@/components/ui/button";
-import PageTitle from "@/components/ui/page-title";
+import PageTitle from "@/ui/page-title";
 
-import { RoleForm } from "@/modules/role/role.form";
-import useEnterpriseUserStore from "@/modules/user/user.store";
+import CustomPageMeta from "@/components/landing/CustomPageMeta";
+
+import { RoleForm } from "@/role/role.form";
+
+import useEnterpriseUserStore from "@/user/user.store";
 
 export default function AddRolePage() {
   const t = useTranslations();

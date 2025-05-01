@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { TransitionPanel } from "@/components/ui/transition-panel";
+import { TransitionPanel } from "@/ui/transition-panel";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from "@/ui/dialog";
+import { Button } from "@/ui/button";
 import useMeasure from "react-use-measure";
 import { useLocale } from "next-intl";
 import { Loader2 } from "lucide-react";

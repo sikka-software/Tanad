@@ -2,10 +2,11 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
+import { Card, CardContent, CardDescription, CardTitle } from "@/ui/card";
+
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import SocialIcons from "@/components/landing/SocialIcons";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 
 // Constants
 import settings from "../../landing.config";

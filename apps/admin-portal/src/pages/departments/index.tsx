@@ -6,26 +6,28 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import DepartmentCard from "@/modules/department/department.card";
-import DepartmentForm from "@/modules/department/department.form";
+import DepartmentCard from "@/department/department.card";
+import DepartmentForm from "@/department/department.form";
 import {
   useDepartments,
   useBulkDeleteDepartments,
   useDuplicateDepartment,
-} from "@/modules/department/department.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/department/department.options";
-import useDepartmentsStore from "@/modules/department/department.store";
-import DepartmentsTable from "@/modules/department/department.table";
-import { Department } from "@/modules/department/department.type";
+} from "@/department/department.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/department/department.options";
+import useDepartmentsStore from "@/department/department.store";
+import DepartmentsTable from "@/department/department.table";
+import { Department } from "@/department/department.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function DepartmentsPage() {

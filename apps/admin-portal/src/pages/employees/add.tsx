@@ -2,14 +2,15 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
+import { Button } from "@/ui/button";
+import PageTitle from "@/ui/page-title";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import { Button } from "@/components/ui/button";
-import PageTitle from "@/components/ui/page-title";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { EmployeeForm } from "@/modules/employee/employee.form";
-import useEmployeesStore from "@/modules/employee/employee.store";
+import { EmployeeForm } from "@/employee/employee.form";
+import useEmployeesStore from "@/employee/employee.store";
 
 export default function AddEmployeePage() {
   const t = useTranslations();

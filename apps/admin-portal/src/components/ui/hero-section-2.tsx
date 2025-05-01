@@ -6,8 +6,8 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import React from "react";
 
-import { AnimatedGroup } from "@/components/ui/animated-group";
-import { Button } from "@/components/ui/button";
+import { AnimatedGroup } from "@/ui/animated-group";
+import { Button } from "@/ui/button";
 
 import { cn } from "@/lib/utils";
 

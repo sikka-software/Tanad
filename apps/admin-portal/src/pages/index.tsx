@@ -1,6 +1,9 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
+import CustomersSection from "@/ui/customers-section";
+import { HeroSection as HeroSection2 } from "@/ui/hero-section-2";
+
 import BottomCTA from "@/components/landing/BottomCTA";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import Features from "@/components/landing/Features";
@@ -10,8 +13,6 @@ import { DepartmentsFeatures } from "@/components/landing/departments-features";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { Pricing } from "@/components/landing/pricing-with-comparison";
 import WaitlistSection from "@/components/landing/waitlist-section";
-import CustomersSection from "@/components/ui/customers-section";
-import { HeroSection as HeroSection2 } from "@/components/ui/hero-section-2";
 
 export default function LandingPage() {
   const t = useTranslations();

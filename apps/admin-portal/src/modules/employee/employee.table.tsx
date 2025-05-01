@@ -8,10 +8,12 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import { useDepartments } from "@/modules/department/department.hooks";
-import { useUpdateEmployee } from "@/modules/employee/employee.hooks";
-import useEmployeeStore from "@/modules/employee/employee.store";
-import { Employee } from "@/modules/employee/employee.types";
+import { useDepartments } from "@/department/department.hooks";
+
+import { useUpdateEmployee } from "@/employee/employee.hooks";
+import useEmployeeStore from "@/employee/employee.store";
+import { Employee } from "@/employee/employee.types";
+
 import useUserStore from "@/stores/use-user-store";
 
 const EmployeesTable = ({

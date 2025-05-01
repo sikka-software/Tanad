@@ -11,11 +11,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useInvoiceStore from "@/modules/invoice/invoice.store";
-import { Invoice } from "@/modules/invoice/invoice.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateInvoice } from "@/invoice/invoice.hooks";
+import useInvoiceStore from "@/invoice/invoice.store";
+import { Invoice } from "@/invoice/invoice.type";
 
-import { useUpdateInvoice } from "./invoice.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const formatDate = (dateStr: string) => {
   try {

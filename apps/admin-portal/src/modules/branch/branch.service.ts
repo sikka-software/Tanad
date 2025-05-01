@@ -1,4 +1,4 @@
-import { Branch, BranchCreateData } from "@/modules/branch/branch.type";
+import { Branch, BranchCreateData } from "@/branch/branch.type";
 
 export async function fetchBranches(): Promise<Branch[]> {
   try {

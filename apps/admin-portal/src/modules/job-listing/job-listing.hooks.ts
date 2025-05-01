@@ -5,8 +5,8 @@ import {
   bulkDeleteJobListings,
   createJobListing,
   updateJobListing,
-} from "@/modules/job-listing/job-listing.service";
-import { JobListing } from "@/modules/job-listing/job-listing.type";
+} from "@/job-listing/job-listing.service";
+import { JobListing } from "@/job-listing/job-listing.type";
 
 export const jobListingKeys = {
   all: ["jobListings"] as const,

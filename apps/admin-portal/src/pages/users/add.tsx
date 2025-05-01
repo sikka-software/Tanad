@@ -10,8 +10,8 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { UserForm } from "@/modules/user/user.form";
-import { useCreateUser } from "@/modules/user/user.hooks";
+import { UserForm } from "@/user/user.form";
+import { useCreateUser } from "@/user/user.hooks";
 
 export default function AddUserPage() {
   const t = useTranslations();

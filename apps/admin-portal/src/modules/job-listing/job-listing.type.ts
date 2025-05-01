@@ -1,4 +1,4 @@
-import { Job } from "@/modules/job/job.type";
+import { Job } from "@/job/job.type";
 
 export interface JobListing {
   id: string;

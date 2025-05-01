@@ -1,10 +1,9 @@
+import { format } from "date-fns";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 
-import { format } from "date-fns";
-
-import { Invoice } from "@/modules/invoice/invoice.type";
-import { fetchInvoiceById } from "@/modules/invoice/invoice.service";
+import { fetchInvoiceById } from "@/invoice/invoice.service";
+import { Invoice } from "@/invoice/invoice.type";
 
 interface Props {
   invoice: Invoice;

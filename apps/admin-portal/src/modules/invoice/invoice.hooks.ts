@@ -7,8 +7,8 @@ import {
   fetchInvoiceById,
   fetchInvoices,
   updateInvoice,
-} from "@/modules/invoice/invoice.service";
-import { Invoice, InvoiceCreateData } from "@/modules/invoice/invoice.type";
+} from "@/invoice/invoice.service";
+import { Invoice, InvoiceCreateData } from "@/invoice/invoice.type";
 
 // Query keys
 export const invoiceKeys = {

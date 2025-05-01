@@ -4,8 +4,8 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
-import { Chip } from "@/components/ui/chip";
+} from "@/ui/card";
+import { Chip } from "@/ui/chip";
 import { cn } from "@/lib/utils";
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 

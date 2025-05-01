@@ -9,11 +9,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useJobsStore from "@/modules/job/job.store";
-import { Job } from "@/modules/job/job.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateJob } from "@/job/job.hooks";
+import useJobsStore from "@/job/job.store";
+import { Job } from "@/job/job.type";
 
-import { useUpdateJob } from "./job.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Job>) => {
   const t = useTranslations();

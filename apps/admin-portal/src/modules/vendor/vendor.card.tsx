@@ -1,9 +1,9 @@
 import { Mail, Phone, MapPin, NotebookText } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Vendor } from "@/modules/vendor/vendor.type";
+import { Vendor } from "@/vendor/vendor.type";
 
 const VendorCard = ({ vendor }: { vendor: Vendor }) => {
   const t = useTranslations("Vendors");

@@ -1,10 +1,10 @@
 import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { createClient } from "@/utils/supabase/server-props";
+
 import { db } from "@/db/drizzle";
 import { products } from "@/db/schema";
-import type { Product, ProductCreateData } from "@/modules/product/product.type";
-import { createClient } from "@/utils/supabase/server-props";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createClient({

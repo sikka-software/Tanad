@@ -6,19 +6,21 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import QuoteCard from "@/modules/quote/quote.card";
-import { useQuotes, useBulkDeleteQuotes } from "@/modules/quote/quote.hooks";
-import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/quote/quote.options";
-import useQuotesStore from "@/modules/quote/quote.store";
-import QuotesTable from "@/modules/quote/quote.table";
+import QuoteCard from "@/quote/quote.card";
+import { useQuotes, useBulkDeleteQuotes } from "@/quote/quote.hooks";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/quote/quote.options";
+import useQuotesStore from "@/quote/quote.store";
+import QuotesTable from "@/quote/quote.table";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function QuotesPage() {

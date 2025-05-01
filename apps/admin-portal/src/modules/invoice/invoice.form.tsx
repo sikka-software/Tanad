@@ -19,8 +19,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 import { Textarea } from "@/ui/textarea";
 
-import { ClientForm } from "@/modules/client/client.form";
 import { createClient } from "@/utils/supabase/component";
+
+import { ClientForm } from "@/client/client.form";
 
 const createInvoiceSchema = (t: (key: string) => string) =>
   z.object({

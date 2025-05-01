@@ -8,15 +8,17 @@ import { toast } from "sonner";
 import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
+import { createClient } from "@/utils/supabase/component";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { BranchForm, type BranchFormValues } from "@/modules/branch/branch.form";
-import { branchKeys } from "@/modules/branch/branch.hooks";
-import useBranchStore from "@/modules/branch/branch.store";
+import { BranchForm } from "@/branch/branch.form";
+import { branchKeys } from "@/branch/branch.hooks";
+import useBranchStore from "@/branch/branch.store";
+
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 export default function AddBranchPage() {
   const supabase = createClient();

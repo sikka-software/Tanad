@@ -8,11 +8,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useCompanyStore from "@/modules/company/company.store";
-import { Company } from "@/modules/company/company.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateCompany } from "@/company/company.hooks";
+import useCompanyStore from "@/company/company.store";
+import { Company } from "@/company/company.type";
 
-import { useUpdateCompany } from "./company.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Company>) => {
   const t = useTranslations();

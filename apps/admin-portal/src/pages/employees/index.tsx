@@ -6,19 +6,21 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import EmployeeCard from "@/modules/employee/employee.card";
-import { useEmployees, useBulkDeleteEmployees } from "@/modules/employee/employee.hooks";
-import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/modules/employee/employee.options";
-import useEmployeesStore from "@/modules/employee/employee.store";
-import EmployeesTable from "@/modules/employee/employee.table";
+import EmployeeCard from "@/employee/employee.card";
+import { useEmployees, useBulkDeleteEmployees } from "@/employee/employee.hooks";
+import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/employee/employee.options";
+import useEmployeesStore from "@/employee/employee.store";
+import EmployeesTable from "@/employee/employee.table";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function EmployeesPage() {

@@ -7,8 +7,8 @@ import {
   fetchProductById,
   fetchProducts,
   updateProduct,
-} from "@/modules/product/product.service";
-import type { Product } from "@/modules/product/product.type";
+} from "@/product/product.service";
+import type { Product } from "@/product/product.type";
 
 // Query keys for products
 export const productKeys = {

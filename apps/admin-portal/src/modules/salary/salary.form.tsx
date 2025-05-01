@@ -7,23 +7,22 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { ComboboxAdd } from "@/ui/combobox-add";
+import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
-import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
-
-import { CurrencyInput } from "@/components/ui/currency-input";
 
 import { generateDummyEmployee } from "@/lib/dummy-factory";
 
-import { EmployeeForm } from "@/modules/employee/employee.form";
-import { useEmployees } from "@/modules/employee/employee.hooks";
-import useUserStore from "@/stores/use-user-store";
+import { EmployeeForm } from "@/employee/employee.form";
+import { useEmployees } from "@/employee/employee.hooks";
+import useEmployeeStore from "@/employee/employee.store";
 
-import useEmployeeStore from "../employee/employee.store";
-import { useCreateSalary, useUpdateSalary } from "./salary.hooks";
-import useSalaryStore from "./salary.store";
+import { useCreateSalary, useUpdateSalary } from "@/salary/salary.hooks";
+import useSalaryStore from "@/salary/salary.store";
+
+import useUserStore from "@/stores/use-user-store";
 
 const createSalarySchema = (t: (key: string) => string) =>
   z.object({

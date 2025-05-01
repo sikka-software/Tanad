@@ -18,10 +18,11 @@ import { Textarea } from "@/ui/textarea";
 
 import { cn } from "@/lib/utils";
 
-import useEmployeeRequestsStore from "@/modules/employee-request/employee-request.store";
-import { EmployeeForm } from "@/modules/employee/employee.form";
-import { useEmployees } from "@/modules/employee/employee.hooks";
-import useEmployeeStore from "@/modules/employee/employee.store";
+import { EmployeeForm } from "@/employee/employee.form";
+import { useEmployees } from "@/employee/employee.hooks";
+import useEmployeeStore from "@/employee/employee.store";
+
+import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
 
 const createRequestSchema = (t: (key: string) => string) =>
   z.object({

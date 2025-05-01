@@ -5,11 +5,10 @@ import { useCallback } from "react";
 import React from "react";
 import { z } from "zod";
 
+import { Badge } from "@/ui/badge";
 import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
-
-import { Badge } from "@/components/ui/badge";
 
 import { ModuleTableProps } from "@/types/common.type";
 

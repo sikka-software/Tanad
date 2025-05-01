@@ -6,8 +6,8 @@ import {
   fetchWarehouseById,
   fetchWarehouses,
   updateWarehouse,
-} from "@/modules/warehouse/warehouse.service";
-import type { Warehouse, WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
+} from "@/warehouse/warehouse.service";
+import type { Warehouse, WarehouseCreateData } from "@/warehouse/warehouse.type";
 
 // Query keys for warehouses
 export const warehouseKeys = {

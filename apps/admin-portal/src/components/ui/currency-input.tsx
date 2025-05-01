@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 
-import { Input } from "@/components/ui/input";
+import { Input } from "@/ui/input";
 
 import { SARSymbol } from "./sar-symbol";
 

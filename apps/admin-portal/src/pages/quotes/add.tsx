@@ -4,14 +4,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
+
+import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { QuoteForm, type QuoteFormValues } from "@/modules/quote/quote.form";
+import { QuoteForm, type QuoteFormValues } from "@/quote/quote.form";
+
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 export default function AddQuotePage() {
   const supabase = createClient();

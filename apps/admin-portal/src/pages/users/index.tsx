@@ -6,22 +6,24 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import UserCard from "@/modules/user/user.card";
-import { UserForm } from "@/modules/user/user.form";
-import { useUsers, useBulkDeleteUsers } from "@/modules/user/user.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/user/user.options";
-import useEnterpriseUsersStore from "@/modules/user/user.store";
-import UsersTable, { UserType } from "@/modules/user/user.table";
-import { User } from "@/modules/user/user.type";
+import UserCard from "@/user/user.card";
+import { UserForm } from "@/user/user.form";
+import { useUsers, useBulkDeleteUsers } from "@/user/user.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/user/user.options";
+import useEnterpriseUsersStore from "@/user/user.store";
+import UsersTable from "@/user/user.table";
+import { UserType } from "@/user/user.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function UsersPage() {
@@ -53,7 +55,7 @@ export default function UsersPage() {
   const { createDeleteHandler } = useDeleteHandler();
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableUser, setActionableUser] = useState<User | null>(null);
+  const [actionableUser, setActionableUser] = useState<UserType | null>(null);
 
   const handleConfirmDelete = createDeleteHandler(deleteUsers, {
     loading: "Users.loading.deleting",
@@ -67,7 +69,7 @@ export default function UsersPage() {
   });
 
   const filteredUsers = useMemo(() => {
-    return getFilteredUsers((users as User[]) || []);
+    return getFilteredUsers((users as UserType[]) || []);
   }, [users, getFilteredUsers, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedUsers = useMemo(() => {
@@ -77,7 +79,7 @@ export default function UsersPage() {
   const onActionClicked = async (action: string, rowId: string) => {
     const userToActOn = users?.find((user) => user.id === rowId) || null;
     if (action === "edit") {
-      setActionableUser(userToActOn as User | null);
+      setActionableUser(userToActOn as UserType | null);
       setIsFormDialogOpen(true);
     }
 
@@ -128,14 +130,14 @@ export default function UsersPage() {
         <div>
           {viewMode === "table" ? (
             <UsersTable
-              users={sortedUsers as unknown as UserType[]}
+              data={sortedUsers as unknown as UserType[]}
               isLoading={isLoading}
               error={error as Error | null}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
-              <DataModelList<User>
+              <DataModelList<UserType>
                 data={sortedUsers}
                 isLoading={isLoading}
                 error={error as Error | null}

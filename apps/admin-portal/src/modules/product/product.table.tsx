@@ -8,11 +8,11 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useProductStore from "@/modules/product/product.store";
-import { Product } from "@/modules/product/product.type";
-import useUserStore from "@/stores/use-user-store";
+import { useUpdateProduct } from "@/product/product.hooks";
+import useProductStore from "@/product/product.store";
+import { Product } from "@/product/product.type";
 
-import { useUpdateProduct } from "./product.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Product>) => {
   const t = useTranslations();

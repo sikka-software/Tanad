@@ -6,19 +6,21 @@ import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDeleteHandler } from "@/hooks/use-delete-handler";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import NoPermission from "@/components/ui/no-permission";
 
-import { useDeleteHandler } from "@/hooks/use-delete-handler";
-import WarehouseCard from "@/modules/warehouse/warehouse.card";
-import { useBulkDeleteWarehouses, useWarehouses } from "@/modules/warehouse/warehouse.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/warehouse/warehouse.options";
-import useWarehouseStore from "@/modules/warehouse/warehouse.store";
-import WarehouseTable from "@/modules/warehouse/warehouse.table";
+import WarehouseCard from "@/warehouse/warehouse.card";
+import { useBulkDeleteWarehouses, useWarehouses } from "@/warehouse/warehouse.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/warehouse/warehouse.options";
+import useWarehouseStore from "@/warehouse/warehouse.store";
+import WarehouseTable from "@/warehouse/warehouse.table";
+
 import useUserStore from "@/stores/use-user-store";
 
 export default function WarehousesPage() {

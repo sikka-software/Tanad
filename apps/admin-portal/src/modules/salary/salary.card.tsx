@@ -1,15 +1,13 @@
+import { CalendarDays, CircleDollarSign, ReceiptText, NotebookText, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-
-import { CalendarDays, CircleDollarSign, ReceiptText, NotebookText, User } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 
-import { Salary } from "@/modules/salary/salary.type";
-
-import { useDeleteSalary } from "@/modules/salary/salary.hooks";
+import { useDeleteSalary } from "@/salary/salary.hooks";
+import { Salary } from "@/salary/salary.type";
 
 // Helper to format date string (optional)
 const formatDate = (dateString: string | null | undefined) => {

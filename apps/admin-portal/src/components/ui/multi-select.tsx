@@ -4,8 +4,8 @@ import { CheckIcon, XCircle, ChevronDown, XIcon, WandSparkles } from "lucide-rea
 import { useLocale, useTranslations } from "next-intl";
 import * as React from "react";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -14,10 +14,10 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
+import { Separator } from "@/ui/separator";
+import { Skeleton } from "@/ui/skeleton";
 
 import { cn } from "@/lib/utils";
 

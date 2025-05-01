@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { ComboboxAdd } from "@/ui/combobox-add";
+import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
@@ -13,16 +14,16 @@ import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
-import { CurrencyInput } from "@/components/ui/currency-input";
-
-import DepartmentForm from "@/modules/department/department.form";
-import { useDepartments } from "@/modules/department/department.hooks";
-import useEmployeeStore from "@/modules/employee/employee.store";
-import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
 
-import useDepartmentStore from "../department/department.store";
-import { useCreateEmployee, useUpdateEmployee } from "./employee.hooks";
+import DepartmentForm from "@/department/department.form";
+import { useDepartments } from "@/department/department.hooks";
+import useDepartmentStore from "@/department/department.store";
+
+import { useCreateEmployee, useUpdateEmployee } from "@/employee/employee.hooks";
+import useEmployeeStore from "@/employee/employee.store";
+
+import useUserStore from "@/stores/use-user-store";
 
 const createEmployeeFormSchema = (t: (key: string) => string) => {
   const supabase = createClient();

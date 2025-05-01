@@ -1,8 +1,8 @@
 import { Check, Minus, MoveRight, PhoneCall } from "lucide-react";
 import React from "react";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/ui/badge";
+import { Button } from "@/ui/button";
 
 // Define the structure for a pricing plan
 interface PricingPlan {

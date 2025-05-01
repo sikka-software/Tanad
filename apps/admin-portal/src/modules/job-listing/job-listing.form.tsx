@@ -1,18 +1,15 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-import { useTranslations } from "next-intl";
-
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { Job } from "@/modules/job/job.type";
-
-import { useJobs } from "@/modules/job/job.hooks";
+import { useJobs } from "@/job/job.hooks";
+import { Job } from "@/job/job.type";
 
 interface JobListingFormProps {
   id?: string;

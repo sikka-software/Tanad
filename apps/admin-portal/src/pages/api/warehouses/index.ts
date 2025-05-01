@@ -1,10 +1,12 @@
 import { eq, desc } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { createClient } from "@/utils/supabase/server-props";
+
+import { WarehouseCreateData } from "@/warehouse/warehouse.type";
+
 import { db } from "@/db/drizzle";
 import { warehouses } from "@/db/schema";
-import { WarehouseCreateData } from "@/modules/warehouse/warehouse.type";
-import { createClient } from "@/utils/supabase/server-props";
 
 // Helper to convert Drizzle warehouse to our Warehouse type
 function convertDrizzleWarehouse(data: typeof warehouses.$inferSelect) {

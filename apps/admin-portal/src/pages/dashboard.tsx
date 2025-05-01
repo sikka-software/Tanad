@@ -1,18 +1,17 @@
-import { Plus } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
+import { StatCard } from "@/ui/stat-card";
+
+import { createClient } from "@/utils/supabase/component";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Combobox } from "@/components/ui/combobox";
-import PageTitle from "@/components/ui/page-title";
-import { StatCard } from "@/components/ui/stat-card";
 
 import { useEmployees } from "@/modules/employee/employee.hooks";
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 interface DashboardStats {
   totalInvoices: number;

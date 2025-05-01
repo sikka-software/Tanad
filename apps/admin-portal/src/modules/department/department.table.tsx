@@ -15,12 +15,16 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
-import { useBranches } from "@/modules/branch/branch.hooks";
-import { useUpdateDepartment } from "@/modules/department/department.hooks";
-import useDepartmentStore from "@/modules/department/department.store";
-import { Department } from "@/modules/department/department.type";
-import { useOffices } from "@/modules/office/office.hooks";
-import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
+import { useOffices } from "@/office/office.hooks";
+
+import { useBranches } from "@/branch/branch.hooks";
+
+import { useUpdateDepartment } from "@/department/department.hooks";
+import useDepartmentStore from "@/department/department.store";
+import { Department } from "@/department/department.type";
+
+import { useWarehouses } from "@/warehouse/warehouse.hooks";
+
 import useUserStore from "@/stores/use-user-store";
 
 interface DepartmentsTableProps {

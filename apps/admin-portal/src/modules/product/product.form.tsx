@@ -6,11 +6,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { CurrencyInput } from "@/ui/currency-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
-
-import { CurrencyInput } from "@/components/ui/currency-input";
 
 export const createProductSchema = (t: (key: string) => string) =>
   z.object({
