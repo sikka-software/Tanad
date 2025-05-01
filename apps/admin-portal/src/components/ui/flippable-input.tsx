@@ -18,6 +18,42 @@ function FlippableInput({
   const [isHovering, setIsHovering] = React.useState(false);
   const t = useTranslations();
 
+  React.useEffect(() => {
+    setIsFlipped(locale === "ar");
+  }, [locale]);
+
+  const getDirectionClasses = () => {
+    if (locale === "ar") {
+      if (isFlipped) {
+        return "-end-1.5";
+      } else {
+        return "start-0.5";
+      }
+    } else {
+      if (isFlipped) {
+        return "start-0.5";
+      } else {
+        return "-end-1.5";
+      }
+    }
+  };
+
+  const getTooltipLabel = () => {
+    if (locale === "ar") {
+      if (isFlipped) {
+        return t("General.switch_to_rtl");
+      } else {
+        return t("General.switch_to_ltr");
+      }
+    } else {
+      if (isFlipped) {
+        return t("General.switch_to_ltr");
+      } else {
+        return t("General.switch_to_rtl");
+      }
+    }
+  };
+
   return (
     <div
       className="relative"
@@ -33,7 +69,9 @@ function FlippableInput({
             transition={{ duration: 0.15, delay: 0.3 }}
             className={cn(
               "absolute top-0.5 h-10 w-10",
-              isFlipped ? "start-0.5 rtl:-end-1.5" : "-end-1.5 rtl:start-0.5",
+              getDirectionClasses(),
+              // isFlipped ? "!rtl:-end-1.5 start-0.5" : "!rtl:start-0.5 -end-1.5",
+              // isFlipped ? "-end-1.5" : "start-0.5",
             )}
           >
             <IconButton
@@ -45,7 +83,7 @@ function FlippableInput({
                   <PilcrowLeft className="text-muted-foreground size-4" />
                 )
               }
-              label={!isFlipped ? t("General.switch_to_ltr") : t("General.switch_to_rtl")}
+              label={getTooltipLabel()}
               onClick={() => setIsFlipped(!isFlipped)}
               className="size-8"
             />

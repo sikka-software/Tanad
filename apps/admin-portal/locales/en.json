@@ -26,6 +26,10 @@
         "placeholder": "Value"
       }
     },
+    "switch_to_ltr": "Switch to LTR",
+    "switch_to_rtl": "Switch to RTL",
+    "search_country": "Search Country",
+    "no_country_found": "No country found",
     "apply_filters": "Apply Filter",
     "save_current_filter": "Save Current Filter",
     "apply_filter": "Apply Filter",
@@ -1373,18 +1377,32 @@
     "description": "Create your enterprise to get started",
     "welcome_message": "Set up your enterprise and start managing your organization efficiently.",
     "form": {
-      "enterprise_name": "Enterprise Name",
-      "enterprise_name_placeholder": "Enter your enterprise name",
-      "description": "Description",
-      "description_placeholder": "Tell us about your enterprise",
-      "logo": "Logo URL",
-      "logo_placeholder": "Enter your logo URL",
-      "email": "Enterprise Email",
-      "email_placeholder": "Enter your enterprise email",
-      "industry": "Industry",
-      "industry_placeholder": "Select your industry",
-      "size": "Company Size",
-      "size_placeholder": "Select your company size",
+      "enterprise_name": {
+        "label": "Enterprise Name",
+        "placeholder": "Enter your enterprise name",
+        "required": "Enterprise name is required"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Tell us about your enterprise"
+      },
+      "logo": {
+        "label": "Logo URL",
+        "placeholder": "Enter your enterprise logo URL"
+      },
+      "email": {
+        "label": "Enterprise Email",
+        "placeholder": "Enter enterprise email",
+        "invalid": "Invalid email"
+      },
+      "industry": {
+        "label": "Industry",
+        "placeholder": "Select your enterprise industry"
+      },
+      "size": {
+        "label": "Enterprise Size",
+        "placeholder": "Select your enterprise size"
+      },
       "create_enterprise": "Create Enterprise"
     },
     "industry_options": {
@@ -2662,75 +2680,89 @@
   },
   "Companies": {
     "title": "Companies",
-    "add_new": "Add New Company",
-    "search_companies": "Search companies",
-    "no_companies_found": "No companies found",
-    "edit_company": "Edit Company",
+    "add_new": "Add Company",
     "company_details": "Company Details",
     "create_company": "Create Company",
     "creating_company": "Creating company...",
-    "error_loading_companies": "Error loading companies",
+    "edit_company": "Edit Company",
+    "search_companies": "Search companies",
+    "back_to_list": "Back to List",
+    "no_companies_found": "No companies found",
     "form": {
       "name": {
         "label": "Name",
-        "required": "Name is required"
-      },
-      "industry": {
-        "label": "Industry"
+        "placeholder": "Enter company name"
       },
       "email": {
         "label": "Email",
-        "required": "Email is required",
-        "invalid": "Invalid email"
+        "placeholder": "Enter company email"
       },
       "phone": {
-        "label": "Phone"
+        "label": "Phone",
+        "placeholder": "Enter company phone number"
       },
       "website": {
         "label": "Website",
-        "invalid": "Invalid URL"
+        "placeholder": "Enter company website"
       },
       "address": {
-        "label": "Address"
+        "label": "Address",
+        "placeholder": "Enter company address"
       },
       "city": {
-        "label": "City"
+        "label": "City",
+        "placeholder": "Enter city"
       },
       "state": {
-        "label": "State"
+        "label": "State/Region",
+        "placeholder": "Enter state/region"
       },
       "zip_code": {
         "label": "Zip Code",
-        "required": "Zip code is required"
+        "placeholder": "Enter zip code"
       },
-      "is_active": {
-        "label": "Status"
+      "industry": {
+        "label": "Industry",
+        "placeholder": "Enter company industry"
       },
       "size": {
-        "label": "Size"
+        "label": "Company Size",
+        "placeholder": "Enter company size"
       },
-
       "notes": {
-        "label": "Notes"
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      },
+      "is_active": {
+        "label": "Active Status"
+      },
+      "validation": {
+        "name_required": "Company name is required",
+        "email_required": "Email is required",
+        "email_invalid": "Email is invalid"
+      },
+      "created_at": {
+        "label": "Created At"
+      },
+      "updated_at": {
+        "label": "Updated At"
       }
-    },
-    "messages": {
-      "creating": "Creating company...",
-      "create": "Create Company",
-      "created": "Company created successfully",
-      "updated": "Company updated successfully",
-      "deleted": "Company deleted successfully",
-      "error": "An error occurred while processing your request"
     },
     "success": {
       "created": "Company created successfully",
       "updated": "Company updated successfully",
-      "deleted": "Company deleted successfully"
+      "deleted": "Company deleted successfully",
+      "duplicated": "Company duplicated successfully"
+    },
+    "loading": {
+      "duplicating": "Duplicating company...",
+      "deleting": "Deleting company..."
     },
     "error": {
       "creating": "An error occurred while creating the company",
       "updating": "An error occurred while updating the company",
-      "deleting": "An error occurred while deleting the company"
+      "deleting": "An error occurred while deleting the company",
+      "duplicating": "An error occurred while duplicating the company"
     }
   },
   "Navigation": {

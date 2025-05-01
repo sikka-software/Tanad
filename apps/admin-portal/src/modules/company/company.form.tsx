@@ -12,6 +12,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import PhoneInput from "@/components/ui/phone-input";
+
 import { uploadDocument } from "@/services/documents";
 
 import { useCreateCompany, useUpdateCompany } from "@/company/company.hooks";
@@ -245,11 +247,7 @@ export function CompanyForm({
               <FormItem>
                 <FormLabel>{t("Companies.form.phone.label")}</FormLabel>
                 <FormControl>
-                  <Input
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.phone.placeholder")}
-                    {...field}
-                  />
+                  <PhoneInput value={field.value || ""} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

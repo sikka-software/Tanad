@@ -8,9 +8,10 @@ interface IconButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   label?: string;
   badge?: number;
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  buttonType?: "button" | "submit" | "reset";
 }
 
-const IconButton = ({ icon, label, badge, variant, ...props }: IconButtonProps) => {
+const IconButton = ({ icon, label, badge, buttonType, variant, ...props }: IconButtonProps) => {
   return (
     <TooltipProvider>
       <Tooltip delayDuration={400}>
@@ -19,6 +20,7 @@ const IconButton = ({ icon, label, badge, variant, ...props }: IconButtonProps) 
             variant={variant || "outline"}
             size="icon"
             className={cn("relative size-8", props.className)}
+            type={buttonType || "button"}
             {...props}
           >
             {icon}

@@ -48,6 +48,9 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
     {
       accessorKey: "phone",
       header: t("Companies.form.phone.label"),
+      cell: ({ row }) => {
+        return <span dir="ltr"> {row.original.phone}</span>;
+      },
       validationSchema: z.string().optional(),
     },
     {
