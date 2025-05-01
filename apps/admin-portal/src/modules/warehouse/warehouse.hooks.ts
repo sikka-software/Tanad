@@ -41,16 +41,13 @@ export function useCreateWarehouse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newWarehouse: Omit<Warehouse, "id" | "created_at"> & { user_id: string }) => {
-      const { user_id, ...rest } = newWarehouse;
-      const warehouseData: WarehouseCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createWarehouse(warehouseData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
+    mutationFn: (newWarehouse: WarehouseCreateData) => createWarehouse(newWarehouse),
+    onSuccess: (newWarehouse: Warehouse) => {
+      const previousWarehouses = queryClient.getQueryData(warehouseKeys.lists()) || [];
+      queryClient.setQueryData(warehouseKeys.lists(), [
+        ...(Array.isArray(previousWarehouses) ? previousWarehouses : []),
+        newWarehouse,
+      ]);
     },
   });
 }

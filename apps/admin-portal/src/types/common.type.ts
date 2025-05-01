@@ -45,6 +45,14 @@ export interface ModuleTableProps<T> {
   onActionClicked: (action: string, rowId: string) => void;
 }
 
+export interface ModuleFormProps<T> {
+  id?: string;
+  onSuccess?: () => void;
+  loading?: boolean;
+  defaultValues?: T | null;
+  editMode?: boolean;
+}
+
 export interface AddressProps {
   short_address?: string;
   building_number?: string;

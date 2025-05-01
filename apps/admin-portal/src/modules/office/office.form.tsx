@@ -44,7 +44,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
   const t = useTranslations();
   const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();
   const { mutateAsync: updateOffice, isPending: isUpdating } = useUpdateOffice();
-  const { profile, membership } = useUserStore();
+  const membership = useUserStore((state) => state.membership);
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
 
@@ -215,7 +215,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
           />
         </div>
         <AddressFormSection
-          title={t("Offices.form.address")}
+          title={t("Offices.form.address.label")}
           control={form.control}
           isLoading={isLoading}
         />

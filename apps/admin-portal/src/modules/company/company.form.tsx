@@ -17,9 +17,11 @@ import PhoneInput from "@/components/ui/phone-input";
 
 import { uploadDocument } from "@/services/documents";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import { useCreateCompany, useUpdateCompany } from "@/company/company.hooks";
 import useCompanyStore from "@/company/company.store";
-import { CompanyUpdateData } from "@/company/company.type";
+import { Company } from "@/company/company.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -45,21 +47,13 @@ export const createCompanySchema = (t: (key: string) => string) => {
 
 export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
 
-interface CompanyFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  loading?: boolean;
-  defaultValues?: CompanyUpdateData | null;
-  editMode?: boolean;
-}
-
 export function CompanyForm({
   id,
   onSuccess,
   loading = false,
   defaultValues,
   editMode = false,
-}: CompanyFormProps) {
+}: ModuleFormProps<Company>) {
   const t = useTranslations();
   const { locale } = useRouter();
   const { profile, membership } = useUserStore();
