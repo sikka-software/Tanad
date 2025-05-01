@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dice1, Dice5, Dices, MapPin, Shuffle } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { DiamondPlus, Dice1, Dice5, Dices, Hash, MapPin, Shuffle } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -12,6 +12,13 @@ import { Textarea } from "@/ui/textarea";
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import IconButton from "@/components/ui/icon-button";
 
 import { ModuleFormProps } from "@/types/common.type";
@@ -46,6 +53,7 @@ export function WarehouseForm({
   editMode,
 }: ModuleFormProps<Warehouse>) {
   const t = useTranslations();
+  const locale = useLocale();
   const { profile, membership } = useUserStore();
 
   const { mutateAsync: createWarehouse, isPending: isCreating } = useCreateWarehouse();
@@ -195,33 +203,37 @@ export function WarehouseForm({
                         {...field}
                         disabled={loading}
                       />
-                      <IconButton
-                        size="icon_sm"
-                        buttonType="button"
-                        variant="ghost"
-                        contentClassName="flex flex-col gap-1 max-w-40"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // const randomCode =
-                          //   warehouses?.[Math.floor(Math.random() * warehouses.length)]?.code;
-                          form.setValue("code", "WH-" + warehouses?.length);
-                        }}
-                        icon={<Dice5 className="size-6" />}
-                        label={
-                          <div className="relative">
-                            <Badge className="absolute -end-4 -top-2 rounded-sm rounded-e-none !rounded-t-none bg-blue-200 p-1 px-2 text-[10px] text-black dark:bg-blue-800 dark:text-white">
-                              {t("General.soon")}
-                            </Badge>
-                            <p className="text-sm font-medium">
-                              {t("Companies.form.short_address.explainer.title")}
-                            </p>
-                            <p className="text-muted-foreground text-xs">
-                              {t("Companies.form.short_address.explainer.description")}
-                            </p>
-                          </div>
-                        }
-                        className="absolute end-0.5 top-0.5"
-                      />
+                      <DropdownMenu dir={locale === "ar" ? "rtl" : "ltr"}>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            size="icon_sm"
+                            type="button"
+                            variant="ghost"
+                            className="absolute end-0.5 top-0.5"
+                          >
+                            <Hash className="size-6" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              form.setValue("code", "WH-" + warehouses?.length);
+                            }}
+                          >
+                            <DiamondPlus /> {t("General.next_number")}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              form.setValue(
+                                "code",
+                                "WH-" + Math.random().toString(36).substring(2, 15),
+                              );
+                            }}
+                          >
+                            <Shuffle /> {t("General.random_number")}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </FormControl>
                   <FormMessage />

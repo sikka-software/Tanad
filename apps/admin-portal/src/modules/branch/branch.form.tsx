@@ -142,97 +142,113 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
 
   return (
     <Form {...form}>
-      <form
-        id={id || "branch-form"}
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-4"
-      >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Branches.form.name.label")} *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Branches.form.name.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <form id={id || "branch-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Branches.form.name.label")} *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Branches.form.name.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Branches.form.code.label")} *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Branches.form.code.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Branches.form.code.label")} *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Branches.form.code.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Branches.form.phone.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="tel"
-                    placeholder={t("Branches.form.phone.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Branches.form.phone.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder={t("Branches.form.phone.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Branches.form.email.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder={t("Branches.form.email.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Branches.form.email.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder={t("Branches.form.email.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
+            <FormField
+              control={form.control}
+              name="manager"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Branches.form.manager.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Branches.form.manager.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
-            name="manager"
+            name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Branches.form.manager.label")}</FormLabel>
+                <FormLabel>{t("Branches.form.notes.label")}</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t("Branches.form.manager.placeholder")}
+                  <Textarea
+                    placeholder={t("Branches.form.notes.placeholder")}
+                    className="min-h-[120px]"
                     {...field}
                     disabled={isLoading}
                   />
@@ -244,28 +260,9 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
         </div>
 
         <AddressFormSection
-          title={t("Branches.form.address")}
+          title={t("Branches.form.address.label")}
           control={form.control}
           isLoading={isLoading}
-        />
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Branches.form.notes.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={t("Branches.form.notes.placeholder")}
-                  className="min-h-[120px]"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
         />
       </form>
     </Form>

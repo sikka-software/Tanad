@@ -72,9 +72,7 @@ export default function AddBranchPage() {
         dummyButton={handleDummyData}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <BranchForm id="branch-form" onSuccess={onAddSuccess} />
-      </div>
+      <BranchForm id="branch-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

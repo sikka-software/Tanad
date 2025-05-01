@@ -340,7 +340,7 @@ export function CompanyForm({
         </div>
 
         <AddressFormSection
-          title={t("Companies.form.address")}
+          title={t("Companies.form.address.label")}
           control={form.control}
           isLoading={isLoading}
         />

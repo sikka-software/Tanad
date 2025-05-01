@@ -6,6 +6,8 @@
     "light": "فاتح",
     "language": "اللغة",
     "theme": "طابع الموقع",
+    "next_number": "رقم تسلسلي",
+    "random_number": "رقم عشوائي",
     "soon": "قريباً",
     "active": "نشط",
     "inactive": "غير نشط",
@@ -2116,9 +2118,9 @@
         "required": "الرمز مطلوب"
       },
       "address": {
-        "label": "العنوان",
-        "placeholder": "أدخل العنوان",
-        "required": "العنوان مطلوب"
+        "label": "عنوان الفرع",
+        "placeholder": "أدخل عنوان الفرع",
+        "required": "عنوان الفرع مطلوب"
       },
       "city": {
         "label": "المدينة",
@@ -2961,7 +2963,10 @@
         "label": "الموقع الإلكتروني",
         "placeholder": "https://www.example.com"
       },
-      "address": "عنوان الشركة",
+      "address": {
+        "label": "عنوان الشركة",
+        "placeholder": "أدخل عنوان الشركة"
+      },
       "short_address": {
         "label": "العنوان الوطني المختصر",
         "placeholder": "أدخل رمز مكون من ٤ أحرف و ٤ أرقام",
