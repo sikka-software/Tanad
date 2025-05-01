@@ -25,7 +25,7 @@ const LandingLayout: React.FC<LayoutType> = ({ children }) => {
           <LoadingBar />
           {children}
         </div>
-        {/* <Footer /> */}
+        <Footer />
       </main>
     </ThemeProvider>
   );
