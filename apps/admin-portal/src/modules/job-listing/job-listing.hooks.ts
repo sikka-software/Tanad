@@ -5,6 +5,8 @@ import {
   bulkDeleteJobListings,
   createJobListing,
   updateJobListing,
+  duplicateJobListing,
+  fetchJobListingById,
 } from "@/job-listing/job-listing.service";
 import { JobListing } from "@/job-listing/job-listing.type";
 
@@ -17,29 +19,41 @@ export const jobListingKeys = {
 };
 
 export function useJobListings() {
-  const queryClient = useQueryClient();
-
-  const query = useQuery<JobListing[]>({
+  return useQuery({
     queryKey: jobListingKeys.lists(),
     queryFn: fetchJobListings,
   });
+}
 
-  const createMutation = useMutation({
-    mutationFn: (
-      data: Pick<JobListing, "title" | "user_id"> & {
-        description?: string | undefined;
-        jobs?: string[];
-      },
-    ) => createJobListing(data),
+// Hook to fetch a single job listing
+export function useJobListing(id: string) {
+  return useQuery({
+    queryKey: jobListingKeys.detail(id),
+    queryFn: () => fetchJobListingById(id),
+    enabled: !!id,
+  });
+}
+
+export function useCreateJobListing() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: JobListing) => createJobListing(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() });
     },
   });
+}
 
-  return {
-    ...query,
-    createJobListing: createMutation,
-  };
+export function useDuplicateJobListing() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => duplicateJobListing(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() });
+    },
+  });
 }
 
 export function useBulkDeleteJobListings() {

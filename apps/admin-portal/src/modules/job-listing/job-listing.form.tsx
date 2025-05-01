@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
@@ -11,28 +12,50 @@ import { Textarea } from "@/ui/textarea";
 import { useJobs } from "@/job/job.hooks";
 import { Job } from "@/job/job.type";
 
+import { useCreateJobListing, useUpdateJobListing } from "@/job-listing/job-listing.hooks";
+import useJobListingsStore from "@/job-listing/job-listing.store";
+import { JobListingUpdateData } from "@/job-listing/job-listing.type";
+
+import useUserStore from "@/stores/use-user-store";
+
 interface JobListingFormProps {
   id?: string;
   onSuccess?: () => void;
-  onSubmit: (data: JobListingFormValues) => Promise<void>;
   loading?: boolean;
+  defaultValues?: JobListingUpdateData | null;
+  editMode?: boolean;
 }
 
-const jobListingFormSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  jobs: z.array(z.string()).min(1, "At least one job is required"),
-});
+export const createJobListingFormSchema = (t: (key: string) => string) =>
+  z.object({
+    title: z.string().min(1, t("JobListings.form.title.required")),
+    description: z.string().optional(),
+    jobs: z.array(z.string()).min(1, t("JobListings.form.jobs.required")),
+  });
 
-export type JobListingFormValues = z.infer<typeof jobListingFormSchema>;
+export type JobListingFormValues = z.infer<ReturnType<typeof createJobListingFormSchema>>;
 
-export function JobListingForm({ id, onSuccess, onSubmit, loading = false }: JobListingFormProps) {
+export function JobListingForm({
+  id,
+  onSuccess,
+  loading = false,
+  defaultValues,
+  editMode = false,
+}: JobListingFormProps) {
   const t = useTranslations();
   const { data: jobs, isLoading: isLoadingJobs } = useJobs();
+
+  const { mutateAsync: createJobListing, isPending: isCreating } = useCreateJobListing();
+  const { mutateAsync: updateJobListing, isPending: isUpdating } = useUpdateJobListing();
+
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
+  const { profile, membership } = useUserStore();
+
+  const isLoading = useJobListingsStore((state) => state.isLoading);
+  const setIsLoading = useJobListingsStore((state) => state.setIsLoading);
 
   const form = useForm<JobListingFormValues>({
-    resolver: zodResolver(jobListingFormSchema),
+    resolver: zodResolver(createJobListingFormSchema(t)),
     defaultValues: {
       title: "",
       description: "",
@@ -50,9 +73,75 @@ export function JobListingForm({ id, onSuccess, onSubmit, loading = false }: Job
     form.setValue("jobs", selectedJobs);
   };
 
+  const handleSubmit = async (data: JobListingFormValues) => {
+    setIsLoading(true);
+    if (!profile?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
+
+    try {
+      if (editMode && defaultValues) {
+        if (!defaultValues.id) {
+          console.error("Job Listing ID missing in edit mode");
+          toast.error(t("JobListings.error.missing_id"));
+          setIsLoading(false);
+          return;
+        }
+        await updateJobListing(
+          {
+            id: defaultValues.id,
+            jobListing: {
+              title: data.title.trim(),
+              description: data.description?.trim() || null,
+              jobs: data.jobs,
+              user_id: profile?.id || "",
+            },
+          },
+          {
+            onSuccess: async () => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      } else {
+        await createJobListing(
+          {
+            id: "",
+            title: data.title.trim(),
+            description: data.description?.trim() || null,
+            jobs: data.jobs,
+            user_id: profile?.id || "",
+            is_active: true,
+            slug: "",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onSuccess: async () => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Failed to save company:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Companies.error.creating"),
+      });
+    }
+  };
+
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="title"

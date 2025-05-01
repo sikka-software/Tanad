@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
 import { JobListingForm, type JobListingFormValues } from "@/job-listing/job-listing.form";
-import { useJobListings } from "@/job-listing/job-listing.hooks";
+import { useCreateJobListing } from "@/job-listing/job-listing.hooks";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -15,35 +15,8 @@ export default function AddJobListingPage() {
   const t = useTranslations();
   const router = useRouter();
   const user = useUserStore((state) => state.user);
-  const { createJobListing } = useJobListings();
+  const { mutateAsync: createJobListing, isPending: isCreating } = useCreateJobListing();
   const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (data: JobListingFormValues) => {
-    if (!user?.id) {
-      toast.error(t("JobListings.messages.auth_required"));
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await createJobListing.mutateAsync({
-        ...data,
-        user_id: user.id,
-      });
-
-      toast.success(t("General.successful_operation"), {
-        description: t("JobListings.messages.listing_created"),
-      });
-      router.push("/jobs/listings");
-    } catch (error: any) {
-      console.error("Error creating job listing:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("JobListings.messages.error"),
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div>
@@ -65,7 +38,11 @@ export default function AddJobListingPage() {
             <CardTitle>{t("JobListings.listing_details")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <JobListingForm id="job-listing-form" onSubmit={handleSubmit} loading={loading} />
+            <JobListingForm
+              id="job-listing-form"
+              onSuccess={() => router.push("/jobs/listings")}
+              loading={loading}
+            />
           </CardContent>
         </Card>
       </div>

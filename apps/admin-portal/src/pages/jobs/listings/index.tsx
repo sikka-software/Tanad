@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -8,25 +8,48 @@ import DataModelList from "@/ui/data-model-list";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
 
+import { useDataTableActions } from "@/hooks/use-data-table-actions";
 import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormDialog } from "@/components/ui/form-dialog";
+import NoPermission from "@/components/ui/no-permission";
 
 import JobListingCard from "@/job-listing/job-listing.card";
-import { useJobListings, useBulkDeleteJobListings } from "@/job-listing/job-listing.hooks";
+import {
+  useJobListings,
+  useBulkDeleteJobListings,
+  useDuplicateJobListing,
+} from "@/job-listing/job-listing.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/job-listing/job-listing.options";
 import useJobListingsStore from "@/job-listing/job-listing.store";
 import JobListingsTable from "@/job-listing/job-listing.table";
 import { JobListing } from "@/job-listing/job-listing.type";
 
+import { CompanyForm } from "@/modules/company/company.form";
+import { CompanyUpdateData } from "@/modules/company/company.type";
+import { JobListingForm } from "@/modules/job-listing/job-listing.form";
+import useUserStore from "@/stores/use-user-store";
+
 export default function JobListingsPage() {
   const t = useTranslations();
   const router = useRouter();
+
+  const canReadJobListings = useUserStore((state) => state.hasPermission("job_listings.read"));
+  const canCreateJobListings = useUserStore((state) => state.hasPermission("job_listings.create"));
+
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [actionableJobListing, setActionableJobListing] = useState<JobListing | null>(null);
+
+  const loadingSaveJobListing = useJobListingsStore((state) => state.isLoading);
+  const setLoadingSaveJobListing = useJobListingsStore((state) => state.setIsLoading);
+
   const viewMode = useJobListingsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useJobListingsStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useJobListingsStore((state) => state.setIsDeleteDialogOpen);
   const selectedRows = useJobListingsStore((state) => state.selectedRows);
+  const setSelectedRows = useJobListingsStore((state) => state.setSelectedRows);
   const clearSelection = useJobListingsStore((state) => state.clearSelection);
   const sortRules = useJobListingsStore((state) => state.sortRules);
   const sortCaseSensitive = useJobListingsStore((state) => state.sortCaseSensitive);
@@ -40,6 +63,17 @@ export default function JobListingsPage() {
   const { data: jobListings = [], isLoading, error } = useJobListings();
   const { mutateAsync: deleteJobListings, isPending: isDeleting } = useBulkDeleteJobListings();
   const { createDeleteHandler } = useDeleteHandler();
+  const { mutate: duplicateJobListing } = useDuplicateJobListing();
+
+  const { handleAction: onActionClicked } = useDataTableActions({
+    data: jobListings,
+    setSelectedRows,
+    setIsDeleteDialogOpen,
+    setIsFormDialogOpen,
+    setActionableItem: setActionableJobListing,
+    duplicateMutation: duplicateJobListing,
+    moduleName: "JobListings",
+  });
 
   const handleConfirmDelete = createDeleteHandler(deleteJobListings, {
     loading: "JobListings.loading.deleting",
@@ -62,6 +96,10 @@ export default function JobListingsPage() {
   const handleCreateClick = () => {
     router.push("/jobs/listings/add");
   };
+
+  if (!canReadJobListings) {
+    return <NoPermission />;
+  }
 
   return (
     <div>
@@ -92,6 +130,7 @@ export default function JobListingsPage() {
               data={sortedListings}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
+              onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
@@ -108,6 +147,28 @@ export default function JobListingsPage() {
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("JobListings.add_new")}
+          formId="job-listing-form"
+          loadingSave={loadingSaveJobListing}
+        >
+          <JobListingForm
+            id={"job-listing-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableJobListing(null);
+              setLoadingSaveJobListing(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("JobListings.success.updated"),
+              });
+            }}
+            defaultValues={actionableJobListing}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

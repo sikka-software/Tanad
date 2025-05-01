@@ -9,7 +9,7 @@ export interface JobListing {
   created_at: string;
   updated_at: string;
   user_id: string;
-  jobs?: Job[]; // Optional array of related jobs
+  jobs?: (Job | string)[]; // Optional array of related jobs
 }
 
 export interface JobListingJob {
@@ -26,3 +26,5 @@ export interface JobListingFormValues {
   jobs?: string[];
   user_id?: string;
 }
+
+export type JobListingUpdateData = Partial<JobListing>;
