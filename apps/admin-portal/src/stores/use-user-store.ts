@@ -3,7 +3,7 @@ import { create } from "zustand";
 
 import { createClient } from "@/utils/supabase/component";
 
-interface ProfileType {
+export interface ProfileType {
   id: string;
   email: string;
   full_name: string | null;
