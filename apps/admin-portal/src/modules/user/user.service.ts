@@ -1,6 +1,6 @@
-import { User, UserCreateData, UserUpdateData } from "./user.type";
+import { UserType, UserCreateData, UserUpdateData } from "./user.type";
 
-export async function fetchUsers(): Promise<User[]> {
+export async function fetchUsers(): Promise<UserType[]> {
   try {
     const response = await fetch("/api/resource/users");
     if (!response.ok) {
@@ -14,7 +14,7 @@ export async function fetchUsers(): Promise<User[]> {
   }
 }
 
-export async function fetchUserById(id: string): Promise<User> {
+export async function fetchUserById(id: string): Promise<UserType> {
   try {
     const response = await fetch(`/api/resource/users/${id}`);
     if (!response.ok) {
@@ -27,7 +27,7 @@ export async function fetchUserById(id: string): Promise<User> {
   }
 }
 
-export async function createUser(user: UserCreateData): Promise<User> {
+export async function createUser(user: UserCreateData): Promise<UserType> {
   try {
     const response = await fetch("/api/resource/users", {
       method: "POST",
@@ -46,7 +46,7 @@ export async function createUser(user: UserCreateData): Promise<User> {
   }
 }
 
-export async function updateUser(id: string, updates: UserUpdateData): Promise<User> {
+export async function updateUser(id: string, updates: UserUpdateData): Promise<UserType> {
   const response = await fetch(`/api/resource/users/${id}`, {
     method: "PUT",
     headers: {
@@ -60,7 +60,7 @@ export async function updateUser(id: string, updates: UserUpdateData): Promise<U
   return response.json();
 }
 
-export async function duplicateUser(id: string): Promise<User> {
+export async function duplicateUser(id: string): Promise<UserType> {
   const response = await fetch(`/api/resource/users/${id}/duplicate`, {
     method: "POST",
   });

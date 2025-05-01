@@ -13,8 +13,7 @@ import {
   bulkDeleteUsers,
   getUserPermissions,
 } from "./user.service";
-import useEnterpriseUserStore from "./user.store";
-import { User, UserCreateData, UserUpdateData } from "./user.type";
+import { UserCreateData, UserUpdateData } from "./user.type";
 
 // Query keys
 const userKeys = {

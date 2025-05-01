@@ -1,39 +1,25 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { Asterisk, CreditCard, LogOut, MessageSquareWarning, Search, User2 } from "lucide-react";
+import { Asterisk, Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { Button } from "@/ui/button";
-import { Dialog, DialogTrigger } from "@/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/ui/dropdown-menu";
 import { Input } from "@/ui/input";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenuItem,
   SidebarRail,
   useSidebar,
 } from "@/ui/sidebar";
 
-import { CACHE_KEY } from "@/lib/constants";
 import { applyCustomMenuOrder, getMenuList, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
 import useUserStore, { ProfileType } from "@/stores/use-user-store";
 
-import { FeedbackDialog } from "../app/FeedbackDialog";
 import { EnterpriseSwitcher } from "./enterprise-switcher";
 import { NavMain } from "./sidebar-menu";
 import { SidebarUserFooter } from "./sidebar-user-footer";
@@ -56,7 +42,6 @@ type Menu = {
 export function AppSidebar() {
   const t = useTranslations();
   const lang = useLocale();
-  const [open, setOpen] = useState(false);
   const { state, isMobile, setOpen: setSidebarOpen } = useSidebar();
   const router = useRouter();
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
@@ -66,7 +51,10 @@ export function AppSidebar() {
     groups: new Set(),
     menus: new Set(),
   });
-  const { user, profile, enterprise, membership, signOut, hasPermission } = useUserStore();
+
+  const profile = useUserStore((state) => state.profile);
+  const enterprise = useUserStore((state) => state.enterprise);
+  const hasPermission = useUserStore((state) => state.hasPermission);
 
   // Store and clear expanded states when sidebar collapses
   useEffect(() => {
@@ -85,30 +73,6 @@ export function AppSidebar() {
       setExpandedMenus(previousStateRef.current.menus);
     }
   }, [state, isMobile]);
-
-  const handleItemClick = useCallback(
-    (groupIndex: number, menuIndex?: number) => {
-      if (state === "collapsed" && !isMobile) {
-        // First open the sidebar
-        setSidebarOpen(true);
-        // Then restore previous state and add the clicked items
-        const newGroups = new Set(previousStateRef.current.groups);
-        const newMenus = new Set(previousStateRef.current.menus);
-
-        newGroups.add(groupIndex);
-        if (menuIndex !== undefined) {
-          newMenus.add(`${groupIndex}-${menuIndex}`);
-        }
-
-        // Update states with a slight delay to ensure sidebar transition has started
-        requestAnimationFrame(() => {
-          setExpandedGroups(newGroups);
-          setExpandedMenus(newMenus);
-        });
-      }
-    },
-    [state, isMobile, setSidebarOpen],
-  );
 
   const defaultMenuGroups = useMemo(() => getMenuList(router.pathname), [router.pathname]);
 

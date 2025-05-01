@@ -1,10 +1,10 @@
 import { createGenericStore } from "@/utils/generic-store";
 
-import { User } from "./user.type";
+import { UserType } from "./user.type";
 
-const searchUserFn = (user: User, searchQuery: string) =>
+const searchUserFn = (user: UserType, searchQuery: string) =>
   user.email ? user.email.toLowerCase().includes(searchQuery.toLowerCase()) : false;
 
-const useUserStore = createGenericStore<User>("users", searchUserFn);
+const useUserStore = createGenericStore<UserType>("users", searchUserFn);
 
 export default useUserStore;
