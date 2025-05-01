@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -12,7 +13,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import { Badge } from "@/components/ui/badge";
+import IconButton from "@/components/ui/icon-button";
+import NumberInput from "@/components/ui/number-input";
 import PhoneInput from "@/components/ui/phone-input";
+import { Separator } from "@/components/ui/separator";
 
 import { uploadDocument } from "@/services/documents";
 
@@ -31,10 +36,14 @@ export const createCompanySchema = (t: (key: string) => string) =>
       .email(t("Companies.form.validation.email_invalid")),
     phone: z.string().optional(),
     website: z.string().optional(),
-    address: z.string().optional(),
+    short_address: z.string().optional(),
+    building_number: z.string().optional(),
+    street_name: z.string().optional(),
     city: z.string().optional(),
-    state: z.string().optional(),
+    region: z.string().optional(),
+    country: z.string().optional(),
     zip_code: z.string().optional(),
+    additional_number: z.string().optional(),
     industry: z.string().optional(),
     size: z.string().optional(),
     notes: z.string().optional(),
@@ -75,12 +84,14 @@ export function CompanyForm({
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
       website: defaultValues?.website || "",
-      address: defaultValues?.address || "",
+      short_address: defaultValues?.short_address || "",
+      building_number: defaultValues?.building_number || "",
+      street_name: defaultValues?.street_name || "",
       city: defaultValues?.city || "",
-      state: defaultValues?.state || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
-      industry: defaultValues?.industry || "",
-      size: defaultValues?.size || "",
+      additional_number: defaultValues?.additional_number || "",
       notes: defaultValues?.notes || "",
       is_active: defaultValues?.is_active || true,
     },
@@ -142,12 +153,16 @@ export function CompanyForm({
               name: data.name.trim(),
               email: data.email.trim(),
               phone: data.phone?.trim() || undefined,
-              address: data.address?.trim() || undefined,
+              building_number: data.building_number?.trim() || undefined,
+              street_name: data.street_name?.trim() || undefined,
               city: data.city?.trim() || undefined,
-              state: data.state?.trim() || undefined,
+              region: data.region?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
+              additional_number: data.additional_number?.trim() || undefined,
               website: data.website?.trim() || undefined,
               notes: data.notes?.trim() || undefined,
+              short_address: data.short_address?.trim() || undefined,
+              country: data.country?.trim() || undefined,
             },
           },
           {
@@ -165,12 +180,16 @@ export function CompanyForm({
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone?.trim() || undefined,
-            address: data.address?.trim() || undefined,
+            building_number: data.building_number?.trim() || undefined,
+            street_name: data.street_name?.trim() || undefined,
             city: data.city?.trim() || undefined,
-            state: data.state?.trim() || undefined,
+            region: data.region?.trim() || undefined,
+            country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
+            additional_number: data.additional_number?.trim() || undefined,
             website: data.website?.trim() || undefined,
             notes: data.notes?.trim() || undefined,
+            short_address: data.short_address?.trim() || undefined,
             is_active: true,
             user_id: profile?.id || "",
           },
@@ -231,6 +250,7 @@ export function CompanyForm({
                 <FormControl>
                   <Input
                     type="email"
+                    dir="ltr"
                     disabled={isLoading}
                     placeholder={t("Companies.form.email.placeholder")}
                     {...field}
@@ -261,6 +281,7 @@ export function CompanyForm({
                 <FormLabel>{t("Companies.form.website.label")}</FormLabel>
                 <FormControl>
                   <Input
+                    dir="ltr"
                     disabled={isLoading}
                     placeholder={t("Companies.form.website.placeholder")}
                     {...field}
@@ -270,74 +291,7 @@ export function CompanyForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.address.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.address.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.city.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.city.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.state.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.state.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="zip_code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.zip_code.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.zip_code.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
           <FormField
             control={form.control}
             name="industry"
@@ -373,6 +327,173 @@ export function CompanyForm({
             )}
           />
         </div>
+
+        <div>
+          <h1 className="text-lg font-medium">{t("Companies.form.address")}</h1>
+          <Separator className="mb-6" />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="short_address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.short_address.label")}</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        disabled={isLoading}
+                        placeholder={t("Companies.form.short_address.placeholder")}
+                        {...field}
+                      />
+                      <IconButton
+                        size="icon_sm"
+                        buttonType="button"
+                        contentClassName="flex flex-col gap-1 max-w-40"
+                        onClick={(e) => e.preventDefault()}
+                        icon={<MapPin className="size-6" />}
+                        label={
+                          <div className="relative">
+                            <Badge className="absolute -end-4 -top-2 rounded-sm rounded-e-none !rounded-t-none bg-blue-200 p-1 px-2 text-[10px] text-black dark:bg-blue-800 dark:text-white">
+                              {t("General.soon")}
+                            </Badge>
+                            <p className="text-sm font-medium">
+                              {t("Companies.form.short_address.explainer.title")}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                              {t("Companies.form.short_address.explainer.description")}
+                            </p>
+                          </div>
+                        }
+                        className="absolute end-0.5 top-0.5"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="building_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.building_number.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.building_number.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="street_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.street_name.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.street_name.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.city.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.city.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="region"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.region.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.region.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.country.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.country.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="zip_code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.zip_code.label")}</FormLabel>
+                  <FormControl>
+                    <NumberInput
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.zip_code.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="additional_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Companies.form.additional_number.label")}</FormLabel>
+                  <FormControl>
+                    <NumberInput
+                      disabled={isLoading}
+                      placeholder={t("Companies.form.additional_number.placeholder")}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
         <FormField
           control={form.control}
           name="notes"
@@ -391,7 +512,7 @@ export function CompanyForm({
           )}
         />
 
-        <div className="space-y-4">
+        {/* <div className="space-y-4">
           <DocumentUploader
             entityType="company"
             disabled={isLoading}
@@ -404,7 +525,7 @@ export function CompanyForm({
               <DocumentList entityId={id} entityType="company" />
             </div>
           )}
-        </div>
+        </div> */}
       </form>
     </Form>
   );

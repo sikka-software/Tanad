@@ -11,7 +11,8 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { createClient } from "@/utils/supabase/component";
+import NumberInput from "@/components/ui/number-input";
+import PhoneInput from "@/components/ui/phone-input";
 
 import {
   CompanyForm,
@@ -49,7 +50,6 @@ interface VendorFormProps {
 }
 
 export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: VendorFormProps) {
-  const supabase = createClient();
   const t = useTranslations();
   const locale = useLocale();
 
@@ -88,55 +88,6 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
       label: company.name,
       value: company.id,
     })) || [];
-
-  const handleCompanySubmit = async (data: CompanyFormValuesType) => {
-    try {
-      // Check if user ID is available
-      if (!profile?.id) {
-        throw new Error(t("error.not_authenticated"));
-      }
-
-      const { data: newCompany, error } = await supabase
-        .from("companies")
-        .insert([
-          {
-            name: data.name.trim(),
-            email: data.email.trim(),
-            phone: data.phone?.trim() || null,
-            website: data.website?.trim() || null,
-            address: data.address?.trim() || null,
-            city: data.city?.trim() || null,
-            state: data.state?.trim() || null,
-            zip_code: data.zip_code?.trim() || null,
-            industry: data.industry?.trim() || null,
-            size: data.size?.trim() || null,
-            notes: data.notes?.trim() || null,
-            is_active: data.is_active,
-            user_id: profile.id,
-          },
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Set the new company name as the selected company
-      form.setValue("company", newCompany.name);
-
-      // Close the dialog
-      setIsCompanyDialogOpen(false);
-
-      // Show success message
-      toast.success(t("General.successful_operation"), {
-        description: t("Companies.success.created"),
-      });
-    } catch (error) {
-      console.error("Error creating company:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Companies.error.create"),
-      });
-    }
-  };
 
   const handleSubmit = async (data: VendorFormValues) => {
     setIsLoading(true);
@@ -249,8 +200,8 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
                       onChange={(value) => field.onChange(value || null)}
                       texts={{
                         placeholder: t("Vendors.form.company.placeholder"),
-                        searchPlaceholder: t("Vendors.form.company.search_placeholder"),
-                        noItems: t("Vendors.form.company.no_companies"),
+                        searchPlaceholder: t("Companies.search_companies"),
+                        noItems: t("Companies.no_companies_found"),
                       }}
                       addText={t("Companies.add_new")}
                       onAddClick={() => setIsCompanyDialogOpen(true)}
@@ -271,6 +222,7 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
                   <FormLabel>{t("Vendors.form.email.label")} *</FormLabel>
                   <FormControl>
                     <Input
+                      dir="ltr"
                       type="email"
                       placeholder={t("Vendors.form.email.placeholder")}
                       {...field}
@@ -289,11 +241,9 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
                 <FormItem>
                   <FormLabel>{t("Vendors.form.phone.label")} *</FormLabel>
                   <FormControl>
-                    <Input
-                      type="tel"
-                      placeholder={t("Vendors.form.phone.placeholder")}
-                      {...field}
-                      disabled={isLoading}
+                    <PhoneInput
+                      value={field.value || ""}
+                      onChange={(value) => field.onChange(value || null)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -364,7 +314,7 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
                 <FormItem>
                   <FormLabel>{t("Vendors.form.zip_code.label")} *</FormLabel>
                   <FormControl>
-                    <Input
+                    <NumberInput
                       placeholder={t("Vendors.form.zip_code.placeholder")}
                       {...field}
                       disabled={isLoading}

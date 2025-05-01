@@ -2951,7 +2951,7 @@
       },
       "email": {
         "label": "البريد الإلكتروني",
-        "placeholder": "أدخل البريد الإلكتروني للشركة"
+        "placeholder": "fulan@example.com"
       },
       "phone": {
         "label": "الهاتف",
@@ -2959,15 +2959,41 @@
       },
       "website": {
         "label": "الموقع الإلكتروني",
-        "placeholder": "أدخل الموقع الإلكتروني للشركة"
+        "placeholder": "https://www.example.com"
       },
-      "address": {
-        "label": "العنوان",
-        "placeholder": "أدخل عنوان الشركة"
+      "address": "عنوان الشركة",
+      "short_address": {
+        "label": "العنوان الوطني المختصر",
+        "placeholder": "أدخل رمز مكون من ٤ أحرف و ٤ أرقام",
+        "explainer": {
+          "title": "جلب العنوان",
+          "description": "استخدم قاعدة بيانات البريد السعودي لجلب تفاصيل العنوان"
+        }
       },
+      "building_number": {
+        "label": "رقم المبنى",
+        "placeholder": "أدخل رقم المبنى"
+      },
+      "street_name": {
+        "label": "اسم الشارع",
+        "placeholder": "أدخل اسم الشارع"
+      },
+      "additional_number": {
+        "label": "الرقم الإضافي",
+        "placeholder": "أدخل الرقم الإضافي"
+      },
+      "region": {
+        "label": "المنطقة",
+        "placeholder": "أدخل المنطقة"
+      },
+
       "city": {
         "label": "المدينة",
         "placeholder": "أدخل المدينة"
+      },
+      "country": {
+        "label": "الدولة",
+        "placeholder": "أدخل الدولة"
       },
       "state": {
         "label": "المنطقة",

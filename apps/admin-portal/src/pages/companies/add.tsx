@@ -26,7 +26,14 @@ export default function AddCompanyPage() {
       form.setValue("name", dummyData.full_name);
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
-      form.setValue("address", dummyData.address);
+      form.setValue("street_name", dummyData.address);
+      form.setValue("city", dummyData.city);
+      form.setValue("region", "Eastern");
+      form.setValue("zip_code", dummyData.zip_code);
+      form.setValue("building_number", dummyData.randomNumber);
+      form.setValue("additional_number", dummyData.randomNumber);
+      form.setValue("industry", dummyData.randomString);
+      form.setValue("size", dummyData.randomNumber);
     }
   };
 

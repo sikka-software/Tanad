@@ -4,15 +4,19 @@ export interface Company {
   email: string;
   phone?: string;
   website?: string;
-  address?: string;
+  building_number?: string;
+  street_name?: string;
   city?: string;
-  state?: string;
+  region?: string;
   zip_code?: string;
+  additional_number?: string;
   industry?: string;
   size?: string;
   notes?: string;
   is_active: boolean;
   enterprise_id: string;
+  short_address?: string;
+  country?: string;
   created_at: string;
   user_id: string;
 }
