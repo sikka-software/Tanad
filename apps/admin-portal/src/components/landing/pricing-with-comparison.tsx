@@ -17,7 +17,7 @@ function Pricing() {
               Managing a small business today is already tough.
             </p>
           </div>
-          <div className="grid w-full grid-cols-3 divide-x pt-20 text-left lg:grid-cols-4">
+          <div className="bg--200 grid w-full grid-cols-3 divide-x pt-20 text-start lg:grid-cols-4">
             <div className="col-span-3 lg:col-span-1"></div>
             <div className="flex flex-col gap-2 px-3 py-1 md:px-6 md:py-4">
               <p className="text-2xl">Startup</p>
@@ -61,13 +61,13 @@ function Pricing() {
                 Contact us <PhoneCall className="h-4 w-4" />
               </Button>
             </div>
-            <div className="col-span-3 px-3 py-4 lg:col-span-1 lg:px-6">
+            <div className="bg--400 col-span-3 border-s px-3 py-4 lg:col-span-1 lg:px-6">
               <b>Features</b>
             </div>
+            <div className="bg--800"></div>
             <div></div>
             <div></div>
-            <div></div>
-            <div className="col-span-3 px-3 py-4 lg:col-span-1 lg:px-6">SSO</div>
+            <div className="col-span-3 border-s px-3 py-4 lg:col-span-1 lg:px-6">SSO</div>
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <Check className="text-primary h-4 w-4" />
             </div>
@@ -77,7 +77,7 @@ function Pricing() {
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <Check className="text-primary h-4 w-4" />
             </div>
-            <div className="col-span-3 px-3 py-4 lg:col-span-1 lg:px-6">AI Assistant</div>
+            <div className="col-span-3 border-s px-3 py-4 lg:col-span-1 lg:px-6">AI Assistant</div>
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <Minus className="text-muted-foreground h-4 w-4" />
             </div>
@@ -87,7 +87,9 @@ function Pricing() {
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <Check className="text-primary h-4 w-4" />
             </div>
-            <div className="col-span-3 px-3 py-4 lg:col-span-1 lg:px-6">Version Control</div>
+            <div className="col-span-3 border-s px-3 py-4 lg:col-span-1 lg:px-6">
+              Version Control
+            </div>
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <Minus className="text-muted-foreground h-4 w-4" />
             </div>
@@ -97,7 +99,7 @@ function Pricing() {
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <Check className="text-primary h-4 w-4" />
             </div>
-            <div className="col-span-3 px-3 py-4 lg:col-span-1 lg:px-6">Members</div>
+            <div className="col-span-3 border-s px-3 py-4 lg:col-span-1 lg:px-6">Members</div>
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <p className="text-muted-foreground text-sm">5 members</p>
             </div>
@@ -107,7 +109,9 @@ function Pricing() {
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <p className="text-muted-foreground text-sm">100+ members</p>
             </div>
-            <div className="col-span-3 px-3 py-4 lg:col-span-1 lg:px-6">Multiplayer Mode</div>
+            <div className="col-span-3 border-s px-3 py-4 lg:col-span-1 lg:px-6">
+              Multiplayer Mode
+            </div>
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <Minus className="text-muted-foreground h-4 w-4" />
             </div>
@@ -117,7 +121,7 @@ function Pricing() {
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <Check className="text-primary h-4 w-4" />
             </div>
-            <div className="col-span-3 px-3 py-4 lg:col-span-1 lg:px-6">Orchestration</div>
+            <div className="col-span-3 border-s px-3 py-4 lg:col-span-1 lg:px-6">Orchestration</div>
             <div className="flex justify-center px-3 py-1 md:px-6 md:py-4">
               <Minus className="text-muted-foreground h-4 w-4" />
             </div>

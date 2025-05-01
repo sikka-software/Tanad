@@ -11,6 +11,9 @@ import { Button } from "@/components/ui/button";
 
 import { cn } from "@/lib/utils";
 
+import LanguageSwitcher from "../ui/language-switcher";
+import ThemeSwitcher from "../ui/theme-switcher";
+
 const menuItems = [
   { name: "Landing.features", href: "#link" },
   { name: "Landing.solution", href: "#link" },
@@ -94,7 +97,8 @@ const Navigation = () => {
                   ))}
                 </ul>
               </div>
-              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-2 sm:space-y-0 md:w-fit">
+          
                 <Button asChild variant="outline" size="sm">
                   <Link href="#">
                     <span>{t("Auth.sign_in")}</span>
@@ -105,6 +109,9 @@ const Navigation = () => {
                     <span>{t("Auth.sign_up")}</span>
                   </Link>
                 </Button>
+                <ThemeSwitcher />
+                <LanguageSwitcher />
+
               </div>
             </div>
           </div>
