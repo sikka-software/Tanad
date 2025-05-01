@@ -10,10 +10,10 @@
     "active": "نشط",
     "inactive": "غير نشط",
     "archive": "أرشيف",
-    "enterprises": "المؤسسات",
-    "invalid_date": "تاريخ غير صالح",
-    "add_enterprise": "إضافة مؤسسة",
     "view": "عرض",
+    "enterprises": "المؤسسات",
+    "add_enterprise": "إضافة مؤسسة",
+
     "actions": "العمليات",
     "duplicate": "تكرار",
     "successful_operation": "تمت العملية بنجاح",
@@ -23,8 +23,6 @@
     "must_be_logged_in": "يجب عليك تسجيل الدخول لتنفيذ هذه العملية",
     "clear": "مسح",
     "close": "اغلاق",
-    "no_permission": "ليس لديك الصلاحية لتنفيذ هذه العملية",
-    "no_permission_description": "يرجى الاتصال بالمدير للحصول على الصلاحية اللازمة",
     "no_results_found": "لا توجد نتائج",
     "quick_access": "الوصول السريع",
     "items_selected": "عناصر مختارة",
@@ -34,28 +32,6 @@
     "view_selected": "عرض المختارة",
     "select_all": "اختر الكل",
     "deselect_all": "إلغاء الاختيار",
-    "pick_date": "اختر التاريخ",
-    "cards_view": "عرض البطاقات",
-    "table_view": "عرض الجدول",
-    "sort": "ترتيب",
-    "sort_options": "خيارات الترتيب",
-    "rule": "قاعدة",
-    "add_another_rule": "إضافة قاعدة أخرى",
-    "reset_all": "إعادة تعيين الكل",
-    "apply_sort": "تطبيق الترتيب",
-    "select_field": "اختر الحقل",
-    "case_sensitive": "حساس لحالة الأحرف",
-    "show_empty_values_first": "إظهار القيم الفارغة أولاً",
-    "ascending": "تصاعدي",
-    "descending": "تنازلي",
-    "primary_sort": "الترتيب الأساسي",
-    "secondary_sort": "الترتيب الثانوي",
-    "tertiary_sort": "الترتيب الثالث",
-    "sort_priority_hint": "القواعد الأعلى لها الأولوية",
-    "remove_sort_rule": "إزالة قاعدة الترتيب",
-    "case_sensitive_hint": "مطابقة حالة الأحرف بالضبط عند الترتيب",
-    "empty_values_hint": "إظهار القيم الفارغة في البداية",
-    "sort_by": "ترتيب بـ",
     "calendars": {
       "gregorian": "التقويم الميلادي",
       "hijri": "التقويم الهجري"
@@ -64,29 +40,6 @@
       "label": "تغيير اللغة",
       "ar": "العربية",
       "en": "English"
-    },
-    "filter": {
-      "title": "فرز",
-      "value": {
-        "placeholder": "القيمة"
-      }
-    },
-    "add_filter_condition": "إضافة قاعدة فرز",
-    "apply_filters": "تطبيق الفرز",
-    "saved_filters": "الفروز المحفوظة",
-    "save_current_filter": "حفظ الفرز الحالي",
-    "apply_filter": "تطبيق الفرز",
-    "field": "الحقل",
-    "operator": "المعامل",
-    "operators": {
-      "equals": "يساوي",
-      "not_equals": "لا يساوي",
-      "contains": "يحتوي",
-      "not_contains": "لا يحتوي",
-      "starts_with": "يبدأ بـ",
-      "ends_with": "ينتهي بـ",
-      "is_empty": "فارغ",
-      "is_not_empty": "ليس فارغ"
     },
     "sidebar_search": "ابحث عن صفحة",
     "saving": "جاري الحفظ...",
@@ -158,7 +111,7 @@
     "updating": "جاري التحديث...",
     "updated": "تم التحديث",
     "select": "اختر",
-    "filter_options": "خيارات الفرز",
+    "filter": "تصفية",
     "reset": "إعادة تعيين",
     "reload": "إعادة تحميل",
     "more": "المزيد",
@@ -195,7 +148,7 @@
   },
   "SEO": {
     "landing": {
-      "title": "العمود الفقري لتجارتك",
+      "title": "رابط واحد عن كل الروابط!",
       "description": "رابط واحد يشمل جميع روابطك الأخرى من منصات التواصل الإجتماعي و من تطبيقات التوصيل و حتى طرق التواصل مثل الواتساب او الإتصال المباشر!",
       "author": "سكة لتقنية المعلومات",
       "keywords": "بكلة, رابط واحد, روابط, تواصل, تطبيق, تطبيقات, تطبيق التوصيل, الواتساب, الإتصال المباشر, التواصل الإجتماعي, منصات التواصل الإجتماعي, تطبيقات التوصيل, طرق التواصل, الواتساب, الإتصال المباشر, التواصل الإجتماعي, منصات التواصل الإجتماعي"
@@ -213,9 +166,9 @@
       "description": "تسجيل الدخول إلى بكلة لإدارة جميع روابطك الأخرى"
     },
     "billing": "الإشتراك",
-    "slogan": "العمود الفقري لتجارتك",
+    "slogan": "رابط واحد عن كل الروابط",
     "index": {
-      "title": "العمود الفقري لتجارتك",
+      "title": "رابط واحد عن كل الروابط",
       "description": "بكلة هو موقع يسمح لك بإنشاء رابط واحد يحتوي على كل روابطك الأخرى. يمكنك إستخدامه في السيرة الذاتية أو السوشيال ميديا أو أي مكان آخر."
     },
     "features": {
@@ -261,7 +214,7 @@
   "Landing": {
     "directory": "الدليل",
     "hero": {
-      "title": "العمود الفقري لتجارتك",
+      "title": "رابط واحد عن كل الروابط!",
       "subtitle": "رابط واحد يشمل جميع روابطك الأخرى من منصات التواصل الإجتماعي و من تطبيقات التوصيل و حتى طرق التواصل مثل الواتساب او الإتصال المباشر!",
       "primary-action": "إبدأ الآن"
     },
@@ -274,7 +227,6 @@
     "get-started": "إبدأ الآن",
     "home": "الرئيسية",
     "pricing": "الأسعار",
-    "solution": "الحلول",
     "features": "المزايا",
     "legal": "قانوني",
     "company": "المؤسسة",
@@ -292,7 +244,7 @@
       "action-1-text": "يلا نبدأ"
     },
     "footer": {
-      "tagline": "العمود الفقري لتجارتك"
+      "tagline": "رابط واحد عن كل الروابط"
     },
     "feature-design": {
       "tiny-1": "لون الخلفية",
@@ -317,12 +269,6 @@
     "feature-highlight-2": {
       "title": "جميع المنصات اللي تحبها",
       "subtitle": "من منصات التواصل الإجتماعي و من تطبيقات التوصيل و حتى طرق التواصل مثل الواتساب او الإتصال المباشر!"
-    },
-    "waitlist": {
-      "title": "انضم إلى قائمة الإنتظار",
-      "subtitle": "كون جزءًا من أول منصة لإدارة روابط السيرة الذاتية",
-      "placeholder": "أدخل بريدك الإلكتروني",
-      "button": "إنضم إلى القائمة"
     }
   },
   "Features": {
@@ -747,6 +693,7 @@
     "pukla_slug_too_long": "الرابط المخصص طويل",
     "pukla_slug_invalid": "الرابط المخصص غير صالح",
     "title": "البكلات",
+
     "pukla_description": "الوصف",
     "pukla_description_placeholder": "أدخل الوصف",
     "success_creating_pukla": "تم إنشاء البكلة بنجاح",
@@ -775,6 +722,7 @@
     "start_creating_a_pukla": "ابدأ في إنشاء بكلات لصفحتك الخاصة بك والمزيد.",
     "start_creating_short_links": "ابدأ في إنشاء روابط قصيرة لحملاتك التسويقية وبرامج الإحالة والمزيد.",
     "this_custom_slug_is_not_allowed": "هذا الرابط المخصص غير مسموح به",
+
     "custom_slug_can_only_contain_letters_numbers_and_hyphens": "يمكن أن يحتوي الرابط المخصص على أحرف وأرقام وشرطات فقط",
     "validation": {
       "title_required": "العنوان مطلوب",
@@ -999,12 +947,13 @@
     "select_date_range": "اختر نطاق التاريخ"
   },
   "Billing": {
-    "pro_plan": "الباقة الإحترافية",
+    "tanad_premium": "الباقة الممتازة",
     "only_for_enterprise_users": "لباقة المؤسسات فقط",
     "upgrade_to_enterprise_for_advanced_analytics": "قم بالترقية لباقة المؤسسات للوصول إلى التحليلات المتقدمة",
-    "enterprise_plan": "باقة المؤسسات",
     "title": "الدفع",
     "description": "إدارة جميع طرق الدفع الخاصة بك",
+    "subscription_plans": "الباقات",
+    "free_plan_badge": "مجاني",
     "upgrade_dialog": {
       "title": "ترقية إلى المستوى التالي",
       "description": "قم بترقية خطتك لإنشاء المزيد من البكلات",
@@ -1012,8 +961,184 @@
       "custom_design_and_colors": "تصميم خاص وألوان مخصصة",
       "advanced_analytics": "تحليلات متقدمة ودعم بالبريد الإلكتروني"
     },
-    "upgrade_now": "ترقية الآن"
+    "choose_the_right_plan": "اختر الباقة التي تناسب احتياجاتك وفريقك",
+    "manage_description": "إدارة اشتراكك ومعلومات الفواتير",
+    "available_plans": "الباقات المتاحة",
+    "choose_plan_description": "اختر الباقة التي تناسب احتياجاتك وفريقك",
+    "monthly_billing": "الدفع الشهري",
+    "yearly_billing": "الدفع السنوي (خصم {discount})",
+    "yearly_plans_coming_soon": "خيارات الدفع السنوي قريباً",
+    "need_custom_solution": "هل تحتاج إلى حل مخصص؟",
+    "contact_sales_description": "تواصل مع فريق خدمات تند لتخصيص خطتك",
+    "contact_sales": "التواصل مع تند",
+    "current_plan": {
+      "title": "الباقة الحالية",
+      "refresh": "تحديث"
+    },
+    "billing_history": {
+      "title": "سجل الفواتير",
+      "description": "تاريخ الدفعات السابقة",
+      "no_history": "لم يتم العثور على سجل فواتير",
+      "no_history_description": "ستظهر الفواتير هنا بمجرد أن تكون قد تم الفوترة",
+      "invoice_date": "تاريخ الفوتر",
+      "invoice_number": "رقم الفوتر",
+      "invoice_amount": "مبلغ الفوتر",
+      "invoice_status": "حالة الفوتر",
+      "invoice_plan": "الخطة المستخدمة",
+      "actions": "الإجراءات",
+      "invoice_status_paid": "مدفوع",
+      "invoice_status_open": "مفتوح",
+      "invoice_status_void": "ملغي",
+      "invoice_status_uncollectible": "غير قابل للتحصيل",
+      "invoice_status_draft": "مسودة",
+      "invoice_status_pending": "قيد الإنتظار",
+      "invoice_status_overdue": "متأخر",
+      "unknown_plan": "لا يوجد خطة حالية"
+    },
+    "most_popular": "الأكثر طلباً",
+    "subscription_updated_successfully": "تم تحديث الاشتراك بنجاح",
+    "subscription_update_failed": "فشل تحديث الاشتراك",
+    "select_plan_button": "اختر الباقة",
+    "selected_plan_button": "تم الاختيار",
+    "current_plan_button": "الباقة الحالية",
+    "update_plan": "تحديث الباقة",
+    "subscription_cancels_on": "ينتهي الاشتراك في {date}",
+    "next_billing_date": "تاريخ الفاتورة القادمة",
+    "next_billing_date_full": "تاريخ الفاتورة القادمة هو {date}",
+    "next_billing_date_short": "تاريخ الفاتورة القادمة هو ١٥ مايو ٢٠٢٥",
+    "history": "سجل الفواتير",
+    "subscription_status": {
+      "active": "نشط"
+    },
+    "subscription_trialing": "تجريبي",
+    "subscription_past_due": "متأخر",
+    "subscription_canceled": "ملغي",
+    "subscription_incomplete": "غير مكتمل",
+    "subscription_incomplete_expired": "منتهي",
+    "subscription_unpaid": "غير مدفوع",
+    "subscription_expired": "منتهي",
+    "canceling": "قيد الإلغاء",
+    "reactivate_subscription": "إعادة تفعيل الاشتراك",
+    "reactivating": "جاري إعادة التفعيل...",
+    "payment_details": "تفاصيل الدفع",
+    "payment_dialog_description": "قم بإدخال تفاصيل الدفع لإكمال الاشتراك",
+    "selected_plan_price": "السعر: {price}",
+    "update_to_plan": "الترقية إلى {plan}",
+    "cancel_subscription": {
+      "button": "إلغاء الاشتراك",
+      "title": "إلغاء الاشتراك",
+      "description": "هل أنت متأكد من رغبتك في إلغاء اشتراكك؟ ستفقد الوصول إلى الميزات المتقدمة في نهاية فترة الفوترة الحالية.",
+      "cancel": "الاحتفاظ بالاشتراك",
+      "confirm": "نعم، إلغاء",
+      "cancel_success": "تم إلغاء اشتراكك وسينتهي في نهاية فترة الفوترة الحالية"
+    },
+    "history_dialog_title": "سجل الفواتير",
+    "no_history_description": "ستظهر الفواتير هنا بمجرد أن تكون قد تم الفوترة",
+    "no_history": "لم يتم العثور على سجل فواتير",
+    "tanad_free": "الباقة المجانية",
+    "tanad_standard": "الباقة القياسية",
+    "tanad_pro": "الباقة الاحترافية",
+    "tanad_business": "باقة الأعمال",
+    "tanad_enterprise": "باقة المؤسسات",
+
+    "tanad_free_description": "الميزات الأساسية للأفراد",
+    "tanad_standard_description": "ميزات متقدمة للفرق الصغيرة",
+    "tanad_pro_description": "ميزات متقدمة للشركات النامية",
+    "tanad_business_description": "حل متكامل للشركات المستقرة",
+    "tanad_enterprise_description": "حل مخصص للمؤسسات الكبيرة",
+
+    "free_plan": "الباقة المجانية",
+    "upgrade_plan": "ترقية الباقة",
+    "next_billing_date_is": "تاريخ الفاتورة القادمة هو {date}",
+    "payment": {
+      "credit_card": "بطاقة ائتمان",
+      "digital_wallet": "محفظة رقمية",
+      "card_holder_name": "اسم حامل البطاقة",
+      "payment_details": "تفاصيل الدفع",
+      "card_holder_placeholder": "محمد أحمد",
+      "email": "البريد الإلكتروني",
+      "email_placeholder": "example@domain.com",
+      "card_information": "معلومات البطاقة",
+      "save_card": "حفظ البطاقة للمدفوعات المستقبلية",
+      "terms_agreement_start": "بالمتابعة، فإنك توافق على ",
+      "dialog_title": "تفاصيل الدفع",
+      "terms": "شروط الخدمة",
+      "terms_agreement_middle": " وتقر بـ ",
+      "setting_up": "جاري التحقق من البيانات...",
+      "privacy": "سياسة الخصوصية",
+      "terms_agreement_end": ".",
+      "processing": "جاري المعالجة...",
+      "success": "تم الدفع بنجاح! تم تحديث الاشتراك الخاص بك.",
+      "pay_with_paypal": "الدفع باستخدام بايبال",
+      "google_pay": "الدفع باستخدام جوجل باي",
+      "saved_cards": "البطاقات المحفوظة",
+      "use_new_card": "استخدام بطاقة جديدة",
+      "expires": "ينتهي في",
+      "complete_payment": "إتمام الدفع",
+      "error": "حدث خطأ أثناء معالجة الدفع الخاص بك. يرجى المحاولة مرة أخرى.",
+      "incomplete_card": "يرجى إكمال معلومات بطاقتك.",
+      "enter_details": "أدخل تفاصيل الدفع الخاصة بك لإكمال تغيير الاشتراك",
+      "test_card": "للاختبار، استخدم رقم البطاقة: ٤٢٤٢ ٤٢٤٢ ٤٢٤٢ ٤٢٤٢، أي تاريخ مستقبلي، أي رمز CVC",
+      "method_unavailable": "طريقة الدفع هذه غير متوفرة حالياً. الرجاء استخدام بطاقة ائتمان."
+    },
+    "month_billing": "الدفع الشهري",
+    "year_billing": "الدفع السنوي (يوفر {discount})",
+    "data_refreshed": "تم تحديث البيانات بنجاح",
+    "features": {
+      "basic_access": "وصول أساسي",
+      "limited_projects": "حتى 3 مشاريع",
+      "standard_support": "دعم قياسي",
+      "community_access": "دعم المجتمع",
+      "limited_clients": "حسابات عملاء محدودة",
+      "basic_invoicing": "فواتير أساسية",
+      "limited_employees": "حسابات موظفين محدودة",
+      "basic_attendance": "تتبع الحضور الأساسي",
+
+      "unlimited_projects": "مشاريع غير محدودة",
+      "priority_support": "دعم ذو أولوية",
+      "advanced_analytics": "تحليلات متقدمة",
+      "custom_branding": "علامة تجارية مخصصة",
+      "api_access": "وصول إلى واجهة البرمجة",
+      "client_portal": "بوابة العملاء",
+      "invoice_customization": "تخصيص الفواتير",
+      "employee_management": "إدارة الموظفين",
+      "payroll_processing": "معالجة الرواتب",
+      "vendor_management": "إدارة الموردين",
+      "product_catalog": "كتالوج المنتجات",
+      "advanced_reports": "تقارير متقدمة",
+      "dedicated_support": "دعم مخصص",
+      "advanced_reporting": "تقارير متقدمة",
+      "white_label": "العلامة البيضاء",
+      "team_collaboration": "تعاون الفريق",
+      "extended_api": "وصول موسع لواجهة البرمجة",
+      "sso_auth": "مصادقة الدخول الموحد",
+      "enterprise_integrations": "تكاملات المؤسسات",
+      "unlimited_employees": "موظفين غير محدودين",
+      "multi_branch": "دعم متعدد الفروع",
+      "warehouse_management": "إدارة المستودعات",
+      "job_listings": "قوائم الوظائف",
+      "purchase_management": "إدارة المشتريات",
+      "company_management": "إدارة الشركة",
+
+      "unlimited_access": "وصول غير محدود",
+      "premium_support": "دعم متميز",
+      "ai_analytics": "تحليلات مدعومة بالذكاء الاصطناعي",
+      "complete_white_label": "علامة بيضاء كاملة",
+      "advanced_permissions": "صلاحيات متقدمة",
+      "unlimited_api": "وصول غير محدود لواجهة البرمجة",
+      "advanced_sso": "مصادقة الدخول الموحد المتقدمة",
+      "custom_integrations": "تكاملات مخصصة",
+      "account_manager": "مدير حساب مخصص",
+      "custom_development": "تطوير مخصص",
+      "advanced_security": "أمان متقدم",
+      "data_management": "إدارة البيانات",
+      "custom_automation": "أتمتة مخصصة",
+      "biometric_auth": "مصادقة بيومترية",
+      "multiple_payment_gateways": "بوابات دفع متعددة"
+    }
   },
+  "available_plans": "الباقات المتاحة",
+  "choose_plan_description": "اختر الباقة التي تناسبك",
   "Account": {
     "title": "الحساب",
     "description": "إدارة جميع حساباتك الخاصة بك"
@@ -1117,6 +1242,16 @@
     "billing": {
       "title": "الدفع",
       "description": "إدارة معلومات الدفع والاشتراك",
+      "unknown_plan": "لا يوجد خطة حالية",
+
+      "history_description": "تاريخ الدفعات السابقة",
+
+      "invoice_date": "تاريخ الفوتر",
+      "invoice_number": "رقم الفوتر",
+      "invoice_amount": "مبلغ الفوتر",
+      "invoice_status": "حالة الفوتر",
+      "invoice_plan": "الخطة المستخدمة",
+      "actions": "الإجراءات",
       "current_plan": {
         "title": "الخطة الحالية",
         "change_plan": "تغيير الخطة"
@@ -1368,55 +1503,14 @@
     "zimbabwe": "زيمبابوي"
   },
   "OnBoarding": {
-    "title": "مرحباً بك في تند",
-    "description": "أنشئ مؤسستك للبدء",
-    "welcome_message": "قم بإعداد مؤسستك وابدأ في إدارة منظمتك بكفاءة.",
-    "form": {
-      "enterprise_name": {
-        "label": "اسم المؤسسة",
-        "placeholder": "أدخل اسم مؤسستك",
-        "required": "اسم المؤسسة مطلوب"
-      },
-      "description": {
-        "label": "الوصف",
-        "placeholder": "أخبرنا عن مؤسستك"
-      },
-      "logo": {
-        "label": "رابط الشعار",
-        "placeholder": "أدخل رابط شعار مؤسستك"
-      },
-      "email": {
-        "label": "البريد الإلكتروني للمؤسسة",
-        "placeholder": "أدخل البريد الإلكتروني للمؤسسة",
-        "invalid": "البريد الإلكتروني غير صالح"
-      },
-      "industry": {
-        "label": "المجال",
-        "placeholder": "اختر مجال عمل مؤسستك"
-      },
-      "size": {
-        "label": "حجم المؤسسة",
-        "placeholder": "اختر حجم مؤسستك"
-      },
-      "create_enterprise": "إنشاء المؤسسة"
-    },
-    "industry_options": {
-      "technology": "التقنية",
-      "healthcare": "الرعاية الصحية",
-      "finance": "المالية",
-      "education": "التعليم",
-      "manufacturing": "التصنيع",
-      "retail": "التجزئة",
-      "other": "أخرى"
-    },
-    "size_options": {
-      "1-10": "1-10 موظفين",
-      "11-50": "11-50 موظف",
-      "51-200": "51-200 موظف",
-      "201-500": "201-500 موظف",
-      "501-1000": "501-1000 موظف",
-      "1000+": "أكثر من 1000 موظف"
-    }
+    "title": "مرحباً بك في بكلة",
+    "congratulations": "تهانينا!",
+    "pukla_created": "لقد نجحت في إنشاء البكلة الأولى!",
+    "next_steps": "ما التالي؟",
+    "editor_info": "قم بزيارة صفحة الروابط لترتيب روابطك وإضافة المزيد من المزايا إليها.",
+    "theme_info": "انتقل إلى صفحة التصميم لتخصيص تصميم ومظهر البكلة الخاصة بك.",
+    "go_to_editor": "تعديل الروابط",
+    "go_to_theme": "تصميم البكلة"
   },
   "OnBoardingForm": {
     "username": "اسم المستخدم",
@@ -1439,6 +1533,7 @@
     "total_puklas": "تم العثور على {count} بكلة",
     "loading": "جاري تحميل البكلات..."
   },
+
   "Dashboard": {
     "title": "لوحة التحكم",
     "create_product": "إضافة منتج",
@@ -1474,7 +1569,7 @@
   },
   "Products": {
     "title": "المنتجات",
-    "add_new": "منتج جديد",
+    "add_new": "إضافة منتج جديد",
     "search_products": "بحث عن منتجات",
     "product_details": "تفاصيل المنتج",
     "product_name": "اسم المنتج",
@@ -1545,7 +1640,7 @@
       "select_product": "اختر منتج",
       "search_products": "بحث عن منتجات",
       "no_products_found": "لا توجد منتجات",
-      "add_new_product": "منتج جديد",
+      "add_new_product": "إضافة منتج جديد",
       "product_description": "وصف المنتج",
       "name": "الاسم",
       "save_product": "حفظ المنتج"
@@ -1553,7 +1648,7 @@
   },
   "Invoices": {
     "title": "الفواتير",
-    "add_new": "فاتورة جديدة",
+    "add_new": "إضافة فاتورة جديدة",
     "invoice_details": "تفاصيل الفاتورة",
     "invoice_number": "فاتورة #{number}",
     "enter_invoice_number": "أدخل رقم الفاتورة",
@@ -1577,7 +1672,7 @@
     "select_client": "اختر عميل",
     "search_clients": "بحث عن عملاء...",
     "no_clients": "لا يوجد عملاء",
-    "add_new_client": "عميل جديد",
+    "add_new_client": "إضافة عميل جديد",
     "amount": "المبلغ",
     "due_date": "تاريخ الاستحقاق",
     "select_status": "اختر حالة",
@@ -1613,45 +1708,22 @@
     "issue_date": "تاريخ الإصدار",
     "form": {
       "invoice_number": {
-        "label": "رقم الفاتورة",
-        "placeholder": "أدخل رقم الفاتورة"
+        "label": "رقم الفاتورة"
       },
       "client": {
-        "label": "العميل",
-        "select_client": "اختر عميل",
-        "search_clients": "بحث عن عملاء...",
-        "no_clients": "لا يوجد عملاء",
-        "add_new_client": "عميل جديد"
+        "label": "العميل"
       },
       "issue_date": {
-        "label": "تاريخ الإصدار",
-        "placeholder": "اختر تاريخ الإصدار"
+        "label": "تاريخ الإصدار"
       },
       "due_date": {
-        "label": "تاريخ الاستحقاق",
-        "placeholder": "اختر تاريخ الاستحقاق"
+        "label": "تاريخ الاستحقاق"
       },
       "total": {
         "label": "المجموع"
       },
       "status": {
-        "label": "الحالة",
-        "placeholder": "اختر حالة",
-        "draft": "مسودة",
-        "pending": "قيد الانتظار",
-        "paid": "مدفوعة",
-        "overdue": "متأخرة",
-        "cancelled": "ملغاة"
-      },
-      "subtotal": {
-        "label": "المجموع الفرعي"
-      },
-      "tax_rate": {
-        "label": "نسبة الضريبة"
-      },
-      "notes": {
-        "label": "ملاحظات",
-        "placeholder": "أدخل ملاحظاتك"
+        "label": "الحالة"
       }
     },
     "actions": {
@@ -1668,13 +1740,13 @@
       "select_product": "اختر منتج",
       "search_products": "بحث عن منتجات",
       "no_products_found": "لم يتم العثور على منتجات",
-      "add_new_product": "منتج جديد",
+      "add_new_product": "إضافة منتج جديد",
       "product_description": "وصف المنتج"
     }
   },
   "Sales": {
     "title": "المبيعات",
-    "add_new": "مبيعات جديدة",
+    "add_new": "إضافة مبيعات جديدة",
     "sale_details": "تفاصيل البيع",
     "description": "الوصف",
     "description_required": "الوصف مطلوب",
@@ -1701,7 +1773,7 @@
     "select_client": "اختر عميل",
     "search_clients": "بحث عن عملاء...",
     "no_clients": "لا يوجد عملاء",
-    "add_new_client": "عميل جديد",
+    "add_new_client": "إضافة عميل جديد",
     "client_added": "تمت إضافة العميل بنجاح",
     "products": {
       "title": "المنتجات",
@@ -1714,7 +1786,7 @@
       "select_product": "اختر منتج",
       "search_products": "بحث عن منتجات",
       "no_products_found": "لا توجد منتجات",
-      "add_new_product": "منتج جديد",
+      "add_new_product": "إضافة منتج جديد",
       "product_description": "وصف المنتج"
     },
     "error": {
@@ -1732,7 +1804,7 @@
   "Quotes": {
     "title": "عروض الأسعار",
     "create_quote": "إنشاء عرض سعر",
-    "add_new": "عرض سعر جديد",
+    "add_new": "إضافة عرض سعر جديد",
     "back_to_list": "العودة إلى عروض الأسعار",
     "quote_details": "تفاصيل عرض السعر",
     "submitting": "جاري الإرسال...",
@@ -1742,7 +1814,7 @@
     "select_client": "اختر عميل",
     "search_clients": "البحث عن عملاء",
     "no_clients": "لم يتم العثور على عملاء",
-    "add_new_client": "عميل جديد",
+    "add_new_client": "إضافة عميل جديد",
     "quote_number": "رقم عرض السعر",
     "enter_quote_number": "أدخل رقم عرض السعر",
     "subtotal": "المجموع الفرعي",
@@ -1797,7 +1869,7 @@
       "select_product": "اختر منتج",
       "search_products": "البحث عن منتجات",
       "no_products_found": "لم يتم العثور على منتجات",
-      "add_new_product": "منتج جديد",
+      "add_new_product": "إضافة منتج جديد",
       "add_product": "إضافة منتج",
       "quantity": "الكمية",
       "unit_price": "سعر الوحدة",
@@ -1835,10 +1907,19 @@
       "item_description_or_product": "يجب اختيار منتج أو إدخال وصف لكل عنصر"
     }
   },
+  "Holidays": {
+    "title": "العطلات الرسمية"
+  },
+  "Reports": {
+    "title": "التقارير"
+  },
+  "Requests": {
+    "title": "الطلبات"
+  },
   "EmployeeRequests": {
     "title": "طلبات الموظفين",
     "description": "طلبات الموظفين",
-    "add_new": "طلب موظف جديد",
+    "add_new": "إضافة طلب موظف جديد",
     "no_employee_requests_found": "لا توجد طلبات موظفين",
     "search_requests": "بحث عن طلبات الموظفين...",
     "form": {
@@ -1914,7 +1995,7 @@
   },
   "Clients": {
     "title": "العملاء",
-    "add_new": "عميل جديد",
+    "add_new": "إضافة عميل جديد",
     "create_client": "إضافة عميل",
     "back_to_list": "الرجوع للقائمة",
     "client_details": "تفاصيل العميل",
@@ -1991,11 +2072,11 @@
       "duplicating": "جاري تكرار العميل..."
     }
   },
+
   "Warehouses": {
     "title": "المستودعات",
-    "add_new": "مستودع جديد",
+    "add_new": "إضافة مستودع جديد",
     "warehouse_details": "تفاصيل المستودع",
-    "search_warehouses": "بحث عن مستودعات...",
     "name": "الاسم",
     "name_required": "اسم المستودع مطلوب",
     "enter_name": "أدخل اسم المستودع",
@@ -2089,7 +2170,7 @@
   },
   "Branches": {
     "title": "الفروع",
-    "add_new": "فرع جديد",
+    "add_new": "إضافة فرع جديد",
     "branch_details": "تفاصيل الفرع",
     "create_branch": "إنشاء فرع",
     "no_branches_found": "لا توجد فروع",
@@ -2173,7 +2254,7 @@
   },
   "Vendors": {
     "title": "الموردين",
-    "add_new": "مورد جديد",
+    "add_new": "إضافة مورد جديد",
     "back_to_list": "الرجوع للقائمة",
     "vendor_details": "تفاصيل المورد",
     "no_vendors": "لا يوجد موردين",
@@ -2230,24 +2311,20 @@
       }
     },
     "success": {
-      "title": "تم بنجاح",
       "created": "تم إنشاء المورد بنجاح",
       "updated": "تم تحديث المورد بنجاح",
       "deleted": "تم حذف المورد بنجاح",
       "duplicated": "تم تكرار المورد بنجاح"
     },
-    "error": {
-      "create": "فشل في إنشاء المورد",
-      "load_vendors": "فشل في تحميل الموردين",
-      "update": "فشل في تحديث المورد",
-      "delete": "فشل في حذف المورد",
-      "duplicate": "فشل في تكرار المورد"
-    },
     "loading": {
-      "creating": "جاري إنشاء المورد...",
-      "updating": "جاري تحديث المورد...",
-      "deleting": "جاري حذف المورد...",
-      "duplicating": "جاري تكرار المورد..."
+      "duplicating": "جاري تكرار المورد...",
+      "deleting": "جاري حذف المورد..."
+    },
+    "error": {
+      "creating": "حدث خطأ أثناء إنشاء المورد",
+      "updating": "حدث خطأ أثناء تحديث المورد",
+      "deleting": "حدث خطأ أثناء حذف المورد",
+      "duplicating": "حدث خطأ أثناء تكرار المورد"
     }
   },
   "Attendance": {
@@ -2289,17 +2366,17 @@
   },
   "Users": {
     "title": "المستخدمون",
-    "add_new": "مستخدم جديد",
+    "add_new": "إضافة مستخدم جديد",
     "user_details": "تفاصيل المستخدم",
     "login_details": "تفاصيل تسجيل الدخول",
     "personal_info": "المعلومات الشخصية",
-    "permissions": "الصلاحيات",
+    "permissions": "الصلاحيات والأدوار",
     "no_users": "لا يوجد مستخدمين",
     "active_users": "المستخدمون النشطون",
     "inactive_users": "المستخدمون غير النشطين",
     "search_placeholder": "بحث عن مستخدمين...",
     "add_dialog": {
-      "title": "مستخدم جديد",
+      "title": "إضافة مستخدم جديد",
       "description": "املأ التفاصيل لإنشاء مستخدم جديد. سينتمي إلى نفس المؤسسة."
     },
     "permissions_popover": "الصلاحيات",
@@ -2342,16 +2419,6 @@
       }
     },
     "form": {
-      "first_name": {
-        "label": "الاسم الأول",
-        "placeholder": "أدخل الاسم الأول",
-        "required": "الاسم الأول مطلوب"
-      },
-      "last_name": {
-        "label": "الاسم الأخير",
-        "placeholder": "أدخل الاسم الأخير",
-        "required": "الاسم الأخير مطلوب"
-      },
       "name": {
         "label": "الاسم الكامل",
         "placeholder": "أدخل الاسم الكامل",
@@ -2379,8 +2446,7 @@
         "admin": "مدير النظام",
         "manager": "مدير",
         "employee": "موظف",
-        "user": "مستخدم عادي",
-        "search_placeholder": "بحث عن دور..."
+        "user": "مستخدم عادي"
       },
       "status": {
         "label": "الحالة",
@@ -2404,12 +2470,6 @@
       "permissions": {
         "label": "الصلاحيات",
         "placeholder": "اختر الصلاحيات"
-      },
-      "created_at": {
-        "label": "تاريخ الإنشاء"
-      },
-      "updated_at": {
-        "label": "تاريخ التحديث"
       }
     },
     "messages": {
@@ -2439,9 +2499,10 @@
       "warehouse": "مخزن"
     }
   },
+
   "Salaries": {
     "title": "الرواتب",
-    "add_new": "راتب جديد",
+    "add_new": "إضافة راتب جديد",
     "create_salary": "إضافة راتب",
     "edit_salary": "تعديل الراتب",
     "delete_salary": "حذف الراتب",
@@ -2524,13 +2585,22 @@
     "add_job": "إضافة وظيفة",
     "edit_job": "تعديل الوظيفة",
     "job_details": "تفاصيل الوظيفة",
-    "add_new": "وظيفة جديدة",
-    "add_new_listing": "صفحة توظيف جديدة",
+    "add_new": "إضافة وظيفة جديدة",
+    "add_new_listing": "إضافة صفحة توظيف جديدة",
     "listing_details": "تفاصيل صفحة توظيف",
     "back_to_list": "العودة إلى القائمة",
     "no_jobs_found": "لم يتم العثور على وظائف",
     "failed_to_fetch_jobs": "فشل في جلب الوظائف",
     "search_jobs": "البحث في الوظائف...",
+    "messages": {
+      "creating_job": "جاري إنشاء الوظيفة...",
+      "create_job": "إنشاء الوظيفة",
+      "created": "تم إنشاء الوظيفة بنجاح",
+      "updated": "تم تحديث الوظيفة بنجاح",
+      "deleted": "تم حذف الوظيفة بنجاح",
+      "error": "حدث خطأ أثناء معالجة طلبك"
+    },
+
     "form": {
       "title": {
         "label": "عنوان الوظيفة",
@@ -2551,8 +2621,7 @@
       },
       "department": {
         "label": "القسم",
-        "placeholder": "أدخل القسم",
-        "required": "القسم مطلوب"
+        "placeholder": "أدخل القسم"
       },
       "type": {
         "label": "نوع الوظيفة",
@@ -2561,17 +2630,11 @@
         "part_time": "دوام جزئي",
         "contract": "عقد",
         "internship": "تدريب",
-        "temporary": "مؤقت",
-        "required": "نوع الوظيفة مطلوب"
+        "temporary": "مؤقت"
       },
       "salary": {
         "label": "الراتب",
-        "placeholder": "أدخل الراتب",
-        "required": "الراتب مطلوب"
-      },
-      "status": {
-        "label": "الحالة",
-        "placeholder": "اختر الحالة"
+        "placeholder": "أدخل الراتب"
       },
       "start_date": {
         "label": "تاريخ البدء",
@@ -2583,12 +2646,6 @@
       },
       "is_active": {
         "label": "هل هذه الوظيفة نشطة؟"
-      },
-      "created_at": {
-        "label": "تاريخ الإنشاء"
-      },
-      "updated_at": {
-        "label": "تاريخ التحديث"
       }
     },
     "success": {
@@ -2611,7 +2668,7 @@
   "JobListings": {
     "title": "صفحات التوظيف",
     "create_listing": "إنشاء صفحة توظيف",
-    "add_new_listing": "صفحة توظيف جديدة",
+    "add_new_listing": "إضافة صفحة توظيف جديدة",
     "search_listings": "البحث في صفحات التوظيف...",
     "listing_details": "تفاصيل صفحة التوظيف",
     "messages": {
@@ -2655,7 +2712,7 @@
   "Expenses": {
     "title": "المصروفات",
     "description": "إدارة وتتبع المصروفات",
-    "add_new": "مصروف جديد",
+    "add_new": "إضافة مصروف جديد",
     "search_expenses": "البحث في المصروفات",
     "no_expenses_found": "لم يتم العثور على مصروفات",
     "confirm_delete_title": "تأكيد حذف المصروفات",
@@ -2725,7 +2782,7 @@
   },
   "Applicants": {
     "title": "المتقدمين",
-    "add_new": "متقدم جديد",
+    "add_new": "إضافة متقدم جديد",
     "applicant_details": "تفاصيل المتقدم",
     "back_to_list": "العودة إلى القائمة",
     "no_applicants": "لم يتم العثور على متقدمين",
@@ -2816,7 +2873,7 @@
   },
   "Employees": {
     "title": "الموظفين",
-    "add_new": "موظف جديد",
+    "add_new": "إضافة موظف جديد",
     "add_employee": "إضافة موظف",
     "search_employees": "بحث عن موظفين",
     "cancel": "إلغاء",
@@ -2860,8 +2917,7 @@
         "label": "البريد الإلكتروني",
         "placeholder": "أدخل البريد الإلكتروني",
         "required": "البريد الإلكتروني مطلوب",
-        "invalid": "البريد الإلكتروني غير صالح",
-        "duplicate": "البريد الإلكتروني مستخدم من قبل موظف آخر"
+        "invalid": "البريد الإلكتروني غير صالح"
       },
       "phone": {
         "label": "رقم الهاتف",
@@ -2910,26 +2966,23 @@
   "Contacts": {
     "title": "جهات الاتصال",
     "all": "جميع جهات الاتصال",
-    "add_new": "جهة إتصال جديدة",
+    "add_new": "إضافة جهة إتصال جديدة",
     "name": "الاسم",
     "email": "البريد الإلكتروني",
     "phone": "الهاتف",
     "address": "العنوان"
   },
-  "Forms": {
-    "description": {
-      "label": "الوصف",
-      "placeholder": "أدخل الوصف"
-    },
-    "created_at": {
-      "label": "تاريخ الإنشاء",
-      "placeholder": "أدخل تاريخ الإنشاء"
-    },
-    "updated_at": {
-      "label": "تاريخ التحديث",
-      "placeholder": "أدخل تاريخ التحديث"
-    }
+  "Applications": {
+    "title": "الطلبات"
   },
+  "JobListing": {
+    "title": "الوظائف"
+  },
+
+  "Calendar": {
+    "title": "التقويم"
+  },
+
   "Companies": {
     "title": "الشركات",
     "add_new": "إضافة شركة",
@@ -2992,12 +3045,6 @@
         "name_required": "اسم الشركة مطلوب",
         "email_required": "البريد الإلكتروني مطلوب",
         "email_invalid": "البريد الإلكتروني غير صالح"
-      },
-      "created_at": {
-        "label": "تاريخ الإنشاء"
-      },
-      "updated_at": {
-        "label": "تاريخ التحديث"
       }
     },
     "success": {
@@ -3024,7 +3071,7 @@
   },
   "Offices": {
     "title": "المكاتب",
-    "add_new": "مكتب جديد",
+    "add_new": "إضافة مكتب جديد",
     "office_details": "تفاصيل المكتب",
     "back_to_list": "العودة إلى القائمة",
     "no_offices": "لم يتم العثور على مكاتب",
@@ -3094,7 +3141,7 @@
   },
   "Departments": {
     "title": "الإدارات",
-    "add_new": "إدارة جديدة",
+    "add_new": "إضافة إدارة جديدة",
     "search_departments": "بحث عن الإدارات",
     "department_details": "تفاصيل الإدارة",
     "form": {
@@ -3150,7 +3197,7 @@
   },
   "Purchases": {
     "title": "المشتريات",
-    "add_new": "مشترية جديدة",
+    "add_new": "إضافة مشترية جديدة",
     "search_purchases": "بحث عن المشتريات",
     "purchase_details": "تفاصيل المشترية",
     "form": {},
@@ -3171,84 +3218,11 @@
       "duplicating": "حدث خطأ أثناء تكرار المشترية"
     }
   },
-  "Employee_requests": {
-    "title": "طلبات الموظفين"
-  },
-  "Job_listings": {
-    "title": "صفحات الوظائف"
-  },
   "Roles": {
     "title": "الأدوار",
-    "your_role": "دورك",
-    "create_role": "إنشاء دور جديد",
-    "add_new": "دور جديد",
-    "search_roles": "بحث عن الدور",
-    "role_details": "تفاصيل الدور",
-    "no_permissions": "لا يوجد صلاحيات",
-    "permissions": {
-      "title": "الصلاحيات",
-      "description": "الصلاحيات المتاحة للدور",
-      "read": "القراءة",
-      "create": "إنشاء",
-      "update": "تحديث",
-      "delete": "حذف",
-      "duplicate": "تكرار",
-      "view": "عرض",
-      "manage": "إدارة",
-      "approve": "موافقة",
-      "process": "معالجة",
-      "report": "تقرير",
-      "configure": "تكوين",
-      "manage_users": "إدارة المستخدمين",
-      "invite": "دعوة",
-      "export": "تصدير",
-      "import": "استيراد",
-      "print": "طباعة",
-      "send": "إرسال",
-      "receive": "استلام",
-      "assign": "تعيين",
-      "unassign": "إلغاء التعيين",
-      "edit": "تعديل"
-    },
-    "form": {
-      "name": {
-        "label": "الاسم",
-        "placeholder": "أدخل اسم الدور",
-        "required": "الاسم مطلوب",
-        "format": "يجب أن يحتوي اسم الدور على أحرف صغيرة وأرقام وشرطات سفلية فقط"
-      },
-      "description": {
-        "label": "الوصف",
-        "placeholder": "أدخل وصف الدور",
-        "required": "الوصف مطلوب"
-      },
-      "permissions": {
-        "label": "الصلاحيات"
-      }
-    },
-    "predefined": {
-      "system": "نظام",
-      "superadmin": {
-        "title": "مدير النظام",
-        "description": "مدير النظام لديه جميع الصلاحيات للتحكم في النظام والمستخدمين"
-      },
-      "admin": {
-        "title": "مدير المؤسسة",
-        "description": "مدير المؤسسة لديه جميع الصلاحيات للتحكم في المؤسسة والمستخدمين"
-      },
-      "employee": {
-        "title": "موظف",
-        "description": "الموظف لديه صلاحيات الوصول إلى البيانات الخاصة به"
-      },
-      "human_resources": {
-        "title": "مسؤول الموارد البشرية",
-        "description": "موظف الموارد البشرية لديه صلاحيات الوصول إلى البيانات الخاصة بالموارد البشرية"
-      },
-      "accounting": {
-        "title": "مسؤول المحاسبة",
-        "description": "موظف المحاسبة لديه صلاحيات الوصول إلى البيانات الخاصة بالمحاسبة"
-      }
-    },
+    "add_new": "إضافة أدوار جديدة",
+    "search_roles": "بحث عن الأدوار",
+    "role_details": "تفاصيل الأدوار",
     "roles": {
       "superadmin": "مدير النظام",
       "admin": "مدير المؤسسة",
@@ -3257,22 +3231,22 @@
       "accounting": "موظف المحاسبة"
     },
     "messages": {
-      "creating": "جاري إنشاء الدور...",
-      "create": "إنشاء الدور",
-      "created": "تم إنشاء الدور بنجاح",
-      "updated": "تم تحديث الدور بنجاح",
-      "deleted": "تم حذف الدور بنجاح",
+      "creating": "جاري إنشاء الأدوار...",
+      "create": "إنشاء الأدوار",
+      "created": "تم إنشاء الأدوار بنجاح",
+      "updated": "تم تحديث الأدوار بنجاح",
+      "deleted": "تم حذف الأدوار بنجاح",
       "error": "حدث خطأ أثناء معالجة طلبك"
     },
     "success": {
-      "created": "تم إنشاء الدور بنجاح",
-      "updated": "تم تحديث الدور بنجاح",
-      "deleted": "تم حذف الدور بنجاح"
+      "created": "تم إنشاء الأدوار بنجاح",
+      "updated": "تم تحديث الأدوار بنجاح",
+      "deleted": "تم حذف الأدوار بنجاح"
     },
     "error": {
-      "creating": "حدث خطأ أثناء إنشاء الدور",
-      "updating": "حدث خطأ أثناء تحديث الدور",
-      "deleting": "حدث خطأ أثناء حذف الدور"
+      "creating": "حدث خطأ أثناء إنشاء الأدوار",
+      "updating": "حدث خطأ أثناء تحديث الأدوار",
+      "deleting": "حدث خطأ أثناء حذف الأدوار"
     }
   }
 }
