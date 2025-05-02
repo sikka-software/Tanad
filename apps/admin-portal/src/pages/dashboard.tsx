@@ -253,7 +253,7 @@ export default function Dashboard() {
         {/* Sales & Revenue Section */}
         <div>
           <h2 className="mb-4 text-lg font-semibold">{t("Sales.title")}</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <StatCard
               title={t("Invoices.title")}
               value={stats.totalInvoices}
@@ -267,11 +267,7 @@ export default function Dashboard() {
               loading={loading}
               link="/products"
             />
-            <StatCard
-              title={t("Revenue.title")}
-              value={loading ? "..." : `$${stats.totalRevenue.toFixed(2)}`}
-              loading={loading}
-            />
+
             <StatCard
               title={t("Invoices.title")}
               value={stats.pendingInvoices}

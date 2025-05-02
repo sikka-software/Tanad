@@ -9,6 +9,7 @@ ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'companies.duplicate';
 ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'companies.export';
 
 ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'users.read';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'users.create';
 ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'users.invite';
 ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'users.update';
 ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'users.delete';

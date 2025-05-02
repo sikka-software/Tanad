@@ -99,20 +99,14 @@ const useUserStore = create<UserState>((set, get) => ({
 
   signOut: async () => {
     try {
-      set({ loading: true });
+      // Only call Supabase sign out, let the listener handle state changes
       await supabase.auth.signOut();
-      set({
-        user: null,
-        profile: null,
-        enterprise: null,
-        membership: null,
-        permissions: [],
-        loading: false,
-        error: null,
-      });
+      // No state updates here
       return Promise.resolve();
     } catch (error) {
+      // Log error, potentially set an error state if needed elsewhere
       console.error("Error signing out:", error);
+      // Optionally set error state: set({ error: (error as Error).message, loading: false });
       return Promise.reject(error);
     }
   },

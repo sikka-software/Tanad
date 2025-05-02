@@ -32,14 +32,21 @@ const systemRolePermissions: Record<string, string[]> = {
     "companies.update",
     "companies.duplicate",
     "companies.export",
+
     "users.read",
     "users.invite",
+    "users.create",
     "users.update",
     "users.delete",
+    "users.export",
+    "users.duplicate",
+
     "roles.create",
     "roles.read",
     "roles.update",
     "roles.delete",
+    "roles.duplicate",
+    "roles.export",
 
     "branches.read",
     "branches.create",
