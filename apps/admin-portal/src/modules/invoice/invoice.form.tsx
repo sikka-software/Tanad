@@ -185,12 +185,6 @@ export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFo
     }
   };
 
-  // Format clients for ComboboxAdd
-  const clientOptions = clients.map((client) => ({
-    label: client.company ? `${client.name} (${client.company})` : client.name,
-    value: client.id,
-  }));
-
   const handleSubmit = async (data: InvoiceFormValues) => {
     setIsLoading(true);
     if (!profile?.id) {
@@ -247,7 +241,6 @@ export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFo
             status: data.status,
             subtotal: data.subtotal,
             tax_rate: data.tax_rate,
-            total: data.subtotal + (data.subtotal * data.tax_rate) / 100,
             notes: data.notes,
             items: data.items.map((item) => ({
               ...item,
@@ -277,6 +270,12 @@ export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFo
   if (typeof window !== "undefined") {
     (window as any).invoiceForm = form;
   }
+
+  // Format clients for ComboboxAdd
+  const clientOptions = clients.map((client) => ({
+    label: client.company ? `${client.name} (${client.company})` : client.name,
+    value: client.id,
+  }));
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { Invoice } from "@/invoice/invoice.type";
+import { Invoice, InvoiceCreateData } from "@/invoice/invoice.type";
 
 export async function fetchInvoices(): Promise<Invoice[]> {
   const response = await fetch("/api/resource/invoices");
@@ -16,7 +16,7 @@ export async function fetchInvoiceById(id: string): Promise<Invoice> {
   return response.json();
 }
 
-export async function createInvoice(invoice: Omit<Invoice, "id" | "created_at">): Promise<Invoice> {
+export async function createInvoice(invoice: InvoiceCreateData): Promise<Invoice> {
   const response = await fetch("/api/resource/invoices", {
     method: "POST",
     headers: {

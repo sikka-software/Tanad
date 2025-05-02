@@ -9,6 +9,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { MoneyFormatter } from "@/components/ui/currency-input";
+import { SARSymbol } from "@/components/ui/sar-symbol";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateInvoice } from "@/invoice/invoice.hooks";
@@ -41,7 +44,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canDeleteInvoice = useUserStore((state) => state.hasPermission("invoices.delete"));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
+  console.log("data is ", data);
   const columns: ExtendedColumnDef<Invoice>[] = [
     {
       accessorKey: "invoice_number",
@@ -51,30 +54,34 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     {
       accessorKey: "client.company",
       header: t("Invoices.form.client.label"),
-      cell: ({ row }) => row.original.client?.company || "N/A",
+      cell: ({ row }) => {
+        console.log(row.original.client);
+        return row.original.client?.name;
+      },
     },
     {
       accessorKey: "issue_date",
       header: t("Invoices.form.issue_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.issue_date.required")),
-      cell: ({ row }) => formatDate(row.original.issue_date),
+      cell: ({ row }) => row.original.issue_date,
     },
     {
       accessorKey: "due_date",
       header: t("Invoices.form.due_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.due_date.required")),
-      cell: ({ row }) => formatDate(row.original.due_date),
+      cell: ({ row }) => row.original.due_date,
     },
     {
       accessorKey: "total",
       header: t("Invoices.form.total.label"),
       validationSchema: z.number().min(0, t("Invoices.form.total.required")),
       cell: ({ row }) => {
-        const total =
-          typeof row.original.total === "string"
-            ? parseFloat(row.original.total)
-            : row.original.total;
-        return `$${Number(total).toFixed(2)}`;
+        return (
+          <span className="flex flex-row items-center gap-1 text-sm font-medium">
+            {MoneyFormatter(row.getValue("total"))}
+            <SARSymbol className="size-3" />
+          </span>
+        );
       },
     },
     {

@@ -28,4 +28,4 @@ export type InvoiceItem = {
   unit_price: number;
 };
 
-export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "client" | "items">;
+export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "total">;

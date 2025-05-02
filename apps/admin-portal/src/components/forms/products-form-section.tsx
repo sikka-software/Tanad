@@ -50,7 +50,7 @@ interface ProductRowProps {
   control: Control<FormValues>;
   remove: UseFieldArrayRemove;
   locale: string;
-  productOptions: { label: string; value: string }[] | undefined;
+  productOptions: { label: string; value: string; price?: number }[] | undefined;
   isLoading?: boolean;
   productsLoading?: boolean;
   productsData: Product[] | undefined;
@@ -117,9 +117,13 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                       }
                       handleProductSelection(index, value);
                     }}
-                    renderOption={(item) => (
-                      <div className="flex flex-col">
-                        <span>{item.label}</span>
+                    renderOption={(option) => (
+                      <div className="flex w-full flex-row items-center justify-between gap-2">
+                        <span>{option.label}</span>
+                        <div className="flex flex-row items-center gap-1 text-sm text-gray-500">
+                          <span>{MoneyFormatter(option.price)}</span>
+                          <SARSymbol className="!size-2.5 opacity-100" />
+                        </div>
                       </div>
                     )}
                     texts={{
@@ -251,8 +255,9 @@ export function ProductsFormSection({
   const productOptions = useMemo(
     () =>
       productsData?.map((product) => ({
-        label: `${product.name} (SAR ${product.price.toFixed(2)})`,
+        label: product.name,
         value: product.id,
+        price: product.price,
       })),
     [productsData],
   );
