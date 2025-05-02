@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- Enable RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
+-- Add username column if it doesn't exist (to handle partial application)
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS username text;
+
 -- Create indexes
 CREATE INDEX IF NOT EXISTS profiles_email_idx ON public.profiles USING btree (email);
 CREATE INDEX IF NOT EXISTS profiles_username_idx ON public.profiles USING btree (username);
