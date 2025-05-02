@@ -7,6 +7,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { MoneyFormatter } from "@/components/ui/currency-input";
+import { SARSymbol } from "@/components/ui/sar-symbol";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateJob } from "@/job/job.hooks";
@@ -55,7 +58,14 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
       header: t("Jobs.form.salary.label"),
       validationSchema: z.number().min(0, t("Jobs.form.salary.required")),
       cell: (props: CellContext<Job, unknown>) =>
-        props.row.original.salary ? `$${Number(props.row.original.salary).toFixed(2)}` : "N/A",
+        props.row.original.salary ? (
+          <span className="flex flex-row items-center gap-1 text-sm font-medium">
+            {MoneyFormatter(props.row.original.salary)}
+            <SARSymbol className="size-3" />
+          </span>
+        ) : (
+          "N/A"
+        ),
     },
     {
       accessorKey: "is_active",

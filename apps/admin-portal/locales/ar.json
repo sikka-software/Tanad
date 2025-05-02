@@ -2003,6 +2003,7 @@
   },
   "Warehouses": {
     "title": "المستودعات",
+    "singular": "مستودع",
     "add_new": "مستودع جديد",
     "warehouse_details": "تفاصيل المستودع",
     "search_warehouses": "بحث عن مستودعات...",
@@ -2099,6 +2100,7 @@
   },
   "Branches": {
     "title": "الفروع",
+    "singular": "فرع",
     "add_new": "فرع جديد",
     "branch_details": "تفاصيل الفرع",
     "create_branch": "إنشاء فرع",
@@ -2183,6 +2185,7 @@
   },
   "Vendors": {
     "title": "الموردين",
+    "singular": "مورد",
     "add_new": "مورد جديد",
     "back_to_list": "الرجوع للقائمة",
     "vendor_details": "تفاصيل المورد",
@@ -2439,6 +2442,9 @@
   },
   "Locations": {
     "title": "المواقع",
+    "add_new": "موقع جديد",
+    "search_locations": "البحث عن مواقع...",
+    "no_locations": "لا يوجد مواقع",
     "types": {
       "office": "مكتب",
       "branch": "فرع",
@@ -3060,6 +3066,7 @@
   "Offices": {
     "title": "المكاتب",
     "add_new": "مكتب جديد",
+    "singular": "مكتب",
     "office_details": "تفاصيل المكتب",
     "back_to_list": "العودة إلى القائمة",
     "no_offices": "لم يتم العثور على مكاتب",
@@ -3072,9 +3079,9 @@
         "required": "الاسم مطلوب"
       },
       "code": {
-        "label": "الكود",
-        "placeholder": "أدخل الكود",
-        "required": "الكود مطلوب"
+        "label": "الرمز",
+        "placeholder": "أدخل الرمز",
+        "required": "الرمز مطلوب"
       },
       "address": {
         "label": "عنوان المكتب",
@@ -3319,5 +3326,9 @@
       "updating": "حدث خطأ أثناء تحديث الدور",
       "deleting": "حدث خطأ أثناء حذف الدور"
     }
+  },
+  "OnlineShops": {
+    "title": "المتاجر الإلكترونية",
+    "singular": "متجر إلكتروني"
   }
 }

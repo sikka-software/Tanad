@@ -6,6 +6,9 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { MoneyFormatter } from "@/components/ui/currency-input";
+import { SARSymbol } from "@/components/ui/sar-symbol";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateExpense } from "@/expense/expense.hooks";
@@ -56,11 +59,12 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       header: t("Expenses.form.amount.label"),
       validationSchema: z.number().min(0, t("Expenses.form.amount.required")),
       cell: ({ row }) => {
-        const amount = row.getValue("amount");
-        return new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        }).format(amount as number);
+        return (
+          <span className="flex flex-row items-center gap-1 text-sm font-medium">
+            {MoneyFormatter(row.getValue("amount"))}
+            <SARSymbol className="size-3" />
+          </span>
+        );
       },
     },
     {

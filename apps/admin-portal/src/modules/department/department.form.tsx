@@ -223,62 +223,64 @@ export default function DepartmentForm({
   return (
     <Form {...form}>
       <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Departments.form.name.label")}</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="form-container">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Departments.form.name.label")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Departments.form.description.label")}</FormLabel>
-              <FormControl>
-                <Textarea {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Departments.form.description.label")}</FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="locations"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Departments.form.locations.label")}</FormLabel>
-              <FormControl>
-                <MultiSelect<LocationValue>
-                  loading={isOfficesLoading || isBranchesLoading || isWarehousesLoading}
-                  dir={locale === "ar" ? "rtl" : "ltr"}
-                  options={locationOptions}
-                  onValueChange={(values) => {
-                    field.onChange(values);
-                  }}
-                  defaultValue={field.value}
-                  placeholder={t("Departments.form.locations.placeholder")}
-                  variant="inverted"
-                  animation={2}
-                  maxCount={3}
-                  renderOption={renderLocationOption}
-                  getValueKey={(value) => value.id}
-                  isValueEqual={(a, b) => a.id === b.id && a.type === b.type}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="locations"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Departments.form.locations.label")}</FormLabel>
+                <FormControl>
+                  <MultiSelect<LocationValue>
+                    loading={isOfficesLoading || isBranchesLoading || isWarehousesLoading}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                    options={locationOptions}
+                    onValueChange={(values) => {
+                      field.onChange(values);
+                    }}
+                    defaultValue={field.value}
+                    placeholder={t("Departments.form.locations.placeholder")}
+                    variant="inverted"
+                    animation={2}
+                    maxCount={3}
+                    renderOption={renderLocationOption}
+                    getValueKey={(value) => value.id}
+                    isValueEqual={(a, b) => a.id === b.id && a.type === b.type}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </form>
     </Form>
   );

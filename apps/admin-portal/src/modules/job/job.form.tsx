@@ -1,22 +1,44 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { ComboboxAdd } from "@/ui/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
+import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { CurrencyInput } from "@/components/ui/currency-input";
+import { Dialog } from "@/components/ui/dialog";
+import { DialogContent } from "@/components/ui/dialog";
+
 import { useCreateJob, useUpdateJob } from "@/job/job.hooks";
 import useJobStore from "@/job/job.store";
 import { JobUpdateData } from "@/job/job.type";
 
+import DepartmentForm from "@/department/department.form";
+import { useDepartments } from "@/department/department.hooks";
+import useDepartmentStore from "@/department/department.store";
+
+// import { generateDummyDepartment } from "@/lib/dummy-factory"; // Commented out for now
+
 import useUserStore from "@/stores/use-user-store";
+
+import { BranchForm } from "../branch/branch.form";
+import { OfficeForm } from "../office/office.form";
+import { WarehouseForm } from "../warehouse/warehouse.form";
 
 interface JobFormProps {
   id?: string;
@@ -51,6 +73,17 @@ export type JobFormValues = z.infer<ReturnType<typeof createJobFormSchema>>;
 export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobFormProps) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
+  const locale = useLocale();
+  const queryClient = useQueryClient();
+  const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
+  const { data: departments = [], isLoading: departmentsLoading } = useDepartments();
+  const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
+  const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
+
+  const [isChooseLocationDialogOpen, setIsChooseLocationDialogOpen] = useState(false);
+  const [chosenForm, setChosenForm] = useState<
+    "Warehouses" | "Offices" | "Branches" | "OnlineShops" | "Departments"
+  >();
 
   const { mutate: createJob } = useCreateJob();
   const { mutate: updateJob } = useUpdateJob();
@@ -67,12 +100,17 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
       location: defaultValues?.location || "",
       department: defaultValues?.department || "",
       type: defaultValues?.type || "Full-time",
-      salary: String(defaultValues?.salary) || undefined,
+      salary: defaultValues?.salary ? String(defaultValues.salary) : undefined,
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
       is_active: defaultValues?.is_active || true,
     },
   });
+
+  const departmentOptions = departments.map((dept) => ({
+    label: dept.name,
+    value: dept.name,
+  }));
 
   const handleSubmit = async (data: JobFormValues) => {
     setIsLoading(true);
@@ -172,6 +210,7 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
               <FormItem>
                 <FormLabel>{t("Jobs.form.type.label")} *</FormLabel>
                 <Select
+                  dir={locale === "ar" ? "rtl" : "ltr"}
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                   value={field.value}
@@ -203,7 +242,23 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
               <FormItem>
                 <FormLabel>{t("Jobs.form.department.label")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("Jobs.form.department.placeholder")} {...field} />
+                  <ComboboxAdd
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    data={departmentOptions}
+                    isLoading={departmentsLoading}
+                    defaultValue={field.value || ""}
+                    onChange={(value) => field.onChange(value || null)}
+                    texts={{
+                      placeholder: t("Jobs.form.department.placeholder"),
+                      searchPlaceholder: t("Departments.search_departments"),
+                      noItems: t("Departments.no_departments"),
+                    }}
+                    addText={t("Departments.add_new")}
+                    onAddClick={() => {
+                      setChosenForm("Departments");
+                      setIsDepartmentDialogOpen(true);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -217,7 +272,21 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
               <FormItem>
                 <FormLabel>{t("Jobs.form.location.label")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("Jobs.form.location.placeholder")} {...field} />
+                  <ComboboxAdd
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    data={departmentOptions}
+                    isLoading={departmentsLoading}
+                    defaultValue={field.value || ""}
+                    onChange={(value) => field.onChange(value || null)}
+                    texts={{
+                      placeholder: t("Jobs.form.location.placeholder"),
+                      searchPlaceholder: t("Locations.search_locations"),
+                      noItems: t("Locations.no_locations"),
+                    }}
+                    addText={t("Locations.add_new")}
+                    onAddClick={() => setIsChooseLocationDialogOpen(true)}
+                  />
+                  {/* <Input placeholder={t("Jobs.form.location.placeholder")} {...field} /> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -270,12 +339,12 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
             <FormItem>
               <FormLabel>{t("Jobs.form.salary.label")}</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
+                <CurrencyInput
+                  showCommas={true}
+                  value={field.value ? parseFloat(field.value) : undefined}
+                  onChange={(value) => field.onChange(value?.toString() || "")}
                   placeholder={t("Jobs.form.salary.placeholder")}
-                  {...field}
+                  disabled={isLoading}
                 />
               </FormControl>
               <FormMessage />
@@ -334,6 +403,107 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
           )}
         />
       </form>
+
+      <Dialog open={isChooseLocationDialogOpen} onOpenChange={setIsChooseLocationDialogOpen}>
+        <DialogContent>
+          <div className="m-4 grid grid-cols-2 gap-4">
+            <Card
+              onClick={() => {
+                setChosenForm("Warehouses");
+                setIsDepartmentDialogOpen(true);
+              }}
+              className="flex cursor-pointer flex-col items-center justify-center pt-6 transition-all duration-300 hover:shadow-xl"
+            >
+              <Warehouse className="h-10 w-10" />
+              <CardHeader>
+                <CardTitle>{t("Warehouses.singular")}</CardTitle>
+              </CardHeader>
+            </Card>
+            <Card
+              onClick={() => {
+                setChosenForm("Offices");
+                setIsDepartmentDialogOpen(true);
+              }}
+              className="flex cursor-pointer flex-col items-center justify-center pt-6 transition-all duration-300 hover:shadow-xl"
+            >
+              <Building2 className="h-10 w-10" />
+              <CardHeader>
+                <CardTitle>{t("Offices.singular")}</CardTitle>
+              </CardHeader>
+            </Card>
+            <Card
+              onClick={() => {
+                setChosenForm("Branches");
+                setIsDepartmentDialogOpen(true);
+              }}
+              className="flex cursor-pointer flex-col items-center justify-center pt-6 transition-all duration-300 hover:shadow-xl"
+            >
+              <Store className="h-10 w-10" />
+              <CardHeader>
+                <CardTitle>{t("Branches.singular")}</CardTitle>
+              </CardHeader>
+            </Card>
+            <Card className="relative flex cursor-not-allowed flex-col items-center justify-center overflow-clip pt-6">
+              <Badge className="absolute -end-0 -top-0 rounded-sm rounded-e-none !rounded-t-none bg-blue-200 p-1 px-2 text-[10px] text-black dark:bg-blue-800 dark:text-white">
+                {t("General.soon")}
+              </Badge>
+              <ShoppingCart className="text-muted-foreground/50 h-10 w-10" />
+              <CardHeader>
+                <CardTitle className="text-muted-foreground/50">
+                  {t("OnlineShops.singular")}
+                </CardTitle>
+              </CardHeader>
+            </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <FormDialog
+        open={isDepartmentDialogOpen}
+        onOpenChange={setIsDepartmentDialogOpen}
+        title={t(`${chosenForm}.add_new`)}
+        formId="department-form"
+        loadingSave={isDepartmentSaving}
+        // dummyData={() => process.env.NODE_ENV === "development" && generateDummyDepartment()} // Commented out
+      >
+        {chosenForm === "Warehouses" && (
+          <WarehouseForm
+            id="warehouse-form"
+            onSuccess={() => {
+              setIsDepartmentSaving(false);
+              setIsDepartmentDialogOpen(false);
+            }}
+          />
+        )}
+        {chosenForm === "Offices" && (
+          <OfficeForm
+            id="office-form"
+            onSuccess={() => {
+              setIsDepartmentSaving(false);
+              setIsDepartmentDialogOpen(false);
+            }}
+          />
+        )}
+        {chosenForm === "Branches" && (
+          <BranchForm
+            id="branch-form"
+            onSuccess={() => {
+              setIsDepartmentSaving(false);
+              setIsDepartmentDialogOpen(false);
+            }}
+          />
+        )}
+        {chosenForm === "Departments" && (
+          <DepartmentForm
+            id="department-form"
+            onSuccess={() => {
+              setIsDepartmentSaving(false);
+              setIsDepartmentDialogOpen(false);
+              queryClient.invalidateQueries({ queryKey: ["departments"] });
+            }}
+          />
+        )}
+      </FormDialog>
     </Form>
   );
 }

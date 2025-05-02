@@ -4,6 +4,14 @@ import { Input } from "@/ui/input";
 
 import { SARSymbol } from "./sar-symbol";
 
+export const MoneyFormatter = (value: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  }).format(value);
+};
+
 // Helper function to convert Arabic numerals to English numerals
 const convertArabicToEnglishNumerals = (value: string): string => {
   const arabicNumerals = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
@@ -118,14 +126,14 @@ export function CurrencyInput({
         type="text"
         inputMode="decimal"
         placeholder="0.00"
-        className="currency-input"
+        className="currency-input ps-8 rtl:pe-8 rtl:text-end"
         value={inputText}
         onChange={handleChange}
         onBlur={handleBlur}
         {...props}
       />
       {showCurrencySymbol && (
-        <span className="text-muted-foreground absolute end-2 top-1/2 -translate-y-1/2">
+        <span className="text-muted-foreground absolute top-1/2 -translate-y-1/2 ltr:start-2 rtl:left-2">
           <SARSymbol className="size-4" />
         </span>
       )}

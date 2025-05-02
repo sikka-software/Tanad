@@ -1,3 +1,4 @@
+import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
@@ -5,6 +6,9 @@ import { z } from "zod";
 import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
+
+import { MoneyFormatter } from "@/components/ui/currency-input";
+import { SARSymbol } from "@/components/ui/sar-symbol";
 
 import { ModuleTableProps } from "@/types/common.type";
 
@@ -43,6 +47,12 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       accessorKey: "price",
       header: t("Products.form.price.label"),
       validationSchema: z.number().min(0, t("Products.form.price.required")),
+      cell: (props: CellContext<Product, unknown>) => (
+        <span className="flex flex-row items-center gap-1 text-sm font-medium">
+          {MoneyFormatter(props.row.original.price)}
+          <SARSymbol className="size-3" />
+        </span>
+      ),
     },
     {
       accessorKey: "sku",
@@ -57,7 +67,7 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateProduct({ id: rowId, data: { [columnId]: value } });
+    await updateProduct({ id: rowId, product: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(
