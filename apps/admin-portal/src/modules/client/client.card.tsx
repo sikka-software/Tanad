@@ -32,8 +32,12 @@ const ClientCard = ({ client }: { client: Client }) => {
           <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
             <MapPin className="mt-1 h-4 w-4" />
             <div>
-              <p>{client.address}</p>
-              <p>{`${client.city}, ${client.state} ${client.zip_code}`}</p>
+              <p>
+                {client.building_number} {client.street_name}
+              </p>
+              <p>
+                {client.city} {client.region} {client.zip_code}
+              </p>
             </div>
           </div>
           {client.notes && (

@@ -28,8 +28,12 @@ const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
           <div className="flex items-start gap-2 text-sm text-gray-600">
             <MapPin className="mt-1 h-4 w-4 flex-shrink-0" />
             <div>
-              <p>{warehouse.address}</p>
-              <p>{`${warehouse.city}, ${warehouse.state} ${warehouse.zip_code}`}</p>
+              <p>
+                {warehouse.building_number} {warehouse.street_name}
+              </p>
+              <p>
+                {warehouse.city} {warehouse.region} {warehouse.zip_code}
+              </p>
             </div>
           </div>
           {/* Capacity */}
