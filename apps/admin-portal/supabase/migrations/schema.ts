@@ -786,6 +786,14 @@ export const mfa_amr_claimsInAuth = auth.table(
   ],
 );
 
+export const user_permissions_view = pgView("user_permissions_view", {
+  profile_id: uuid(),
+  enterprise_id: uuid(),
+  permission: text(),
+}).as(
+  sql`SELECT m.profile_id, m.enterprise_id, p.permission FROM memberships m JOIN permissions p ON m.role_id = p.role_id`,
+);
+
 export const mfa_challengesInAuth = auth.table(
   "mfa_challenges",
   {
@@ -1500,11 +1508,4 @@ export const user_roles = pgTable(
       withCheck: sql`has_enterprise_permission(enterprise_id, ARRAY['roles.create'::app_permission, 'roles.update'::app_permission])`,
     }),
   ],
-);
-export const user_permissions_view = pgView("user_permissions_view", {
-  profile_id: uuid(),
-  enterprise_id: uuid(),
-  permission: text(),
-}).as(
-  sql`SELECT m.profile_id, m.enterprise_id, p.permission FROM memberships m JOIN permissions p ON m.role_id = p.role_id`,
 );

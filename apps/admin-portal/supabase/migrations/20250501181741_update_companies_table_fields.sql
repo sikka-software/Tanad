@@ -1,11 +1,15 @@
 -- Add new columns
 ALTER TABLE companies
-ADD COLUMN building_number TEXT,
-ADD COLUMN street_name TEXT,
-ADD COLUMN region TEXT,
-ADD COLUMN additional_number TEXT;
+ADD COLUMN IF NOT EXISTS building_number TEXT;
+ALTER TABLE companies
+ADD COLUMN IF NOT EXISTS street_name TEXT;
+ALTER TABLE companies
+ADD COLUMN IF NOT EXISTS region TEXT;
+ALTER TABLE companies
+ADD COLUMN IF NOT EXISTS additional_number TEXT;
 
 -- Drop old columns
 ALTER TABLE companies
-DROP COLUMN address,
-DROP COLUMN state;
+DROP COLUMN IF EXISTS address;
+ALTER TABLE companies
+DROP COLUMN IF EXISTS state;

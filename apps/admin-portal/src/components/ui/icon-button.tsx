@@ -24,33 +24,35 @@ const IconButton = ({
   ...props
 }: IconButtonProps) => {
   return (
-    <Tooltip delayDuration={400}>
-      <TooltipTrigger asChild>
-        <Button
-          variant={variant || "outline"}
-          size={size || "icon"}
-          className={cn("relative size-8", props.className)}
-          type={buttonType || "button"}
-          {...props}
+    <TooltipProvider>
+      <Tooltip delayDuration={400}>
+        <TooltipTrigger asChild>
+          <Button
+            variant={variant || "outline"}
+            size={size || "icon"}
+            className={cn("relative size-8", props.className)}
+            type={buttonType || "button"}
+            {...props}
+          >
+            {icon}
+            {badge !== undefined && (
+              <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px]">
+                {badge}
+              </span>
+            )}
+            <span className="sr-only">{label}</span>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent
+          style={{
+            transformOrigin: "var(--radix-tooltip-trigger-width)",
+          }}
+          className={contentClassName}
         >
-          {icon}
-          {badge !== undefined && (
-            <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px]">
-              {badge}
-            </span>
-          )}
-          <span className="sr-only">{label}</span>
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent
-        style={{
-          transformOrigin: "var(--radix-tooltip-trigger-width)",
-        }}
-        className={contentClassName}
-      >
-        {label}
-      </TooltipContent>
-    </Tooltip>
+          {label}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 
