@@ -263,9 +263,9 @@ export function ProductsFormSection({
   });
 
   return (
-    <div className="!-z-[500] bg-green-500">
+    <div>
       {/* Header similar to AddressFormSection */}
-      <div className="bg-muted top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
+      <div className="bg-muted top-12 sticky z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
         <h2 className="ms-2 text-xl font-bold">{title}</h2>
         <Button
           type="button"
@@ -284,13 +284,8 @@ export function ProductsFormSection({
       {/* Table Section */}
       <div className="p-4">
         <div className="rounded-md border">
-          <Table
-            className="!-z-[500] bg-blue-500"
-            style={{
-              zIndex: '-1000 !important',
-            }}
-          >
-            <TableHeader className="">
+          <Table>
+            <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
