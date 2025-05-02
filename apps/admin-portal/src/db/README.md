@@ -35,9 +35,15 @@ values
     'e5a42bf8-12a8-4ac9-89f8-1f2ee46ed44b',
     'companies.update'
   );
+  (
+    'e5a42bf8-12a8-4ac9-89f8-1f2ee46ed44b',
+    'companies.duplicate'
+  );
+  (
+    'e5a42bf8-12a8-4ac9-89f8-1f2ee46ed44b',
+    'companies.export'
+  );
 ```
-
-
 
 # Steps
 

@@ -20,7 +20,7 @@ EXCEPTION
 END $$;
 
 -- Drop other objects
-DROP TABLE IF EXISTS role_permissions CASCADE;
+DROP TABLE IF EXISTS permissions CASCADE;
 DROP TABLE IF EXISTS roles CASCADE;
 DROP TYPE IF EXISTS app_permission CASCADE;
 
@@ -154,8 +154,8 @@ CREATE POLICY "Users can delete roles in their enterprise" ON roles
         )
     );
 
--- Create role_permissions table
-CREATE TABLE role_permissions (
+-- Create permissions table (renamed from role_permissions)
+CREATE TABLE permissions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     role_id UUID REFERENCES roles(id) ON DELETE CASCADE,
     permission app_permission NOT NULL,
@@ -164,10 +164,10 @@ CREATE TABLE role_permissions (
     UNIQUE(role_id, permission)
 );
 
--- Create RLS policies for role_permissions
-ALTER TABLE role_permissions ENABLE ROW LEVEL SECURITY;
+-- Create RLS policies for permissions table
+ALTER TABLE permissions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view role permissions in their enterprise" ON role_permissions
+CREATE POLICY "Users can view permissions in their enterprise" ON permissions
     FOR SELECT
     USING (
         role_id IN (
@@ -181,7 +181,7 @@ CREATE POLICY "Users can view role permissions in their enterprise" ON role_perm
         )
     );
 
-CREATE POLICY "Users can manage role permissions in their enterprise" ON role_permissions
+CREATE POLICY "Users can manage permissions in their enterprise" ON permissions
     FOR ALL
     USING (
         role_id IN (
@@ -206,139 +206,23 @@ CREATE POLICY "Users can manage role permissions in their enterprise" ON role_pe
         )
     );
 
--- Create user_role_permissions view
-CREATE OR REPLACE VIEW user_role_permissions AS
+-- Create user_permissions_view (updated to use permissions table, renamed from user_role_permissions)
+CREATE OR REPLACE VIEW user_permissions_view AS
 SELECT DISTINCT
-    up.user_id,
-    rp.permission::text
-FROM user_roles up
-JOIN role_permissions rp ON rp.role_id = up.role_id
-WHERE up.user_id = auth.uid();
+    ur.user_id,
+    p.permission::text
+FROM user_roles ur
+JOIN permissions p ON p.role_id = ur.role_id -- Changed rp to p
+WHERE ur.user_id = auth.uid();
 
--- Insert predefined roles and their permissions
+-- Insert predefined system roles ONLY (permissions handled by seed script)
 DO $$
-DECLARE
-    superadmin_id UUID;
-    human_resources_id UUID;
-    accounting_id UUID;
 BEGIN
-    -- Insert superadmin role first
-    INSERT INTO roles (name, description, is_system)
-    VALUES ('superadmin', 'Super Administrator with full system access', true)
-    RETURNING id INTO superadmin_id;
-
-    -- Insert all permissions for superadmin
-    INSERT INTO role_permissions (role_id, permission)
-    SELECT 
-        superadmin_id,
-        unnest(enum_range(NULL::app_permission));
-
-    -- Insert other roles
+    -- Insert system roles
     INSERT INTO roles (name, description, is_system)
     VALUES 
+        ('superadmin', 'Super Administrator with full system access', true),
         ('human_resources', 'Human Resources role with employee access', true),
         ('accounting', 'Accounting role with financial access', true);
-
-    -- Get other role IDs
-    SELECT id INTO human_resources_id FROM roles WHERE name = 'human_resources';
-    SELECT id INTO accounting_id FROM roles WHERE name = 'accounting';
-
-    -- Insert admin permissions
-    INSERT INTO role_permissions (role_id, permission)
-    SELECT 
-        superadmin_id,
-        unnest(ARRAY[
-            'users.create',
-            'users.read',
-            'users.update',
-            'users.delete',
-            'users.export',
-            'users.invite',
-            'roles.create',
-            'roles.read',
-            'roles.update',
-            'roles.delete',
-            'roles.export',
-            'roles.assign',
-            'companies.create',
-            'companies.read',
-            'companies.update',
-            'companies.delete',
-            'companies.export',
-            'companies.duplicate',
-            'branches.create',
-            'branches.read',
-            'branches.update',
-            'branches.delete',
-            'branches.export',
-            'branches.duplicate',
-            'clients.create',
-            'clients.read',
-            'clients.update',
-            'clients.delete',
-            'clients.export',
-            'clients.duplicate',
-            'vendors.create',
-            'vendors.read',
-            'vendors.update',
-            'vendors.delete',
-            'vendors.export',
-            'vendors.duplicate',
-            'products.create',
-            'products.read',
-            'products.update',
-            'products.delete',
-            'products.export',
-            'products.duplicate',
-            'invoices.create',
-            'invoices.read',
-            'invoices.update',
-            'invoices.delete',
-            'invoices.export',
-            'invoices.duplicate',
-            'expenses.create',
-            'expenses.read',
-            'expenses.update',
-            'expenses.delete',
-            'expenses.export',
-            'expenses.duplicate',
-            'settings.read',
-            'settings.update'
-        ]::app_permission[]);
-
-    -- Insert manager permissions
-    INSERT INTO role_permissions (role_id, permission)
-    SELECT 
-        human_resources_id,
-        unnest(ARRAY[
-            'users.read',
-            'roles.read',
-            'companies.read',
-            'branches.read',
-            'clients.read',
-            'vendors.read',
-            'products.read',
-            'invoices.read',
-            'expenses.read',
-            'settings.read'
-        ]::app_permission[]);
-
-    -- Insert accounting permissions
-    INSERT INTO role_permissions (role_id, permission)
-    SELECT 
-        accounting_id,
-        unnest(ARRAY[
-            'invoices.create',
-            'invoices.read',
-            'invoices.update',
-            'invoices.delete',
-            'invoices.export',
-            'expenses.create',
-            'expenses.read',
-            'expenses.update',
-            'expenses.delete',
-            'expenses.export',
-            'companies.read'
-        ]::app_permission[]);
 
 END $$;

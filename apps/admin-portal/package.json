@@ -25,7 +25,8 @@
     "db:setup-new": "tsx scripts/setup-new.ts",
     "db:policies": "tsx scripts/apply-policies.ts",
     "db:types": "tsx scripts/apply-types.ts",
-    "db:update": "infisical run --env=dev -- tsx scripts/apply-types.ts && infisical run --env=dev -- tsx scripts/apply-rbac.ts && infisical run --env=dev -- tsx scripts/apply-triggers.ts && infisical run --env=dev -- drizzle-kit push && infisical run --env=dev -- tsx scripts/apply-policies.ts"
+    "db:update": "infisical run --env=dev -- tsx scripts/apply-types.ts && infisical run --env=dev -- tsx scripts/apply-rbac.ts && infisical run --env=dev -- tsx scripts/apply-triggers.ts && infisical run --env=dev -- drizzle-kit push && infisical run --env=dev -- tsx scripts/apply-policies.ts",
+    "populate:roles": "infisical run --env=dev -- tsx src/db/seed-system-roles.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
