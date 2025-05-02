@@ -54,7 +54,7 @@ const salaryComponentSchema = z.object({
     .default(0),
 });
 
-const createEmployeeFormSchema = (t: (key: string) => string) => {
+const createEmployeeFormSchema = (t: (key: string) => string, employeeId?: string) => {
   const supabase = createClient();
 
   return z.object({
@@ -68,11 +68,22 @@ const createEmployeeFormSchema = (t: (key: string) => string) => {
         if (!user?.id) return true;
         const query = supabase
           .from("employees")
-          .select("id")
+          .select("id", { count: "exact" })
           .eq("email", email)
           .eq("user_id", user.id);
-        const { data } = await query.maybeSingle();
-        return !data;
+
+        if (employeeId) {
+          query.neq("id", employeeId);
+        }
+
+        const { error, count } = await query;
+
+        if (error) {
+          console.error("Email validation error:", error);
+          return false;
+        }
+
+        return count === 0;
       }, t("Employees.form.email.duplicate")),
     phone: z.string().optional(),
     position: z.string().min(1, t("Employees.form.position.required")),
@@ -86,15 +97,6 @@ const createEmployeeFormSchema = (t: (key: string) => string) => {
   });
 };
 export type EmployeeFormValues = z.input<ReturnType<typeof createEmployeeFormSchema>>;
-
-interface EmployeeFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: Omit<Partial<EmployeeFormValues>, "salary"> & {
-    salary?: SalaryComponent[] | null;
-  };
-  editMode?: boolean;
-}
 
 export function EmployeeForm({
   id,
@@ -116,7 +118,7 @@ export function EmployeeForm({
   const loadingSave = useEmployeeStore((state) => state.isLoading);
 
   const form = useForm<EmployeeFormValues>({
-    resolver: zodResolver(createEmployeeFormSchema(t)),
+    resolver: zodResolver(createEmployeeFormSchema(t, editMode ? id : undefined)),
     defaultValues: {
       first_name: defaultValues?.first_name || "",
       last_name: defaultValues?.last_name || "",
