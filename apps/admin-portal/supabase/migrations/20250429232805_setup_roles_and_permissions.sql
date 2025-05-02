@@ -27,7 +27,7 @@ DROP TYPE IF EXISTS app_permission CASCADE;
 -- Create user_enterprises view
 CREATE OR REPLACE VIEW user_enterprises AS
 SELECT DISTINCT
-    p.user_id,
+    p.id AS user_id,
     p.enterprise_id
 FROM profiles p;
 

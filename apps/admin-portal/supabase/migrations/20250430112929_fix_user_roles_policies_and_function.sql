@@ -4,7 +4,7 @@ DROP POLICY IF EXISTS "Admins can manage user roles" ON public.user_roles;
 
 -- Create a view for user enterprises to avoid recursion
 CREATE OR REPLACE VIEW user_enterprises AS
-SELECT DISTINCT p.user_id, p.enterprise_id
+SELECT DISTINCT p.id AS user_id, p.enterprise_id
 FROM profiles p;
 
 -- Create new policies using the view instead
