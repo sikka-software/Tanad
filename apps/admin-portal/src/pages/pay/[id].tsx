@@ -1,9 +1,16 @@
 import { format } from "date-fns";
+import { eq } from "drizzle-orm";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 
-import { fetchInvoiceById } from "@/invoice/invoice.service";
-import { Invoice } from "@/invoice/invoice.type";
+import { createClient } from "@/utils/supabase/server-props";
+
+import { MoneyFormatter } from "@/components/ui/currency-input";
+
+import { Invoice, InvoiceItem } from "@/invoice/invoice.type";
+
+import { db } from "@/db/drizzle";
+import * as schema from "@/db/schema";
 
 interface Props {
   invoice: Invoice;
@@ -22,7 +29,7 @@ export default function InvoicePreviewPage({ invoice }: Props) {
         </h1>
         <div className="text-right">
           <p className="text-sm text-gray-500">{t("issue_date")}</p>
-          <p>{format(new Date(invoice.issue_date), "MMM dd, yyyy")}</p>
+          <p>{new Date(invoice.issue_date).toLocaleDateString()}</p>
         </div>
       </div>
 
@@ -45,7 +52,7 @@ export default function InvoicePreviewPage({ invoice }: Props) {
       <div className="mt-8 border-t pt-4">
         <div className="flex justify-between">
           <span className="font-semibold">{t("total")}</span>
-          <span className="text-lg font-bold">${invoice.total.toFixed(2)}</span>
+          <span className="text-lg font-bold">{MoneyFormatter(invoice.total)}</span>
         </div>
       </div>
     </div>
@@ -53,28 +60,56 @@ export default function InvoicePreviewPage({ invoice }: Props) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { params, locale } = context;
+  const { params, locale, req, res } = context;
   const invoice_id = params?.id as string;
-  console.log("invoice_id is ", invoice_id);
+  console.log(">>> Fetching invoice for ID:", invoice_id);
+
+  if (!invoice_id) {
+    console.log(">>> No invoice ID provided in params.");
+    return { notFound: true };
+  }
+
+  const supabase = createClient({ req, res, query: {}, resolvedUrl: "" });
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError) {
+    console.error(">>> Supabase auth error:", userError);
+    return { notFound: true };
+  }
+
   try {
-    const invoice = await fetchInvoiceById(invoice_id);
-    console.log("invoice is ", invoice);
-    if (!invoice) {
-      return {
-        props: {
-          invoice: null, // Return pukla as null if not found
-          messages: (await import(`../../../locales/${locale}.json`)).default,
-        },
-      };
+    const invoiceData = await supabase.from("invoices").select("*").eq("id", invoice_id).single();
+
+    console.log(">>> Base invoice data fetched:", invoiceData);
+
+    if (!invoiceData) {
+      console.log(">>> Invoice not found or RLS prevented access.");
+      return { notFound: true };
     }
+
+    const invoiceItems = await db.query.invoice_items.findMany({
+      where: eq(schema.invoice_items.invoice_id, invoice_id),
+    });
+
+    console.log(">>> Invoice items fetched:", invoiceItems);
+
+    const fullInvoice: Invoice = {
+      ...(invoiceData as unknown as Omit<Invoice, "items">),
+      items: invoiceItems as unknown as InvoiceItem[],
+    };
 
     return {
       props: {
-        invoice,
+        invoice: fullInvoice,
         messages: (await import(`../../../locales/${locale}.json`)).default,
       },
     };
   } catch (error) {
+    console.error(">>> Error fetching invoice details directly:", error);
     return { notFound: true };
   }
 };
