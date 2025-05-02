@@ -1,19 +1,22 @@
 import { Client } from "@/client/client.type";
 
+import { Product } from "../product/product.type";
+
 export type Invoice = {
   id: string;
   user_id: string;
   invoice_number: string;
-  issue_date: string;
-  due_date: string;
-  status: "paid" | "pending" | "overdue";
+  issue_date: Date;
+  due_date: Date;
+  status: "paid" | "pending" | "overdue" | "draft" | "cancelled";
   subtotal: number;
   tax_rate?: number;
   total: number;
   notes?: string;
   client_id?: string;
   client?: Client;
-  created_at: string;
+  created_at: Date;
+  items: Product[];
 };
 
 export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "client">;

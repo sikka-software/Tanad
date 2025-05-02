@@ -23,7 +23,7 @@ import { useCompanies, useBulkDeleteCompanies, useDuplicateCompany } from "@/com
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/company/company.options";
 import useCompanyStore from "@/company/company.store";
 import CompaniesTable from "@/company/company.table";
-import { CompanyUpdateData } from "@/company/company.type";
+import { Company, CompanyUpdateData } from "@/company/company.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -35,7 +35,7 @@ export default function CompaniesPage() {
   const canCreateCompanies = useUserStore((state) => state.hasPermission("companies.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableCompany, setActionableCompany] = useState<CompanyUpdateData | null>(null);
+  const [actionableCompany, setActionableCompany] = useState<Company | null>(null);
 
   const loadingSaveCompany = useCompanyStore((state) => state.isLoading);
   const setLoadingSaveCompany = useCompanyStore((state) => state.setIsLoading);

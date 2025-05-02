@@ -1624,22 +1624,32 @@
     "form": {
       "invoice_number": {
         "label": "رقم الفاتورة",
-        "placeholder": "أدخل رقم الفاتورة"
+
+        "placeholder": "أدخل رقم الفاتورة",
+        "required": "رقم الفاتورة مطلوب"
       },
       "client": {
         "label": "العميل",
         "select_client": "اختر عميل",
         "search_clients": "بحث عن عملاء...",
         "no_clients": "لا يوجد عملاء",
-        "add_new_client": "عميل جديد"
+        "add_new_client": "عميل جديد",
+        "required": "العميل مطلوب"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل وصف الفاتورة",
+        "required": "الوصف مطلوب"
       },
       "issue_date": {
         "label": "تاريخ الإصدار",
-        "placeholder": "اختر تاريخ الإصدار"
+        "placeholder": "اختر تاريخ الإصدار",
+        "required": "تاريخ الإصدار مطلوب"
       },
       "due_date": {
         "label": "تاريخ الاستحقاق",
-        "placeholder": "اختر تاريخ الاستحقاق"
+        "placeholder": "اختر تاريخ الاستحقاق",
+        "required": "تاريخ الاستحقاق مطلوب"
       },
       "total": {
         "label": "المجموع"

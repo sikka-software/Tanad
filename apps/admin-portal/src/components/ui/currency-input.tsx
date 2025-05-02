@@ -129,15 +129,15 @@ export function CurrencyInput({
         type="text"
         inputMode="decimal"
         placeholder="0.00"
-        className="currency-input ltr:ps-8 rtl:pe-8 rtl:text-end"
+        className="currency-input ltr:ps-6 rtl:pe-6 rtl:text-end"
         value={inputText}
         onChange={handleChange}
         onBlur={handleBlur}
         {...props}
       />
       {showCurrencySymbol && (
-        <span className="text-muted-foreground absolute top-2.5 ltr:start-2 rtl:left-2">
-          <SARSymbol className="size-4" />
+        <span className="text-muted-foreground absolute top-3 ltr:start-2 rtl:left-2">
+          <SARSymbol className="size-3" />
         </span>
       )}
     </div>

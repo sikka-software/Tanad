@@ -80,7 +80,7 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     {
       accessorKey: "client_id",
       header: t("Expenses.form.client_id.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.client_id.required")),
+      validationSchema: z.string().min(1, t("Expenses.form.client.required")),
     },
   ];
 

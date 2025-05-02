@@ -1,4 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useMemo } from "react";
@@ -8,8 +7,7 @@ import type {
   UseFieldArrayRemove,
   FieldArrayWithId,
 } from "react-hook-form";
-import { useForm, useFieldArray, FormProvider, useFormContext, useWatch } from "react-hook-form";
-import * as z from "zod";
+import { useFormContext, useWatch } from "react-hook-form";
 
 import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/combobox-add";
@@ -18,18 +16,9 @@ import { Input } from "@/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
 import { useProducts } from "@/modules/product/product.hooks";
-import useProductStore from "@/modules/product/product.store";
 
-import { CurrencyInput } from "../ui/currency-input";
+import { CurrencyInput, MoneyFormatter } from "../ui/currency-input";
 import { SARSymbol } from "../ui/sar-symbol";
-
-// Define the shape of a single item - adjust if needed based on InvoiceFormValues
-interface InvoiceItem {
-  product_id?: string;
-  description: string;
-  quantity: string;
-  unit_price: string;
-}
 
 // Define the props for the component
 interface ProductFormSectionProps {
@@ -45,6 +34,13 @@ interface ProductFormSectionProps {
 
 // --- Helper Types ---
 type FormValues = any; // Replace 'any' with your actual form values type
+// Define a minimal Product type needed here
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  // Add other fields if necessary for handleProductSelection or other logic
+}
 type ItemsFieldArray = FieldArrayWithId<FormValues, "items", "id">[];
 
 // --- Product Row Component ---
@@ -57,6 +53,8 @@ interface ProductRowProps {
   productOptions: { label: string; value: string }[] | undefined;
   isLoading?: boolean;
   productsLoading?: boolean;
+  productsData: Product[] | undefined;
+  setValue: ReturnType<typeof useFormContext>["setValue"];
   handleProductSelection: (index: number, productId: string) => void;
   onAddNewProduct: () => void;
   t: ReturnType<typeof useTranslations>;
@@ -73,6 +71,8 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
     productOptions,
     isLoading,
     productsLoading,
+    productsData,
+    setValue,
     handleProductSelection,
     onAddNewProduct,
     t,
@@ -106,6 +106,15 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                     valueKey={"value"}
                     onChange={(value) => {
                       formField.onChange(value || null);
+                      if (value && productsData) {
+                        const selectedProduct = productsData.find((p) => p.id === value);
+                        if (selectedProduct) {
+                          setValue(`items.${index}.unit_price`, selectedProduct.price.toString(), {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
+                        }
+                      }
                       handleProductSelection(index, value);
                     }}
                     renderOption={(item) => (
@@ -196,8 +205,8 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
         {/* Subtotal */}
         <TableCell>
           <div className="flex flex-row items-center gap-1 text-right">
-            {subtotal}
-            <SARSymbol className="size-4" />
+            {MoneyFormatter(parseFloat(subtotal))}
+            <SARSymbol className="size-3" />
           </div>
         </TableCell>
 
@@ -235,6 +244,7 @@ export function ProductsFormSection({
   isLoading = false,
 }: ProductFormSectionProps) {
   const t = useTranslations();
+  const { setValue } = useFormContext<FormValues>();
   const locale = useLocale();
   const { data: productsData, isLoading: productsLoading } = useProducts();
 
@@ -294,6 +304,8 @@ export function ProductsFormSection({
                       productOptions={productOptions}
                       isLoading={isLoading}
                       productsLoading={productsLoading}
+                      productsData={productsData}
+                      setValue={setValue}
                       handleProductSelection={handleProductSelection}
                       onAddNewProduct={onAddNewProduct}
                       t={t}

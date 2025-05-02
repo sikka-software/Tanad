@@ -2,6 +2,7 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -14,6 +15,7 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormDialog } from "@/components/ui/form-dialog";
 
 import InvoiceCard from "@/invoice/invoice.card";
 import { useInvoices, useBulkDeleteInvoices, useDuplicateInvoice } from "@/invoice/invoice.hooks";
@@ -21,6 +23,8 @@ import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
 import useInvoiceStore from "@/invoice/invoice.store";
 import InvoicesTable from "@/invoice/invoice.table";
 
+import { CompanyForm } from "@/modules/company/company.form";
+import { InvoiceForm } from "@/modules/invoice/invoice.form";
 import { Invoice } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
@@ -34,6 +38,8 @@ export default function InvoicesPage() {
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableInvoice, setActionableInvoice] = useState<Invoice | null>(null);
 
+  const loadingSaveInvoice = useInvoiceStore((state) => state.isLoading);
+  const setLoadingSaveInvoice = useInvoiceStore((state) => state.setIsLoading);
   const viewMode = useInvoiceStore((state) => state.viewMode);
   const isDeleteDialogOpen = useInvoiceStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useInvoiceStore((state) => state.setIsDeleteDialogOpen);
@@ -130,6 +136,28 @@ export default function InvoicesPage() {
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Invoices.add_new")}
+          formId="invoice-form"
+          loadingSave={loadingSaveInvoice}
+        >
+          <InvoiceForm
+            id={"invoice-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableInvoice(null);
+              setLoadingSaveInvoice(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("Invoices.success.updated"),
+              });
+            }}
+            defaultValues={actionableInvoice}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

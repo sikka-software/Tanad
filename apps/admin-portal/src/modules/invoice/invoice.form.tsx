@@ -23,15 +23,25 @@ import { createClient } from "@/utils/supabase/component";
 import { ProductsFormSection } from "@/components/forms/products-form-section";
 import CodeInput from "@/components/ui/code-input";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import { ClientForm } from "@/client/client.form";
 
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
+import { Invoice } from "@/modules/invoice/invoice.type";
+import useUserStore from "@/stores/use-user-store";
 
+import { CompanyFormValues } from "../company/company.form";
+import { useUpdateCompany } from "../company/company.hooks";
+import { createCompany, updateCompany } from "../company/company.service";
+import useCompanyStore from "../company/company.store";
+import { useCreateInvoice, useUpdateInvoice } from "../invoice/invoice.hooks";
+import useInvoiceStore from "../invoice/invoice.store";
 import { ProductForm } from "../product/product.form";
 
 const createInvoiceSchema = (t: (key: string) => string) =>
   z.object({
-    client_id: z.string().min(1, t("Invoices.form.client_id.required")),
+    client_id: z.string().min(1, t("Invoices.form.client.required")),
     invoice_number: z.string().min(1, t("Invoices.form.invoice_number.required")),
     issue_date: z.date({
       required_error: t("Invoices.form.issue_date.required"),
@@ -39,7 +49,7 @@ const createInvoiceSchema = (t: (key: string) => string) =>
     due_date: z.date({
       required_error: t("Invoices.form.due_date.required"),
     }),
-    status: z.string().min(1, t("Invoices.form.status.required")),
+    status: z.enum(["draft", "pending", "paid", "overdue", "cancelled"]),
     subtotal: z.number().min(0, t("Invoices.form.subtotal.required")),
     tax_rate: z.number().min(0, t("Invoices.form.tax_rate.required")),
     notes: z.string().optional(),
@@ -47,7 +57,7 @@ const createInvoiceSchema = (t: (key: string) => string) =>
       .array(
         z.object({
           product_id: z.string().optional(),
-          description: z.string().min(1, t("Invoices.form.description.required")),
+          description: z.string(),
           quantity: z
             .string()
             .min(1, t("Invoices.form.quantity.required"))
@@ -73,26 +83,27 @@ const createInvoiceSchema = (t: (key: string) => string) =>
 
 export type InvoiceFormValues = z.infer<ReturnType<typeof createInvoiceSchema>>;
 
-interface InvoiceFormProps {
-  id?: string;
-  loading?: boolean;
-  onSubmit: (data: InvoiceFormValues) => Promise<void>;
-}
+export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFormProps<Invoice>) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const { profile, membership } = useUserStore();
+  const { mutateAsync: createInvoice, isPending: isCreating } = useCreateInvoice();
+  const { mutateAsync: updateInvoice, isPending: isUpdating } = useUpdateInvoice();
 
-export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceFormProps) {
   const supabase = createClient();
   const router = useRouter();
   const { data: invoices } = useInvoices();
-  const [loading, setLoading] = useState(externalLoading || false);
+  const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [clientsLoading, setClientsLoading] = useState(true);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
   const [user_id, setuser_id] = useState<string | undefined>();
-  const [clientsLoading, setClientsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
-  const t = useTranslations();
-  const locale = useLocale();
+
+  const isLoading = useInvoiceStore((state) => state.isLoading);
+  const setIsLoading = useInvoiceStore((state) => state.setIsLoading);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(createInvoiceSchema(t)),
@@ -166,30 +177,6 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
     form.setValue("subtotal", subtotal);
   }, [items, form]);
 
-  // const handleClientAdded = async () => {
-  //   // Close the dialog
-  //   setIsDialogOpen(false);
-
-  //   // Refresh the clients list
-  //   try {
-  //     const { data, error } = await supabase
-  //       .from("clients")
-  //       .select("id, name, company")
-  //       .order("name");
-
-  //     if (error) throw error;
-
-  //     setClients(data || []);
-
-  //     // Show success message
-  //     toast.success(t("General.successful_operation"), {
-  //       description: t("client_added"),
-  //     });
-  //   } catch (error) {
-  //     console.error("Error refreshing clients:", error);
-  //   }
-  // };
-
   const handleProductSelection = (index: number, product_id: string) => {
     const selectedProduct = products.find((product) => product.id === product_id);
     if (selectedProduct) {
@@ -204,6 +191,78 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
     value: client.id,
   }));
 
+  const handleSubmit = async (data: InvoiceFormValues) => {
+    setIsLoading(true);
+    if (!profile?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
+
+    try {
+      if (editMode && defaultValues) {
+        if (!defaultValues.id) {
+          console.error("Company ID missing in edit mode");
+          toast.error(t("Companies.error.missing_id"));
+          setIsLoading(false);
+          return;
+        }
+        await updateInvoice(
+          {
+            id: defaultValues.id,
+            data: {
+              client_id: data.client_id,
+              invoice_number: data.invoice_number,
+              issue_date: data.issue_date,
+              due_date: data.due_date,
+              status: data.status,
+              subtotal: data.subtotal,
+              tax_rate: data.tax_rate,
+              notes: data.notes,
+              items: data.items,
+            },
+          },
+          {
+            onSuccess: async () => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      } else {
+        await createInvoice(
+          {
+            user_id: profile?.id || "",
+            client_id: data.client_id,
+            invoice_number: data.invoice_number,
+            issue_date: data.issue_date,
+            due_date: data.due_date,
+            status: data.status,
+            subtotal: data.subtotal,
+            tax_rate: data.tax_rate,
+            notes: data.notes,
+            items: data.items,
+          },
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Failed to save company:", error);
+      toast.error(t("General.error_operation"), {
+        description: t("Companies.error.creating"),
+      });
+    }
+  };
+
   if (typeof window !== "undefined") {
     (window as any).invoiceForm = form;
   }
@@ -211,7 +270,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
   return (
     <>
       <Form {...form}>
-        <form id={id || "invoice-form"} onSubmit={form.handleSubmit(onSubmit)}>
+        <form id={id || "invoice-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
