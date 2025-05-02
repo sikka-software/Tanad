@@ -42,6 +42,8 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canViewInvoice = useUserStore((state) => state.hasPermission("invoices.view"));
   const canArchiveInvoice = useUserStore((state) => state.hasPermission("invoices.archive"));
   const canDeleteInvoice = useUserStore((state) => state.hasPermission("invoices.delete"));
+  // const canPreviewInvoice = useUserStore((state) => state.hasPermission("invoices.preview"));
+  const canPreviewInvoice = true;
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
   console.log("data is ", data);
@@ -52,6 +54,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       validationSchema: z.string().min(1, t("Invoices.form.invoice_number.required")),
     },
     {
+      enableEditing: false,
       accessorKey: "client.name",
       header: t("Invoices.form.client.label"),
       cell: ({ row }) => {
@@ -61,12 +64,13 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         return (
           <div>
             <div className="text-sm font-medium">{client.name || "-"}</div>
-            {client.email && <div className="text-muted-foreground text-xs">{client.email}</div>}
+            {/* {client.email && <div className="text-muted-foreground text-xs">{client.email}</div>} */}
           </div>
         );
       },
     },
     {
+      enableEditing: false,
       accessorKey: "issue_date",
       header: t("Invoices.form.issue_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.issue_date.required")),
@@ -79,6 +83,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       cell: ({ row }) => row.original.due_date,
     },
     {
+      enableEditing: false,
       accessorKey: "total",
       header: t("Invoices.form.total.label"),
       validationSchema: z.number().min(0, t("Invoices.form.total.required")),
@@ -96,22 +101,23 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       header: t("Invoices.form.status.label"),
       validationSchema: z.string().min(1, t("Invoices.form.status.required")),
     },
-    {
-      id: "preview",
-      header: t("General.preview"),
-      cell: ({ row }) => {
-        const invoice = row.original;
-        return (
-          <div className="flex space-x-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/pay/${invoice.id}`} target="_blank">
-                {t("General.preview")}
-              </Link>
-            </Button>
-          </div>
-        );
-      },
-    },
+    // {
+    //   enableEditing: false,
+    //   id: "preview",
+    //   header: t("General.preview"),
+    //   cell: ({ row }) => {
+    //     const invoice = row.original;
+    //     return (
+    //       <div className="flex space-x-2">
+    //         <Button variant="outline" className="h-4 p-0 !px-2 text-xs" asChild>
+    //           <Link href={`/pay/${invoice.id}`} target="_blank">
+    //             {t("General.preview")}
+    //           </Link>
+    //         </Button>
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
@@ -173,6 +179,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       canViewAction={canViewInvoice}
       canArchiveAction={canArchiveInvoice}
       canDeleteAction={canDeleteInvoice}
+      canPreviewAction={canPreviewInvoice}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={invoiceTableOptions}
       onActionClicked={onActionClicked}
@@ -183,6 +190,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         view: t("General.view"),
         archive: t("General.archive"),
         delete: t("General.delete"),
+        preview: t("General.preview"),
       }}
     />
   );

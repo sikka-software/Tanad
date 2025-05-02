@@ -68,6 +68,9 @@ export default function InvoicesPage() {
     setActionableItem: setActionableInvoice,
     duplicateMutation: duplicateInvoice,
     moduleName: "Invoices",
+    previewAction: (id: string) => {
+      window.open(`/pay/${id}`, "_blank");
+    },
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteInvoices, {

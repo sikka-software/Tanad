@@ -9,6 +9,7 @@ interface UseDataTableActionsProps<T extends { id: string }> {
   setActionableItem: (item: T | null) => void;
   duplicateMutation: (id: string, options?: any) => void;
   moduleName: string;
+  previewAction?: (id: string) => void;
 }
 
 export function useDataTableActions<T extends { id: string }>({
@@ -19,6 +20,7 @@ export function useDataTableActions<T extends { id: string }>({
   setActionableItem,
   duplicateMutation,
   moduleName,
+  previewAction,
 }: UseDataTableActionsProps<T>) {
   const t = useTranslations();
 
@@ -31,6 +33,10 @@ export function useDataTableActions<T extends { id: string }>({
     if (action === "delete") {
       setSelectedRows([rowId]);
       setIsDeleteDialogOpen(true);
+    }
+
+    if (action === "preview") {
+      previewAction?.(rowId);
     }
 
     if (action === "duplicate") {

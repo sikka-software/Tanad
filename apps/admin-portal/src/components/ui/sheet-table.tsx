@@ -25,20 +25,7 @@ import {
   Row as TanStackRow,
   ColumnSizingState,
 } from "@tanstack/react-table";
-// ** import icons
-import {
-  ChevronDown,
-  ChevronRight,
-  MoreHorizontal,
-  Plus,
-  Trash2,
-  Edit,
-  Copy,
-  Eye,
-  Archive,
-} from "lucide-react";
-import { EllipsisVertical } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
+import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
@@ -48,7 +35,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -59,8 +45,6 @@ import {
 // ** import lib
 import { cn } from "@/lib/utils";
 
-import { Button } from "./button";
-import IconButton from "./icon-button";
 import RowActions from "./row-actions";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
@@ -74,6 +58,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
   style?: React.CSSProperties; // style for inline styles
+  enableEditing?: boolean;
 };
 
 /**
@@ -218,6 +203,7 @@ export interface SheetTableProps<T extends object> extends FooterProps {
     view?: string;
     archive?: string;
     delete?: string;
+    preview?: string;
   };
 
   onActionClicked?: (action: string, rowId: string) => void;
@@ -226,6 +212,7 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   canViewAction?: boolean;
   canArchiveAction?: boolean;
   canDeleteAction?: boolean;
+  canPreviewAction?: boolean;
 }
 
 /**
@@ -869,7 +856,7 @@ function SheetTable<
                     : colDef.className,
                 )}
                 style={style}
-                contentEditable={cellIndex === 0 ? false : !isDisabled}
+                contentEditable={colDef.enableEditing !== false ? !isDisabled : false}
                 suppressContentEditableWarning
                 onFocus={(e) => {
                   if (cellIndex > 0 && !isDisabled) {
@@ -952,6 +939,9 @@ function SheetTable<
                 }
                 onDelete={
                   props.canDeleteAction ? () => onActionClicked?.("delete", rowId) : undefined
+                }
+                onPreview={
+                  props.canPreviewAction ? () => onActionClicked?.("preview", rowId) : undefined
                 }
               />
             </div>
