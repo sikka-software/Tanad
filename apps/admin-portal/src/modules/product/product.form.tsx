@@ -40,13 +40,7 @@ export const createProductSchema = (t: (key: string) => string) =>
 
 export type ProductFormValues = z.input<ReturnType<typeof createProductSchema>>;
 
-export function ProductForm({
-  id,
-  onSuccess,
-  loading,
-  defaultValues,
-  editMode,
-}: ModuleFormProps<Product>) {
+export function ProductForm({ id, onSuccess, defaultValues, editMode }: ModuleFormProps<Product>) {
   const t = useTranslations();
 
   const { profile, membership } = useUserStore();
@@ -130,7 +124,7 @@ export function ProductForm({
       setIsLoading(false);
       console.error("Failed to save product:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Products.error.creating"),
+        description: t("Products.error.creating"),
       });
     }
   };
@@ -154,7 +148,7 @@ export function ProductForm({
                   <Input
                     placeholder={t("Products.form.name.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -173,7 +167,7 @@ export function ProductForm({
                     placeholder={t("Products.form.description.placeholder")}
                     rows={4}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -194,7 +188,7 @@ export function ProductForm({
                       value={field.value ? parseFloat(String(field.value)) : undefined}
                       onChange={(value) => field.onChange(value?.toString() || "")}
                       placeholder={t("Products.form.price.placeholder")}
-                      disabled={loading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -209,7 +203,7 @@ export function ProductForm({
                 <FormItem>
                   <FormLabel>{t("Products.form.stock_quantity.label")} *</FormLabel>
                   <FormControl>
-                    <Input type="number" min="0" placeholder="0" {...field} disabled={loading} />
+                    <Input type="number" min="0" placeholder="0" {...field} disabled={isLoading} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -227,7 +221,7 @@ export function ProductForm({
                   <Input
                     placeholder={t("Products.form.sku.placeholder")}
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />

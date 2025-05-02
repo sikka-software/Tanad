@@ -50,12 +50,10 @@ export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
 export function CompanyForm({
   id,
   onSuccess,
-  loading = false,
   defaultValues,
   editMode = false,
 }: ModuleFormProps<Company>) {
   const t = useTranslations();
-  const { locale } = useRouter();
   const { profile, membership } = useUserStore();
   const { mutateAsync: createCompany, isPending: isCreating } = useCreateCompany();
   const { mutateAsync: updateCompany, isPending: isUpdating } = useUpdateCompany();

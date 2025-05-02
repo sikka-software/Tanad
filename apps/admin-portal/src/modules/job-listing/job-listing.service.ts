@@ -11,7 +11,7 @@ export async function fetchJobListings(): Promise<JobListing[]> {
       throw new Error("User ID is required");
     }
 
-    const response = await fetch("/api/resources/job-listings", {
+    const response = await fetch("/api/resource/job-listings", {
       headers: {
         "x-user-id": user.id,
       },
@@ -35,7 +35,7 @@ export async function bulkDeleteJobListings(ids: string[]): Promise<void> {
       throw new Error("User ID is required");
     }
 
-    const response = await fetch("/api/resources/job-listings/bulk-delete", {
+    const response = await fetch("/api/resource/job-listings/bulk-delete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export async function createJobListing(data: JobListing): Promise<JobListing> {
       throw new Error("User ID is required");
     }
 
-    const response = await fetch("/api/resources/job-listings/create", {
+    const response = await fetch("/api/resource/job-listings/create", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export async function fetchJobListingById(id: string): Promise<JobListing> {
 
 export async function duplicateJobListing(id: string): Promise<JobListing> {
   try {
-    const response = await fetch(`/api/resources/job-listings/${id}/duplicate`, {
+    const response = await fetch(`/api/resource/job-listings/${id}/duplicate`, {
       method: "POST",
     });
 
@@ -111,7 +111,7 @@ export async function duplicateJobListing(id: string): Promise<JobListing> {
 
 export async function updateJobListing(id: string, jobListing: Partial<JobListing>) {
   try {
-    const response = await fetch(`/api/resources/job-listings/${id}`, {
+    const response = await fetch(`/api/resource/job-listings/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

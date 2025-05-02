@@ -12,15 +12,14 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { ProductForm } from "@/product/product.form";
 
+import useProductStore from "@/modules/product/product.store";
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddProductPage() {
   const router = useRouter();
   const t = useTranslations();
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
 
-  const [loading, setLoading] = useState(false);
+  const isLoading = useProductStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const form = (window as any).productForm;
@@ -39,7 +38,7 @@ export default function AddProductPage() {
       <PageTitle
         formButtons
         formId="product-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/products")}
         texts={{
           title: t("Products.add_new"),
@@ -49,7 +48,7 @@ export default function AddProductPage() {
         dummyButton={handleDummyData}
       />
 
-      <ProductForm id="product-form" loading={loading} />
+      <ProductForm id="product-form" />
     </div>
   );
 }
