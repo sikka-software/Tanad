@@ -164,9 +164,9 @@ export function ClientForm({
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Failed to save company:", error);
+      console.error("Failed to save client:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Companies.error.creating"),
+        description: t("Clients.error.creating"),
       });
     }
   };

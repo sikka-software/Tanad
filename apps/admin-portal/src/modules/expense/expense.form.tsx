@@ -101,7 +101,7 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
     } catch (error) {
       setIsLoading(false);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Expenses.error.creating"),
+        description: t("Expenses.error.creating"),
       });
     }
   };

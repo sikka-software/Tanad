@@ -211,7 +211,7 @@ export default function DepartmentForm({
       setIsLoading(false);
       console.error("Failed to save department:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Departments.error.create"),
+        description: t("Departments.error.creating"),
       });
     }
   };

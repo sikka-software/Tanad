@@ -39,7 +39,6 @@ export type WarehouseFormValues = z.input<ReturnType<typeof createWarehouseFormS
 export function WarehouseForm({
   id,
   onSuccess,
-  loading,
   defaultValues,
   editMode,
 }: ModuleFormProps<Warehouse>) {
@@ -85,8 +84,8 @@ export function WarehouseForm({
     try {
       if (editMode && defaultValues) {
         if (!defaultValues.id) {
-          console.error("Company ID missing in edit mode");
-          toast.error(t("Companies.error.missing_id"));
+          console.error("Warehouse ID missing in edit mode");
+          toast.error(t("Warehouses.error.missing_id"));
           setIsLoading(false);
           return;
         }
@@ -147,9 +146,9 @@ export function WarehouseForm({
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Failed to save company:", error);
+      console.error("Failed to save warehouse:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Companies.error.creating"),
+        description: t("Warehouses.error.creating"),
       });
     }
   };
@@ -173,7 +172,7 @@ export function WarehouseForm({
                     <Input
                       placeholder={t("Warehouses.form.name.placeholder")}
                       {...field}
-                      disabled={loading}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -208,7 +207,7 @@ export function WarehouseForm({
                       <Input
                         placeholder={t("Warehouses.form.code.placeholder")}
                         {...field}
-                        disabled={loading}
+                        disabled={isLoading}
                       />
                     </CodeInput>
                   </FormControl>
@@ -230,7 +229,7 @@ export function WarehouseForm({
                       type="number"
                       placeholder={t("Warehouses.form.capacity.placeholder")}
                       {...field}
-                      disabled={loading}
+                      disabled={isLoading}
                       value={field.value || ""}
                     />
                   </FormControl>
@@ -250,7 +249,7 @@ export function WarehouseForm({
                     placeholder={t("Warehouses.form.notes.placeholder")}
                     className="min-h-[120px]"
                     {...field}
-                    disabled={loading}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -261,7 +260,7 @@ export function WarehouseForm({
         <AddressFormSection
           title={t("Warehouses.form.address.label")}
           control={form.control}
-          isLoading={loading}
+          isLoading={isLoading}
         />
       </form>
     </Form>

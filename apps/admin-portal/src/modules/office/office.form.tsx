@@ -22,7 +22,7 @@ import { OfficeUpdateData } from "./office.type";
 const createOfficeSchema = (t: (key: string) => string) => {
   const baseOfficeSchema = z.object({
     name: z.string().min(1, t("Offices.form.name.required")),
-    code: z.string().min(1, t("Offices.form.code.required")),
+    code: z.string().optional().or(z.literal("")),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
     notes: z.string().optional().or(z.literal("")),
@@ -83,7 +83,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
             id: defaultValues.id,
             office: {
               name: data.name.trim(),
-              code: data.code.trim(),
+              code: data.code?.trim() || undefined,
               short_address: data.short_address?.trim() || undefined,
               building_number: data.building_number?.trim() || undefined,
               street_name: data.street_name?.trim() || undefined,
@@ -111,7 +111,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
         await createOffice(
           {
             name: data.name.trim(),
-            code: data.code.trim(),
+            code: data.code?.trim() || undefined,
             short_address: data.short_address?.trim() || undefined,
             building_number: data.building_number?.trim() || undefined,
             street_name: data.street_name?.trim() || undefined,
@@ -132,7 +132,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
     } catch (error) {
       console.error("Error in office form:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Offices.error.creating"),
+        description: t("Offices.error.creating"),
       });
       setIsLoading(false);
     }

@@ -132,9 +132,9 @@ export function JobListingForm({
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Failed to save company:", error);
+      console.error("Failed to save job listing:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Companies.error.creating"),
+        description: t("JobListings.error.creating"),
       });
     }
   };

@@ -7,6 +7,7 @@ import {
   fetchWarehouses,
   updateWarehouse,
   duplicateWarehouse,
+  bulkDeleteWarehouses,
 } from "@/warehouse/warehouse.service";
 import type { Warehouse, WarehouseCreateData } from "@/warehouse/warehouse.type";
 
@@ -56,6 +57,14 @@ export function useDuplicateWarehouse() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => duplicateWarehouse(id),
+    onSuccess: (newWarehouse: Warehouse) => {
+      const previousWarehouses = queryClient.getQueryData(warehouseKeys.lists()) || [];
+      queryClient.setQueryData(warehouseKeys.lists(), [
+        ...(Array.isArray(previousWarehouses) ? previousWarehouses : []),
+        newWarehouse,
+      ]);
+      queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(newWarehouse.id) });
+    },
   });
 }
 
@@ -96,18 +105,7 @@ export function useDeleteWarehouse() {
 export function useBulkDeleteWarehouses() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/warehouses/bulk-delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete warehouses");
-      }
-    },
+    mutationFn: (ids: string[]) => bulkDeleteWarehouses(ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
     },

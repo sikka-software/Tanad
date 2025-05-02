@@ -580,6 +580,20 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Invoices.form.notes.label")}</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder={t("Invoices.form.notes.placeholder")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Products Section with Table */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -632,20 +646,6 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
                 </Table>
               </div>
             </div>
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Invoices.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder={t("Invoices.form.notes.placeholder")} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <div className="mt-4 text-right">
               <div className="text-sm text-gray-600">

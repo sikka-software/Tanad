@@ -7,7 +7,6 @@ import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import { Switch } from "@/ui/switch";
 import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
@@ -131,9 +130,9 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Failed to save company:", error);
+      console.error("Failed to save branch:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Companies.error.creating"),
+        description: t("Branches.error.creating"),
       });
     }
   };

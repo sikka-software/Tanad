@@ -75,7 +75,7 @@ export default function AddQuotePage() {
       router.push("/quotes");
     } catch (error) {
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Quotes.error.create"),
+        description: t("Quotes.error.creating"),
       });
     } finally {
       setLoading(false);

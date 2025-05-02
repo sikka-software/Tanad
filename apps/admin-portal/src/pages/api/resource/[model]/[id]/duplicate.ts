@@ -1,9 +1,10 @@
 import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { createClient } from "@/utils/supabase/server-props";
+
 import { db } from "@/db/drizzle";
 import * as schema from "@/db/schema";
-import { createClient } from "@/utils/supabase/server-props";
 
 type ModelConfig = {
   table: any;
@@ -33,7 +34,12 @@ const modelMap: Record<string, ModelConfig> = {
   },
   salaries: { table: schema.salaries, query: db.query.salaries, idField: "id" },
   offices: { table: schema.offices, query: db.query.offices, idField: "id" },
-  warehouses: { table: schema.warehouses, query: db.query.warehouses, idField: "id" },
+  warehouses: {
+    table: schema.warehouses,
+    query: db.query.warehouses,
+    idField: "id",
+    excludeFromDuplicate: ["code"],
+  },
   employees: { table: schema.employees, query: db.query.employees, idField: "id" },
   products: { table: schema.products, query: db.query.products, idField: "id" },
   invoices: { table: schema.invoices, query: db.query.invoices, idField: "id" },

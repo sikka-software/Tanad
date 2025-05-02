@@ -64,6 +64,27 @@
       "when": 1746162152327,
       "tag": "0008_curly_moon_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1746162546651,
+      "tag": "0009_overjoyed_richard_fisk",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1746162628045,
+      "tag": "0010_watery_mysterio",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1746162974131,
+      "tag": "0011_grey_leech",
+      "breakpoints": true
     }
   ]
 }

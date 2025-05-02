@@ -68,7 +68,7 @@ export default function AddInvoicePage() {
     } catch (error) {
       console.error("Error creating invoice:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Invoices.error.create"),
+        description: t("Invoices.error.creating"),
       });
     } finally {
       setLoading(false);

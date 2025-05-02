@@ -156,7 +156,7 @@ export function EmployeeForm({ id, onSuccess, defaultValues, editMode }: Employe
       console.error(error);
       setLoadingSave(false);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Employees.error.create"),
+        description: t("Employees.error.creating"),
       });
       throw error;
     }

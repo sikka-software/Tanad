@@ -85,7 +85,7 @@ export default function AddEmployeeRequestPage() {
     } catch (error) {
       setLoadingSave(false);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("EmployeeRequests.error.creating"),
+        description: t("EmployeeRequests.error.creating"),
       });
     }
   };
