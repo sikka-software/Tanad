@@ -1475,6 +1475,7 @@ export const invoices = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     enterprise_id: uuid(),
+    user_id: uuid(),
     invoice_number: text().notNull(),
     issue_date: date().default(sql`CURRENT_DATE`),
     due_date: date(),

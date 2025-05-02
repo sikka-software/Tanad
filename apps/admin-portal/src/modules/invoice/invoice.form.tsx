@@ -28,7 +28,7 @@ import { ModuleFormProps } from "@/types/common.type";
 import { ClientForm } from "@/client/client.form";
 
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
-import { Invoice } from "@/modules/invoice/invoice.type";
+import { Invoice, InvoiceItem } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 import { CompanyFormValues } from "../company/company.form";
@@ -220,7 +220,12 @@ export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFo
               subtotal: data.subtotal,
               tax_rate: data.tax_rate,
               notes: data.notes,
-              items: data.items,
+              items: data.items.map((item) => ({
+                ...item,
+                product_id: item.product_id || "",
+                quantity: parseFloat(item.quantity),
+                unit_price: parseFloat(item.unit_price),
+              })) as InvoiceItem[],
             },
           },
           {
@@ -242,8 +247,14 @@ export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFo
             status: data.status,
             subtotal: data.subtotal,
             tax_rate: data.tax_rate,
+            total: data.subtotal + (data.subtotal * data.tax_rate) / 100,
             notes: data.notes,
-            items: data.items,
+            items: data.items.map((item) => ({
+              ...item,
+              product_id: item.product_id || "",
+              quantity: parseFloat(item.quantity),
+              unit_price: parseFloat(item.unit_price),
+            })),
           },
           {
             onSuccess: async (response) => {

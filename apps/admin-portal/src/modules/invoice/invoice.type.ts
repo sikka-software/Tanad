@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import { Client } from "@/client/client.type";
 
 import { Product } from "../product/product.type";
@@ -16,7 +18,14 @@ export type Invoice = {
   client_id?: string;
   client?: Client;
   created_at: Date;
-  items: Product[];
+  items: InvoiceItem[];
 };
 
-export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "client">;
+export type InvoiceItem = {
+  product_id: string;
+  description: string;
+  quantity: number;
+  unit_price: number;
+};
+
+export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "client" | "items">;
