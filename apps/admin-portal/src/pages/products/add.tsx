@@ -1,11 +1,8 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -13,13 +10,13 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { ProductForm } from "@/product/product.form";
 
 import useProductStore from "@/modules/product/product.store";
-import useUserStore from "@/stores/use-user-store";
 
 export default function AddProductPage() {
   const router = useRouter();
   const t = useTranslations();
 
   const isLoading = useProductStore((state) => state.isLoading);
+  const setIsLoading = useProductStore((state) => state.setIsLoading);
 
   const handleDummyData = () => {
     const form = (window as any).productForm;
@@ -30,6 +27,14 @@ export default function AddProductPage() {
       form.setValue("sku", Math.random().toString(36).substring(2, 15));
       form.setValue("stock_quantity", "100");
     }
+  };
+
+  const onAddSuccess = () => {
+    toast.success(t("General.successful_operation"), {
+      description: t("Products.success.created"),
+    });
+    router.push("/products");
+    setIsLoading(false);
   };
 
   return (
@@ -48,7 +53,7 @@ export default function AddProductPage() {
         dummyButton={handleDummyData}
       />
 
-      <ProductForm id="product-form" />
+      <ProductForm id="product-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

@@ -164,7 +164,7 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
       setIsLoading(false);
       console.error("Failed to save vendor:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Vendors.messages.error_save"),
+        description: t("Vendors.error.creating"),
       });
     }
   };

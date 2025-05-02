@@ -166,7 +166,7 @@ export function ClientForm({
       setIsLoading(false);
       console.error("Failed to save company:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Companies.error.creating"),
+        description: t("Companies.error.creating"),
       });
     }
   };
