@@ -1,16 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/combobox-add";
 import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
 import { generateDummyEmployee } from "@/lib/dummy-factory";
@@ -24,6 +27,13 @@ import useSalaryStore from "@/salary/salary.store";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { DEDUCTION_TYPES } from "./salary.options";
+
+const deductionSchema = z.object({
+  type: z.string().min(1, "Type is required"),
+  amount: z.coerce.number().positive("Amount must be positive").or(z.literal(0)),
+});
+
 const createSalarySchema = (t: (key: string) => string) =>
   z.object({
     employee_name: z.string().min(1, t("Salaries.form.employee_name.required")),
@@ -35,21 +45,7 @@ const createSalarySchema = (t: (key: string) => string) =>
       .positive(t("Salaries.form.gross_amount.positive"))
       .or(z.literal(0)),
     net_amount: z.coerce.number().positive(t("Salaries.form.net_amount.positive")).or(z.literal(0)),
-    deductions: z
-      .string()
-      .optional()
-      .refine(
-        (val) => {
-          if (!val) return true;
-          try {
-            JSON.parse(val);
-            return true;
-          } catch (e) {
-            return false;
-          }
-        },
-        { message: t("Salaries.form.deductions.invalid_json") },
-      ),
+    deductions: z.array(deductionSchema).optional(),
     notes: z.string().optional(),
   });
 
@@ -89,9 +85,15 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
       payment_date: "",
       gross_amount: 0, // Default as number
       net_amount: 0, // Default as number
-      deductions: "",
-      notes: "",
+      deductions: defaultValues?.deductions || [],
+      notes: defaultValues?.notes || "",
     },
+  });
+
+  // Use useFieldArray for deductions
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "deductions",
   });
 
   // Format employees for ComboboxAdd
@@ -103,12 +105,16 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
   const handleSubmit = async (data: SalaryFormValues) => {
     setLoading(true);
     try {
+      // Revert to stringifying; pass undefined if empty to match expected type signature
+      const deductionsPayload =
+        data.deductions && data.deductions.length > 0 ? JSON.stringify(data.deductions) : undefined;
+
       if (editMode) {
         await updateSalary({
           id: id!,
           data: {
             ...data,
-            deductions: data.deductions ? JSON.parse(data.deductions) : null,
+            deductions: deductionsPayload ? JSON.parse(deductionsPayload) : undefined,
             notes: data.notes?.trim() || undefined,
             user_id: user?.id,
           },
@@ -116,7 +122,7 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
       } else {
         await createSalary({
           ...data,
-          deductions: data.deductions ? JSON.parse(data.deductions) : null,
+          deductions: deductionsPayload ? JSON.parse(deductionsPayload) : undefined,
           notes: data.notes?.trim() || undefined,
           user_id: user?.id,
         });
@@ -304,26 +310,100 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
             />
           </div>
 
-          {/* Deductions (JSON Textarea) */}
-          <FormField
-            control={form.control}
-            name="deductions"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Salaries.form.deductions.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Salaries.form.deductions.placeholder")}
-                    {...field}
-                    value={field.value ?? ""}
-                    rows={5}
-                    disabled={loading}
+          {/* Deductions (Dynamic Array) */}
+          <div>
+            <FormLabel>{t("Salaries.form.deductions.label")}</FormLabel>
+            <div className="mt-2 space-y-4">
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex items-end gap-4">
+                  {/* Deduction Amount */}
+                  <FormField
+                    control={form.control}
+                    name={`deductions.${index}.amount`}
+                    render={({ field: amountField }) => (
+                      <FormItem className="w-full flex-grow max-w-1/2">
+                        <FormLabel className="sr-only">
+                          {t("Salaries.form.deduction_amount.label")}
+                        </FormLabel>
+                        <FormControl>
+                          <CurrencyInput
+                            showCommas={true}
+                            value={
+                              amountField.value ? parseFloat(String(amountField.value)) : undefined
+                            }
+                            onChange={(value) => amountField.onChange(value?.toString() || "")}
+                            placeholder={t("Salaries.form.deduction_amount.placeholder")}
+                            disabled={loading}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
+                  {/* Deduction Type */}
+                  <FormField
+                    control={form.control}
+                    name={`deductions.${index}.type`}
+                    render={({ field: typeField }) => (
+                      <FormItem className="w-full flex-grow max-w-1/2">
+                        <FormLabel className="sr-only">
+                          {t("Salaries.form.deduction_type.label")}
+                        </FormLabel>
+                        <Select
+                          dir={locale === "ar" ? "rtl" : "ltr"}
+                          onValueChange={typeField.onChange}
+                          defaultValue={typeField.value}
+                          disabled={loading}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue
+                                placeholder={t("Salaries.form.deduction_type.placeholder")}
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {DEDUCTION_TYPES.map((type) => (
+                              <SelectItem key={type.value} value={type.value}>
+                                {/* Use label as fallback if translation missing */}
+                                {t(`Salaries.form.deduction_type_options.${type.value}`) ||
+                                  type.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Remove Button */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="min-w-10 h-10"
+                    onClick={() => remove(index)}
+                    disabled={loading}
+                    aria-label={t("Salaries.form.remove_deduction")}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => append({ type: "", amount: 0 })}
+                disabled={loading}
+              >
+                {t("Salaries.form.deductions.add")}
+              </Button>
+            </div>
+          </div>
 
           {/* Notes */}
           <FormField

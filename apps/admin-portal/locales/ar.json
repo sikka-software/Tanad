@@ -2518,6 +2518,32 @@
       "notes": {
         "label": "ملاحظات",
         "placeholder": "أدخل أي ملاحظات إضافية"
+      },
+      "deductions": {
+        "label": "الاستقطاعات",
+        "placeholder": "أدخل الاستقطاعات",
+        "required": "الاستقطاعات مطلوبة",
+        "add": "إضافة استقطاع",
+        "remove": "إزالة استقطاع",
+        "invalid_json": "الاستقطاعات غير صالحة"
+      },
+      "deduction_type": {
+        "label": "نوع الاستقطاع",
+        "placeholder": "اختر نوع الاستقطاع",
+        "required": "نوع الاستقطاع مطلوب"
+      },
+      "deduction_type_options": {
+        "tax": "الضريبة",
+        "insurance": "التأمين",
+        "loan_payment": "دفع القرض",
+        "advance_repayment": "إرجاع المبلغ المسبق",
+        "other": "أخرى",
+        "absences": "الغيابات"
+      },
+      "deduction_amount": {
+        "label": "مبلغ الاستقطاع",
+        "placeholder": "أدخل مبلغ الاستقطاع",
+        "required": "مبلغ الاستقطاع مطلوب"
       }
     }
   },

@@ -50,6 +50,7 @@ type ComboboxAddTypes<T> = {
   renderSelected?: (item: T) => React.ReactNode;
   addText?: string;
   onAddClick?: () => void;
+  containerClassName?: string;
 };
 export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any>>(
   (
@@ -57,6 +58,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
       labelKey = "label",
       valueKey = "value",
       defaultValue = "",
+      containerClassName,
       popoverClassName,
       direction,
       labelProps,
@@ -103,7 +105,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
             {props.isLoading ? (
               <Skeleton className="h-[40px] w-full" />
             ) : (
-              <div className="flex flex-col items-start gap-2">
+              <div className={cn("flex flex-col items-start gap-2", containerClassName)}>
                 <div
                   className={cn(
                     "absolute top-[22px] h-[0.8px] w-full bg-gray-200 transition-all dark:bg-gray-800",
@@ -131,7 +133,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                     xmlns="http://www.w3.org/2000/svg"
                     className={cn(
                       "size-4 transition-all",
-                      !props.preview ? "visible opacity-100" : "invisible opacity-0",
+                      !props.preview ? "visible opacity-50" : "invisible opacity-0",
                     )}
                     aria-label="Chevron down icon"
                     viewBox="0 0 24 24"

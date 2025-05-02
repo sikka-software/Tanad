@@ -22,6 +22,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useProducts } from "@/modules/product/product.hooks";
 import useProductStore from "@/modules/product/product.store";
 
+import { CurrencyInput } from "../ui/currency-input";
+import { SARSymbol } from "../ui/sar-symbol";
+
 // Define the shape of a single item - adjust if needed based on InvoiceFormValues
 interface InvoiceItem {
   product_id?: string;
@@ -81,6 +84,7 @@ export function ProductsFormSection({
                       direction={locale === "ar" ? "rtl" : "ltr"}
                       data={productOptions || []}
                       disabled={isLoading}
+                      containerClassName="min-w-[150px] w-full"
                       isLoading={productsLoading}
                       defaultValue={field.value}
                       valueKey={"id"}
@@ -151,15 +155,13 @@ export function ProductsFormSection({
               control={control} // Use passed control
               name={`items.${index}.unit_price`}
               render={({ field }) => (
-                <FormItem className="space-y-0">
+                <FormItem className="max-w-[200px] space-y-0">
                   <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="0.00"
-                      {...field}
-                      className="w-32"
+                    <CurrencyInput
+                      showCommas={true}
+                      value={field.value ? parseFloat(field.value) : undefined}
+                      onChange={(value) => field.onChange(value?.toString() || "")}
+                      placeholder={t("Invoices.products.unit_price.placeholder")}
                       disabled={isLoading}
                     />
                   </FormControl>
@@ -208,7 +210,12 @@ export function ProductsFormSection({
               ? (parseFloat(quantity || "0") * parseFloat(unitPrice || "0")).toFixed(2)
               : "0.00";
 
-          return <div className="text-right">${subtotal}</div>;
+          return (
+            <div className="flex flex-row items-center gap-1 text-right">
+              {subtotal}
+              <SARSymbol className="size-4" />
+            </div>
+          );
         },
       },
       {
@@ -256,7 +263,7 @@ export function ProductsFormSection({
   });
 
   return (
-    <div>
+    <div className="!-z-[500] bg-green-500">
       {/* Header similar to AddressFormSection */}
       <div className="bg-muted top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
         <h2 className="ms-2 text-xl font-bold">{title}</h2>
@@ -277,8 +284,13 @@ export function ProductsFormSection({
       {/* Table Section */}
       <div className="p-4">
         <div className="rounded-md border">
-          <Table>
-            <TableHeader>
+          <Table
+            className="!-z-[500] bg-blue-500"
+            style={{
+              zIndex: '-1000 !important',
+            }}
+          >
+            <TableHeader className="">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (

@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 
 import { Input } from "@/ui/input";
 
+import { cn } from "@/lib/utils";
+
 import { SARSymbol } from "./sar-symbol";
 
 export const MoneyFormatter = (value: number) => {
@@ -31,6 +33,7 @@ interface CurrencyInputProps
   onChange?: (value: number | undefined) => void;
   showCommas?: boolean;
   showCurrencySymbol?: boolean;
+  containerClassName?: string;
 }
 
 export function CurrencyInput({
@@ -121,19 +124,19 @@ export function CurrencyInput({
   };
 
   return (
-    <div className="relative">
+    <div className={cn("relative", props.containerClassName)}>
       <Input
         type="text"
         inputMode="decimal"
         placeholder="0.00"
-        className="currency-input ps-8 rtl:pe-8 rtl:text-end"
+        className="currency-input ltr:ps-8 rtl:pe-8 rtl:text-end"
         value={inputText}
         onChange={handleChange}
         onBlur={handleBlur}
         {...props}
       />
       {showCurrencySymbol && (
-        <span className="text-muted-foreground absolute top-1/2 -translate-y-1/2 ltr:start-2 rtl:left-2">
+        <span className="text-muted-foreground absolute top-2.5 ltr:start-2 rtl:left-2">
           <SARSymbol className="size-4" />
         </span>
       )}

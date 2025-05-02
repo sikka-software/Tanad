@@ -13,7 +13,7 @@ export interface Salary {
   payment_date: string;
   pay_period_start: string;
   pay_period_end: string;
-  deductions?: Record<string, number>;
+  deductions?: DeductionDetail[];
   notes?: string;
 }
 

@@ -29,7 +29,7 @@ const formatDate = (dateStr: string) => {
 };
 
 const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Invoice>) => {
-  const t = useTranslations("Invoices");
+  const t = useTranslations();
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
   const selectedRows = useInvoiceStore((state) => state.selectedRows);
   const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
@@ -45,29 +45,29 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const columns: ExtendedColumnDef<Invoice>[] = [
     {
       accessorKey: "invoice_number",
-      header: t("form.invoice_number.label"),
+      header: t("Invoices.form.invoice_number.label"),
       validationSchema: z.string().min(1, t("Invoices.form.invoice_number.required")),
     },
     {
       accessorKey: "client.company",
-      header: t("form.client.label"),
+      header: t("Invoices.form.client.label"),
       cell: ({ row }) => row.original.client?.company || "N/A",
     },
     {
       accessorKey: "issue_date",
-      header: t("form.issue_date.label"),
+      header: t("Invoices.form.issue_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.issue_date.required")),
       cell: ({ row }) => formatDate(row.original.issue_date),
     },
     {
       accessorKey: "due_date",
-      header: t("form.due_date.label"),
+      header: t("Invoices.form.due_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.due_date.required")),
       cell: ({ row }) => formatDate(row.original.due_date),
     },
     {
       accessorKey: "total",
-      header: t("form.total.label"),
+      header: t("Invoices.form.total.label"),
       validationSchema: z.number().min(0, t("Invoices.form.total.required")),
       cell: ({ row }) => {
         const total =
@@ -79,18 +79,19 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     },
     {
       accessorKey: "status",
-      header: t("form.status.label"),
+      header: t("Invoices.form.status.label"),
       validationSchema: z.string().min(1, t("Invoices.form.status.required")),
     },
     {
-      id: "actions",
+      id: "preview",
+      header: t("General.preview"),
       cell: ({ row }) => {
         const invoice = row.original;
         return (
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" asChild>
               <Link href={`/pay/${invoice.id}`} target="_blank">
-                {t("actions.preview")}
+                {t("General.preview")}
               </Link>
             </Button>
           </div>
