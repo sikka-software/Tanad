@@ -10,10 +10,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { ProductForm, ProductFormValues } from "@/product/product.form";
-import { productKeys } from "@/product/product.hooks";
-import { createProduct } from "@/product/product.service";
-import type { Product, ProductCreateData } from "@/product/product.type";
+import { ProductForm } from "@/product/product.form";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -24,44 +21,6 @@ export default function AddProductPage() {
   const { user } = useUserStore();
 
   const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (data: ProductFormValues) => {
-    setLoading(true);
-    try {
-      const productData = {
-        name: data.name.trim(),
-        description: data.description?.trim() || null,
-        price: data.price,
-        sku: data.sku?.trim() || null,
-        stock_quantity: data.stock_quantity,
-      };
-
-      let result: Product;
-
-      const productCreateData = {
-        ...productData,
-        user_id: user?.id,
-      };
-      result = await createProduct(productCreateData as unknown as ProductCreateData);
-      toast.success(t("General.successful_operation"), {
-        description: t("Products.success.created"),
-      });
-
-      const previousProducts = queryClient.getQueryData(productKeys.lists()) || [];
-      queryClient.setQueryData(productKeys.lists(), [
-        ...(Array.isArray(previousProducts) ? previousProducts : []),
-        result,
-      ]);
-
-      router.push("/products");
-    } catch (error) {
-      console.error("Failed to save product:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Products.error.create"),
-      });
-      setLoading(false);
-    }
-  };
 
   const handleDummyData = () => {
     const form = (window as any).productForm;
@@ -87,18 +46,10 @@ export default function AddProductPage() {
           submit_form: t("Products.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
+        dummyButton={handleDummyData}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <ProductForm id="product-form" onSubmit={handleSubmit} loading={loading} />
-      </div>
+      <ProductForm id="product-form" loading={loading} />
     </div>
   );
 }

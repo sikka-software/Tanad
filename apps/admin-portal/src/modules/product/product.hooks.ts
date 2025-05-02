@@ -69,8 +69,13 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Omit<Product, "id" | "created_at">> }) =>
-      updateProduct(id, data),
+    mutationFn: ({
+      id,
+      product,
+    }: {
+      id: string;
+      product: Partial<Omit<Product, "id" | "created_at">>;
+    }) => updateProduct(id, product),
     onSuccess: (data: Product) => {
       queryClient.invalidateQueries({ queryKey: productKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });

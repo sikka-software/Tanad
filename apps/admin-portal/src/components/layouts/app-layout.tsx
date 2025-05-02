@@ -46,7 +46,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
             richColors
             position={lang === "ar" ? "bottom-left" : "bottom-right"}
             dir={lang === "ar" ? "rtl" : "ltr"}
-            style={{ fontFamily: "var(--font-family)" }}
+            style={{ fontFamily: "var(--font-arabic)" }}
           />
           <div className="w-full">
             <div className="flex w-full flex-row justify-between border-b p-2">

@@ -9,32 +9,11 @@ export type Product = {
   description?: string | null;
   price: number;
   sku?: string | null;
-  stock_quantity?: number;
-  user_id: string;
-  created_at?: string;
-  updated_at?: string;
-};
-
-export type ProductProps = {
-  id: string;
-  name: string;
-  description?: string | null;
-  price: number;
-  sku?: string | null;
   stock_quantity?: number | null;
   user_id: string;
   created_at?: string | null;
   updated_at?: string | null;
 };
 
-export type NoteProps = {
-  _id?: string;
-  title?: string;
-  description?: string;
-  content?: any;
-  author?: string;
-  created_at?: string;
-  updated_at?: string;
-};
-
 export type ProductCreateData = Omit<Product, "id" | "created_at"> & { user_id: string };
+export type ProductUpdateData = Partial<Product>;

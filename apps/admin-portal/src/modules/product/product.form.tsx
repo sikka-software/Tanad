@@ -1,7 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-import { RefObject, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -10,6 +8,14 @@ import { CurrencyInput } from "@/ui/currency-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
+
+import { ModuleFormProps } from "@/types/common.type";
+
+import useUserStore from "@/stores/use-user-store";
+
+import { useCreateProduct, useUpdateProduct } from "./product.hooks";
+import useProductStore from "./product.store";
+import { Product } from "./product.type";
 
 export const createProductSchema = (t: (key: string) => string) =>
   z.object({
@@ -34,15 +40,22 @@ export const createProductSchema = (t: (key: string) => string) =>
 
 export type ProductFormValues = z.input<ReturnType<typeof createProductSchema>>;
 
-interface ProductFormProps {
-  id?: string;
-  loading?: boolean;
-
-  onSubmit: (data: ProductFormValues) => void;
-}
-
-export function ProductForm({ id, onSubmit, loading }: ProductFormProps) {
+export function ProductForm({
+  id,
+  onSuccess,
+  loading,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<Product>) {
   const t = useTranslations();
+
+  const { profile, membership } = useUserStore();
+  const { mutateAsync: createProduct, isPending: isCreating } = useCreateProduct();
+  const { mutateAsync: updateProduct, isPending: isUpdating } = useUpdateProduct();
+
+  const isLoading = useProductStore((state) => state.isLoading);
+  const setIsLoading = useProductStore((state) => state.setIsLoading);
+
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(createProductSchema(t)),
     defaultValues: {
@@ -54,64 +67,93 @@ export function ProductForm({ id, onSubmit, loading }: ProductFormProps) {
     },
   });
 
+  const handleSubmit = async (data: ProductFormValues) => {
+    setIsLoading(true);
+    if (!profile?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
+
+    try {
+      if (editMode && defaultValues) {
+        if (!defaultValues.id) {
+          console.error("Product ID missing in edit mode");
+          toast.error(t("Products.error.missing_id"));
+          setIsLoading(false);
+          return;
+        }
+        await updateProduct(
+          {
+            id: defaultValues.id,
+            product: {
+              name: data.name.trim(),
+              description: data.description?.trim() || undefined,
+              price: parseFloat(data.price?.trim() || "0"),
+              sku: data.sku?.trim() || undefined,
+              stock_quantity: data.stock_quantity?.trim()
+                ? parseInt(data.stock_quantity.trim())
+                : null,
+            },
+          },
+          {
+            onSuccess: async () => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      } else {
+        await createProduct(
+          {
+            name: data.name.trim(),
+            description: data.description?.trim() || undefined,
+            price: parseFloat(data.price?.trim() || "0"),
+            sku: data.sku?.trim() || undefined,
+            stock_quantity: data.stock_quantity?.trim()
+              ? parseInt(data.stock_quantity.trim())
+              : null,
+            user_id: profile?.id || "",
+          },
+          {
+            onSuccess: async (response) => {
+              if (onSuccess) {
+                onSuccess();
+              }
+            },
+          },
+        );
+      }
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Failed to save product:", error);
+      toast.error(t("General.error_operation"), {
+        description: error instanceof Error ? error.message : t("Products.error.creating"),
+      });
+    }
+  };
+
   if (typeof window !== "undefined") {
     (window as any).productForm = form;
   }
 
   return (
     <Form {...form}>
-      <form id={id || "product-form"} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <input type="submit" hidden />
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Products.form.name.label")} *</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t("Products.form.name.placeholder")}
-                  {...field}
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Products.form.description.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={t("Products.form.description.placeholder")}
-                  rows={4}
-                  {...field}
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <form id={id || "product-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="form-container">
+          <input type="submit" hidden />
           <FormField
             control={form.control}
-            name="price"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Products.form.price.label")} *</FormLabel>
+                <FormLabel>{t("Products.form.name.label")} *</FormLabel>
                 <FormControl>
-                  <CurrencyInput
-                    showCommas={true}
-                    value={field.value ? parseFloat(String(field.value)) : undefined}
-                    onChange={(value) => field.onChange(value?.toString() || "")}
-                    placeholder={t("Products.form.price.placeholder")}
+                  <Input
+                    placeholder={t("Products.form.name.placeholder")}
+                    {...field}
                     disabled={loading}
                   />
                 </FormControl>
@@ -122,36 +164,77 @@ export function ProductForm({ id, onSubmit, loading }: ProductFormProps) {
 
           <FormField
             control={form.control}
-            name="stock_quantity"
+            name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Products.form.stock_quantity.label")} *</FormLabel>
+                <FormLabel>{t("Products.form.description.label")}</FormLabel>
                 <FormControl>
-                  <Input type="number" min="0" placeholder="0" {...field} disabled={loading} />
+                  <Textarea
+                    placeholder={t("Products.form.description.placeholder")}
+                    rows={4}
+                    {...field}
+                    disabled={loading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Products.form.price.label")} *</FormLabel>
+                  <FormControl>
+                    <CurrencyInput
+                      showCommas={true}
+                      value={field.value ? parseFloat(String(field.value)) : undefined}
+                      onChange={(value) => field.onChange(value?.toString() || "")}
+                      placeholder={t("Products.form.price.placeholder")}
+                      disabled={loading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="stock_quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Products.form.stock_quantity.label")} *</FormLabel>
+                  <FormControl>
+                    <Input type="number" min="0" placeholder="0" {...field} disabled={loading} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="sku"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Products.form.sku.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder={t("Products.form.sku.placeholder")}
+                    {...field}
+                    disabled={loading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-
-        <FormField
-          control={form.control}
-          name="sku"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Products.form.sku.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder={t("Products.form.sku.placeholder")}
-                  {...field}
-                  disabled={loading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </form>
     </Form>
   );

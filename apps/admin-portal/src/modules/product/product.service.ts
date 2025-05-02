@@ -1,4 +1,4 @@
-import { Product } from "@/product/product.type";
+import { Product, ProductCreateData, ProductUpdateData } from "@/product/product.type";
 
 export async function fetchProducts(): Promise<Product[]> {
   const response = await fetch("/api/resources/products");
@@ -16,7 +16,7 @@ export async function fetchProductById(id: string): Promise<Product> {
   return response.json();
 }
 
-export async function createProduct(product: Omit<Product, "id" | "created_at">): Promise<Product> {
+export async function createProduct(product: ProductCreateData): Promise<Product> {
   try {
     const response = await fetch("/api/resources/products", {
       method: "POST",
@@ -26,7 +26,7 @@ export async function createProduct(product: Omit<Product, "id" | "created_at">)
       body: JSON.stringify(product),
     });
     if (!response.ok) {
-      throw new Error("Failed to create product");
+      throw new Error("Failed to create product", { cause: response.statusText });
     }
     return response.json();
   } catch (error) {
@@ -45,10 +45,7 @@ export async function duplicateProduct(id: string): Promise<Product> {
   return response.json();
 }
 
-export async function updateProduct(
-  id: string,
-  product: Partial<Omit<Product, "id" | "created_at">>,
-): Promise<Product> {
+export async function updateProduct(id: string, product: ProductUpdateData): Promise<Product> {
   const response = await fetch(`/api/resources/products/${id}`, {
     method: "PUT",
     headers: {

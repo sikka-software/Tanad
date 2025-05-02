@@ -54,7 +54,7 @@ export function NavMain({ title, items }: SidebarMenuGroupProps) {
           </motion.div>
         )}
       </AnimatePresence>
-      <SidebarSeparator className="mb-2" />
+      <SidebarSeparator className="mb-2 mx-0" />
       <SidebarMenu>
         {items.map((item, i) =>
           item.items ? (

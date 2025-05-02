@@ -19,6 +19,7 @@ import "@/styles/globals.css";
 const arabicFont = IBM_Plex_Sans_Arabic({
   weight: ["100", "200", "300", "400", "500", "600", "700"],
   subsets: ["arabic", "latin"],
+  variable: "--font-arabic",
 });
 
 const authPages = ["/auth", "/reset-password", "/onboarding"];
@@ -44,6 +45,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
 
   useEffect(() => {
     setMounted(true);
+    document.documentElement.classList.add(arabicFont.className);
   }, []);
 
   // Don't render anything until mounted
@@ -54,7 +56,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   // Auth Pages
   if (authPages.includes(router.pathname)) {
     return (
-      <div className={`${arabicFont.className}`}>
+      <div>
         <NextIntlClientProvider
           messages={pageProps.messages}
           locale={router.locale}
@@ -70,7 +72,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   // Landing Page
   if (landingPages.includes(router.pathname)) {
     return (
-      <div className={`${arabicFont.className}`}>
+      <div>
         <NextIntlClientProvider
           messages={pageProps.messages}
           locale={router.locale}
@@ -86,7 +88,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   // Invoice pages
   if (router.pathname === "/invoices/[code]") {
     return (
-      <div className={`${arabicFont.className}`}>
+      <div>
         <NextIntlClientProvider
           messages={pageProps.messages}
           locale={router.locale}
@@ -99,14 +101,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
     );
   }
 
-  // App Pages
   return (
-    <div
-      className={arabicFont.className}
-      style={{
-        fontFamily: "var(--font-arabic)",
-      }}
-    >
+    <div>
       <NextIntlClientProvider
         messages={pageProps.messages}
         locale={router.locale}

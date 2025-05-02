@@ -90,9 +90,7 @@ export default function AddInvoicePage() {
         }}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <InvoiceForm id="invoice-form" onSubmit={handleSubmit} loading={loading} />
-      </div>
+      <InvoiceForm id="invoice-form" onSubmit={handleSubmit} loading={loading} />
     </div>
   );
 }
