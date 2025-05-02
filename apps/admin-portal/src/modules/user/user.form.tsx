@@ -229,10 +229,24 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
       onSuccess();
     } catch (error: any) {
       console.error("Submit Error in UserForm:", error);
-      toast.error(t("General.error_occurred"), {
-        description:
-          error?.message || t(isEditing ? "Users.error.updating" : "Users.error.creating"),
-      });
+
+      // Check for the specific 409 conflict error
+      if (error?.response?.status === 409 && error?.response?.data?.code === "USER_MEMBERSHIP_EXISTS") {
+        // Set a specific error message on the email field
+        form.setError("email", {
+          type: "manual",
+          message: t("Users.error.already_exists_in_enterprise"), // Add this translation key
+        });
+        toast.error(t("Validation.error"), { // More generic toast title
+          description: t("Users.error.already_exists_in_enterprise"),
+        });
+      } else {
+        // Handle other errors generally
+        toast.error(t("General.error_occurred"), {
+          description:
+            error?.message || t(isEditing ? "Users.error.updating" : "Users.error.creating"),
+        });
+      }
       setIsLoading(false);
     }
   };
