@@ -52,11 +52,18 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       validationSchema: z.string().min(1, t("Invoices.form.invoice_number.required")),
     },
     {
-      accessorKey: "client.company",
+      accessorKey: "client.name",
       header: t("Invoices.form.client.label"),
       cell: ({ row }) => {
-        console.log(row.original.client);
-        return row.original.client?.name;
+        const client = row.original.client;
+        if (!client) return "N/A";
+        // Display name and email if available
+        return (
+          <div>
+            <div className="text-sm font-medium">{client.name || "-"}</div>
+            {client.email && <div className="text-muted-foreground text-xs">{client.email}</div>}
+          </div>
+        );
       },
     },
     {

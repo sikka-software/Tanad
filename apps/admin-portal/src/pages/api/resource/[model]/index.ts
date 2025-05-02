@@ -73,6 +73,36 @@ const modelMap: Record<string, ModelConfig> = {
   invoices: {
     tableName: "invoices",
     customHandlers: {
+      GET: async (supabase: SupabaseClient, user_id: string, req: NextApiRequest) => {
+        // First, get the user's enterprise_id
+        const { data: membership, error: enterpriseError } = await supabase
+          .from("memberships")
+          .select("enterprise_id")
+          .eq("profile_id", user_id)
+          .maybeSingle();
+
+        if (enterpriseError) {
+          console.error("Error fetching enterprise ID for invoice GET:", enterpriseError);
+          throw new Error("Failed to retrieve enterprise association for invoices");
+        }
+        if (!membership?.enterprise_id) {
+          throw new Error("User is not associated with an enterprise for invoices");
+        }
+        const enterprise_id = membership.enterprise_id;
+
+        // Now fetch invoices with client data
+        const { data, error } = await supabase
+          .from("invoices")
+          .select("*, client:clients(*)") // Select all invoice fields and all related client fields
+          .eq("enterprise_id", enterprise_id)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching invoices with clients:", error);
+          throw error;
+        }
+        return data;
+      },
       POST: async (
         supabase: SupabaseClient,
         user_id: string,
