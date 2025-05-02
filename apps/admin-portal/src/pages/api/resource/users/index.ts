@@ -229,8 +229,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 .insert({
                   id: newUserId, // Link to the auth user
                   email: email, // From request body
-                  first_name: first_name, // From request body
-                  last_name: last_name, // From request body
+                  full_name: `${first_name} ${last_name}`, // Combine first and last name
                   // Add other default/required profile fields if necessary
                 });
 

@@ -252,6 +252,10 @@ body {
   .clickable-link {
     @apply text-primary/80 hover:text-primary cursor-pointer underline underline-offset-4 transition-all;
   }
+
+  .form-container {
+    @apply mx-auto flex max-w-2xl flex-col gap-4 p-4;
+  }
 }
 /* Hide arrows from number input */
 

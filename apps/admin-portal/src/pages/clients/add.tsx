@@ -56,9 +56,7 @@ export default function AddClientPage() {
         }}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <ClientForm id="client-form" loading={isLoading} onSuccess={onAddSuccess} />
-      </div>
+      <ClientForm id="client-form" loading={isLoading} onSuccess={onAddSuccess} />
     </div>
   );
 }

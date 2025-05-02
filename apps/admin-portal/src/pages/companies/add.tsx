@@ -29,11 +29,11 @@ export default function AddCompanyPage() {
       form.setValue("street_name", dummyData.address);
       form.setValue("city", dummyData.city);
       form.setValue("region", "Eastern");
-      form.setValue("zip_code", dummyData.zip_code);
-      form.setValue("building_number", dummyData.randomNumber);
-      form.setValue("additional_number", dummyData.randomNumber);
+      form.setValue("zip_code", String(dummyData.zip_code));
+      form.setValue("building_number", String(dummyData.randomNumber));
+      form.setValue("additional_number", String(dummyData.randomNumber));
       form.setValue("industry", dummyData.randomString);
-      form.setValue("size", dummyData.randomNumber);
+      form.setValue("size", String(dummyData.randomNumber));
     }
   };
 

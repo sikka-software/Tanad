@@ -53,7 +53,7 @@ export function FormDialog({
             )}
           </DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto p-4">{children}</div>
+        <div className="flex-1 overflow-y-auto">{children}</div>
         <DialogFooter className="sticky bottom-0 flex justify-end gap-2 border-t p-4">
           <Button variant="outline" onClick={handleCancel}>
             {t("General.cancel")}

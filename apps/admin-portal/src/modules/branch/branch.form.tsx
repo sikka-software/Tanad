@@ -12,10 +12,12 @@ import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
+import CodeInput from "@/components/ui/code-input";
+import PhoneInput from "@/components/ui/phone-input";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateBranch, useUpdateBranch } from "./branch.hooks";
+import { useBranches, useCreateBranch, useUpdateBranch } from "./branch.hooks";
 import useBranchStore from "./branch.store";
 import { BranchUpdateData } from "./branch.type";
 
@@ -49,6 +51,7 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
   const { user } = useUserStore();
   const { mutate: createBranch } = useCreateBranch();
   const { mutate: updateBranch } = useUpdateBranch();
+  const { data: branches } = useBranches();
 
   const isLoading = useBranchStore((state) => state.isLoading);
   const setIsLoading = useBranchStore((state) => state.setIsLoading);
@@ -170,11 +173,29 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
                 <FormItem>
                   <FormLabel>{t("Branches.form.code.label")} *</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("Branches.form.code.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
+                    <CodeInput
+                      onSerial={() => {
+                        const nextNumber = (branches?.length || 0) + 1;
+                        const paddedNumber = String(nextNumber).padStart(4, "0");
+                        form.setValue("code", `BR-${paddedNumber}`);
+                      }}
+                      onRandom={() => {
+                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        let randomCode = "";
+                        for (let i = 0; i < 5; i++) {
+                          randomCode += randomChars.charAt(
+                            Math.floor(Math.random() * randomChars.length),
+                          );
+                        }
+                        form.setValue("code", `BR-${randomCode}`);
+                      }}
+                    >
+                      <Input
+                        placeholder={t("Branches.form.code.placeholder")}
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </CodeInput>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -190,12 +211,7 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
                 <FormItem>
                   <FormLabel>{t("Branches.form.phone.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      type="tel"
-                      placeholder={t("Branches.form.phone.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
+                    <PhoneInput value={field.value || ""} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

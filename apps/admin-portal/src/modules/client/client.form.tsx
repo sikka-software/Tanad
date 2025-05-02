@@ -13,6 +13,7 @@ import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
+import PhoneInput from "@/components/ui/phone-input";
 
 import { useCreateClient, useUpdateClient } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
@@ -173,87 +174,98 @@ export function ClientForm({
   return (
     <>
       <Form {...form}>
-        <form
-          id={id || "client-form"}
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-4"
-        >
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Clients.form.name.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Clients.form.name.placeholder")}
-                      {...field}
-                      disabled={loading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <form id={id || "client-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="form-container">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Clients.form.name.label")} *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t("Clients.form.name.placeholder")}
+                        {...field}
+                        disabled={loading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="company"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Clients.form.company.label")}</FormLabel>
-                  <FormControl>
-                    <ComboboxAdd
-                      direction={locale === "ar" ? "rtl" : "ltr"}
-                      data={companyOptions}
-                      isLoading={companiesLoading}
-                      defaultValue={field.value || ""}
-                      onChange={(value) => field.onChange(value || null)}
-                      texts={{
-                        placeholder: t("Clients.form.company.placeholder"),
-                        searchPlaceholder: t("Clients.form.company.search_placeholder"),
-                        noItems: t("Clients.form.company.no_companies"),
-                      }}
-                      addText={t("Companies.add_new")}
-                      onAddClick={() => setIsCompanyDialogOpen(true)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+              <FormField
+                control={form.control}
+                name="company"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Clients.form.company.label")}</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        data={companyOptions}
+                        isLoading={companiesLoading}
+                        defaultValue={field.value || ""}
+                        onChange={(value) => field.onChange(value || null)}
+                        texts={{
+                          placeholder: t("Clients.form.company.placeholder"),
+                          searchPlaceholder: t("Clients.form.company.search_placeholder"),
+                          noItems: t("Clients.form.company.no_companies"),
+                        }}
+                        addText={t("Companies.add_new")}
+                        onAddClick={() => setIsCompanyDialogOpen(true)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Clients.form.email.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder={t("Clients.form.email.placeholder")}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Clients.form.email.label")} *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder={t("Clients.form.email.placeholder")}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Clients.form.phone.label")} *</FormLabel>
+                    <FormControl>
+                      <PhoneInput value={field.value || ""} onChange={field.onChange} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
-              name="phone"
+              name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Clients.form.phone.label")} *</FormLabel>
+                  <FormLabel>{t("Clients.form.notes.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      type="tel"
-                      placeholder={t("Clients.form.phone.placeholder")}
+                    <Textarea
+                      placeholder={t("Clients.form.notes.placeholder")}
+                      rows={4}
                       {...field}
                     />
                   </FormControl>
@@ -264,23 +276,9 @@ export function ClientForm({
           </div>
 
           <AddressFormSection
-            title={t("Clients.form.address")}
+            title={t("Clients.form.address.label")}
             control={form.control}
             isLoading={isLoading}
-          />
-
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Clients.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea placeholder={t("Clients.form.notes.placeholder")} rows={4} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
           />
         </form>
       </Form>

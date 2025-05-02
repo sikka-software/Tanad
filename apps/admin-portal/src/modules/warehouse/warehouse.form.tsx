@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DiamondPlus, Dice1, Dice5, Dices, Hash, MapPin, Shuffle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -11,16 +10,7 @@ import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import CodeInput from "@/components/ui/code-input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import IconButton from "@/components/ui/icon-button";
 
 import { ModuleFormProps } from "@/types/common.type";
 

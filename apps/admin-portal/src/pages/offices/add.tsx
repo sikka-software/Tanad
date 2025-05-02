@@ -24,10 +24,10 @@ export default function AddOfficePage() {
       form.setValue("name", "Office " + dummyData.randomNumber);
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
-      form.setValue("address", dummyData.address);
-      form.setValue("city", dummyData.city);
-      form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zip_code);
+      form.setValue("building_number", String(dummyData.address));
+      form.setValue("street_name", dummyData.city);
+      form.setValue("city", dummyData.state);
+      form.setValue("zip_code", String(dummyData.zip_code));
     }
   };
 
