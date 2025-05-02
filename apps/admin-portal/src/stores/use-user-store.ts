@@ -178,12 +178,12 @@ const useUserStore = create<UserState>((set, get) => ({
           // Get user permissions from the view
           const { data: permissionsData } = await supabase
             .from("user_permissions_view")
-            .select("permission_id")
+            .select("permission_name")
             .eq("user_id", session.user.id)
             .eq("enterprise_id", membershipData.enterprise_id);
 
           if (permissionsData) {
-            const permissions = permissionsData.map((p) => p.permission_id);
+            const permissions = permissionsData.map((p) => p.permission_name);
             set({ permissions });
           }
           console.log("user", session.user);

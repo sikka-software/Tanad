@@ -40,10 +40,7 @@ const systemRolePermissions: Record<string, string[]> = {
     "roles.read",
     "roles.update",
     "roles.delete",
-    "permissions.create",
-    "permissions.read",
-    "permissions.update",
-    "permissions.delete",
+
     // Add any other superadmin permissions here
   ],
   human_resources: [

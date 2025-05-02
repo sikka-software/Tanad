@@ -28,7 +28,7 @@ import {
 } from "@/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/ui/sidebar";
 
-import { ProfileType } from "@/stores/use-user-store";
+import useUserStore, { ProfileType } from "@/stores/use-user-store";
 
 import { FeedbackDialog } from "../app/FeedbackDialog";
 
@@ -37,6 +37,7 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
   const t = useTranslations();
   const lang = useLocale();
   const [open, setOpen] = useState(false);
+  const signOut = useUserStore((state) => state.signOut);
 
   return (
     <>
@@ -108,7 +109,7 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem className="cursor-pointer" onClick={signOut}>
                 <LogOut className="me-2 h-4 w-4" />
                 {t("Auth.sign_out")}
               </DropdownMenuItem>
