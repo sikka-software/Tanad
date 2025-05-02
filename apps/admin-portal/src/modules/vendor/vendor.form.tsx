@@ -249,10 +249,7 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
                   <FormItem>
                     <FormLabel>{t("Vendors.form.phone.label")} *</FormLabel>
                     <FormControl>
-                      <PhoneInput
-                        value={field.value || ""}
-                        onChange={(value) => field.onChange(value || null)}
-                      />
+                      <PhoneInput value={field.value || ""} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

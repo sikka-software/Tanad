@@ -27,10 +27,11 @@ const modelMap: Record<string, ModelConfig> = {
   clients: { table: schema.clients, query: db.query.clients, idField: "id" },
   expenses: { table: schema.expenses, query: db.query.expenses, idField: "id" },
   departments: { table: schema.departments, query: db.query.departments, idField: "id" },
-  departmentLocations: {
+  department_locations: {
     table: schema.department_locations,
     query: db.query.department_locations,
     idField: "id",
+    excludeFromDuplicate: ["department_id"],
   },
   salaries: { table: schema.salaries, query: db.query.salaries, idField: "id" },
   offices: { table: schema.offices, query: db.query.offices, idField: "id" },

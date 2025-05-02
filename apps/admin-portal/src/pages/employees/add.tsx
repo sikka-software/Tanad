@@ -28,7 +28,7 @@ export default function AddEmployeePage() {
       form.setValue("phone", dummyData.phone);
       form.setValue("position", dummyData.employee_position);
       form.setValue("hire_date", dummyData.employee_hire_date);
-      form.setValue("salary", dummyData.randomNumber);
+      form.setValue("salary", String(dummyData.randomNumber));
       form.setValue("status", dummyData.employee_status);
       form.setValue("notes", dummyData.employee_notes);
     }
@@ -47,24 +47,16 @@ export default function AddEmployeePage() {
           submit_form: t("Employees.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
+        dummyButton={handleDummyData}
+      />
+      <EmployeeForm
+        id="employee-form"
+        onSuccess={() =>
+          router.push("/employees").then(() => {
+            setLoadingSave(false);
+          })
         }
       />
-      <div className="mx-auto max-w-2xl p-4">
-        <EmployeeForm
-          id="employee-form"
-          onSuccess={() =>
-            router.push("/employees").then(() => {
-              setLoadingSave(false);
-            })
-          }
-        />
-      </div>
     </div>
   );
 }

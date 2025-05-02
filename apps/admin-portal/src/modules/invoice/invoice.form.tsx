@@ -16,11 +16,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 import { Textarea } from "@/ui/textarea";
 
 import { createClient } from "@/utils/supabase/component";
 
+import { ProductsFormSection } from "@/components/forms/products-form-section";
 import CodeInput from "@/components/ui/code-input";
 
 import { ClientForm } from "@/client/client.form";
@@ -139,29 +139,6 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
         setClientsLoading(false);
       }
     };
-    // Fetch products
-    const fetchProducts = async () => {
-      setProductsLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("products")
-          .select("id, name, description, price")
-          .order("name");
-
-        if (error) throw error;
-
-        setProducts(data || []);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        toast.error(t("General.error_operation"), {
-          description: t("General.error_load_products"),
-        });
-      } finally {
-        setProductsLoading(false);
-      }
-    };
-
-    fetchProducts();
 
     getClients();
   }, [t]);
@@ -226,171 +203,6 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
     label: client.company ? `${client.name} (${client.company})` : client.name,
     value: client.id,
   }));
-
-  // Format products for ComboboxAdd
-  const productOptions = products.map((product) => ({
-    label: `${product.name} ($${parseFloat(product.price).toFixed(2)})`,
-    value: product.id,
-  }));
-
-  // Define table columns for the products
-  const columns = useMemo(
-    () => [
-      {
-        id: "product",
-        header: t("Invoices.products.product"),
-        cell: ({ row }: any) => {
-          const index = row.index;
-          return (
-            <FormField
-              control={form.control}
-              name={`items.${index}.product_id`}
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  <FormControl>
-                    <ComboboxAdd
-                      data={productOptions}
-                      isLoading={productsLoading}
-                      defaultValue={field.value}
-                      onChange={(value) => {
-                        field.onChange(value);
-                        handleProductSelection(index, value);
-                      }}
-                      texts={{
-                        placeholder: t("Invoices.products.select_product"),
-                        searchPlaceholder: t("Invoices.products.search_products"),
-                        noItems: t("Invoices.products.no_products_found"),
-                      }}
-                      addText={t("Invoices.products.add_new_product")}
-                      onAddClick={() => setIsNewProductDialogOpen(true)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        },
-      },
-      {
-        id: "quantity",
-        header: t("Invoices.products.quantity"),
-        cell: ({ row }: any) => {
-          const index = row.index;
-          return (
-            <FormField
-              control={form.control}
-              name={`items.${index}.quantity`}
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  <FormControl>
-                    <Input type="number" min="1" step="1" {...field} className="w-24" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        },
-      },
-      {
-        id: "unit_price",
-        header: t("Invoices.products.unit_price"),
-        cell: ({ row }: any) => {
-          const index = row.index;
-          return (
-            <FormField
-              control={form.control}
-              name={`items.${index}.unit_price`}
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="0.00"
-                      {...field}
-                      className="w-32"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        },
-      },
-      {
-        id: "description",
-        header: t("Forms.description.label"),
-        cell: ({ row }: any) => {
-          const index = row.index;
-          return (
-            <FormField
-              control={form.control}
-              name={`items.${index}.description`}
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  <FormControl>
-                    <Input placeholder={t("Forms.description.placeholder")} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        },
-      },
-      {
-        id: "subtotal",
-        header: t("Invoices.products.subtotal"),
-        cell: ({ row }: any) => {
-          const index = row.index;
-          return (
-            <div className="text-right">
-              $
-              {form.watch(`items.${index}.quantity`) && form.watch(`items.${index}.unit_price`)
-                ? (
-                    parseFloat(form.watch(`items.${index}.quantity`) || "0") *
-                    parseFloat(form.watch(`items.${index}.unit_price`) || "0")
-                  ).toFixed(2)
-                : "0.00"}
-            </div>
-          );
-        },
-      },
-      {
-        id: "actions",
-        header: "",
-        cell: ({ row }: any) => {
-          const index = row.index;
-          return (
-            fields.length > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => remove(index)}
-                className="size-8 p-0"
-              >
-                <Trash2 className="size-4 text-red-500" />
-              </Button>
-            )
-          );
-        },
-      },
-    ],
-    [form, fields, productOptions, productsLoading, handleProductSelection, remove],
-  );
-
-  // Set up the table
-  const data = useMemo(() => fields.map((_, i) => ({ index: i })), [fields]);
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
 
   if (typeof window !== "undefined") {
     (window as any).invoiceForm = form;
@@ -593,73 +405,31 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
                 </FormItem>
               )}
             />
-
-            {/* Products Section with Table */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium">{t("Invoices.products.title")}</h3>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    append({ product_id: "", description: "", quantity: "1", unit_price: "" })
-                  }
-                >
-                  <PlusCircle className="mr-2 size-4" />
-                  {t("Invoices.products.add_product")}
-                </Button>
-              </div>
-
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <TableHead key={header.id}>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableHeader>
-                  <TableBody>
-                    {table.getRowModel().rows.length ? (
-                      table.getRowModel().rows.map((row) => (
-                        <TableRow key={row.id}>
-                          {row.getVisibleCells().map((cell) => (
-                            <TableCell key={cell.id}>
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={columns.length} className="h-24 text-center">
-                          {t("products.no_products")}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-
-            <div className="mt-4 text-right">
-              <div className="text-sm text-gray-600">
-                Tax Amount: ${((form.watch("subtotal") * form.watch("tax_rate")) / 100).toFixed(2)}
-              </div>
-              <div className="text-lg font-semibold">
-                Total: $
-                {(
-                  form.watch("subtotal") +
-                  (form.watch("subtotal") * form.watch("tax_rate")) / 100
-                ).toFixed(2)}
-              </div>
-            </div>
           </div>
+
+          {/* Use the new ProductFormSection component */}
+          <ProductsFormSection
+            control={form.control}
+            fields={fields}
+            append={append}
+            remove={remove}
+            onAddNewProduct={() => setIsNewProductDialogOpen(true)}
+            handleProductSelection={handleProductSelection}
+            title={t("Invoices.products.title")}
+            isLoading={loading}
+          />
+          {/* <div className="mt-4 text-right">
+            <div className="text-sm text-gray-600">
+              Tax Amount: ${((form.watch("subtotal") * form.watch("tax_rate")) / 100).toFixed(2)}
+            </div>
+            <div className="text-lg font-semibold">
+              Total: $
+              {(
+                form.watch("subtotal") +
+                (form.watch("subtotal") * form.watch("tax_rate")) / 100
+              ).toFixed(2)}
+            </div>
+          </div> */}
         </form>
       </Form>
 

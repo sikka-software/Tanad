@@ -18,3 +18,5 @@ export interface Employee {
 export type EmployeeCreateData = Omit<Employee, "id" | "created_at" | "updated_at"> & {
   user_id?: string;
 };
+
+export type EmployeeUpdateData = Partial<EmployeeCreateData>;

@@ -80,7 +80,6 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
     },
   });
 
-  // Format employees for ComboboxAdd
   const employeeOptions = employees.map((emp) => {
     return {
       label: `${emp.first_name} ${emp.last_name}`,
@@ -167,6 +166,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
                 <FormLabel>{t("EmployeeRequests.form.type.label")}</FormLabel>
                 <FormControl>
                   <Select
+                    dir={locale === "ar" ? "rtl" : "ltr"}
                     disabled={isLoadingSave}
                     onValueChange={field.onChange}
                     defaultValue={field.value}

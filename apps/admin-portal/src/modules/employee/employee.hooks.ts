@@ -9,6 +9,7 @@ import {
   fetchEmployeeById,
   fetchEmployees,
   updateEmployee,
+  bulkDeleteEmployees,
 } from "@/employee/employee.service";
 import { Employee, EmployeeCreateData } from "@/employee/employee.types";
 
@@ -181,22 +182,8 @@ export const useDeleteEmployee = () => {
 
 export function useBulkDeleteEmployees() {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/employees/bulk-delete", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete offices");
-      }
-    },
+    mutationFn: bulkDeleteEmployees,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
     },

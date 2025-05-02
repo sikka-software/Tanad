@@ -85,6 +85,41 @@
       "when": 1746162974131,
       "tag": "0011_grey_leech",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1746165281229,
+      "tag": "0012_rapid_puppet_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1746166049323,
+      "tag": "0013_quick_namorita",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1746166131035,
+      "tag": "0014_funny_norman_osborn",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1746166177245,
+      "tag": "0015_sudden_dark_beast",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1746166255845,
+      "tag": "0016_nebulous_aqueduct",
+      "breakpoints": true
     }
   ]
 }

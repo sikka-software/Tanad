@@ -4,7 +4,7 @@ export async function fetchDepartmentsWithLocations(): Promise<Department[]> {
   try {
     const [departmentsRes, relRes] = await Promise.all([
       fetch("/api/resource/departments"),
-      fetch("/api/resource/departmentLocations"), // or similar
+      fetch("/api/resource/department_locations"),
     ]);
 
     if (!departmentsRes.ok || !relRes.ok) throw new Error("Failed to load data");
@@ -15,7 +15,7 @@ export async function fetchDepartmentsWithLocations(): Promise<Department[]> {
     // Optional: fetch all locations in one go and map by ID/type
     const allLocationIds = [...new Set(relations.map((r: any) => r.location_id))];
     const locationsRes = await fetch(
-      "/api/resource/departmentLocations?ids=" + allLocationIds.join(","),
+      "/api/resource/department_locations?ids=" + allLocationIds.join(","),
     );
     const locations = await locationsRes.json(); // Assume includes office/branch/warehouse in one response
     const locationMap = Object.fromEntries(locations.map((loc: any) => [loc.id, loc]));
@@ -72,8 +72,8 @@ export async function createDepartmentWithLocations(
 
   const createdDept: Department = await deptRes.json();
 
-  // Step 2: Create department-location relations
-  const relationRes = await fetch("/api/resource/departmentLocations", {
+  // Step 2: Create department_location relations
+  const relationRes = await fetch("/api/resource/department_locations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(
@@ -87,7 +87,7 @@ export async function createDepartmentWithLocations(
   });
 
   if (!relationRes.ok) {
-    throw new Error("Failed to create department-location relations");
+    throw new Error("Failed to create department_location relations");
   }
 
   // Step 3: Fetch the created department with its locations

@@ -92,7 +92,6 @@ export function ClientForm({
     (window as any).clientForm = form;
   }
 
-  // Format companies for ComboboxAdd
   const companyOptions =
     companies?.map((company) => ({
       label: company.name,

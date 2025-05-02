@@ -162,7 +162,6 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
   ) => {
     const [selectedValues, setSelectedValues] = React.useState<T[]>(defaultValue as T[]);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
-    const [isAnimating, setIsAnimating] = React.useState(false);
     const t = useTranslations();
     const locale = useLocale();
 
@@ -238,10 +237,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                       return (
                         <Badge
                           key={getValueKey(value)}
-                          className={cn(
-                            isAnimating ? "animate-bounce" : "",
-                            multiSelectVariants({ variant }),
-                          )}
+                          className={multiSelectVariants({ variant })}
                           style={{ animationDuration: `${animation}s` }}
                         >
                           {IconComponent && <IconComponent className="me-2 h-4 w-4" />}
@@ -260,7 +256,6 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                       <Badge
                         className={cn(
                           "text-foreground border-foreground/1 bg-transparent hover:bg-transparent",
-                          isAnimating ? "animate-bounce" : "",
                           multiSelectVariants({ variant }),
                         )}
                         style={{ animationDuration: `${animation}s` }}
@@ -300,6 +295,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
         <PopoverContent
           className="w-auto p-0"
           align="start"
+          style={{ width: "var(--radix-popover-trigger-width)" }}
           dir={locale === "ar" ? "rtl" : "ltr"}
           onEscapeKeyDown={() => setIsPopoverOpen(false)}
         >
@@ -351,7 +347,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                 })}
               </CommandGroup>
               <CommandSeparator />
-              <CommandGroup>
+              <CommandGroup className="bg-background sticky bottom-0 border-t">
                 <div className="flex items-center justify-between">
                   {selectedValues.length > 0 && (
                     <>
@@ -375,15 +371,6 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
             </CommandList>
           </Command>
         </PopoverContent>
-        {animation > 0 && selectedValues.length > 0 && (
-          <WandSparkles
-            className={cn(
-              "text-foreground bg-background my-2 h-3 w-3 cursor-pointer",
-              isAnimating ? "" : "text-muted-foreground",
-            )}
-            onClick={() => setIsAnimating(!isAnimating)}
-          />
-        )}
       </Popover>
     );
   },

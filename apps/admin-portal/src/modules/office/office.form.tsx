@@ -229,10 +229,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
               <FormItem>
                 <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
                 <FormControl>
-                  <PhoneInput
-                    value={field.value || ""}
-                    onChange={(value) => field.onChange(value || null)}
-                  />
+                  <PhoneInput value={field.value || ""} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

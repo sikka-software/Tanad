@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -11,9 +11,11 @@ import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
+import CodeInput from "@/components/ui/code-input";
+
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateExpense, useUpdateExpense, useDuplicateExpense } from "./expense.hooks";
+import { useCreateExpense, useUpdateExpense, useExpenses } from "./expense.hooks";
 import useExpenseStore from "./expense.store";
 import { ExpenseUpdateData } from "./expense.type";
 
@@ -40,9 +42,11 @@ export interface ExpenseFormProps {
 
 export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: ExpenseFormProps) {
   const t = useTranslations();
+  const locale = useLocale();
   const user = useUserStore((state) => state.user);
   const { mutate: createExpense } = useCreateExpense();
   const { mutate: updateExpense } = useUpdateExpense();
+  const { data: expenses } = useExpenses();
 
   const isLoading = useExpenseStore((state) => state.isLoading);
   const setIsLoading = useExpenseStore((state) => state.setIsLoading);
@@ -125,11 +129,29 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
               <FormItem>
                 <FormLabel>{t("Expenses.form.expense_number.label")} *</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t("Expenses.form.expense_number.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
+                  <CodeInput
+                    onSerial={() => {
+                      const nextNumber = (expenses?.length || 0) + 1;
+                      const paddedNumber = String(nextNumber).padStart(4, "0");
+                      form.setValue("expense_number", `EX-${paddedNumber}`);
+                    }}
+                    onRandom={() => {
+                      const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                      let randomCode = "";
+                      for (let i = 0; i < 5; i++) {
+                        randomCode += randomChars.charAt(
+                          Math.floor(Math.random() * randomChars.length),
+                        );
+                      }
+                      form.setValue("expense_number", `EX-${randomCode}`);
+                    }}
+                  >
+                    <Input
+                      placeholder={t("Expenses.form.expense_number.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </CodeInput>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -221,6 +243,7 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
               <FormItem>
                 <FormLabel>{t("Expenses.form.status.label")} *</FormLabel>
                 <Select
+                  dir={locale === "ar" ? "rtl" : "ltr"}
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                   disabled={isLoading}

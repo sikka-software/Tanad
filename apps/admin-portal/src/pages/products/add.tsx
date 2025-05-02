@@ -7,6 +7,8 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
+import { generateDummyData } from "@/lib/dummy-generator";
+
 import { ProductForm } from "@/product/product.form";
 
 import useProductStore from "@/modules/product/product.store";
@@ -19,13 +21,14 @@ export default function AddProductPage() {
   const setIsLoading = useProductStore((state) => state.setIsLoading);
 
   const handleDummyData = () => {
+    const dummyData = generateDummyData();
     const form = (window as any).productForm;
     if (form) {
       form.setValue("name", "Product 1");
       form.setValue("description", "Description 1");
-      form.setValue("price", "100");
-      form.setValue("sku", Math.random().toString(36).substring(2, 15));
-      form.setValue("stock_quantity", "100");
+      form.setValue("price", String(dummyData.randomNumber));
+      form.setValue("sku", dummyData.randomString);
+      form.setValue("stock_quantity", String(dummyData.randomNumber));
     }
   };
 
