@@ -18,7 +18,7 @@ import "@/styles/globals.css";
 
 const arabicFont = IBM_Plex_Sans_Arabic({
   weight: ["100", "200", "300", "400", "500", "600", "700"],
-  subsets: ["arabic"],
+  subsets: ["arabic", "latin"],
 });
 
 const authPages = ["/auth", "/reset-password", "/onboarding"];
@@ -101,7 +101,12 @@ function AppContent({ Component, pageProps, router }: AppProps) {
 
   // App Pages
   return (
-    <div className={`${arabicFont.className}`}>
+    <div
+      className={arabicFont.className}
+      style={{
+        fontFamily: "var(--font-arabic)",
+      }}
+    >
       <NextIntlClientProvider
         messages={pageProps.messages}
         locale={router.locale}

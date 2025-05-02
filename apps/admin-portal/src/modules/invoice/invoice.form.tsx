@@ -21,7 +21,11 @@ import { Textarea } from "@/ui/textarea";
 
 import { createClient } from "@/utils/supabase/component";
 
+import CodeInput from "@/components/ui/code-input";
+
 import { ClientForm } from "@/client/client.form";
+
+import { useInvoices } from "@/modules/invoice/invoice.hooks";
 
 const createInvoiceSchema = (t: (key: string) => string) =>
   z.object({
@@ -76,6 +80,7 @@ interface InvoiceFormProps {
 export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceFormProps) {
   const supabase = createClient();
   const router = useRouter();
+  const { data: invoices } = useInvoices();
   const [loading, setLoading] = useState(externalLoading || false);
   const [clients, setClients] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -431,7 +436,29 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
                 <FormItem>
                   <FormLabel>{t("Invoices.form.invoice_number.label")} *</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("Invoices.form.invoice_number.placeholder")} {...field} />
+                    <CodeInput
+                      onSerial={() => {
+                        const nextNumber = (invoices?.length || 0) + 1;
+                        const paddedNumber = String(nextNumber).padStart(4, "0");
+                        form.setValue("invoice_number", `INV-${paddedNumber}`);
+                      }}
+                      onRandom={() => {
+                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        let randomCode = "";
+                        for (let i = 0; i < 5; i++) {
+                          randomCode += randomChars.charAt(
+                            Math.floor(Math.random() * randomChars.length),
+                          );
+                        }
+                        form.setValue("invoice_number", `INV-${randomCode}`);
+                      }}
+                    >
+                      <Input
+                        placeholder={t("Invoices.form.invoice_number.placeholder")}
+                        {...field}
+                        disabled={loading}
+                      />
+                    </CodeInput>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -637,7 +664,7 @@ export function InvoiceForm({ id, loading: externalLoading, onSubmit }: InvoiceF
       <FormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        title={t("add_new_client")}
+        title={t("Clients.add_new")}
         formId="client-form"
         cancelText={t("cancel")}
         submitText={t("save")}
