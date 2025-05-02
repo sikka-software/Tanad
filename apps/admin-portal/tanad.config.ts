@@ -120,7 +120,7 @@ const ModulesOptions = {
     translationKey: "Departments.title",
     url: "/departments",
   },
-  employeeRequests: {
+  employee_requests: {
     icon: Briefcase,
     label: "EmployeeRequests.title",
     translationKey: "EmployeeRequests.title",

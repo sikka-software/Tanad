@@ -10,9 +10,26 @@ import { createClient } from "@/utils/supabase/component";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { useEmployees } from "@/modules/employee/employee.hooks";
 import useUserStore from "@/stores/use-user-store";
 
+// Interface for the data returned by the view
+interface DashboardStatsViewData {
+  total_invoices: number;
+  total_products: number;
+  total_revenue: number;
+  pending_invoices: number;
+  total_employees: number;
+  total_departments: number;
+  total_jobs: number;
+  total_clients: number;
+  total_companies: number;
+  total_vendors: number;
+  total_offices: number;
+  total_warehouses: number;
+  total_branches: number;
+}
+
+// Update state interface to match view column names (or map later)
 interface DashboardStats {
   totalInvoices: number;
   totalProducts: number;
@@ -50,29 +67,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const t = useTranslations();
   const router = useRouter();
-  const { user, profile, enterprise, error: userError } = useUserStore();
-
-  // Comment out hooks that are causing infinite loops
-  // Keep the ones that are working correctly
-  const { data: employees } = useEmployees();
-  // const { data: departments } = useDepartments();
-  // const { data: jobs } = useJobs();
-  // const { data: clients } = useClients();
-  // const { data: companies } = useCompanies();
-  // const { data: vendors } = useVendors();
-  // const { data: offices } = useOffices();
-  // const { data: warehouses } = useWarehouses();
-  // const { data: branches } = useBranches();
-
-  // Use placeholders for commented-out hooks
-  const departments = [];
-  const jobs = [];
-  const clients = [];
-  const companies = [];
-  const vendors = [];
-  const offices = [];
-  const warehouses = [];
-  const branches = [];
+  const { user, profile, enterprise } = useUserStore();
 
   const createOptions = [
     {
@@ -105,64 +100,57 @@ export default function Dashboard() {
     }
   };
 
-  // Fetch dashboard stats
+  // Fetch dashboard stats using the view
   useEffect(() => {
     let isMounted = true;
 
     async function fetchDashboardStats() {
-      if (!isMounted || !user?.id) {
+      // Ensure user and enterprise IDs are available before fetching
+      if (!isMounted || !user?.id || !enterprise?.id) {
+        if (isMounted && !enterprise?.id && user?.id) {
+          // User exists but no enterprise, stop loading, show 0 stats (or a message)
+          setLoading(false);
+        } else if (isMounted) {
+          // Still waiting for user/enterprise info
+          setLoading(true);
+        }
         return;
       }
 
       try {
-        // If no enterprise is found, set loading to false but don't attempt to fetch enterprise-dependent data
-        if (!enterprise?.id) {
-          if (isMounted) {
-            setLoading(false);
-          }
-          return;
-        }
+        setLoading(true); // Set loading true before fetch
 
-        // Fetch total invoices and revenue
-        const { data: invoiceStats, error: invoiceError } = await supabase
-          .from("invoices")
-          .select("id, total, status")
-          .eq("enterprise_id", enterprise.id);
+        // Fetch stats from the view
+        const { data: viewStats, error: viewError } = await supabase
+          .from("enterprise_dashboard_stats")
+          .select("*") // Select all columns defined in the view
+          .eq("enterprise_id", enterprise.id)
+          .single(); // Expecting a single row for the enterprise
 
-        if (invoiceError) throw invoiceError;
-
-        // Fetch total products
-        const { count: productCount, error: productError } = await supabase
-          .from("products")
-          .select("id", { count: "exact" })
-          .eq("enterprise_id", enterprise.id);
-
-        if (productError) throw productError;
+        if (viewError) throw viewError;
+        if (!viewStats) throw new Error("No stats data found for this enterprise.");
 
         if (!isMounted) return;
 
-        const totalRevenue =
-          invoiceStats?.reduce((sum, invoice) => sum + (invoice.total || 0), 0) || 0;
-        const pendingInvoices =
-          invoiceStats?.filter((invoice) => invoice.status.toLowerCase() === "pending").length || 0;
-
+        // Map the view data to the component's state structure
+        const fetchedStats: DashboardStatsViewData = viewStats; // Type assertion
         setStats({
-          totalInvoices: invoiceStats?.length || 0,
-          totalProducts: productCount || 0,
-          totalRevenue,
-          pendingInvoices,
-          totalEmployees: employees?.length || 0,
-          totalDepartments: departments?.length || 0,
-          totalJobs: jobs?.length || 0,
-          totalClients: clients?.length || 0,
-          totalCompanies: companies?.length || 0,
-          totalVendors: vendors?.length || 0,
-          totalOffices: offices?.length || 0,
-          totalWarehouses: warehouses?.length || 0,
-          totalBranches: branches?.length || 0,
+          totalInvoices: fetchedStats.total_invoices || 0,
+          totalProducts: fetchedStats.total_products || 0,
+          totalRevenue: fetchedStats.total_revenue || 0,
+          pendingInvoices: fetchedStats.pending_invoices || 0,
+          totalEmployees: fetchedStats.total_employees || 0,
+          totalDepartments: fetchedStats.total_departments || 0,
+          totalJobs: fetchedStats.total_jobs || 0,
+          totalClients: fetchedStats.total_clients || 0,
+          totalCompanies: fetchedStats.total_companies || 0,
+          totalVendors: fetchedStats.total_vendors || 0,
+          totalOffices: fetchedStats.total_offices || 0,
+          totalWarehouses: fetchedStats.total_warehouses || 0,
+          totalBranches: fetchedStats.total_branches || 0,
         });
       } catch (err) {
-        console.error("Error fetching stats:", err);
+        console.error("Error fetching dashboard stats from view:", err);
         if (isMounted) {
           setError(
             err instanceof Error ? err.message : "An error occurred while fetching dashboard stats",
@@ -175,27 +163,13 @@ export default function Dashboard() {
       }
     }
 
-    if (user?.id) {
-      fetchDashboardStats();
-    }
+    fetchDashboardStats(); // Call fetch function
 
     return () => {
       isMounted = false;
     };
-  }, [
-    user?.id,
-    enterprise?.id,
-    employees,
-    // Remove these dependencies since we've commented out the hooks
-    // departments,
-    // jobs,
-    // clients,
-    // companies,
-    // vendors,
-    // offices,
-    // warehouses,
-    // branches,
-  ]);
+    // Update dependencies: only need user and enterprise IDs
+  }, [user?.id, enterprise?.id, supabase]); // Add supabase as dependency
 
   // Show error state
   if (error) {
@@ -295,16 +269,20 @@ export default function Dashboard() {
             />
             <StatCard
               title={t("Revenue.title")}
-              value={`$${stats.totalRevenue.toFixed(2)}`}
+              value={loading ? "..." : `$${stats.totalRevenue.toFixed(2)}`}
               loading={loading}
             />
             <StatCard
               title={t("Invoices.title")}
               value={stats.pendingInvoices}
               loading={loading}
-              additionalText={`${((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}% ${t(
-                "Dashboard.of_total",
-              )}`}
+              additionalText={
+                stats.totalInvoices > 0
+                  ? `${((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}% ${t(
+                      "Dashboard.of_total",
+                    )}`
+                  : `0% ${t("Dashboard.of_total")}`
+              }
             />
           </div>
         </div>

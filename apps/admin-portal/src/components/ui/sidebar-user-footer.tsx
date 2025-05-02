@@ -57,7 +57,9 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
                 </Avatar>
                 <div className="grid flex-1 text-start text-sm leading-tight">
                   <span className="truncate font-semibold">{user?.full_name}</span>
-                  <span className="truncate text-xs">{user?.email}</span>
+                  <span className="truncate text-start text-xs rtl:text-end" dir="ltr">
+                    {user?.email}
+                  </span>
                 </div>
                 <ChevronsUpDown className="ms-auto size-4" />
               </SidebarMenuButton>
@@ -76,7 +78,9 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
                   </Avatar>
                   <div className="grid flex-1 text-start text-sm leading-tight">
                     <span className="truncate font-semibold">{user?.full_name}</span>
-                    <span className="truncate text-xs">{user?.email}</span>
+                    <span className="truncate text-start text-xs rtl:text-end" dir="ltr">
+                      {user?.email}
+                    </span>
                   </div>
                 </div>
               </DropdownMenuLabel>

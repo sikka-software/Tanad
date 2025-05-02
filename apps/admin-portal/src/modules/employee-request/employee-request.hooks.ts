@@ -13,7 +13,7 @@ import {
 import { EmployeeRequest } from "./employee-request.type";
 
 export const employeeRequestKeys = {
-  all: ["employeeRequests"] as const,
+  all: ["employee_requests"] as const,
   lists: () => [...employeeRequestKeys.all, "list"] as const,
   list: (filters: any) => [...employeeRequestKeys.lists(), { filters }] as const,
   details: () => [...employeeRequestKeys.all, "detail"] as const,

@@ -87,10 +87,10 @@ export const commandList = [
         href: ModulesOptions.employees.url,
       },
       {
-        icon: ModulesOptions.employeeRequests.icon,
-        label: ModulesOptions.employeeRequests.label,
+        icon: ModulesOptions.employee_requests.icon,
+        label: ModulesOptions.employee_requests.label,
         shortcut: "⌘R",
-        href: ModulesOptions.employeeRequests.url,
+        href: ModulesOptions.employee_requests.url,
       },
       {
         icon: ModulesOptions.jobs.icon,

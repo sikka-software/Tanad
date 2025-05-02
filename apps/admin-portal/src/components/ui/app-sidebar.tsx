@@ -1,10 +1,9 @@
 "use client";
 
-import type { LucideIcon } from "lucide-react";
 import { Asterisk, Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Input } from "@/ui/input";
 import {
@@ -23,21 +22,6 @@ import useUserStore, { ProfileType } from "@/stores/use-user-store";
 import { EnterpriseSwitcher } from "./enterprise-switcher";
 import { NavMain } from "./sidebar-menu";
 import { SidebarUserFooter } from "./sidebar-user-footer";
-
-type Menu = {
-  href: string;
-  label: string;
-  translationKey: string;
-  active?: boolean;
-  icon: LucideIcon;
-  submenus?: {
-    href: string;
-    label: string;
-    translationKey: string;
-    active?: boolean;
-    plusAction?: string;
-  }[];
-};
 
 export function AppSidebar() {
   const t = useTranslations();
