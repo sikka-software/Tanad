@@ -1,5 +1,5 @@
 -- Create user_roles table
-CREATE TABLE public.user_roles (
+CREATE TABLE IF NOT EXISTS public.user_roles (
     user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     role app_role NOT NULL,
     created_at timestamptz DEFAULT timezone('utc'::text, now()) NOT NULL,
