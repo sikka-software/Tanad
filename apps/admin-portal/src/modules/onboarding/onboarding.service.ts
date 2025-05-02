@@ -15,11 +15,9 @@ export class OnboardingService {
         .rpc("create_enterprise", {
           enterprise_name: data.name,
           // Pass other data if the RPC function expects it
-          // description: data.description,
-          // logo: data.logo,
-          // email: data.email,
-          // industry: data.industry,
-          // size: data.size,
+          enterprise_email: data.email,
+          enterprise_industry: data.industry,
+          enterprise_size: data.size,
         })
         // Assume RPC returns the necessary data matching the Enterprise type
         // If it returns only an ID, we might need another fetch here.

@@ -1431,6 +1431,9 @@ export const enterprises = pgTable(
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     name: text().notNull(),
+    email: text(),
+    industry: text(),
+    size: text(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
   },
   (table) => [],
