@@ -195,13 +195,13 @@ function TabsContents({
 
 export {
   Tabs,
-  TabsList,
-  TabsTrigger,
   TabsContent,
   TabsContents,
-  type TabsProps,
-  type TabsListProps,
-  type TabsTriggerProps,
+  TabsList,
+  TabsTrigger,
   type TabsContentProps,
   type TabsContentsProps,
+  type TabsListProps,
+  type TabsProps,
+  type TabsTriggerProps,
 };

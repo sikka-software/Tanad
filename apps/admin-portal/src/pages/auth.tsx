@@ -14,10 +14,11 @@ import { Label } from "@/ui/label";
 import LanguageSwitcher from "@/ui/language-switcher";
 import ThemeSwitcher from "@/ui/theme-switcher";
 
+import { createClient } from "@/utils/supabase/component";
+
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import useUserStore from "@/stores/use-user-store";
-import { createClient } from "@/utils/supabase/component";
 
 export default function Auth() {
   const t = useTranslations();

@@ -12,6 +12,7 @@ export interface ProfileType {
   avatar_url: string | null;
   address: string | null;
   subscribed_to?: string;
+  price_id?: string;
   username: string | null;
   user_settings: {
     currency: string;
@@ -54,7 +55,7 @@ interface MembershipType {
 }
 
 interface UserState {
-  user: User | null;
+  user: any | null;
   profile: ProfileType | null;
   enterprise: EnterpriseType | null;
   membership: MembershipType | null;
