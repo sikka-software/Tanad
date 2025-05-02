@@ -8,7 +8,7 @@ export interface Employee {
   department?: string | null;
   department_id?: string | null;
   hire_date: string;
-  salary?: number;
+  salary?: SalaryComponent[] | null;
   status: "active" | "inactive" | "on_leave" | "terminated";
   notes?: string;
   created_at: string;
@@ -17,6 +17,14 @@ export interface Employee {
 
 export type EmployeeCreateData = Omit<Employee, "id" | "created_at" | "updated_at"> & {
   user_id?: string;
+  salary?: SalaryComponent[] | null;
 };
 
-export type EmployeeUpdateData = Partial<EmployeeCreateData>;
+export type EmployeeUpdateData = Partial<Omit<Employee, "id" | "created_at" | "updated_at">> & {
+  salary?: SalaryComponent[] | null;
+};
+
+export interface SalaryComponent {
+  type: string;
+  amount: number;
+}

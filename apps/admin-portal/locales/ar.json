@@ -2934,7 +2934,15 @@
       "salary": {
         "label": "الراتب",
         "placeholder": "أدخل الراتب",
-        "required": "الراتب مطلوب"
+        "required": "الراتب مطلوب",
+        "amount_label": "المبلغ",
+        "amount_placeholder": "أدخل المبلغ",
+        "type_label": "نوع الراتب",
+        "type_placeholder": "أدخل نوع الراتب",
+        "add_component": "إضافة مكون",
+        "total": "المجموع",
+        "total_label": "المجموع",
+        "total_placeholder": "أدخل المجموع"
       },
       "is_active": {
         "label": "الحالة النشطة"
