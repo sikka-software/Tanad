@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo } from "react";
 import type {
   Control,
   UseFieldArrayAppend,
@@ -43,6 +43,187 @@ interface ProductFormSectionProps {
   isLoading?: boolean;
 }
 
+// --- Helper Types ---
+type FormValues = any; // Replace 'any' with your actual form values type
+type ItemsFieldArray = FieldArrayWithId<FormValues, "items", "id">[];
+
+// --- Product Row Component ---
+interface ProductRowProps {
+  field: FieldArrayWithId<FormValues, "items", "id">;
+  index: number;
+  control: Control<FormValues>;
+  remove: UseFieldArrayRemove;
+  locale: string;
+  productOptions: { label: string; value: string }[] | undefined;
+  isLoading?: boolean;
+  productsLoading?: boolean;
+  handleProductSelection: (index: number, productId: string) => void;
+  onAddNewProduct: () => void;
+  t: ReturnType<typeof useTranslations>;
+  canDelete: boolean;
+}
+
+const ProductRow: React.FC<ProductRowProps> = React.memo(
+  ({
+    field,
+    index,
+    control,
+    remove,
+    locale,
+    productOptions,
+    isLoading,
+    productsLoading,
+    handleProductSelection,
+    onAddNewProduct,
+    t,
+    canDelete,
+  }) => {
+    // Call hooks consistently within the Row component instance
+    const quantity = useWatch({ control, name: `items.${index}.quantity` });
+    const unitPrice = useWatch({ control, name: `items.${index}.unit_price` });
+    const subtotal =
+      quantity && unitPrice
+        ? (parseFloat(quantity || "0") * parseFloat(unitPrice || "0")).toFixed(2)
+        : "0.00";
+
+    return (
+      <TableRow key={field.id}>
+        {/* Product */}
+        <TableCell>
+          <FormField
+            control={control}
+            name={`items.${index}.product_id`}
+            render={({ field: formField }) => (
+              <FormItem className="space-y-0">
+                <FormControl>
+                  <ComboboxAdd
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    data={productOptions || []}
+                    disabled={isLoading}
+                    containerClassName="min-w-[150px] w-full"
+                    isLoading={productsLoading}
+                    defaultValue={formField.value}
+                    valueKey={"value"}
+                    onChange={(value) => {
+                      formField.onChange(value || null);
+                      handleProductSelection(index, value);
+                    }}
+                    renderOption={(item) => (
+                      <div className="flex flex-col">
+                        <span>{item.label}</span>
+                      </div>
+                    )}
+                    texts={{
+                      placeholder: t("Invoices.products.select_product"),
+                      searchPlaceholder: t("Invoices.products.search_products"),
+                      noItems: t("Invoices.products.no_products_found"),
+                    }}
+                    addText={t("Invoices.products.add_new_product")}
+                    onAddClick={onAddNewProduct}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </TableCell>
+
+        {/* Quantity */}
+        <TableCell>
+          <FormField
+            control={control}
+            name={`items.${index}.quantity`}
+            render={({ field: formField }) => (
+              <FormItem className="space-y-0">
+                <FormControl>
+                  <Input
+                    type="number"
+                    min="1"
+                    step="1"
+                    {...formField}
+                    className="w-24"
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </TableCell>
+
+        {/* Unit Price */}
+        <TableCell>
+          <FormField
+            control={control}
+            name={`items.${index}.unit_price`}
+            render={({ field: formField }) => (
+              <FormItem className="max-w-[200px] space-y-0">
+                <FormControl>
+                  <CurrencyInput
+                    showCommas={true}
+                    value={formField.value ? parseFloat(formField.value) : undefined}
+                    onChange={(value) => formField.onChange(value?.toString() || "")}
+                    placeholder={t("Invoices.products.unit_price.placeholder")}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </TableCell>
+
+        {/* Description */}
+        <TableCell>
+          <FormField
+            control={control}
+            name={`items.${index}.description`}
+            render={({ field: formField }) => (
+              <FormItem className="space-y-0">
+                <FormControl>
+                  <Input
+                    placeholder={t("Forms.description.placeholder")}
+                    {...formField}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </TableCell>
+
+        {/* Subtotal */}
+        <TableCell>
+          <div className="flex flex-row items-center gap-1 text-right">
+            {subtotal}
+            <SARSymbol className="size-4" />
+          </div>
+        </TableCell>
+
+        {/* Actions */}
+        <TableCell>
+          {canDelete && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => remove(index)}
+              className="size-8 p-0"
+              disabled={isLoading}
+            >
+              <Trash2 className="size-4 text-red-500" />
+            </Button>
+          )}
+        </TableCell>
+      </TableRow>
+    );
+  },
+);
+ProductRow.displayName = "ProductRow"; // Add display name for easier debugging
+
+// --- Main Products Form Section Component ---
+
 export function ProductsFormSection({
   control,
   fields,
@@ -55,7 +236,6 @@ export function ProductsFormSection({
 }: ProductFormSectionProps) {
   const t = useTranslations();
   const locale = useLocale();
-  const form = useFormContext(); // Get form context if needed, or pass directly if required elsewhere
   const { data: productsData, isLoading: productsLoading } = useProducts();
 
   const productOptions = useMemo(
@@ -70,7 +250,7 @@ export function ProductsFormSection({
   return (
     <div>
       {/* Header similar to AddressFormSection */}
-      <div className="bg-muted top-12 sticky z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
+      <div className="bg-muted sticky top-12 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
         <h2 className="ms-2 text-xl font-bold">{title}</h2>
         <Button
           type="button"
@@ -85,7 +265,6 @@ export function ProductsFormSection({
           {t("Invoices.products.add_product")}
         </Button>
       </div>
-
       {/* Table Section */}
       <div className="p-4">
         <div className="rounded-md border">
@@ -103,145 +282,23 @@ export function ProductsFormSection({
             <TableBody>
               {fields.length > 0 ? (
                 fields.map((field, index) => {
-                  // Watch values needed for subtotal calculation directly within the loop
-                  const quantity = useWatch({ control, name: `items.${index}.quantity` });
-                  const unitPrice = useWatch({ control, name: `items.${index}.unit_price` });
-                  const subtotal =
-                    quantity && unitPrice
-                      ? (parseFloat(quantity || "0") * parseFloat(unitPrice || "0")).toFixed(2)
-                      : "0.00";
-
+                  // Render the extracted row component
                   return (
-                    <TableRow key={field.id}>
-                      {/* Product */}
-                      <TableCell>
-                        <FormField
-                          control={control}
-                          name={`items.${index}.product_id`}
-                          render={({ field: formField }) => ( // Renamed to avoid conflict with outer 'field'
-                            <FormItem className="space-y-0">
-                              <FormControl>
-                                <ComboboxAdd
-                                  direction={locale === "ar" ? "rtl" : "ltr"}
-                                  data={productOptions || []}
-                                  disabled={isLoading}
-                                  containerClassName="min-w-[150px] w-full"
-                                  isLoading={productsLoading}
-                                  defaultValue={formField.value}
-                                  valueKey={"value"} // Use value from productOptions
-                                  onChange={(value) => {
-                                    formField.onChange(value || null);
-                                    handleProductSelection(index, value);
-                                  }}
-                                  renderOption={(item) => (
-                                    <div className="flex flex-col">
-                                      <span>{item.label}</span>
-                                    </div>
-                                  )}
-                                  texts={{
-                                    placeholder: t("Invoices.products.select_product"),
-                                    searchPlaceholder: t("Invoices.products.search_products"),
-                                    noItems: t("Invoices.products.no_products_found"),
-                                  }}
-                                  addText={t("Invoices.products.add_new_product")}
-                                  onAddClick={onAddNewProduct}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TableCell>
-
-                      {/* Quantity */}
-                      <TableCell>
-                        <FormField
-                          control={control}
-                          name={`items.${index}.quantity`}
-                          render={({ field: formField }) => (
-                            <FormItem className="space-y-0">
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min="1"
-                                  step="1"
-                                  {...formField}
-                                  className="w-24"
-                                  disabled={isLoading}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TableCell>
-
-                      {/* Unit Price */}
-                      <TableCell>
-                        <FormField
-                          control={control}
-                          name={`items.${index}.unit_price`}
-                          render={({ field: formField }) => (
-                            <FormItem className="max-w-[200px] space-y-0">
-                              <FormControl>
-                                <CurrencyInput
-                                  showCommas={true}
-                                  value={formField.value ? parseFloat(formField.value) : undefined}
-                                  onChange={(value) => formField.onChange(value?.toString() || "")}
-                                  placeholder={t("Invoices.products.unit_price.placeholder")}
-                                  disabled={isLoading}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TableCell>
-
-                      {/* Description */}
-                      <TableCell>
-                        <FormField
-                          control={control}
-                          name={`items.${index}.description`}
-                          render={({ field: formField }) => (
-                            <FormItem className="space-y-0">
-                              <FormControl>
-                                <Input
-                                  placeholder={t("Forms.description.placeholder")}
-                                  {...formField}
-                                  disabled={isLoading}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TableCell>
-
-                      {/* Subtotal */}
-                      <TableCell>
-                        <div className="flex flex-row items-center gap-1 text-right">
-                          {subtotal}
-                          <SARSymbol className="size-4" />
-                        </div>
-                      </TableCell>
-
-                      {/* Actions */}
-                      <TableCell>
-                        {fields.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => remove(index)}
-                            className="size-8 p-0"
-                            disabled={isLoading}
-                          >
-                            <Trash2 className="size-4 text-red-500" />
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
+                    <ProductRow
+                      key={field.id} // Use stable key
+                      field={field}
+                      index={index}
+                      control={control}
+                      remove={remove}
+                      locale={locale}
+                      productOptions={productOptions}
+                      isLoading={isLoading}
+                      productsLoading={productsLoading}
+                      handleProductSelection={handleProductSelection}
+                      onAddNewProduct={onAddNewProduct}
+                      t={t}
+                      canDelete={fields.length > 1}
+                    />
                   );
                 })
               ) : (
