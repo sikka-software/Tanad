@@ -1,7 +1,7 @@
 import { PostgrestError } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { createClient } from "@/utils/supabase/server-admin";
+import { createClient } from "@/utils/supabase/server-props";
 
 // Define the expected shape of the data returned by the query
 interface MembershipWithDetails {
@@ -30,6 +30,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     data: { user },
   } = await supabase.auth.getUser();
 
+  console.log("user", user);
   if (!user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
