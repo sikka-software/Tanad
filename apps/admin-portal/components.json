@@ -16,7 +16,14 @@
     "ui": "@/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks",
-    "types": "@/types"
+    "types": "@/types",
+    "pages": "@/pages",
+    "services": "@/services",
+    "shared": "@/shared",
+    "for_invoices": "@/for_invoices",
+    "data": "@/data",
+    "api": "@/api",
+    "tags": "@/tags"
   },
   "iconLibrary": "lucide"
 }
