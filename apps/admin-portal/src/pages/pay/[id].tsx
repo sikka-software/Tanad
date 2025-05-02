@@ -12,6 +12,8 @@ interface Props {
 export default function InvoicePreviewPage({ invoice }: Props) {
   const t = useTranslations("Invoices");
 
+  console.log("invoice is ", invoice);
+
   return (
     <div className="mx-auto max-w-4xl p-8">
       <div className="mb-8 flex items-start justify-between">
@@ -52,12 +54,18 @@ export default function InvoicePreviewPage({ invoice }: Props) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { params, locale } = context;
-  const invoice_id = params?.invoice as string;
-
+  const invoice_id = params?.id as string;
+  console.log("invoice_id is ", invoice_id);
   try {
     const invoice = await fetchInvoiceById(invoice_id);
+    console.log("invoice is ", invoice);
     if (!invoice) {
-      return { notFound: true };
+      return {
+        props: {
+          invoice: null, // Return pukla as null if not found
+          messages: (await import(`../../../locales/${locale}.json`)).default,
+        },
+      };
     }
 
     return {

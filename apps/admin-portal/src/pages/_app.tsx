@@ -86,7 +86,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   }
 
   // Invoice pages
-  if (router.pathname === "/invoices/[code]") {
+  if (router.pathname === "/pay/[id]") {
     return (
       <div>
         <NextIntlClientProvider
