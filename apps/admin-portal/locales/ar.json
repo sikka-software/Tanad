@@ -2872,6 +2872,7 @@
     "edit": "تعديل الموظف",
     "back_to_list": "الرجوع للقائمة",
     "allEmployees": "جميع الموظفين",
+    "salary_section_title": "معلومات الراتب",
     "success": {
       "created": "تم إنشاء الموظف بنجاح",
       "updated": "تم تحديث الموظف بنجاح",
@@ -2887,6 +2888,18 @@
       "updating": "حدث خطأ أثناء تحديث الموظف",
       "deleting": "حدث خطأ أثناء حذف الموظف",
       "duplicating": "حدث خطأ أثناء تكرار الموظف"
+    },
+    "salary_types": {
+      "base": "راتب أساسي",
+      "bonus": "مكافآت",
+      "allowance": "مواظبات",
+      "deduction": "مبالغ مؤمنة",
+      "commission": "عمولات",
+      "overtime": "ساعات إضافية",
+      "health_insurance": "تأمين طبي",
+      "housing": "بدل سكن",
+      "transportation": "بدل مواصلات",
+      "other": "أخرى"
     },
     "form": {
       "first_name": {
@@ -2931,6 +2944,7 @@
         "placeholder": "أدخل تاريخ التعيين",
         "required": "تاريخ التعيين مطلوب"
       },
+
       "salary": {
         "label": "الراتب",
         "placeholder": "أدخل الراتب",

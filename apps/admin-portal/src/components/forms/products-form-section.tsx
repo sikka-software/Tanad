@@ -269,10 +269,9 @@ export function ProductsFormSection({
         <h2 className="ms-2 text-xl font-bold">{title}</h2>
         <Button
           type="button"
-          variant="outline"
           size="sm"
-          onClick={
-            () => append({ product_id: "", description: "", quantity: "1", unit_price: "0" }) // Use passed append function, ensure default value structure matches item type
+          onClick={() =>
+            append({ product_id: "", description: "", quantity: "1", unit_price: "0" })
           }
           disabled={isLoading}
         >

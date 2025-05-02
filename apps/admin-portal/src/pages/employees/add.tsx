@@ -28,7 +28,6 @@ export default function AddEmployeePage() {
       form.setValue("phone", dummyData.phone);
       form.setValue("position", dummyData.employee_position);
       form.setValue("hire_date", dummyData.employee_hire_date);
-      form.setValue("salary", String(dummyData.randomNumber));
       form.setValue("status", dummyData.employee_status);
       form.setValue("notes", dummyData.employee_notes);
     }

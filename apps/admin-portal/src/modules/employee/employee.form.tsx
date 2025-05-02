@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Trash2Icon } from "lucide-react";
+import { PlusCircle, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import {
@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { ComboboxAdd } from "@/ui/combobox-add";
-import { CurrencyInput } from "@/ui/currency-input";
+import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
@@ -26,13 +26,17 @@ import { createClient } from "@/utils/supabase/component";
 import { Button } from "@/components/ui/button";
 import PhoneInput from "@/components/ui/phone-input";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
 
 import { useCreateEmployee, useUpdateEmployee } from "@/employee/employee.hooks";
+import { SALARY_COMPONENT_TYPES } from "@/employee/employee.options";
 import useEmployeeStore from "@/employee/employee.store";
 import type {
+  Employee,
   EmployeeCreateData,
   EmployeeUpdateData,
   SalaryComponent,
@@ -92,7 +96,12 @@ interface EmployeeFormProps {
   editMode?: boolean;
 }
 
-export function EmployeeForm({ id, onSuccess, defaultValues, editMode }: EmployeeFormProps) {
+export function EmployeeForm({
+  id,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<Employee>) {
   const t = useTranslations();
   const locale = useLocale();
   const { mutate: createEmployee } = useCreateEmployee();
@@ -116,7 +125,10 @@ export function EmployeeForm({ id, onSuccess, defaultValues, editMode }: Employe
       position: defaultValues?.position || "",
       department: defaultValues?.department || null,
       hire_date: defaultValues?.hire_date || undefined,
-      salary: defaultValues?.salary ?? [],
+      salary:
+        defaultValues?.salary && defaultValues.salary.length > 0
+          ? defaultValues.salary
+          : [{ type: "", amount: 0 }],
       status: defaultValues?.status || "active",
       notes: defaultValues?.notes ?? undefined,
     },
@@ -147,7 +159,7 @@ export function EmployeeForm({ id, onSuccess, defaultValues, editMode }: Employe
       email: data.email.trim(),
       phone: data.phone?.trim() || undefined,
       position: data.position.trim(),
-      hire_date: data.hire_date?.toISOString(),
+      hire_date: data.hire_date,
       notes: data.notes?.trim() || undefined,
       department_id: data.department || undefined,
       salary: data.salary || [],
@@ -159,7 +171,7 @@ export function EmployeeForm({ id, onSuccess, defaultValues, editMode }: Employe
       if (editMode) {
         await updateEmployee({
           id: id!,
-          updates: finalSubmitData as EmployeeUpdateData,
+          updates: { ...finalSubmitData } as EmployeeUpdateData,
         });
 
         toast.success(t("General.successful_operation"), {
@@ -359,82 +371,6 @@ export function EmployeeForm({ id, onSuccess, defaultValues, editMode }: Employe
               )}
             />
 
-            <div className="space-y-4 rounded-md border p-4 md:col-span-2">
-              <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
-              {fields.map((field, index) => (
-                <div key={field.id} className="flex items-end gap-2">
-                  <FormField
-                    control={form.control}
-                    name={`salary.${index}.type`}
-                    render={({ field: typeField }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel className="text-xs">
-                          {t("Employees.form.salary.type_label")}
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder={t("Employees.form.salary.type_placeholder")}
-                            disabled={loadingSave}
-                            {...typeField}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`salary.${index}.amount`}
-                    render={({ field: amountField }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel className="text-xs">
-                          {t("Employees.form.salary.amount_label")}
-                        </FormLabel>
-                        <FormControl>
-                          <CurrencyInput
-                            placeholder={t("Employees.form.salary.amount_placeholder")}
-                            disabled={loadingSave}
-                            {...amountField}
-                            showCommas={true}
-                            value={
-                              amountField.value ? parseFloat(String(amountField.value)) : undefined
-                            }
-                            onChange={(value) => amountField.onChange(value?.toString() || "")}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => remove(index)}
-                    disabled={loadingSave}
-                    aria-label={t("General.remove")}
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => append({ type: "", amount: 0 })}
-                disabled={loadingSave}
-              >
-                {t("Employees.form.salary.add_component")}
-              </Button>
-              <div className="mt-4 text-right font-medium">
-                {t("Employees.form.salary.total")}:{" "}
-                {new Intl.NumberFormat(locale, { style: "currency", currency: "USD" }).format(
-                  totalSalary,
-                )}
-              </div>
-            </div>
-
             <FormField
               control={form.control}
               name="notes"
@@ -454,6 +390,100 @@ export function EmployeeForm({ id, onSuccess, defaultValues, editMode }: Employe
                 </FormItem>
               )}
             />
+          </div>
+
+          <div className="bg-muted sticky top-12 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
+            <h2 className="ms-2 text-xl font-bold">{t("Employees.salary_section_title")}</h2>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => append({ type: "", amount: 0 })}
+              disabled={loadingSave}
+            >
+              <PlusCircle className="mr-2 size-4" />
+              {t("Employees.form.salary.add_component")}
+            </Button>
+          </div>
+
+          <div className="form-container">
+            <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
+            {fields.map((field, index) => (
+              <div key={field.id} className="flex items-end gap-2">
+                <FormField
+                  control={form.control}
+                  name={`salary.${index}.type`}
+                  render={({ field: typeField }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel className="text-xs">
+                        {t("Employees.form.salary.type_label")}
+                      </FormLabel>
+                      <Select
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        onValueChange={typeField.onChange}
+                        defaultValue={typeField.value}
+                        disabled={loadingSave}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={t("Employees.form.salary.type_placeholder")}
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {SALARY_COMPONENT_TYPES.map((typeOpt) => (
+                            <SelectItem key={typeOpt.value} value={typeOpt.value}>
+                              {t(`Employees.salary_types.${typeOpt.value}`, {
+                                defaultValue: typeOpt.label,
+                              })}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`salary.${index}.amount`}
+                  render={({ field: amountField }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel className="text-xs">
+                        {t("Employees.form.salary.amount_label")}
+                      </FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          placeholder={t("Employees.form.salary.amount_placeholder")}
+                          disabled={loadingSave}
+                          {...amountField}
+                          showCommas={true}
+                          value={
+                            amountField.value ? parseFloat(String(amountField.value)) : undefined
+                          }
+                          onChange={(value) => amountField.onChange(value?.toString() || "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-9"
+                  onClick={() => remove(index)}
+                  disabled={loadingSave}
+                  aria-label={t("General.remove")}
+                >
+                  <Trash2Icon className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+
+            <div className="mt-4 text-end font-medium">
+              {t("Employees.form.salary.total")}: {MoneyFormatter(totalSalary)}
+            </div>
           </div>
         </form>
       </Form>
