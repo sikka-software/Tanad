@@ -3435,6 +3435,19 @@
   "ActivityLogs": {
     "title": "سجل الأنشطة",
     "description": "سجل الأنشطة التي تمت في المؤسسة خلال فترة محددة",
+    "fields": {
+      "id": "المعرف",
+      "user_full_name": "الاسم الكامل للمستخدم",
+      "user_email": "البريد الإلكتروني للمستخدم",
+      "action_type": "نوع العملية",
+      "target_type": "الهدف",
+      "target_name": "اسم الهدف",
+      "target_id": "معرف الهدف",
+      "details": "التفاصيل",
+      "created_at": "تاريخ الإنشاء",
+      "enterprise_id": "معرف المؤسسة",
+      "user_id": "معرف المستخدم"
+    },
     "action_description": {
       "created": "أنشئ {target} باسم {name}",
       "updated": "تحديث {target} باسم {name}",

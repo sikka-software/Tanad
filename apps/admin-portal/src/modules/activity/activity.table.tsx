@@ -4,11 +4,11 @@ import { formatDistanceToNow } from "date-fns";
 import {
   ChevronLeft,
   ChevronRight,
-  MoreHorizontal,
   AlertTriangle,
   Info,
   CheckCircle2,
   ArrowRight,
+  Eye,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
@@ -16,12 +16,7 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import IconButton from "@/components/ui/icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -33,6 +28,7 @@ import {
 } from "@/components/ui/table";
 
 import { ActivityService } from "./activity.service";
+import { useActivityLogStore } from "./activity.store";
 import type { ActivityLogListData } from "./activity.type";
 
 interface ActivityLogTableProps {
@@ -41,6 +37,7 @@ interface ActivityLogTableProps {
 
 export function ActivityLogTable({}: ActivityLogTableProps) {
   const t = useTranslations();
+  const { openDialog } = useActivityLogStore();
   const [activityLogs, setActivityLogs] = useState<ActivityLogListData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -123,15 +120,6 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
     <div className="w-full space-y-4">
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[250px]">User</TableHead>
-              <TableHead>Action</TableHead>
-              <TableHead>Details</TableHead>
-              <TableHead>Timestamp</TableHead>
-              <TableHead className="text-right"> </TableHead>
-            </TableRow>
-          </TableHeader>
           <TableBody>
             {isLoading ? (
               Array.from({ length: itemsPerPage }).map((_, index) => (
@@ -196,7 +184,8 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                           variant={getActionBadgeVariant(item.action_type)}
                           className={badgeColor(item.action_type)}
                         >
-                          {t(`General.${item.action_type?.toLowerCase() || "unknown"}`) || "Unknown"}
+                          {t(`General.${item.action_type?.toLowerCase() || "unknown"}`) ||
+                            "Unknown"}
                         </Badge>
                         <ArrowRight className="text-muted-foreground h-3 w-3 rtl:rotate-180" />
                         <Badge variant="outline" className="text-xs capitalize">
@@ -219,18 +208,14 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                   <TableCell className="text-muted-foreground text-xs">
                     {formatDateTime(item.created_at)}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">More options</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  <TableCell className="w-[50px] text-right">
+                    <IconButton
+                      icon={<Eye className="h-4 w-4" />}
+                      label={t("General.preview")}
+                      variant="ghost"
+                      size="icon_sm"
+                      onClick={() => openDialog(item)}
+                    />
                   </TableCell>
                 </TableRow>
               ))
