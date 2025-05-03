@@ -19,10 +19,10 @@ import {
 import { cn } from "@/lib/utils";
 
 interface ActivityLogFiltersProps {
-  eventType?: string;
+  // Removed unused eventType prop
 }
 
-export function ActivityLogFilters({ eventType }: ActivityLogFiltersProps) {
+export function ActivityLogFilters({}: ActivityLogFiltersProps) { // Removed prop from destructuring
   const [date, setDate] = useState<Date>();
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);

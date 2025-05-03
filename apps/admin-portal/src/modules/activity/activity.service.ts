@@ -1,26 +1,135 @@
-import type { ActivityLog } from "@/modules/activity/activity.type";
+import { createClient } from "@/utils/supabase/component";
 
-const API_BASE_URL = "/api/resource/activity";
+import type { ActivityLogListData, ActivityLog } from "./activity.type";
 
-// Fetches all activity logs (consider pagination in API/service if needed)
-export async function fetchActivityLogs(): Promise<ActivityLog[]> {
-  try {
-    const response = await fetch(API_BASE_URL);
-    if (!response.ok) {
-      console.error("Failed to fetch activity logs:", response.statusText);
-      // Optionally throw an error or return a default value
-      throw new Error(`Failed to fetch activity logs: ${response.statusText}`);
-      // return [];
+// Define the type returned by the RPC function based on its definition
+type ActivityLogRpcResult = {
+  id: string;
+  enterprise_id: string;
+  user_id: string;
+  action_type: ActivityLog['action_type']; // Assuming ActivityLog type has these
+  target_type: ActivityLog['target_type'];
+  target_id: string | null;
+  target_name: string | null;
+  details: any | null; // jsonb
+  created_at: string; // timestamp with time zone
+  user_email: string | null;
+};
+
+export class ActivityService {
+  private static readonly TABLE_NAME = "activity_logs";
+
+  /**
+   * List all activity log records for the user's enterprise using an RPC function.
+   * Note: Pagination needs to be handled differently with RPC or potentially added to the RPC itself.
+   * Currently, this implementation fetches all logs for the enterprise returned by the RPC.
+   */
+  static async list(page = 1, pageSize = 20): Promise<ActivityLogListData[]> {
+    const supabase = createClient();
+
+    // 1. Get the current user's session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session?.user) {
+        console.error("ActivityService.list: Error fetching session or no user found", sessionError);
+        throw new Error("User session not found.");
     }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching activity logs:", error);
-    throw error; // Re-throw the error to be caught by the caller
-    // return [];
-  }
-}
+    const user_id = session.user.id;
 
-// Note: Activity logs are typically read-only from the frontend.
-// Create, Update, Delete operations are usually handled server-side (triggers/actions).
-// Therefore, service methods for CUD are omitted here.
+    // 2. Get the user's enterprise_id from memberships
+    const { data: membership, error: enterpriseError } = await supabase
+        .from('memberships')
+        .select('enterprise_id')
+        .eq('profile_id', user_id)
+        .maybeSingle();
+
+    if (enterpriseError) {
+        console.error("ActivityService.list: Error fetching enterprise ID:", enterpriseError);
+        throw new Error("Failed to retrieve enterprise association.");
+    }
+    if (!membership?.enterprise_id) {
+        console.warn("ActivityService.list: User is not associated with an enterprise.");
+        return []; // Or throw an error, depending on expected behavior
+        // throw new Error("User is not associated with an enterprise.");
+    }
+    const enterprise_id = membership.enterprise_id;
+
+
+    // 3. Call the RPC function with the fetched enterprise_id
+    // Note: The RPC currently doesn't support pagination directly.
+    // We fetch all and could implement client-side pagination if needed, or modify the RPC.
+    const { data, error } = await supabase.rpc(
+        'get_activity_logs_with_user_email',
+        { p_enterprise_id: enterprise_id }
+    );
+
+
+    if (error) {
+      console.error("ActivityService.list error calling RPC:", error);
+      throw error;
+    }
+
+    // Explicitly type the data returned from Supabase RPC
+    const rpcData = (data || []) as ActivityLogRpcResult[];
+
+    // Manually map the RPC result data to the expected ActivityLogListData format
+    // The RPC doesn't return full_name, so we set it to null or derive if needed later.
+    const formattedData = rpcData.map((log: ActivityLogRpcResult) => ({
+      ...log,
+      user_full_name: null, // RPC doesn't provide this, default to null
+      target_id: log.target_id ?? undefined, // Handle potential nulls if needed elsewhere
+      target_name: log.target_name ?? undefined,
+      details: log.details ?? undefined,
+      // Ensure the shape matches ActivityLogListData
+    })) as ActivityLogListData[];
+
+    // Basic client-side pagination (consider modifying RPC for DB-level pagination for performance)
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    return formattedData.slice(start, end);
+  }
+
+  /**
+   * Get a single activity log record.
+   * Note: Joining profile info might be less common here, but possible.
+   */
+  static async get(id: string): Promise<ActivityLog> {
+    const supabase = createClient();
+    const { data, error } = await supabase.from(this.TABLE_NAME).select("*").eq("id", id).single();
+
+    if (error) {
+      console.error("ActivityService.get error:", error);
+      throw error;
+    }
+    return data;
+  }
+
+  // --- Other standard service methods (Create, Update, Delete, BulkDelete, Duplicate) ---
+  // Activity logs are typically append-only and often generated by triggers,
+  // so these methods might not be directly used by the UI but are included
+  // for consistency or potential future administrative actions.
+
+  static async delete(id: string): Promise<void> {
+    const supabase = createClient();
+    // Be cautious deleting logs. Usually requires specific permissions.
+    const { error } = await supabase.from(this.TABLE_NAME).delete().eq("id", id);
+
+    if (error) {
+      console.error("ActivityService.delete error:", error);
+      throw error;
+    }
+  }
+
+  static async bulkDelete(ids: string[]): Promise<void> {
+    const supabase = createClient();
+    // Be cautious deleting logs. Usually requires specific permissions.
+    const { error } = await supabase.from(this.TABLE_NAME).delete().in("id", ids);
+
+    if (error) {
+      console.error("ActivityService.bulkDelete error:", error);
+      throw error;
+    }
+  }
+
+  // Create, Update, Duplicate are less applicable to immutable logs
+  // but stubs can be added if needed for administrative tasks.
+}

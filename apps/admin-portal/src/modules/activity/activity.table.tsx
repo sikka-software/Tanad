@@ -8,7 +8,7 @@ import {
   Info,
   CheckCircle2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -27,303 +27,192 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+
+import { ActivityService } from "./activity.service";
+import type { ActivityLogListData } from "./activity.type";
+import { formatDistanceToNow } from 'date-fns';
 
 interface ActivityLogTableProps {
-  eventType?: string;
+  // Removed eventType as filtering is not implemented in service yet
 }
 
-// Mock data for the activity log
-const mockActivityData = [
-  {
-    id: "1",
-    timestamp: "2025-05-03T07:30:00Z",
-    user: {
-      name: "Sarah Johnson",
-      email: "sarah.j@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "User login",
-    resource: "Dashboard",
-    ipAddress: "192.168.1.1",
-    status: "success",
-    details: "Successful login from Chrome on macOS",
-  },
-  {
-    id: "2",
-    timestamp: "2025-05-03T07:15:22Z",
-    user: {
-      name: "Michael Chen",
-      email: "m.chen@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "Deployment",
-    resource: "Production",
-    ipAddress: "192.168.1.45",
-    status: "success",
-    details: "Deployed version v2.3.0 to production",
-  },
-  {
-    id: "3",
-    timestamp: "2025-05-03T06:58:10Z",
-    user: {
-      name: "Alex Rodriguez",
-      email: "alex.r@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "Permission change",
-    resource: "User Management",
-    ipAddress: "192.168.2.15",
-    status: "warning",
-    details: "Changed role from Developer to Admin for user james.smith@example.com",
-  },
-  {
-    id: "4",
-    timestamp: "2025-05-03T06:45:33Z",
-    user: {
-      name: "Emily Wilson",
-      email: "e.wilson@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "API key created",
-    resource: "Security",
-    ipAddress: "192.168.3.22",
-    status: "success",
-    details: "Created new API key for integration with CRM system",
-  },
-  {
-    id: "5",
-    timestamp: "2025-05-03T06:30:15Z",
-    user: {
-      name: "James Smith",
-      email: "j.smith@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "Failed login attempt",
-    resource: "Authentication",
-    ipAddress: "203.0.113.42",
-    status: "error",
-    details: "Multiple failed login attempts detected from unknown IP",
-  },
-  {
-    id: "6",
-    timestamp: "2025-05-03T06:15:00Z",
-    user: {
-      name: "Lisa Wang",
-      email: "l.wang@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "Environment variable updated",
-    resource: "Configuration",
-    ipAddress: "192.168.1.30",
-    status: "success",
-    details: "Updated DATABASE_URL in staging environment",
-  },
-  {
-    id: "7",
-    timestamp: "2025-05-03T06:00:45Z",
-    user: {
-      name: "David Kim",
-      email: "d.kim@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "User invited",
-    resource: "Team Management",
-    ipAddress: "192.168.4.10",
-    status: "success",
-    details: "Invited new user olivia.parker@example.com with Developer role",
-  },
-  {
-    id: "8",
-    timestamp: "2025-05-03T05:45:30Z",
-    user: {
-      name: "System",
-      email: "system@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "Automatic backup",
-    resource: "Database",
-    ipAddress: "10.0.0.5",
-    status: "success",
-    details: "Scheduled daily backup completed successfully",
-  },
-  {
-    id: "9",
-    timestamp: "2025-05-03T05:30:15Z",
-    user: {
-      name: "Robert Taylor",
-      email: "r.taylor@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "Domain added",
-    resource: "Domains",
-    ipAddress: "192.168.5.20",
-    status: "warning",
-    details: "Added domain example-staging.com but DNS verification pending",
-  },
-  {
-    id: "10",
-    timestamp: "2025-05-03T05:15:00Z",
-    user: {
-      name: "Olivia Parker",
-      email: "o.parker@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    action: "Project created",
-    resource: "Projects",
-    ipAddress: "192.168.6.25",
-    status: "success",
-    details: "Created new project 'Customer Portal v2'",
-  },
-];
-
-export function ActivityLogTable({ eventType }: ActivityLogTableProps) {
+export function ActivityLogTable({}: ActivityLogTableProps) {
+  const [activityLogs, setActivityLogs] = useState<ActivityLogListData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
-  const totalPages = Math.ceil(mockActivityData.length / itemsPerPage);
+  const [hasNextPage, setHasNextPage] = useState(true);
 
-  // Filter data based on eventType if provided
-  const filteredData = eventType
-    ? mockActivityData.filter((item) => {
-        if (eventType === "user")
-          return (
-            item.resource.includes("User") ||
-            item.action.includes("User") ||
-            item.action.includes("login")
-          );
-        if (eventType === "deployment")
-          return item.action.includes("Deploy") || item.resource.includes("Production");
-        if (eventType === "security")
-          return (
-            item.resource.includes("Security") ||
-            item.action.includes("login") ||
-            item.action.includes("API") ||
-            item.status === "error"
-          );
-        return true;
-      })
-    : mockActivityData;
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await ActivityService.list(page, itemsPerPage);
+        setActivityLogs(data);
+        setHasNextPage(data.length === itemsPerPage);
+      } catch (err) {
+        console.error("Failed to fetch activity logs:", err);
+        setError(err instanceof Error ? err.message : "An unknown error occurred");
+        setHasNextPage(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    }).format(date);
-  };
+    void fetchLogs();
+  }, [page]);
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "success":
-        return (
-          <Badge
-            variant="outline"
-            className="flex items-center gap-1 border-green-200 bg-green-50 text-green-700"
-          >
-            <CheckCircle2 className="h-3 w-3" />
-            Success
-          </Badge>
-        );
-      case "warning":
-        return (
-          <Badge
-            variant="outline"
-            className="flex items-center gap-1 border-yellow-200 bg-yellow-50 text-yellow-700"
-          >
-            <AlertTriangle className="h-3 w-3" />
-            Warning
-          </Badge>
-        );
-      case "error":
-        return (
-          <Badge
-            variant="outline"
-            className="flex items-center gap-1 border-red-200 bg-red-50 text-red-700"
-          >
-            <AlertTriangle className="h-3 w-3" />
-            Error
-          </Badge>
-        );
-      default:
-        return (
-          <Badge
-            variant="outline"
-            className="flex items-center gap-1 border-blue-200 bg-blue-50 text-blue-700"
-          >
-            <Info className="h-3 w-3" />
-            Info
-          </Badge>
-        );
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage((prev) => prev - 1);
     }
   };
 
+  const handleNextPage = () => {
+    if (hasNextPage) {
+        setPage((prev) => prev + 1);
+    }
+  };
+
+  const formatDateTime = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
+    try {
+      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+    } catch (e) {
+        console.error("Error formatting date:", e);
+        return 'Invalid Date';
+    }
+  };
+  
+  const getStatusBadge = (action: string) => {
+    if (action?.toUpperCase().includes('DELETE') || action?.toUpperCase().includes('FAIL')) {
+      return (
+        <Badge variant="destructive" className="capitalize">
+          <AlertTriangle className="mr-1 h-3 w-3" /> Error
+        </Badge>
+      );
+    } 
+    return (
+      <Badge variant="secondary" className="capitalize">
+        <CheckCircle2 className="mr-1 h-3 w-3" /> Success
+      </Badge>
+    );
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="w-full space-y-4">
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[180px]">Timestamp</TableHead>
-              <TableHead className="max-w-[300px] w-[300px]">User</TableHead>
+              <TableHead className="w-[250px]">User</TableHead>
               <TableHead>Action</TableHead>
+              <TableHead>Target</TableHead>
+              <TableHead>Details</TableHead>
+              <TableHead>Timestamp</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right"> </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredData.map((activity) => (
-              <TableRow key={activity.id}>
-                <TableCell className="font-medium">{formatDate(activity.timestamp)}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage
-                        src={activity.user.avatar || "/placeholder.svg"}
-                        alt={activity.user.name}
-                      />
-                      <AvatarFallback>{activity.user.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium">{activity.user.name}</div>
-                      <div className="text-muted-foreground text-xs">{activity.user.email}</div>
-                    </div>
-                  </div>
+            {isLoading ? (
+              Array.from({ length: itemsPerPage }).map((_, index) => (
+                <TableRow key={`skeleton-${index}`}>
+                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                  <TableCell><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                </TableRow>
+              ))
+            ) : error ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-red-500">
+                  Error loading activity logs: {error}
                 </TableCell>
-                <TableCell>{activity.action}</TableCell>
               </TableRow>
-            ))}
+            ) : activityLogs.length === 0 ? (
+                <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground">
+                        No activity logs found.
+                    </TableCell>
+                </TableRow>
+            ) : (
+              activityLogs.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={`/placeholder-user.jpg`} alt={item.user_full_name || item.user_email || 'User'} />
+                        <AvatarFallback>{(item.user_full_name || item.user_email || 'U').substring(0, 2).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className="grid gap-0.5">
+                        <div className="font-medium">{item.user_full_name || 'System/Unknown'}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {item.user_email || '-'}
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium capitalize">
+                      {item.action_type?.replace(/_/g, ' ').toLowerCase() || 'Unknown Action'}
+                    </div>
+                  </TableCell>
+                   <TableCell>
+                      <div className="text-sm text-muted-foreground">
+                        {item.target_type ? `${item.target_type}:` : ''}
+                        {item.target_name || item.target_id || 'N/A'}
+                      </div>
+                   </TableCell>
+                  <TableCell className="max-w-[300px] truncate text-xs text-muted-foreground">
+                    {typeof item.details === 'string' ? item.details : JSON.stringify(item.details)}
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">
+                    {formatDateTime(item.created_at)}
+                  </TableCell>
+                  <TableCell>{getStatusBadge(item.action_type)}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">More options</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>View Details</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
-
-      <div className="flex items-center justify-between">
-        <div className="text-muted-foreground text-sm">
-          Showing <strong>{filteredData.length}</strong> of{" "}
-          <strong>{mockActivityData.length}</strong> events
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(page - 1)}
-            disabled={page === 1}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            <span className="sr-only">Previous page</span>
-          </Button>
-          <div className="text-sm font-medium">
-            Page {page} of {totalPages}
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(page + 1)}
-            disabled={page === totalPages}
-          >
-            <ChevronRight className="h-4 w-4" />
-            <span className="sr-only">Next page</span>
-          </Button>
-        </div>
+      <div className="flex items-center justify-end gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handlePreviousPage}
+          disabled={page <= 1 || isLoading}
+        >
+          <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleNextPage}
+          disabled={!hasNextPage || isLoading}
+        >
+          Next <ChevronRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
