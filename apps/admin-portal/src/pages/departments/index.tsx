@@ -75,8 +75,8 @@ export default function DepartmentsPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteDepartments, {
     loading: "Departments.loading.delete",
-    success: "Departments.success.deleted",
-    error: "Departments.error.deleting",
+    success: "Departments.success.delete",
+    error: "Departments.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

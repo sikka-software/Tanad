@@ -71,8 +71,8 @@ export default function BranchesPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteBranches, {
     loading: "Branches.loading.delete",
-    success: "Branches.success.deleted",
-    error: "Branches.error.deleting",
+    success: "Branches.success.delete",
+    error: "Branches.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

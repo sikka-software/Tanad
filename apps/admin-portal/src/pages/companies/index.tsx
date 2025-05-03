@@ -71,8 +71,8 @@ export default function CompaniesPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteCompanies, {
     loading: "Companies.loading.delete",
-    success: "Companies.success.deleted",
-    error: "Companies.error.deleting",
+    success: "Companies.success.delete",
+    error: "Companies.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

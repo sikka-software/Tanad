@@ -68,8 +68,8 @@ export default function VendorsPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteVendors, {
     loading: "Vendors.loading.delete",
-    success: "Vendors.success.deleted",
-    error: "Vendors.error.deleting",
+    success: "Vendors.success.delete",
+    error: "Vendors.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

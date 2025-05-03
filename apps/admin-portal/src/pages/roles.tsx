@@ -73,8 +73,8 @@ export default function RolesPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteRoles, {
     loading: "Roles.loading.delete",
-    success: "Roles.success.deleted",
-    error: "Roles.error.deleting",
+    success: "Roles.success.delete",
+    error: "Roles.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

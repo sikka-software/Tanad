@@ -68,8 +68,8 @@ export default function QuotesPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteQuotes, {
     loading: "Quotes.loading.delete",
-    success: "Quotes.success.deleted",
-    error: "Quotes.error.deleting",
+    success: "Quotes.success.delete",
+    error: "Quotes.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

@@ -71,8 +71,8 @@ export default function ClientsPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteClients, {
     loading: "Clients.loading.delete",
-    success: "Clients.success.deleted",
-    error: "Clients.error.deleting",
+    success: "Clients.success.delete",
+    error: "Clients.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

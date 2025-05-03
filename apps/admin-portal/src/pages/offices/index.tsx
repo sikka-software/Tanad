@@ -70,8 +70,8 @@ export default function OfficesPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteOffices, {
     loading: "Offices.loading.delete",
-    success: "Offices.success.deleted",
-    error: "Offices.error.deleting",
+    success: "Offices.success.delete",
+    error: "Offices.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

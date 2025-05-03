@@ -66,8 +66,8 @@ export default function SalariesPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteSalaries, {
     loading: "Salaries.loading.delete",
-    success: "Salaries.success.deleted",
-    error: "Salaries.error.deleting",
+    success: "Salaries.success.delete",
+    error: "Salaries.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

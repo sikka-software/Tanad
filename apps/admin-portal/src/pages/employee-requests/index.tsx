@@ -77,8 +77,8 @@ export default function EmployeeRequestsPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteEmployeeRequests, {
     loading: "EmployeeRequests.loading.delete",
-    success: "EmployeeRequests.success.deleted",
-    error: "EmployeeRequests.error.deleting",
+    success: "EmployeeRequests.success.delete",
+    error: "EmployeeRequests.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

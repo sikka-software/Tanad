@@ -66,8 +66,8 @@ export default function ProductsPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteProducts, {
     loading: "Products.loading.delete",
-    success: "Products.success.deleted",
-    error: "Products.error.deleting",
+    success: "Products.success.delete",
+    error: "Products.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

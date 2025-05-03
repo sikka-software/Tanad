@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ChevronLeft, ChevronRight, ArrowRight, Eye } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
+import { useDebounce } from "use-debounce";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -32,13 +33,16 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
   const format = useFormatter();
   const now = new Date();
 
+  // Debounce the filters
+  const [debouncedFilters] = useDebounce(filters, 500); // 500ms debounce delay
+
   useEffect(() => {
     const fetchLogs = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        console.log("Fetching logs with filters:", JSON.stringify(filters, null, 2));
-        const data = await ActivityService.list(page, itemsPerPage, filters);
+        console.log("Fetching logs with debounced filters:", JSON.stringify(debouncedFilters, null, 2));
+        const data = await ActivityService.list(page, itemsPerPage, debouncedFilters);
         setActivityLogs(data);
         setHasNextPage(data.length === itemsPerPage);
       } catch (err) {
@@ -51,7 +55,7 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
     };
 
     void fetchLogs();
-  }, [page, filters]);
+  }, [page, debouncedFilters]); // Depend on debouncedFilters
 
   const handlePreviousPage = () => {
     if (page > 1) {

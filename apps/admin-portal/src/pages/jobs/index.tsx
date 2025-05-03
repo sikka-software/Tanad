@@ -75,8 +75,8 @@ export default function JobsPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteJobs, {
     loading: "Jobs.loading.delete",
-    success: "Jobs.success.deleted",
-    error: "Jobs.error.deleting",
+    success: "Jobs.success.delete",
+    error: "Jobs.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

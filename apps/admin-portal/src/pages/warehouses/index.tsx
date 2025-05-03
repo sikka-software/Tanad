@@ -71,8 +71,8 @@ export default function WarehousesPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteWarehouses, {
     loading: "Warehouses.loading.delete",
-    success: "Warehouses.success.deleted",
-    error: "Warehouses.error.deleting",
+    success: "Warehouses.success.delete",
+    error: "Warehouses.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

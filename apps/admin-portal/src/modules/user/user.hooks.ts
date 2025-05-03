@@ -115,7 +115,7 @@ export function useDeleteUser() {
     },
     onError: (error) => {
       console.error("Error deleting user:", error);
-      toast.error(t("Users.error.deleting"));
+      toast.error(t("Users.error.delete"));
     },
   });
 }

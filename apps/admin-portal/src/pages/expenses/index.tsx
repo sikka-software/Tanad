@@ -71,8 +71,8 @@ export default function ExpensesPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteExpenses, {
     loading: "Expenses.loading.delete",
-    success: "Expenses.success.deleted",
-    error: "Expenses.error.deleting",
+    success: "Expenses.success.delete",
+    error: "Expenses.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

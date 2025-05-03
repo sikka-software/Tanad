@@ -75,8 +75,8 @@ export default function InvoicesPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteInvoices, {
     loading: "Invoices.loading.delete",
-    success: "Invoices.success.deleted",
-    error: "Invoices.error.deleting",
+    success: "Invoices.success.delete",
+    error: "Invoices.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);

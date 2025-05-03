@@ -71,8 +71,8 @@ export default function UsersPage() {
 
   const handleConfirmDelete = createDeleteHandler(deleteUsers, {
     loading: "Users.loading.delete",
-    success: "Users.success.deleted",
-    error: "Users.error.deleting",
+    success: "Users.success.delete",
+    error: "Users.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
