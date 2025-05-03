@@ -2,18 +2,36 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { createApiHandler } from "@/lib/api-handler";
+import type { Database } from "@/lib/db_types";
 
+// Assuming this path is correct
+
+// Simplify ModelConfig signatures to match inferred createApiHandler behavior
 type ModelConfig = {
   tableName: string;
   customHandlers?: {
     POST?: (
-      supabase: SupabaseClient,
+      supabase: SupabaseClient<Database>,
       user_id: string,
-      enterprise_id: string,
+      enterprise_id: string, // POST seems to get enterprise_id
       req: NextApiRequest,
     ) => Promise<any>;
-    GET?: (supabase: SupabaseClient, user_id: string, req: NextApiRequest) => Promise<any>;
-    DELETE?: (supabase: SupabaseClient, user_id: string, req: NextApiRequest) => Promise<any>;
+    GET?: (
+      supabase: SupabaseClient<Database>,
+      user_id: string,
+      req: NextApiRequest, // GET likely doesn't get enterprise_id automatically
+    ) => Promise<any>;
+    DELETE?: (
+      supabase: SupabaseClient<Database>,
+      user_id: string,
+      req: NextApiRequest, // DELETE likely doesn't get enterprise_id automatically
+    ) => Promise<any>;
+    PUT?: (
+      supabase: SupabaseClient<Database>,
+      user_id: string,
+      req: NextApiRequest, // PUT likely doesn't get enterprise_id automatically
+      id: string, // PUT needs id, passed separately by createApiHandler?
+    ) => Promise<any>;
   };
 };
 
@@ -30,7 +48,7 @@ const modelMap: Record<string, ModelConfig> = {
     tableName: "department_locations",
     customHandlers: {
       POST: async (
-        supabase: SupabaseClient,
+        supabase: SupabaseClient<Database>,
         user_id: string,
         enterprise_id: string,
         req: NextApiRequest,
@@ -73,8 +91,7 @@ const modelMap: Record<string, ModelConfig> = {
   invoices: {
     tableName: "invoices",
     customHandlers: {
-      GET: async (supabase: SupabaseClient, user_id: string, req: NextApiRequest) => {
-        // First, get the user's enterprise_id
+      GET: async (supabase: SupabaseClient<Database>, user_id: string, req: NextApiRequest) => {
         const { data: membership, error: enterpriseError } = await supabase
           .from("memberships")
           .select("enterprise_id")
@@ -83,17 +100,16 @@ const modelMap: Record<string, ModelConfig> = {
 
         if (enterpriseError) {
           console.error("Error fetching enterprise ID for invoice GET:", enterpriseError);
-          throw new Error("Failed to retrieve enterprise association for invoices");
+          throw new Error("Failed to retrieve enterprise association");
         }
         if (!membership?.enterprise_id) {
-          throw new Error("User is not associated with an enterprise for invoices");
+          throw new Error("User is not associated with an enterprise.");
         }
         const enterprise_id = membership.enterprise_id;
 
-        // Now fetch invoices with client data
         const { data, error } = await supabase
           .from("invoices")
-          .select("*, client:clients(*)") // Select all invoice fields and all related client fields
+          .select("*, client:clients(*)")
           .eq("enterprise_id", enterprise_id)
           .order("created_at", { ascending: false });
 
@@ -104,7 +120,7 @@ const modelMap: Record<string, ModelConfig> = {
         return data;
       },
       POST: async (
-        supabase: SupabaseClient,
+        supabase: SupabaseClient<Database>,
         user_id: string,
         enterprise_id: string,
         req: NextApiRequest,
@@ -160,12 +176,60 @@ const modelMap: Record<string, ModelConfig> = {
   },
   quotes: { tableName: "quotes" },
   vendors: { tableName: "vendors" },
+
+  activity: {
+    tableName: "activity_logs",
+    customHandlers: {
+      GET: async (supabase: SupabaseClient<Database>, user_id: string, req: NextApiRequest) => {
+        const { data: membership, error: enterpriseError } = await supabase
+          .from("memberships")
+          .select("enterprise_id")
+          .eq("profile_id", user_id)
+          .maybeSingle();
+
+        if (enterpriseError) {
+          console.error("Error fetching enterprise ID for activity logs:", enterpriseError);
+          throw new Error("Failed to retrieve enterprise association for activity logs");
+        }
+        if (!membership?.enterprise_id) {
+          throw new Error("User is not associated with an enterprise for activity logs");
+        }
+        const enterprise_id = membership.enterprise_id;
+
+        const { data, error } = await supabase
+          .from("activity_logs")
+          .select(
+            `
+            *,
+            profile:profiles ( email )
+          `,
+          )
+          .eq("enterprise_id", enterprise_id)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching activity logs:", error);
+          throw error;
+        }
+
+        const formattedData =
+          data?.map((log) => ({
+            ...log,
+            user_email: (log.profile as { email?: string | null })?.email ?? "N/A",
+            profile: undefined,
+          })) ?? [];
+
+        return formattedData;
+      },
+    },
+  },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { model } = req.query;
 
   if (typeof model !== "string" || !(model in modelMap)) {
+    console.error(`>>> [${model}] Error: Model not found in modelMap <<<`);
     return res.status(404).json({ message: "Model not found" });
   }
 
