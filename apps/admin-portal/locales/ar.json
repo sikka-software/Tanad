@@ -17,6 +17,25 @@
     "add_enterprise": "إضافة مؤسسة",
     "created_at": "تاريخ الإنشاء",
     "updated_at": "تاريخ التحديث",
+    "created": "أنشئ",
+    "updated": "تحديث",
+    "deleted": "حذف",
+    "duplicated": "تكرار",
+    "unknown": "تنفيذ",
+    "employee": "موظف",
+    "invoice": "فاتورة",
+    "customer": "عميل",
+    "client": "عميل",
+    "product": "منتج",
+    "expense": "مصروف",
+    "salary": "راتب",
+    "vendor": "مورد",
+    "department": "قسم",
+    "office": "مكتب",
+    "user": "مستخدم",
+    "branch": "فرع",
+    "warehouse": "مخزن",
+    "role": "دور",
     "view": "عرض",
     "actions": "العمليات",
     "duplicate": "تكرار",
@@ -164,7 +183,6 @@
     "saved": "تم الحفظ",
     "update": "تحديث",
     "updating": "جاري التحديث...",
-    "updated": "تم التحديث",
     "select": "اختر",
     "filter_options": "خيارات الفرز",
     "reset": "إعادة تعيين",
@@ -3415,6 +3433,13 @@
     "singular": "متجر إلكتروني"
   },
   "ActivityLogs": {
-    "title": "سجل الأنشطة"
+    "title": "سجل الأنشطة",
+    "description": "سجل الأنشطة التي تمت في المؤسسة خلال فترة محددة",
+    "action_description": {
+      "created": "أنشئ {target} باسم {name}",
+      "updated": "تحديث {target} باسم {name}",
+      "deleted": "حذف {target} باسم {name}",
+      "unknown": "تنفيذ {action} على {target}"
+    }
   }
 }

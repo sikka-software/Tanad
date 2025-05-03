@@ -33,7 +33,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) { // Removed pro
   };
 
   return (
-    <div className="mb-6 space-y-4">
+    <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />

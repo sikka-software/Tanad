@@ -1,22 +1,21 @@
 import { GetStaticProps } from "next";
+import { useTranslations } from "next-intl";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { ActivityLogFilters } from "@/modules/activity/activity.filters";
 import { ActivityLogTable } from "@/modules/activity/activity.table";
 
 const ActivityPage = () => {
+  const t = useTranslations();
   return (
     <DataPageLayout>
       <CardHeader className="pb-3">
-        <CardTitle>User Activity</CardTitle>
-        <CardDescription>
-          Events related to user actions, permissions, and account changes.
-        </CardDescription>
+        <CardTitle>{t("ActivityLogs.title")}</CardTitle>
+        <CardDescription>{t("ActivityLogs.description")}</CardDescription>
       </CardHeader>
-      <div className="p-4">
+      <div className="flex flex-col gap-4 p-4">
         <ActivityLogFilters />
         <ActivityLogTable />
       </div>
