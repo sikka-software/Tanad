@@ -124,7 +124,7 @@ const ModulesOptions = {
     icon: Briefcase,
     label: "EmployeeRequests.title",
     translationKey: "EmployeeRequests.title",
-    url: "/employee-requests",
+    url: "/employee_requests",
   },
   jobs: {
     icon: Briefcase,

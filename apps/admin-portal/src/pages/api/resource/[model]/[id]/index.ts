@@ -35,7 +35,7 @@ const modelMap: Record<string, ModelConfig> = {
   invoices: { table: schema.invoices, query: db.query.invoices, idField: "id" },
   quotes: { table: schema.quotes, query: db.query.quotes, idField: "id" },
   vendors: { table: schema.vendors, query: db.query.vendors, idField: "id" },
-  "employee-requests": {
+  employee_requests: {
     table: schema.employee_requests,
     query: db.query.employee_requests,
     idField: "id",
@@ -44,7 +44,7 @@ const modelMap: Record<string, ModelConfig> = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { model, id } = req.query;
-
+  console.log("API Handler - Received request for model:", model, "with ID:", id);
   // Validate model
   if (typeof model !== "string" || !(model in modelMap)) {
     return res.status(404).json({ message: "Model not found" });
@@ -94,6 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   // Handle PUT request
   if (req.method === "PUT") {
+    console.log("API Handler - PUT request received");
     try {
       const existingRecord = await query.findFirst({
         where: eq(table[idField], id),
@@ -165,6 +166,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .select()
         .single(); // Assuming you expect one record back
 
+      console.log("API Handler - Updated record:", JSON.stringify(updatedRecord, null, 2));
       if (updateError) {
         console.error(`Supabase update error for ${model}:`, updateError);
         // Throw the specific Supabase error for better debugging

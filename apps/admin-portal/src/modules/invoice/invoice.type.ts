@@ -1,6 +1,10 @@
 import type { Database } from "@/lib/database.types";
+import type { Client } from "@/modules/client/client.type";
 
-export type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
+export type Invoice = Database["public"]["Tables"]["invoices"]["Row"] & {
+  client: Client | null; // Assuming 'Client' type exists and client can be null
+  items?: InvoiceItem[]; // Assuming items might be included sometimes
+};
 
 export type InvoiceItem = Database["public"]["Tables"]["invoice_items"]["Row"];
 

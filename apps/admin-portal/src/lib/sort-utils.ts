@@ -7,7 +7,7 @@ const models = [
   "invoices",
   "products",
   "employees",
-  "employee-requests",
+  "employee_requests",
   "salaries",
   "jobs",
 

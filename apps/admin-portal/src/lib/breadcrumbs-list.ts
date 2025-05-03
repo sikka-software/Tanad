@@ -15,7 +15,7 @@ export const routeMap: RouteMap = {
   "/clients": { label: "Clients", translationKey: "Clients.title" },
   "/products": { label: "Products", translationKey: "Products.title" },
   "/employees": { label: "Employees", translationKey: "Employees.title" },
-  "/employee-requests": { label: "Employee Requests", translationKey: "EmployeeRequests.title" },
+  "/employee_requests": { label: "Employee Requests", translationKey: "EmployeeRequests.title" },
   "/jobs": { label: "Jobs", translationKey: "Jobs.title" },
   "/job-listings": { label: "Job Listings", translationKey: "JobListings.title" },
   "/applicants": { label: "Applicants", translationKey: "Applicants.title" },
@@ -111,18 +111,18 @@ export const dynamicRoutePatterns = [
     ],
   },
   {
-    pattern: /^\/employee-requests\/add$/,
+    pattern: /^\/employee_requests\/add$/,
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/employee-requests", labelKey: "EmployeeRequests.title" },
-      { path: "/employee-requests/add", labelKey: "EmployeeRequests.add_new", is_active: true },
+      { path: "/employee_requests", labelKey: "EmployeeRequests.title" },
+      { path: "/employee_requests/add", labelKey: "EmployeeRequests.add_new", is_active: true },
     ],
   },
   {
-    pattern: /^\/employee-requests\/edit\/(.+)$/,
+    pattern: /^\/employee_requests\/edit\/(.+)$/,
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/employee-requests", labelKey: "EmployeeRequests.title" },
+      { path: "/employee_requests", labelKey: "EmployeeRequests.title" },
       { path: "", labelKey: "EmployeeRequests.edit", is_active: true },
     ],
   },

@@ -23,7 +23,7 @@ export default function AddEmployeeRequestPage() {
         formButtons
         formId="employee-request-form"
         loading={loadingSave}
-        onCancel={() => router.push("/employee-requests")}
+        onCancel={() => router.push("/employee_requests")}
         texts={{
           title: t("EmployeeRequests.add_new"),
           submit_form: t("EmployeeRequests.add_new"),
@@ -34,7 +34,7 @@ export default function AddEmployeeRequestPage() {
       <EmployeeRequestForm
         formHtmlId="employee-request-form"
         onSuccess={() =>
-          router.push("/employee-requests").then(() => {
+          router.push("/employee_requests").then(() => {
             setLoadingSave(false);
           })
         }
