@@ -52,6 +52,8 @@ export const useCreateEmployee = () => {
         ...(Array.isArray(previousEmployees) ? previousEmployees : []),
         newEmployee,
       ]);
+      
+      queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
     },
   });
 };

@@ -1081,48 +1081,10 @@ function SheetTable<
                   );
                 }),
               )}
-
-              {/* Left icon cells empty headers */}
-              {addPos === "right" && (
-                <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-              )}
-
-              {removePos === "right" && (
-                <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-              )}
-
-              {enableRowActions && (
-                <TableHead className="border">{props.texts?.actions || "Actions"}</TableHead>
-              )}
             </TableRow>
           </TableHeader>
         )}
-        {/* Optional second header */}
-        {showSecondHeader && secondHeaderTitle && (
-          <TableRow>
-            {/* Right icon cells empty headers */}
-            {addPos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
 
-            {removePos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            <TableHead colSpan={columns.length} className="border text-center">
-              {secondHeaderTitle}
-            </TableHead>
-
-            {/* Left icon cells empty headers */}
-            {addPos === "right" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {removePos === "right" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-          </TableRow>
-        )}
         <TableBody>
           {Object.entries(groupedData).map(([groupKey, topRows]) => (
             <React.Fragment key={groupKey}>
