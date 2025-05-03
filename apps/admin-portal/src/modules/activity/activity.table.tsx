@@ -37,7 +37,7 @@ interface ActivityLogTableProps {
 
 export function ActivityLogTable({}: ActivityLogTableProps) {
   const t = useTranslations();
-  const { openDialog } = useActivityLogStore();
+  const { openDialog, filters } = useActivityLogStore();
   const [activityLogs, setActivityLogs] = useState<ActivityLogListData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +50,7 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await ActivityService.list(page, itemsPerPage);
+        const data = await ActivityService.list(page, itemsPerPage, filters);
         setActivityLogs(data);
         setHasNextPage(data.length === itemsPerPage);
       } catch (err) {
@@ -63,7 +63,7 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
     };
 
     void fetchLogs();
-  }, [page]);
+  }, [page, filters]);
 
   const handlePreviousPage = () => {
     if (page > 1) {
@@ -223,24 +223,26 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handlePreviousPage}
-          disabled={page <= 1 || isLoading}
-        >
-          <ChevronLeft className="mr-2 h-4 w-4" /> Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleNextPage}
-          disabled={!hasNextPage || isLoading}
-        >
-          Next <ChevronRight className="ml-2 h-4 w-4" />
-        </Button>
-      </div>
+      {page > 1 && (
+        <div className="flex items-center justify-end gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePreviousPage}
+            disabled={page <= 1 || isLoading}
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleNextPage}
+            disabled={!hasNextPage || isLoading}
+          >
+            Next <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

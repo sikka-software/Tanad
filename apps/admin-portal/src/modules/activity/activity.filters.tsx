@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 
 import { cn } from "@/lib/utils";
+import { useActivityLogStore } from "./activity.store";
 
 interface ActivityLogFiltersProps {
   // Removed unused eventType prop
@@ -27,13 +28,15 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
   // Removed prop from destructuring
   const t = useTranslations();
   const locale = useLocale();
-  const [date, setDate] = useState<Date>();
-  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    filters,
+    setFilters,
+    clearFilters
+  } = useActivityLogStore();
   const [showFilters, setShowFilters] = useState(false);
 
   const handleClearFilters = () => {
-    setDate(undefined);
-    setSearchQuery("");
+    clearFilters();
   };
 
   return (
@@ -45,8 +48,8 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
             type="search"
             placeholder={t("ActivityLogs.filters.search")}
             className="w-full pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={filters.searchQuery}
+            onChange={(e) => setFilters({ searchQuery: e.target.value })}
           />
         </div>
         <div className="flex gap-2">
@@ -64,15 +67,20 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                 variant="outline"
                 className={cn(
                   "w-[240px] justify-start text-left font-normal",
-                  !date && "text-muted-foreground",
+                  !filters.date && "text-muted-foreground",
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : t("ActivityLogs.filters.pickDate")}
+                {filters.date ? format(filters.date, "PPP") : t("ActivityLogs.filters.pickDate")}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end">
-              <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+              <Calendar
+                mode="single"
+                selected={filters.date}
+                onSelect={(d) => setFilters({ date: d })}
+                initialFocus
+              />
             </PopoverContent>
           </Popover>
           <Button variant="outline">
@@ -86,7 +94,11 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
         <div className="grid grid-cols-1 gap-4 rounded-md border p-4 md:grid-cols-3">
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("ActivityLogs.filters.eventType")}</label>
-            <Select defaultValue="all" dir={locale === "ar" ? "rtl" : "ltr"}>
+            <Select
+              value={filters.eventType}
+              onValueChange={(value) => setFilters({ eventType: value })}
+              dir={locale === "ar" ? "rtl" : "ltr"}
+            >
               <SelectTrigger>
                 <SelectValue placeholder={t("ActivityLogs.filters.selectEventType")} />
               </SelectTrigger>
@@ -94,16 +106,20 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                 <SelectItem value="all">{t("ActivityLogs.filters.allEvents")}</SelectItem>
                 <SelectItem value="login">{t("ActivityLogs.filters.login")}</SelectItem>
                 <SelectItem value="logout">{t("ActivityLogs.filters.logout")}</SelectItem>
-                <SelectItem value="create">{t("ActivityLogs.filters.create")}</SelectItem>
-                <SelectItem value="update">{t("ActivityLogs.filters.update")}</SelectItem>
-                <SelectItem value="delete">{t("ActivityLogs.filters.delete")}</SelectItem>
+                <SelectItem value="created">{t("ActivityLogs.filters.create")}</SelectItem>
+                <SelectItem value="updated">{t("ActivityLogs.filters.update")}</SelectItem>
+                <SelectItem value="deleted">{t("ActivityLogs.filters.delete")}</SelectItem>
                 <SelectItem value="deploy">{t("ActivityLogs.filters.deploy")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("ActivityLogs.filters.user")}</label>
-            <Select defaultValue="all" dir={locale === "ar" ? "rtl" : "ltr"}>
+            <Select
+              value={filters.user}
+              onValueChange={(value) => setFilters({ user: value })}
+              dir={locale === "ar" ? "rtl" : "ltr"}
+            >
               <SelectTrigger>
                 <SelectValue placeholder={t("ActivityLogs.filters.selectUser")} />
               </SelectTrigger>
@@ -117,7 +133,11 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("ActivityLogs.filters.timeRange")}</label>
-            <Select defaultValue="24h" dir={locale === "ar" ? "rtl" : "ltr"}>
+            <Select
+              value={filters.timeRange}
+              onValueChange={(value) => setFilters({ timeRange: value })}
+              dir={locale === "ar" ? "rtl" : "ltr"}
+            >
               <SelectTrigger>
                 <SelectValue placeholder={t("ActivityLogs.filters.selectTimeRange")} />
               </SelectTrigger>

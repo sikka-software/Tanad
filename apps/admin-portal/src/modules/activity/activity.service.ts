@@ -1,6 +1,8 @@
 import { createClient } from "@/utils/supabase/component";
+import { subHours, subDays, startOfDay, endOfDay } from 'date-fns';
 
 import type { ActivityLogListData, ActivityLog } from "./activity.type";
+import type { ActivityFilters } from "./activity.store"; // Import filters type
 
 // Define the type returned by the RPC function based on its definition
 type ActivityLogRpcResult = {
@@ -22,10 +24,13 @@ export class ActivityService {
 
   /**
    * List all activity log records for the user's enterprise using an RPC function.
-   * Note: Pagination needs to be handled differently with RPC or potentially added to the RPC itself.
-   * Currently, this implementation fetches all logs for the enterprise returned by the RPC.
+   * Applies filtering and pagination client-side after fetching all logs via RPC.
    */
-  static async list(page = 1, pageSize = 20): Promise<ActivityLogListData[]> {
+  static async list(
+    page = 1,
+    pageSize = 20,
+    filters?: ActivityFilters // Add filters parameter
+  ): Promise<ActivityLogListData[]> {
     const supabase = createClient();
 
     // 1. Get the current user's session
@@ -54,15 +59,12 @@ export class ActivityService {
     }
     const enterprise_id = membership.enterprise_id;
 
-
     // 3. Call the RPC function with the fetched enterprise_id
-    // Note: The RPC currently doesn't support pagination directly.
-    // We fetch all and could implement client-side pagination if needed, or modify the RPC.
+    // Fetches ALL logs for the enterprise.
     const { data, error } = await supabase.rpc(
         'get_activity_logs_with_user_email',
         { p_enterprise_id: enterprise_id }
     );
-
 
     if (error) {
       console.error("ActivityService.list error calling RPC:", error);
@@ -73,17 +75,79 @@ export class ActivityService {
     const rpcData = (data || []) as ActivityLogRpcResult[];
 
     // Manually map the RPC result data to the expected ActivityLogListData format
-    // The RPC doesn't return full_name, so we set it to null or derive if needed later.
-    const formattedData = rpcData.map((log: ActivityLogRpcResult) => ({
+    let formattedData = rpcData.map((log: ActivityLogRpcResult) => ({
       ...log,
       user_full_name: log.user_full_name ?? null,
       target_id: log.target_id ?? undefined,
       target_name: log.target_name ?? undefined,
       details: log.details ?? undefined,
-      // Ensure the shape matches ActivityLogListData
     })) as ActivityLogListData[];
 
-    // Basic client-side pagination (consider modifying RPC for DB-level pagination for performance)
+    // 4. Apply client-side filtering
+    if (filters) {
+      const { searchQuery, date, eventType, user, timeRange } = filters;
+
+      formattedData = formattedData.filter(log => {
+        const logDate = new Date(log.created_at);
+
+        // Date filter (if specific date is selected)
+        if (date) {
+          const start = startOfDay(date);
+          const end = endOfDay(date);
+          if (logDate < start || logDate > end) return false;
+        }
+
+        // Time range filter (if specific date is NOT selected)
+        if (!date && timeRange !== 'all') {
+          let startDate: Date;
+          const now = new Date();
+          switch (timeRange) {
+            case '1h': startDate = subHours(now, 1); break;
+            case '24h': startDate = subHours(now, 24); break;
+            case '7d': startDate = subDays(now, 7); break;
+            case '30d': startDate = subDays(now, 30); break;
+            case '90d': startDate = subDays(now, 90); break;
+            default: startDate = new Date(0); // Effectively no start date limit
+          }
+          if (logDate < startDate) return false;
+        }
+
+        // Event type filter
+        if (eventType !== 'all' && log.action_type?.toLowerCase() !== eventType.toLowerCase()) {
+          return false;
+        }
+
+        // User filter (Note: This filters by role name, needs adjustment if filtering by specific user ID)
+        // This requires knowledge of how user roles/types are stored or derived.
+        // Assuming 'user' filter values ('admin', 'dev', 'viewer') correspond to something searchable.
+        // If filtering by specific user ID is needed, the filter state/UI and this logic must change.
+        // if (user !== 'all' && !checkUserRole(log.user_id, user)) { // Placeholder for actual user role check
+        //   return false;
+        // }
+
+        // Search query filter (searches across multiple fields)
+        if (searchQuery) {
+          const lowerQuery = searchQuery.toLowerCase();
+          const searchableFields = [
+            log.user_full_name,
+            log.user_email,
+            log.action_type,
+            log.target_type,
+            log.target_name,
+            log.target_id,
+            // Add details if it's string searchable, be careful with performance
+            // typeof log.details === 'string' ? log.details : '',
+          ];
+          if (!searchableFields.some(field => field?.toLowerCase().includes(lowerQuery))) {
+            return false;
+          }
+        }
+
+        return true; // Log passes all filters
+      });
+    }
+
+    // 5. Apply client-side pagination to the filtered data
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     return formattedData.slice(start, end);
@@ -91,7 +155,6 @@ export class ActivityService {
 
   /**
    * Get a single activity log record.
-   * Note: Joining profile info might be less common here, but possible.
    */
   static async get(id: string): Promise<ActivityLog> {
     const supabase = createClient();
