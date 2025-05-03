@@ -37,7 +37,7 @@ export const createWarehouseFormSchema = (t: (key: string) => string) => {
 export type WarehouseFormValues = z.input<ReturnType<typeof createWarehouseFormSchema>>;
 
 export function WarehouseForm({
-  id,
+  formHtmlId,
   onSuccess,
   defaultValues,
   editMode,
@@ -159,8 +159,8 @@ export function WarehouseForm({
 
   return (
     <Form {...form}>
-      <form id={id || "warehouse-form"} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="form-container">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}

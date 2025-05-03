@@ -15,6 +15,8 @@ import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
 import PhoneInput from "@/components/ui/phone-input";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import {
   CompanyForm,
   type CompanyFormValues as CompanyFormValuesType,
@@ -24,7 +26,7 @@ import type { Company } from "@/company/company.type";
 
 import { useCreateVendor, useUpdateVendor } from "@/vendor/vendor.hooks";
 import useVendorStore from "@/vendor/vendor.store";
-import type { VendorUpdateData } from "@/vendor/vendor.type";
+import type { Vendor, VendorUpdateData } from "@/vendor/vendor.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -44,14 +46,12 @@ export const createVendorSchema = (t: (key: string) => string) => {
 
 export type VendorFormValues = z.input<ReturnType<typeof createVendorSchema>>;
 
-interface VendorFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: VendorUpdateData | null;
-  editMode?: boolean;
-}
-
-export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: VendorFormProps) {
+export function VendorForm({
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<Vendor>) {
   const t = useTranslations();
   const locale = useLocale();
 
@@ -172,8 +172,8 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
   return (
     <>
       <Form {...form}>
-        <form id={id || "vendor-form"} onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
@@ -293,7 +293,7 @@ export function VendorForm({ id, onSuccess, defaultValues, editMode = false }: V
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
-        <CompanyForm id="company-form" />
+        <CompanyForm formHtmlId="company-form" />
       </FormDialog>
     </>
   );

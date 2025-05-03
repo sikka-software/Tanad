@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { User } from "@supabase/supabase-js";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useForm } from "react-hook-form";
@@ -9,6 +10,8 @@ import { ComboboxAdd } from "@/ui/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
+
+import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -51,14 +54,7 @@ const updateUserFormSchema = baseUserFormSchema.extend({
 // Infer the type from the base schema, specific validation handled conditionally
 type UserFormData = z.infer<typeof baseUserFormSchema> & { password?: string };
 
-interface UserFormProps {
-  onSuccess: () => void;
-  id?: string;
-  // Revert to User type, assuming it has first_name, last_name, and role (ID/key)
-  initialData?: UserType | null;
-}
-
-export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
+export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormProps<UserType>) {
   const t = useTranslations();
   const locale = useLocale();
   const enterprise = useUserStore((state) => state.enterprise);
@@ -112,42 +108,42 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
   const rolesLoading = customRolesLoading || systemRolesLoading;
   const rolesError = customRolesError || systemRolesError;
 
-  const isEditing = !!initialData;
+  const isEditing = !!defaultValues;
   const currentSchema = isEditing ? updateUserFormSchema : createUserFormSchema;
 
   const form = useForm<UserFormData>({
     resolver: zodResolver(currentSchema),
     defaultValues: useMemo(() => {
       // Revert to splitting full_name
-      const [firstName = "", lastName = ""] = (initialData?.full_name || "").split(" ", 2);
+      const [firstName = "", lastName = ""] = (defaultValues?.full_name || "").split(" ", 2);
       // Cannot reliably determine initial role name from initialData type
       return {
         first_name: firstName,
         last_name: lastName,
-        email: initialData?.email || "",
+        email: defaultValues?.email || "",
         password: "",
         role: "", // Default role to empty string
       };
-    }, [initialData?.id, initialData?.full_name, initialData?.email]), // Revert dependencies
+    }, [defaultValues?.id, defaultValues?.full_name, defaultValues?.email]), // Revert dependencies
   });
 
   // Reset form
   useEffect(() => {
     // Revert to splitting full_name
-    const [firstName = "", lastName = ""] = (initialData?.full_name || "").split(" ", 2);
+    const [firstName = "", lastName = ""] = (defaultValues?.full_name || "").split(" ", 2);
 
     form.reset({
       first_name: firstName,
       last_name: lastName,
-      email: initialData?.email || "",
+      email: defaultValues?.email || "",
       password: "",
       role: "", // Default role to empty string
     });
     // Update dependencies to match defaultValues
   }, [
-    initialData?.id,
-    initialData?.full_name, // Revert dependencies
-    initialData?.email,
+    defaultValues?.id,
+    defaultValues?.full_name, // Revert dependencies
+    defaultValues?.email,
     form.reset,
   ]);
 
@@ -191,9 +187,9 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
       // Remove first_name and last_name
       full_name: fullName, // Add full_name
       email: values.email.toLowerCase(), // Ensure email is lowercase
-      role: values.role,             // Keep role name for API check
+      role: values.role, // Keep role name for API check
       enterprise_id: enterprise.id, // Keep for potential use (though API doesn't destructure it)
-      role_id: roleId,             // Keep role_id for potential use (though API doesn't destructure it)
+      role_id: roleId, // Keep role_id for potential use (though API doesn't destructure it)
     };
 
     // Add password conditionally
@@ -202,9 +198,9 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
       : mutationDataBase;
 
     try {
-      if (isEditing && initialData) {
+      if (isEditing && defaultValues) {
         await updateUser({
-          id: initialData.id,
+          id: defaultValues.id,
           data: { ...mutationData, role_id: roleId } as UserUpdateData,
         });
         toast.success(t("General.successful_operation"), {
@@ -230,7 +226,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
         password: "",
         role: "", // Reset role to empty
       });
-      onSuccess();
+      onSuccess?.();
     } catch (error: any) {
       console.error("Submit Error in UserForm:", error);
 
@@ -264,7 +260,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
   return (
     <Form {...form}>
       {/* Use the correct form ID */}
-      <form id={id} onSubmit={form.handleSubmit(onSubmit)}>
+      <form id={formHtmlId} onSubmit={form.handleSubmit(onSubmit)}>
         <div className="form-container">
           <div className="grid grid-cols-2 gap-4">
             <FormField

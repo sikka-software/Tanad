@@ -14,11 +14,13 @@ import { createAddressSchema } from "@/components/forms/address-schema";
 import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { useBranches, useCreateBranch, useUpdateBranch } from "./branch.hooks";
 import useBranchStore from "./branch.store";
-import { BranchUpdateData } from "./branch.type";
+import { Branch, BranchUpdateData } from "./branch.type";
 
 export const createBranchSchema = (t: (key: string) => string) => {
   const baseBranchSchema = z.object({
@@ -45,7 +47,12 @@ export interface BranchFormProps {
   editMode?: boolean;
 }
 
-export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: BranchFormProps) {
+export function BranchForm({
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<Branch>) {
   const t = useTranslations();
   const { user } = useUserStore();
   const { mutate: createBranch } = useCreateBranch();
@@ -144,7 +151,7 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
 
   return (
     <Form {...form}>
-      <form id={id || "branch-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField

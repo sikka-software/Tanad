@@ -13,11 +13,13 @@ import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
 import { Textarea } from "@/components/ui/textarea";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateOffice, useOffices, useUpdateOffice } from "./office.hooks";
 import useOfficeStore from "./office.store";
-import { OfficeUpdateData } from "./office.type";
+import { Office, OfficeUpdateData } from "./office.type";
 
 const createOfficeSchema = (t: (key: string) => string) => {
   const baseOfficeSchema = z.object({
@@ -35,14 +37,12 @@ const createOfficeSchema = (t: (key: string) => string) => {
 
 export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
 
-interface OfficeFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: OfficeUpdateData | null;
-  editMode?: boolean;
-}
-
-export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFormProps) {
+export function OfficeForm({
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<Office>) {
   const t = useTranslations();
   const { data: offices } = useOffices();
   const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();
@@ -145,7 +145,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
 
   return (
     <Form {...form}>
-      <form id={id || "office-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField

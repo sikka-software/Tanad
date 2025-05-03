@@ -13,11 +13,13 @@ import { Textarea } from "@/ui/textarea";
 
 import CodeInput from "@/components/ui/code-input";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateExpense, useUpdateExpense, useExpenses } from "./expense.hooks";
 import useExpenseStore from "./expense.store";
-import { ExpenseUpdateData } from "./expense.type";
+import { Expense, ExpenseUpdateData } from "./expense.type";
 
 export const createExpenseSchema = (t: (key: string) => string) =>
   z.object({
@@ -33,14 +35,12 @@ export const createExpenseSchema = (t: (key: string) => string) =>
 
 export type ExpenseFormValues = z.input<ReturnType<typeof createExpenseSchema>>;
 
-export interface ExpenseFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: ExpenseUpdateData | null;
-  editMode?: boolean;
-}
-
-export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: ExpenseFormProps) {
+export function ExpenseForm({
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<Expense>) {
   const t = useTranslations();
   const locale = useLocale();
   const user = useUserStore((state) => state.user);
@@ -116,156 +116,153 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
 
   return (
     <Form {...form}>
-      <form
-        id={id || "expense-form"}
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-4"
-      >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="expense_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Expenses.form.expense_number.label")} *</FormLabel>
-                <FormControl>
-                  <CodeInput
-                    onSerial={() => {
-                      const nextNumber = (expenses?.length || 0) + 1;
-                      const paddedNumber = String(nextNumber).padStart(4, "0");
-                      form.setValue("expense_number", `EX-${paddedNumber}`);
-                    }}
-                    onRandom={() => {
-                      const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                      let randomCode = "";
-                      for (let i = 0; i < 5; i++) {
-                        randomCode += randomChars.charAt(
-                          Math.floor(Math.random() * randomChars.length),
-                        );
-                      }
-                      form.setValue("expense_number", `EX-${randomCode}`);
-                    }}
-                  >
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="form-container">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="expense_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Expenses.form.expense_number.label")} *</FormLabel>
+                  <FormControl>
+                    <CodeInput
+                      onSerial={() => {
+                        const nextNumber = (expenses?.length || 0) + 1;
+                        const paddedNumber = String(nextNumber).padStart(4, "0");
+                        form.setValue("expense_number", `EX-${paddedNumber}`);
+                      }}
+                      onRandom={() => {
+                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        let randomCode = "";
+                        for (let i = 0; i < 5; i++) {
+                          randomCode += randomChars.charAt(
+                            Math.floor(Math.random() * randomChars.length),
+                          );
+                        }
+                        form.setValue("expense_number", `EX-${randomCode}`);
+                      }}
+                    >
+                      <Input
+                        placeholder={t("Expenses.form.expense_number.placeholder")}
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </CodeInput>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Expenses.form.category.label")} *</FormLabel>
+                  <FormControl>
                     <Input
-                      placeholder={t("Expenses.form.expense_number.placeholder")}
+                      placeholder={t("Expenses.form.category.placeholder")}
                       {...field}
                       disabled={isLoading}
                     />
-                  </CodeInput>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Expenses.form.category.label")} *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Expenses.form.category.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="issue_date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Expenses.form.issue_date.label")} *</FormLabel>
-                <FormControl>
-                  <DatePicker
-                    date={field.value ? new Date(field.value) : undefined}
-                    onSelect={field.onChange}
-                    placeholder={t("Expenses.form.issue_date.placeholder")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="due_date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Expenses.form.due_date.label")} *</FormLabel>
-                <FormControl>
-                  <DatePicker
-                    date={field.value ? new Date(field.value) : undefined}
-                    onSelect={field.onChange}
-                    placeholder={t("Expenses.form.due_date.placeholder")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Expenses.form.amount.label")} *</FormLabel>
-                <FormControl>
-                  <CurrencyInput
-                    showCommas={true}
-                    value={field.value ? parseFloat(String(field.value)) : undefined}
-                    onChange={(value) => field.onChange(value?.toString() || "")}
-                    placeholder={t("Expenses.form.amount.placeholder")}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Expenses.form.status.label")} *</FormLabel>
-                <Select
-                  dir={locale === "ar" ? "rtl" : "ltr"}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={isLoading}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("Expenses.form.status.placeholder")} />
-                    </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="pending">{t("Expenses.form.status.pending")}</SelectItem>
-                    <SelectItem value="paid">{t("Expenses.form.status.paid")}</SelectItem>
-                    <SelectItem value="overdue">{t("Expenses.form.status.overdue")}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-        {/* <FormField
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="issue_date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Expenses.form.issue_date.label")} *</FormLabel>
+                  <FormControl>
+                    <DatePicker
+                      date={field.value ? new Date(field.value) : undefined}
+                      onSelect={field.onChange}
+                      placeholder={t("Expenses.form.issue_date.placeholder")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="due_date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Expenses.form.due_date.label")} *</FormLabel>
+                  <FormControl>
+                    <DatePicker
+                      date={field.value ? new Date(field.value) : undefined}
+                      onSelect={field.onChange}
+                      placeholder={t("Expenses.form.due_date.placeholder")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Expenses.form.amount.label")} *</FormLabel>
+                  <FormControl>
+                    <CurrencyInput
+                      showCommas={true}
+                      value={field.value ? parseFloat(String(field.value)) : undefined}
+                      onChange={(value) => field.onChange(value?.toString() || "")}
+                      placeholder={t("Expenses.form.amount.placeholder")}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Expenses.form.status.label")} *</FormLabel>
+                  <Select
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={isLoading}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("Expenses.form.status.placeholder")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="pending">{t("Expenses.form.status.pending")}</SelectItem>
+                      <SelectItem value="paid">{t("Expenses.form.status.paid")}</SelectItem>
+                      <SelectItem value="overdue">{t("Expenses.form.status.overdue")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* <FormField
           control={form.control}
           name="client_id"
           render={({ field }) => (
@@ -283,23 +280,24 @@ export function ExpenseForm({ id, onSuccess, defaultValues, editMode = false }: 
           )}
         /> */}
 
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Expenses.form.notes.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={t("Expenses.form.notes.placeholder")}
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Expenses.form.notes.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={t("Expenses.form.notes.placeholder")}
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </form>
     </Form>
   );

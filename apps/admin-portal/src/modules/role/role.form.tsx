@@ -13,6 +13,9 @@ import { Input } from "@/ui/input";
 import { ScrollArea } from "@/ui/scroll-area";
 import { Textarea } from "@/ui/textarea";
 
+import { ModuleFormProps } from "@/types/common.type";
+import { Role } from "@/types/rbac";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { usePermissions } from "../permission/permission.hooks";
@@ -48,7 +51,12 @@ interface RoleFormProps {
   formId?: string;
 }
 
-export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: RoleFormProps) {
+export function RoleForm({
+  formHtmlId,
+  defaultValues,
+  onSuccess,
+  editMode,
+}: ModuleFormProps<Role>) {
   const t = useTranslations();
   const locale = useLocale();
   const enterprise = useUserStore((state) => state.enterprise);
@@ -121,10 +129,10 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
 
     try {
       setIsLoading(true);
-      if (editMode && id) {
+      if (editMode && defaultValues?.id) {
         // Ensure id exists for edit mode
         await updateRole({
-          id: id,
+          id: defaultValues?.id,
           data: {
             name: formData.name,
             description: formData.description,
@@ -155,7 +163,7 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
 
   return (
     <Form {...form}>
-      <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+      <form id={formHtmlId} onSubmit={form.handleSubmit(onSubmit)}>
         <div className="form-container">
           <FormField
             control={form.control}

@@ -40,7 +40,12 @@ export const createProductSchema = (t: (key: string) => string) =>
 
 export type ProductFormValues = z.input<ReturnType<typeof createProductSchema>>;
 
-export function ProductForm({ id, onSuccess, defaultValues, editMode }: ModuleFormProps<Product>) {
+export function ProductForm({
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<Product>) {
   const t = useTranslations();
 
   const { profile, membership } = useUserStore();
@@ -135,7 +140,7 @@ export function ProductForm({ id, onSuccess, defaultValues, editMode }: ModuleFo
 
   return (
     <Form {...form}>
-      <form id={id || "product-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="form-container">
           <input type="submit" hidden />
           <FormField

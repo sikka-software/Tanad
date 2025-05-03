@@ -9,14 +9,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import { useJobs } from "@/job/job.hooks";
-import { Job } from "@/job/job.type";
 
 import { useCreateJobListing, useUpdateJobListing } from "@/job-listing/job-listing.hooks";
 import useJobListingsStore from "@/job-listing/job-listing.store";
-import { JobListingUpdateData } from "@/job-listing/job-listing.type";
+import { JobListing, JobListingUpdateData } from "@/job-listing/job-listing.type";
 
 import useUserStore from "@/stores/use-user-store";
+
+import { Job } from "../job/job.type";
 
 interface JobListingFormProps {
   id?: string;
@@ -36,12 +39,11 @@ export const createJobListingFormSchema = (t: (key: string) => string) =>
 export type JobListingFormValues = z.infer<ReturnType<typeof createJobListingFormSchema>>;
 
 export function JobListingForm({
-  id,
+  formHtmlId,
   onSuccess,
-  loading = false,
   defaultValues,
-  editMode = false,
-}: JobListingFormProps) {
+  editMode,
+}: ModuleFormProps<JobListing>) {
   const t = useTranslations();
   const { data: jobs, isLoading: isLoadingJobs } = useJobs();
 
@@ -141,7 +143,7 @@ export function JobListingForm({
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="title"

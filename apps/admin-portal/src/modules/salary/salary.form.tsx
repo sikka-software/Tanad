@@ -111,7 +111,7 @@ export function SalaryForm({
 
       if (editMode) {
         await updateSalary({
-          id: defaultValues?.id,
+          id: defaultValues?.id || "",
           data: {
             ...data,
             deductions: deductionsPayload ? JSON.parse(deductionsPayload) : undefined,

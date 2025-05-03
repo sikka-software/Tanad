@@ -21,10 +21,16 @@ import { Textarea } from "@/ui/textarea";
 
 import { createClient } from "@/utils/supabase/component";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import { ClientForm, type ClientFormValues } from "@/client/client.form";
 import { Client } from "@/client/client.type";
 
 import { Product } from "@/product/product.type";
+
+import useUserStore from "@/stores/use-user-store";
+
+import { Quote } from "./quote.type";
 
 export interface QuoteItem {
   product_id?: string;
@@ -45,27 +51,17 @@ export interface QuoteFormValues {
   items: QuoteItem[];
 }
 
-export interface QuoteFormProps {
-  id?: string;
-  formRef?: RefObject<HTMLFormElement>;
-  loading?: boolean;
-  user_id?: string | undefined;
-  onSubmit: (data: QuoteFormValues) => void;
-  hideFormButtons?: boolean;
-}
-
 export function QuoteForm({
-  id,
-  formRef,
-  loading,
-  user_id,
-  onSubmit,
-  hideFormButtons,
-}: QuoteFormProps) {
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<Quote>) {
   const supabase = createClient();
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
+  const { user } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -233,7 +229,7 @@ export function QuoteForm({
         .insert([
           {
             ...data,
-            user_id: user_id,
+            user_id: user?.id,
           },
         ])
         .select("*")
@@ -433,25 +429,22 @@ export function QuoteForm({
     </div>
   );
 
+  const handleSubmit = (data: QuoteFormValues) => {
+    const formattedData: QuoteFormValues = {
+      ...data,
+      items: data.items.map((item) => ({
+        ...item,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+      })),
+    };
+    console.log(data);
+  };
+
   return (
     <>
       <Form {...form}>
-        <form
-          id={id}
-          ref={formRef}
-          onSubmit={form.handleSubmit((data) => {
-            const formattedData: QuoteFormValues = {
-              ...data,
-              items: data.items.map((item) => ({
-                ...item,
-                quantity: item.quantity,
-                unit_price: item.unit_price,
-              })),
-            };
-            onSubmit(formattedData);
-          })}
-          className="space-y-4"
-        >
+        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -678,14 +671,6 @@ export function QuoteForm({
               <span className="text-sm font-bold">${total.toFixed(2)}</span>
             </div>
           </div>
-
-          {!hideFormButtons && (
-            <div className="flex justify-end">
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? t("Quotes.submitting") : t("Quotes.create_quote")}
-              </Button>
-            </div>
-          )}
         </form>
       </Form>
 

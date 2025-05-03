@@ -48,10 +48,10 @@ export const createCompanySchema = (t: (key: string) => string) => {
 export type CompanyFormValues = z.input<ReturnType<typeof createCompanySchema>>;
 
 export function CompanyForm({
-  id,
+  formHtmlId,
   onSuccess,
   defaultValues,
-  editMode = false,
+  editMode,
 }: ModuleFormProps<Company>) {
   const t = useTranslations();
   const { profile, membership } = useUserStore();
@@ -212,8 +212,8 @@ export function CompanyForm({
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="form-container">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
