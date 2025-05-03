@@ -1,6 +1,6 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,8 +10,10 @@ import {
   ArrowRight,
   Eye,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
+
+import { useRelativeTime } from "@/hooks/use-relative-time";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +46,29 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const [hasNextPage, setHasNextPage] = useState(true);
+  const localizedTimeDistance = (item: ActivityLogListData) => {
+    const format = useFormatter();
+
+    // 1. Get the timestamp.
+    const createdAt = item.created_at; // e.g., "2025-05-03T17:41:17.000Z" or a timestamp number
+
+    // 2. Ensure it's a Date object.
+    //    If createdAt is already a Date object, you can skip wrapping it.
+    //    If it's a string (like ISO 8601), new Date() usually works.
+    //    If it's a number (milliseconds since epoch), new Date() works too.
+    //    If it's a different string format, you might need parsing (e.g., with date-fns).
+    const createdAtDate = new Date(createdAt);
+
+    // 3. Check if the date is valid before formatting
+    const isValidDate = !isNaN(createdAtDate.getTime());
+
+    // 4. Format the date relatively using the formatter
+    //    next-intl's format.relativeTime handles calculating the difference
+    //    and selecting the appropriate unit (seconds, minutes, hours, etc.)
+    //    and formatting it according to the active locale (e.g., 'ar').
+    const relativeTimeString = isValidDate ? format.relativeTime(createdAtDate) : "Invalid Date"; // Fallback for invalid dates
+    return relativeTimeString;
+  };
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -87,6 +112,8 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
       return "Invalid Date";
     }
   };
+  const format = useFormatter();
+  const now = new Date();
 
   const getActionBadgeVariant = (
     actionType: string | null,
@@ -155,71 +182,102 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              activityLogs.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={`/placeholder-user.jpg`}
-                          alt={item.user_full_name || item.user_email || "User"}
-                        />
-                        <AvatarFallback>
-                          {(item.user_full_name || item.user_email || "U")
-                            .substring(0, 2)
-                            .toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="grid gap-0.5">
-                        <div className="font-medium">{item.user_full_name || "System/Unknown"}</div>
-                        <div className="text-muted-foreground text-xs">
-                          {item.user_email || "-"}
+              activityLogs.map((item) => {
+                const diffInSeconds = Math.floor(
+                  (now.getTime() - new Date(item.created_at).getTime()) / 1000,
+                );
+
+                let value: number;
+                let unit: Intl.RelativeTimeFormatUnit;
+
+                if (diffInSeconds < 60) {
+                  value = -diffInSeconds;
+                  unit = "second";
+                } else if (diffInSeconds < 3600) {
+                  value = -Math.floor(diffInSeconds / 60);
+                  unit = "minute";
+                } else if (diffInSeconds < 86400) {
+                  value = -Math.floor(diffInSeconds / 3600);
+                  unit = "hour";
+                } else {
+                  value = -Math.floor(diffInSeconds / 86400);
+                  unit = "day";
+                }
+
+                return (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage
+                            src={`/placeholder-user.jpg`}
+                            alt={item.user_full_name || item.user_email || "User"}
+                          />
+                          <AvatarFallback>
+                            {(item.user_full_name || item.user_email || "U")
+                              .substring(0, 2)
+                              .toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="grid gap-0.5">
+                          <div className="font-medium">
+                            {item.user_full_name || "System/Unknown"}
+                          </div>
+                          <div className="text-muted-foreground text-xs">
+                            {item.user_email || "-"}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-1">
-                        <Badge
-                          variant={getActionBadgeVariant(item.action_type)}
-                          className={badgeColor(item.action_type)}
-                        >
-                          {t(`General.${item.action_type?.toLowerCase() || "unknown"}`) ||
-                            "Unknown"}
-                        </Badge>
-                        <ArrowRight className="text-muted-foreground h-3 w-3 rtl:rotate-180" />
-                        <Badge variant="outline" className="text-xs capitalize">
-                          {t(`General.${item.target_type?.toLowerCase() || "N/A"}`) || "N/A"}
-                        </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1">
+                          <Badge
+                            variant={getActionBadgeVariant(item.action_type)}
+                            className={badgeColor(item.action_type)}
+                          >
+                            {t(`General.${item.action_type?.toLowerCase() || "unknown"}`) ||
+                              "Unknown"}
+                          </Badge>
+                          <ArrowRight className="text-muted-foreground h-3 w-3 rtl:rotate-180" />
+                          <Badge variant="outline" className="text-xs capitalize">
+                            {t(`General.${item.target_type?.toLowerCase() || "N/A"}`) || "N/A"}
+                          </Badge>
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          {t(`ActivityLogs.action_description.${item.action_type.toLowerCase()}`, {
+                            action: t(`General.${item.action_type.toLowerCase()}`),
+                            target: t(`General.${item.target_type?.toLowerCase()}`) || "item",
+                            name: item.target_name || item.target_id || "N/A",
+                          })}
+                          {/* {getActionPastTense(item.action_type)} */}
+                        </div>
                       </div>
-                      <div className="text-muted-foreground text-xs">
-                        {t(`ActivityLogs.action_description.${item.action_type.toLowerCase()}`, {
-                          action: t(`General.${item.action_type.toLowerCase()}`),
-                          target: t(`General.${item.target_type?.toLowerCase()}`) || "item",
-                          name: item.target_name || item.target_id || "N/A",
-                        })}
-                        {/* {getActionPastTense(item.action_type)} */}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground max-w-[300px] truncate text-xs">
+                      {/* {typeof item.details === 'string' ? item.details : JSON.stringify(item.details)} */}
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      <div className="flex flex-col">
+                        <span>{format.relativeTime(new Date(item.created_at))}</span>
+                        {/* <span>{localizedTimeDistance(item)}</span> */}
+                        <span className="text-muted-foreground text-[10px]">
+                          {item.created_at ? format.dateTime(new Date(item.created_at), "PPpp") : "N/A"}
+                        </span>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground max-w-[300px] truncate text-xs">
-                    {/* {typeof item.details === 'string' ? item.details : JSON.stringify(item.details)} */}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground text-xs">
-                    {formatDateTime(item.created_at)}
-                  </TableCell>
-                  <TableCell className="w-[50px] text-right">
-                    <IconButton
-                      icon={<Eye className="h-4 w-4" />}
-                      label={t("General.preview")}
-                      variant="ghost"
-                      size="icon_sm"
-                      onClick={() => openDialog(item)}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell className="w-[50px] text-right">
+                      <IconButton
+                        icon={<Eye className="h-4 w-4" />}
+                        label={t("General.preview")}
+                        variant="ghost"
+                        size="icon_sm"
+                        onClick={() => openDialog(item)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>
