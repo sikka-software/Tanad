@@ -83,7 +83,12 @@ const createInvoiceSchema = (t: (key: string) => string) =>
 
 export type InvoiceFormValues = z.infer<ReturnType<typeof createInvoiceSchema>>;
 
-export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFormProps<Invoice>) {
+export function InvoiceForm({
+  formHtmlId,
+  editMode,
+  onSuccess,
+  defaultValues,
+}: ModuleFormProps<Invoice>) {
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();
@@ -280,7 +285,7 @@ export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFo
   return (
     <>
       <Form {...form}>
-        <form id={id || "invoice-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+        <form id={formHtmlId || "invoice-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
@@ -510,7 +515,7 @@ export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFo
         cancelText={t("cancel")}
         submitText={t("save")}
       >
-        <ClientForm id="client-form" />
+        <ClientForm formHtmlId="client-form" />
       </FormDialog>
       <FormDialog
         open={isNewProductDialogOpen}
@@ -520,7 +525,7 @@ export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFo
         cancelText={t("cancel")}
         submitText={t("save")}
       >
-        <ProductForm id="product-form" />
+        <ProductForm formHtmlId="product-form" />
       </FormDialog>
     </>
   );

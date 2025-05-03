@@ -468,7 +468,7 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
       >
         {chosenForm === "Warehouses" && (
           <WarehouseForm
-            id="warehouse-form"
+            formHtmlId="warehouse-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
               setIsDepartmentDialogOpen(false);
@@ -477,7 +477,7 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
         )}
         {chosenForm === "Offices" && (
           <OfficeForm
-            id="office-form"
+            formHtmlId="office-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
               setIsDepartmentDialogOpen(false);
@@ -486,7 +486,7 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
         )}
         {chosenForm === "Branches" && (
           <BranchForm
-            id="branch-form"
+            formHtmlId="branch-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
               setIsDepartmentDialogOpen(false);
@@ -495,7 +495,7 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
         )}
         {chosenForm === "Departments" && (
           <DepartmentForm
-            id="department-form"
+            formHtmlId="department-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
               setIsDepartmentDialogOpen(false);

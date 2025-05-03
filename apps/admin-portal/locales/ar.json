@@ -3439,9 +3439,11 @@
       "title": "تفاصيل النشاط"
     },
     "filters": {
-      "eventType": "نوع النشاط",
-      "selectEventType": "اختر نوع النشاط",
-      "allEvents": "جميع الأنشطة",
+      "date_range": "المدى الزمني",
+      "select_date_range": "اختر المدى الزمني",
+      "event_type": "نوع النشاط",
+      "select_event_type": "اختر نوع النشاط",
+      "all_events": "جميع الأنشطة",
       "login": "تسجيل الدخول",
       "logout": "تسجيل الخروج",
       "create": "إنشاء",

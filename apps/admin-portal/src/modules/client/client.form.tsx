@@ -15,9 +15,11 @@ import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
 import PhoneInput from "@/components/ui/phone-input";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import { useCreateClient, useUpdateClient } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
-import { ClientUpdateData } from "@/client/client.type";
+import { Client, ClientUpdateData } from "@/client/client.type";
 
 import { CompanyForm } from "@/company/company.form";
 import { useCompanies } from "@/company/company.hooks";
@@ -43,21 +45,12 @@ export const createClientSchema = (t: (key: string) => string) => {
 
 export type ClientFormValues = z.input<ReturnType<typeof createClientSchema>>;
 
-interface ClientFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  loading?: boolean;
-  defaultValues?: ClientUpdateData | null;
-  editMode?: boolean;
-}
-
 export function ClientForm({
-  id,
+  formHtmlId,
   onSuccess,
-  loading = false,
   defaultValues,
   editMode = false,
-}: ClientFormProps) {
+}: ModuleFormProps<Client>) {
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();
@@ -173,7 +166,7 @@ export function ClientForm({
   return (
     <>
       <Form {...form}>
-        <form id={id || "client-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+        <form id={formHtmlId || "client-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
               <FormField
@@ -186,7 +179,7 @@ export function ClientForm({
                       <Input
                         placeholder={t("Clients.form.name.placeholder")}
                         {...field}
-                        disabled={loading}
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -288,7 +281,7 @@ export function ClientForm({
         title={t("Companies.add_new")}
         formId="company-form"
       >
-        <CompanyForm id="company-form" onSuccess={() => setIsCompanyDialogOpen(false)} />
+        <CompanyForm formHtmlId="company-form" onSuccess={() => setIsCompanyDialogOpen(false)} />
       </FormDialog>
     </>
   );

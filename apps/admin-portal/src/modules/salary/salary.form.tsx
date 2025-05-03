@@ -18,6 +18,8 @@ import { Textarea } from "@/ui/textarea";
 
 import { generateDummyEmployee } from "@/lib/dummy-factory";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import { EmployeeForm } from "@/employee/employee.form";
 import { useEmployees } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
@@ -28,6 +30,7 @@ import useSalaryStore from "@/salary/salary.store";
 import useUserStore from "@/stores/use-user-store";
 
 import { DEDUCTION_TYPES } from "./salary.options";
+import { Salary } from "./salary.type";
 
 const deductionSchema = z.object({
   type: z.string().min(1, "Type is required"),
@@ -52,15 +55,12 @@ const createSalarySchema = (t: (key: string) => string) =>
 // This type will have numbers for amounts due to the .transform()
 export type SalaryFormValues = z.infer<ReturnType<typeof createSalarySchema>>;
 
-interface SalaryFormProps {
-  id?: string;
-  loading?: boolean;
-  onSuccess?: () => void;
-  defaultValues?: SalaryFormValues | null;
-  editMode?: boolean;
-}
-
-export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFormProps) {
+export function SalaryForm({
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<Salary>) {
   const t = useTranslations();
   const locale = useLocale();
   const { user } = useUserStore();
@@ -111,7 +111,7 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
 
       if (editMode) {
         await updateSalary({
-          id: id!,
+          id: defaultValues?.id,
           data: {
             ...data,
             deductions: deductionsPayload ? JSON.parse(deductionsPayload) : undefined,
@@ -153,7 +153,8 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
   return (
     <>
       <Form {...form}>
-        <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        className="space-y-4"
+        <form id={formHtmlId || "salary-form"} onSubmit={form.handleSubmit(handleSubmit)}>
           <FormField
             control={form.control}
             name="employee_name"
@@ -196,7 +197,7 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
                         if (date) {
                           // Ensure we're working with the local date
                           const localDate = new Date(
-                            date.getTime() - date.getTimezoneOffset() * 60000,
+                            (date as Date).getTime() - (date as Date).getTimezoneOffset() * 60000,
                           );
                           field.onChange(localDate.toISOString().split("T")[0]);
                         } else {
@@ -223,7 +224,7 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
                         if (date) {
                           // Ensure we're working with the local date
                           const localDate = new Date(
-                            date.getTime() - date.getTimezoneOffset() * 60000,
+                            (date as Date).getTime() - (date as Date).getTimezoneOffset() * 60000,
                           );
                           field.onChange(localDate.toISOString().split("T")[0]);
                         } else {
@@ -253,7 +254,7 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
                       if (date) {
                         // Ensure we're working with the local date
                         const localDate = new Date(
-                          date.getTime() - date.getTimezoneOffset() * 60000,
+                          (date as Date).getTime() - (date as Date).getTimezoneOffset() * 60000,
                         );
                         field.onChange(localDate.toISOString().split("T")[0]);
                       } else {
@@ -321,7 +322,7 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
                     control={form.control}
                     name={`deductions.${index}.amount`}
                     render={({ field: amountField }) => (
-                      <FormItem className="w-full flex-grow max-w-1/2">
+                      <FormItem className="w-full max-w-1/2 flex-grow">
                         <FormLabel className="sr-only">
                           {t("Salaries.form.deduction_amount.label")}
                         </FormLabel>
@@ -346,7 +347,7 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
                     control={form.control}
                     name={`deductions.${index}.type`}
                     render={({ field: typeField }) => (
-                      <FormItem className="w-full flex-grow max-w-1/2">
+                      <FormItem className="w-full max-w-1/2 flex-grow">
                         <FormLabel className="sr-only">
                           {t("Salaries.form.deduction_type.label")}
                         </FormLabel>
@@ -383,7 +384,7 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
                     type="button"
                     variant="outline"
                     size="icon"
-                    className="min-w-10 h-10"
+                    className="h-10 min-w-10"
                     onClick={() => remove(index)}
                     disabled={loading}
                     aria-label={t("Salaries.form.remove_deduction")}
@@ -436,7 +437,7 @@ export function SalaryForm({ id, onSuccess, defaultValues, editMode }: SalaryFor
         dummyData={() => process.env.NODE_ENV === "development" && generateDummyEmployee()}
       >
         <EmployeeForm
-          id="employee-form"
+          formHtmlId="employee-form"
           onSuccess={() => {
             setIsEmployeeSaving(false);
             setIsEmployeeDialogOpen(false);

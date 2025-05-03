@@ -12,7 +12,7 @@ const ActivityPage = () => {
   const t = useTranslations();
   return (
     <DataPageLayout>
-      <CardHeader className="pb-3">
+      <CardHeader className="p-4 pb-0">
         <CardTitle>{t("ActivityLogs.title")}</CardTitle>
         <CardDescription>{t("ActivityLogs.description")}</CardDescription>
       </CardHeader>

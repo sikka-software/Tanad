@@ -1,33 +1,16 @@
 "use client";
 
-import { formatDistanceToNow, format } from "date-fns";
-import {
-  ChevronLeft,
-  ChevronRight,
-  AlertTriangle,
-  Info,
-  CheckCircle2,
-  ArrowRight,
-  Eye,
-} from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { ChevronLeft, ChevronRight, ArrowRight, Eye } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-
-import { useRelativeTime } from "@/hooks/use-relative-time";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import IconButton from "@/components/ui/icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 import { ActivityService } from "./activity.service";
 import { useActivityLogStore } from "./activity.store";
@@ -46,29 +29,8 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const [hasNextPage, setHasNextPage] = useState(true);
-  const localizedTimeDistance = (item: ActivityLogListData) => {
-    const format = useFormatter();
-
-    // 1. Get the timestamp.
-    const createdAt = item.created_at; // e.g., "2025-05-03T17:41:17.000Z" or a timestamp number
-
-    // 2. Ensure it's a Date object.
-    //    If createdAt is already a Date object, you can skip wrapping it.
-    //    If it's a string (like ISO 8601), new Date() usually works.
-    //    If it's a number (milliseconds since epoch), new Date() works too.
-    //    If it's a different string format, you might need parsing (e.g., with date-fns).
-    const createdAtDate = new Date(createdAt);
-
-    // 3. Check if the date is valid before formatting
-    const isValidDate = !isNaN(createdAtDate.getTime());
-
-    // 4. Format the date relatively using the formatter
-    //    next-intl's format.relativeTime handles calculating the difference
-    //    and selecting the appropriate unit (seconds, minutes, hours, etc.)
-    //    and formatting it according to the active locale (e.g., 'ar').
-    const relativeTimeString = isValidDate ? format.relativeTime(createdAtDate) : "Invalid Date"; // Fallback for invalid dates
-    return relativeTimeString;
-  };
+  const format = useFormatter();
+  const now = new Date();
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -102,18 +64,6 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
       setPage((prev) => prev + 1);
     }
   };
-
-  const formatDateTime = (dateString: string | null) => {
-    if (!dateString) return "N/A";
-    try {
-      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
-    } catch (e) {
-      console.error("Error formatting date:", e);
-      return "Invalid Date";
-    }
-  };
-  const format = useFormatter();
-  const now = new Date();
 
   const getActionBadgeVariant = (
     actionType: string | null,
@@ -262,7 +212,9 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                         <span>{format.relativeTime(new Date(item.created_at))}</span>
                         {/* <span>{localizedTimeDistance(item)}</span> */}
                         <span className="text-muted-foreground text-[10px]">
-                          {item.created_at ? format.dateTime(new Date(item.created_at), "PPpp") : "N/A"}
+                          {item.created_at
+                            ? format.dateTime(new Date(item.created_at), "PPpp")
+                            : "N/A"}
                         </span>
                       </div>
                     </TableCell>

@@ -379,6 +379,7 @@ export function EmployeeForm({
                     <FormLabel>{t("Employees.form.hire_date.label")} *</FormLabel>
                     <FormControl>
                       <DatePicker
+                        placeholder={t("Employees.form.hire_date.placeholder")}
                         date={field.value}
                         onSelect={field.onChange}
                         disabled={isSubmitting}

@@ -539,7 +539,9 @@ export function QuoteForm({
                   <FormLabel>{t("Quotes.form.issue_date.label")} *</FormLabel>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
-                    onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+                    onSelect={(date) =>
+                      field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")
+                    }
                     placeholder={t("Quotes.form.issue_date.placeholder")}
                   />
                   <FormMessage />
@@ -555,7 +557,9 @@ export function QuoteForm({
                   <FormLabel>{t("Quotes.form.expiry_date.label")} *</FormLabel>
                   <DatePicker
                     date={field.value ? new Date(field.value) : undefined}
-                    onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+                    onSelect={(date) =>
+                      field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")
+                    }
                     placeholder={t("Quotes.form.expiry_date.placeholder")}
                   />
                   <FormMessage />
@@ -693,7 +697,7 @@ export function QuoteForm({
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
-        <ClientForm id="client-form" />
+        <ClientForm formHtmlId="client-form" />
       </FormDialog>
     </>
   );

@@ -11,13 +11,19 @@ import { Input } from "@/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import { useOffices } from "@/office/office.hooks";
 
 import { useBranches } from "@/branch/branch.hooks";
 
 import { useCreateDepartment, useUpdateDepartment } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
-import { DepartmentCreateData, DepartmentUpdateData } from "@/department/department.type";
+import {
+  Department,
+  DepartmentCreateData,
+  DepartmentUpdateData,
+} from "@/department/department.type";
 
 import { useWarehouses } from "@/warehouse/warehouse.hooks";
 
@@ -48,19 +54,12 @@ export const createDepartmentSchema = (t: (key: string) => string) =>
 
 export type DepartmentFormValues = z.infer<ReturnType<typeof createDepartmentSchema>>;
 
-interface DepartmentFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: DepartmentUpdateData | null;
-  editMode?: boolean;
-}
-
 export default function DepartmentForm({
-  id,
+  formHtmlId,
   onSuccess,
   defaultValues,
   editMode = false,
-}: DepartmentFormProps) {
+}: ModuleFormProps<Department>) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
   const { mutateAsync: createDepartment } = useCreateDepartment();
@@ -148,14 +147,14 @@ export default function DepartmentForm({
       if (editMode) {
         try {
           const locations = data.locations.map((location) => ({
-            department_id: id!,
+            department_id: defaultValues?.id,
             location_id: location.id,
             location_type: location.type,
             user_id: user.id,
           }));
 
           await updateDepartment({
-            id: id!,
+            id: defaultValues?.id,
             data: {
               name: data.name,
               description: data.description || null,
@@ -185,7 +184,7 @@ export default function DepartmentForm({
             user_id: user.id,
             is_active: true,
             locations: data.locations.map((location) => ({
-              department_id: id!,
+              department_id: defaultValues?.id,
               location_id: location.id,
               location_type: location.type,
               user_id: user.id,
@@ -222,7 +221,11 @@ export default function DepartmentForm({
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form
+        id={formHtmlId || "department-form"}
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-8"
+      >
         <div className="form-container">
           <FormField
             control={form.control}

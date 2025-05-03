@@ -71,7 +71,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
               <div className="grid grid-cols-1 gap-4 rounded-md border p-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    {t("ActivityLogs.filters.eventType")}
+                    {t("ActivityLogs.filters.event_type")}
                   </label>
                   <Select
                     value={filters.eventType}
@@ -79,10 +79,10 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                     dir={locale === "ar" ? "rtl" : "ltr"}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={t("ActivityLogs.filters.selectEventType")} />
+                      <SelectValue placeholder={t("ActivityLogs.filters.select_event_type")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("ActivityLogs.filters.allEvents")}</SelectItem>
+                      <SelectItem value="all">{t("ActivityLogs.filters.all_events")}</SelectItem>
                       <SelectItem value="created">{t("ActivityLogs.filters.create")}</SelectItem>
                       <SelectItem value="updated">{t("ActivityLogs.filters.update")}</SelectItem>
                       <SelectItem value="deleted">{t("ActivityLogs.filters.delete")}</SelectItem>
@@ -93,11 +93,12 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                   </Select>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label>{t("ActivityLogs.filters.date")}</Label>
+                  <Label>{t("ActivityLogs.filters.date_range")}</Label>
                   <DatePicker
+                    placeholder={t("ActivityLogs.filters.select_date_range")}
                     date={filters.dateRange}
                     onSelect={(d) => {
-                      if (d === undefined || (d && 'from' in d)) {
+                      if (d === undefined || (d && "from" in d)) {
                         setFilters({ dateRange: d });
                       }
                     }}
