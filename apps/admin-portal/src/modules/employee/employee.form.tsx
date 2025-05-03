@@ -117,8 +117,10 @@ export function EmployeeForm({
   const setLoadingSave = useEmployeeStore((state) => state.setIsLoading);
   const loadingSave = useEmployeeStore((state) => state.isLoading);
 
+  const actualEmployeeId = editMode ? defaultValues?.id : undefined;
+
   const form = useForm<EmployeeFormValues>({
-    resolver: zodResolver(createEmployeeFormSchema(t, editMode ? id : undefined)),
+    resolver: zodResolver(createEmployeeFormSchema(t, actualEmployeeId)),
     defaultValues: {
       first_name: defaultValues?.first_name || "",
       last_name: defaultValues?.last_name || "",
