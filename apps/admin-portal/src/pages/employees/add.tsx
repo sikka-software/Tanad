@@ -2,7 +2,6 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
@@ -12,17 +11,12 @@ import { generateDummyData } from "@/lib/dummy-generator";
 import { EmployeeForm } from "@/employee/employee.form";
 import useEmployeesStore from "@/employee/employee.store";
 
-import { useCreateEmployee, useUpdateEmployee } from "@/modules/employee/employee.hooks";
-
 export default function AddEmployeePage() {
   const t = useTranslations();
   const router = useRouter();
-  
+
   const setLoadingSave = useEmployeesStore((state) => state.setIsLoading);
   const loadingSave = useEmployeesStore((state) => state.isLoading);
-
-  const { mutateAsync: updateEmployeeMutate, isPending: isUpdatingEmployee } = useUpdateEmployee();
-  const { mutateAsync: createEmployeeMutate, isPending: isCreatingEmployee } = useCreateEmployee();
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -61,9 +55,6 @@ export default function AddEmployeePage() {
             setLoadingSave(false);
           })
         }
-        createEmployee={createEmployeeMutate}
-        updateEmployee={updateEmployeeMutate}
-        isSubmitting={loadingSave}
       />
     </div>
   );

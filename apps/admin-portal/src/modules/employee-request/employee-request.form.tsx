@@ -4,6 +4,7 @@ import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/ui/button";
@@ -18,11 +19,16 @@ import { Textarea } from "@/ui/textarea";
 
 import { cn } from "@/lib/utils";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import { EmployeeForm } from "@/employee/employee.form";
 import { useEmployees } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
 
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
+
+import { useCreateEmployeeRequest, useUpdateEmployeeRequest } from "./employee-request.hooks";
+import { EmployeeRequest, EmployeeRequestCreateData } from "./employee-request.type";
 
 const createRequestSchema = (t: (key: string) => string) =>
   z.object({
@@ -44,14 +50,12 @@ const createRequestSchema = (t: (key: string) => string) =>
 
 export type EmployeeRequestFormValues = z.input<ReturnType<typeof createRequestSchema>>;
 
-interface EmployeeRequestFormProps {
-  id?: string;
-  employee_id?: string;
-  onSubmit: (data: EmployeeRequestFormValues) => void;
-  loading?: boolean;
-}
-
-const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormProps) => {
+const EmployeeRequestForm = ({
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<EmployeeRequest>) => {
   const t = useTranslations();
   const locale = useLocale();
 
@@ -60,6 +64,9 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
   const isLoadingCreateEmployee = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
 
+  const { mutateAsync: createEmployeeRequest, isPending: isCreating } = useCreateEmployeeRequest();
+  const { mutateAsync: updateEmployeeRequest, isPending: isUpdating } = useUpdateEmployeeRequest();
+
   const isLoadingSave = useEmployeeRequestsStore((state) => state.isLoading);
   const setIsLoadingSave = useEmployeeRequestsStore((state) => state.setIsLoading);
 
@@ -67,16 +74,16 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
     resolver: zodResolver(createRequestSchema(t)),
     mode: "onChange",
     defaultValues: {
-      employee_id: employee_id || "",
-      type: "leave",
-      status: "pending",
-      title: "",
-      description: "",
-      start_date: undefined,
-      end_date: undefined,
-      amount: undefined,
+      employee_id: defaultValues?.employee_id || "",
+      type: defaultValues?.type || "leave",
+      status: defaultValues?.status || "pending",
+      title: defaultValues?.title || "",
+      description: defaultValues?.description || "",
+      start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
+      end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
+      amount: defaultValues?.amount || undefined,
       // attachments: [],
-      notes: "",
+      notes: defaultValues?.notes || "",
     },
   });
 
@@ -88,21 +95,49 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
     };
   });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (data: EmployeeRequestFormValues) => {
+    setIsLoadingSave(true);
+
+    const finalSubmitData = {
+      ...data,
+      title: data.title.trim(),
+      description: data.description?.trim() || undefined,
+      notes: data.notes?.trim() || undefined,
+    };
+
     try {
-      setIsLoadingSave(true);
-      const isValid = await form.trigger();
-      if (!isValid) {
-        setIsLoadingSave(false);
-        return;
+      if (editMode) {
+        await updateEmployeeRequest({
+          id: defaultValues?.id || "",
+          updates: { ...finalSubmitData } as EmployeeRequest,
+        });
+        onSuccess?.();
+      } else {
+        await createEmployeeRequest(finalSubmitData as EmployeeRequestCreateData);
+        onSuccess?.();
       }
-      await form.handleSubmit(onSubmit)();
     } catch (error) {
       setIsLoadingSave(false);
-      console.error("Error submitting form:", error);
+      toast.error(t("General.error_operation"), {
+        description: t("EmployeeRequests.error.create"),
+      });
     }
   };
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   try {
+  //     setIsLoadingSave(true);
+  //     const isValid = await form.trigger();
+  //     if (!isValid) {
+  //       setIsLoadingSave(false);
+  //       return;
+  //     }
+  //     await form.handleSubmit(onSubmit)();
+  //   } catch (error) {
+  //     setIsLoadingSave(false);
+  //     console.error("Error submitting form:", error);
+  //   }
+  // };
 
   const requestTypes = [
     { label: t("EmployeeRequests.form.type.leave"), value: "leave" },
@@ -118,143 +153,41 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
   return (
     <>
       <Form {...form}>
-        <form id={id || "employee-request-form"} onSubmit={handleSubmit} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="employee_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("EmployeeRequests.form.employee.label")} *</FormLabel>
-                <FormControl>
-                  <ComboboxAdd
-                    direction={locale === "ar" ? "rtl" : "ltr"}
-                    data={employeeOptions}
-                    disabled={isLoadingSave}
-                    isLoading={employeesLoading}
-                    defaultValue={field.value}
-                    valueKey={"id"}
-                    onChange={(value) => {
-                      field.onChange(value || null);
-                    }}
-                    renderOption={(item) => {
-                      return (
-                        <div className="flex flex-col">
-                          <span>{item.label}</span>
-                          <span className="text-muted-foreground text-sm">{item.value}</span>
-                        </div>
-                      );
-                    }}
-                    texts={{
-                      placeholder: t("EmployeeRequests.form.employee.placeholder"),
-                      searchPlaceholder: t("Employees.search_employees"),
-                      noItems: t("EmployeeRequests.form.employee.no_employees"),
-                    }}
-                    addText={t("Employees.add_new")}
-                    onAddClick={() => setIsEmployeeDialogOpen(true)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("EmployeeRequests.form.type.label")}</FormLabel>
-                <FormControl>
-                  <Select
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                    disabled={isLoadingSave}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("EmployeeRequests.form.type.placeholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {requestTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("EmployeeRequests.form.title.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder={t("EmployeeRequests.form.title.placeholder")}
-                    disabled={isLoadingSave}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("EmployeeRequests.form.description.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder={t("EmployeeRequests.form.description.placeholder")}
-                    disabled={isLoadingSave}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid grid-cols-2 gap-4">
+        <form id={formHtmlId || "employee-request-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="form-container">
             <FormField
               control={form.control}
-              name="start_date"
+              name="employee_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("EmployeeRequests.form.date_range.start")}</FormLabel>
+                  <FormLabel>{t("EmployeeRequests.form.employee.label")} *</FormLabel>
                   <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground",
-                          )}
-                          disabled={isLoadingSave}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {field.value ? format(field.value, "PPP") : t("General.pick_date")}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <ComboboxAdd
+                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      data={employeeOptions}
+                      disabled={isLoadingSave}
+                      isLoading={employeesLoading}
+                      defaultValue={field.value}
+                      valueKey={"id"}
+                      onChange={(value) => {
+                        field.onChange(value || null);
+                      }}
+                      renderOption={(item) => {
+                        return (
+                          <div className="flex flex-col">
+                            <span>{item.label}</span>
+                            <span className="text-muted-foreground text-sm">{item.value}</span>
+                          </div>
+                        );
+                      }}
+                      texts={{
+                        placeholder: t("EmployeeRequests.form.employee.placeholder"),
+                        searchPlaceholder: t("Employees.search_employees"),
+                        noItems: t("EmployeeRequests.form.employee.no_employees"),
+                      }}
+                      addText={t("Employees.add_new")}
+                      onAddClick={() => setIsEmployeeDialogOpen(true)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -263,79 +196,183 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
 
             <FormField
               control={form.control}
-              name="end_date"
+              name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("EmployeeRequests.form.date_range.end")}</FormLabel>
+                  <FormLabel>{t("EmployeeRequests.form.type.label")}</FormLabel>
                   <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground",
-                          )}
-                          disabled={isLoadingSave}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {field.value ? format(field.value, "PPP") : t("General.pick_date")}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <Select
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                      disabled={isLoadingSave}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("EmployeeRequests.form.type.placeholder")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {requestTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("EmployeeRequests.form.title.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder={t("EmployeeRequests.form.title.placeholder")}
+                      disabled={isLoadingSave}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("EmployeeRequests.form.description.label")}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder={t("EmployeeRequests.form.description.placeholder")}
+                      disabled={isLoadingSave}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="start_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("EmployeeRequests.form.date_range.start")}</FormLabel>
+                    <FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground",
+                            )}
+                            disabled={isLoadingSave}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? format(field.value, "PPP") : t("General.pick_date")}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="end_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("EmployeeRequests.form.date_range.end")}</FormLabel>
+                    <FormControl>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !field.value && "text-muted-foreground",
+                            )}
+                            disabled={isLoadingSave}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {field.value ? format(field.value, "PPP") : t("General.pick_date")}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("EmployeeRequests.form.amount.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      {...field}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      placeholder={t("EmployeeRequests.form.amount.placeholder")}
+                      disabled={isLoadingSave}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("EmployeeRequests.form.notes.label")}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder={t("EmployeeRequests.form.notes.placeholder")}
+                      disabled={isLoadingSave}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-
-          <FormField
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("EmployeeRequests.form.amount.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    {...field}
-                    onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                    placeholder={t("EmployeeRequests.form.amount.placeholder")}
-                    disabled={isLoadingSave}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("EmployeeRequests.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder={t("EmployeeRequests.form.notes.placeholder")}
-                    disabled={isLoadingSave}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </form>
       </Form>
 
@@ -347,7 +384,7 @@ const EmployeeRequestForm = ({ id, employee_id, onSubmit }: EmployeeRequestFormP
         loadingSave={isLoadingCreateEmployee}
       >
         <EmployeeForm
-          id="employee-form"
+          formHtmlId="employee-form"
           onSuccess={() => {
             setIsEmployeeDialogOpen(false);
             setIsLoadingCreateEmployee(false);

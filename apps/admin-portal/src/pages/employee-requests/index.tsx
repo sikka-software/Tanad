@@ -34,10 +34,10 @@ export default function EmployeeRequestsPage() {
   const router = useRouter();
 
   const canReadEmployeeRequests = useUserStore((state) =>
-    state.hasPermission("employee-requests.read"),
+    state.hasPermission("employee_requests.read"),
   );
   const canCreateEmployeeRequests = useUserStore((state) =>
-    state.hasPermission("employee-requests.create"),
+    state.hasPermission("employee_requests.create"),
   );
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);

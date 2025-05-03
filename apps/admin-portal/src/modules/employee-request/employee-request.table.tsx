@@ -13,6 +13,7 @@ import { ModuleTableProps } from "@/types/common.type";
 import { useUpdateEmployeeRequest } from "@/employee-request/employee-request.hooks";
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
 import { EmployeeRequest } from "@/employee-request/employee-request.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 const EmployeeRequestsTable = ({
@@ -27,19 +28,19 @@ const EmployeeRequestsTable = ({
   const selectedRows = useEmployeeRequestsStore((state) => state.selectedRows);
 
   const canEditEmployeeRequest = useUserStore((state) =>
-    state.hasPermission("employee-requests.update"),
+    state.hasPermission("employee_requests.update"),
   );
   const canDuplicateEmployeeRequest = useUserStore((state) =>
-    state.hasPermission("employee-requests.duplicate"),
+    state.hasPermission("employee_requests.duplicate"),
   );
   const canViewEmployeeRequest = useUserStore((state) =>
-    state.hasPermission("employee-requests.view"),
+    state.hasPermission("employee_requests.view"),
   );
   const canArchiveEmployeeRequest = useUserStore((state) =>
-    state.hasPermission("employee-requests.archive"),
+    state.hasPermission("employee_requests.archive"),
   );
   const canDeleteEmployeeRequest = useUserStore((state) =>
-    state.hasPermission("employee-requests.delete"),
+    state.hasPermission("employee_requests.delete"),
   );
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
@@ -107,7 +108,7 @@ const EmployeeRequestsTable = ({
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateEmployeeRequest({ id: rowId, data: { [columnId]: value } });
+    await updateEmployeeRequest({ id: rowId, updates: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = (rows: EmployeeRequest[]) => {

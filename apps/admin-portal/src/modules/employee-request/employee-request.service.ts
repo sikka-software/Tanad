@@ -2,7 +2,7 @@ import { EmployeeRequest, EmployeeRequestCreateData } from "./employee-request.t
 
 export async function fetchEmployeeRequests(): Promise<EmployeeRequest[]> {
   try {
-    const response = await fetch("/api/employee-requests");
+    const response = await fetch("/api/resource/employee-requests");
     if (!response.ok) {
       throw new Error("Failed to fetch employee requests");
     }
@@ -16,7 +16,7 @@ export async function fetchEmployeeRequests(): Promise<EmployeeRequest[]> {
 
 export async function fetchEmployeeRequestById(id: string): Promise<EmployeeRequest> {
   try {
-    const response = await fetch(`/api/employee-requests/${id}`);
+    const response = await fetch(`/api/resource/employee-requests/${id}`);
     if (!response.ok) {
       throw new Error(`Employee request with id ${id} not found`);
     }
@@ -31,7 +31,7 @@ export async function createEmployeeRequest(
   employeeRequest: EmployeeRequestCreateData,
 ): Promise<EmployeeRequest> {
   try {
-    const response = await fetch("/api/employee-requests", {
+    const response = await fetch("/api/resource/employee-requests", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(employeeRequest),
@@ -47,7 +47,7 @@ export async function createEmployeeRequest(
 }
 
 export async function duplicateEmployeeRequest(id: string): Promise<EmployeeRequest> {
-  const response = await fetch(`/api/employee-requests/${id}/duplicate`, {
+  const response = await fetch(`/api/resource/employee-requests/${id}/duplicate`, {
     method: "POST",
   });
   if (!response.ok) {
@@ -61,7 +61,7 @@ export async function updateEmployeeRequest(
   updates: Partial<EmployeeRequest>,
 ): Promise<EmployeeRequest> {
   try {
-    const response = await fetch(`/api/employee-requests/${id}`, {
+    const response = await fetch(`/api/resource/employee-requests/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
@@ -78,7 +78,7 @@ export async function updateEmployeeRequest(
 
 export async function deleteEmployeeRequest(id: string): Promise<void> {
   try {
-    const response = await fetch(`/api/employee-requests/${id}`, {
+    const response = await fetch(`/api/resource/employee-requests/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -92,7 +92,7 @@ export async function deleteEmployeeRequest(id: string): Promise<void> {
 
 export async function bulkDeleteEmployeeRequests(ids: string[]): Promise<void> {
   try {
-    const response = await fetch("/api/employee-requests/bulk-delete", {
+    const response = await fetch("/api/resource/employee-requests/bulk-delete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),

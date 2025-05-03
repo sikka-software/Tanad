@@ -176,7 +176,7 @@ const modelMap: Record<string, ModelConfig> = {
   },
   quotes: { tableName: "quotes" },
   vendors: { tableName: "vendors" },
-
+  "employee-requests": { tableName: "employee_requests" },
   activity: {
     tableName: "activity_logs",
     customHandlers: {
@@ -196,10 +196,9 @@ const modelMap: Record<string, ModelConfig> = {
         }
         const enterprise_id = membership.enterprise_id;
 
-        const { data, error } = await supabase.rpc(
-          "get_activity_logs_with_user_email",
-          { p_enterprise_id: enterprise_id },
-        );
+        const { data, error } = await supabase.rpc("get_activity_logs_with_user_email", {
+          p_enterprise_id: enterprise_id,
+        });
 
         if (error) {
           console.error("Error calling get_activity_logs_with_user_email RPC:", error);
