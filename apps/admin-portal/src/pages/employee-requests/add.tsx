@@ -6,7 +6,7 @@ import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import EmployeeRequestForm from "@/employee-request/employee-request.form";
+import { EmployeeRequestForm } from "@/employee-request/employee-request.form";
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
 
 export default function AddEmployeeRequestPage() {

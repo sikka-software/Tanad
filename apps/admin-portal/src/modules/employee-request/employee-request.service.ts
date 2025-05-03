@@ -67,12 +67,29 @@ export async function updateEmployeeRequest(
       body: JSON.stringify(updates),
     });
     if (!response.ok) {
-      throw new Error(`Failed to update employee request with id ${id}`);
+      let errorDetails = {};
+      let errorMessage = `Failed to update employee request with id ${id}. Status: ${response.status}`;
+      try {
+        // Try to parse the error response from the API
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage; // Use the message from the API if available
+        errorDetails = errorData.errorDetails || {};
+        console.error("API Error Data:", errorData); // Log the full error data from API
+      } catch (parseError) {
+        // Ignore if the response body isn't valid JSON
+        console.error("Could not parse error response JSON:", parseError);
+      }
+      // Throw an error that includes the message from the API response
+      const error = new Error(errorMessage);
+      (error as any).details = errorDetails; // Attach details if available
+      throw error;
     }
     return response.json();
   } catch (error) {
+    // Log the final error being thrown (could be the original network error or the one constructed above)
     console.error(`Error updating employee request ${id}:`, error);
-    throw new Error(`Failed to update employee request with id ${id}`);
+    // Re-throw the error to be caught by the mutation hook
+    throw error;
   }
 }
 

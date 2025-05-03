@@ -74,6 +74,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ message: "Unauthorized" });
   }
 
+  console.log(`API Handler - Authenticated user ID: ${user.id}`);
+
   // Handle GET request
   if (req.method === "GET") {
     try {
@@ -101,6 +103,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ message: `${model} not found` });
       }
 
+      console.log("API Handler - Existing record found:", JSON.stringify(existingRecord, null, 2));
+
       // Check ownership if the model has a user_id field (Example - adjust if needed)
       // Assuming enterprise_id implies ownership/permission in this context
       if ("enterprise_id" in existingRecord) {
@@ -115,13 +119,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           console.error("Failed to verify enterprise membership for update:", enterpriseError);
           return res.status(403).json({ error: `Failed to verify authorization for ${model}` });
         }
+
+        console.log(`API Handler - User's membership enterprise ID: ${membership.enterprise_id}`);
+
         if (existingRecord.enterprise_id !== membership.enterprise_id) {
+          console.error(
+            `Authorization failed: Record enterprise ID (${existingRecord.enterprise_id}) !== User enterprise ID (${membership.enterprise_id})`,
+          );
           return res.status(403).json({ error: `Not authorized to update this ${model}` });
         }
       }
 
       console.log("API Handler - req.body before update:", JSON.stringify(req.body, null, 2));
-      console.log("API Handler - req.body.salary:", req.body.salary);
 
       // --- Explicitly define fields to update ---
       const {
@@ -129,18 +138,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         id: _id,
         created_at: _createdAt,
         updated_at: _updatedAt,
-        enterprise_id: _enterpriseId,
         created_by: _createdBy,
+        enterprise_id: _enterpriseId, // Also exclude enterprise_id from spread if present in body
         // Include other fields from req.body that ARE updatable
-        ...updatableData
+        ...updatableDataFromRequest
       } = req.body;
+
+      // Explicitly add the user's enterprise_id to the update payload
+      const updatableData = {
+        ...updatableDataFromRequest,
+        enterprise_id: existingRecord.enterprise_id, // Use the enterprise_id from the record being updated
+      };
       // --- End Explicit Update Definition ---
+
+      console.log(
+        "API Handler - Data being sent to Supabase update:",
+        JSON.stringify(updatableData, null, 2),
+      );
 
       // Perform the update using the AUTHENTICATED supabase client
       // Use the actual model name string from the query param
       const { data: updatedRecord, error: updateError } = await supabase
         .from(model) // Use model name string directly
-        .update(updatableData) // Use the filtered data
+        .update(updatableData) // Use the data with enterprise_id added
         .eq(idField, id)
         .select()
         .single(); // Assuming you expect one record back

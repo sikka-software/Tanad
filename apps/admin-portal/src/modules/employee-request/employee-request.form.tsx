@@ -27,32 +27,33 @@ import useEmployeeStore from "@/employee/employee.store";
 
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
 
+import useUserStore from "@/stores/use-user-store";
+
 import { useCreateEmployeeRequest, useUpdateEmployeeRequest } from "./employee-request.hooks";
-import {
-  EmployeeRequest,
-  EmployeeRequestCreateData,
-  EmployeeRequestUpdateData,
-} from "./employee-request.type";
+import { EmployeeRequestCreateData, EmployeeRequestUpdateData } from "./employee-request.type";
 
 const createRequestSchema = (t: (key: string) => string) =>
   z.object({
     employee_id: z
-      .string({ message: t("EmployeeRequests.form.employee.required") })
-      .nonempty({ message: t("EmployeeRequests.form.employee.required") })
-      .uuid({ message: t("EmployeeRequests.form.employee.required") }),
-
+      .string()
+      .uuid({ message: t("EmployeeRequests.form.employee.required") })
+      .nonempty({ message: t("EmployeeRequests.form.employee.required") }),
     type: z.enum(["leave", "expense", "document", "other"]),
-    status: z.enum(["pending", "approved", "rejected"]).default("pending"),
+    status: z.enum(["pending", "approved", "rejected"]).optional(),
     title: z.string({ message: t("EmployeeRequests.form.title.required") }).min(1),
     description: z.string().optional(),
     start_date: z.date().optional(),
     end_date: z.date().optional(),
     amount: z.number().optional(),
-    // attachments: z.array(z.any()).default([]),
     notes: z.string().optional(),
   });
 
-export type EmployeeRequestFormValues = z.input<ReturnType<typeof createRequestSchema>>;
+// Infer the type from the Zod schema for form values
+type EmployeeRequestFormSchema = ReturnType<typeof createRequestSchema>;
+// Use z.infer for the final validated shape
+export type EmployeeRequestFormValues = z.infer<EmployeeRequestFormSchema>;
+// Use z.input for the initial/input shape (allows undefined for defaulted fields)
+type EmployeeRequestFormInput = z.input<EmployeeRequestFormSchema>;
 
 export function EmployeeRequestForm({
   formHtmlId,
@@ -62,6 +63,7 @@ export function EmployeeRequestForm({
 }: ModuleFormProps<EmployeeRequestUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
+  const user = useUserStore((state) => state.user);
 
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const setIsLoadingCreateEmployee = useEmployeeStore((state) => state.setIsLoading);
@@ -74,19 +76,23 @@ export function EmployeeRequestForm({
   const isLoadingSave = useEmployeeRequestsStore((state) => state.isLoading);
   const setIsLoadingSave = useEmployeeRequestsStore((state) => state.setIsLoading);
 
+  // Define literal types here, now that `t` is available
+  const concreteSchema = createRequestSchema(t);
+  type EmployeeRequestType = z.infer<typeof concreteSchema>["type"];
+  type EmployeeRequestStatus = z.infer<typeof concreteSchema>["status"];
+
   const form = useForm<EmployeeRequestFormValues>({
-    resolver: zodResolver(createRequestSchema(t)),
+    resolver: zodResolver(concreteSchema),
     mode: "onChange",
     defaultValues: {
       employee_id: defaultValues?.employee_id || "",
-      type: defaultValues?.type || "leave",
-      status: defaultValues?.status || "pending",
+      type: (defaultValues?.type || "leave") as EmployeeRequestType,
+      status: (defaultValues?.status || "pending") as EmployeeRequestStatus,
       title: defaultValues?.title || "",
       description: defaultValues?.description || "",
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
       amount: defaultValues?.amount || undefined,
-      // attachments: [],
       notes: defaultValues?.notes || "",
     },
   });
@@ -102,22 +108,41 @@ export function EmployeeRequestForm({
   const handleSubmit = async (data: EmployeeRequestFormValues) => {
     setIsLoadingSave(true);
 
-    const finalSubmitData = {
+    // Convert dates to string format expected by the backend/type
+    const baseSubmitData = {
       ...data,
       title: data.title.trim(),
       description: data.description?.trim() || undefined,
       notes: data.notes?.trim() || undefined,
+      start_date: data.start_date ? data.start_date.toISOString() : undefined,
+      end_date: data.end_date ? data.end_date.toISOString() : undefined,
     };
 
     try {
       if (editMode) {
+        // Ensure we only proceed if we have a valid id
+        if (!defaultValues?.id) {
+          console.error("Missing id for update");
+          setIsLoadingSave(false);
+          toast.error(t("General.error_operation"), {
+            description: t("EmployeeRequests.error.update"), // Or a more specific error
+          });
+          return; // Stop execution if critical data is missing
+        }
+
+        // Prepare update payload - `baseSubmitData` matches EmployeeRequestFormValues (zod output)
+        // EmployeeRequestUpdateData allows partial updates and matches the zod schema structure
+        const updatePayload: EmployeeRequestUpdateData = baseSubmitData;
+
         await updateEmployeeRequest({
-          id: defaultValues?.id || "",
-          updates: { ...finalSubmitData } as EmployeeRequestUpdateData,
+          id: defaultValues.id,
+          updates: updatePayload,
         });
         onSuccess?.();
       } else {
-        await createEmployeeRequest(finalSubmitData as EmployeeRequestCreateData);
+        // For create, prepare data without user_id
+        const createPayload = baseSubmitData as EmployeeRequestCreateData;
+        await createEmployeeRequest(createPayload);
         onSuccess?.();
       }
     } catch (error) {
@@ -127,21 +152,6 @@ export function EmployeeRequestForm({
       });
     }
   };
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   try {
-  //     setIsLoadingSave(true);
-  //     const isValid = await form.trigger();
-  //     if (!isValid) {
-  //       setIsLoadingSave(false);
-  //       return;
-  //     }
-  //     await form.handleSubmit(onSubmit)();
-  //   } catch (error) {
-  //     setIsLoadingSave(false);
-  //     console.error("Error submitting form:", error);
-  //   }
-  // };
 
   const requestTypes = [
     { label: t("EmployeeRequests.form.type.leave"), value: "leave" },
