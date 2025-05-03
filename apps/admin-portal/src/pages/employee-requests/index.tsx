@@ -2,10 +2,10 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormSheet } from "@/ui/form-sheet";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
@@ -17,6 +17,7 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import EmployeeRequestCard from "@/employee-request/employee-request.card";
+import { EmployeeRequestForm } from "@/employee-request/employee-request.form";
 import {
   useEmployeeRequests,
   useBulkDeleteEmployeeRequests,
@@ -40,9 +41,14 @@ export default function EmployeeRequestsPage() {
     state.hasPermission("employee_requests.create"),
   );
 
-  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableEmployeeRequest, setActionableEmployeeRequest] =
     useState<EmployeeRequestUpdateData | null>(null);
+
+  const isFormDialogOpen = useEmployeeRequestsStore((state) => state.isFormDialogOpen);
+  const setIsFormDialogOpen = useEmployeeRequestsStore((state) => state.setIsFormDialogOpen);
+
+  const loadingSaveEmployeeRequest = useEmployeeRequestsStore((state) => state.isLoading);
+  const setLoadingSaveEmployeeRequest = useEmployeeRequestsStore((state) => state.setIsLoading);
 
   const viewMode = useEmployeeRequestsStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEmployeeRequestsStore((state) => state.isDeleteDialogOpen);
@@ -146,6 +152,25 @@ export default function EmployeeRequestsPage() {
             </div>
           )}
         </div>
+
+        <FormSheet
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Employees.update_employee")}
+          formId="employee-form"
+          loadingSave={loadingSaveEmployeeRequest}
+        >
+          <EmployeeRequestForm
+            formHtmlId={"employee-request-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableEmployeeRequest(null);
+            }}
+            defaultValues={actionableEmployeeRequest}
+            editMode={true}
+          />
+        </FormSheet>
+
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}

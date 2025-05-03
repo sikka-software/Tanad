@@ -54,12 +54,12 @@ const createRequestSchema = (t: (key: string) => string) =>
 
 export type EmployeeRequestFormValues = z.input<ReturnType<typeof createRequestSchema>>;
 
-const EmployeeRequestForm = ({
+export function EmployeeRequestForm({
   formHtmlId,
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<EmployeeRequestUpdateData>) => {
+}: ModuleFormProps<EmployeeRequestUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
 
@@ -397,6 +397,4 @@ const EmployeeRequestForm = ({
       </FormDialog>
     </>
   );
-};
-
-export default EmployeeRequestForm;
+}

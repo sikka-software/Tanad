@@ -2,7 +2,6 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -15,7 +14,6 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import { FormDialog } from "@/components/ui/form-dialog";
 import { FormSheet } from "@/components/ui/form-sheet";
 
 import EmployeeCard from "@/employee/employee.card";
@@ -23,8 +21,6 @@ import {
   useEmployees,
   useBulkDeleteEmployees,
   useDuplicateEmployee,
-  useUpdateEmployee,
-  useCreateEmployee,
 } from "@/employee/employee.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/employee/employee.options";
 import useEmployeesStore from "@/employee/employee.store";
@@ -46,6 +42,9 @@ export default function EmployeesPage() {
   const isFormDialogOpen = useEmployeesStore((state) => state.isFormDialogOpen);
   const setIsFormDialogOpen = useEmployeesStore((state) => state.setIsFormDialogOpen);
 
+  const loadingSaveEmployee = useEmployeesStore((state) => state.isLoading);
+  const setLoadingSaveEmployee = useEmployeesStore((state) => state.setIsLoading);
+
   const viewMode = useEmployeesStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEmployeesStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useEmployeesStore((state) => state.setIsDeleteDialogOpen);
@@ -64,8 +63,6 @@ export default function EmployeesPage() {
   const { data: employees, isLoading, error } = useEmployees();
   const { mutateAsync: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
   const { mutate: duplicateEmployee } = useDuplicateEmployee();
-  const { mutateAsync: updateEmployeeMutate, isPending: isUpdatingEmployee } = useUpdateEmployee();
-  const { mutateAsync: createEmployeeMutate, isPending: isCreatingEmployee } = useCreateEmployee();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
@@ -95,8 +92,6 @@ export default function EmployeesPage() {
   const sortedEmployees = useMemo(() => {
     return getSortedEmployees(filteredEmployees);
   }, [filteredEmployees, sortRules, sortCaseSensitive, sortNullsFirst]);
-
-  const isSubmitting = isUpdatingEmployee;
 
   if (!canReadEmployees) {
     return <NoPermission />;
@@ -153,7 +148,7 @@ export default function EmployeesPage() {
           onOpenChange={setIsFormDialogOpen}
           title={t("Employees.update_employee")}
           formId="employee-form"
-          loadingSave={isUpdatingEmployee}
+          loadingSave={loadingSaveEmployee}
         >
           <EmployeeForm
             formHtmlId={"employee-form"}
@@ -163,9 +158,6 @@ export default function EmployeesPage() {
             }}
             defaultValues={actionableEmployee}
             editMode={true}
-            updateEmployee={updateEmployeeMutate}
-            createEmployee={createEmployeeMutate}
-            isSubmitting={isUpdatingEmployee}
           />
         </FormSheet>
 
