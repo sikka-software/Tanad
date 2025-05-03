@@ -57,7 +57,8 @@ export type MultiSelectOption<T = string> = {
  * Props for MultiSelect component
  */
 interface MultiSelectProps<T = string>
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "defaultValue"> {
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "value"> {
+  onClear?: () => void;
   /**
    * An array of option objects to be displayed in the multi-select component.
    * Each option object has a label, value, and an optional icon.
@@ -70,8 +71,8 @@ interface MultiSelectProps<T = string>
    */
   onValueChange: (value: T[]) => void;
 
-  /** The default selected values when the component mounts. */
-  defaultValue?: T[];
+  /** The controlled selected values. */
+  value: T[];
 
   /**
    * Placeholder text to be displayed when no values are selected.
@@ -145,8 +146,9 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     {
       options,
       onValueChange,
+      value,
       variant,
-      defaultValue = [],
+      onClear,
       placeholder = "Select options",
       animation = 0,
       maxCount = 3,
@@ -161,7 +163,6 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     }: MultiSelectProps<T>,
     ref: React.Ref<HTMLButtonElement>,
   ) => {
-    const [selectedValues, setSelectedValues] = React.useState<T[]>(defaultValue as T[]);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const t = useTranslations();
     const locale = useLocale();
@@ -170,23 +171,21 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
       if (event.key === "Enter") {
         setIsPopoverOpen(true);
       } else if (event.key === "Backspace" && !event.currentTarget.value) {
-        const newSelectedValues = [...selectedValues];
+        const newSelectedValues = [...value];
         newSelectedValues.pop();
-        setSelectedValues(newSelectedValues);
         onValueChange(newSelectedValues);
       }
     };
 
-    const toggleOption = (option: T) => {
-      const newSelectedValues = selectedValues.some((value) => isValueEqual(value, option))
-        ? selectedValues.filter((value) => !isValueEqual(value, option))
-        : [...selectedValues, option];
-      setSelectedValues(newSelectedValues);
+    const toggleOption = (optionValue: T) => {
+      const newSelectedValues = value.some((v) => isValueEqual(v, optionValue))
+        ? value.filter((v) => !isValueEqual(v, optionValue))
+        : [...value, optionValue];
       onValueChange(newSelectedValues);
     };
 
     const handleClear = () => {
-      setSelectedValues([]);
+      onClear?.();
       onValueChange([]);
     };
 
@@ -195,23 +194,21 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
     };
 
     const clearExtraOptions = () => {
-      const newSelectedValues = selectedValues.slice(0, maxCount);
-      setSelectedValues(newSelectedValues);
+      const newSelectedValues = value.slice(0, maxCount);
       onValueChange(newSelectedValues);
     };
 
     const toggleAll = () => {
-      if (selectedValues.length === options.length) {
+      if (value.length === options.length) {
         handleClear();
       } else {
-        const allValues = options.map((option) => option.value);
-        setSelectedValues(allValues as T[]);
-        onValueChange(allValues as T[]);
+        const allOptionValues = options.map((option) => option.value);
+        onValueChange(allOptionValues as T[]);
       }
     };
 
-    const getOptionLabel = (value: T): string => {
-      return options.find((o) => isValueEqual(o.value, value))?.label || "";
+    const getOptionLabel = (val: T): string => {
+      return options.find((o) => isValueEqual(o.value, val))?.label || "";
     };
 
     return (
@@ -229,31 +226,31 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                 className,
               )}
             >
-              {selectedValues.length > 0 ? (
+              {value.length > 0 ? (
                 <div className="flex w-full items-center justify-between">
                   <div className="flex flex-wrap items-center">
-                    {selectedValues.slice(0, maxCount).map((value) => {
-                      const option = options.find((o) => isValueEqual(o.value, value));
+                    {value.slice(0, maxCount).map((val) => {
+                      const option = options.find((o) => isValueEqual(o.value, val));
                       const IconComponent = option?.icon;
                       return (
                         <Badge
-                          key={getValueKey(value)}
+                          key={getValueKey(val)}
                           className={multiSelectVariants({ variant })}
                           style={{ animationDuration: `${animation}s` }}
                         >
                           {IconComponent && <IconComponent className="me-2 h-4 w-4" />}
-                          {getOptionLabel(value)}
+                          {getOptionLabel(val)}
                           <XCircle
                             className="ms-2 h-4 w-4 cursor-pointer"
                             onClick={(event) => {
                               event.stopPropagation();
-                              toggleOption(value);
+                              toggleOption(val);
                             }}
                           />
                         </Badge>
                       );
                     })}
-                    {selectedValues.length > maxCount && (
+                    {value.length > maxCount && (
                       <Badge
                         className={cn(
                           "text-foreground border-foreground/1 bg-transparent hover:bg-transparent",
@@ -261,7 +258,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                         )}
                         style={{ animationDuration: `${animation}s` }}
                       >
-                        {`+ ${selectedValues.length - maxCount} ${t("General.more")}`}
+                        {`+ ${value.length - maxCount} ${t("General.more")}`}
                         <XCircle
                           className="ms-2 h-4 w-4 cursor-pointer"
                           onClick={(event) => {
@@ -309,7 +306,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                   <div
                     className={cn(
                       "border-primary me-2 flex h-4 w-4 items-center justify-center rounded-sm border",
-                      selectedValues.length === options.length
+                      value.length === options.length
                         ? "bg-primary text-primary-foreground"
                         : "opacity-50 [&_svg]:invisible",
                     )}
@@ -319,9 +316,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
                   <span>{t("General.select_all")}</span>
                 </CommandItem>
                 {options.map((option, i) => {
-                  const isSelected = selectedValues.some((value) =>
-                    isValueEqual(value, option.value),
-                  );
+                  const isSelected = value.some((val) => isValueEqual(val, option.value));
                   return (
                     <CommandItem
                       key={i}
@@ -350,7 +345,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
               <CommandSeparator />
               <CommandGroup className="bg-background sticky bottom-0 border-t">
                 <div className="flex items-center justify-between">
-                  {selectedValues.length > 0 && (
+                  {value.length > 0 && (
                     <>
                       <CommandItem
                         onSelect={handleClear}

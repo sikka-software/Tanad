@@ -122,13 +122,13 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
             ) : error ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center text-red-500">
-                  Error loading activity logs: {error}
+                  {t("ActivityLogs.error_fetching")}: {error}
                 </TableCell>
               </TableRow>
             ) : activityLogs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-muted-foreground text-center">
-                  No activity logs found.
+                  {t("ActivityLogs.no_activity_logs_found")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -211,7 +211,7 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                       <div className="flex flex-col">
                         <span>{format.relativeTime(new Date(item.created_at))}</span>
                         {/* <span>{localizedTimeDistance(item)}</span> */}
-                        <span className="text-muted-foreground text-[10px]">
+                        <span className="text-muted-foreground text-[10px] hidden lg:block">
                           {item.created_at
                             ? format.dateTime(new Date(item.created_at), "PPpp")
                             : "N/A"}

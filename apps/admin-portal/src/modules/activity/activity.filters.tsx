@@ -124,7 +124,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                       })) || []
                     }
                     onValueChange={(selectedUserIds) => setFilters({ user: selectedUserIds })}
-                    defaultValue={filters.user}
+                    value={filters.user}
                     placeholder={t("ActivityLogs.filters.selectUser")}
                     className="w-full"
                     loading={isLoadingUsers}

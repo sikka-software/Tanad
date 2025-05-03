@@ -3438,6 +3438,8 @@
     "dialog": {
       "title": "تفاصيل النشاط"
     },
+    "error_fetching": "حدث خطأ أثناء جلب الأنشطة",
+    "no_activity_logs_found": "لا توجد أنشطة",
     "filters": {
       "date_range": "المدى الزمني",
       "select_date_range": "اختر المدى الزمني",
