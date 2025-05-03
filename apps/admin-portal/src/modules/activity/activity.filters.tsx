@@ -32,7 +32,6 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
   const t = useTranslations();
   const locale = useLocale();
   const { filters, setFilters, clearFilters } = useActivityLogStore();
-  const [showFilters, setShowFilters] = useState(false);
   const { data: users, isLoading: isLoadingUsers } = useUsers();
 
   const handleClearFilters = () => {
@@ -53,117 +52,118 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
           />
         </div>
         <div className="flex gap-2">
-          <IconButton
-            icon={<Filter className="h-4 w-4" />}
-            label={t("General.filter")}
-            variant="outline"
-            className="size-9"
-            onClick={() => setShowFilters(!showFilters)}
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <IconButton
+                icon={<Filter className="h-4 w-4" />}
+                label={t("General.filter")}
+                variant="outline"
+                className="size-9"
+              />
+            </PopoverTrigger>
+            <PopoverContent className="w-screen max-w-sm p-0" align="end">
+              <div className="grid grid-cols-1 gap-4 rounded-md border p-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t("ActivityLogs.filters.eventType")}</label>
+                  <Select
+                    value={filters.eventType}
+                    onValueChange={(value) => setFilters({ eventType: value })}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("ActivityLogs.filters.selectEventType")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("ActivityLogs.filters.allEvents")}</SelectItem>
+                      <SelectItem value="created">{t("ActivityLogs.filters.create")}</SelectItem>
+                      <SelectItem value="updated">{t("ActivityLogs.filters.update")}</SelectItem>
+                      <SelectItem value="deleted">{t("ActivityLogs.filters.delete")}</SelectItem>
+                      <SelectItem value="duplicated">{t("ActivityLogs.filters.duplicate")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !filters.date && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {filters.date ? format(filters.date, "PPP") : t("ActivityLogs.filters.pickDate")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={filters.date}
+                      onSelect={(d) => setFilters({ date: d })}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t("ActivityLogs.filters.user")}</label>
+                  <MultiSelect
+                    options={
+                      users?.map((user) => ({
+                        id: user.id,
+                        component: (
+                          <div className="flex flex-col">
+                            <span className="text-sm font-medium">{user.full_name}</span>
+                            <span className="text-muted-foreground text-sm">{user.email}</span>
+                          </div>
+                        ),
+                        label: user.email,
+                        value: user.id,
+                      })) || []
+                    }
+                    onValueChange={(selectedUserIds) => setFilters({ user: selectedUserIds })}
+                    defaultValue={filters.user}
+                    placeholder={t("ActivityLogs.filters.selectUser")}
+                    className="w-full"
+                    loading={isLoadingUsers}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t("ActivityLogs.filters.timeRange")}</label>
+                  <Select
+                    value={filters.timeRange}
+                    onValueChange={(value) => setFilters({ timeRange: value })}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("ActivityLogs.filters.selectTimeRange")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("General.all")}</SelectItem>
+                      <SelectItem value="1h">{t("ActivityLogs.filters.lastHour")}</SelectItem>
+                      <SelectItem value="24h">{t("ActivityLogs.filters.last24Hours")}</SelectItem>
+                      <SelectItem value="7d">{t("ActivityLogs.filters.last7Days")}</SelectItem>
+                      <SelectItem value="30d">{t("ActivityLogs.filters.last30Days")}</SelectItem>
+                      <SelectItem value="90d">{t("ActivityLogs.filters.last90Days")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex justify-end">
+                  <Button variant="ghost" size="sm" onClick={handleClearFilters}>
+                    <X className="mr-2 h-4 w-4" />
+                    {t("ActivityLogs.filters.clearFilters")}
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
           <IconButton
             icon={<Download className="h-4 w-4" />}
             label={t("General.export")}
             variant="outline"
             className="size-9"
-            onClick={() => setShowFilters(!showFilters)}
           />
         </div>
       </div>
-
-      {showFilters && (
-        <div className="grid grid-cols-1 gap-4 rounded-md border p-4 md:grid-cols-3">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t("ActivityLogs.filters.eventType")}</label>
-            <Select
-              value={filters.eventType}
-              onValueChange={(value) => setFilters({ eventType: value })}
-              dir={locale === "ar" ? "rtl" : "ltr"}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("ActivityLogs.filters.selectEventType")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("ActivityLogs.filters.allEvents")}</SelectItem>
-                <SelectItem value="created">{t("ActivityLogs.filters.create")}</SelectItem>
-                <SelectItem value="updated">{t("ActivityLogs.filters.update")}</SelectItem>
-                <SelectItem value="deleted">{t("ActivityLogs.filters.delete")}</SelectItem>
-                <SelectItem value="duplicated">{t("ActivityLogs.filters.duplicate")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-[240px] justify-start text-left font-normal",
-                  !filters.date && "text-muted-foreground",
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.date ? format(filters.date, "PPP") : t("ActivityLogs.filters.pickDate")}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={filters.date}
-                onSelect={(d) => setFilters({ date: d })}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t("ActivityLogs.filters.user")}</label>
-            <MultiSelect
-              options={
-                users?.map((user) => ({
-                  id: user.id,
-                  component: (
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{user.full_name}</span>
-                      <span className="text-muted-foreground text-sm">{user.email}</span>
-                    </div>
-                  ),
-                  label: user.email,
-                  value: user.id,
-                })) || []
-              }
-              onValueChange={(selectedUserIds) => setFilters({ user: selectedUserIds })}
-              defaultValue={filters.user}
-              placeholder={t("ActivityLogs.filters.selectUser")}
-              className="w-full"
-              loading={isLoadingUsers}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">{t("ActivityLogs.filters.timeRange")}</label>
-            <Select
-              value={filters.timeRange}
-              onValueChange={(value) => setFilters({ timeRange: value })}
-              dir={locale === "ar" ? "rtl" : "ltr"}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t("ActivityLogs.filters.selectTimeRange")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("General.all")}</SelectItem>
-                <SelectItem value="1h">{t("ActivityLogs.filters.lastHour")}</SelectItem>
-                <SelectItem value="24h">{t("ActivityLogs.filters.last24Hours")}</SelectItem>
-                <SelectItem value="7d">{t("ActivityLogs.filters.last7Days")}</SelectItem>
-                <SelectItem value="30d">{t("ActivityLogs.filters.last30Days")}</SelectItem>
-                <SelectItem value="90d">{t("ActivityLogs.filters.last90Days")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex justify-end md:col-span-3">
-            <Button variant="ghost" size="sm" onClick={handleClearFilters}>
-              <X className="mr-2 h-4 w-4" />
-              {t("ActivityLogs.filters.clearFilters")}
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
