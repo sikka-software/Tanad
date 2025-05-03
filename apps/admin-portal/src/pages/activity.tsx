@@ -17,8 +17,8 @@ const ActivityPage = () => {
         </CardDescription>
       </CardHeader>
       <div className="p-4">
-        <ActivityLogFilters eventType="user" />
-        <ActivityLogTable eventType="user" />
+        <ActivityLogFilters />
+        <ActivityLogTable />
       </div>
     </DataPageLayout>
   );

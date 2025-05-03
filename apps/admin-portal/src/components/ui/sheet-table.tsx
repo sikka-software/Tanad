@@ -1031,7 +1031,7 @@ function SheetTable<
   }
 
   return (
-    <div className="overflow-x-auto p-0 pb-2">
+    <div className="relative max-h-[calc(100vh-5rem)] overflow-auto p-0 pb-2">
       <Table id={id}>
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         {/* Primary header */}
@@ -1040,7 +1040,7 @@ function SheetTable<
             <TableRow className="border-none">
               {/* Selection checkbox header */}
               {enableRowSelection && (
-                <TableHead className="bg-muted sticky start-0 z-2 w-[30px] border-y p-0">
+                <TableHead className="bg-muted sticky top-0 z-20 border text-start">
                   <div className="flex h-full items-center justify-center">
                     <input
                       type="checkbox"
@@ -1052,15 +1052,6 @@ function SheetTable<
                   </div>
                   <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
                 </TableHead>
-              )}
-
-              {/* Right icon cells empty headers */}
-              {addPos === "left" && (
-                <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-              )}
-
-              {removePos === "left" && (
-                <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
               )}
 
               {table.getHeaderGroups().map((headerGroup) =>
@@ -1075,12 +1066,18 @@ function SheetTable<
                   }
 
                   return (
-                    <TableHead key={header.id} className="border text-start" style={style}>
+                    <TableHead
+                      key={header.id}
+                      className="bg-muted sticky top-0 !z-20 border-x text-start"
+                      style={style}
+                    >
                       {flexRender(header.column.columnDef.header, header.getContext()) as string}
                     </TableHead>
                   );
                 }),
               )}
+              {/* Action column */}
+              <TableHead className="bg-muted sticky top-0 !z-20 border-x text-start" />
             </TableRow>
           </TableHeader>
         )}
@@ -1088,37 +1085,6 @@ function SheetTable<
         <TableBody>
           {Object.entries(groupedData).map(([groupKey, topRows]) => (
             <React.Fragment key={groupKey}>
-              {/* Group label row (if not ungrouped) */}
-              {groupKey !== "ungrouped" && (
-                <TableRow className="border-none">
-                  {/* Right icon cells empty headers */}
-                  {addPos === "left" && (
-                    <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-                  )}
-
-                  {removePos === "left" && (
-                    <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-                  )}
-
-                  <TableCell
-                    colSpan={columns.length}
-                    className="bg-muted-foreground/10 border font-bold"
-                  >
-                    {groupKey}
-                  </TableCell>
-
-                  {/* Left icon cells empty headers */}
-                  {addPos === "right" && (
-                    <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-                  )}
-
-                  {removePos === "right" && (
-                    <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-                  )}
-                </TableRow>
-              )}
-              {/* For each top-level row in this group, find the actual row in table.
-                  Then recursively render it with renderRow() */}
               {topRows.map((rowData) => {
                 const row = table.getRowModel().flatRows.find((r) => r.original === rowData);
                 if (!row) return null;
@@ -1128,8 +1094,6 @@ function SheetTable<
             </React.Fragment>
           ))}
         </TableBody>
-        {/* Render footer (totals row + custom footer) */}
-        {renderFooter()}
       </Table>
     </div>
   );

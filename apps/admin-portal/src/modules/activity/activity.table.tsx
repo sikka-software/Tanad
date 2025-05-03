@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDistanceToNow } from "date-fns";
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,6 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -27,11 +29,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import { ActivityService } from "./activity.service";
 import type { ActivityLogListData } from "./activity.type";
-import { formatDistanceToNow } from 'date-fns';
 
 interface ActivityLogTableProps {
   // Removed eventType as filtering is not implemented in service yet
@@ -73,33 +73,18 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
 
   const handleNextPage = () => {
     if (hasNextPage) {
-        setPage((prev) => prev + 1);
+      setPage((prev) => prev + 1);
     }
   };
 
   const formatDateTime = (dateString: string | null) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     try {
       return formatDistanceToNow(new Date(dateString), { addSuffix: true });
     } catch (e) {
-        console.error("Error formatting date:", e);
-        return 'Invalid Date';
+      console.error("Error formatting date:", e);
+      return "Invalid Date";
     }
-  };
-  
-  const getStatusBadge = (action: string) => {
-    if (action?.toUpperCase().includes('DELETE') || action?.toUpperCase().includes('FAIL')) {
-      return (
-        <Badge variant="destructive" className="capitalize">
-          <AlertTriangle className="mr-1 h-3 w-3" /> Error
-        </Badge>
-      );
-    } 
-    return (
-      <Badge variant="secondary" className="capitalize">
-        <CheckCircle2 className="mr-1 h-3 w-3" /> Success
-      </Badge>
-    );
   };
 
   return (
@@ -113,7 +98,6 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
               <TableHead>Target</TableHead>
               <TableHead>Details</TableHead>
               <TableHead>Timestamp</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="text-right"> </TableHead>
             </TableRow>
           </TableHeader>
@@ -121,13 +105,25 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
             {isLoading ? (
               Array.from({ length: itemsPerPage }).map((_, index) => (
                 <TableRow key={`skeleton-${index}`}>
-                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
-                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
-                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
-                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
-                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
-                  <TableCell><Skeleton className="h-8 w-full" /></TableCell>
-                  <TableCell><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-full" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-full" />
+                  </TableCell>
+            
                 </TableRow>
               ))
             ) : error ? (
@@ -137,46 +133,52 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                 </TableCell>
               </TableRow>
             ) : activityLogs.length === 0 ? (
-                <TableRow>
-                    <TableCell colSpan={7} className="text-center text-muted-foreground">
-                        No activity logs found.
-                    </TableCell>
-                </TableRow>
+              <TableRow>
+                <TableCell colSpan={7} className="text-muted-foreground text-center">
+                  No activity logs found.
+                </TableCell>
+              </TableRow>
             ) : (
               activityLogs.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={`/placeholder-user.jpg`} alt={item.user_full_name || item.user_email || 'User'} />
-                        <AvatarFallback>{(item.user_full_name || item.user_email || 'U').substring(0, 2).toUpperCase()}</AvatarFallback>
+                        <AvatarImage
+                          src={`/placeholder-user.jpg`}
+                          alt={item.user_full_name || item.user_email || "User"}
+                        />
+                        <AvatarFallback>
+                          {(item.user_full_name || item.user_email || "U")
+                            .substring(0, 2)
+                            .toUpperCase()}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="grid gap-0.5">
-                        <div className="font-medium">{item.user_full_name || 'System/Unknown'}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {item.user_email || '-'}
+                        <div className="font-medium">{item.user_full_name || "System/Unknown"}</div>
+                        <div className="text-muted-foreground text-xs">
+                          {item.user_email || "-"}
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="font-medium capitalize">
-                      {item.action_type?.replace(/_/g, ' ').toLowerCase() || 'Unknown Action'}
+                      {item.action_type?.replace(/_/g, " ").toLowerCase() || "Unknown Action"}
                     </div>
                   </TableCell>
-                   <TableCell>
-                      <div className="text-sm text-muted-foreground">
-                        {item.target_type ? `${item.target_type}:` : ''}
-                        {item.target_name || item.target_id || 'N/A'}
-                      </div>
-                   </TableCell>
-                  <TableCell className="max-w-[300px] truncate text-xs text-muted-foreground">
+                  <TableCell>
+                    <div className="text-muted-foreground text-sm">
+                      {item.target_type ? `${item.target_type}:` : ""}
+                      {item.target_name || item.target_id || "N/A"}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground max-w-[300px] truncate text-xs">
                     {/* {typeof item.details === 'string' ? item.details : JSON.stringify(item.details)} */}
                   </TableCell>
-                  <TableCell className="text-xs text-muted-foreground">
+                  <TableCell className="text-muted-foreground text-xs">
                     {formatDateTime(item.created_at)}
                   </TableCell>
-                  <TableCell>{getStatusBadge(item.action_type)}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

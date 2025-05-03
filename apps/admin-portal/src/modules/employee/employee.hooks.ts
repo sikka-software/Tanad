@@ -43,6 +43,7 @@ export const useEmployee = (id: string) => {
 
 // Hook for adding a new employee
 export const useCreateEmployee = () => {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (employee: EmployeeCreateData) => createEmployee(employee),
@@ -52,8 +53,12 @@ export const useCreateEmployee = () => {
         ...(Array.isArray(previousEmployees) ? previousEmployees : []),
         newEmployee,
       ]);
-      
+
       queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
+
+      toast.success(t("General.successful_operation"), {
+        description: t("Employees.success.create"),
+      });
     },
   });
 };
