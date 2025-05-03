@@ -165,7 +165,7 @@ export function ClientForm({
       setIsLoading(false);
       console.error("Failed to save client:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Clients.error.creating"),
+        description: t("Clients.error.create"),
       });
     }
   };

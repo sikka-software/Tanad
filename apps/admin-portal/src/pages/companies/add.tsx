@@ -39,7 +39,7 @@ export default function AddCompanyPage() {
 
   const onAddSuccess = () => {
     toast.success(t("General.successful_operation"), {
-      description: t("Companies.success.created"),
+      description: t("Companies.success.create"),
     });
     router.push("/companies");
     setIsLoading(false);

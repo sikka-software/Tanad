@@ -262,7 +262,7 @@ export function InvoiceForm({ id, editMode, onSuccess, defaultValues }: ModuleFo
       setIsLoading(false);
       console.error("Failed to save company:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Companies.error.creating"),
+        description: t("Companies.error.create"),
       });
     }
   };

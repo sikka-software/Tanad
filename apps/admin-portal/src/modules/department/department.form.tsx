@@ -166,7 +166,7 @@ export default function DepartmentForm({
           });
 
           toast.success(t("General.successful_operation"), {
-            description: t("Departments.success.updated"),
+            description: t("Departments.success.update"),
           });
           if (onSuccess) {
             onSuccess();
@@ -174,7 +174,7 @@ export default function DepartmentForm({
         } catch (error) {
           console.error("Error updating department:", error);
           toast.error(t("General.error_occurred"), {
-            description: t("Departments.error.updating"),
+            description: t("Departments.error.update"),
           });
         }
       } else {
@@ -195,7 +195,7 @@ export default function DepartmentForm({
           await createDepartment(createData);
 
           toast.success(t("General.successful_operation"), {
-            description: t("Departments.success.created"),
+            description: t("Departments.success.create"),
           });
           if (onSuccess) {
             onSuccess();
@@ -203,7 +203,7 @@ export default function DepartmentForm({
         } catch (error) {
           console.error("Error creating department:", error);
           toast.error(t("General.error_occurred"), {
-            description: t("Departments.error.creating"),
+            description: t("Departments.error.create"),
           });
         }
       }
@@ -211,7 +211,7 @@ export default function DepartmentForm({
       setIsLoading(false);
       console.error("Failed to save department:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Departments.error.creating"),
+        description: t("Departments.error.create"),
       });
     }
   };

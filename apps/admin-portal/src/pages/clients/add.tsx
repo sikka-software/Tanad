@@ -34,7 +34,7 @@ export default function AddClientPage() {
 
   const onAddSuccess = () => {
     toast.success(t("General.successful_operation"), {
-      description: t("Clients.success.created"),
+      description: t("Clients.success.create"),
     });
     router.push("/clients");
     setIsLoading(false);

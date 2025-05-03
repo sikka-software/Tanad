@@ -40,7 +40,7 @@ export function FormSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        className="flex flex-col gap-0 overflow-hidden !p-0 w-[540px]"
+        className="flex w-[540px] flex-col gap-0 overflow-hidden !p-0"
         dir={locale === "ar" ? "rtl" : "ltr"}
         side={locale === "ar" ? "left" : "right"}
       >

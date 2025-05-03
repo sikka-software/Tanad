@@ -70,7 +70,7 @@ export default function BranchesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteBranches, {
-    loading: "Branches.loading.deleting",
+    loading: "Branches.loading.delete",
     success: "Branches.success.deleted",
     error: "Branches.error.deleting",
     onSuccess: () => {
@@ -149,7 +149,7 @@ export default function BranchesPage() {
               setActionableBranch(null);
               setLoadingSaveBranch(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Branches.success.updated"),
+                description: t("Branches.success.update"),
               });
             }}
             defaultValues={actionableBranch}

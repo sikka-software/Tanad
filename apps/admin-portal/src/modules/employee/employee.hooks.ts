@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import { departmentKeys } from "@/department/department.hooks";
 
@@ -65,6 +67,7 @@ export const useDuplicateEmployee = () => {
 // Hook for updating an employee with optimistic updates
 export const useUpdateEmployee = () => {
   const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Partial<Employee> }) =>
@@ -132,6 +135,9 @@ export const useUpdateEmployee = () => {
 
       // Also update the individual employee query data if it exists
       queryClient.setQueryData(employeeKeys.detail(id), updatedEmployee);
+      toast.success(t("General.successful_operation"), {
+        description: t("Employees.success.update"),
+      });
     },
     onError: (err, { id }, context) => {
       // Roll back to the previous values if mutation fails

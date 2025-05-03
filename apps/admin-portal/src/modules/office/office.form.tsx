@@ -132,7 +132,7 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
     } catch (error) {
       console.error("Error in office form:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Offices.error.creating"),
+        description: t("Offices.error.create"),
       });
       setIsLoading(false);
     }

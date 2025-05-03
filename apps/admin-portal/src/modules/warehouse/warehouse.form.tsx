@@ -148,7 +148,7 @@ export function WarehouseForm({
       setIsLoading(false);
       console.error("Failed to save warehouse:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Warehouses.error.creating"),
+        description: t("Warehouses.error.create"),
       });
     }
   };

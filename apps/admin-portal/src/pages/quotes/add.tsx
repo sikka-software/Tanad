@@ -69,13 +69,13 @@ export default function AddQuotePage() {
       if (itemsError) throw itemsError;
 
       toast.success(t("General.successful_operation"), {
-        description: t("Quotes.success.created"),
+        description: t("Quotes.success.create"),
       });
 
       router.push("/quotes");
     } catch (error) {
       toast.error(t("General.error_operation"), {
-        description: t("Quotes.error.creating"),
+        description: t("Quotes.error.create"),
       });
     } finally {
       setLoading(false);

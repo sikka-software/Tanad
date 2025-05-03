@@ -132,7 +132,7 @@ export function BranchForm({ id, onSuccess, defaultValues, editMode = false }: B
       setIsLoading(false);
       console.error("Failed to save branch:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Branches.error.creating"),
+        description: t("Branches.error.create"),
       });
     }
   };

@@ -160,7 +160,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
       setIsRoleDialogOpen(false);
       // Refetch roles - React Query handles this via hook re-render if keys are correct
       toast.success(t("General.successful_operation"), {
-        description: t("Roles.success.created"), // Use Role success message
+        description: t("Roles.success.create"), // Use Role success message
       });
       // Cannot reliably set value without knowing the new role name from RoleForm onSuccess
       // if (newRole?.name) {
@@ -204,7 +204,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
           data: { ...mutationData, role_id: roleId } as UserUpdateData,
         });
         toast.success(t("General.successful_operation"), {
-          description: t("Users.success.updated"),
+          description: t("Users.success.update"),
         });
       } else {
         // Ensure password exists for creation, handled by schema but double-check
@@ -215,7 +215,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
         }
         await createUser({ ...mutationData, role_id: roleId } as UserCreateData);
         toast.success(t("General.successful_operation"), {
-          description: t("Users.success.created"),
+          description: t("Users.success.create"),
         });
       }
       // Reset form fields explicitly
@@ -231,20 +231,23 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
       console.error("Submit Error in UserForm:", error);
 
       // Check for the specific 409 conflict error
-      if (error?.response?.status === 409 && error?.response?.data?.code === "USER_MEMBERSHIP_EXISTS") {
+      if (
+        error?.response?.status === 409 &&
+        error?.response?.data?.code === "USER_MEMBERSHIP_EXISTS"
+      ) {
         // Set a specific error message on the email field
         form.setError("email", {
           type: "manual",
           message: t("Users.error.already_exists_in_enterprise"), // Add this translation key
         });
-        toast.error(t("Validation.error"), { // More generic toast title
+        toast.error(t("Validation.error"), {
+          // More generic toast title
           description: t("Users.error.already_exists_in_enterprise"),
         });
       } else {
         // Handle other errors generally
         toast.error(t("General.error_occurred"), {
-          description:
-            error?.message || t(isEditing ? "Users.error.updating" : "Users.error.creating"),
+          description: error?.message || t(isEditing ? "Users.error.update" : "Users.error.create"),
         });
       }
       setIsLoading(false);

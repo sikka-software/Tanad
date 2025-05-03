@@ -34,7 +34,7 @@ export default function AddProductPage() {
 
   const onAddSuccess = () => {
     toast.success(t("General.successful_operation"), {
-      description: t("Products.success.created"),
+      description: t("Products.success.create"),
     });
     router.push("/products");
     setIsLoading(false);

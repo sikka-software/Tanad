@@ -71,7 +71,7 @@ export default function AddEmployeeRequestPage() {
       });
 
       toast.success(t("General.successful_operation"), {
-        description: t("EmployeeRequests.success.created"),
+        description: t("EmployeeRequests.success.create"),
       });
 
       const previousRequests = queryClient.getQueryData(employeeKeys.lists()) || [];
@@ -85,7 +85,7 @@ export default function AddEmployeeRequestPage() {
     } catch (error) {
       setLoadingSave(false);
       toast.error(t("General.error_operation"), {
-        description: t("EmployeeRequests.error.creating"),
+        description: t("EmployeeRequests.error.create"),
       });
     }
   };

@@ -76,7 +76,7 @@ export default function EmployeeRequestsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteEmployeeRequests, {
-    loading: "EmployeeRequests.loading.deleting",
+    loading: "EmployeeRequests.loading.delete",
     success: "EmployeeRequests.success.deleted",
     error: "EmployeeRequests.error.deleting",
     onSuccess: () => {

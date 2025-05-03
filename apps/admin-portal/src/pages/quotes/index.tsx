@@ -67,7 +67,7 @@ export default function QuotesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteQuotes, {
-    loading: "Quotes.loading.deleting",
+    loading: "Quotes.loading.delete",
     success: "Quotes.success.deleted",
     error: "Quotes.error.deleting",
     onSuccess: () => {

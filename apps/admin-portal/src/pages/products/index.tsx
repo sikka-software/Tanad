@@ -65,7 +65,7 @@ export default function ProductsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteProducts, {
-    loading: "Products.loading.deleting",
+    loading: "Products.loading.delete",
     success: "Products.success.deleted",
     error: "Products.error.deleting",
     onSuccess: () => {

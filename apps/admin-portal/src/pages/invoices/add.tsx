@@ -24,7 +24,7 @@ export default function AddInvoicePage() {
     setIsLoading(false);
     router.push("/invoices");
     toast.success(t("General.successful_operation"), {
-      description: t("Invoices.success.created"),
+      description: t("Invoices.success.create"),
     });
   };
 

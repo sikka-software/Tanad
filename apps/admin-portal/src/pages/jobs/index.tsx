@@ -74,7 +74,7 @@ export default function JobsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteJobs, {
-    loading: "Jobs.loading.deleting",
+    loading: "Jobs.loading.delete",
     success: "Jobs.success.deleted",
     error: "Jobs.error.deleting",
     onSuccess: () => {
@@ -153,7 +153,7 @@ export default function JobsPage() {
               setActionableItem(null);
               setIsLoading(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Jobs.success.updated"),
+                description: t("Jobs.success.update"),
               });
             }}
             defaultValues={actionableItem}

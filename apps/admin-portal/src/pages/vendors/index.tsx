@@ -67,7 +67,7 @@ export default function VendorsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteVendors, {
-    loading: "Vendors.loading.deleting",
+    loading: "Vendors.loading.delete",
     success: "Vendors.success.deleted",
     error: "Vendors.error.deleting",
     onSuccess: () => {

@@ -72,7 +72,7 @@ export default function RolesPage() {
   const { createDeleteHandler } = useDeleteHandler();
 
   const handleConfirmDelete = createDeleteHandler(deleteRoles, {
-    loading: "Roles.loading.deleting",
+    loading: "Roles.loading.delete",
     success: "Roles.success.deleted",
     error: "Roles.error.deleting",
     onSuccess: () => {
@@ -111,14 +111,14 @@ export default function RolesPage() {
       const roleToDuplicate = allRoles.find((r) => r.id === rowId);
       if (roleToDuplicate && !roleToDuplicate.is_system) {
         const toastId = toast.loading(t("General.loading_operation"), {
-          description: t("Roles.loading.duplicating"),
+          description: t("Roles.loading.duplicate"),
         });
         await duplicateRole(
           { id: rowId, enterprise_id: enterprise?.id || "" },
           {
             onSuccess: () => {
               toast.success(t("General.successful_operation"), {
-                description: t("Roles.success.duplicated"),
+                description: t("Roles.success.duplicate"),
               });
               toast.dismiss(toastId);
             },
@@ -213,8 +213,8 @@ export default function RolesPage() {
               setActionableRole(null);
               toast.success(t("General.successful_operation"), {
                 description: actionableRole?.id
-                  ? t("Roles.success.updated")
-                  : t("Roles.success.created"),
+                  ? t("Roles.success.update")
+                  : t("Roles.success.create"),
               });
             }}
             editMode={!!actionableRole?.id}

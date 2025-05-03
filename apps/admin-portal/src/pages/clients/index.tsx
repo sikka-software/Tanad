@@ -70,7 +70,7 @@ export default function ClientsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteClients, {
-    loading: "Clients.loading.deleting",
+    loading: "Clients.loading.delete",
     success: "Clients.success.deleted",
     error: "Clients.error.deleting",
     onSuccess: () => {
@@ -150,7 +150,7 @@ export default function ClientsPage() {
               setActionableClient(null);
               setLoadingSaveClient(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Clients.success.updated"),
+                description: t("Clients.success.update"),
               });
             }}
             defaultValues={actionableClient}

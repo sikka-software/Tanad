@@ -156,7 +156,7 @@ export default function TemplatesPage() {
       }
 
       toast.success(t("General.successful_operation"), {
-        description: t("Templates.success.created"),
+        description: t("Templates.success.create"),
       });
       setOpen(false);
       form.reset({
@@ -191,7 +191,7 @@ export default function TemplatesPage() {
       }
 
       toast.success(t("General.successful_operation"), {
-        description: t("Templates.success.updated"),
+        description: t("Templates.success.update"),
       });
       fetchTemplates();
     } catch (error) {

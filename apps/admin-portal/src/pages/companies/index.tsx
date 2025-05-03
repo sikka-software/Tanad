@@ -70,7 +70,7 @@ export default function CompaniesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteCompanies, {
-    loading: "Companies.loading.deleting",
+    loading: "Companies.loading.delete",
     success: "Companies.success.deleted",
     error: "Companies.error.deleting",
     onSuccess: () => {
@@ -151,7 +151,7 @@ export default function CompaniesPage() {
               setActionableCompany(null);
               setLoadingSaveCompany(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Companies.success.updated"),
+                description: t("Companies.success.update"),
               });
             }}
             defaultValues={actionableCompany}

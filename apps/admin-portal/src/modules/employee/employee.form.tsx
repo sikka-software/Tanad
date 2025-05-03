@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
 import { PlusCircle, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -11,7 +12,6 @@ import {
 } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { UseMutateAsyncFunction } from "@tanstack/react-query";
 
 import { ComboboxAdd } from "@/ui/combobox-add";
 import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
@@ -56,7 +56,12 @@ const salaryComponentSchema = z.object({
 });
 
 interface EmployeeFormExtendedProps extends ModuleFormProps<Employee> {
-  updateEmployee: UseMutateAsyncFunction<Employee, Error, { id: string; updates: EmployeeUpdateData }, unknown>;
+  updateEmployee: UseMutateAsyncFunction<
+    Employee,
+    Error,
+    { id: string; updates: EmployeeUpdateData },
+    unknown
+  >;
   createEmployee: UseMutateAsyncFunction<Employee, Error, EmployeeCreateData, unknown>;
   isSubmitting: boolean;
 }
@@ -213,16 +218,22 @@ export function EmployeeForm({
           id: actualEmployeeId!,
           updates: { ...finalSubmitData } as EmployeeUpdateData,
         });
+        // Show success toast for update
+        // toast.success(t("General.success_operation"), {
+        //   description: t("Employees.success.updating"),
+        // });
         onSuccess?.();
       } else {
         await createEmployee(finalSubmitData as EmployeeCreateData);
+        // Show success toast for create
+        // toast.success(t("General.success_operation"), {
+        //   description: t("Employees.success.creating"),
+        // });
         onSuccess?.();
       }
     } catch (error) {
       console.error("Employee form error:", error);
-      const errorDescription = editMode
-        ? t("Employees.error.updating")
-        : t("Employees.error.creating");
+      const errorDescription = editMode ? t("Employees.error.update") : t("Employees.error.create");
       toast.error(t("General.error_operation"), {
         description: errorDescription,
       });

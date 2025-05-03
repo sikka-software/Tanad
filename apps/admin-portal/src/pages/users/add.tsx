@@ -32,7 +32,7 @@ export default function AddUserPage() {
 
   const onAddSuccess = () => {
     toast.success(t("General.successful_operation"), {
-      description: t("Users.success.created"),
+      description: t("Users.success.create"),
     });
     router.push("/users");
   };

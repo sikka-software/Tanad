@@ -60,7 +60,7 @@ export function useCreateUser() {
     },
     onError: (error) => {
       console.error("Error creating user:", error);
-      const defaultError = t("Users.error.creating");
+      const defaultError = t("Users.error.create");
       const message = (error as any)?.message || defaultError;
       if ((error as any)?.code === "23505") {
         toast.error(t("Users.error.email_exists"));
@@ -98,7 +98,7 @@ export function useUpdateUser() {
     },
     onError: (error) => {
       console.error("Error updating user:", error);
-      toast.error(t("Users.error.updating"));
+      toast.error(t("Users.error.update"));
     },
   });
 }

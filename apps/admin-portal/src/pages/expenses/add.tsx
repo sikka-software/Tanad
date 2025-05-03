@@ -34,7 +34,7 @@ export default function AddExpensePage() {
 
   const onAddSuccess = () => {
     toast.success(t("General.successful_operation"), {
-      description: t("Expenses.success.created"),
+      description: t("Expenses.success.create"),
     });
     router.push("/expenses");
     setIsLoading(false);

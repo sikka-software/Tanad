@@ -69,7 +69,7 @@ export default function OfficesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteOffices, {
-    loading: "Offices.loading.deleting",
+    loading: "Offices.loading.delete",
     success: "Offices.success.deleted",
     error: "Offices.error.deleting",
     onSuccess: () => {
@@ -149,7 +149,7 @@ export default function OfficesPage() {
               setActionableOffice(null);
               setLoadingSaveOffice(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Offices.success.updated"),
+                description: t("Offices.success.update"),
               });
             }}
             defaultValues={actionableOffice}

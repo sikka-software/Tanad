@@ -70,7 +70,7 @@ export default function UsersPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteUsers, {
-    loading: "Users.loading.deleting",
+    loading: "Users.loading.delete",
     success: "Users.success.deleted",
     error: "Users.error.deleting",
     onSuccess: () => {

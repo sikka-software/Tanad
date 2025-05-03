@@ -134,7 +134,7 @@ export function JobListingForm({
       setIsLoading(false);
       console.error("Failed to save job listing:", error);
       toast.error(t("General.error_operation"), {
-        description: t("JobListings.error.creating"),
+        description: t("JobListings.error.create"),
       });
     }
   };

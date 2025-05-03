@@ -74,7 +74,7 @@ export default function DepartmentsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteDepartments, {
-    loading: "Departments.loading.deleting",
+    loading: "Departments.loading.delete",
     success: "Departments.success.deleted",
     error: "Departments.error.deleting",
     onSuccess: () => {
@@ -158,7 +158,7 @@ export default function DepartmentsPage() {
               setActionableDepartment(null);
               setLoadingSaveDepartment(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Departments.success.updated"),
+                description: t("Departments.success.update"),
               });
             }}
             defaultValues={actionableDepartment}

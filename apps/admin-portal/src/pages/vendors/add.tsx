@@ -56,7 +56,7 @@ export default function AddVendorPage() {
           router.push("/vendors").then(() => {
             setIsLoading(false);
             toast.success(t("General.successful_operation"), {
-              description: t("Vendors.success.created"),
+              description: t("Vendors.success.create"),
             });
           });
         }}

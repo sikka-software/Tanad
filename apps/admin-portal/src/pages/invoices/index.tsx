@@ -74,7 +74,7 @@ export default function InvoicesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteInvoices, {
-    loading: "Invoices.loading.deleting",
+    loading: "Invoices.loading.delete",
     success: "Invoices.success.deleted",
     error: "Invoices.error.deleting",
     onSuccess: () => {
@@ -154,7 +154,7 @@ export default function InvoicesPage() {
               setActionableInvoice(null);
               setLoadingSaveInvoice(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Invoices.success.updated"),
+                description: t("Invoices.success.update"),
               });
             }}
             defaultValues={actionableInvoice}

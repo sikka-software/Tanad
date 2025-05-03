@@ -64,7 +64,7 @@ export default function AddJobPage() {
             setIsLoading(false);
             router.push("/jobs");
             toast.success(t("General.successful_operation"), {
-              description: t("Jobs.success.created"),
+              description: t("Jobs.success.create"),
             });
           }}
         />

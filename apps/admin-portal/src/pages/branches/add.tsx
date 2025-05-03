@@ -50,7 +50,7 @@ export default function AddBranchPage() {
 
   const onAddSuccess = () => {
     toast.success(t("General.successful_operation"), {
-      description: t("Branches.success.created"),
+      description: t("Branches.success.create"),
     });
     router.push("/branches");
     setIsLoading(false);

@@ -124,7 +124,7 @@ export function ProductForm({ id, onSuccess, defaultValues, editMode }: ModuleFo
       setIsLoading(false);
       console.error("Failed to save product:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Products.error.creating"),
+        description: t("Products.error.create"),
       });
     }
   };

@@ -76,7 +76,7 @@ export default function JobListingsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteJobListings, {
-    loading: "JobListings.loading.deleting",
+    loading: "JobListings.loading.delete",
     success: "JobListings.success.deleted",
     error: "JobListings.error.deleting",
     onSuccess: () => {
@@ -162,7 +162,7 @@ export default function JobListingsPage() {
               setActionableJobListing(null);
               setLoadingSaveJobListing(false);
               toast.success(t("General.successful_operation"), {
-                description: t("JobListings.success.updated"),
+                description: t("JobListings.success.update"),
               });
             }}
             defaultValues={actionableJobListing}

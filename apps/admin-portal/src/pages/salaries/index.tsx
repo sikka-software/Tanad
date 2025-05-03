@@ -65,7 +65,7 @@ export default function SalariesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteSalaries, {
-    loading: "Salaries.loading.deleting",
+    loading: "Salaries.loading.delete",
     success: "Salaries.success.deleted",
     error: "Salaries.error.deleting",
     onSuccess: () => {

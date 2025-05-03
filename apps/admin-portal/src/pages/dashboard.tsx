@@ -9,6 +9,7 @@ import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import ActivityCalendar from "@/components/ui/activity-calendar";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -306,6 +307,8 @@ export default function Dashboard() {
               link="/jobs"
             />
           </div>
+
+          <ActivityCalendar />
         </div>
       </div>
     </div>

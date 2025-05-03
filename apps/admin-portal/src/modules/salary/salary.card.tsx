@@ -35,12 +35,12 @@ const SalaryCard = ({ salary }: { salary: Salary }) => {
       deleteSalaryMutation.mutate(id, {
         onSuccess: () => {
           toast.success(t("General.successful_operation"), {
-            description: t("Salaries.success.deleted"),
+            description: t("Salaries.success.delete"),
           });
         },
         onError: (err) => {
           toast.error(t("General.error_operation"), {
-            description: t("Salaries.error.deleting"),
+            description: t("Salaries.error.delete"),
           });
         },
       });

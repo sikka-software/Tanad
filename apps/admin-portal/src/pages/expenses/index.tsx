@@ -70,7 +70,7 @@ export default function ExpensesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteExpenses, {
-    loading: "Expenses.loading.deleting",
+    loading: "Expenses.loading.delete",
     success: "Expenses.success.deleted",
     error: "Expenses.error.deleting",
     onSuccess: () => {
@@ -150,7 +150,7 @@ export default function ExpensesPage() {
               setActionableExpense(null);
               setLoadingSaveExpense(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Expenses.success.updated"),
+                description: t("Expenses.success.update"),
               });
             }}
             defaultValues={actionableExpense}

@@ -175,7 +175,7 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
       setIsLoading(false);
       console.error("Failed to save job:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Jobs.error.creating"),
+        description: t("Jobs.error.create"),
       });
     }
   };

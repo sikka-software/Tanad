@@ -70,7 +70,7 @@ export default function WarehousesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteWarehouses, {
-    loading: "Warehouses.loading.deleting",
+    loading: "Warehouses.loading.delete",
     success: "Warehouses.success.deleted",
     error: "Warehouses.error.deleting",
     onSuccess: () => {
