@@ -54,7 +54,11 @@ const salaryComponentSchema = z.object({
     .default(0),
 });
 
-const createEmployeeFormSchema = (t: (key: string) => string, employeeId?: string) => {
+const createEmployeeFormSchema = (
+  t: (key: string) => string,
+  employeeId?: string,
+  initialEmail?: string,
+) => {
   const supabase = createClient();
 
   return z.object({
@@ -64,6 +68,10 @@ const createEmployeeFormSchema = (t: (key: string) => string, employeeId?: strin
       .string()
       .email(t("Employees.form.email.invalid"))
       .refine(async (email) => {
+        if (employeeId && email === initialEmail) {
+          return true;
+        }
+
         const { user } = useUserStore.getState();
         if (!user?.id) return true;
         const query = supabase
@@ -99,7 +107,7 @@ const createEmployeeFormSchema = (t: (key: string) => string, employeeId?: strin
 export type EmployeeFormValues = z.input<ReturnType<typeof createEmployeeFormSchema>>;
 
 export function EmployeeForm({
-  id,
+  formHtmlId,
   onSuccess,
   defaultValues,
   editMode,
@@ -114,13 +122,15 @@ export function EmployeeForm({
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
 
+  const setIsFormDialogOpen = useEmployeeStore((state) => state.setIsFormDialogOpen);
   const setLoadingSave = useEmployeeStore((state) => state.setIsLoading);
   const loadingSave = useEmployeeStore((state) => state.isLoading);
 
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
+  const initialEmail = editMode ? defaultValues?.email : undefined;
 
   const form = useForm<EmployeeFormValues>({
-    resolver: zodResolver(createEmployeeFormSchema(t, actualEmployeeId)),
+    resolver: zodResolver(createEmployeeFormSchema(t, actualEmployeeId, initialEmail)),
     defaultValues: {
       first_name: defaultValues?.first_name || "",
       last_name: defaultValues?.last_name || "",
@@ -129,10 +139,7 @@ export function EmployeeForm({
       position: defaultValues?.position || "",
       department: defaultValues?.department_id || null,
       hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
-      salary:
-        defaultValues?.salary && defaultValues.salary.length > 0
-          ? defaultValues.salary
-          : [{ type: "", amount: 0 }],
+      salary: defaultValues?.salary || [],
       status: defaultValues?.status || "active",
       notes: defaultValues?.notes ?? undefined,
     },
@@ -166,15 +173,30 @@ export function EmployeeForm({
       hire_date: data.hire_date,
       notes: data.notes?.trim() || undefined,
       department_id: data.department || undefined,
-      salary: data.salary || [],
+      salary: (data.salary || []).map(comp => ({
+        ...comp,
+        amount: Number(comp.amount) || 0,
+      })),
     };
 
     const { department, ...finalSubmitData } = submitData;
 
+    console.log("Form state on submit:", form.formState);
+
     try {
       if (editMode) {
+        // Temporarily removing the isDirty check for diagnostics
+        /*
+        if (!form.formState.isDirty) {
+          toast.info(t("General.no_changes_detected")); 
+          onSuccess?.(); 
+          setLoadingSave(false); 
+          return; 
+        }
+        */
+
         await updateEmployee({
-          id: id!,
+          id: actualEmployeeId!,
           updates: { ...finalSubmitData } as EmployeeUpdateData,
         });
 
@@ -204,7 +226,7 @@ export function EmployeeForm({
   return (
     <>
       <Form {...form}>
-        <form id={id} onSubmit={form.handleSubmit(handleSubmit)}>
+        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField

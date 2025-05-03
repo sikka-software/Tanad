@@ -101,6 +101,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(403).json({ error: `Not authorized to update this ${model}` });
       }
 
+      console.log("API Handler - req.body before update:", JSON.stringify(req.body, null, 2));
+      console.log("API Handler - req.body.salary:", req.body.salary);
+
       const [updatedRecord] = await db
         .update(table)
         .set(req.body)

@@ -949,7 +949,7 @@ export const employees = pgTable(
     is_active: boolean().default(true).notNull(),
     department_id: uuid(),
     position: text(),
-    salary: numeric({ precision: 10, scale: 2 }),
+    salary: jsonb(),
     notes: text(),
   },
   (table) => [

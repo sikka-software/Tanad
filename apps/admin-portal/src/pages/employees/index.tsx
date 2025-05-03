@@ -38,11 +38,12 @@ export default function EmployeesPage() {
   const canReadEmployees = useUserStore((state) => state.hasPermission("employees.read"));
   const canCreateEmployees = useUserStore((state) => state.hasPermission("employees.create"));
 
-  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableEmployee, setActionableEmployee] = useState<Employee | null>(null);
 
   const loadingSaveEmployee = useEmployeesStore((state) => state.isLoading);
   const setLoadingSaveEmployee = useEmployeesStore((state) => state.setIsLoading);
+  const isFormDialogOpen = useEmployeesStore((state) => state.isFormDialogOpen);
+  const setIsFormDialogOpen = useEmployeesStore((state) => state.setIsFormDialogOpen);
 
   const viewMode = useEmployeesStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEmployeesStore((state) => state.isDeleteDialogOpen);
@@ -150,7 +151,7 @@ export default function EmployeesPage() {
           loadingSave={loadingSaveEmployee}
         >
           <EmployeeForm
-            id={"employee-form"}
+            formHtmlId={"employee-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableEmployee(null);
