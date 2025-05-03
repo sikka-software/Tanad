@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import IconButton from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -52,40 +53,20 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
           />
         </div>
         <div className="flex gap-2">
-          <Button
+          <IconButton
+            icon={<Filter className="h-4 w-4" />}
+            label={t("General.filter")}
             variant="outline"
-            className="flex items-center gap-2"
+            className="size-9"
             onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter className="h-4 w-4" />
-            <span>{t("ActivityLogs.filters.filter")}</span>
-          </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-[240px] justify-start text-left font-normal",
-                  !filters.date && "text-muted-foreground",
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.date ? format(filters.date, "PPP") : t("ActivityLogs.filters.pickDate")}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={filters.date}
-                onSelect={(d) => setFilters({ date: d })}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            {t("ActivityLogs.filters.export")}
-          </Button>
+          />
+          <IconButton
+            icon={<Download className="h-4 w-4" />}
+            label={t("General.export")}
+            variant="outline"
+            className="size-9"
+            onClick={() => setShowFilters(!showFilters)}
+          />
         </div>
       </div>
 
@@ -110,6 +91,28 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
               </SelectContent>
             </Select>
           </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[240px] justify-start text-left font-normal",
+                  !filters.date && "text-muted-foreground",
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filters.date ? format(filters.date, "PPP") : t("ActivityLogs.filters.pickDate")}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={filters.date}
+                onSelect={(d) => setFilters({ date: d })}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
           <div className="space-y-2">
             <label className="text-sm font-medium">{t("ActivityLogs.filters.user")}</label>
             <MultiSelect
