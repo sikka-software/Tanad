@@ -2884,5 +2884,8 @@
       "creating": "An error occurred while creating the department",
       "updating": "An error occurred while updating the department"
     }
+  },
+  "ActivityLogs": {
+    "title": "Activity Logs"
   }
 }

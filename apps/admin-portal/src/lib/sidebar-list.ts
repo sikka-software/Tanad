@@ -11,6 +11,7 @@ import {
   SaudiRiyal,
   ShieldPlus,
   FileUser,
+  TableOfContents,
 } from "lucide-react";
 
 import { ModulesOptions } from "../../tanad.config";
@@ -70,39 +71,6 @@ type SimplifiedMenu = {
   items: SimplifiedMenuItem[];
 };
 
-let simplifiedMenu: SimplifiedMenu = {
-  group: "Administration",
-  items: [
-    { title: "Dashboard" },
-    { title: "Analytics" },
-    {
-      title: "Contacts",
-      items: [
-        { title: "All Contacts" },
-        { title: "Companies" },
-        { title: "Clients" },
-        { title: "Vendors" },
-      ],
-    },
-    {
-      title: "Locations",
-      items: [{ title: "Offices" }, { title: "Warehouses" }, { title: "Branches" }],
-    },
-    {
-      title: "Sales",
-      items: [{ title: "Products" }, { title: "Invoices" }, { title: "Quotes" }],
-    },
-    {
-      title: "Human Resources",
-      items: [{ title: "Employees" }, { title: "Departments" }, { title: "Salaries" }],
-    },
-    {
-      title: "Settings",
-      items: [{ title: "Users" }, { title: "Billing" }, { title: "Settings" }],
-    },
-  ],
-};
-
 // Main menu items
 function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
@@ -120,6 +88,14 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       icon: BarChart,
       is_active: pathname.startsWith("/analytics"),
       requiredPermission: "analytics.read",
+    },
+    {
+      title: "Activity Logs",
+      translationKey: "ActivityLogs.title",
+      url: "/activity",
+      icon: TableOfContents,
+      is_active: pathname.startsWith("/activity-logs"),
+      requiredPermission: "activity_logs.read",
     },
 
     {

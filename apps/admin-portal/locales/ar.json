@@ -3413,5 +3413,8 @@
   "OnlineShops": {
     "title": "المتاجر الإلكترونية",
     "singular": "متجر إلكتروني"
+  },
+  "ActivityLogs": {
+    "title": "سجل الأنشطة"
   }
 }
