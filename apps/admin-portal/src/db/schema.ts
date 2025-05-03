@@ -934,6 +934,7 @@ export const employees = pgTable(
     created_at: timestamp({ withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
+    updated_at: timestamp({ withTimezone: true, mode: "string" }),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
     short_address: text(),

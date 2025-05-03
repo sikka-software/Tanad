@@ -134,6 +134,13 @@
       "when": 1746235464305,
       "tag": "0018_minor_black_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1746235577299,
+      "tag": "0019_low_boomerang",
+      "breakpoints": true
     }
   ]
 }
