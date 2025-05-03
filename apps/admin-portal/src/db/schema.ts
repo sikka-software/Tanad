@@ -1,27 +1,27 @@
 import { sql } from "drizzle-orm";
 import {
-  pgTable,
-  index,
-  uuid,
-  text,
-  numeric,
-  timestamp,
+  bigserial,
   boolean,
   check,
-  jsonb,
-  foreignKey,
   date,
+  foreignKey,
+  index,
+  inet,
+  json,
+  jsonb,
+  numeric,
+  pgEnum,
   pgSchema,
+  pgTable,
+  pgView,
+  primaryKey,
+  smallint,
+  text,
+  timestamp,
   unique,
   uniqueIndex,
+  uuid,
   varchar,
-  smallint,
-  json,
-  inet,
-  bigserial,
-  primaryKey,
-  pgView,
-  pgEnum,
 } from "drizzle-orm/pg-core";
 
 export const auth = pgSchema("auth");
@@ -81,7 +81,6 @@ export const app_permission = pgEnum("app_permission", [
   "expenses.delete",
   "expenses.export",
   "expenses.duplicate",
- 
 
   "quotes.read",
   "quotes.create",
@@ -1352,6 +1351,7 @@ export const profiles = pgTable(
     full_name: text(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
     user_settings: jsonb(),
+    stripe_customer_id: text(),
   },
   (table) => [
     foreignKey({

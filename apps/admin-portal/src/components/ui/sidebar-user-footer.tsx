@@ -39,6 +39,11 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
   const router = useRouter();
   const signOut = useUserStore((state) => state.signOut);
 
+  // Early return if no user to prevent null reference errors
+  if (!user) {
+    return null;
+  }
+
   const handleSignOut = async () => {
     try {
       await signOut();

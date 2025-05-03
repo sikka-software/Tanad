@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import { Asterisk, Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Input } from "@/ui/input";
 import {
@@ -270,7 +270,7 @@ export function AppSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter className="border-t">
-        <SidebarUserFooter user={profile as ProfileType} />
+        {profile && <SidebarUserFooter user={profile as ProfileType} />}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
