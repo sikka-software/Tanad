@@ -184,12 +184,16 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
     const roleId = selectedRole?.id;
 
     // Construct mutation data based on form values
+    // ** Combine first and last name into full_name **
+    const fullName = `${values.first_name} ${values.last_name}`.trim();
+
     const mutationDataBase = {
-      first_name: values.first_name,
-      last_name: values.last_name,
+      // Remove first_name and last_name
+      full_name: fullName, // Add full_name
       email: values.email.toLowerCase(), // Ensure email is lowercase
-      role: values.role,
-      enterprise_id: enterprise.id,
+      role: values.role,             // Keep role name for API check
+      enterprise_id: enterprise.id, // Keep for potential use (though API doesn't destructure it)
+      role_id: roleId,             // Keep role_id for potential use (though API doesn't destructure it)
     };
 
     // Add password conditionally

@@ -1,7 +1,7 @@
 import { PostgrestError, createClient as createAdminClient } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { createClient } from "@/utils/supabase/server-props";
+import { createClient } from "@/utils/supabase/server-admin";
 
 // Define the expected shape of the data returned by the query
 interface MembershipWithDetails {
@@ -12,8 +12,7 @@ interface MembershipWithDetails {
     id: string;
     email: string | null;
     created_at: string | null;
-    first_name: string | null;
-    last_name: string | null;
+    full_name: string | null;
     avatar_url: string | null;
     phone: string | null;
     // Add other profile fields if needed
@@ -21,6 +20,24 @@ interface MembershipWithDetails {
   roles: {
     name: string | null;
   } | null; // Role might be null
+}
+
+// Define expected shape for the membership fetch with joins
+interface NewMembershipDetails {
+  profile_id: string;
+  enterprise_id: string;
+  role_id: string;
+  profiles: {
+    id: string;
+    email: string | null;
+    created_at: string | null;
+    full_name: string | null;
+    avatar_url: string | null;
+    phone: string | null;
+  } | null; // Profile could technically be null if join fails
+  roles: {
+    name: string | null;
+  } | null; // Role could technically be null
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -107,8 +124,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               role: m.roles!.name, // Use non-null assertion
               enterprise_id: m.enterprise_id,
               created_at: m.profiles!.created_at,
-              first_name: m.profiles!.first_name,
-              last_name: m.profiles!.last_name,
+              full_name: m.profiles!.full_name,
               avatar_url: m.profiles!.avatar_url,
               phone: m.profiles!.phone,
               // role_id: m.role_id
@@ -150,12 +166,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
         const creatorEnterpriseId = creatorMembershipData.enterprise_id;
 
-        const { email, password, role: roleName, first_name, last_name } = req.body; // Renamed role to roleName for clarity
+        const { email, password, role: roleName, full_name } = req.body; // Renamed role to roleName for clarity
 
-        if (!email || !password || !roleName || !first_name || !last_name) {
+        if (!email || !password || !roleName || !full_name) {
           return res.status(400).json({
             error: "Missing required fields",
-            details: "Email, password, role name, first name, and last name are required",
+            details: "Email, password, role name, and full name are required",
           });
         }
 
@@ -209,8 +225,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             newUserId = userIdResult[0].id;
             console.log(`Found existing user ID via RPC: ${newUserId}`);
 
-            // *** ADDED: Check if profile exists for the existing auth user ***
-            const { data: existingProfile, error: profileCheckError } = await supabaseUserClient
+            // *** Use supabaseAdmin for profile check/creation ***
+            const { data: existingProfile, error: profileCheckError } = await supabaseAdmin
               .from("profiles")
               .select("id")
               .eq("id", newUserId)
@@ -224,12 +240,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             if (!existingProfile) {
               console.log(`Profile for user ${newUserId} not found. Creating profile...`);
               // Profile doesn't exist, create it using data from the request
-              const { error: createProfileError } = await supabaseUserClient
+              const { error: createProfileError } = await supabaseAdmin
                 .from("profiles")
                 .insert({
                   id: newUserId, // Link to the auth user
                   email: email, // From request body
-                  full_name: `${first_name} ${last_name}`, // Combine first and last name
+                  full_name: full_name, // Use full_name directly
                   // Add other default/required profile fields if necessary
                 });
 
@@ -248,8 +264,50 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         }
 
-        // 3. Check if the user (newly created or existing) is already in the target enterprise
-        const { data: existingMembership, error: checkMembershipError } = await supabaseUserClient
+        // 3. Ensure the profile exists (Upsert based on newUserId)
+        console.log(`Ensuring profile exists for user ID: ${newUserId}`);
+        const { error: profileUpsertError } = await supabaseAdmin.from("profiles").upsert(
+          {
+            id: newUserId, // This is the foreign key to auth.users.id
+            full_name: full_name,
+            email: email.toLowerCase(), // Keep email consistent
+          },
+          {
+            onConflict: "id", // Specify the conflict target
+          },
+        );
+
+        if (profileUpsertError) {
+          console.error("Profile Upsert Error:", profileUpsertError);
+          // If it's a foreign key violation pointing back to auth.users, it's unexpected
+          if (profileUpsertError.code === "23503") {
+            console.error(
+              "Profile upsert failed: User ID might not exist in auth.users. This is unexpected.",
+            );
+          }
+          throw profileUpsertError; // Propagate the error
+        }
+        console.log(`Profile ensured for user ID: ${newUserId}`);
+
+        // 4. Get the role_id based on the provided role name
+        const { data: fetchedRoleData, error: roleError } = await supabaseUserClient // Renamed roleData to fetchedRoleData
+          .from("roles")
+          .select("id, name")
+          .eq("name", roleName)
+          .single();
+
+        if (roleError || !fetchedRoleData) {
+          console.error("Role Fetch Error:", roleError);
+          // Consider rollback if we created the user/profile
+          throw new Error(`Role with name '${roleName}' not found or error fetching it.`);
+        }
+
+        const roleId = fetchedRoleData.id;
+        console.log(`Found role ID: ${roleId} for role name: ${roleName}`);
+
+        // 5. Check if the user (newly created or existing) is already in the target enterprise
+        // (This check was previously step 3, moved here after profile/role confirmation)
+        const { data: existingMembership, error: checkMembershipError } = await supabaseAdmin
           .from("memberships")
           .select("id")
           .eq("profile_id", newUserId)
@@ -258,12 +316,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         if (checkMembershipError) {
           console.error("Error checking existing membership:", checkMembershipError);
-          // If we *just* created the user, we might want to roll back?
-          if (!userAlreadyExists) {
-            await supabaseAdmin.auth.admin
-              .deleteUser(newUserId)
-              .catch((err) => console.error("Rollback delete failed:", err));
-          }
+          // Rollback might be needed if user/profile created
           throw checkMembershipError;
         }
 
@@ -275,57 +328,67 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             code: "USER_MEMBERSHIP_EXISTS",
           });
         }
-
-        // User does not exist in this enterprise yet.
         console.log(
           `User ${newUserId} not yet in enterprise ${creatorEnterpriseId}. Proceeding to add membership.`,
         );
 
-        // 4. Find the role_id based on the role name
-        const { data: roleData, error: roleError } = await supabaseUserClient
-          .from("roles")
-          .select("id")
-          .eq("name", roleName)
+        // 6. Create the membership entry
+        console.log(
+          `Attempting to create membership for user ${newUserId} in enterprise ${creatorEnterpriseId} with role ${roleId}`,
+        );
+        const { data: newMembership, error: membershipCreationError } = await supabaseAdmin
+          .from("memberships")
+          .insert({ profile_id: newUserId, enterprise_id: creatorEnterpriseId, role_id: roleId })
+          .select(
+            `
+            profile_id,
+            enterprise_id,
+            role_id,
+            profiles:profiles!inner (*),
+            roles:roles!inner (name)
+          `,
+          )
           .single();
 
-        if (roleError || !roleData) {
-          console.error("Role Lookup Error:", roleError);
+        if (membershipCreationError) {
+          console.error("Membership Creation Error:", membershipCreationError);
           // Rollback Auth user creation only if we actually created one
           if (!userAlreadyExists) {
             await supabaseAdmin.auth.admin
               .deleteUser(newUserId)
               .catch((err) => console.error("Rollback delete failed:", err));
           }
-          return res.status(400).json({ error: `Role '${roleName}' not found.` });
+          throw membershipCreationError;
         }
-        const roleId = roleData.id;
 
-        // 5. Create the membership entry to link user, enterprise, and role
-        const membershipData = {
-          profile_id: newUserId,
-          enterprise_id: creatorEnterpriseId,
-          role_id: roleId,
+        // 7. Format the response - Accessing with optional chaining and nullish coalescing
+        // Assuming newMembership contains the data despite linter warnings
+        if (!newMembership?.profiles || !newMembership.roles) {
+          console.error("Failed to retrieve full membership details after creation.");
+          throw new Error("Failed to retrieve membership details.");
+        }
+
+        // Access potentially nested data safely
+        const profileData = Array.isArray(newMembership.profiles)
+          ? newMembership.profiles[0]
+          : newMembership.profiles;
+        const roleData = Array.isArray(newMembership.roles)
+          ? newMembership.roles[0]
+          : newMembership.roles;
+
+        const newUserResponse = {
+          id: profileData?.id ?? null,
+          email: profileData?.email ?? null,
+          role: roleData?.name ?? null,
+          enterprise_id: newMembership.enterprise_id,
+          created_at: profileData?.created_at ?? null,
+          full_name: profileData?.full_name ?? null,
+          avatar_url: profileData?.avatar_url ?? null,
+          phone: profileData?.phone ?? null,
         };
 
-        const { error: createMembershipError } = await supabaseUserClient
-          .from("memberships")
-          .insert(membershipData);
-
-        if (createMembershipError) {
-          console.error("Membership Creation Error:", createMembershipError);
-          // Rollback Auth user creation only if we actually created one
-          if (!userAlreadyExists) {
-            await supabaseAdmin.auth.admin
-              .deleteUser(newUserId)
-              .catch((err) => console.error("Rollback delete failed:", err));
-          }
-          throw createMembershipError;
-        }
-
-        // Return the created profile information (or just a success status)
-        return res
-          .status(201)
-          .json({ id: newUserId, email, role: roleName, user_existed: userAlreadyExists }); // Indicate if user was pre-existing
+        console.log("Successfully created user and membership:", newUserResponse);
+        return res.status(201).json(newUserResponse);
 
       case "DELETE":
         const { ids } = req.body;
