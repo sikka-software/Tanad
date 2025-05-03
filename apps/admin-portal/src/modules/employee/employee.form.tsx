@@ -127,8 +127,8 @@ export function EmployeeForm({
       email: defaultValues?.email || "",
       phone: defaultValues?.phone ?? undefined,
       position: defaultValues?.position || "",
-      department: defaultValues?.department || null,
-      hire_date: defaultValues?.hire_date || undefined,
+      department: defaultValues?.department_id || null,
+      hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       salary:
         defaultValues?.salary && defaultValues.salary.length > 0
           ? defaultValues.salary
@@ -178,9 +178,6 @@ export function EmployeeForm({
           updates: { ...finalSubmitData } as EmployeeUpdateData,
         });
 
-        toast.success(t("General.successful_operation"), {
-          description: t("Employees.success.updated"),
-        });
         onSuccess?.();
       } else {
         await createEmployee(finalSubmitData as EmployeeCreateData);
