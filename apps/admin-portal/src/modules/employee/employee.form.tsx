@@ -11,6 +11,7 @@ import {
 } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { UseMutateAsyncFunction } from "@tanstack/react-query";
 
 import { ComboboxAdd } from "@/ui/combobox-add";
 import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
@@ -32,7 +33,7 @@ import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
 
-import { useCreateEmployee, useUpdateEmployee } from "@/employee/employee.hooks";
+import { useCreateEmployee } from "@/employee/employee.hooks";
 import { SALARY_COMPONENT_TYPES } from "@/employee/employee.options";
 import useEmployeeStore from "@/employee/employee.store";
 import type {
@@ -54,28 +55,45 @@ const salaryComponentSchema = z.object({
     .default(0),
 });
 
+interface EmployeeFormExtendedProps extends ModuleFormProps<Employee> {
+  updateEmployee: UseMutateAsyncFunction<Employee, Error, { id: string; updates: EmployeeUpdateData }, unknown>;
+  createEmployee: UseMutateAsyncFunction<Employee, Error, EmployeeCreateData, unknown>;
+  isSubmitting: boolean;
+}
+
 export function EmployeeForm({
   formHtmlId,
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Employee>) {
+  updateEmployee,
+  createEmployee,
+  isSubmitting,
+}: EmployeeFormExtendedProps) {
   const t = useTranslations();
   const locale = useLocale();
-  const { mutate: createEmployee } = useCreateEmployee();
-  const { mutate: updateEmployee } = useUpdateEmployee();
 
   const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
-  const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
 
   const setIsFormDialogOpen = useEmployeeStore((state) => state.setIsFormDialogOpen);
-  const setLoadingSave = useEmployeeStore((state) => state.setIsLoading);
-  const loadingSave = useEmployeeStore((state) => state.isLoading);
 
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
   const initialEmail = editMode ? defaultValues?.email : undefined;
+
+  const mapDataToFormDefaults = (data: Employee | null | undefined) => ({
+    first_name: data?.first_name || "",
+    last_name: data?.last_name || "",
+    email: data?.email || "",
+    phone: data?.phone ?? "",
+    position: data?.position || "",
+    department: data?.department_id || null,
+    hire_date: data?.hire_date ? new Date(data.hire_date) : undefined,
+    salary: data?.salary || [],
+    status: data?.status || "active",
+    notes: data?.notes ?? "",
+  });
 
   const createEmployeeFormSchema = () => {
     const supabase = createClient();
@@ -107,7 +125,6 @@ export function EmployeeForm({
 
           if (error) {
             console.error("Email validation error:", error);
-            setLoadingSave(false);
             return false;
           }
 
@@ -127,27 +144,18 @@ export function EmployeeForm({
 
   const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
     resolver: zodResolver(createEmployeeFormSchema()),
-    defaultValues: {
-      first_name: defaultValues?.first_name || "",
-      last_name: defaultValues?.last_name || "",
-      email: defaultValues?.email || "",
-      phone: defaultValues?.phone ?? undefined,
-      position: defaultValues?.position || "",
-      department: defaultValues?.department_id || null,
-      hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
-      salary: defaultValues?.salary || [],
-      status: defaultValues?.status || "active",
-      notes: defaultValues?.notes ?? undefined,
-    },
+    defaultValues: mapDataToFormDefaults(defaultValues),
   });
 
-  // useEffect(() => {
-  //   console.log("EmployeeForm: Initial form state:", {
-  //     isDirty: form.formState.isDirty,
-  //     dirtyFields: form.formState.dirtyFields,
-  //     values: form.getValues(),
-  //   });
-  // }, [form]);
+  useEffect(() => {
+    if (defaultValues) {
+      console.log("Resetting form with defaultValues:", defaultValues);
+      form.reset(mapDataToFormDefaults(defaultValues));
+    } else {
+      // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
+      // form.reset(mapDataToFormDefaults(null));
+    }
+  }, [defaultValues, form.reset]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -165,7 +173,21 @@ export function EmployeeForm({
     })) || [];
 
   const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
-    setLoadingSave(true);
+    // Log dirtyFields for debugging
+    console.log("Form dirtyFields:", form.formState.dirtyFields);
+    console.log("Form isDirty:", form.formState.isDirty);
+
+    // Explicitly check if any field has been marked as dirty
+    const isActuallyDirty = Object.keys(form.formState.dirtyFields).length > 0;
+    console.log("Is Actually Dirty (based on dirtyFields object):", isActuallyDirty);
+
+    // Check if editing and if the form is actually dirty based on the dirtyFields object
+    if (editMode && !isActuallyDirty) {
+      console.log("Form not dirty (based on dirtyFields), closing without saving.");
+      // If nothing changed, just close the form without an API call or toast
+      onSuccess?.();
+      return;
+    }
 
     const submitData = {
       ...data,
@@ -185,37 +207,25 @@ export function EmployeeForm({
 
     const { department, ...finalSubmitData } = submitData;
 
-    console.log("Values before isDirty check:", form.getValues());
-
     try {
       if (editMode) {
-        if (Object.keys(form.formState.dirtyFields).length === 0) {
-          setLoadingSave(false);
-          setIsFormDialogOpen(false);
-          return;
-        }
-
         await updateEmployee({
           id: actualEmployeeId!,
           updates: { ...finalSubmitData } as EmployeeUpdateData,
         });
-
         onSuccess?.();
       } else {
         await createEmployee(finalSubmitData as EmployeeCreateData);
-
-        toast.success(t("General.successful_operation"), {
-          description: t("Employees.success.created"),
-        });
         onSuccess?.();
       }
     } catch (error) {
-      console.error(error);
-      setLoadingSave(false);
+      console.error("Employee form error:", error);
+      const errorDescription = editMode
+        ? t("Employees.error.updating")
+        : t("Employees.error.creating");
       toast.error(t("General.error_operation"), {
-        description: t("Employees.error.creating"),
+        description: errorDescription,
       });
-      throw error;
     }
   };
 
@@ -238,7 +248,7 @@ export function EmployeeForm({
                     <FormControl>
                       <Input
                         placeholder={t("Employees.form.first_name.placeholder")}
-                        disabled={loadingSave}
+                        disabled={isSubmitting}
                         {...field}
                       />
                     </FormControl>
@@ -256,7 +266,7 @@ export function EmployeeForm({
                     <FormControl>
                       <Input
                         placeholder={t("Employees.form.last_name.placeholder")}
-                        disabled={loadingSave}
+                        disabled={isSubmitting}
                         {...field}
                       />
                     </FormControl>
@@ -274,7 +284,7 @@ export function EmployeeForm({
                     <FormControl>
                       <Input
                         placeholder={t("Employees.form.email.placeholder")}
-                        disabled={loadingSave}
+                        disabled={isSubmitting}
                         type="email"
                         {...field}
                       />
@@ -291,7 +301,7 @@ export function EmployeeForm({
                   <FormItem>
                     <FormLabel>{t("Employees.form.phone.label")}</FormLabel>
                     <FormControl>
-                      <PhoneInput disabled={loadingSave} {...field} value={field.value ?? ""} />
+                      <PhoneInput disabled={isSubmitting} {...field} value={field.value ?? ""} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -307,7 +317,7 @@ export function EmployeeForm({
                     <FormControl>
                       <Input
                         placeholder={t("Employees.form.position.placeholder")}
-                        disabled={loadingSave}
+                        disabled={isSubmitting}
                         {...field}
                       />
                     </FormControl>
@@ -328,7 +338,7 @@ export function EmployeeForm({
                         defaultValue={field.value ?? undefined}
                         onChange={field.onChange}
                         isLoading={departmentsLoading}
-                        disabled={loadingSave}
+                        disabled={isSubmitting}
                         texts={{
                           placeholder: t("Employees.form.department.placeholder"),
                           searchPlaceholder: t("Employees.form.department.searchPlaceholder"),
@@ -353,7 +363,7 @@ export function EmployeeForm({
                       <DatePicker
                         date={field.value}
                         onSelect={field.onChange}
-                        disabled={loadingSave}
+                        disabled={isSubmitting}
                       />
                     </FormControl>
                     <FormMessage />
@@ -371,7 +381,7 @@ export function EmployeeForm({
                     dir={locale === "ar" ? "rtl" : "ltr"}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
-                    disabled={loadingSave}
+                    disabled={isSubmitting}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -386,7 +396,6 @@ export function EmployeeForm({
                       <SelectItem value="on_leave">
                         {t("Employees.form.status.on_leave")}
                       </SelectItem>
-                      {/* <SelectItem value="terminated">{t("Employees.form.status.terminated")}</SelectItem> */}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -404,7 +413,7 @@ export function EmployeeForm({
                     <Textarea
                       placeholder={t("Employees.form.notes.placeholder")}
                       className="min-h-[100px]"
-                      disabled={loadingSave}
+                      disabled={isSubmitting}
                       {...field}
                       value={field.value ?? ""}
                     />
@@ -421,7 +430,7 @@ export function EmployeeForm({
               type="button"
               size="sm"
               onClick={() => append({ type: "", amount: 0 })}
-              disabled={loadingSave}
+              disabled={isSubmitting}
             >
               <PlusCircle className="mr-2 size-4" />
               {t("Employees.form.salary.add_component")}
@@ -444,7 +453,7 @@ export function EmployeeForm({
                         dir={locale === "ar" ? "rtl" : "ltr"}
                         onValueChange={typeField.onChange}
                         defaultValue={typeField.value}
-                        disabled={loadingSave}
+                        disabled={isSubmitting}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -478,7 +487,7 @@ export function EmployeeForm({
                       <FormControl>
                         <CurrencyInput
                           placeholder={t("Employees.form.salary.amount_placeholder")}
-                          disabled={loadingSave}
+                          disabled={isSubmitting}
                           {...amountField}
                           showCommas={true}
                           value={
@@ -496,7 +505,7 @@ export function EmployeeForm({
                   variant="outline"
                   className="w-9"
                   onClick={() => remove(index)}
-                  disabled={loadingSave}
+                  disabled={isSubmitting}
                   aria-label={t("General.remove")}
                 >
                   <Trash2Icon className="h-4 w-4" />
@@ -524,7 +533,6 @@ export function EmployeeForm({
           id="department-form"
           onSuccess={() => {
             setIsDepartmentDialogOpen(false);
-            setIsDepartmentSaving(false);
           }}
         />
       </FormDialog>
