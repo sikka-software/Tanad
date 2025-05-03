@@ -96,28 +96,77 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ message: `${model} not found` });
       }
 
-      // Check ownership if the model has a user_id field
-      if ("user_id" in existingRecord && existingRecord.user_id !== user.id) {
-        return res.status(403).json({ error: `Not authorized to update this ${model}` });
+      // Check ownership if the model has a user_id field (Example - adjust if needed)
+      // Assuming enterprise_id implies ownership/permission in this context
+      if ("enterprise_id" in existingRecord) {
+        // Fetch user's enterprise membership if not already available
+        const { data: membership, error: enterpriseError } = await supabase
+          .from("memberships")
+          .select("enterprise_id")
+          .eq("profile_id", user.id)
+          .maybeSingle();
+
+        if (enterpriseError || !membership?.enterprise_id) {
+          console.error("Failed to verify enterprise membership for update:", enterpriseError);
+          return res.status(403).json({ error: `Failed to verify authorization for ${model}` });
+        }
+        if (existingRecord.enterprise_id !== membership.enterprise_id) {
+          return res.status(403).json({ error: `Not authorized to update this ${model}` });
+        }
       }
 
       console.log("API Handler - req.body before update:", JSON.stringify(req.body, null, 2));
       console.log("API Handler - req.body.salary:", req.body.salary);
 
-      const [updatedRecord] = await db
-        .update(table)
-        .set(req.body)
-        .where(eq(table[idField], id))
-        .returning();
+      // --- Explicitly define fields to update ---
+      const {
+        // Exclude fields not meant for direct update
+        id: _id,
+        created_at: _createdAt,
+        updated_at: _updatedAt,
+        enterprise_id: _enterpriseId,
+        created_by: _createdBy,
+        // Include other fields from req.body that ARE updatable
+        ...updatableData
+      } = req.body;
+      // --- End Explicit Update Definition ---
+
+      // Perform the update using the AUTHENTICATED supabase client
+      // Use the actual model name string from the query param
+      const { data: updatedRecord, error: updateError } = await supabase
+        .from(model) // Use model name string directly
+        .update(updatableData) // Use the filtered data
+        .eq(idField, id)
+        .select()
+        .single(); // Assuming you expect one record back
+
+      if (updateError) {
+        console.error(`Supabase update error for ${model}:`, updateError);
+        // Throw the specific Supabase error for better debugging
+        throw updateError;
+      }
 
       if (!updatedRecord) {
-        return res.status(404).json({ message: `${model} not found` });
+        // This could happen if RLS prevents seeing the updated record
+        console.warn(
+          `Update operation on ${model} ${id} seemed successful but SELECT returned no data. Check RLS.`,
+        );
+        return res
+          .status(404)
+          .json({ message: `${model} not found or update failed silently (potentially RLS)` });
       }
 
       return res.status(200).json(updatedRecord);
-    } catch (error) {
-      console.error(`Error updating ${model}:`, error);
-      return res.status(500).json({ message: `Error updating ${model}` });
+    } catch (error: any) {
+      console.error(`Raw error object updating ${model}:`, error);
+      console.error(`Stringified error object updating ${model}:`, JSON.stringify(error, null, 2));
+      console.error(`Error message updating ${model}:`, error?.message);
+      const errorMessage =
+        error?.message || JSON.stringify(error) || "Unknown error occurred during update";
+      return res.status(500).json({
+        message: `Error updating ${model}: ${errorMessage}`,
+        errorDetails: error, // Also include the raw error in the response if possible
+      });
     }
   }
 

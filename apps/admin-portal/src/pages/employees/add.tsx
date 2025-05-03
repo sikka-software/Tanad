@@ -12,11 +12,16 @@ import { generateDummyData } from "@/lib/dummy-generator";
 import { EmployeeForm } from "@/employee/employee.form";
 import useEmployeesStore from "@/employee/employee.store";
 
+import { useCreateEmployee, useUpdateEmployee } from "@/modules/employee/employee.hooks";
+
 export default function AddEmployeePage() {
   const t = useTranslations();
   const router = useRouter();
   const setLoadingSave = useEmployeesStore((state) => state.setIsLoading);
   const loadingSave = useEmployeesStore((state) => state.isLoading);
+
+  const { mutateAsync: updateEmployeeMutate, isPending: isUpdatingEmployee } = useUpdateEmployee();
+  const { mutateAsync: createEmployeeMutate, isPending: isCreatingEmployee } = useCreateEmployee();
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
@@ -39,7 +44,7 @@ export default function AddEmployeePage() {
       <PageTitle
         formButtons
         formId="employee-form"
-        loading={loadingSave}
+        loading={isCreatingEmployee}
         onCancel={() => router.push("/employees")}
         texts={{
           title: t("Employees.add_new"),
@@ -49,12 +54,15 @@ export default function AddEmployeePage() {
         dummyButton={handleDummyData}
       />
       <EmployeeForm
-        id="employee-form"
+        formHtmlId="employee-form"
         onSuccess={() =>
           router.push("/employees").then(() => {
             setLoadingSave(false);
           })
         }
+        createEmployee={createEmployeeMutate}
+        updateEmployee={updateEmployeeMutate}
+        isSubmitting={isCreatingEmployee || isUpdatingEmployee}
       />
     </div>
   );

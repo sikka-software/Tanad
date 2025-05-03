@@ -1599,7 +1599,7 @@ export const user_permissions_view = pgView("user_permissions_view", {
 );
 
 // Define enums for activity logging
-export const activityActionType = pgEnum("activity_action_type", [
+export const activityLogActionType = pgEnum("activity_log_action_type", [
   "CREATE",
   "UPDATE",
   "DELETE",
@@ -1646,7 +1646,7 @@ export const activityLogs = pgTable(
     user_id: uuid("user_id")
       .notNull()
       .references(() => usersInAuth.id, { onDelete: "set null" }),
-    action_type: activityActionType("action_type").notNull(),
+    action_type: activityLogActionType("action_type").notNull(),
     target_type: activityTargetType("target_type").notNull(),
     target_id: uuid("target_id").notNull(),
     target_name: text("target_name"),
