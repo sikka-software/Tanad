@@ -6,10 +6,10 @@ import type { ActivityLogListData } from "./activity.type";
 // Export the interface
 export interface ActivityFilters {
   searchQuery: string;
-  date: Date | undefined;
+  // date: Date | undefined; // Keep or remove? Date picker uses dateRange now.
   eventType: string;
   user: string[];
-  timeRange: string;
+  // timeRange: string; // Removed
   dateRange?: DateRange;
 }
 
@@ -25,10 +25,11 @@ interface ActivityLogStore {
 
 const initialFilters: ActivityFilters = {
   searchQuery: "",
-  date: undefined,
+  // date: undefined, // Removed
   eventType: "all",
   user: [],
-  timeRange: "all",
+  // timeRange: "all", // Removed
+  dateRange: undefined, // Ensure dateRange starts as undefined
 };
 
 export const useActivityLogStore = create<ActivityLogStore>((set) => ({

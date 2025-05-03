@@ -129,28 +129,6 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                     loading={isLoadingUsers}
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t("ActivityLogs.filters.timeRange")}
-                  </label>
-                  <Select
-                    value={filters.timeRange}
-                    onValueChange={(value) => setFilters({ timeRange: value })}
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("ActivityLogs.filters.selectTimeRange")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("General.all")}</SelectItem>
-                      <SelectItem value="1h">{t("ActivityLogs.filters.lastHour")}</SelectItem>
-                      <SelectItem value="24h">{t("ActivityLogs.filters.last24Hours")}</SelectItem>
-                      <SelectItem value="7d">{t("ActivityLogs.filters.last7Days")}</SelectItem>
-                      <SelectItem value="30d">{t("ActivityLogs.filters.last30Days")}</SelectItem>
-                      <SelectItem value="90d">{t("ActivityLogs.filters.last90Days")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
                 <div className="flex justify-end">
                   <Button variant="ghost" size="sm" onClick={handleClearFilters}>
                     <X className="mr-2 h-4 w-4" />

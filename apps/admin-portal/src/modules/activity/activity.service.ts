@@ -90,42 +90,26 @@ export class ActivityService {
 
     // 4. Apply client-side filtering
     if (filters) {
-      const { searchQuery, date, eventType, user, timeRange } = filters;
+      const { searchQuery, eventType, user, dateRange } = filters;
 
       formattedData = formattedData.filter((log) => {
         const logDate = new Date(log.created_at);
 
-        // Date filter (if specific date is selected)
-        if (date) {
-          const start = startOfDay(date);
-          const end = endOfDay(date);
-          if (logDate < start || logDate > end) return false;
-        }
+        // Add logging for date comparison
+        const fromDate = dateRange?.from ? startOfDay(dateRange.from) : null;
+        const toDate = dateRange?.to ? endOfDay(dateRange.to) : null;
+        console.log(
+          `Filtering Log ID: ${log.id}, Log Date: ${logDate.toISOString()}, Filter From: ${fromDate?.toISOString() || 'N/A'}, Filter To: ${toDate?.toISOString() || 'N/A'}`,
+        );
 
-        // Time range filter (if specific date is NOT selected)
-        if (!date && timeRange !== "all") {
-          let startDate: Date;
-          const now = new Date();
-          switch (timeRange) {
-            case "1h":
-              startDate = subHours(now, 1);
-              break;
-            case "24h":
-              startDate = subHours(now, 24);
-              break;
-            case "7d":
-              startDate = subDays(now, 7);
-              break;
-            case "30d":
-              startDate = subDays(now, 30);
-              break;
-            case "90d":
-              startDate = subDays(now, 90);
-              break;
-            default:
-              startDate = new Date(0); // Effectively no start date limit
-          }
-          if (logDate < startDate) return false;
+        // Date range filter
+        if (fromDate) {
+          console.log(`Comparing: ${logDate.toISOString()} < ${fromDate.toISOString()} = ${logDate < fromDate}`);
+          if (logDate < fromDate) return false;
+        }
+        if (toDate) {
+          console.log(`Comparing: ${logDate.toISOString()} > ${toDate.toISOString()} = ${logDate > toDate}`);
+          if (logDate > toDate) return false;
         }
 
         // Event type filter
