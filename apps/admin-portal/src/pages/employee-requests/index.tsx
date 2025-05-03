@@ -156,8 +156,8 @@ export default function EmployeeRequestsPage() {
         <FormSheet
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Employees.update_employee")}
-          formId="employee-form"
+          title={t("EmployeeRequests.update_employee_request")}
+          formId="employee-request-form"
           loadingSave={loadingSaveEmployeeRequest}
         >
           <EmployeeRequestForm

@@ -35,6 +35,11 @@ const modelMap: Record<string, ModelConfig> = {
   invoices: { table: schema.invoices, query: db.query.invoices, idField: "id" },
   quotes: { table: schema.quotes, query: db.query.quotes, idField: "id" },
   vendors: { table: schema.vendors, query: db.query.vendors, idField: "id" },
+  "employee-requests": {
+    table: schema.employee_requests,
+    query: db.query.employee_requests,
+    idField: "id",
+  },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
