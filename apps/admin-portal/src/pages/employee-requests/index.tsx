@@ -96,6 +96,7 @@ export default function EmployeeRequestsPage() {
   if (!canReadEmployeeRequests) {
     return <NoPermission />;
   }
+
   return (
     <div>
       <CustomPageMeta

@@ -7,7 +7,7 @@ export async function fetchEmployeeRequests(): Promise<EmployeeRequest[]> {
       throw new Error("Failed to fetch employee requests");
     }
     const data = await response.json();
-    return data.requests || [];
+    return data || [];
   } catch (error) {
     console.error("Error fetching employee requests:", error);
     throw new Error("Failed to fetch employee requests");
