@@ -7,8 +7,10 @@ import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { DatePicker } from "@/components/ui/date-picker";
 import IconButton from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
@@ -61,10 +63,16 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                 className="size-9"
               />
             </PopoverTrigger>
-            <PopoverContent className="w-screen max-w-sm p-0" align="end">
+            <PopoverContent
+              className="w-screen max-w-sm p-0"
+              align="end"
+              dir={locale === "ar" ? "rtl" : "ltr"}
+            >
               <div className="grid grid-cols-1 gap-4 rounded-md border p-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t("ActivityLogs.filters.eventType")}</label>
+                  <label className="text-sm font-medium">
+                    {t("ActivityLogs.filters.eventType")}
+                  </label>
                   <Select
                     value={filters.eventType}
                     onValueChange={(value) => setFilters({ eventType: value })}
@@ -78,32 +86,26 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                       <SelectItem value="created">{t("ActivityLogs.filters.create")}</SelectItem>
                       <SelectItem value="updated">{t("ActivityLogs.filters.update")}</SelectItem>
                       <SelectItem value="deleted">{t("ActivityLogs.filters.delete")}</SelectItem>
-                      <SelectItem value="duplicated">{t("ActivityLogs.filters.duplicate")}</SelectItem>
+                      <SelectItem value="duplicated">
+                        {t("ActivityLogs.filters.duplicate")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !filters.date && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {filters.date ? format(filters.date, "PPP") : t("ActivityLogs.filters.pickDate")}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={filters.date}
-                      onSelect={(d) => setFilters({ date: d })}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <div className="flex flex-col gap-2">
+                  <Label>{t("ActivityLogs.filters.date")}</Label>
+                  <DatePicker
+                    date={filters.dateRange}
+                    onSelect={(d) => {
+                      if (d === undefined || (d && 'from' in d)) {
+                        setFilters({ dateRange: d });
+                      }
+                    }}
+                    mode="range"
+                    isolated
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium">{t("ActivityLogs.filters.user")}</label>
                   <MultiSelect
@@ -128,7 +130,9 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t("ActivityLogs.filters.timeRange")}</label>
+                  <label className="text-sm font-medium">
+                    {t("ActivityLogs.filters.timeRange")}
+                  </label>
                   <Select
                     value={filters.timeRange}
                     onValueChange={(value) => setFilters({ timeRange: value })}

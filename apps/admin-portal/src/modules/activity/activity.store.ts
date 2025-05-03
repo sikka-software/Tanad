@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { DateRange } from "react-day-picker";
 
 import type { ActivityLogListData } from "./activity.type";
 
@@ -9,6 +10,7 @@ export interface ActivityFilters {
   eventType: string;
   user: string[];
   timeRange: string;
+  dateRange?: DateRange;
 }
 
 interface ActivityLogStore {
@@ -26,7 +28,7 @@ const initialFilters: ActivityFilters = {
   date: undefined,
   eventType: "all",
   user: [],
-  timeRange: "24h",
+  timeRange: "all",
 };
 
 export const useActivityLogStore = create<ActivityLogStore>((set) => ({
