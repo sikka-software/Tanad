@@ -14,6 +14,7 @@ type ActivityLogRpcResult = {
   details: any | null; // jsonb
   created_at: string; // timestamp with time zone
   user_email: string | null;
+  user_full_name: string | null;
 };
 
 export class ActivityService {
@@ -75,8 +76,8 @@ export class ActivityService {
     // The RPC doesn't return full_name, so we set it to null or derive if needed later.
     const formattedData = rpcData.map((log: ActivityLogRpcResult) => ({
       ...log,
-      user_full_name: null, // RPC doesn't provide this, default to null
-      target_id: log.target_id ?? undefined, // Handle potential nulls if needed elsewhere
+      user_full_name: log.user_full_name ?? null,
+      target_id: log.target_id ?? undefined,
       target_name: log.target_name ?? undefined,
       details: log.details ?? undefined,
       // Ensure the shape matches ActivityLogListData
