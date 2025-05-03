@@ -50,6 +50,7 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
       setIsLoading(true);
       setError(null);
       try {
+        console.log("Fetching logs with filters:", JSON.stringify(filters, null, 2));
         const data = await ActivityService.list(page, itemsPerPage, filters);
         setActivityLogs(data);
         setHasNextPage(data.length === itemsPerPage);
