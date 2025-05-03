@@ -47,6 +47,7 @@ const multiSelectVariants = cva(
 export type MultiSelectOption<T = string> = {
   id: string;
   label: string;
+  component?: React.ReactNode;
   value: T;
   icon?: React.ComponentType<{ className?: string }>;
   metadata?: Record<string, any>;

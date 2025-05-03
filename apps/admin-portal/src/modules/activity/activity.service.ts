@@ -1,16 +1,19 @@
-import { createClient } from "@/utils/supabase/component";
-import { subHours, subDays, startOfDay, endOfDay } from 'date-fns';
+import { subHours, subDays, startOfDay, endOfDay } from "date-fns";
 
+import { createClient } from "@/utils/supabase/component";
+
+import type { ActivityFilters } from "./activity.store";
 import type { ActivityLogListData, ActivityLog } from "./activity.type";
-import type { ActivityFilters } from "./activity.store"; // Import filters type
+
+// Import filters type
 
 // Define the type returned by the RPC function based on its definition
 type ActivityLogRpcResult = {
   id: string;
   enterprise_id: string;
   user_id: string;
-  action_type: ActivityLog['action_type']; // Assuming ActivityLog type has these
-  target_type: ActivityLog['target_type'];
+  action_type: ActivityLog["action_type"]; // Assuming ActivityLog type has these
+  target_type: ActivityLog["target_type"];
   target_id: string | null;
   target_name: string | null;
   details: any | null; // jsonb
@@ -29,42 +32,44 @@ export class ActivityService {
   static async list(
     page = 1,
     pageSize = 20,
-    filters?: ActivityFilters // Add filters parameter
+    filters?: ActivityFilters, // Add filters parameter
   ): Promise<ActivityLogListData[]> {
     const supabase = createClient();
 
     // 1. Get the current user's session
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
     if (sessionError || !session?.user) {
-        console.error("ActivityService.list: Error fetching session or no user found", sessionError);
-        throw new Error("User session not found.");
+      console.error("ActivityService.list: Error fetching session or no user found", sessionError);
+      throw new Error("User session not found.");
     }
     const user_id = session.user.id;
 
     // 2. Get the user's enterprise_id from memberships
     const { data: membership, error: enterpriseError } = await supabase
-        .from('memberships')
-        .select('enterprise_id')
-        .eq('profile_id', user_id)
-        .maybeSingle();
+      .from("memberships")
+      .select("enterprise_id")
+      .eq("profile_id", user_id)
+      .maybeSingle();
 
     if (enterpriseError) {
-        console.error("ActivityService.list: Error fetching enterprise ID:", enterpriseError);
-        throw new Error("Failed to retrieve enterprise association.");
+      console.error("ActivityService.list: Error fetching enterprise ID:", enterpriseError);
+      throw new Error("Failed to retrieve enterprise association.");
     }
     if (!membership?.enterprise_id) {
-        console.warn("ActivityService.list: User is not associated with an enterprise.");
-        return []; // Or throw an error, depending on expected behavior
-        // throw new Error("User is not associated with an enterprise.");
+      console.warn("ActivityService.list: User is not associated with an enterprise.");
+      return []; // Or throw an error, depending on expected behavior
+      // throw new Error("User is not associated with an enterprise.");
     }
     const enterprise_id = membership.enterprise_id;
 
     // 3. Call the RPC function with the fetched enterprise_id
     // Fetches ALL logs for the enterprise.
-    const { data, error } = await supabase.rpc(
-        'get_activity_logs_with_user_email',
-        { p_enterprise_id: enterprise_id }
-    );
+    const { data, error } = await supabase.rpc("get_activity_logs_with_user_email", {
+      p_enterprise_id: enterprise_id,
+    });
 
     if (error) {
       console.error("ActivityService.list error calling RPC:", error);
@@ -87,7 +92,7 @@ export class ActivityService {
     if (filters) {
       const { searchQuery, date, eventType, user, timeRange } = filters;
 
-      formattedData = formattedData.filter(log => {
+      formattedData = formattedData.filter((log) => {
         const logDate = new Date(log.created_at);
 
         // Date filter (if specific date is selected)
@@ -98,32 +103,43 @@ export class ActivityService {
         }
 
         // Time range filter (if specific date is NOT selected)
-        if (!date && timeRange !== 'all') {
+        if (!date && timeRange !== "all") {
           let startDate: Date;
           const now = new Date();
           switch (timeRange) {
-            case '1h': startDate = subHours(now, 1); break;
-            case '24h': startDate = subHours(now, 24); break;
-            case '7d': startDate = subDays(now, 7); break;
-            case '30d': startDate = subDays(now, 30); break;
-            case '90d': startDate = subDays(now, 90); break;
-            default: startDate = new Date(0); // Effectively no start date limit
+            case "1h":
+              startDate = subHours(now, 1);
+              break;
+            case "24h":
+              startDate = subHours(now, 24);
+              break;
+            case "7d":
+              startDate = subDays(now, 7);
+              break;
+            case "30d":
+              startDate = subDays(now, 30);
+              break;
+            case "90d":
+              startDate = subDays(now, 90);
+              break;
+            default:
+              startDate = new Date(0); // Effectively no start date limit
           }
           if (logDate < startDate) return false;
         }
 
         // Event type filter
-        if (eventType !== 'all' && log.action_type?.toLowerCase() !== eventType.toLowerCase()) {
+        if (eventType !== "all" && log.action_type?.toLowerCase() !== eventType.toLowerCase()) {
           return false;
         }
 
-        // User filter (Note: This filters by role name, needs adjustment if filtering by specific user ID)
-        // This requires knowledge of how user roles/types are stored or derived.
-        // Assuming 'user' filter values ('admin', 'dev', 'viewer') correspond to something searchable.
-        // If filtering by specific user ID is needed, the filter state/UI and this logic must change.
-        // if (user !== 'all' && !checkUserRole(log.user_id, user)) { // Placeholder for actual user role check
-        //   return false;
-        // }
+        console.log("useuuuuuur", user);
+        console.log("log.user_id", log);
+        console.log("is included? user.includes(log.user_id)", user.includes(log.user_id));
+        // User filter (using the user ID array)
+        if (user && user.length > 0 && !user.includes(log.user_id)) {
+          return false; // If user filter is set and log's user is not in the selected list, exclude it
+        }
 
         // Search query filter (searches across multiple fields)
         if (searchQuery) {
@@ -138,7 +154,7 @@ export class ActivityService {
             // Add details if it's string searchable, be careful with performance
             // typeof log.details === 'string' ? log.details : '',
           ];
-          if (!searchableFields.some(field => field?.toLowerCase().includes(lowerQuery))) {
+          if (!searchableFields.some((field) => field?.toLowerCase().includes(lowerQuery))) {
             return false;
           }
         }

@@ -7,7 +7,7 @@ export interface ActivityFilters {
   searchQuery: string;
   date: Date | undefined;
   eventType: string;
-  user: string;
+  user: string[];
   timeRange: string;
 }
 
@@ -25,7 +25,7 @@ const initialFilters: ActivityFilters = {
   searchQuery: "",
   date: undefined,
   eventType: "all",
-  user: "all",
+  user: [],
   timeRange: "24h",
 };
 
@@ -35,7 +35,6 @@ export const useActivityLogStore = create<ActivityLogStore>((set) => ({
   openDialog: (log) => set({ isDialogOpen: true, selectedLog: log }),
   closeDialog: () => set({ isDialogOpen: false, selectedLog: null }),
   filters: initialFilters,
-  setFilters: (newFilters) =>
-    set((state) => ({ filters: { ...state.filters, ...newFilters } })),
+  setFilters: (newFilters) => set((state) => ({ filters: { ...state.filters, ...newFilters } })),
   clearFilters: () => set({ filters: initialFilters }),
-})); 
+}));
