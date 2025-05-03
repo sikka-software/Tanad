@@ -260,17 +260,56 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
   return (
     <Form {...form}>
       {/* Use the correct form ID */}
-      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+      <form id={id} onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="form-container">
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="first_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Users.form.first_name.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Users.form.first_name.placeholder")}
+                      {...field}
+                      disabled={isFormSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="last_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Users.form.last_name.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Users.form.last_name.placeholder")}
+                      {...field}
+                      disabled={isFormSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
-            name="first_name"
+            name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Users.form.first_name.label")}</FormLabel>
+                <FormLabel>{t("Users.form.email.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={t("Users.form.first_name.placeholder")}
+                    dir="ltr"
+                    className="text-start"
+                    type="email"
+                    placeholder={t("Users.form.email.placeholder")}
                     {...field}
                     disabled={isFormSubmitting}
                   />
@@ -281,14 +320,54 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
           />
           <FormField
             control={form.control}
-            name="last_name"
+            name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Users.form.last_name.label")}</FormLabel>
+                <FormLabel>
+                  {t("Users.form.password.label")}{" "}
+                  {isEditing && (
+                    <span className="text-muted-foreground text-xs">
+                      {" "}
+                      ({t("Users.password_optional")})
+                    </span>
+                  )}
+                </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={t("Users.form.last_name.placeholder")}
+                    type="password"
+                    placeholder={t("Users.form.password.placeholder")}
                     {...field}
+                    disabled={isFormSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>{t("Users.form.role.label")}</FormLabel>
+                <FormControl>
+                  <ComboboxAdd
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    // Use role name as value, consistent with previous Select
+                    data={allRoles.roles.map((role) => ({
+                      label: predefinedRoles(t, role.name)?.name || role.name, // Pass role.name to predefinedRoles
+                      value: role.name, // Form value
+                    }))}
+                    isLoading={rolesLoading}
+                    defaultValue={field.value} // Current form value (role name)
+                    onChange={(value) => field.onChange(value || null)} // Update form value
+                    texts={{
+                      placeholder: t("Users.form.role.placeholder"),
+                      searchPlaceholder: t("Users.form.role.search_placeholder"),
+                      noItems: t("Roles.no_roles_available"),
+                    }}
+                    addText={t("Roles.add_new")} // Use Role translation
+                    onAddClick={() => setIsRoleDialogOpen(true)} // Open dialog
                     disabled={isFormSubmitting}
                   />
                 </FormControl>
@@ -297,83 +376,6 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Users.form.email.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  dir="ltr"
-                  className="text-start"
-                  type="email"
-                  placeholder={t("Users.form.email.placeholder")}
-                  {...field}
-                  disabled={isFormSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                {t("Users.form.password.label")}{" "}
-                {isEditing && (
-                  <span className="text-muted-foreground text-xs">
-                    {" "}
-                    ({t("Users.password_optional")})
-                  </span>
-                )}
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder={t("Users.form.password.placeholder")}
-                  {...field}
-                  disabled={isFormSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>{t("Users.form.role.label")}</FormLabel>
-              <FormControl>
-                <ComboboxAdd
-                  direction={locale === "ar" ? "rtl" : "ltr"}
-                  // Use role name as value, consistent with previous Select
-                  data={allRoles.roles.map((role) => ({
-                    label: predefinedRoles(t, role.name)?.name || role.name, // Pass role.name to predefinedRoles
-                    value: role.name, // Form value
-                  }))}
-                  isLoading={rolesLoading}
-                  defaultValue={field.value} // Current form value (role name)
-                  onChange={(value) => field.onChange(value || null)} // Update form value
-                  texts={{
-                    placeholder: t("Users.form.role.placeholder"),
-                    searchPlaceholder: t("Users.form.role.search_placeholder"),
-                    noItems: t("Roles.no_roles_available"),
-                  }}
-                  addText={t("Roles.add_new")} // Use Role translation
-                  onAddClick={() => setIsRoleDialogOpen(true)} // Open dialog
-                  disabled={isFormSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </form>
 
       {/* Role Creation Dialog */}

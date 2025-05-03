@@ -171,7 +171,7 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                       </div>
                    </TableCell>
                   <TableCell className="max-w-[300px] truncate text-xs text-muted-foreground">
-                    {typeof item.details === 'string' ? item.details : JSON.stringify(item.details)}
+                    {/* {typeof item.details === 'string' ? item.details : JSON.stringify(item.details)} */}
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">
                     {formatDateTime(item.created_at)}
