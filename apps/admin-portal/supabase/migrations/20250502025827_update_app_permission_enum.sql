@@ -1,6 +1,10 @@
 -- Add missing values to the app_permission enum
 -- Use IF NOT EXISTS to avoid errors if values already exist
 
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'activity_logs.read';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'activity_logs.delete';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'activity_logs.export';
+
 ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'companies.read';
 ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'companies.create';
 ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'companies.delete';

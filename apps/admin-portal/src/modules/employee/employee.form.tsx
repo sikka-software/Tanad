@@ -79,8 +79,12 @@ export function EmployeeForm({
   const locale = useLocale();
 
   const isDepartmentSaving = useDepartmentStore((state) => state.isLoading);
+  const setIsDepartmentSaving = useDepartmentStore((state) => state.setIsLoading);
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
   const { data: departments, isLoading: departmentsLoading } = useDepartments();
+
+  const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
+  const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
 
   const setIsFormDialogOpen = useEmployeeStore((state) => state.setIsFormDialogOpen);
 
@@ -113,6 +117,7 @@ export function EmployeeForm({
           if (actualEmployeeId && email === initialEmail) {
             return true;
           }
+          setIsEmployeeSaving(true);
 
           const { user } = useUserStore.getState();
           if (!user?.id) return true;
@@ -133,6 +138,7 @@ export function EmployeeForm({
             return false;
           }
 
+          setIsEmployeeSaving(false);
           return count === 0;
         }, t("Employees.form.email.duplicate")),
       phone: z.string().optional(),
@@ -178,6 +184,7 @@ export function EmployeeForm({
     })) || [];
 
   const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
+    setIsEmployeeSaving(true);
     // Log dirtyFields for debugging
     console.log("Form dirtyFields:", form.formState.dirtyFields);
     console.log("Form isDirty:", form.formState.isDirty);

@@ -17,6 +17,7 @@ import { useCreateEmployee, useUpdateEmployee } from "@/modules/employee/employe
 export default function AddEmployeePage() {
   const t = useTranslations();
   const router = useRouter();
+  
   const setLoadingSave = useEmployeesStore((state) => state.setIsLoading);
   const loadingSave = useEmployeesStore((state) => state.isLoading);
 
@@ -44,7 +45,7 @@ export default function AddEmployeePage() {
       <PageTitle
         formButtons
         formId="employee-form"
-        loading={isCreatingEmployee}
+        loading={loadingSave}
         onCancel={() => router.push("/employees")}
         texts={{
           title: t("Employees.add_new"),
@@ -62,7 +63,7 @@ export default function AddEmployeePage() {
         }
         createEmployee={createEmployeeMutate}
         updateEmployee={updateEmployeeMutate}
-        isSubmitting={isCreatingEmployee || isUpdatingEmployee}
+        isSubmitting={loadingSave}
       />
     </div>
   );

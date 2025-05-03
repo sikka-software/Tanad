@@ -26,6 +26,10 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 // Define the system roles and their desired permissions
 const systemRolePermissions: Record<string, string[]> = {
   superadmin: [
+    "activity_logs.read",
+    "activity_logs.delete",
+    "activity_logs.export",
+
     "companies.read",
     "companies.create",
     "companies.delete",
