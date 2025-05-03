@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useForm,
   useFieldArray,
@@ -54,58 +54,6 @@ const salaryComponentSchema = z.object({
     .default(0),
 });
 
-const createEmployeeFormSchema = (
-  t: (key: string) => string,
-  employeeId?: string,
-  initialEmail?: string,
-) => {
-  const supabase = createClient();
-
-  return z.object({
-    first_name: z.string().min(1, t("Employees.form.first_name.required")),
-    last_name: z.string().min(1, t("Employees.form.last_name.required")),
-    email: z
-      .string()
-      .email(t("Employees.form.email.invalid"))
-      .refine(async (email) => {
-        if (employeeId && email === initialEmail) {
-          return true;
-        }
-
-        const { user } = useUserStore.getState();
-        if (!user?.id) return true;
-        const query = supabase
-          .from("employees")
-          .select("id", { count: "exact" })
-          .eq("email", email)
-          .eq("user_id", user.id);
-
-        if (employeeId) {
-          query.neq("id", employeeId);
-        }
-
-        const { error, count } = await query;
-
-        if (error) {
-          console.error("Email validation error:", error);
-          return false;
-        }
-
-        return count === 0;
-      }, t("Employees.form.email.duplicate")),
-    phone: z.string().optional(),
-    position: z.string().min(1, t("Employees.form.position.required")),
-    department: z.string().nullable(),
-    hire_date: z.date({
-      required_error: t("Employees.form.hire_date.required"),
-    }),
-    salary: z.array(salaryComponentSchema).optional(),
-    status: z.enum(["active", "inactive", "on_leave", "terminated"]),
-    notes: z.string().optional(),
-  });
-};
-export type EmployeeFormValues = z.input<ReturnType<typeof createEmployeeFormSchema>>;
-
 export function EmployeeForm({
   formHtmlId,
   onSuccess,
@@ -129,8 +77,56 @@ export function EmployeeForm({
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
   const initialEmail = editMode ? defaultValues?.email : undefined;
 
-  const form = useForm<EmployeeFormValues>({
-    resolver: zodResolver(createEmployeeFormSchema(t, actualEmployeeId, initialEmail)),
+  const createEmployeeFormSchema = () => {
+    const supabase = createClient();
+
+    return z.object({
+      first_name: z.string().min(1, t("Employees.form.first_name.required")),
+      last_name: z.string().min(1, t("Employees.form.last_name.required")),
+      email: z
+        .string()
+        .email(t("Employees.form.email.invalid"))
+        .refine(async (email) => {
+          if (actualEmployeeId && email === initialEmail) {
+            return true;
+          }
+
+          const { user } = useUserStore.getState();
+          if (!user?.id) return true;
+          const query = supabase
+            .from("employees")
+            .select("id", { count: "exact" })
+            .eq("email", email)
+            .eq("user_id", user.id);
+
+          if (actualEmployeeId) {
+            query.neq("id", actualEmployeeId);
+          }
+
+          const { error, count } = await query;
+
+          if (error) {
+            console.error("Email validation error:", error);
+            setLoadingSave(false);
+            return false;
+          }
+
+          return count === 0;
+        }, t("Employees.form.email.duplicate")),
+      phone: z.string().optional(),
+      position: z.string().min(1, t("Employees.form.position.required")),
+      department: z.string().nullable(),
+      hire_date: z.date({
+        required_error: t("Employees.form.hire_date.required"),
+      }),
+      salary: z.array(salaryComponentSchema).optional(),
+      status: z.enum(["active", "inactive", "on_leave", "terminated"]),
+      notes: z.string().optional(),
+    });
+  };
+
+  const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
+    resolver: zodResolver(createEmployeeFormSchema()),
     defaultValues: {
       first_name: defaultValues?.first_name || "",
       last_name: defaultValues?.last_name || "",
@@ -144,6 +140,14 @@ export function EmployeeForm({
       notes: defaultValues?.notes ?? undefined,
     },
   });
+
+  // useEffect(() => {
+  //   console.log("EmployeeForm: Initial form state:", {
+  //     isDirty: form.formState.isDirty,
+  //     dirtyFields: form.formState.dirtyFields,
+  //     values: form.getValues(),
+  //   });
+  // }, [form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -160,7 +164,7 @@ export function EmployeeForm({
       value: department.id,
     })) || [];
 
-  const handleSubmit = async (data: EmployeeFormValues) => {
+  const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
     setLoadingSave(true);
 
     const submitData = {
@@ -173,7 +177,7 @@ export function EmployeeForm({
       hire_date: data.hire_date,
       notes: data.notes?.trim() || undefined,
       department_id: data.department || undefined,
-      salary: (data.salary || []).map(comp => ({
+      salary: (data.salary || []).map((comp) => ({
         ...comp,
         amount: Number(comp.amount) || 0,
       })),
@@ -181,19 +185,15 @@ export function EmployeeForm({
 
     const { department, ...finalSubmitData } = submitData;
 
-    console.log("Form state on submit:", form.formState);
+    console.log("Values before isDirty check:", form.getValues());
 
     try {
       if (editMode) {
-        // Temporarily removing the isDirty check for diagnostics
-        /*
-        if (!form.formState.isDirty) {
-          toast.info(t("General.no_changes_detected")); 
-          onSuccess?.(); 
-          setLoadingSave(false); 
-          return; 
+        if (Object.keys(form.formState.dirtyFields).length === 0) {
+          setLoadingSave(false);
+          setIsFormDialogOpen(false);
+          return;
         }
-        */
 
         await updateEmployee({
           id: actualEmployeeId!,

@@ -16,6 +16,7 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { FormDialog } from "@/components/ui/form-dialog";
+import { FormSheet } from "@/components/ui/sheet-dialog";
 
 import EmployeeCard from "@/employee/employee.card";
 import {
@@ -143,7 +144,7 @@ export default function EmployeesPage() {
           )}
         </div>
 
-        <FormDialog
+        <FormSheet
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
           title={t("Employees.update_employee")}
@@ -163,7 +164,7 @@ export default function EmployeesPage() {
             defaultValues={actionableEmployee}
             editMode={true}
           />
-        </FormDialog>
+        </FormSheet>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

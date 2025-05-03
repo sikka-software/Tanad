@@ -12,13 +12,16 @@ const EmployeeCard = ({ employee }: { employee: Employee }) => {
         <h3 className="text-lg font-semibold">
           {employee.first_name} {employee.last_name}
         </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{employee.position}</p>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
           <p className="text-sm text-gray-600 dark:text-gray-400">{employee.email}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{employee.position}</p>
           <p className="text-xs text-gray-500">
             {t("General.created_at")}: {new Date(employee.created_at).toLocaleDateString()}
+          </p>
+          <p className="text-xs text-gray-500">
+            {t("Employees.form.hire_date.label")}: {new Date(employee.hire_date).toLocaleDateString()}
           </p>
         </div>
       </CardContent>
