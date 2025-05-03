@@ -1597,3 +1597,71 @@ export const user_permissions_view = pgView("user_permissions_view", {
 }).as(
   sql`SELECT m.profile_id, m.enterprise_id, p.permission FROM memberships m JOIN permissions p ON m.role_id = p.role_id`,
 );
+
+// Define enums for activity logging
+export const activityActionType = pgEnum("activity_action_type", [
+  "CREATE",
+  "UPDATE",
+  "DELETE",
+  "INVITE", // e.g., User invite
+  "ASSIGN_ROLE", // e.g., Assign role to user
+  "LOGIN", // Could be useful
+  // Add other relevant actions specific to your app
+]);
+
+export const activityTargetType = pgEnum("activity_target_type", [
+  "USER",
+  "ROLE",
+  "COMPANY",
+  "CLIENT",
+  "INVOICE",
+  "EXPENSE",
+  "QUOTE",
+  "BRANCH",
+  "VENDOR",
+  "OFFICE",
+  "WAREHOUSE",
+  "PURCHASE",
+  "PRODUCT",
+  "EMPLOYEE",
+  "DEPARTMENT",
+  "SALARY",
+  "JOB_LISTING",
+  "APPLICANT",
+  "JOB",
+  "TEMPLATE",
+  "DOCUMENT",
+  "ENTERPRISE_SETTINGS", // For settings changes
+  // Add other entity types involved in actions
+]);
+
+// Define the activity_logs table
+export const activityLogs = pgTable(
+  "activity_logs",
+  {
+    id: uuid("id").defaultRandom().notNull(), // Keep as regular column
+    enterprise_id: uuid("enterprise_id")
+      .notNull()
+      .references(() => enterprises.id, { onDelete: "cascade" }),
+    user_id: uuid("user_id")
+      .notNull()
+      .references(() => usersInAuth.id, { onDelete: "set null" }),
+    action_type: activityActionType("action_type").notNull(),
+    target_type: activityTargetType("target_type").notNull(),
+    target_id: uuid("target_id").notNull(),
+    target_name: text("target_name"),
+    details: jsonb("details"),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+  },
+  (table) => [
+    // Define composite primary key including the time column
+    primaryKey({ columns: [table.id, table.created_at] }),
+
+    // Indexes are still beneficial
+    index("activity_logs_enterprise_idx").on(table.enterprise_id),
+    index("activity_logs_user_idx").on(table.user_id),
+    index("activity_logs_target_idx").on(table.target_type, table.target_id),
+  ],
+);

@@ -141,6 +141,13 @@
       "when": 1746235577299,
       "tag": "0019_low_boomerang",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1746241829873,
+      "tag": "0020_minor_talon",
+      "breakpoints": true
     }
   ]
 }
