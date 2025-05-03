@@ -1,6 +1,6 @@
 -- Function to log company changes to activity_logs
 
-CREATE OR REPLACE FUNCTION public.module_log_company()
+CREATE OR REPLACE FUNCTION public.module_log_employee_request()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
@@ -20,10 +20,8 @@ begin
   elsif (TG_OP = 'UPDATE') then
     log_action_type := 'UPDATED';
     record_data := NEW;
-    -- Capture both old and new data for updates if desired
-    -- log_details := jsonb_build_object('old_data', row_to_json(OLD), 'updated_data', row_to_json(NEW));
     log_details := jsonb_build_object('updated_data', row_to_json(NEW));
-  elsif (TG_OP = 'DELETE') then
+ elsif (TG_OP = 'DELETE') then
     log_action_type := 'DELETED';
     record_data := OLD;
     log_details := jsonb_build_object('deleted_data', row_to_json(OLD));
@@ -40,9 +38,9 @@ begin
     record_data.enterprise_id,
     user_id_to_log,
     log_action_type,
-    'COMPANY', -- Set target_type to COMPANY
+    'EMPLOYEE_REQUEST', -- Set target_type to employee request
     record_data.id,
-    record_data.name, -- Use company name as target_name
+    record_data.title, -- Use employee request name as target_name
     log_details
   );
 
@@ -55,13 +53,13 @@ begin
 
 exception
   when others then
-    raise warning 'Error in module_log_company trigger: %', sqlerrm;
-    raise exception 'Trigger module_log_company failed: %', sqlerrm;
+    raise warning 'Error in module_log_employee_request trigger: %', sqlerrm;
+    raise exception 'Trigger module_log_employee_request failed: %', sqlerrm;
 
 end;
 $function$;
 
 -- Trigger to execute the function after changes on the companies table
-CREATE TRIGGER log_company_changes
-  AFTER INSERT OR UPDATE OR DELETE ON public.companies
-  FOR EACH ROW EXECUTE FUNCTION public.module_log_company();
+CREATE OR REPLACE TRIGGER log_employee_request_changes
+  AFTER INSERT OR UPDATE OR DELETE ON public.employee_requests
+  FOR EACH ROW EXECUTE FUNCTION public.module_log_employee_request();
