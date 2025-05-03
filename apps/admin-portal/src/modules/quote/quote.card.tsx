@@ -31,7 +31,7 @@ const QuoteCard = ({ quote }: { quote: Quote }) => {
           <h3 className="text-lg font-semibold">
             {t("quote_number", { number: quote.quote_number })}
           </h3>
-          <p className="text-sm text-gray-500">{quote.clients?.company}</p>
+          <p className="text-sm text-gray-500">{quote.client?.company}</p>
         </div>
         <Badge className={getQuoteStatusColor(quote.status)}>
           {t(`status.${quote.status.toLowerCase()}`)}
@@ -59,7 +59,7 @@ const QuoteCard = ({ quote }: { quote: Quote }) => {
           </div>
           <div className="border-t pt-2">
             <p className="text-sm text-gray-500">
-              {quote.clients?.name} • {quote.clients?.email}
+              {quote.client?.name} • {quote.client?.email}
             </p>
           </div>
         </div>

@@ -29,7 +29,7 @@ export default function InvoicePreviewPage({ invoice }: Props) {
         </h1>
         <div className="text-right">
           <p className="text-sm text-gray-500">{t("issue_date")}</p>
-          <p>{new Date(invoice.issue_date).toLocaleDateString()}</p>
+          <p>{invoice.issue_date ? new Date(invoice.issue_date).toLocaleDateString() : "N/A"}</p>
         </div>
       </div>
 
@@ -52,7 +52,9 @@ export default function InvoicePreviewPage({ invoice }: Props) {
       <div className="mt-8 border-t pt-4">
         <div className="flex justify-between">
           <span className="font-semibold">{t("total")}</span>
-          <span className="text-lg font-bold">{MoneyFormatter(invoice.total)}</span>
+          <span className="text-lg font-bold">
+            {invoice.total ? MoneyFormatter(invoice.total) : "N/A"}
+          </span>
         </div>
       </div>
     </div>

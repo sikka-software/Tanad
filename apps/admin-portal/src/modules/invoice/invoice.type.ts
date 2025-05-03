@@ -1,4 +1,5 @@
 import type { Database } from "@/lib/database.types";
+
 import type { Client } from "@/modules/client/client.type";
 
 export type Invoice = Database["public"]["Tables"]["invoices"]["Row"] & {
@@ -10,8 +11,11 @@ export type InvoiceItem = Database["public"]["Tables"]["invoice_items"]["Row"];
 
 // Base types from DB
 // Exclude fields automatically handled by the API or DB
-type BaseInvoiceCreate = Omit<Invoice, "id" | "created_at" | "total" | "created_by" | "enterprise_id" | "tax_amount">;
-type BaseInvoiceUpdate = Partial<Invoice>;
+type BaseInvoiceCreate = Omit<
+  Invoice,
+  "id" | "created_at" | "total" | "created_by" | "enterprise_id" | "tax_amount" | "client" | "items"
+>;
+type BaseInvoiceUpdate = Partial<Omit<Invoice, "items">>; // Omit items here
 
 // Extended types expected by the form/API handlers
 // Explicitly define the fields needed for creating an invoice item via the form/API
@@ -22,7 +26,6 @@ export type InvoiceItemInput = {
   unit_price: number;
 };
 export type InvoiceCreateData = BaseInvoiceCreate & { items: InvoiceItemInput[] };
-export type InvoiceUpdateData = BaseInvoiceUpdate & { items?: InvoiceItemInput[] }; // Items optional for update
+export type InvoiceUpdateData = BaseInvoiceUpdate & { items?: InvoiceItemInput[] }; // Now this should work correctly
 
 export type InvoiceItemCreateData = Omit<InvoiceItem, "id">;
-

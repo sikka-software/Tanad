@@ -2,23 +2,13 @@ import type { Database } from "@/lib/database.types";
 
 import { Client } from "@/client/client.type";
 
-export type Quote = Database["public"]["Tables"]["quotes"]["Row"];
+// Define the base type from the database row
+type QuoteRow = Database["public"]["Tables"]["quotes"]["Row"];
 
-// export interface Quote {
-//   id: string;
-//   created_at: string;
-//   quote_number: string;
-//   issue_date: string;
-//   expiry_date: string;
-//   subtotal: number;
-//   tax_rate: number;
-//   tax_amount: number;
-//   total: number;
-//   status: string;
-//   notes?: string;
-//   client_id: string;
-//   clients?: Client;
-// }
+// Extend the base type to include the related Client object
+export type Quote = QuoteRow & {
+  client?: Client; // Making it optional in case the join is sometimes omitted
+};
 
 export interface QuoteItem {
   id: string;
@@ -29,7 +19,7 @@ export interface QuoteItem {
   unit_price: number;
 }
 
-export type QuoteCreateData = Omit<Quote, "id" | "created_at" | "clients"> & {
+export type QuoteCreateData = Omit<Quote, "id" | "created_at" | "client"> & {
   user_id?: string;
 };
 

@@ -185,7 +185,7 @@ export default function RolesPage() {
                 key={role.id}
                 role={role}
                 onActionClick={onActionClicked}
-                disableActions={role.is_system}
+                disableActions={role.is_system || false}
               />
             )}
             gridCols="3"

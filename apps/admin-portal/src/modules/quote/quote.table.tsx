@@ -39,7 +39,7 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
     {
       accessorKey: "client_id",
       header: t("Companies.title"),
-      cell: (props: CellContext<Quote, unknown>) => props.row.original.clients?.company || "N/A",
+      cell: (props: CellContext<Quote, unknown>) => props.row.original.client?.company || "N/A",
     },
     {
       accessorKey: "issue_date",

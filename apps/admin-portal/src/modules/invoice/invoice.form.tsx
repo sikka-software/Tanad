@@ -224,7 +224,7 @@ export function InvoiceForm({
                 product_id: item.product_id || "",
                 quantity: parseFloat(item.quantity),
                 unit_price: parseFloat(item.unit_price),
-              })) as InvoiceItem[],
+              })),
             },
           },
           {
