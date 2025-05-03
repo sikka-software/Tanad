@@ -101,6 +101,7 @@ export default function Auth() {
         throw new Error("No Stripe customer ID returned from API");
       }
 
+      // Step 2: Sign up the user with Supabase, including the Stripe customer ID in metadata
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -113,24 +114,28 @@ export default function Auth() {
 
       if (error) throw error;
 
+      // Step 3: Create the user profile with the Stripe customer ID
       if (data.user) {
-        // Create the user profile
-        const { error: profileError } = await supabase.from("profiles").upsert({
+        const { error: profileError } = await supabase.from("profiles").insert({
           id: data.user.id,
           email: data.user.email,
-          full_name: email.split("@")[0], // Placeholder
+          full_name: email.split("@")[0], // Placeholder name
+          stripe_customer_id: customerId, // Store customer ID in profile
         });
 
         if (profileError) {
+          console.error("Profile creation error:", profileError);
           toast.error(t("Auth.profile_creation_error"));
-          throw profileError;
+          // Continue with sign-up process even if profile creation fails
+          // The profile can be created later during onboarding
+        } else {
+          toast.success(t("Auth.signup_successful_check_email"));
+          // Redirect to onboarding
+          router.push("/onboarding");
         }
-
-        // Redirect to onboarding
-        router.push("/onboarding");
+      } else {
+        toast.success(t("Auth.signup_successful_check_email"));
       }
-
-      toast.success(t("Auth.signup_successful_check_email"));
     } catch (error: any) {
       // Attempt to translate Supabase auth error codes
       const errorCode = error.code || error.message;
