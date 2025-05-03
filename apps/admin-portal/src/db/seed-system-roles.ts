@@ -188,6 +188,13 @@ const systemRolePermissions: Record<string, string[]> = {
     "employees.duplicate",
     "employees.export",
 
+    "employee_requests.read",
+    "employee_requests.create",
+    "employee_requests.delete",
+    "employee_requests.update",
+    "employee_requests.duplicate",
+    "employee_requests.export",
+
     // Add HR-specific permissions here
   ],
   accounting: [

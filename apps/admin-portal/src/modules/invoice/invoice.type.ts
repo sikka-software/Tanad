@@ -4,6 +4,21 @@ export type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
 
 export type InvoiceItem = Database["public"]["Tables"]["invoice_items"]["Row"];
 
-export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "total">;
-export type InvoiceUpdateData = Partial<Invoice>;
+// Base types from DB
+// Exclude fields automatically handled by the API or DB
+type BaseInvoiceCreate = Omit<Invoice, "id" | "created_at" | "total" | "created_by" | "enterprise_id" | "tax_amount">;
+type BaseInvoiceUpdate = Partial<Invoice>;
+
+// Extended types expected by the form/API handlers
+// Explicitly define the fields needed for creating an invoice item via the form/API
+export type InvoiceItemInput = {
+  product_id?: string | null; // Match backend expectation (null if not provided)
+  description: string;
+  quantity: number;
+  unit_price: number;
+};
+export type InvoiceCreateData = BaseInvoiceCreate & { items: InvoiceItemInput[] };
+export type InvoiceUpdateData = BaseInvoiceUpdate & { items?: InvoiceItemInput[] }; // Items optional for update
+
 export type InvoiceItemCreateData = Omit<InvoiceItem, "id">;
+

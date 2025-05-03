@@ -9,7 +9,7 @@ import {
   updateInvoice,
   duplicateInvoice,
 } from "@/invoice/invoice.service";
-import { Invoice } from "@/invoice/invoice.type";
+import { Invoice, InvoiceCreateData, InvoiceUpdateData } from "@/invoice/invoice.type";
 
 // Query keys
 export const invoiceKeys = {
@@ -40,7 +40,7 @@ export function useCreateInvoice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createInvoice,
+    mutationFn: (data: InvoiceCreateData) => createInvoice(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
     },
@@ -62,7 +62,7 @@ export function useUpdateInvoice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Invoice> }) => updateInvoice(id, data),
+    mutationFn: ({ id, data }: { id: string; data: InvoiceUpdateData }) => updateInvoice(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
