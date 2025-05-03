@@ -1631,8 +1631,8 @@ export const activityTargetType = pgEnum("activity_target_type", [
   "JOB",
   "TEMPLATE",
   "DOCUMENT",
-  "ENTERPRISE_SETTINGS", // For settings changes
-  // Add other entity types involved in actions
+  "ENTERPRISE_SETTINGS",
+  "EMPLOYEE_REQUEST",
 ]);
 
 // Define the activity_logs table

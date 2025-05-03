@@ -41,7 +41,10 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
       setIsLoading(true);
       setError(null);
       try {
-        console.log("Fetching logs with debounced filters:", JSON.stringify(debouncedFilters, null, 2));
+        console.log(
+          "Fetching logs with debounced filters:",
+          JSON.stringify(debouncedFilters, null, 2),
+        );
         const data = await ActivityService.list(page, itemsPerPage, debouncedFilters);
         setActivityLogs(data);
         setHasNextPage(data.length === itemsPerPage);
@@ -194,7 +197,7 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                               "Unknown"}
                           </Badge>
                           <ArrowRight className="text-muted-foreground h-3 w-3 rtl:rotate-180" />
-                          <Badge variant="outline" className="text-xs capitalize">
+                          <Badge variant="outline" className="text-xs">
                             {t(`General.${item.target_type?.toLowerCase() || "N/A"}`) || "N/A"}
                           </Badge>
                         </div>
@@ -215,7 +218,7 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                       <div className="flex flex-col">
                         <span>{format.relativeTime(new Date(item.created_at))}</span>
                         {/* <span>{localizedTimeDistance(item)}</span> */}
-                        <span className="text-muted-foreground text-[10px] hidden lg:block">
+                        <span className="text-muted-foreground hidden text-[10px] lg:block">
                           {item.created_at
                             ? format.dateTime(new Date(item.created_at), "PPpp")
                             : "N/A"}
