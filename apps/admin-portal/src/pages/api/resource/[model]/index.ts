@@ -196,30 +196,17 @@ const modelMap: Record<string, ModelConfig> = {
         }
         const enterprise_id = membership.enterprise_id;
 
-        const { data, error } = await supabase
-          .from("activity_logs")
-          .select(
-            `
-            *,
-            profile:profiles ( email )
-          `,
-          )
-          .eq("enterprise_id", enterprise_id)
-          .order("created_at", { ascending: false });
+        const { data, error } = await supabase.rpc(
+          "get_activity_logs_with_user_email",
+          { p_enterprise_id: enterprise_id },
+        );
 
         if (error) {
-          console.error("Error fetching activity logs:", error);
+          console.error("Error calling get_activity_logs_with_user_email RPC:", error);
           throw error;
         }
 
-        const formattedData =
-          data?.map((log) => ({
-            ...log,
-            user_email: (log.profile as { email?: string | null })?.email ?? "N/A",
-            profile: undefined,
-          })) ?? [];
-
-        return formattedData;
+        return data ?? [];
       },
     },
   },
