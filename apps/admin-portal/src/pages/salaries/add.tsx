@@ -34,7 +34,7 @@ export default function AddSalaryPage() {
 
       <div className="mx-auto max-w-2xl p-4">
         <SalaryForm
-          id="salary-form"
+          formHtmlId="salary-form"
           onSuccess={() =>
             router.push("/salaries").then(() => {
               setLoading(false);

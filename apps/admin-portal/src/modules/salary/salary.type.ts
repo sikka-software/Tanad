@@ -19,4 +19,4 @@ export interface Salary {
 
 // For creating a new salary entry
 export type SalaryCreateData = Omit<Salary, "id" | "created_at"> & { user_id?: string };
-export type SalaryUpdateData = Partial<SalaryCreateData>;
+export type SalaryUpdateData = Partial<Salary>;

@@ -28,7 +28,11 @@ import useEmployeeStore from "@/employee/employee.store";
 import useEmployeeRequestsStore from "@/employee-request/employee-request.store";
 
 import { useCreateEmployeeRequest, useUpdateEmployeeRequest } from "./employee-request.hooks";
-import { EmployeeRequest, EmployeeRequestCreateData } from "./employee-request.type";
+import {
+  EmployeeRequest,
+  EmployeeRequestCreateData,
+  EmployeeRequestUpdateData,
+} from "./employee-request.type";
 
 const createRequestSchema = (t: (key: string) => string) =>
   z.object({
@@ -55,7 +59,7 @@ const EmployeeRequestForm = ({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<EmployeeRequest>) => {
+}: ModuleFormProps<EmployeeRequestUpdateData>) => {
   const t = useTranslations();
   const locale = useLocale();
 
@@ -109,7 +113,7 @@ const EmployeeRequestForm = ({
       if (editMode) {
         await updateEmployeeRequest({
           id: defaultValues?.id || "",
-          updates: { ...finalSubmitData } as EmployeeRequest,
+          updates: { ...finalSubmitData } as EmployeeRequestUpdateData,
         });
         onSuccess?.();
       } else {

@@ -15,4 +15,4 @@ export interface EmployeeRequest {
 }
 
 export type EmployeeRequestCreateData = Omit<EmployeeRequest, "id" | "created_at" | "updated_at">;
-export type EmployeeRequestUpdateData = Partial<EmployeeRequestCreateData>;
+export type EmployeeRequestUpdateData = Partial<EmployeeRequest>;

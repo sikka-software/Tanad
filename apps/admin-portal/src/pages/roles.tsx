@@ -37,9 +37,8 @@ export default function RolesPage() {
   const canCreateRoles = useUserStore((state) => state.hasPermission("roles.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableRole, setActionableRole] = useState<(RoleUpdateData & { id?: string }) | null>(
-    null,
-  );
+  const [editingRole, setEditingRole] = useState<RoleWithPermissions | null>(null);
+
   const { enterprise, profile, membership } = useUserStore();
 
   const loadingSaveRole = useRoleStore((state) => state.isLoading);
@@ -87,12 +86,7 @@ export default function RolesPage() {
     if (action === "edit") {
       const roleToEdit = allRoles.find((role) => role.id === rowId);
       if (roleToEdit) {
-        setActionableRole({
-          id: roleToEdit.id,
-          name: roleToEdit.name,
-          description: roleToEdit.description,
-          permissions: roleToEdit.permissions || [],
-        });
+        setEditingRole(roleToEdit);
         setIsFormDialogOpen(true);
       }
     }
@@ -161,7 +155,7 @@ export default function RolesPage() {
             title={t("Roles.title")}
             onAddClick={() => {
               if (canCreateRoles) {
-                setActionableRole(null);
+                setEditingRole(null);
                 setIsFormDialogOpen(true);
               } else {
                 return undefined;
@@ -201,33 +195,22 @@ export default function RolesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableRole?.id ? t("Roles.edit_role") : t("Roles.add_new")}
+          title={editingRole ? t("Roles.edit_role") : t("Roles.add_new")}
           formId="role-form"
           loadingSave={loadingSaveRole}
         >
           <RoleForm
-            formId={"role-form"}
+            formHtmlId={"role-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setLoadingSaveRole(false);
-              setActionableRole(null);
+              setEditingRole(null);
               toast.success(t("General.successful_operation"), {
-                description: actionableRole?.id
-                  ? t("Roles.success.update")
-                  : t("Roles.success.create"),
+                description: editingRole ? t("Roles.success.update") : t("Roles.success.create"),
               });
             }}
-            editMode={!!actionableRole?.id}
-            id={actionableRole?.id}
-            defaultValues={
-              actionableRole
-                ? {
-                    name: actionableRole.name || "",
-                    description: actionableRole.description || null,
-                    permissions: actionableRole.permissions || [],
-                  }
-                : undefined
-            }
+            editMode={!!editingRole}
+            defaultValues={editingRole as any}
           />
         </FormDialog>
 

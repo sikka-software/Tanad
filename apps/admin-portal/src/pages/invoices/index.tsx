@@ -148,7 +148,7 @@ export default function InvoicesPage() {
           loadingSave={loadingSaveInvoice}
         >
           <InvoiceForm
-            id={"invoice-form"}
+            formHtmlId={"invoice-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableInvoice(null);

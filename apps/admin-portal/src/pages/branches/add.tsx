@@ -72,7 +72,7 @@ export default function AddBranchPage() {
         dummyButton={handleDummyData}
       />
 
-      <BranchForm id="branch-form" onSuccess={onAddSuccess} />
+      <BranchForm formHtmlId="branch-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

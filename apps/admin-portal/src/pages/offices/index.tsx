@@ -143,7 +143,7 @@ export default function OfficesPage() {
           loadingSave={loadingSaveOffice}
         >
           <OfficeForm
-            id={"office-form"}
+            formHtmlId={"office-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableOffice(null);

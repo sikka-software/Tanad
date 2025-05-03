@@ -50,7 +50,7 @@ export function ClientForm({
   onSuccess,
   defaultValues,
   editMode = false,
-}: ModuleFormProps<Client>) {
+}: ModuleFormProps<ClientUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();

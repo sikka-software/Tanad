@@ -39,9 +39,8 @@ export default function AddJobListingPage() {
           </CardHeader>
           <CardContent>
             <JobListingForm
-              id="job-listing-form"
+              formHtmlId="job-listing-form"
               onSuccess={() => router.push("/jobs/listings")}
-              loading={loading}
             />
           </CardContent>
         </Card>

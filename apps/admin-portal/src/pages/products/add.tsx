@@ -56,7 +56,7 @@ export default function AddProductPage() {
         dummyButton={handleDummyData}
       />
 
-      <ProductForm id="product-form" onSuccess={onAddSuccess} />
+      <ProductForm formHtmlId="product-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

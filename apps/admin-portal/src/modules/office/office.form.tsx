@@ -42,7 +42,7 @@ export function OfficeForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Office>) {
+}: ModuleFormProps<OfficeUpdateData>) {
   const t = useTranslations();
   const { data: offices } = useOffices();
   const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();

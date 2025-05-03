@@ -51,7 +51,7 @@ export function VendorForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Vendor>) {
+}: ModuleFormProps<VendorUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
 

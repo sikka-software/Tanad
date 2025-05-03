@@ -19,8 +19,7 @@ export type EmployeeCreateData = Omit<Employee, "id" | "created_at" | "updated_a
   user_id?: string;
 };
 
-export type EmployeeUpdateData = Partial<Omit<Employee, "id" | "created_at" | "updated_at">> & {};
-
+export type EmployeeUpdateData = Partial<Employee>;
 export interface SalaryComponent {
   type: string;
   amount: number;

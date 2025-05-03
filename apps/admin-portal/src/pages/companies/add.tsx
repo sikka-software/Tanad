@@ -60,7 +60,7 @@ export default function AddCompanyPage() {
           cancel: t("General.cancel"),
         }}
       />
-      <CompanyForm id="company-form" onSuccess={onAddSuccess} />
+      <CompanyForm formHtmlId="company-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

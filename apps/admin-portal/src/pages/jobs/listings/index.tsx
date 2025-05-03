@@ -156,7 +156,7 @@ export default function JobListingsPage() {
           loadingSave={loadingSaveJobListing}
         >
           <JobListingForm
-            id={"job-listing-form"}
+            formHtmlId={"job-listing-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableJobListing(null);

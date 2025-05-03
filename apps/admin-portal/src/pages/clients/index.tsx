@@ -144,7 +144,7 @@ export default function ClientsPage() {
           loadingSave={loadingSaveClient}
         >
           <ClientForm
-            id={"client-form"}
+            formHtmlId={"client-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableClient(null);

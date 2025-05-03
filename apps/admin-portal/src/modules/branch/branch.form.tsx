@@ -52,7 +52,7 @@ export function BranchForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Branch>) {
+}: ModuleFormProps<BranchUpdateData>) {
   const t = useTranslations();
   const { user } = useUserStore();
   const { mutate: createBranch } = useCreateBranch();

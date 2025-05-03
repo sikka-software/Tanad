@@ -156,8 +156,8 @@ export default function UsersPage() {
           loadingSave={loadingSaveUser}
         >
           <UserForm
-            id="user-form"
-            initialData={actionableUser}
+            formHtmlId="user-form"
+            defaultValues={actionableUser}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableUser(null);

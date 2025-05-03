@@ -51,7 +51,7 @@ export default function AddVendorPage() {
       />
 
       <VendorForm
-        id="vendor-form"
+        formHtmlId="vendor-form"
         onSuccess={() => {
           router.push("/vendors").then(() => {
             setIsLoading(false);

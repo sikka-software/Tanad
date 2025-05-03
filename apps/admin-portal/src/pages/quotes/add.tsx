@@ -98,13 +98,7 @@ export default function AddQuotePage() {
       />
 
       <div className="mx-auto max-w-2xl p-4">
-        <QuoteForm
-          id="quote-form"
-          user_id={user?.id}
-          onSubmit={handleSubmit}
-          loading={loading}
-          hideFormButtons
-        />
+        <QuoteForm formHtmlId="quote-form" onSuccess={() => router.push("/quotes")} />
       </div>
     </div>
   );

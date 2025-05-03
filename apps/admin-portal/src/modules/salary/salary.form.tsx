@@ -30,7 +30,7 @@ import useSalaryStore from "@/salary/salary.store";
 import useUserStore from "@/stores/use-user-store";
 
 import { DEDUCTION_TYPES } from "./salary.options";
-import { Salary } from "./salary.type";
+import { Salary, SalaryUpdateData } from "./salary.type";
 
 const deductionSchema = z.object({
   type: z.string().min(1, "Type is required"),
@@ -60,7 +60,7 @@ export function SalaryForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Salary>) {
+}: ModuleFormProps<SalaryUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const { user } = useUserStore();
@@ -116,7 +116,6 @@ export function SalaryForm({
             ...data,
             deductions: deductionsPayload ? JSON.parse(deductionsPayload) : undefined,
             notes: data.notes?.trim() || undefined,
-            user_id: user?.id,
           },
         });
       } else {
@@ -124,7 +123,6 @@ export function SalaryForm({
           ...data,
           deductions: deductionsPayload ? JSON.parse(deductionsPayload) : undefined,
           notes: data.notes?.trim() || undefined,
-          user_id: user?.id,
         });
 
         toast.success(t("General.successful_operation"), {

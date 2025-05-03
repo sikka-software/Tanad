@@ -30,7 +30,7 @@ import { Product } from "@/product/product.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { Quote } from "./quote.type";
+import { QuoteUpdateData } from "./quote.type";
 
 export interface QuoteItem {
   product_id?: string;
@@ -56,7 +56,7 @@ export function QuoteForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Quote>) {
+}: ModuleFormProps<QuoteUpdateData>) {
   const supabase = createClient();
   const t = useTranslations();
   const locale = useLocale();

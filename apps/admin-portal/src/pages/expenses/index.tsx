@@ -144,7 +144,7 @@ export default function ExpensesPage() {
           loadingSave={loadingSaveExpense}
         >
           <ExpenseForm
-            id={"expense-form"}
+            formHtmlId={"expense-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableExpense(null);

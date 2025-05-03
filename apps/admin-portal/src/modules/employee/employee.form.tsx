@@ -50,7 +50,7 @@ export function EmployeeForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Employee>) {
+}: ModuleFormProps<EmployeeUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
 
@@ -70,7 +70,7 @@ export function EmployeeForm({
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
   const initialEmail = editMode ? defaultValues?.email : undefined;
 
-  const mapDataToFormDefaults = (data: Employee | null | undefined) => ({
+  const mapDataToFormDefaults = (data: EmployeeUpdateData | null | undefined) => ({
     first_name: data?.first_name || "",
     last_name: data?.last_name || "",
     email: data?.email || "",

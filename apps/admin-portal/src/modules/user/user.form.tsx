@@ -389,7 +389,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
         loadingSave={isSavingRole}
       >
         <RoleForm
-          formId="role-form" // Match the FormDialog's formId
+          formHtmlId="role-form" // Match the FormDialog's formId
           onSuccess={handleRoleCreated} // Callback on successful creation
         />
       </FormDialog>

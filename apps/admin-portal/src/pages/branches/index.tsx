@@ -143,7 +143,7 @@ export default function BranchesPage() {
           loadingSave={loadingSaveBranch}
         >
           <BranchForm
-            id={"branch-form"}
+            formHtmlId={"branch-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableBranch(null);

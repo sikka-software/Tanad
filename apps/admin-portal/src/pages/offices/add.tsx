@@ -48,7 +48,7 @@ export default function AddOfficePage() {
       />
 
       <OfficeForm
-        id="office-form"
+        formHtmlId="office-form"
         onSuccess={() =>
           router.push("/offices").then(() => {
             setIsLoading(false);

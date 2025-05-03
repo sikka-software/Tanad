@@ -28,7 +28,7 @@ import { ModuleFormProps } from "@/types/common.type";
 import { ClientForm } from "@/client/client.form";
 
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
-import { Invoice, InvoiceItem } from "@/modules/invoice/invoice.type";
+import { Invoice, InvoiceItem, InvoiceUpdateData } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 import { CompanyFormValues } from "../company/company.form";
@@ -88,7 +88,7 @@ export function InvoiceForm({
   editMode,
   onSuccess,
   defaultValues,
-}: ModuleFormProps<Invoice>) {
+}: ModuleFormProps<InvoiceUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();
@@ -213,12 +213,12 @@ export function InvoiceForm({
             data: {
               client_id: data.client_id,
               invoice_number: data.invoice_number,
-              issue_date: data.issue_date,
-              due_date: data.due_date,
+              issue_date: data.issue_date.toISOString(),
+              due_date: data.due_date?.toISOString() || null,
               status: data.status,
               subtotal: data.subtotal,
               tax_rate: data.tax_rate,
-              notes: data.notes,
+              notes: data.notes || null,
               items: data.items.map((item) => ({
                 ...item,
                 product_id: item.product_id || "",
@@ -241,12 +241,12 @@ export function InvoiceForm({
             user_id: profile?.id || "",
             client_id: data.client_id,
             invoice_number: data.invoice_number,
-            issue_date: data.issue_date,
-            due_date: data.due_date,
+            issue_date: data.issue_date.toISOString(),
+            due_date: data.due_date?.toISOString() || null,
             status: data.status,
             subtotal: data.subtotal,
             tax_rate: data.tax_rate,
-            notes: data.notes,
+            notes: data.notes || null,
             items: data.items.map((item) => ({
               ...item,
               product_id: item.product_id || "",

@@ -43,7 +43,7 @@ export default function AddInvoicePage() {
         }}
       />
 
-      <InvoiceForm id="invoice-form" onSuccess={onAddSuccess} />
+      <InvoiceForm formHtmlId="invoice-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

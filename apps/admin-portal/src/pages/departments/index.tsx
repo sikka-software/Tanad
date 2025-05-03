@@ -152,7 +152,7 @@ export default function DepartmentsPage() {
           loadingSave={loadingSaveDepartment}
         >
           <DepartmentForm
-            id="department-form"
+            formHtmlId="department-form"
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableDepartment(null);

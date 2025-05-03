@@ -57,18 +57,16 @@ export default function AddJobPage() {
         dummyButton={handleDummyData}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <JobForm
-          id="job-form"
-          onSuccess={() => {
-            setIsLoading(false);
-            router.push("/jobs");
-            toast.success(t("General.successful_operation"), {
-              description: t("Jobs.success.create"),
-            });
-          }}
-        />
-      </div>
+      <JobForm
+        formHtmlId="job-form"
+        onSuccess={() => {
+          setIsLoading(false);
+          router.push("/jobs");
+          toast.success(t("General.successful_operation"), {
+            description: t("Jobs.success.create"),
+          });
+        }}
+      />
     </div>
   );
 }

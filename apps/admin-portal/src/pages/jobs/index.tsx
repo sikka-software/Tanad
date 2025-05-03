@@ -147,7 +147,7 @@ export default function JobsPage() {
           loadingSave={isLoading}
         >
           <JobForm
-            id={"job-form"}
+            formHtmlId={"job-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableItem(null);

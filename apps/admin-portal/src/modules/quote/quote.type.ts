@@ -1,20 +1,24 @@
+import type { Database } from "@/lib/database.types";
+
 import { Client } from "@/client/client.type";
 
-export interface Quote {
-  id: string;
-  created_at: string;
-  quote_number: string;
-  issue_date: string;
-  expiry_date: string;
-  subtotal: number;
-  tax_rate: number;
-  tax_amount: number;
-  total: number;
-  status: string;
-  notes?: string;
-  client_id: string;
-  clients?: Client;
-}
+export type Quote = Database["public"]["Tables"]["quotes"]["Row"];
+
+// export interface Quote {
+//   id: string;
+//   created_at: string;
+//   quote_number: string;
+//   issue_date: string;
+//   expiry_date: string;
+//   subtotal: number;
+//   tax_rate: number;
+//   tax_amount: number;
+//   total: number;
+//   status: string;
+//   notes?: string;
+//   client_id: string;
+//   clients?: Client;
+// }
 
 export interface QuoteItem {
   id: string;
@@ -29,4 +33,5 @@ export type QuoteCreateData = Omit<Quote, "id" | "created_at" | "clients"> & {
   user_id?: string;
 };
 
+export type QuoteUpdateData = Partial<Quote>;
 export type QuoteItemCreateData = Omit<QuoteItem, "id">;

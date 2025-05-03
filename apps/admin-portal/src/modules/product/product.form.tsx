@@ -15,7 +15,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateProduct, useUpdateProduct } from "./product.hooks";
 import useProductStore from "./product.store";
-import { Product } from "./product.type";
+import { Product, ProductUpdateData } from "./product.type";
 
 export const createProductSchema = (t: (key: string) => string) =>
   z.object({
@@ -45,7 +45,7 @@ export function ProductForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Product>) {
+}: ModuleFormProps<ProductUpdateData>) {
   const t = useTranslations();
 
   const { profile, membership } = useUserStore();

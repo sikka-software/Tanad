@@ -56,7 +56,7 @@ export default function AddClientPage() {
         }}
       />
 
-      <ClientForm id="client-form" loading={isLoading} onSuccess={onAddSuccess} />
+      <ClientForm formHtmlId="client-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

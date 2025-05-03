@@ -13,20 +13,17 @@ import { Textarea } from "@/ui/textarea";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import { useOffices } from "@/office/office.hooks";
-
-import { useBranches } from "@/branch/branch.hooks";
-
-import { useCreateDepartment, useUpdateDepartment } from "@/department/department.hooks";
-import useDepartmentStore from "@/department/department.store";
+import { useBranches } from "@/modules/branch/branch.hooks";
+import { useCreateDepartment, useUpdateDepartment } from "@/modules/department/department.hooks";
+import useDepartmentStore from "@/modules/department/department.store";
 import {
   Department,
   DepartmentCreateData,
   DepartmentUpdateData,
-} from "@/department/department.type";
-
-import { useWarehouses } from "@/warehouse/warehouse.hooks";
-
+  DepartmentLocation,
+} from "@/modules/department/department.type";
+import { useOffices } from "@/modules/office/office.hooks";
+import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 type LocationValue = {
@@ -36,6 +33,12 @@ type LocationValue = {
 
 type LocationOption = MultiSelectOption<LocationValue> & {
   metadata: { type: LocationValue["type"] };
+};
+
+type FormLocationData = {
+  location_id: string;
+  location_type: "office" | "branch" | "warehouse";
+  user_id: string;
 };
 
 export const createDepartmentSchema = (t: (key: string) => string) =>
@@ -59,7 +62,7 @@ export default function DepartmentForm({
   onSuccess,
   defaultValues,
   editMode = false,
-}: ModuleFormProps<Department>) {
+}: ModuleFormProps<DepartmentUpdateData>) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
   const { mutateAsync: createDepartment } = useCreateDepartment();
@@ -72,16 +75,18 @@ export default function DepartmentForm({
   const locale = useLocale();
   const [locationOptions, setLocationOptions] = useState<LocationOption[]>([]);
 
+  const initialFormLocations =
+    defaultValues?.locations?.map((loc) => ({
+      id: loc.location_id,
+      type: loc.location_type,
+    })) || [];
+
   const form = useForm<DepartmentFormValues>({
     resolver: zodResolver(createDepartmentSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
       description: defaultValues?.description || "",
-      locations:
-        defaultValues?.locations?.map((loc) => ({
-          id: loc.location_id,
-          type: loc.location_type,
-        })) || [],
+      locations: initialFormLocations,
     },
   });
 
@@ -141,27 +146,39 @@ export default function DepartmentForm({
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
+      setIsLoading(false);
       return;
     }
+
     try {
       if (editMode) {
+        if (!defaultValues?.id) {
+          toast.error(t("General.error_occurred"), {
+            description: t("Departments.error.update_missing_id"),
+          });
+          setIsLoading(false);
+          return;
+        }
+        const departmentId = defaultValues.id;
         try {
-          const locations = data.locations.map((location) => ({
-            department_id: defaultValues?.id,
+          const locationsForUpdate: Department["locations"] = data.locations.map((location) => ({
+            department_id: departmentId,
             location_id: location.id,
             location_type: location.type,
             user_id: user.id,
           }));
 
+          const updatePayload: DepartmentUpdateData = {
+            name: data.name,
+            description: data.description || null,
+            user_id: user.id,
+            is_active: defaultValues.is_active,
+            locations: locationsForUpdate,
+          };
+
           await updateDepartment({
-            id: defaultValues?.id,
-            data: {
-              name: data.name,
-              description: data.description || null,
-              user_id: user.id,
-              is_active: true,
-              locations,
-            },
+            id: departmentId,
+            data: updatePayload as Partial<Department>,
           });
 
           toast.success(t("General.successful_operation"), {
@@ -175,20 +192,25 @@ export default function DepartmentForm({
           toast.error(t("General.error_occurred"), {
             description: t("Departments.error.update"),
           });
+        } finally {
+          setIsLoading(false);
         }
       } else {
         try {
+          const locationsForCreate: DepartmentCreateData["locations"] = data.locations.map(
+            (location) => ({
+              location_id: location.id,
+              location_type: location.type,
+              user_id: user.id,
+            }),
+          );
+
           const createData: DepartmentCreateData = {
             name: data.name,
             description: data.description || null,
             user_id: user.id,
             is_active: true,
-            locations: data.locations.map((location) => ({
-              department_id: defaultValues?.id,
-              location_id: location.id,
-              location_type: location.type,
-              user_id: user.id,
-            })),
+            locations: locationsForCreate,
           };
 
           await createDepartment(createData);
@@ -204,13 +226,15 @@ export default function DepartmentForm({
           toast.error(t("General.error_occurred"), {
             description: t("Departments.error.create"),
           });
+        } finally {
+          setIsLoading(false);
         }
       }
     } catch (error) {
       setIsLoading(false);
       console.error("Failed to save department:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Departments.error.create"),
+        description: editMode ? t("Departments.error.update") : t("Departments.error.create"),
       });
     }
   };
@@ -269,7 +293,7 @@ export default function DepartmentForm({
                     onValueChange={(values) => {
                       field.onChange(values);
                     }}
-                    defaultValue={field.value}
+                    value={field.value}
                     placeholder={t("Departments.form.locations.placeholder")}
                     variant="inverted"
                     animation={2}

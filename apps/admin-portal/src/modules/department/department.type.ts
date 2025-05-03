@@ -31,11 +31,6 @@ export type DepartmentCreateData = Omit<
   "id" | "created_at" | "updated_at" | "locations"
 > & {
   user_id: string;
-  locations: Array<{
-    department_id: string;
-    location_id: string;
-    location_type: "office" | "branch" | "warehouse";
-    user_id: string;
-  }>;
+  locations: Array<Omit<Department["locations"][number], "department_id"> & { user_id: string }>;
 };
 export type DepartmentUpdateData = Partial<Department>;

@@ -24,9 +24,11 @@ import { CurrencyInput } from "@/components/ui/currency-input";
 import { Dialog } from "@/components/ui/dialog";
 import { DialogContent } from "@/components/ui/dialog";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import { useCreateJob, useUpdateJob } from "@/job/job.hooks";
 import useJobStore from "@/job/job.store";
-import { JobUpdateData } from "@/job/job.type";
+import { Job, JobUpdateData } from "@/job/job.type";
 
 import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
@@ -39,14 +41,6 @@ import useUserStore from "@/stores/use-user-store";
 import { BranchForm } from "../branch/branch.form";
 import { OfficeForm } from "../office/office.form";
 import { WarehouseForm } from "../warehouse/warehouse.form";
-
-interface JobFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  loading?: boolean;
-  defaultValues?: JobUpdateData | null;
-  editMode?: boolean;
-}
 
 const createJobFormSchema = (t: (key: string) => string) =>
   z.object({
@@ -70,7 +64,12 @@ const createJobFormSchema = (t: (key: string) => string) =>
 
 export type JobFormValues = z.infer<ReturnType<typeof createJobFormSchema>>;
 
-export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobFormProps) {
+export function JobForm({
+  formHtmlId,
+  defaultValues,
+  editMode = false,
+  onSuccess,
+}: ModuleFormProps<JobUpdateData>) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
   const locale = useLocale();
@@ -187,77 +186,165 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Jobs.form.title.label")} *</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("Jobs.form.title.placeholder")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Jobs.form.type.label")} *</FormLabel>
-                <Select
-                  dir={locale === "ar" ? "rtl" : "ltr"}
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  value={field.value}
-                >
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <div className="form-container">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.title.label")} *</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("Jobs.form.type.placeholder")} />
-                    </SelectTrigger>
+                    <Input placeholder={t("Jobs.form.title.placeholder")} {...field} />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Full-time">{t("Jobs.form.type.full_time")}</SelectItem>
-                    <SelectItem value="Part-time">{t("Jobs.form.type.part_time")}</SelectItem>
-                    <SelectItem value="Contract">{t("Jobs.form.type.contract")}</SelectItem>
-                    <SelectItem value="Internship">{t("Jobs.form.type.internship")}</SelectItem>
-                    <SelectItem value="Temporary">{t("Jobs.form.type.temporary")}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.type.label")} *</FormLabel>
+                  <Select
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("Jobs.form.type.placeholder")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Full-time">{t("Jobs.form.type.full_time")}</SelectItem>
+                      <SelectItem value="Part-time">{t("Jobs.form.type.part_time")}</SelectItem>
+                      <SelectItem value="Contract">{t("Jobs.form.type.contract")}</SelectItem>
+                      <SelectItem value="Internship">{t("Jobs.form.type.internship")}</SelectItem>
+                      <SelectItem value="Temporary">{t("Jobs.form.type.temporary")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="department"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.department.label")}</FormLabel>
+                  <FormControl>
+                    <ComboboxAdd
+                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      data={departmentOptions}
+                      isLoading={departmentsLoading}
+                      defaultValue={field.value || ""}
+                      onChange={(value) => field.onChange(value || null)}
+                      texts={{
+                        placeholder: t("Jobs.form.department.placeholder"),
+                        searchPlaceholder: t("Departments.search_departments"),
+                        noItems: t("Departments.no_departments"),
+                      }}
+                      addText={t("Departments.add_new")}
+                      onAddClick={() => {
+                        setChosenForm("Departments");
+                        setIsDepartmentDialogOpen(true);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.location.label")}</FormLabel>
+                  <FormControl>
+                    <ComboboxAdd
+                      direction={locale === "ar" ? "rtl" : "ltr"}
+                      data={departmentOptions}
+                      isLoading={departmentsLoading}
+                      defaultValue={field.value || ""}
+                      onChange={(value) => field.onChange(value || null)}
+                      texts={{
+                        placeholder: t("Jobs.form.location.placeholder"),
+                        searchPlaceholder: t("Locations.search_locations"),
+                        noItems: t("Locations.no_locations"),
+                      }}
+                      addText={t("Locations.add_new")}
+                      onAddClick={() => setIsChooseLocationDialogOpen(true)}
+                    />
+                    {/* <Input placeholder={t("Jobs.form.location.placeholder")} {...field} /> */}
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="start_date"
+              render={({ field: { value, onChange, ...field } }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.start_date.label")}</FormLabel>
+                  <FormControl>
+                    <DatePicker
+                      date={value}
+                      onSelect={onChange}
+                      placeholder={t("Jobs.form.start_date.placeholder")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="end_date"
+              render={({ field: { value, onChange, ...field } }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.end_date.label")}</FormLabel>
+                  <FormControl>
+                    <DatePicker
+                      date={value}
+                      onSelect={onChange}
+                      placeholder={t("Jobs.form.end_date.placeholder")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
-            name="department"
+            name="salary"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Jobs.form.department.label")}</FormLabel>
+                <FormLabel>{t("Jobs.form.salary.label")}</FormLabel>
                 <FormControl>
-                  <ComboboxAdd
-                    direction={locale === "ar" ? "rtl" : "ltr"}
-                    data={departmentOptions}
-                    isLoading={departmentsLoading}
-                    defaultValue={field.value || ""}
-                    onChange={(value) => field.onChange(value || null)}
-                    texts={{
-                      placeholder: t("Jobs.form.department.placeholder"),
-                      searchPlaceholder: t("Departments.search_departments"),
-                      noItems: t("Departments.no_departments"),
-                    }}
-                    addText={t("Departments.add_new")}
-                    onAddClick={() => {
-                      setChosenForm("Departments");
-                      setIsDepartmentDialogOpen(true);
-                    }}
+                  <CurrencyInput
+                    showCommas={true}
+                    value={field.value ? parseFloat(field.value) : undefined}
+                    onChange={(value) => field.onChange(value?.toString() || "")}
+                    placeholder={t("Jobs.form.salary.placeholder")}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -267,45 +354,15 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
 
           <FormField
             control={form.control}
-            name="location"
+            name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Jobs.form.location.label")}</FormLabel>
+                <FormLabel>{t("Jobs.form.description.label")}</FormLabel>
                 <FormControl>
-                  <ComboboxAdd
-                    direction={locale === "ar" ? "rtl" : "ltr"}
-                    data={departmentOptions}
-                    isLoading={departmentsLoading}
-                    defaultValue={field.value || ""}
-                    onChange={(value) => field.onChange(value || null)}
-                    texts={{
-                      placeholder: t("Jobs.form.location.placeholder"),
-                      searchPlaceholder: t("Locations.search_locations"),
-                      noItems: t("Locations.no_locations"),
-                    }}
-                    addText={t("Locations.add_new")}
-                    onAddClick={() => setIsChooseLocationDialogOpen(true)}
-                  />
-                  {/* <Input placeholder={t("Jobs.form.location.placeholder")} {...field} /> */}
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="start_date"
-            render={({ field: { value, onChange, ...field } }) => (
-              <FormItem>
-                <FormLabel>{t("Jobs.form.start_date.label")}</FormLabel>
-                <FormControl>
-                  <DatePicker
-                    date={value}
-                    onSelect={onChange}
-                    placeholder={t("Jobs.form.start_date.placeholder")}
+                  <Textarea
+                    placeholder={t("Jobs.form.description.placeholder")}
+                    className="min-h-[100px]"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
@@ -315,93 +372,37 @@ export function JobForm({ id, defaultValues, editMode = false, onSuccess }: JobF
 
           <FormField
             control={form.control}
-            name="end_date"
-            render={({ field: { value, onChange, ...field } }) => (
+            name="requirements"
+            render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Jobs.form.end_date.label")}</FormLabel>
+                <FormLabel>{t("Jobs.form.requirements.label")}</FormLabel>
                 <FormControl>
-                  <DatePicker
-                    date={value}
-                    onSelect={onChange}
-                    placeholder={t("Jobs.form.end_date.placeholder")}
+                  <Textarea
+                    placeholder={t("Jobs.form.requirements.placeholder")}
+                    className="min-h-[100px]"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="is_active"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">{t("Jobs.form.is_active.label")}</FormLabel>
+                </div>
+                <FormControl>
+                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </div>
-
-        <FormField
-          control={form.control}
-          name="salary"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Jobs.form.salary.label")}</FormLabel>
-              <FormControl>
-                <CurrencyInput
-                  showCommas={true}
-                  value={field.value ? parseFloat(field.value) : undefined}
-                  onChange={(value) => field.onChange(value?.toString() || "")}
-                  placeholder={t("Jobs.form.salary.placeholder")}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Jobs.form.description.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={t("Jobs.form.description.placeholder")}
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="requirements"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Jobs.form.requirements.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={t("Jobs.form.requirements.placeholder")}
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="is_active"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">{t("Jobs.form.is_active.label")}</FormLabel>
-              </div>
-              <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
       </form>
 
       <Dialog open={isChooseLocationDialogOpen} onOpenChange={setIsChooseLocationDialogOpen}>

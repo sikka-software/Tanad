@@ -52,9 +52,7 @@ export default function AddUserPage() {
           cancel: t("General.cancel"),
         }}
       />
-      <div className="mx-auto max-w-2xl p-4">
-        <UserForm id="user-form" onSuccess={onAddSuccess} />
-      </div>
+      <UserForm formHtmlId="user-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

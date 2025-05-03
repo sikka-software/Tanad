@@ -56,9 +56,7 @@ export default function AddExpensePage() {
         dummyButton={handleDummyData}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <ExpenseForm id="expense-form" onSuccess={onAddSuccess} />
-      </div>
+      <ExpenseForm formHtmlId="expense-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

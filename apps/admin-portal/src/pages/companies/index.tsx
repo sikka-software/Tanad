@@ -145,7 +145,7 @@ export default function CompaniesPage() {
           loadingSave={loadingSaveCompany}
         >
           <CompanyForm
-            id={"company-form"}
+            formHtmlId={"company-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableCompany(null);

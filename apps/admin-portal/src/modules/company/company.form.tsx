@@ -21,7 +21,7 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import { useCreateCompany, useUpdateCompany } from "@/company/company.hooks";
 import useCompanyStore from "@/company/company.store";
-import { Company } from "@/company/company.type";
+import { Company, CompanyUpdateData } from "@/company/company.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -52,7 +52,7 @@ export function CompanyForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Company>) {
+}: ModuleFormProps<CompanyUpdateData>) {
   const t = useTranslations();
   const { profile, membership } = useUserStore();
   const { mutateAsync: createCompany, isPending: isCreating } = useCreateCompany();

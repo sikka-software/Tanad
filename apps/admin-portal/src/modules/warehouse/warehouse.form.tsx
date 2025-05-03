@@ -18,7 +18,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateWarehouse, useUpdateWarehouse, useWarehouses } from "./warehouse.hooks";
 import useWarehouseStore from "./warehouse.store";
-import { Warehouse } from "./warehouse.type";
+import { Warehouse, WarehouseUpdateData } from "./warehouse.type";
 
 export const createWarehouseFormSchema = (t: (key: string) => string) => {
   const baseWarehouseFormSchema = z.object({
@@ -41,7 +41,7 @@ export function WarehouseForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Warehouse>) {
+}: ModuleFormProps<WarehouseUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();

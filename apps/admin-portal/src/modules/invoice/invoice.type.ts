@@ -1,31 +1,9 @@
-import { z } from "zod";
+import type { Database } from "@/lib/database.types";
 
-import { Client } from "@/client/client.type";
+export type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
 
-import { Product } from "../product/product.type";
-
-export type Invoice = {
-  id: string;
-  user_id: string;
-  invoice_number: string;
-  issue_date: Date;
-  due_date: Date;
-  status: "paid" | "pending" | "overdue" | "draft" | "cancelled";
-  subtotal: number;
-  tax_rate?: number;
-  total: number;
-  notes?: string;
-  client_id?: string;
-  client?: Client;
-  created_at: Date;
-  items: InvoiceItem[];
-};
-
-export type InvoiceItem = {
-  product_id: string;
-  description: string;
-  quantity: number;
-  unit_price: number;
-};
+export type InvoiceItem = Database["public"]["Tables"]["invoice_items"]["Row"];
 
 export type InvoiceCreateData = Omit<Invoice, "id" | "created_at" | "total">;
+export type InvoiceUpdateData = Partial<Invoice>;
+export type InvoiceItemCreateData = Omit<InvoiceItem, "id">;

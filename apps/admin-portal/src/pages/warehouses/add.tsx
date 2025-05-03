@@ -56,7 +56,7 @@ export default function AddWarehousePage() {
         dummyButton={handleDummyData}
       />
 
-      <WarehouseForm id="warehouse-form" onSuccess={onAddSuccess} />
+      <WarehouseForm formHtmlId="warehouse-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

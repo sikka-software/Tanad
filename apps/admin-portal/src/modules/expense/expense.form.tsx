@@ -40,7 +40,7 @@ export function ExpenseForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Expense>) {
+}: ModuleFormProps<ExpenseUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const user = useUserStore((state) => state.user);
