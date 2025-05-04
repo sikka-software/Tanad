@@ -10,6 +10,8 @@ import IconButton from "@/components/ui/icon-button";
 import NumberInput from "@/components/ui/number-input";
 import { Separator } from "@/components/ui/separator";
 
+import FormSectionHeader from "./form-section-header";
+
 // Define the shape of the form values this section expects
 // Adjust this based on the actual full form schema if needed
 interface AddressFormValues {
@@ -34,9 +36,7 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
 
   return (
     <div>
-      <div className="bg-muted top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
-        <h2 className="ms-2 text-xl font-bold">{title}</h2>
-      </div>
+      <FormSectionHeader title={title} />
 
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-4 p-4 md:grid-cols-2">
         <FormField

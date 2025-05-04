@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Job } from "@/job/job.type";
 
-import ApplicationForm from "./application-form";
+import ApplicationForm from "../forms/job-application-form";
 
 export default function JobDetailsModal({
   job,

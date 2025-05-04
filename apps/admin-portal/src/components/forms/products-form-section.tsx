@@ -22,6 +22,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { CurrencyInput, MoneyFormatter } from "../ui/currency-input";
 import { SARSymbol } from "../ui/sar-symbol";
+import FormSectionHeader from "./form-section-header";
 
 // Define the props for the component
 interface ProductFormSectionProps {
@@ -272,21 +273,12 @@ export function ProductsFormSection({
 
   return (
     <div>
-      {/* Header similar to AddressFormSection */}
-      <div className="bg-muted sticky top-12 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
-        <h2 className="ms-2 text-xl font-bold">{title}</h2>
-        <Button
-          type="button"
-          size="sm"
-          onClick={() =>
-            append({ product_id: "", description: "", quantity: "1", unit_price: "0" })
-          }
-          disabled={isLoading}
-        >
-          <PlusCircle className="mr-2 size-4" />
-          {t("Invoices.products.add_product")}
-        </Button>
-      </div>
+      <FormSectionHeader
+        title={title}
+        onCreate={() => append({ product_id: "", description: "", quantity: "1", unit_price: "0" })}
+        onCreateText={t("Invoices.products.add_product")}
+        onCreateDisabled={isLoading}
+      />
       {/* Table Section */}
       <div className="p-4">
         <div className="overflow-y-auto rounded-md border">

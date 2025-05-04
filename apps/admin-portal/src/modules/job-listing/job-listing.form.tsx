@@ -9,6 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import JobListingOptionsSection from "@/components/forms/job-listing-options-section";
+
 import { ModuleFormProps } from "@/types/common.type";
 
 import { useJobs } from "@/job/job.hooks";
@@ -290,6 +292,7 @@ export function JobListingForm({
             )}
           />
         </div>
+        <JobListingOptionsSection />
       </form>
     </Form>
   );
