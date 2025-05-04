@@ -19,6 +19,7 @@ const modelMap: Record<string, ModelConfig> = {
   branches: { table: schema.branches, query: db.query.branches, idField: "id" },
   companies: { table: schema.companies, query: db.query.companies, idField: "id" },
   jobs: { table: schema.jobs, query: db.query.jobs, idField: "id" },
+  domains: { table: schema.domains, query: db.query.domains, idField: "id" },
   clients: { table: schema.clients, query: db.query.clients, idField: "id" },
   expenses: { table: schema.expenses, query: db.query.expenses, idField: "id" },
   departments: { table: schema.departments, query: db.query.departments, idField: "id" },
@@ -89,7 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       console.log("record is ", record);
-      
+
       if (!record) {
         return res.status(404).json({ message: `${model} not found` });
       }

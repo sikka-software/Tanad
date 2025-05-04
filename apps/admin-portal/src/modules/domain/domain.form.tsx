@@ -199,7 +199,7 @@ export function DomainForm({
                       {...field}
                       showCommas={true}
                       value={field.value ? parseFloat(String(field.value)) : undefined}
-                      onChange={(value) => field.onChange(value?.toString() || "")}
+                      onChange={(value) => field.onChange(value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -220,7 +220,7 @@ export function DomainForm({
                       {...field}
                       showCommas={true}
                       value={field.value ? parseFloat(String(field.value)) : undefined}
-                      onChange={(value) => field.onChange(value?.toString() || "")}
+                      onChange={(value) => field.onChange(value)}
                     />
                   </FormControl>
                   <FormMessage />

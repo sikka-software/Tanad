@@ -43,7 +43,7 @@ const modelMap: Record<string, ModelConfig> = {
   expenses: { tableName: "expenses" },
   departments: { tableName: "departments" },
   salaries: { tableName: "salaries" },
-
+  domains: { tableName: "domains" },
   department_locations: {
     tableName: "department_locations",
     customHandlers: {

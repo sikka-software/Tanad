@@ -83,7 +83,7 @@ const PageSearchAndFilter = ({
       {...props}
     >
       <div className="flex flex-1 items-center gap-4">
-        {title && <h2 className="hidden text-xl font-medium md:block">{title}</h2>}
+        {title && <h2 className="text-xl font-medium">{title}</h2>}
 
         {!hideOptions && (
           <div className="relative max-w-md flex-1">
