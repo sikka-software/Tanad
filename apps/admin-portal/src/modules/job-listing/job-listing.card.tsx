@@ -11,7 +11,7 @@ const JobListingCard = ({ jobListing }: { jobListing: JobListing }) => {
           <div>
             <h3 className="text-lg font-semibold">{jobListing.title}</h3>
             <p className="text-sm text-gray-500">
-              {jobListing.job_count ?? 0} {jobListing.job_count === 1 ? "job" : "jobs"}
+              {jobListing.jobs_count ?? 0} {jobListing.jobs_count === 1 ? "job" : "jobs"}
             </p>
           </div>
           <Badge variant={jobListing.is_active ? "default" : "secondary"}>

@@ -1,7 +1,9 @@
+import { cn } from "@root/src/lib/utils";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
 
+import { Badge } from "@/ui/badge";
 import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
@@ -51,11 +53,31 @@ const JobListingsTable = ({
       accessorKey: "is_active",
       header: t("JobListings.form.is_active.label"),
       validationSchema: z.boolean(),
+      cell: ({ row }) => (
+        <Badge
+          variant={row.original.is_active ? "default" : "secondary"}
+          className={cn(
+            row.original.is_active &&
+              "text-primary border-green-500 bg-green-200 hover:bg-green-200",
+            !row.original.is_active && "text-primary border-red-500 bg-red-200 hover:bg-red-200",
+          )}
+        >
+          {row.original.is_active
+            ? t("JobListings.form.status.active")
+            : t("JobListings.form.status.inactive")}
+        </Badge>
+      ),
     },
     {
       accessorKey: "slug",
       header: t("JobListings.form.slug.label"),
       validationSchema: z.string().min(1, t("JobListings.form.slug.required")),
+    },
+    {
+      accessorKey: "jobs_count",
+      header: t("JobListings.jobs_count.label", { defaultMessage: "Jobs" }),
+      enableEditing: false,
+      cell: ({ row }) => row.original.jobs_count,
     },
   ];
 

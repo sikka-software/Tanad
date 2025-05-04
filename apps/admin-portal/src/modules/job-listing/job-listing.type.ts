@@ -14,7 +14,7 @@ export interface JobListing {
   enterprise_id: string;
   is_public: boolean;
   jobs?: Job[]; // Optional array of associated jobs (e.g., for preview page)
-  job_count?: number; // Optional count of associated jobs (e.g., for list view)
+  jobs_count?: number; // Optional count of associated jobs (e.g., for list view)
 }
 
 export type JobListingJob = Database["public"]["Tables"]["job_listing_jobs"]["Row"];

@@ -217,7 +217,7 @@ const modelMap: Record<string, ModelConfig> = {
         // 3. Map result to flatten the count
         return data.map((listing) => ({
           ...listing,
-          job_count: listing.job_listing_jobs[0]?.count || 0,
+          jobs_count: listing.job_listing_jobs[0]?.count || 0,
         }));
       },
     },
