@@ -128,6 +128,8 @@ export default function EmployeeRequestsPage() {
             }
             createLabel={t("EmployeeRequests.add_new")}
             searchPlaceholder={t("EmployeeRequests.search_requests")}
+            count={requests?.length}
+            hideOptions={requests?.length === 0}
           />
         )}
         <div>

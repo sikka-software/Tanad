@@ -106,6 +106,8 @@ export default function SalariesPage() {
             onAddClick={canCreateSalaries ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Salaries.create_salary")}
             searchPlaceholder={t("Salaries.search_salaries")}
+            count={salaries?.length}
+            hideOptions={salaries?.length === 0}
           />
         )}
         <div>

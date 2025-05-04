@@ -111,6 +111,8 @@ export default function ClientsPage() {
             onAddClick={canCreateClients ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Clients.add_new")}
             searchPlaceholder={t("Clients.search_clients")}
+            count={clients?.length}
+            hideOptions={clients?.length === 0}
           />
         )}
         <div>

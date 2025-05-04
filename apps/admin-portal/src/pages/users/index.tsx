@@ -123,6 +123,8 @@ export default function UsersPage() {
             onAddClick={handleAddClick}
             createLabel={t("Users.add_new")}
             searchPlaceholder={t("Users.search_placeholder")}
+            count={users?.length}
+            hideOptions={users?.length === 0}
           />
         )}
 

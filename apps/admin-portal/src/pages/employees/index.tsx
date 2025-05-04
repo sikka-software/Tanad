@@ -119,6 +119,8 @@ export default function EmployeesPage() {
             }
             createLabel={t("Employees.add_new")}
             searchPlaceholder={t("Employees.search_employees")}
+            count={employees?.length}
+            hideOptions={employees?.length === 0}
           />
         )}
         <div>

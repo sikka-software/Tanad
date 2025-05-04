@@ -110,6 +110,8 @@ export default function BranchesPage() {
             onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Branches.create_branch")}
             searchPlaceholder={t("Branches.search_branches")}
+            count={branches?.length}
+            hideOptions={branches?.length === 0}
           />
         )}
 

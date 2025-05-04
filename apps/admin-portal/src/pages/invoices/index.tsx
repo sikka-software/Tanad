@@ -114,6 +114,8 @@ export default function InvoicesPage() {
             onAddClick={canCreateInvoices ? () => router.push("/invoices/add") : undefined}
             createLabel={t("Invoices.create_invoice")}
             searchPlaceholder={t("Invoices.search_invoices")}
+            count={invoices?.length}
+            hideOptions={invoices?.length === 0}
           />
         )}
 

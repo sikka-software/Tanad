@@ -108,6 +108,8 @@ export default function QuotesPage() {
             onAddClick={canCreateQuotes ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Quotes.add_new")}
             searchPlaceholder={t("Quotes.search_quotes")}
+            count={quotes?.length}
+            hideOptions={quotes?.length === 0}
           />
         )}
 

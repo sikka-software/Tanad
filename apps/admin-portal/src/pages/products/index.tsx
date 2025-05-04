@@ -106,6 +106,8 @@ export default function ProductsPage() {
             onAddClick={canCreateProducts ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Products.add_new")}
             searchPlaceholder={t("Products.search_products")}
+            count={products?.length}
+            hideOptions={products?.length === 0}
           />
         )}
 

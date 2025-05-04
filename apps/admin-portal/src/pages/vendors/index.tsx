@@ -91,7 +91,6 @@ export default function VendorsPage() {
   return (
     <div>
       <CustomPageMeta title={t("Vendors.title")} description={t("Vendors.description")} />
-
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -109,6 +108,8 @@ export default function VendorsPage() {
             onAddClick={canCreateVendors ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Vendors.add_new")}
             searchPlaceholder={t("Vendors.search_vendors")}
+            count={vendors?.length}
+            hideOptions={vendors?.length === 0}
           />
         )}
 

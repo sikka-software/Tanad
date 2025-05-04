@@ -39,8 +39,10 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   onAddClick?: () => void;
   createLabel?: string;
   searchPlaceholder?: string;
+  count?: number;
   sortableColumns: SortableColumn[];
   filterableFields?: FilterableField[];
+  hideOptions?: boolean;
 }
 
 const PageSearchAndFilter = ({
@@ -52,6 +54,8 @@ const PageSearchAndFilter = ({
   searchPlaceholder = "Search...",
   sortableColumns,
   filterableFields,
+  count,
+  hideOptions = false,
   ...props
 }: PageSearchAndFilterProps) => {
   const viewMode = useStore(store, (state) => state.viewMode);
@@ -81,47 +85,58 @@ const PageSearchAndFilter = ({
       <div className="flex flex-1 items-center gap-4">
         {title && <h2 className="hidden text-xl font-medium md:block">{title}</h2>}
 
-        <div className="relative max-w-md flex-1">
-          <Input
-            type="text"
-            placeholder={searchPlaceholder}
-            className="bg-muted/50 h-8 w-full ps-9 focus-visible:ring-1"
-            onChange={(e) => setSearchQuery(e.target.value)}
-            value={searchQuery}
-          />
-          <Search className="text-muted-foreground absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-        </div>
+        {!hideOptions && (
+          <div className="relative max-w-md flex-1">
+            <Input
+              type="text"
+              placeholder={searchPlaceholder}
+              className="bg-muted/50 h-8 w-full ps-9 focus-visible:ring-1"
+              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQuery}
+            />
+            <Search className="text-muted-foreground absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+          </div>
+        )}
+        {count && count > 0 ? (
+          <div className="relative max-w-md flex-1">
+            <span className="text-muted-foreground text-sm">{count}</span>
+          </div>
+        ) : null}
       </div>
 
       <div className="flex items-center gap-2">
-        <IconButton
-          icon={
-            viewMode === "table" ? (
-              <LayoutGrid className="h-4 w-4" />
-            ) : (
-              <Table2 className="h-4 w-4" />
-            )
-          }
-          label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
-          onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
-        />
+        {!hideOptions && (
+          <>
+            <IconButton
+              icon={
+                viewMode === "table" ? (
+                  <LayoutGrid className="h-4 w-4" />
+                ) : (
+                  <Table2 className="h-4 w-4" />
+                )
+              }
+              label={viewMode === "table" ? t("General.cards_view") : t("General.table_view")}
+              onClick={() => setViewMode(viewMode === "table" ? "cards" : "table")}
+            />
 
-        <FilterPopover
-          fields={filterableFields}
-          conditions={filterConditions}
-          onConditionsChange={onFilterConditionsChange}
-          caseSensitive={filterCaseSensitive}
-          onCaseSensitiveChange={onFilterCaseSensitiveChange}
-        />
-        <SortPopover
-          columns={sortableColumns}
-          sortRules={sortRules}
-          onSortRulesChange={onSortRulesChange}
-          caseSensitive={sortCaseSensitive}
-          onCaseSensitiveChange={setSortCaseSensitive}
-          nullsFirst={sortNullsFirst}
-          onNullsFirstChange={setSortNullsFirst}
-        />
+            <FilterPopover
+              fields={filterableFields}
+              conditions={filterConditions}
+              onConditionsChange={onFilterConditionsChange}
+              caseSensitive={filterCaseSensitive}
+              onCaseSensitiveChange={onFilterCaseSensitiveChange}
+            />
+            <SortPopover
+              columns={sortableColumns}
+              sortRules={sortRules}
+              onSortRulesChange={onSortRulesChange}
+              caseSensitive={sortCaseSensitive}
+              onCaseSensitiveChange={setSortCaseSensitive}
+              nullsFirst={sortNullsFirst}
+              onNullsFirstChange={setSortNullsFirst}
+            />
+          </>
+        )}
 
         {onAddClick && (
           <Button size="sm" className="h-8" onClick={onAddClick}>

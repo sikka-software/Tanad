@@ -117,6 +117,8 @@ export default function DepartmentsPage() {
             }
             createLabel={t("Departments.add_new")}
             searchPlaceholder={t("Departments.search_departments")}
+            count={departments?.length}
+            hideOptions={departments?.length === 0}
           />
         )}
 

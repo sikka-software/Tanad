@@ -112,6 +112,8 @@ export default function CompaniesPage() {
             }
             createLabel={t("Companies.create_company")}
             searchPlaceholder={t("Companies.search_companies")}
+            count={companies?.length}
+            hideOptions={companies?.length === 0}
           />
         )}
 

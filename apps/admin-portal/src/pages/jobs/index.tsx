@@ -114,6 +114,8 @@ export default function JobsPage() {
             onAddClick={canCreateJobs ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Jobs.create_job")}
             searchPlaceholder={t("Jobs.search_jobs")}
+            count={jobs?.length}
+            hideOptions={jobs?.length === 0}
           />
         )}
 

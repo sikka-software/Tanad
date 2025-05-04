@@ -111,6 +111,8 @@ export default function ExpensesPage() {
             onAddClick={canCreateExpenses ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Expenses.add_new")}
             searchPlaceholder={t("Expenses.search_expenses")}
+            count={expenses?.length}
+            hideOptions={expenses?.length === 0}
           />
         )}
 

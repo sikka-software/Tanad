@@ -113,6 +113,8 @@ export default function WarehousesPage() {
             }
             createLabel={t("Warehouses.create_warehouse")}
             searchPlaceholder={t("Warehouses.search_warehouses")}
+            count={warehouses?.length}
+            hideOptions={warehouses?.length === 0}
           />
         )}
 

@@ -110,6 +110,8 @@ export default function OfficesPage() {
             onAddClick={canCreateOffices ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Offices.add_new")}
             searchPlaceholder={t("Offices.search_offices")}
+            count={offices?.length}
+            hideOptions={offices?.length === 0}
           />
         )}
 
