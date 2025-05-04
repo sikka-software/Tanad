@@ -202,7 +202,7 @@ export default function JobListingPreviewPage({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <Input
-                placeholder={t("JobListings.search_placeholder") || "Search jobs..."}
+                placeholder={t("Jobs.search_jobs") || "Search jobs..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full"
@@ -212,12 +212,12 @@ export default function JobListingPreviewPage({
               <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                 <SelectTrigger>
                   <SelectValue
-                    placeholder={t("JobListings.department_placeholder") || "Department"}
+                    placeholder={t("Jobs.department_placeholder") || "Department"}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
-                    {t("JobListings.all_departments") || "All Departments"}
+                    {t("Jobs.all_departments") || "All Departments"}
                   </SelectItem>
                   {departments.map((department) => (
                     <SelectItem key={department} value={department}>

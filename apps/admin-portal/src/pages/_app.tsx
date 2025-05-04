@@ -1,6 +1,6 @@
 "use client";
 
-import { NextIntlClientProvider } from "next-intl";
+import { NextIntlClientProvider, useLocale } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import type { AppProps } from "next/app";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
@@ -15,6 +15,8 @@ import LandingLayout from "@/components/layouts/landing-layout";
 
 import { QueryProvider } from "@/providers/QueryProvider";
 import "@/styles/globals.css";
+
+import TopBar from "../components/jobs/top-bar";
 
 const arabicFont = IBM_Plex_Sans_Arabic({
   weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -85,7 +87,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
     );
   }
 
-  // Invoice pages
+  // job listing page
   if (router.pathname === "/job_listings/preview/[id]") {
     return (
       <div>
@@ -95,7 +97,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
           timeZone="Asia/Riyadh"
           now={new Date()}
         >
-          <InvoicePages>{<Component {...pageProps} />}</InvoicePages>
+          <JobListingPage>{<Component {...pageProps} />}</JobListingPage>
         </NextIntlClientProvider>
       </div>
     );
@@ -148,6 +150,17 @@ const InvoicePages = ({ children }: { children: React.ReactNode }) => {
     <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
       <LoadingBar />
       {children}
+    </ThemeProvider>
+  );
+};
+
+const JobListingPage = ({ children }: { children: React.ReactNode }) => {
+  const locale = useLocale();
+  return (
+    <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
+      <LoadingBar />
+      <TopBar />
+      <div dir={locale === "ar" ? "rtl" : "ltr"}>{children}</div>
     </ThemeProvider>
   );
 };
