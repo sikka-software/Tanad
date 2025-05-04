@@ -561,6 +561,10 @@ export const job_listings = pgTable(
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
     is_public: boolean().default(false).notNull(),
+    currency: text(),
+    locations: jsonb("locations").$type<string[]>().default([]),
+    departments: jsonb("departments").$type<string[]>().default([]),
+    enable_search_filtering: boolean().default(true),
   },
   (table) => [
     index("job_listings_slug_idx").using("btree", table.slug.asc().nullsLast().op("text_ops")),
