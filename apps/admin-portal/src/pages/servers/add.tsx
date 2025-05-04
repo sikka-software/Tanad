@@ -8,31 +8,27 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { BranchForm } from "@/branch/branch.form";
-import useBranchStore from "@/branch/branch.store";
+import { ServerForm } from "@/modules/server/server.form";
+import useServerStore from "@/modules/server/server.store";
 
-export default function AddBranchPage() {
+export default function AddServerPage() {
   const router = useRouter();
   const t = useTranslations();
 
-  const setIsLoading = useBranchStore((state) => state.setIsLoading);
-  const isLoading = useBranchStore((state) => state.isLoading);
+  const setIsLoading = useServerStore((state) => state.setIsLoading);
+  const isLoading = useServerStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
-    const form = (window as any).branchForm;
+    const form = (window as any).serverForm;
     if (form) {
       form.setValue("name", dummyData.full_name);
-      form.setValue("code", "BR-" + Math.random().toString(36).substr(2, 6));
-      form.setValue("email", dummyData.email);
-      form.setValue("phone", dummyData.phone);
-      form.setValue("address", dummyData.address);
-      form.setValue("city", dummyData.city);
-      form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zip_code);
-      form.setValue("manager", dummyData.full_name);
-      form.setValue("is_active", true);
-      form.setValue("notes", "Test branch notes");
+      form.setValue("ip_address", dummyData.random_ip_address);
+      form.setValue("location", dummyData.locations);
+      form.setValue("provider", "AWS");
+      form.setValue("os", dummyData.randomPicker(["Windows", "Linux", "MacOS"]));
+      form.setValue("status", dummyData.randomPicker(["Active", "Inactive", "Pending"]));
+      form.setValue("notes", dummyData.randomString);
     }
   };
 
@@ -52,10 +48,10 @@ export default function AddBranchPage() {
         dummyButton={handleDummyData}
       />
 
-      <BranchForm
-        formHtmlId="branch-form"
+      <ServerForm
+        formHtmlId="server-form"
         onSuccess={() => {
-          router.push("/branches");
+          router.push("/servers");
           setIsLoading(false);
         }}
       />

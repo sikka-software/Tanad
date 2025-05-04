@@ -17,82 +17,85 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import BranchCard from "@/branch/branch.card";
-import { BranchForm } from "@/branch/branch.form";
-import { useBranches, useBulkDeleteBranches, useDuplicateBranch } from "@/branch/branch.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/branch/branch.options";
-import useBranchStore from "@/branch/branch.store";
-import BranchesTable from "@/branch/branch.table";
-import { BranchUpdateData } from "@/branch/branch.type";
-
+import ServerCard from "@/modules/server/server.card";
+import { ServerForm } from "@/modules/server/server.form";
+import {
+  useServers,
+  useBulkDeleteServers,
+  useDuplicateServer,
+} from "@/modules/server/server.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/server/server.options";
+import useServerStore from "@/modules/server/server.store";
+import ServersTable from "@/modules/server/server.table";
+import { ServerUpdateData } from "@/modules/server/server.type";
 import useUserStore from "@/stores/use-user-store";
 
-export default function BranchesPage() {
+export default function ServersPage() {
   const t = useTranslations();
   const router = useRouter();
 
-  const canReadBranches = useUserStore((state) => state.hasPermission("branches.read"));
-  const canCreateBranches = useUserStore((state) => state.hasPermission("branches.create"));
+  const canReadServers = useUserStore((state) => state.hasPermission("servers.read"));
+  const canCreateServers = useUserStore((state) => state.hasPermission("servers.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
+  const [actionableServer, setActionableServer] = useState<ServerUpdateData | null>(null);
 
-  const loadingSaveBranch = useBranchStore((state) => state.isLoading);
-  const setLoadingSaveBranch = useBranchStore((state) => state.setIsLoading);
-  const viewMode = useBranchStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useBranchStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useBranchStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useBranchStore((state) => state.selectedRows);
-  const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
-  const clearSelection = useBranchStore((state) => state.clearSelection);
-  const sortRules = useBranchStore((state) => state.sortRules);
-  const sortCaseSensitive = useBranchStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useBranchStore((state) => state.sortNullsFirst);
-  const searchQuery = useBranchStore((state) => state.searchQuery);
-  const filterConditions = useBranchStore((state) => state.filterConditions);
-  const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
-  const getFilteredBranches = useBranchStore((state) => state.getFilteredData);
-  const getSortedBranches = useBranchStore((state) => state.getSortedData);
+  const loadingSaveServer = useServerStore((state) => state.isLoading);
+  const setLoadingSaveServer = useServerStore((state) => state.setIsLoading);
+  const viewMode = useServerStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useServerStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useServerStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useServerStore((state) => state.selectedRows);
+  const setSelectedRows = useServerStore((state) => state.setSelectedRows);
+  const clearSelection = useServerStore((state) => state.clearSelection);
+  const sortRules = useServerStore((state) => state.sortRules);
+  const sortCaseSensitive = useServerStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useServerStore((state) => state.sortNullsFirst);
+  const searchQuery = useServerStore((state) => state.searchQuery);
+  const filterConditions = useServerStore((state) => state.filterConditions);
+  const filterCaseSensitive = useServerStore((state) => state.filterCaseSensitive);
+  const getFilteredServers = useServerStore((state) => state.getFilteredData);
+  const getSortedServers = useServerStore((state) => state.getSortedData);
 
-  const { data: branches, isLoading: loadingFetchBranches, error } = useBranches();
-  const { mutate: duplicateBranch } = useDuplicateBranch();
-  const { mutateAsync: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
+  const { data: servers, isLoading: loadingFetchServers, error } = useServers();
+  const { mutate: duplicateServer } = useDuplicateServer();
+  const { mutateAsync: deleteServers, isPending: isDeleting } = useBulkDeleteServers();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: branches,
+    data: servers,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableBranch,
-    duplicateMutation: duplicateBranch,
-    moduleName: "Branches",
+    setActionableItem: setActionableServer,
+    duplicateMutation: duplicateServer,
+    moduleName: "Servers",
   });
 
-  const handleConfirmDelete = createDeleteHandler(deleteBranches, {
-    loading: "Branches.loading.delete",
-    success: "Branches.success.delete",
-    error: "Branches.error.delete",
+  const handleConfirmDelete = createDeleteHandler(deleteServers, {
+    loading: "Servers.loading.delete",
+    success: "Servers.success.delete",
+    error: "Servers.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
     },
   });
 
-  const filteredBranches = useMemo(() => {
-    return getFilteredBranches(branches || []);
-  }, [branches, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
+  const filteredServers = useMemo(() => {
+    return getFilteredServers(servers || []);
+  }, [servers, getFilteredServers, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const sortedBranches = useMemo(() => {
-    return getSortedBranches(filteredBranches);
-  }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
+  const sortedServers = useMemo(() => {
+    return getSortedServers(filteredServers);
+  }, [filteredServers, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  if (!canReadBranches) {
+  if (!canReadServers) {
     return <NoPermission />;
   }
   return (
     <div>
-      <CustomPageMeta title={t("Branches.title")} description={t("Branches.description")} />
+      <CustomPageMeta title={t("Servers.title")} description={t("Servers.description")} />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -103,34 +106,34 @@ export default function BranchesPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useBranchStore}
+            store={useServerStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Branches.title")}
-            onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Branches.create_new")}
-            searchPlaceholder={t("Branches.search_branches")}
-            count={branches?.length}
-            hideOptions={branches?.length === 0}
+            title={t("Servers.title")}
+            onAddClick={canCreateServers ? () => router.push(router.pathname + "/add") : undefined}
+            createLabel={t("Servers.create_new")}
+            searchPlaceholder={t("Servers.search_servers")}
+            count={servers?.length}
+            hideOptions={servers?.length === 0}
           />
         )}
 
         <div>
           {viewMode === "table" ? (
-            <BranchesTable
-              data={sortedBranches}
-              isLoading={loadingFetchBranches}
+            <ServersTable
+              data={sortedServers}
+              isLoading={loadingFetchServers}
               error={error as Error | null}
               onActionClicked={onActionClicked}
             />
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedBranches}
-                isLoading={loadingFetchBranches}
+                data={sortedServers}
+                isLoading={loadingFetchServers}
                 error={error as Error | null}
-                emptyMessage={t("Branches.no_branches_found")}
-                renderItem={(branch) => <BranchCard key={branch.id} branch={branch} />}
+                emptyMessage={t("Servers.no_servers_found")}
+                renderItem={(server) => <ServerCard key={server.id} server={server} />}
                 gridCols="3"
               />
             </div>
@@ -140,18 +143,18 @@ export default function BranchesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Branches.add_new")}
-          formId="branch-form"
-          loadingSave={loadingSaveBranch}
+          title={t("Servers.add_new")}
+          formId="server-form"
+          loadingSave={loadingSaveServer}
         >
-          <BranchForm
-            formHtmlId={"branch-form"}
+          <ServerForm
+            formHtmlId={"server-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableBranch(null);
-              setLoadingSaveBranch(false);
+              setActionableServer(null);
+              setLoadingSaveServer(false);
             }}
-            defaultValues={actionableBranch}
+            defaultValues={actionableServer}
             editMode={true}
           />
         </FormDialog>
@@ -161,8 +164,8 @@ export default function BranchesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Branches.confirm_delete")}
-          description={t("Branches.delete_description", { count: selectedRows.length })}
+          title={t("Servers.confirm_delete")}
+          description={t("Servers.delete_description", { count: selectedRows.length })}
         />
       </DataPageLayout>
     </div>

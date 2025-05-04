@@ -3558,9 +3558,9 @@
         "required": "الاسم مطلوب"
       },
       "registrar": {
-        "label": "المسوق",
-        "placeholder": "أدخل المسوق",
-        "required": "المسوق مطلوب"
+        "label": "مزود التسجيل",
+        "placeholder": "أدخل مزود التسجيل",
+        "required": "مزود التسجيل مطلوب"
       },
       "monthly_cost": {
         "label": "التكلفة الشهرية",
@@ -3609,7 +3609,80 @@
   },
   "Servers": {
     "title": "الخوادم",
-    "add_new": "خادم جديد"
+    "add_new": "خادم جديد",
+    "singular": "خادم",
+    "server_details": "تفاصيل الخادم",
+    "create_new": "إنشاء خادم",
+    "no_servers_found": "لا توجد خوادم",
+    "search_servers": "بحث عن خوادم...",
+    "manager": "المدير",
+    "edit": "تعديل الخادم",
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "form": {
+      "name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم الخادم",
+        "required": "الاسم مطلوب"
+      },
+      "ip_address": {
+        "label": "العنوان الأساسي",
+        "placeholder": "أدخل العنوان الأساسي",
+        "required": "العنوان الأساسي مطلوب"
+      },
+      "location": {
+        "label": "الموقع الجغرافي",
+        "placeholder": "أدخل الموقع الجغرافي",
+        "required": "الموقع الجغرافي مطلوب"
+      },
+      "provider": {
+        "label": "المزود",
+        "placeholder": "أدخل المزود",
+        "required": "المزود مطلوب"
+      },
+      "os": {
+        "label": "النظام الأساسي",
+        "placeholder": "أدخل النظام الأساسي",
+        "required": "النظام الأساسي مطلوب"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "أدخل الحالة",
+        "required": "الحالة مطلوبة"
+      },
+      "tags": {
+        "label": "التصنيفات",
+        "placeholder": "أدخل التصنيفات",
+        "required": "التصنيفات مطلوبة"
+      },
+
+      "notes": {
+        "label": "الملاحظات",
+        "placeholder": "أدخل الملاحظات"
+      },
+      "update_button": "تحديث الخادم",
+      "create_button": "إنشاء خادم"
+    },
+    "success": {
+      "create": "تم إنشاء النطاق بنجاح",
+      "update": "تم تحديث النطاق بنجاح",
+      "delete": "تم حذف النطاق بنجاح",
+      "duplicate": "تم تكرار النطاق بنجاح"
+    },
+    "loading": {
+      "create": "جاري إنشاء النطاق...",
+      "update": "جاري تحديث النطاق...",
+      "delete": "جاري حذف النطاق...",
+      "duplicate": "جاري تكرار النطاق..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء النطاق",
+      "update": "حدث خطأ أثناء تحديث النطاق",
+      "delete": "حدث خطأ أثناء حذف النطاق",
+      "duplicate": "حدث خطأ أثناء تكرار النطاق"
+    }
   },
   "OnlineStores": {
     "title": "المتاجر الإلكترونية",

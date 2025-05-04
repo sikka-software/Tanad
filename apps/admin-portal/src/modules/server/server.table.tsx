@@ -63,16 +63,6 @@ const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
     },
     { accessorKey: "tags", header: t("Servers.form.tags.label"), validationSchema: tagsSchema },
     { accessorKey: "notes", header: t("Servers.form.notes.label"), validationSchema: notesSchema },
-    {
-      accessorKey: "user_id",
-      header: t("Servers.form.user_id.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
-    {
-      accessorKey: "enterprise_id",
-      header: t("Servers.form.enterprise_id.label"),
-      validationSchema: z.string().min(1, "Required"),
-    },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {

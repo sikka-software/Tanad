@@ -102,8 +102,17 @@ export const generateDummyData = () => {
       start_date.getTime() + Math.random() * (end_date.getTime() - start_date.getTime()),
     );
   };
-
+  const randomPicker = (array: any[]) => array[Math.floor(Math.random() * array.length)];
   return {
+    randomPicker,
+    random_ip_address:
+      Math.floor(Math.random() * 255) +
+      "." +
+      Math.floor(Math.random() * 255) +
+      "." +
+      Math.floor(Math.random() * 255) +
+      "." +
+      Math.floor(Math.random() * 255),
     pick: (array: any[]) => array[Math.floor(Math.random() * array.length)],
     stringNumber: String(Math.random().toString(36).substring(2, 15)),
     expense_category:

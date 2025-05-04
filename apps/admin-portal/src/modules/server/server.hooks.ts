@@ -45,7 +45,7 @@ export function useCreateServer() {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: (newServer: Omit<Server, "id" | "created_at"> & { user_id: string }) => {
+    mutationFn: (newServer: ServerCreateData) => {
       // Map user_id to user_id for the service function
       const { user_id, ...rest } = newServer;
       const serverData: ServerCreateData = {

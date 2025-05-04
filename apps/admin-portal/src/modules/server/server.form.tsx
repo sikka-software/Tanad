@@ -9,8 +9,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@/components/forms/address-schema";
 import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
 
@@ -20,10 +18,10 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useServers, useCreateServer, useUpdateServer } from "./server.hooks";
 import useServerStore from "./server.store";
-import { Server, ServerUpdateData } from "./server.type";
+import { Server, ServerCreateData, ServerUpdateData } from "./server.type";
 
-export const createServerSchema = (t: (key: string) => string) => {
-  const baseServerSchema = z.object({
+export const createServerSchema = (t: (key: string) => string) =>
+  z.object({
     name: z.string().min(1, t("Servers.form.name.required")),
     ip_address: z.string().min(1, t("Servers.form.ip_address.required")),
     location: z.string().optional().or(z.literal("")),
@@ -35,11 +33,6 @@ export const createServerSchema = (t: (key: string) => string) => {
     user_id: z.string().optional().or(z.literal("")),
     enterprise_id: z.string().optional().or(z.literal("")),
   });
-
-  const addressSchema = createAddressSchema(t);
-
-  return baseServerSchema.merge(addressSchema);
-};
 
 export type ServerFormValues = z.input<ReturnType<typeof createServerSchema>>;
 
@@ -57,7 +50,7 @@ export function ServerForm({
   editMode,
 }: ModuleFormProps<ServerUpdateData>) {
   const t = useTranslations();
-  const { user } = useUserStore();
+  const { user, enterprise } = useUserStore();
   const { mutate: createServer } = useCreateServer();
   const { mutate: updateServer } = useUpdateServer();
   const { data: servers } = useServers();
@@ -69,12 +62,14 @@ export function ServerForm({
     resolver: zodResolver(createServerSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
-      ip_address: defaultValues?.ip_address || "",
+      ip_address: typeof defaultValues?.ip_address === "string" ? defaultValues.ip_address : "",
       location: defaultValues?.location || "",
       provider: defaultValues?.provider || "",
       os: defaultValues?.os || "",
       status: defaultValues?.status || "",
-      tags: defaultValues?.tags || [],
+      tags: Array.isArray(defaultValues?.tags)
+        ? defaultValues.tags.filter((tag): tag is string => typeof tag === "string")
+        : [],
       notes: defaultValues?.notes || "",
       user_id: defaultValues?.user_id || "",
       enterprise_id: defaultValues?.enterprise_id || "",
@@ -87,25 +82,33 @@ export function ServerForm({
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
+      setIsLoading(false);
       return;
     }
 
+    const commonData = {
+      name: data.name.trim(),
+      ip_address: data.ip_address?.trim() || null,
+      location: data.location?.trim() || null,
+      provider: data.provider?.trim() || null,
+      os: data.os?.trim() || null,
+      status: data.status?.trim() || undefined,
+      tags: Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : null,
+      notes: data.notes?.trim() || null,
+    };
+
     try {
       if (editMode) {
+        const updateData: Partial<Server> = {
+          ...commonData,
+          enterprise_id: data.enterprise_id?.trim() || undefined,
+          ip_address: commonData.ip_address as unknown | null,
+        };
+
         await updateServer(
           {
             id: defaultValues?.id || "",
-            data: {
-              name: data.name.trim(),
-              ip_address: data.ip_address?.trim() || "",
-              location: data.location?.trim() || null,
-              provider: data.provider?.trim() || null,
-              os: data.os?.trim() || null,
-              status: data.status?.trim() || null,
-              tags: data.tags?.trim() || null,
-              notes: data.notes?.trim() || null,
-              enterprise_id: data.enterprise_id?.trim() || null,
-            },
+            data: updateData,
           },
           {
             onSuccess: async (response) => {
@@ -113,29 +116,39 @@ export function ServerForm({
                 onSuccess();
               }
             },
+            onError: () => setIsLoading(false),
           },
         );
       } else {
-        await createServer(
-          {
-            name: data.name.trim(),
-            ip_address: data.ip_address?.trim() || "",
-            location: data.location?.trim() || null,
-            provider: data.provider?.trim() || null,
-            os: data.os?.trim() || null,
-            status: data.status?.trim() || null,
-            tags: data.tags?.trim() || null,
-            notes: data.notes?.trim() || null,
-            enterprise_id: data.enterprise_id?.trim() || null,
+        if (!enterprise?.id) {
+          toast.error(t("Servers.error.missing_enterprise"), {
+            description: t("Servers.error.no_enterprise_context"),
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        const createData: ServerCreateData = {
+          name: commonData.name,
+          location: commonData.location,
+          provider: commonData.provider,
+          os: commonData.os,
+          status: commonData.status,
+          tags: commonData.tags,
+          notes: commonData.notes,
+          user_id: user.id,
+          enterprise_id: enterprise.id,
+          ip_address: commonData.ip_address as unknown | null,
+        };
+
+        await createServer(createData, {
+          onSuccess: async (response) => {
+            if (onSuccess) {
+              onSuccess();
+            }
           },
-          {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
-            },
-          },
-        );
+          onError: () => setIsLoading(false),
+        });
       }
     } catch (error) {
       setIsLoading(false);
@@ -144,12 +157,11 @@ export function ServerForm({
         description: t("Servers.error.create"),
       });
     }
-  };
 
-  // Expose form methods for external use (like dummy data)
-  if (typeof window !== "undefined") {
-    (window as any).serverForm = form;
-  }
+    if (typeof window !== "undefined") {
+      (window as any).serverForm = form;
+    }
+  };
 
   return (
     <Form {...form}>
