@@ -3527,5 +3527,24 @@
       "deleted": "Deleted {target} with name {name}",
       "unknown": "Executed {action} on {target}"
     }
+  },
+  "Internet": {
+    "title": "Internet"
+  },
+  "Domains": {
+    "title": "Domains",
+    "add_new": "New Domain"
+  },
+  "Websites": {
+    "title": "Websites",
+    "add_new": "New Website"
+  },
+  "Servers": {
+    "title": "Servers",
+    "add_new": "New Server"
+  },
+  "OnlineStores": {
+    "title": "Online Stores",
+    "add_new": "New Online Store"
   }
 }

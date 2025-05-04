@@ -3533,5 +3533,24 @@
       "deleted": "حذف {target} باسم {name}",
       "unknown": "تنفيذ {action} على {target}"
     }
+  },
+  "Internet": {
+    "title": "الإنترنت"
+  },
+  "Domains": {
+    "title": "النطاقات",
+    "add_new": "نطاق جديد"
+  },
+  "Websites": {
+    "title": "المواقع الإلكترونية",
+    "add_new": "موقع إلكتروني جديد"
+  },
+  "Servers": {
+    "title": "الخوادم",
+    "add_new": "خادم جديد"
+  },
+  "OnlineStores": {
+    "title": "المتاجر الإلكترونية",
+    "add_new": "متجر إلكتروني جديد"
   }
 }
