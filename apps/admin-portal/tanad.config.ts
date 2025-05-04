@@ -34,7 +34,7 @@ const ModulesOptions = {
     icon: Briefcase,
     label: "JobListings.title",
     translationKey: "JobListings.title",
-    url: "/jobs/listings",
+    url: "/job_listings",
   },
   companies: {
     icon: Building2,

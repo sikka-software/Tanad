@@ -176,7 +176,8 @@ const modelMap: Record<string, ModelConfig> = {
   },
   quotes: { tableName: "quotes" },
   vendors: { tableName: "vendors" },
-  "employee_requests": { tableName: "employee_requests" },
+  employee_requests: { tableName: "employee_requests" },
+  job_listings: { tableName: "job_listings" },
   activity: {
     tableName: "activity_logs",
     customHandlers: {

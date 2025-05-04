@@ -113,15 +113,15 @@ export function JobListingForm({
       } else {
         await createJobListing(
           {
-            id: "",
             title: data.title.trim(),
             description: data.description?.trim() || null,
             jobs: data.jobs,
             user_id: profile?.id || "",
             is_active: true,
             slug: "",
-            created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
+            enterprise_id: "",
+            is_public: true,
           },
           {
             onSuccess: async () => {
@@ -143,77 +143,81 @@ export function JobListingForm({
 
   return (
     <Form {...form}>
-      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Jobs.form.title.label")} *</FormLabel>
-              <FormControl>
-                <Input placeholder={t("Jobs.form.title.placeholder")} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="form-container">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Jobs.form.title.label")} *</FormLabel>
+                <FormControl>
+                  <Input placeholder={t("Jobs.form.title.placeholder")} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Jobs.form.description.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={t("Jobs.form.description.placeholder")}
-                  className="min-h-[100px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Jobs.form.description.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={t("Jobs.form.description.placeholder")}
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="jobs"
-          render={() => (
-            <FormItem>
-              <FormLabel>{t("Jobs.title")} *</FormLabel>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {jobs?.map((job: Job) => (
-                  <div
-                    key={job.id}
-                    className={`cursor-pointer rounded-lg border p-4 transition-all ${
-                      selectedJobs.includes(job.id)
-                        ? "border-primary bg-primary/5"
-                        : "hover:shadow-md"
-                    }`}
-                    onClick={() => handleJobSelect(job.id)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-semibold">{job.title}</h4>
-                        <p className="text-sm text-gray-500">{job.type}</p>
+          <FormField
+            control={form.control}
+            name="jobs"
+            render={() => (
+              <FormItem>
+                <FormLabel>{t("Jobs.title")} *</FormLabel>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {jobs?.map((job: Job) => (
+                    <div
+                      key={job.id}
+                      className={`cursor-pointer rounded-lg border p-4 transition-all ${
+                        selectedJobs.includes(job.id)
+                          ? "border-primary bg-primary/5"
+                          : "hover:shadow-md"
+                      }`}
+                      onClick={() => handleJobSelect(job.id)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h4 className="font-semibold">{job.title}</h4>
+                          <p className="text-sm text-gray-500">{job.type}</p>
+                        </div>
+                        {selectedJobs.includes(job.id) && (
+                          <div className="bg-primary h-4 w-4 rounded-full" />
+                        )}
                       </div>
-                      {selectedJobs.includes(job.id) && (
-                        <div className="bg-primary h-4 w-4 rounded-full" />
-                      )}
+                      <div className="mt-2 space-y-1">
+                        {job.department && (
+                          <p className="text-sm text-gray-600">{job.department}</p>
+                        )}
+                        {job.location && <p className="text-sm text-gray-600">{job.location}</p>}
+                        {job.salary && <p className="text-sm text-gray-600">{job.salary}</p>}
+                      </div>
                     </div>
-                    <div className="mt-2 space-y-1">
-                      {job.department && <p className="text-sm text-gray-600">{job.department}</p>}
-                      {job.location && <p className="text-sm text-gray-600">{job.location}</p>}
-                      {job.salary && <p className="text-sm text-gray-600">{job.salary}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </form>
     </Form>
   );

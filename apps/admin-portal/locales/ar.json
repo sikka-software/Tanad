@@ -2719,7 +2719,8 @@
     "form": {
       "title": {
         "label": "عنوان الإعلان",
-        "placeholder": "أدخل عنوان الإعلان"
+        "placeholder": "أدخل عنوان الإعلان",
+        "required": "عنوان الإعلان مطلوب"
       },
       "description": {
         "label": "الوصف",

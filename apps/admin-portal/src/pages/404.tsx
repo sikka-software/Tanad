@@ -11,7 +11,7 @@ export default function Eror404Page() {
   return (
     <>
       <CustomPageMeta title={t("not-found.title")} />
-      <div className="flex flex-col items-center justify-center gap-6 px-4 py-10 md:px-0">
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-6 px-4 py-10 md:px-0">
         <div className="text-center text-5xl font-bold">{t("not-found.title")} - 404</div>
         <div className="text-center">{t("not-found.subtitle")}</div>
         <Link href="/">

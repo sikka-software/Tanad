@@ -1,30 +1,15 @@
+import { Database } from "@/lib/database.types";
+
 import { Job } from "@/job/job.type";
 
-export interface JobListing {
-  id: string;
-  title: string;
-  description: string | null;
-  is_active: boolean;
-  slug: string;
-  created_at: string;
-  updated_at: string;
+export type JobListing = Database["public"]["Tables"]["job_listings"]["Row"] & {
+  jobs?: (JobListingJob | string)[]; // Optional array of related jobs
+};
+
+export type JobListingJob = Database["public"]["Tables"]["job_listing_jobs"]["Row"];
+
+export type JobListingCreateData = Omit<JobListing, "id" | "created_at"> & {
   user_id: string;
-  jobs?: (Job | string)[]; // Optional array of related jobs
-}
-
-export interface JobListingJob {
-  id: string;
-  job_listing_id: string;
-  job_id: string;
-  created_at: string;
-  job?: Job; // Optional related job
-}
-
-export interface JobListingFormValues {
-  title: string;
-  description?: string;
-  jobs?: string[];
-  user_id?: string;
-}
+};
 
 export type JobListingUpdateData = Partial<JobListing>;

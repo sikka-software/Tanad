@@ -25,13 +25,13 @@ const JobListingsTable = ({
   const selectedRows = useJobListingsStore((state) => state.selectedRows);
   const setSelectedRows = useJobListingsStore((state) => state.setSelectedRows);
 
-  const canEditJobListing = useUserStore((state) => state.hasPermission("job-listings.update"));
+  const canEditJobListing = useUserStore((state) => state.hasPermission("job_listings.update"));
   const canDuplicateJobListing = useUserStore((state) =>
-    state.hasPermission("job-listings.duplicate"),
+    state.hasPermission("job_listings.duplicate"),
   );
-  const canViewJobListing = useUserStore((state) => state.hasPermission("job-listings.view"));
-  const canArchiveJobListing = useUserStore((state) => state.hasPermission("job-listings.archive"));
-  const canDeleteJobListing = useUserStore((state) => state.hasPermission("job-listings.delete"));
+  const canViewJobListing = useUserStore((state) => state.hasPermission("job_listings.view"));
+  const canArchiveJobListing = useUserStore((state) => state.hasPermission("job_listings.archive"));
+  const canDeleteJobListing = useUserStore((state) => state.hasPermission("job_listings.delete"));
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));

@@ -24,7 +24,7 @@ export default function AddJobListingPage() {
         formButtons
         formId="job-listing-form"
         loading={loading}
-        onCancel={() => router.push("/jobs/listings")}
+        onCancel={() => router.push("/job_listings")}
         texts={{
           title: t("JobListings.add_new_listing"),
           submit_form: t("JobListings.add_new_listing"),
@@ -32,19 +32,10 @@ export default function AddJobListingPage() {
         }}
       />
 
-      <div className="p-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("JobListings.listing_details")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <JobListingForm
-              formHtmlId="job-listing-form"
-              onSuccess={() => router.push("/jobs/listings")}
-            />
-          </CardContent>
-        </Card>
-      </div>
+      <JobListingForm
+        formHtmlId="job-listing-form"
+        onSuccess={() => router.push("/job_listings")}
+      />
     </div>
   );
 }
@@ -52,7 +43,7 @@ export default function AddJobListingPage() {
 export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {
     props: {
-      messages: (await import(`../../../../locales/${locale}.json`)).default,
+      messages: (await import(`../../../locales/${locale}.json`)).default,
     },
   };
 };

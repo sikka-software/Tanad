@@ -17,7 +17,7 @@ export const routeMap: RouteMap = {
   "/employees": { label: "Employees", translationKey: "Employees.title" },
   "/employee_requests": { label: "Employee Requests", translationKey: "EmployeeRequests.title" },
   "/jobs": { label: "Jobs", translationKey: "Jobs.title" },
-  "/job-listings": { label: "Job Listings", translationKey: "JobListings.title" },
+  "/job_listings": { label: "Job Listings", translationKey: "JobListings.title" },
   "/applicants": { label: "Applicants", translationKey: "Applicants.title" },
   "/settings": { label: "Settings", translationKey: "Settings.title" },
   "/vendors": { label: "Vendors", translationKey: "Vendors.title" },

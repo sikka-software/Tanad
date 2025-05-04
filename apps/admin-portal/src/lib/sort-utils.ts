@@ -13,7 +13,7 @@ const models = [
 
   "companies",
   "departments",
-  "job-listings",
+  "job_listings",
   "expenses",
   "purchases",
   "quotes",

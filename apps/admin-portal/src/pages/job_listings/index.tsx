@@ -94,7 +94,7 @@ export default function JobListingsPage() {
   }, [filteredListings, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleCreateClick = () => {
-    router.push("/jobs/listings/add");
+    router.push("/job_listings/add");
   };
 
   if (!canReadJobListings) {
@@ -188,7 +188,7 @@ export default function JobListingsPage() {
 export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {
     props: {
-      messages: (await import(`../../../../locales/${locale}.json`)).default,
+      messages: (await import(`../../../locales/${locale}.json`)).default,
     },
   };
 };
