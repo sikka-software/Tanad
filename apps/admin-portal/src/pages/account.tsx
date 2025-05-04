@@ -157,7 +157,7 @@ export default function Account() {
   if (!user) return null;
 
   return (
-    <div dir={lang === "ar" ? "rtl" : "ltr"} className="p-4 max-w-2xl mx-auto">
+    <div dir={lang === "ar" ? "rtl" : "ltr"} className="mx-auto max-w-2xl p-4">
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="grid w-full grid-cols-2" dir={lang === "ar" ? "rtl" : "ltr"}>
           <TabsTrigger value="general">{t("Profile.general")}</TabsTrigger>
@@ -191,6 +191,7 @@ export default function Account() {
                 <Label htmlFor="email">{t("Profile.email")}</Label>
                 <Input
                   id="email"
+                  dir="ltr"
                   {...registerProfile("email", {
                     required: t("Profile.email_required"),
                     pattern: {

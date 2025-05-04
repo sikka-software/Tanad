@@ -306,6 +306,7 @@ export function JobForm({
                       date={value}
                       onSelect={onChange}
                       placeholder={t("Jobs.form.start_date.placeholder")}
+                      ariaInvalid={form.formState.errors.start_date !== undefined}
                     />
                   </FormControl>
                   <FormMessage />
@@ -324,6 +325,7 @@ export function JobForm({
                       date={value}
                       onSelect={onChange}
                       placeholder={t("Jobs.form.end_date.placeholder")}
+                      ariaInvalid={form.formState.errors.end_date !== undefined}
                     />
                   </FormControl>
                   <FormMessage />

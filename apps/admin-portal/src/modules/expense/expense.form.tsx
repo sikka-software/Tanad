@@ -186,6 +186,7 @@ export function ExpenseForm({
                       date={field.value ? new Date(field.value) : undefined}
                       onSelect={field.onChange}
                       placeholder={t("Expenses.form.issue_date.placeholder")}
+                      ariaInvalid={form.formState.errors.issue_date !== undefined}
                     />
                   </FormControl>
                   <FormMessage />
@@ -204,6 +205,7 @@ export function ExpenseForm({
                       date={field.value ? new Date(field.value) : undefined}
                       onSelect={field.onChange}
                       placeholder={t("Expenses.form.due_date.placeholder")}
+                      ariaInvalid={form.formState.errors.due_date !== undefined}
                     />
                   </FormControl>
                   <FormMessage />

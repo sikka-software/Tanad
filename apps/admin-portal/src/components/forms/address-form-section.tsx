@@ -56,6 +56,7 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
                   <IconButton
                     size="icon_sm"
                     buttonType="button"
+                    disabled={isLoading}
                     contentClassName="flex flex-col gap-1 max-w-40"
                     onClick={(e) => e.preventDefault()}
                     icon={<MapPin className="size-6" />}

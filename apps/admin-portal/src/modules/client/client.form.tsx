@@ -225,6 +225,7 @@ export function ClientForm({
                     <FormControl>
                       <Input
                         type="email"
+                        dir="ltr"
                         placeholder={t("Clients.form.email.placeholder")}
                         {...field}
                       />

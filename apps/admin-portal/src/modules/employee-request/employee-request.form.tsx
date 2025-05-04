@@ -40,7 +40,9 @@ const createRequestSchema = (t: (key: string) => string) =>
       .nonempty({ message: t("EmployeeRequests.form.employee.required") }),
     type: z.enum(["leave", "expense", "document", "other"]),
     status: z.enum(["pending", "approved", "rejected"]).optional(),
-    title: z.string({ message: t("EmployeeRequests.form.title.required") }).min(1),
+    title: z.string({ message: t("EmployeeRequests.form.title.required") }).min(1, {
+      message: t("EmployeeRequests.form.title.required"),
+    }),
     description: z.string().optional(),
     start_date: z.date().optional(),
     end_date: z.date().optional(),
@@ -177,6 +179,7 @@ export function EmployeeRequestForm({
                   <FormLabel>{t("EmployeeRequests.form.employee.label")} *</FormLabel>
                   <FormControl>
                     <ComboboxAdd
+                      ariaInvalid={form.formState.errors.employee_id !== undefined}
                       direction={locale === "ar" ? "rtl" : "ltr"}
                       data={employeeOptions}
                       disabled={isLoadingSave}

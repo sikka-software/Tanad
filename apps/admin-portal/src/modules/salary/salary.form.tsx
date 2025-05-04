@@ -220,6 +220,7 @@ export function SalaryForm({
                           }
                         }}
                         placeholder={t("Salaries.form.pay_period_start.placeholder")}
+                        ariaInvalid={form.formState.errors.pay_period_start !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -247,6 +248,7 @@ export function SalaryForm({
                           }
                         }}
                         placeholder={t("Salaries.form.pay_period_end.placeholder")}
+                        ariaInvalid={form.formState.errors.pay_period_end !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -277,6 +279,7 @@ export function SalaryForm({
                         }
                       }}
                       placeholder={t("Salaries.form.payment_date.placeholder")}
+                      ariaInvalid={form.formState.errors.payment_date !== undefined}
                     />
                   </FormControl>
                   <FormMessage />

@@ -245,11 +245,7 @@ export default function DepartmentForm({
 
   return (
     <Form {...form}>
-      <form
-        id={formHtmlId || "department-form"}
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-8"
-      >
+      <form id={formHtmlId || "department-form"} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="form-container">
           <FormField
             control={form.control}

@@ -74,6 +74,7 @@ export function OnboardingForm() {
               <FormControl>
                 <Input
                   type="email"
+                  dir="ltr"
                   {...field}
                   placeholder={t("OnBoarding.form.email.placeholder")}
                   disabled={isPending}

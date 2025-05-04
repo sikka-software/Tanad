@@ -409,6 +409,7 @@ export function InvoiceForm({
                         date={value}
                         onSelect={onChange}
                         placeholder={t("Invoices.form.issue_date.placeholder")}
+                        ariaInvalid={form.formState.errors.issue_date !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
@@ -427,6 +428,7 @@ export function InvoiceForm({
                         date={value}
                         onSelect={onChange}
                         placeholder={t("Invoices.form.due_date.placeholder")}
+                        ariaInvalid={form.formState.errors.due_date !== undefined}
                       />
                     </FormControl>
                     <FormMessage />

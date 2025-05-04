@@ -275,6 +275,7 @@ export function EmployeeForm({
                         placeholder={t("Employees.form.email.placeholder")}
                         disabled={isEmployeeSaving}
                         type="email"
+                        dir="ltr"
                         {...field}
                       />
                     </FormControl>
@@ -359,44 +360,45 @@ export function EmployeeForm({
                         date={field.value}
                         onSelect={field.onChange}
                         disabled={isEmployeeSaving}
+                        ariaInvalid={form.formState.errors.hire_date !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Employees.form.status.label")} *</FormLabel>
+                    <Select
+                      dir={locale === "ar" ? "rtl" : "ltr"}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={isEmployeeSaving}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={t("Employees.form.status.placeholder")} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="active">{t("Employees.form.status.active")}</SelectItem>
+                        <SelectItem value="inactive">
+                          {t("Employees.form.status.inactive")}
+                        </SelectItem>
+                        <SelectItem value="on_leave">
+                          {t("Employees.form.status.on_leave")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Employees.form.status.label")} *</FormLabel>
-                  <Select
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isEmployeeSaving}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Employees.form.status.placeholder")} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="active">{t("Employees.form.status.active")}</SelectItem>
-                      <SelectItem value="inactive">
-                        {t("Employees.form.status.inactive")}
-                      </SelectItem>
-                      <SelectItem value="on_leave">
-                        {t("Employees.form.status.on_leave")}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <FormField
               control={form.control}

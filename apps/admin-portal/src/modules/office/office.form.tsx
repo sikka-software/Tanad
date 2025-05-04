@@ -202,43 +202,46 @@ export function OfficeForm({
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.email.label")}</FormLabel>
-                <FormControl>
-                  <Input
-                    dir="ltr"
-                    {...field}
-                    type="email"
-                    disabled={isLoading}
-                    placeholder={t("Offices.form.email.placeholder")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Offices.form.email.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      dir="ltr"
+                      {...field}
+                      type="email"
+                      disabled={isLoading}
+                      placeholder={t("Offices.form.email.placeholder")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
-                <FormControl>
-                  <PhoneInput
-                    value={field.value || ""}
-                    onChange={field.onChange}
-                    ariaInvalid={form.formState.errors.phone !== undefined}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
+                  <FormControl>
+                    <PhoneInput
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      ariaInvalid={form.formState.errors.phone !== undefined}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="notes"

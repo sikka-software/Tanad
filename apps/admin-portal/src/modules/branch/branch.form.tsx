@@ -236,6 +236,7 @@ export function BranchForm({
                   <FormLabel>{t("Branches.form.email.label")}</FormLabel>
                   <FormControl>
                     <Input
+                      dir="ltr"
                       type="email"
                       placeholder={t("Branches.form.email.placeholder")}
                       {...field}

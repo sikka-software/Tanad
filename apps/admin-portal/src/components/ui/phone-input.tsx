@@ -25,9 +25,16 @@ interface PhoneInputProps {
   defaultValue?: string;
   onChange: (value: string) => void;
   ariaInvalid?: boolean;
+  disabled?: boolean;
 }
 
-export default function PhoneInput({ value, defaultValue, onChange, ...props }: PhoneInputProps) {
+export default function PhoneInput({
+  value,
+  defaultValue,
+  onChange,
+  disabled,
+  ...props
+}: PhoneInputProps) {
   const t = useTranslations();
   const locale = useLocale();
   const [open, setOpen] = React.useState(false);
@@ -102,6 +109,7 @@ export default function PhoneInput({ value, defaultValue, onChange, ...props }: 
                 "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
             )}
             size="sm"
+            disabled={disabled}
           >
             <div className="flex items-center">
               <span>{selectedCountry.code}</span>
@@ -169,6 +177,7 @@ export default function PhoneInput({ value, defaultValue, onChange, ...props }: 
         placeholder={selectedCountry.placeholder}
         className="flex-1 rounded-s-none shadow-none"
         aria-invalid={props.ariaInvalid}
+        disabled={disabled}
       />
     </div>
   );

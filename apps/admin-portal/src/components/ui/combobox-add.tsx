@@ -51,6 +51,7 @@ type ComboboxAddTypes<T> = {
   addText?: string;
   onAddClick?: () => void;
   containerClassName?: string;
+  ariaInvalid?: boolean;
 };
 export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any>>(
   (
@@ -67,6 +68,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
       renderOption,
       renderSelected,
       addText = "Add Category",
+      ariaInvalid,
       ...props
     },
     ref,
@@ -103,7 +105,7 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
         >
           <PopoverTrigger disabled={props.disabled} asChild>
             {props.isLoading ? (
-              <Skeleton className="h-[40px] w-full" />
+              <Skeleton className="h-9 w-full" />
             ) : (
               <div className={cn("flex flex-col items-start gap-2", containerClassName)}>
                 <div
@@ -118,10 +120,12 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                   type="button"
                   aria-expanded={open}
                   className={cn(
-                    "ring-offset-background focus-visible:ring-ring inline-flex h-10 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                    "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
                     props.preview
                       ? "cursor-default rounded-none border-transparent px-0"
                       : "bg-background px-3",
+                    ariaInvalid &&
+                      "ring-destructive/20 dark:ring-destructive/40 border-destructive",
                   )}
                 >
                   {selectedItem

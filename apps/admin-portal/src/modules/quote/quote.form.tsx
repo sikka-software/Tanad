@@ -503,7 +503,7 @@ export function QuoteForm({
               name="tax_rate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Quotes.tax_rate")} (%)</FormLabel>
+                  <FormLabel>{t("Quotes.tax_rate")}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -536,6 +536,7 @@ export function QuoteForm({
                       field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")
                     }
                     placeholder={t("Quotes.form.issue_date.placeholder")}
+                    ariaInvalid={form.formState.errors.issue_date !== undefined}
                   />
                   <FormMessage />
                 </FormItem>
@@ -554,6 +555,7 @@ export function QuoteForm({
                       field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")
                     }
                     placeholder={t("Quotes.form.expiry_date.placeholder")}
+                    ariaInvalid={form.formState.errors.expiry_date !== undefined}
                   />
                   <FormMessage />
                 </FormItem>

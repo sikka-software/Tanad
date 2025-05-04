@@ -19,6 +19,7 @@ interface DatePickerProps {
   disabled?: boolean;
   isolated?: boolean;
   mode?: "default" | "multiple" | "range" | "single";
+  ariaInvalid?: boolean;
 }
 
 export function DatePicker({
@@ -28,6 +29,7 @@ export function DatePicker({
   disabled = false,
   isolated = false,
   mode = "single",
+  ariaInvalid = false,
 }: DatePickerProps) {
   return (
     <Popover>
@@ -38,10 +40,12 @@ export function DatePicker({
             className={cn(
               "w-full justify-start text-left font-normal",
               !date && "text-muted-foreground",
+              ariaInvalid &&
+                "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
             )}
             disabled={disabled}
           >
-            <CalendarIcon className="h-4 w-4" />
+            <CalendarIcon className="size-4" />
             {date instanceof Date ? (
               format(date, "PPP")
             ) : date?.from && date?.to ? (
@@ -59,10 +63,12 @@ export function DatePicker({
               className={cn(
                 "w-full justify-start text-left font-normal",
                 !date && "text-muted-foreground",
+                ariaInvalid &&
+                  "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
               )}
               disabled={disabled}
             >
-              <CalendarIcon className="h-4 w-4" />
+              <CalendarIcon className="size-4" />
               {date instanceof Date ? (
                 format(date, "PPP")
               ) : date?.from && date?.to ? (
