@@ -24,6 +24,7 @@ import {
 import useUserStore from "@/stores/use-user-store";
 
 import { Job } from "../job/job.type";
+import { bulkAssociateJobsWithListing, updateListingJobAssociations } from "./job-listing.service";
 
 interface JobListingFormProps {
   id?: string;
@@ -121,8 +122,19 @@ export function JobListingForm({
             jobListing: updatePayload,
           },
           {
-            onSuccess: async () => {
+            onSuccess: async (updatedListing) => {
               toast.success(t("JobListings.success.update"));
+
+              // Update associations
+              try {
+                await updateListingJobAssociations(defaultValues.id!, data.jobs);
+                toast.info(t("JobListings.success.associations_updated"));
+              } catch (assocError) {
+                console.error("Failed to update job associations:", assocError);
+                toast.warning(t("JobListings.warning.associations_failed"));
+                // The main listing update was successful, but associations failed.
+              }
+
               if (onSuccess) {
                 onSuccess();
               }
@@ -150,9 +162,33 @@ export function JobListingForm({
           updated_at: new Date().toISOString(),
         };
 
-        await createJobListing(createPayload, {
-          onSuccess: async () => {
+        // Generate a simple slug from the title + timestamp for uniqueness
+        const generatedSlug = `${coreListingData.title
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9-]/g, "")}-${Date.now()}`;
+
+        const createPayloadWithSlug: JobListingCreateData = {
+          ...createPayload,
+          slug: generatedSlug,
+        };
+
+        await createJobListing(createPayloadWithSlug, {
+          onSuccess: async (createdListing) => {
             toast.success(t("JobListings.success.create"));
+
+            // Associate selected jobs
+            if (data.jobs.length > 0) {
+              try {
+                await bulkAssociateJobsWithListing(createdListing.id, data.jobs);
+                toast.info(t("JobListings.success.associations_created"));
+              } catch (assocError) {
+                console.error("Failed to associate jobs:", assocError);
+                toast.warning(t("JobListings.warning.associations_failed_create"));
+                // The listing was created, but associating jobs failed.
+              }
+            }
+
             if (onSuccess) {
               onSuccess();
             }

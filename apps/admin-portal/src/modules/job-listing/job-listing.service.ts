@@ -102,3 +102,44 @@ export async function bulkDeleteJobListings(ids: string[]): Promise<void> {
     throw new Error("Failed to delete job listings");
   }
 }
+
+export async function bulkAssociateJobsWithListing(
+  listingId: string,
+  jobIds: string[],
+): Promise<void> {
+  try {
+    // Assuming an endpoint exists to handle bulk association
+    const response = await fetch("/api/resource/job_listing_jobs/bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ job_listing_id: listingId, job_ids: jobIds }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to associate jobs with listing");
+    }
+  } catch (error) {
+    console.error(`Error associating jobs with listing ${listingId}:`, error);
+    throw new Error(`Failed to associate jobs with listing ${listingId}`);
+  }
+}
+
+export async function updateListingJobAssociations(
+  listingId: string,
+  jobIds: string[],
+): Promise<void> {
+  try {
+    // Assuming an endpoint handles clearing and re-associating
+    // Alternatively, call a delete endpoint first, then the bulk associate endpoint
+    const response = await fetch(`/api/resource/job_listings/${listingId}/associations`, {
+      method: "PUT", // Or POST, depending on API design
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ job_ids: jobIds }),
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to update job associations for listing ${listingId}`);
+    }
+  } catch (error) {
+    console.error(`Error updating job associations for listing ${listingId}:`, error);
+    throw new Error(`Failed to update job associations for listing ${listingId}`);
+  }
+}

@@ -50,7 +50,7 @@ const IconButton = ({
           style={{
             transformOrigin: "var(--radix-tooltip-trigger-width)",
           }}
-          className={contentClassName}
+          className={cn(contentClassName)}
         >
           {label}
         </TooltipContent>

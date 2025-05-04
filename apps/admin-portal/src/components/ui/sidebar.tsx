@@ -1,6 +1,7 @@
 import { Slot } from "@radix-ui/react-slot";
 import { VariantProps, cva } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
+import { useLocale } from "next-intl";
 import * as React from "react";
 
 import { Button } from "@/ui/button";
@@ -150,6 +151,7 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none";
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const locale = useLocale();
 
   if (collapsible === "none") {
     return (
@@ -170,6 +172,7 @@ function Sidebar({
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
+          dir={locale === "ar" ? "rtl" : "ltr"}
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"

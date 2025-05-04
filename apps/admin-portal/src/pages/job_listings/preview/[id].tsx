@@ -46,12 +46,16 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
         `
         *,
         job_listing_jobs (
-          jobs ( * )
+          jobs (
+            *
+          )
         )
       `,
       )
       .eq("id", id)
       .single();
+
+    console.log("data is ", data);
 
     if (error) {
       // Handle specific errors like not found (PGRST116) or others
@@ -107,9 +111,10 @@ export default function JobListingPreviewPage({
       </Alert>
     );
   }
+  console.log("jobListing is ", jobListing);
 
   // Extract jobs from the nested structure
-  const jobs = jobListing.job_listing_jobs.map((j) => j.jobs);
+  const jobs: Job[] = jobListing?.job_listing_jobs.map((jlj) => jlj.jobs).filter(Boolean) || [];
 
   return (
     <div className="container mx-auto max-w-4xl py-8">
@@ -137,7 +142,7 @@ export default function JobListingPreviewPage({
           <h2 className="mb-4 text-xl font-semibold">{t("JobListings.preview.associated_jobs")}</h2>
           {jobs && jobs.length > 0 ? (
             <div className="space-y-4">
-              {jobs.map((job) => (
+              {jobs.map((job: Job) => (
                 <Card key={job.id}>
                   <CardHeader>
                     <CardTitle className="text-lg">{job.title}</CardTitle>

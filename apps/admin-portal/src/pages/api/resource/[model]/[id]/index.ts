@@ -88,6 +88,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: eq(table[idField], id),
       });
 
+      console.log("record is ", record);
+      
       if (!record) {
         return res.status(404).json({ message: `${model} not found` });
       }
