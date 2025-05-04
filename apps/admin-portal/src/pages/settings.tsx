@@ -127,9 +127,9 @@ const SettingsPage = () => {
           </div>
         }
       />
-      <div className="flex flex-col gap-4 p-4 md:flex-row">
+      <div className="flex flex-col gap-4 p-4 lg:flex-row">
         {/* Sidebar */}
-        <div className="w-full shrink-0 md:w-64">
+        <div className="w-full shrink-0 lg:w-64  lg:max-w-[200px]">
           <Card className="shadow-none">
             <CardContent className="p-0" dir={lang === "ar" ? "rtl" : "ltr"}>
               <div className="flex w-full flex-col">

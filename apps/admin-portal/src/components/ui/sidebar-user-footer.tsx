@@ -11,6 +11,8 @@ import {
   Sparkles,
   User2,
   HelpCircle,
+  Cog,
+  Settings,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
@@ -86,6 +88,12 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
+                <Link href="/settings">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <Settings className="me-2 h-4 w-4" />
+                    {t("Settings.title")}
+                  </DropdownMenuItem>
+                </Link>
                 <Link href="/account">
                   <DropdownMenuItem className="cursor-pointer">
                     <User2 className="me-2 h-4 w-4" />

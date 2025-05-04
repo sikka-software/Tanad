@@ -2698,6 +2698,9 @@
       "duplicate": "حدث خطأ أثناء تكرار الوظيفة"
     }
   },
+  "SystemAdmin": {
+    "title": "إدارة النظام"
+  },
   "JobListings": {
     "title": "صفحات التوظيف",
     "create_listing": "إنشاء صفحة توظيف",

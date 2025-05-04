@@ -249,8 +249,9 @@ export function AppSidebar() {
         {searchableMenuGroups.HumanResources && searchableMenuGroups.HumanResources.length > 0 && (
           <NavMain title={t("HumanResources.title")} items={searchableMenuGroups.HumanResources} />
         )}
-        {searchableMenuGroups.Settings && searchableMenuGroups.Settings.length > 0 && (
-          <NavMain title={t("Settings.title")} items={searchableMenuGroups.Settings} />
+
+        {searchableMenuGroups.SystemAdmin && searchableMenuGroups.SystemAdmin.length > 0 && (
+          <NavMain title={t("SystemAdmin.title")} items={searchableMenuGroups.SystemAdmin} />
         )}
       </SidebarContent>
       <SidebarFooter className="border-t">

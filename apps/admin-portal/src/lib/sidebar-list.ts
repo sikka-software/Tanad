@@ -356,8 +356,8 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
     // },
   ];
 }
-// Settings menu items
-function getSettingsMenus(pathname: string): SidebarMenuGroupProps["items"] {
+// System admin menu items
+function getSystemAdminMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
     {
       title: ModulesOptions.users.label,
@@ -373,20 +373,6 @@ function getSettingsMenus(pathname: string): SidebarMenuGroupProps["items"] {
       url: ModulesOptions.roles.url,
       is_active: pathname === ModulesOptions.roles.url,
     },
-    // {
-    //   title: "Billing",
-    //   translationKey: "Billing.title",
-    //   icon: CreditCard,
-    //   url: "/billing",
-    //   is_active: pathname === "/billing",
-    // },
-    // {
-    //   title: "Settings",
-    //   translationKey: "Settings.title",
-    //   icon: Settings,
-    //   url: "/settings",
-    //   is_active: pathname === "/settings",
-    // },
   ];
 }
 
@@ -395,7 +381,7 @@ export function getMenuList(pathname?: string): Record<string, SidebarMenuGroupP
     Administration: getAdministrationMenus(pathname || ""),
     Accounting: getAccountingMenus(pathname || ""),
     HumanResources: getHrMenus(pathname || ""),
-    Settings: getSettingsMenus(pathname || ""),
+    SystemAdmin: getSystemAdminMenus(pathname || ""),
   };
 }
 
@@ -441,63 +427,3 @@ export function applyCustomMenuOrder(
 
   return resultMenu;
 }
-
-// Mapper function to convert simplified menu to the existing format
-function mapSimplifiedMenuToSidebarMenu(
-  menu: SimplifiedMenu,
-  pathname: string = "",
-): Record<string, SidebarMenuGroupProps["items"]> {
-  const getIcon = (title: string): LucideIcon => {
-    const iconMap: Record<string, LucideIcon> = {
-      Dashboard: LayoutDashboard,
-      Analytics: BarChart,
-      Contacts: Users,
-      Locations: MapPin,
-      Sales: Package,
-      "Human Resources": Users,
-      Settings: Settings,
-      Billing: CreditCard,
-    };
-    return iconMap[title] || Users; // Default to Users icon if not found
-  };
-
-  const mapMenuItem = (
-    item: SimplifiedMenuItem,
-    parentUrl: string = "",
-  ): SidebarMenuGroupProps["items"][0] => {
-    const baseUrl = parentUrl || `/${item.title.toLowerCase().replace(/\s+/g, "-")}`;
-    const mappedItem = {
-      title: item.title,
-      translationKey: `${item.title.replace(/\s+/g, "")}.title`,
-      url: baseUrl,
-      icon: getIcon(item.title),
-      is_active: pathname.startsWith(baseUrl),
-    };
-
-    if (item.items) {
-      return {
-        ...mappedItem,
-        items: item.items.map((subItem) => ({
-          title: subItem.title,
-          translationKey: `${subItem.title.replace(/\s+/g, "")}.title`,
-          url: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`,
-          action: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}/add`,
-          is_active: pathname.startsWith(
-            `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`,
-          ),
-        })),
-      };
-    }
-
-    return mappedItem;
-  };
-
-  const result: Record<string, SidebarMenuGroupProps["items"]> = {
-    [menu.group]: menu.items.map((item) => mapMenuItem(item)),
-  };
-
-  return result;
-}
-
-// Example usage:
-// const mappedMenu = mapSimplifiedMenuToSidebarMenu(simplifiedMenu);
