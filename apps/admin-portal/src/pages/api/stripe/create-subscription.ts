@@ -493,7 +493,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // First check if profile exists and create it if it doesn't
         const { data: profileCheck, error: profileCheckError } = await supabase
           .from("profiles")
-          .select("id, subscribed_to, stripe_customer_id, email, user_id")
+          .select("id, subscribed_to, stripe_customer_id, email")
           .eq("id", userId)
           .maybeSingle();
 
