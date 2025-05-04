@@ -1,3 +1,5 @@
+import { JobListingNotFound } from "@root/src/components/app/job-listing-not-found";
+import JobListings from "@root/src/components/jobs/job-listings";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useTranslations } from "next-intl";
 import Head from "next/head";
@@ -70,6 +72,7 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
     return {
       props: {
         jobListing: data as JobListingWithJobs, // Cast to the expected structure
+        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
       },
     };
   } catch (error: any) {
@@ -78,6 +81,7 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
       props: {
         jobListing: null,
         error: error.message || "Failed to load job listing.",
+        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
       },
     };
   }
@@ -94,20 +98,14 @@ export default function JobListingPreviewPage({
     return <div>Loading...</div>; // Handle fallback state if using getStaticProps with fallback: true
   }
 
+  if (!jobListing) {
+    return <JobListingNotFound />;
+  }
   if (error) {
     return (
       <Alert variant="destructive">
         <AlertTitle>{t("General.error_alert_title")}</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
-      </Alert>
-    );
-  }
-
-  if (!jobListing) {
-    return (
-      <Alert>
-        <AlertTitle>{t("JobListings.preview.not_found_title")}</AlertTitle>
-        <AlertDescription>{t("JobListings.preview.not_found_desc")}</AlertDescription>
       </Alert>
     );
   }
@@ -117,68 +115,83 @@ export default function JobListingPreviewPage({
   const jobs: Job[] = jobListing?.job_listing_jobs.map((jlj) => jlj.jobs).filter(Boolean) || [];
 
   return (
-    <div className="container mx-auto max-w-4xl py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">{jobListing.title}</CardTitle>
-          <div className="flex items-center space-x-2 pt-2">
-            <Badge variant={jobListing.is_active ? "default" : "outline"}>
-              {jobListing.is_active ? t("Status.active") : t("Status.inactive")}
-            </Badge>
-            <Badge variant={jobListing.is_public ? "default" : "outline"}>
-              {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {jobListing.description && (
-            <div className="prose dark:prose-invert max-w-none">
-              <p>{jobListing.description}</p>
-            </div>
-          )}
+    <main className="bg-background min-h-screen">
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-8">
+          <h1 className="text-foreground mb-2 text-3xl font-bold">Career Opportunities</h1>
+          <p className="text-muted-foreground max-w-2xl">
+            Join our team and help us build the future. We're looking for talented individuals who
+            are passionate about making a difference.
+          </p>
+        </header>
 
-          <Separator className="my-6" />
-
-          <h2 className="mb-4 text-xl font-semibold">{t("JobListings.preview.associated_jobs")}</h2>
-          {jobs && jobs.length > 0 ? (
-            <div className="space-y-4">
-              {jobs.map((job: Job) => (
-                <Card key={job.id}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">{job.title}</CardTitle>
-                    <div className="flex items-center space-x-2 pt-1">
-                      {job.type && <Badge variant="secondary">{job.type}</Badge>}
-                      {job.department && <Badge variant="outline">{job.department}</Badge>}
-                      {job.location && <Badge variant="outline">{job.location}</Badge>}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {job.description && (
-                      <p className="text-muted-foreground mb-2 text-sm">{job.description}</p>
-                    )}
-                    {job.requirements && (
-                      <div>
-                        <h4 className="mb-1 text-sm font-medium">
-                          {t("Jobs.fields.requirements")}
-                        </h4>
-                        <p className="text-muted-foreground text-sm">{job.requirements}</p>
-                      </div>
-                    )}
-                    {job.salary && (
-                      <p className="mt-2 text-sm">
-                        <strong>{t("Jobs.fields.salary")}:</strong> {job.salary}{" "}
-                        {/* Add currency formatting if needed */}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground">{t("JobListings.preview.no_jobs")}</p>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+        <JobListings />
+      </div>
+    </main>
   );
+  // return (
+  //   <div className="container mx-auto max-w-4xl py-8">
+  //     <Card>
+  //       <CardHeader>
+  //         <CardTitle className="text-2xl font-bold">{jobListing.title}</CardTitle>
+  //         <div className="flex items-center space-x-2 pt-2">
+  //           <Badge variant={jobListing.is_active ? "default" : "outline"}>
+  //             {jobListing.is_active ? t("Status.active") : t("Status.inactive")}
+  //           </Badge>
+  //           <Badge variant={jobListing.is_public ? "default" : "outline"}>
+  //             {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
+  //           </Badge>
+  //         </div>
+  //       </CardHeader>
+  //       <CardContent>
+  //         {jobListing.description && (
+  //           <div className="prose dark:prose-invert max-w-none">
+  //             <p>{jobListing.description}</p>
+  //           </div>
+  //         )}
+
+  //         <Separator className="my-6" />
+
+  //         <h2 className="mb-4 text-xl font-semibold">{t("JobListings.preview.associated_jobs")}</h2>
+  //         {jobs && jobs.length > 0 ? (
+  //           <div className="space-y-4">
+  //             {jobs.map((job: Job) => (
+  //               <Card key={job.id}>
+  //                 <CardHeader>
+  //                   <CardTitle className="text-lg">{job.title}</CardTitle>
+  //                   <div className="flex items-center space-x-2 pt-1">
+  //                     {job.type && <Badge variant="secondary">{job.type}</Badge>}
+  //                     {job.department && <Badge variant="outline">{job.department}</Badge>}
+  //                     {job.location && <Badge variant="outline">{job.location}</Badge>}
+  //                   </div>
+  //                 </CardHeader>
+  //                 <CardContent>
+  //                   {job.description && (
+  //                     <p className="text-muted-foreground mb-2 text-sm">{job.description}</p>
+  //                   )}
+  //                   {job.requirements && (
+  //                     <div>
+  //                       <h4 className="mb-1 text-sm font-medium">
+  //                         {t("Jobs.fields.requirements")}
+  //                       </h4>
+  //                       <p className="text-muted-foreground text-sm">{job.requirements}</p>
+  //                     </div>
+  //                   )}
+  //                   {job.salary && (
+  //                     <p className="mt-2 text-sm">
+  //                       <strong>{t("Jobs.fields.salary")}:</strong> {job.salary}{" "}
+  //                       {/* Add currency formatting if needed */}
+  //                     </p>
+  //                   )}
+  //                 </CardContent>
+  //               </Card>
+  //             ))}
+  //           </div>
+  //         ) : (
+  //           <p className="text-muted-foreground">{t("JobListings.preview.no_jobs")}</p>
+  //         )}
+  //       </CardContent>
+  //     </Card>
+  //   </div>
+  // );
 }
