@@ -150,9 +150,6 @@ export default function BranchesPage() {
               setIsFormDialogOpen(false);
               setActionableBranch(null);
               setLoadingSaveBranch(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Branches.success.update"),
-              });
             }}
             defaultValues={actionableBranch}
             editMode={true}

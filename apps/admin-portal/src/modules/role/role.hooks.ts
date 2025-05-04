@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
+
+import useUserStore from "@/stores/use-user-store";
 
 // Import the user store
 
@@ -110,6 +112,7 @@ export function useRoles() {
 // Create role hook - Uses RoleCreateData
 export function useCreateRole() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return useMutation<Role, Error, RoleCreateData & { enterprise_id: string }>({
     mutationFn: async (data: RoleCreateData & { enterprise_id: string }) => {
@@ -158,6 +161,9 @@ export function useCreateRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
       // Also invalidate the general custom roles list if used elsewhere
       queryClient.invalidateQueries({ queryKey: [...roleKeys.lists(), "custom"] });
+      toast.success(t("General.successful_operation"), {
+        description: t("Roles.success.create"),
+      });
     },
     onError: (error) => {
       console.error("Error creating role:", error);
@@ -169,6 +175,7 @@ export function useCreateRole() {
 // Update role hook - Uses RoleUpdateData
 export function useUpdateRole() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return useMutation<void, Error, { id: string; data: RoleUpdateData }>({
     mutationFn: async ({ id, data }: { id: string; data: RoleUpdateData }) => {
@@ -214,7 +221,10 @@ export function useUpdateRole() {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles
+      queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Roles.success.update"),
+      });
     },
     onError: (error) => {
       console.error("Error updating role:", error);

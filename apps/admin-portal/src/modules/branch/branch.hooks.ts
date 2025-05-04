@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import {
   createBranch,
@@ -40,6 +42,7 @@ export function useBranch(id: string) {
 // Hook for creating a new branch
 export function useCreateBranch() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return useMutation({
     mutationFn: (newBranch: Omit<Branch, "id" | "created_at"> & { user_id: string }) => {
@@ -54,6 +57,9 @@ export function useCreateBranch() {
     onSuccess: () => {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Branches.success.update"),
+      });
     },
   });
 }
@@ -61,11 +67,16 @@ export function useCreateBranch() {
 // Hook for updating an existing branch
 export function useUpdateBranch() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
+
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Branch> }) => updateBranch(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Branches.success.update"),
+      });
     },
   });
 }

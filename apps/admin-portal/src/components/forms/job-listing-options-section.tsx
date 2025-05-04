@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { UseFormReturn } from "react-hook-form";
 
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import {
   Select,
   SelectContent,
@@ -23,6 +24,8 @@ interface JobListingOptionsSectionProps {
   availableCurrencies: { value: string; label: string }[];
   availableLocations: { id: string; name: string }[];
   availableDepartments: { id: string; name: string }[];
+  loadingLocations?: boolean; // Add loading state for locations
+  loadingDepartments?: boolean; // Add loading state for departments
 }
 
 const JobListingOptionsSection = ({
@@ -30,10 +33,12 @@ const JobListingOptionsSection = ({
   availableCurrencies,
   availableLocations,
   availableDepartments,
+  loadingLocations,
+  loadingDepartments,
 }: JobListingOptionsSectionProps) => {
   const t = useTranslations();
   return (
-    <div className="space-y-6">
+    <div>
       <FormSectionHeader title={t("JobListings.options.title")} />
       <div className="form-container">
         {/* Currency Selection */}
@@ -80,110 +85,48 @@ const JobListingOptionsSection = ({
           )}
         />
 
-        {/* Location Selection - Placeholder using Checkboxes */}
-        {/* Replace with your MultiSelect component if available */}
         <FormField
           control={form.control}
           name="locations" // Ensure this name matches your form schema
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("JobListings.options.locationsLabel")}</FormLabel>
-              {/* Example using Checkboxes - Adapt as needed */}
-              {/* <div className="space-y-2">
-              {availableLocations.map((location) => (
-                <FormField
-                  key={location.id}
-                  control={form.control}
-                  name="locations"
-                  render={({ field: itemField }) => {
-                    return (
-                      <FormItem
-                        key={location.id}
-                        className="flex flex-row items-start space-x-3 space-y-0"
-                      >
-                        <FormControl>
-                          <Checkbox
-                            checked={itemField.value?.includes(location.id)}
-                            onCheckedChange={(checked) => {
-                              return checked
-                                ? itemField.onChange([...itemField.value, location.id])
-                                : itemField.onChange(
-                                    itemField.value?.filter(
-                                      (value) => value !== location.id
-                                    )
-                                  );
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          {location.name}
-                        </FormLabel>
-                      </FormItem>
-                    );
-                  }}
-                />
-              ))}
-            </div> */}
               <FormControl>
-                {/* Placeholder: Replace with actual MultiSelect or Checkbox group */}
-                <div className="text-muted-foreground rounded border p-2">
-                  {t("JobListings.options.locationsPlaceholder")}
-                </div>
+                <MultiSelect
+                  options={availableLocations.map((loc) => ({
+                    id: loc.id,
+                    value: loc.id,
+                    label: loc.name,
+                  }))}
+                  onValueChange={field.onChange}
+                  value={field.value || []} // Ensure value is always an array
+                  placeholder={t("JobListings.options.locationsPlaceholder")}
+                  loading={loadingLocations}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {/* Department Selection - Placeholder using Checkboxes */}
-        {/* Replace with your MultiSelect component if available */}
         <FormField
           control={form.control}
           name="departments" // Ensure this name matches your form schema
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("JobListings.options.departmentsLabel")}</FormLabel>
-              {/* Example using Checkboxes - Adapt as needed */}
-              {/* <div className="space-y-2">
-               {availableDepartments.map((dept) => (
-                <FormField
-                  key={dept.id}
-                  control={form.control}
-                  name="departments"
-                  render={({ field: itemField }) => {
-                    return (
-                      <FormItem
-                        key={dept.id}
-                        className="flex flex-row items-start space-x-3 space-y-0"
-                      >
-                        <FormControl>
-                          <Checkbox
-                            checked={itemField.value?.includes(dept.id)}
-                            onCheckedChange={(checked) => {
-                              return checked
-                                ? itemField.onChange([...itemField.value, dept.id])
-                                : itemField.onChange(
-                                    itemField.value?.filter(
-                                      (value) => value !== dept.id
-                                    )
-                                  );
-                            }}
-                          />
-                        </FormControl>
-                        <FormLabel className="font-normal">
-                          {dept.name}
-                        </FormLabel>
-                      </FormItem>
-                    );
-                  }}
-                />
-              ))}
-            </div> */}
+
               <FormControl>
-                {/* Placeholder: Replace with actual MultiSelect or Checkbox group */}
-                <div className="text-muted-foreground rounded border p-2">
-                  {t("JobListings.options.departmentsPlaceholder")}
-                </div>
+                <MultiSelect
+                  options={availableDepartments.map((dept) => ({
+                    id: dept.id,
+                    value: dept.id,
+                    label: dept.name,
+                  }))}
+                  onValueChange={field.onChange}
+                  value={field.value || []} // Ensure value is always an array
+                  placeholder={t("JobListings.options.departmentsPlaceholder")}
+                  loading={loadingDepartments}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

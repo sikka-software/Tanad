@@ -32,14 +32,6 @@ export default function AddClientPage() {
     }
   };
 
-  const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Clients.success.create"),
-    });
-    router.push("/clients");
-    setIsLoading(false);
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Clients.add_new")} />
@@ -56,7 +48,13 @@ export default function AddClientPage() {
         }}
       />
 
-      <ClientForm formHtmlId="client-form" onSuccess={onAddSuccess} />
+      <ClientForm
+        formHtmlId="client-form"
+        onSuccess={() => {
+          router.push("/clients");
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

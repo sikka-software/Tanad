@@ -2723,6 +2723,18 @@
     "add_new_listing": "صفحة توظيف جديدة",
     "search_listings": "البحث في صفحات التوظيف...",
     "listing_details": "تفاصيل صفحة التوظيف",
+    "options": {
+      "title": "إعدادات صفحة التوظيف",
+      "currencyLabel": "العملة",
+      "currencyPlaceholder": "اختر العملة",
+      "searchFilteringLabel": "البحث والتصفية",
+      "locationsLabel": "المواقع",
+      "locationsPlaceholder": "اختر المواقع",
+      "departmentsLabel": "الأقسام",
+      "departmentsPlaceholder": "اختر الأقسام",
+      "enableSearchFilteringLabel": "البحث والتصفية",
+      "enableSearchFilteringPlaceholder": "تفعيل البحث والتصفية"
+    },
     "messages": {
       "auth_required": "يجب تسجيل الدخول لإنشاء إعلان وظيفي",
       "listing_created": "تم إنشاء إعلان الوظيفة بنجاح",

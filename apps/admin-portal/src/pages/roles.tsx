@@ -207,9 +207,6 @@ export default function RolesPage() {
               setIsFormDialogOpen(false);
               setLoadingSaveRole(false);
               setEditingRole(null);
-              toast.success(t("General.successful_operation"), {
-                description: editingRole ? t("Roles.success.update") : t("Roles.success.create"),
-              });
             }}
             editMode={!!editingRole}
             defaultValues={editingRole as any}

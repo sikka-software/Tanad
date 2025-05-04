@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import {
   createClient,
@@ -37,19 +39,23 @@ export function useClient(id: string) {
 
 export function useCreateClient() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return useMutation({
     mutationFn: (newClient: Omit<Client, "id" | "created_at">) =>
       createClient(newClient as ClientCreateData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Clients.success.create"),
+      });
     },
   });
 }
 
 export function useUpdateClient() {
   const queryClient = useQueryClient();
-
+  const t = useTranslations();
   return useMutation({
     mutationFn: ({
       id,
@@ -61,6 +67,9 @@ export function useUpdateClient() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: clientKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Clients.success.update"),
+      });
     },
   });
 }

@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormSectionHeader from "@root/src/components/forms/form-section-header";
+import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -24,8 +25,14 @@ import {
   JobListingCreateData,
 } from "@/job-listing/job-listing.type";
 
+import { useBranches } from "@/modules/branch/branch.hooks";
+import { useDepartments } from "@/modules/department/department.hooks";
+import { useOffices } from "@/modules/office/office.hooks";
+import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 
+import { JobForm } from "../job/job.form";
+import useJobStore from "../job/job.store";
 import { Job } from "../job/job.type";
 import { bulkAssociateJobsWithListing, updateListingJobAssociations } from "./job-listing.service";
 
@@ -59,12 +66,20 @@ export function JobListingForm({
   const t = useTranslations();
   const { data: jobs, isLoading: isLoadingJobs } = useJobs();
 
+  const { data: departments, isLoading: isLoadingDepartments } = useDepartments();
+  const { data: warehouses, isLoading: isLoadingWarehouses } = useWarehouses();
+  const { data: branches, isLoading: isLoadingBranches } = useBranches();
+  const { data: offices, isLoading: isLoadingOffices } = useOffices();
+
   const { mutateAsync: createJobListing, isPending: isCreating } = useCreateJobListing();
   const { mutateAsync: updateJobListing, isPending: isUpdating } = useUpdateJobListing();
 
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
   const { profile, membership } = useUserStore();
 
+  const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
+  const isJobSaving = useJobStore((state) => state.isLoading);
+  const setIsJobSaving = useJobStore((state) => state.setIsLoading);
   const isLoading = useJobListingsStore((state) => state.isLoading);
   const setIsLoading = useJobListingsStore((state) => state.setIsLoading);
 
@@ -243,116 +258,148 @@ export function JobListingForm({
     [],
   );
 
+  const isLoadingLocations = isLoadingWarehouses || isLoadingBranches || isLoadingOffices;
   const availableLocations = useMemo(() => {
-    if (!jobs) return [];
-    const uniqueLocations = new Set<string>();
-    jobs.forEach((job) => {
-      if (job.location) {
-        uniqueLocations.add(job.location);
-      }
-    });
-    return Array.from(uniqueLocations).map((loc) => ({ id: loc, name: loc })); // Assuming ID and Name are the same for now
-  }, [jobs]);
+    const allLocations: { id: string; name: string }[] = [];
+
+    if (warehouses) {
+      allLocations.push(
+        ...warehouses.map((w) => ({ id: `warehouse:${w.id}`, name: `${w.name} (Warehouse)` })),
+      );
+    }
+    if (branches) {
+      allLocations.push(
+        ...branches.map((b) => ({ id: `branch:${b.id}`, name: `${b.name} (Branch)` })),
+      );
+    }
+    if (offices) {
+      allLocations.push(
+        ...offices.map((o) => ({ id: `office:${o.id}`, name: `${o.name} (Office)` })),
+      );
+    }
+
+    // Sort alphabetically by name for better UX
+    return allLocations.sort((a, b) => a.name.localeCompare(b.name));
+  }, [warehouses, branches, offices]);
 
   const availableDepartments = useMemo(() => {
-    if (!jobs) return [];
-    const uniqueDepartments = new Set<string>();
-    jobs.forEach((job) => {
-      if (job.department) {
-        uniqueDepartments.add(job.department);
-      }
-    });
-    return Array.from(uniqueDepartments).map((dept) => ({ id: dept, name: dept })); // Assuming ID and Name are the same for now
-  }, [jobs]);
+    if (!departments) return [];
+    return departments
+      .map((dept) => ({ id: dept.id, name: dept.name }))
+      .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+  }, [departments]);
   // --- End Options Data ---
 
   return (
-    <Form {...form}>
-      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="form-container">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Jobs.form.title.label")} *</FormLabel>
-                <FormControl>
-                  <Input placeholder={t("Jobs.form.title.placeholder")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+    <>
+      <Form {...form}>
+        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="form-container">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.title.label")} *</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t("Jobs.form.title.placeholder")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.form.description.label")}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={t("Jobs.form.description.placeholder")}
+                      className="min-h-[100px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <JobListingOptionsSection
+            form={form}
+            availableCurrencies={availableCurrencies}
+            availableLocations={availableLocations}
+            availableDepartments={availableDepartments}
+            loadingLocations={isLoadingLocations}
+            loadingDepartments={isLoadingDepartments}
           />
 
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Jobs.form.description.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Jobs.form.description.placeholder")}
-                    className="min-h-[100px]"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+          <FormSectionHeader
+            title={t("Jobs.title")}
+            onCreateText={t("Jobs.add_new")}
+            onCreate={() => setIsJobDialogOpen(true)}
           />
-        </div>
-        <JobListingOptionsSection
-          form={form}
-          availableCurrencies={availableCurrencies}
-          availableLocations={availableLocations}
-          availableDepartments={availableDepartments}
-        />
-
-        <FormSectionHeader title={t("Jobs.title")} />
-        <div className="form-container">
-          <FormField
-            control={form.control}
-            name="jobs"
-            render={() => (
-              <FormItem>
-                <FormLabel>{t("Jobs.title")} *</FormLabel>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {jobs?.map((job: Job) => (
-                    <div
-                      key={job.id}
-                      className={`cursor-pointer rounded-lg border p-4 transition-all ${
-                        selectedJobs.includes(job.id)
-                          ? "border-primary bg-primary/5"
-                          : "hover:shadow-md"
-                      }`}
-                      onClick={() => handleJobSelect(job.id)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h4 className="font-semibold">{job.title}</h4>
-                          <p className="text-sm text-gray-500">{job.type}</p>
+          <div className="form-container">
+            <FormField
+              control={form.control}
+              name="jobs"
+              render={() => (
+                <FormItem>
+                  <FormLabel>{t("Jobs.title")} *</FormLabel>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {jobs?.map((job: Job) => (
+                      <div
+                        key={job.id}
+                        className={`cursor-pointer rounded-lg border p-4 transition-all ${
+                          selectedJobs.includes(job.id)
+                            ? "border-primary bg-primary/5"
+                            : "hover:shadow-md"
+                        }`}
+                        onClick={() => handleJobSelect(job.id)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h4 className="font-semibold">{job.title}</h4>
+                            <p className="text-sm text-gray-500">{job.type}</p>
+                          </div>
+                          {selectedJobs.includes(job.id) && (
+                            <div className="bg-primary h-4 w-4 rounded-full" />
+                          )}
                         </div>
-                        {selectedJobs.includes(job.id) && (
-                          <div className="bg-primary h-4 w-4 rounded-full" />
-                        )}
+                        <div className="mt-2 space-y-1">
+                          {job.department && (
+                            <p className="text-sm text-gray-600">{job.department}</p>
+                          )}
+                          {job.location && <p className="text-sm text-gray-600">{job.location}</p>}
+                          {job.salary && <p className="text-sm text-gray-600">{job.salary}</p>}
+                        </div>
                       </div>
-                      <div className="mt-2 space-y-1">
-                        {job.department && (
-                          <p className="text-sm text-gray-600">{job.department}</p>
-                        )}
-                        {job.location && <p className="text-sm text-gray-600">{job.location}</p>}
-                        {job.salary && <p className="text-sm text-gray-600">{job.salary}</p>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </form>
-    </Form>
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </form>
+      </Form>
+      <FormDialog
+        open={isJobDialogOpen}
+        onOpenChange={setIsJobDialogOpen}
+        title={t("Jobs.add_new")}
+        formId="job-form"
+        loadingSave={isJobSaving}
+      >
+        <JobForm
+          formHtmlId="job-form"
+          onSuccess={() => {
+            setIsJobDialogOpen(false);
+            setIsJobSaving(false);
+          }}
+        />
+      </FormDialog>
+    </>
   );
 }

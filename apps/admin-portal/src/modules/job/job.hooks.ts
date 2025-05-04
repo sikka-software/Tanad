@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import {
   fetchJobs,
@@ -35,22 +37,30 @@ export function useJob(id: string) {
 }
 
 export function useCreateJob() {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (job: JobCreateData) => createJob(job),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Jobs.success.create"),
+      });
     },
   });
 }
 
 export function useUpdateJob() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Job> }) => updateJob(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: jobKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Jobs.success.update"),
+      });
     },
   });
 }
