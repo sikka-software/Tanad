@@ -7,6 +7,17 @@ import { TANAD_PRODUCT_ID } from "@/lib/constants";
 
 import useUserStore from "@/stores/use-user-store";
 
+// Global variable to track if subscription has been loaded already
+declare global {
+  interface Window {
+    lastSubscriptionRefresh?: number;
+    lastSubscriptionFetchTime?: number;
+    subscriptionInitialized?: boolean;
+    subscriptionFetchAttempts?: number;
+    tanadSubscriptionDataCached?: boolean;
+  }
+}
+
 // Cache for subscription requests to prevent duplicate API calls
 let lastRequestTime = 0;
 let requestPromise: Promise<any> | null = null;
@@ -74,9 +85,76 @@ export function useSubscription() {
   const { user, profile, loading: userLoading, fetchUserAndProfile } = useUserStore();
   const lastRefetchRef = useRef<number | null>(null);
 
+  // Add visibility change listener to prevent refreshes when tab regains focus
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // Page has become visible again after tab switch
+        console.log("Page visibility changed to visible - preventing subscription refresh");
+        // Set a flag to prevent refreshes for a short time
+        window.tanadSubscriptionDataCached = true;
+
+        // Clear the flag after a short delay
+        setTimeout(() => {
+          window.tanadSubscriptionDataCached = false;
+        }, 5000);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Also handle window focus events for Alt+Tab between applications
+    const handleWindowFocus = () => {
+      console.log("Window regained focus - preventing subscription refresh");
+      window.tanadSubscriptionDataCached = true;
+
+      setTimeout(() => {
+        window.tanadSubscriptionDataCached = false;
+      }, 5000);
+    };
+
+    window.addEventListener("focus", handleWindowFocus);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleWindowFocus);
+    };
+  }, []);
+
   const fetchSubscription = async () => {
+    // If we've just switched back to the tab/window, skip fetching
+    if (window.tanadSubscriptionDataCached) {
+      console.log("Skipping subscription fetch - page just regained focus");
+      return;
+    }
+
     setLoading(true);
     setError(null);
+
+    // Increment fetch attempt counter
+    window.subscriptionFetchAttempts = (window.subscriptionFetchAttempts || 0) + 1;
+
+    // If we've tried too many times, just set free plan and stop
+    if (window.subscriptionFetchAttempts > 2) {
+      console.log("Too many subscription fetch attempts, defaulting to free plan");
+      const freePlan = getPlans().find(
+        (plan) => plan.lookup_key === "tanad_free" || plan.lookup_key?.includes("free"),
+      );
+      setSubscriptionData({
+        id: null,
+        name: freePlan?.name || t("Billing.free_plan", { fallback: "Free Plan" }),
+        price: "0 SAR",
+        billingCycle: "-",
+        nextBillingDate: "-",
+        planLookupKey: freePlan?.lookup_key || "tanad_free",
+        status: null,
+        isExpired: false,
+        cancelAt: null,
+      });
+      setLoading(false);
+      window.subscriptionInitialized = true;
+      return;
+    }
 
     try {
       const plans = getPlans();
@@ -442,52 +520,55 @@ export function useSubscription() {
 
   // Fix the useEffect to prevent infinite loops
   useEffect(() => {
-    // Add a check to prevent excessive fetching
-    const fetchId = Math.random().toString(36).slice(2, 9);
-    console.log(`[${fetchId}] Subscription hook effect checking dependencies`);
-
-    const plans = getPlans();
-    // Only fetch when all dependencies are loaded and stable
-    if (!userLoading && user && !plansLoading && plans.length > 0 && profile?.stripe_customer_id) {
-      console.log(`[${fetchId}] Fetching subscription with stable dependencies`);
-
-      // Using cached version to avoid dependency cycle
-      let isMounted = true;
-
-      // Use debouncing to prevent multiple fetches
-      const now = Date.now();
-      const lastFetch = window.lastSubscriptionFetchTime || 0;
-
-      if (now - lastFetch < 3000) {
-        console.log(
-          `[${fetchId}] Skipping fetch - too soon since last fetch (${now - lastFetch}ms)`,
-        );
-        return;
-      }
-
-      window.lastSubscriptionFetchTime = now;
-
-      const doFetch = async () => {
-        try {
-          console.log(`[${fetchId}] Starting subscription fetch`);
-          await fetchSubscription();
-          console.log(`[${fetchId}] Subscription fetch completed`);
-        } catch (error) {
-          console.error(`[${fetchId}] Error in subscription fetch effect:`, error);
-        }
-      };
-
-      if (isMounted) {
-        doFetch();
-      }
-
-      return () => {
-        console.log(`[${fetchId}] Cleaning up subscription fetch effect`);
-        isMounted = false;
-      };
+    // Skip if the page just regained focus after tab switch or Alt+Tab
+    if (window.tanadSubscriptionDataCached) {
+      console.log("Skipping subscription initialization - page just regained focus");
+      return;
     }
+
+    // Skip completely if we've already initialized the subscription
+    if (window.subscriptionInitialized) {
+      return;
+    }
+
+    // Generate a unique ID for this effect execution for logging
+    const fetchId = Math.random().toString(36).slice(2, 9);
+    console.log(`[${fetchId}] Subscription hook effect running - first load check`);
+
+    // Skip if we don't have the prerequisites
+    if (userLoading || !user || plansLoading) {
+      return;
+    }
+
+    // If we have a valid subscription already, mark as initialized and skip
+    if (subscriptionData.id && subscriptionData.id !== "profile-based") {
+      console.log(`[${fetchId}] Subscription data already exists, marking as initialized`);
+      window.subscriptionInitialized = true;
+      return;
+    }
+
+    // At this point, we're ready to fetch and haven't done so yet
+    console.log(`[${fetchId}] Initial subscription fetch starting`);
+
+    // Mark as initialized immediately to prevent duplicate executions
+    window.subscriptionInitialized = true;
+
+    // Execute the fetch once
+    const doFetch = async () => {
+      try {
+        await fetchSubscription();
+        console.log(`[${fetchId}] Initial subscription fetch completed`);
+      } catch (error) {
+        console.error(`[${fetchId}] Error in initial subscription fetch:`, error);
+        // Reset the flag in case of error
+        window.subscriptionInitialized = false;
+      }
+    };
+
+    doFetch();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLoading, user, plansLoading, profile?.stripe_customer_id]);
+  }, [userLoading, user, plansLoading]);
 
   /**
    * Refetch the subscription data
@@ -519,6 +600,35 @@ export function useSubscription() {
     // Update state to indicate data was refreshed
     return true;
   };
+
+  // Ensure we have at least the free plan when no subscription data is loaded
+  useEffect(() => {
+    // If we've been in loading state for too long (5 seconds), just show free plan
+    if (loading) {
+      const timeoutId = setTimeout(() => {
+        if (loading && !subscriptionData.id) {
+          console.log("Subscription loading timed out, defaulting to free plan");
+          const freePlan = getPlans().find(
+            (plan) => plan.lookup_key === "tanad_free" || plan.lookup_key?.includes("free"),
+          );
+          setSubscriptionData({
+            id: null,
+            name: freePlan?.name || t("Billing.free_plan", { fallback: "Free Plan" }),
+            price: "0 SAR",
+            billingCycle: "-",
+            nextBillingDate: "-",
+            planLookupKey: freePlan?.lookup_key || "tanad_free",
+            status: null,
+            isExpired: false,
+            cancelAt: null,
+          });
+          setLoading(false);
+        }
+      }, 5000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [loading]);
 
   // The subscription data and utility functions to expose
   return {

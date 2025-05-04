@@ -75,42 +75,9 @@ export default function CurrentPlan() {
     };
   }, [refreshData]);
 
-  // Refresh data on mount and when profile changes
-  useEffect(() => {
-    // Refresh on initial load - but only once
-    if (!subscription.loading && user && !refreshedInitially.current) {
-      console.log("CurrentPlan: Initial data refresh");
-      refreshedInitially.current = true;
-      refreshData();
-    }
-  }, [user, refreshData, subscription.loading]);
-
+  // Remove the initial refresh effect entirely
   // Use a ref to track initial refresh
   const refreshedInitially = React.useRef(false);
-
-  // Additional refresh when profile's subscribed_to changes - modified to prevent infinite loop
-  useEffect(() => {
-    if (
-      profile &&
-      profile.subscribed_to &&
-      subscription.planLookupKey !== profile.subscribed_to &&
-      !subscription.loading
-    ) {
-      console.log(
-        "Detected mismatch between profile.subscribed_to and subscription.planLookupKey, refreshing",
-        {
-          profile_subscribed_to: profile.subscribed_to,
-          subscription_plan: subscription.planLookupKey,
-        },
-      );
-      // Only refresh if it hasn't happened in the last 2 seconds
-      const now = Date.now();
-      if (now - lastRefreshTime > 2000) {
-        subscription.refetch();
-        setLastRefreshTime(now);
-      }
-    }
-  }, [profile, subscription]);
 
   if (subscription.loading || !user) {
     return <Skeleton className="h-24 w-full rounded-lg" />;
