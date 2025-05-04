@@ -48,13 +48,6 @@ export type Database = {
             foreignKeyName: "activity_logs_enterprise_id_enterprises_id_fk"
             columns: ["enterprise_id"]
             isOneToOne: false
-            referencedRelation: "enterprise_dashboard_stats"
-            referencedColumns: ["enterprise_id"]
-          },
-          {
-            foreignKeyName: "activity_logs_enterprise_id_enterprises_id_fk"
-            columns: ["enterprise_id"]
-            isOneToOne: false
             referencedRelation: "enterprises"
             referencedColumns: ["id"]
           },
@@ -373,6 +366,56 @@ export type Database = {
         }
         Relationships: []
       }
+      domains: {
+        Row: {
+          annual_cost: number | null
+          created_at: string
+          domain_name: string
+          enterprise_id: string
+          id: string
+          monthly_cost: number | null
+          notes: string | null
+          payment_cycle: Database["public"]["Enums"]["payment_cycle"] | null
+          registrar: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          annual_cost?: number | null
+          created_at?: string
+          domain_name: string
+          enterprise_id: string
+          id?: string
+          monthly_cost?: number | null
+          notes?: string | null
+          payment_cycle?: Database["public"]["Enums"]["payment_cycle"] | null
+          registrar?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          annual_cost?: number | null
+          created_at?: string
+          domain_name?: string
+          enterprise_id?: string
+          id?: string
+          monthly_cost?: number | null
+          notes?: string | null
+          payment_cycle?: Database["public"]["Enums"]["payment_cycle"] | null
+          registrar?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "domains_enterprise_id_enterprises_id_fk"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "enterprises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_requests: {
         Row: {
           amount: number | null
@@ -622,13 +665,6 @@ export type Database = {
             foreignKeyName: "expenses_enterprise_id_fkey"
             columns: ["enterprise_id"]
             isOneToOne: false
-            referencedRelation: "enterprise_dashboard_stats"
-            referencedColumns: ["enterprise_id"]
-          },
-          {
-            foreignKeyName: "expenses_enterprise_id_fkey"
-            columns: ["enterprise_id"]
-            isOneToOne: false
             referencedRelation: "enterprises"
             referencedColumns: ["id"]
           },
@@ -753,13 +789,6 @@ export type Database = {
             foreignKeyName: "invoices_enterprise_id_fkey"
             columns: ["enterprise_id"]
             isOneToOne: false
-            referencedRelation: "enterprise_dashboard_stats"
-            referencedColumns: ["enterprise_id"]
-          },
-          {
-            foreignKeyName: "invoices_enterprise_id_fkey"
-            columns: ["enterprise_id"]
-            isOneToOne: false
             referencedRelation: "enterprises"
             referencedColumns: ["id"]
           },
@@ -810,11 +839,15 @@ export type Database = {
       job_listings: {
         Row: {
           created_at: string
+          currency: string | null
+          departments: Json | null
           description: string | null
+          enable_search_filtering: boolean | null
           enterprise_id: string
           id: string
           is_active: boolean
           is_public: boolean
+          locations: Json | null
           slug: string
           title: string
           updated_at: string
@@ -822,11 +855,15 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          currency?: string | null
+          departments?: Json | null
           description?: string | null
+          enable_search_filtering?: boolean | null
           enterprise_id: string
           id?: string
           is_active?: boolean
           is_public?: boolean
+          locations?: Json | null
           slug: string
           title: string
           updated_at?: string
@@ -834,11 +871,15 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          currency?: string | null
+          departments?: Json | null
           description?: string | null
+          enable_search_filtering?: boolean | null
           enterprise_id?: string
           id?: string
           is_active?: boolean
           is_public?: boolean
+          locations?: Json | null
           slug?: string
           title?: string
           updated_at?: string
@@ -848,6 +889,7 @@ export type Database = {
       }
       jobs: {
         Row: {
+          benefits: string | null
           created_at: string
           department: string | null
           description: string | null
@@ -857,6 +899,7 @@ export type Database = {
           is_active: boolean
           location: string | null
           requirements: string | null
+          responsibilities: string | null
           salary: number | null
           start_date: string | null
           title: string
@@ -865,6 +908,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          benefits?: string | null
           created_at?: string
           department?: string | null
           description?: string | null
@@ -874,6 +918,7 @@ export type Database = {
           is_active?: boolean
           location?: string | null
           requirements?: string | null
+          responsibilities?: string | null
           salary?: number | null
           start_date?: string | null
           title: string
@@ -882,6 +927,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          benefits?: string | null
           created_at?: string
           department?: string | null
           description?: string | null
@@ -891,6 +937,7 @@ export type Database = {
           is_active?: boolean
           location?: string | null
           requirements?: string | null
+          responsibilities?: string | null
           salary?: number | null
           start_date?: string | null
           title?: string
@@ -923,13 +970,6 @@ export type Database = {
           role_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "memberships_enterprise_id_fkey"
-            columns: ["enterprise_id"]
-            isOneToOne: false
-            referencedRelation: "enterprise_dashboard_stats"
-            referencedColumns: ["enterprise_id"]
-          },
           {
             foreignKeyName: "memberships_enterprise_id_fkey"
             columns: ["enterprise_id"]
@@ -1064,6 +1104,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          notes: string | null
           price: number
           sku: string | null
           stock_quantity: number
@@ -1078,6 +1119,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          notes?: string | null
           price: number
           sku?: string | null
           stock_quantity?: number
@@ -1092,6 +1134,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          notes?: string | null
           price?: number
           sku?: string | null
           stock_quantity?: number
@@ -1107,7 +1150,11 @@ export type Database = {
           enterprise_id: string | null
           full_name: string | null
           id: string
+          price_id: string | null
           role: string
+          stripe_customer_id: string | null
+          subscribed_to: string | null
+          updated_at: string | null
           user_settings: Json | null
           username: string | null
         }
@@ -1117,7 +1164,11 @@ export type Database = {
           enterprise_id?: string | null
           full_name?: string | null
           id: string
+          price_id?: string | null
           role?: string
+          stripe_customer_id?: string | null
+          subscribed_to?: string | null
+          updated_at?: string | null
           user_settings?: Json | null
           username?: string | null
         }
@@ -1127,7 +1178,11 @@ export type Database = {
           enterprise_id?: string | null
           full_name?: string | null
           id?: string
+          price_id?: string | null
           role?: string
+          stripe_customer_id?: string | null
+          subscribed_to?: string | null
+          updated_at?: string | null
           user_settings?: Json | null
           username?: string | null
         }
@@ -1269,13 +1324,6 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "roles_enterprise_id_fkey"
-            columns: ["enterprise_id"]
-            isOneToOne: false
-            referencedRelation: "enterprise_dashboard_stats"
-            referencedColumns: ["enterprise_id"]
-          },
           {
             foreignKeyName: "roles_enterprise_id_fkey"
             columns: ["enterprise_id"]
@@ -1493,6 +1541,7 @@ export type Database = {
           is_active: boolean
           name: string
           notes: string | null
+          phone: string | null
           region: string | null
           short_address: string | null
           street_name: string | null
@@ -1512,6 +1561,7 @@ export type Database = {
           is_active?: boolean
           name: string
           notes?: string | null
+          phone?: string | null
           region?: string | null
           short_address?: string | null
           street_name?: string | null
@@ -1531,6 +1581,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           notes?: string | null
+          phone?: string | null
           region?: string | null
           short_address?: string | null
           street_name?: string | null
@@ -1541,25 +1592,6 @@ export type Database = {
       }
     }
     Views: {
-      enterprise_dashboard_stats: {
-        Row: {
-          enterprise_id: string | null
-          pending_invoices: number | null
-          total_branches: number | null
-          total_clients: number | null
-          total_companies: number | null
-          total_departments: number | null
-          total_employees: number | null
-          total_invoices: number | null
-          total_jobs: number | null
-          total_offices: number | null
-          total_products: number | null
-          total_revenue: number | null
-          total_vendors: number | null
-          total_warehouses: number | null
-        }
-        Relationships: []
-      }
       user_enterprises: {
         Row: {
           enterprise_id: string | null
@@ -1578,13 +1610,6 @@ export type Database = {
           user_id: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "memberships_enterprise_id_fkey"
-            columns: ["enterprise_id"]
-            isOneToOne: false
-            referencedRelation: "enterprise_dashboard_stats"
-            referencedColumns: ["enterprise_id"]
-          },
           {
             foreignKeyName: "memberships_enterprise_id_fkey"
             columns: ["enterprise_id"]
@@ -1643,6 +1668,18 @@ export type Database = {
           details: Json
           created_at: string
           user_email: string
+          user_full_name: string
+        }[]
+      }
+      get_daily_activity_counts: {
+        Args: {
+          p_enterprise_id: string
+          p_start_date: string
+          p_end_date: string
+        }
+        Returns: {
+          activity_date: string
+          activity_count: number
         }[]
       }
       get_or_create_role: {
@@ -1661,6 +1698,10 @@ export type Database = {
           permission: string
         }[]
       }
+      is_member_of_enterprise: {
+        Args: { p_enterprise_id: string }
+        Returns: boolean
+      }
       postgres_fdw_disconnect: {
         Args: { "": string }
         Returns: boolean
@@ -1677,6 +1718,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: unknown
       }
+      update_profile_subscription: {
+        Args: {
+          user_id_param: string
+          subscription_param: string
+          price_id_param: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       activity_log_action_type:
@@ -1685,6 +1734,7 @@ export type Database = {
         | "DELETE"
         | "CREATED"
         | "UPDATED"
+        | "DELETED"
       activity_log_target_type:
         | "ENTERPRISE"
         | "USER"
@@ -1719,6 +1769,8 @@ export type Database = {
         | "TEMPLATE"
         | "DOCUMENT"
         | "ENTERPRISE_SETTINGS"
+        | "EMPLOYEE_REQUEST"
+        | "DOMAIN"
       app_permission:
         | "users.create"
         | "users.read"
@@ -1836,6 +1888,7 @@ export type Database = {
         | "activity_logs.delete"
         | "activity_logs.export"
       app_role: "superadmin" | "admin" | "accounting" | "hr"
+      payment_cycle: "monthly" | "annual"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1957,6 +2010,7 @@ export const Constants = {
         "DELETE",
         "CREATED",
         "UPDATED",
+        "DELETED",
       ],
       activity_log_target_type: [
         "ENTERPRISE",
@@ -1993,6 +2047,8 @@ export const Constants = {
         "TEMPLATE",
         "DOCUMENT",
         "ENTERPRISE_SETTINGS",
+        "EMPLOYEE_REQUEST",
+        "DOMAIN",
       ],
       app_permission: [
         "users.create",
@@ -2112,6 +2168,7 @@ export const Constants = {
         "activity_logs.export",
       ],
       app_role: ["superadmin", "admin", "accounting", "hr"],
+      payment_cycle: ["monthly", "annual"],
     },
   },
 } as const

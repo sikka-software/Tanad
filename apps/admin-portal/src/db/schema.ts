@@ -1641,7 +1641,46 @@ export const activityTargetType = pgEnum("activity_target_type", [
   "DOCUMENT",
   "ENTERPRISE_SETTINGS",
   "EMPLOYEE_REQUEST",
+  "DOMAIN",
 ]);
+
+// Define the payment cycle enum
+export const paymentCycleEnum = pgEnum("payment_cycle", ["monthly", "annual"]);
+
+// Define the domains table
+export const domains = pgTable(
+  "domains",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    domain_name: text("domain_name").notNull(),
+    registrar: text("registrar"),
+    monthly_cost: numeric("monthly_cost", { precision: 10, scale: 2 }),
+    annual_cost: numeric("annual_cost", { precision: 10, scale: 2 }),
+    payment_cycle: paymentCycleEnum("payment_cycle"),
+    notes: text("notes"),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    user_id: uuid("user_id")
+      .notNull()
+      .references(() => usersInAuth.id),
+    enterprise_id: uuid("enterprise_id")
+      .notNull()
+      .references(() => enterprises.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    index("domains_enterprise_id_idx").on(table.enterprise_id),
+    index("domains_user_id_idx").on(table.user_id),
+    index("domains_domain_name_idx").on(table.domain_name),
+    unique("domains_enterprise_id_domain_name_unique").on(table.enterprise_id, table.domain_name), // Ensure unique domain per enterprise
+  ],
+);
 
 // Define the activity_logs table
 export const activityLogs = pgTable(

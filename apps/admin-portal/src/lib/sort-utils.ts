@@ -19,6 +19,7 @@ const models = [
   "quotes",
   "roles",
   "users",
+  "domains",
 ];
 
 interface SortOptions {

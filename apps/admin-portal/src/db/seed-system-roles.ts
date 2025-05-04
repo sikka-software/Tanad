@@ -171,6 +171,12 @@ const systemRolePermissions: Record<string, string[]> = {
     "vendors.duplicate",
     "vendors.export",
 
+    "domains.read",
+    "domains.create",
+    "domains.delete",
+    "domains.update",
+    "domains.export",
+
     // Add any other superadmin permissions here
   ],
   human_resources: [
