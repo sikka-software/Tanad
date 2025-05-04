@@ -169,6 +169,13 @@
       "when": 1746318966446,
       "tag": "0023_loving_retro_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1746320220488,
+      "tag": "0024_yellow_the_anarchist",
+      "breakpoints": true
     }
   ]
 }

@@ -201,6 +201,7 @@ export const products = pgTable(
     stock_quantity: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
     unit: text(),
     is_active: boolean().default(true).notNull(),
+    notes: text(),
   },
   (table) => [
     index("products_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),

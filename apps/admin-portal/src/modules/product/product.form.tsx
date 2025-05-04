@@ -29,6 +29,7 @@ export const createProductSchema = (t: (key: string) => string) =>
         t("Products.form.price.invalid"),
       ),
     sku: z.string().optional(),
+    notes: z.string().optional(),
     stock_quantity: z
       .string()
       .min(1, t("Products.form.stock_quantity.required"))
@@ -63,6 +64,7 @@ export function ProductForm({
       price: "",
       sku: "",
       stock_quantity: "",
+      notes: "",
     },
   });
 
@@ -143,24 +145,44 @@ export function ProductForm({
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="form-container">
           <input type="submit" hidden />
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Products.form.name.label")} *</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t("Products.form.name.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Products.form.name.label")} *</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Products.form.name.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="sku"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Products.form.sku.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Products.form.sku.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="description"
@@ -215,18 +237,17 @@ export function ProductForm({
               )}
             />
           </div>
-
           <FormField
             control={form.control}
-            name="sku"
+            name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Products.form.sku.label")}</FormLabel>
+                <FormLabel>{t("Companies.form.notes.label")}</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t("Products.form.sku.placeholder")}
-                    {...field}
+                  <Textarea
                     disabled={isLoading}
+                    placeholder={t("Companies.form.notes.placeholder")}
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
