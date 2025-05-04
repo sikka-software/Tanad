@@ -1,3 +1,4 @@
+import { ModulesOptions } from "@root/tanad.config";
 import {
   Users,
   Settings,
@@ -13,8 +14,6 @@ import {
   FileUser,
   TableOfContents,
 } from "lucide-react";
-
-import { ModulesOptions } from "../../tanad.config";
 
 export type SidebarMenuGroupProps = {
   title: string;

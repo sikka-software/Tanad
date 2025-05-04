@@ -15,7 +15,10 @@ import { FormField, FormItem, FormControl, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
+import { getCurrencySymbol } from "@/lib/currency-utils";
+
 import { useProducts } from "@/modules/product/product.hooks";
+import useUserStore from "@/stores/use-user-store";
 
 import { CurrencyInput, MoneyFormatter } from "../ui/currency-input";
 import { SARSymbol } from "../ui/sar-symbol";
@@ -78,6 +81,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
     t,
     canDelete,
   }) => {
+    const currency = useUserStore((state) => state.profile?.user_settings.currency);
     // Call hooks consistently within the Row component instance
     const quantity = useWatch({ control, name: `items.${index}.quantity` });
     const unitPrice = useWatch({ control, name: `items.${index}.unit_price` });
@@ -122,7 +126,11 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                         <span>{option.label}</span>
                         <div className="flex flex-row items-center gap-1 text-sm text-gray-500">
                           <span>{MoneyFormatter(option.price)}</span>
-                          <SARSymbol className="!size-2.5 opacity-100" />
+                          {
+                            getCurrencySymbol(currency || "sar", {
+                              sarClassName: "!size-2.5",
+                            }).symbol
+                          }
                         </div>
                       </div>
                     )}
@@ -210,7 +218,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
         <TableCell>
           <div className="flex flex-row items-center gap-1 text-right">
             {MoneyFormatter(parseFloat(subtotal))}
-            <SARSymbol className="size-3" />
+            {getCurrencySymbol(currency || "sar").symbol}
           </div>
         </TableCell>
 
@@ -281,7 +289,7 @@ export function ProductsFormSection({
       </div>
       {/* Table Section */}
       <div className="p-4">
-        <div className="rounded-md border  overflow-y-auto">
+        <div className="overflow-y-auto rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>

@@ -10,7 +10,8 @@ import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { MoneyFormatter } from "@/components/ui/currency-input";
-import { SARSymbol } from "@/components/ui/sar-symbol";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import { ModuleTableProps } from "@/types/common.type";
 
@@ -33,6 +34,7 @@ const formatDate = (dateStr: string) => {
 
 const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Invoice>) => {
   const t = useTranslations();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
   const selectedRows = useInvoiceStore((state) => state.selectedRows);
   const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
@@ -91,7 +93,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         return (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(row.getValue("total"))}
-            <SARSymbol className="size-3" />
+            {getCurrencySymbol(currency || "sar").symbol}
           </span>
         );
       },

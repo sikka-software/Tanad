@@ -158,4 +158,19 @@ const ModulesOptions = {
   },
 };
 
-export { ModulesOptions };
+const currencies = [
+  "sar",
+  "usd",
+  "bhd",
+  "kwd",
+  "qar",
+  "aed",
+  "omr",
+  "try",
+  "iqd",
+  "eur",
+  "gbp",
+  "jpy",
+] as const;
+
+export { ModulesOptions, currencies };

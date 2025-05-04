@@ -1,3 +1,4 @@
+import { currencies } from "@root/tanad.config";
 import { Session, User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
@@ -14,8 +15,8 @@ export interface ProfileType {
   subscribed_to?: string;
   username: string | null;
   user_settings: {
-    currency: string;
-    calendar_type: string;
+    currency: (typeof currencies)[number];
+    calendar_type: "gregorian" | "hijri";
     timezone: string;
     notifications?: {
       email_updates: boolean;

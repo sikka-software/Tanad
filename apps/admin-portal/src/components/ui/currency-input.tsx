@@ -1,8 +1,12 @@
+import { DollarSign, Euro, PoundSterling, JapaneseYen } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
 import { Input } from "@/ui/input";
 
+import { currencyInputClassName, getCurrencySymbol } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
+
+import useUserStore from "@/stores/use-user-store";
 
 import { SARSymbol } from "./sar-symbol";
 
@@ -45,6 +49,9 @@ export function CurrencyInput({
 }: CurrencyInputProps) {
   const [inputText, setInputText] = useState(value?.toFixed(2) || "");
   const isUserInput = useRef(false);
+  const profile = useUserStore((state) => state.profile);
+  const currency = profile?.user_settings?.currency || "sar";
+  const [currencySymbol, setCurrencySymbol] = useState(getCurrencySymbol(currency));
 
   // Update input text when value prop changes, but only if it's not from user input
   useEffect(() => {
@@ -123,21 +130,31 @@ export function CurrencyInput({
     }
   };
 
+  useEffect(() => {
+    setCurrencySymbol(getCurrencySymbol(currency));
+  }, [profile]);
+
+  // let currencySymbol = getCurrencySymbol(currency);
+
   return (
     <div className={cn("relative", props.containerClassName)}>
       <Input
         type="text"
         inputMode="decimal"
         placeholder="0.00"
-        className="currency-input ltr:ps-6 rtl:pe-6 rtl:text-end"
+        className={cn("currency-input rtl:text-end", currencyInputClassName(currency))}
         value={inputText}
         onChange={handleChange}
         onBlur={handleBlur}
         {...props}
       />
       {showCurrencySymbol && (
-        <span className="text-muted-foreground absolute top-3 ltr:start-2 rtl:left-2">
-          <SARSymbol className="size-3" />
+        <span
+          className={
+            "text-muted-foreground absolute top-1/2 -translate-y-1/2 ltr:start-2 rtl:left-2"
+          }
+        >
+          {currencySymbol.symbol}
         </span>
       )}
     </div>

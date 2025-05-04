@@ -10,6 +10,8 @@ import TableSkeleton from "@/ui/table-skeleton";
 import { MoneyFormatter } from "@/components/ui/currency-input";
 import { SARSymbol } from "@/components/ui/sar-symbol";
 
+import { getCurrencySymbol } from "@/lib/currency-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateProduct } from "@/product/product.hooks";
@@ -24,6 +26,7 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const setSelectedRows = useProductStore((state) => state.setSelectedRows);
   const { mutateAsync: updateProduct } = useUpdateProduct();
 
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
   const canEditProduct = useUserStore((state) => state.hasPermission("products.update"));
   const canDuplicateProduct = useUserStore((state) => state.hasPermission("products.duplicate"));
   const canViewProduct = useUserStore((state) => state.hasPermission("products.view"));
@@ -50,7 +53,7 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       cell: (props: CellContext<Product, unknown>) => (
         <span className="flex flex-row items-center gap-1 text-sm font-medium">
           {MoneyFormatter(props.row.original.price)}
-          <SARSymbol className="size-3" />
+          {getCurrencySymbol(currency || "sar").symbol}
         </span>
       ),
     },

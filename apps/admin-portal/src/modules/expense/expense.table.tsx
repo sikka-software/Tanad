@@ -7,7 +7,8 @@ import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { MoneyFormatter } from "@/components/ui/currency-input";
-import { SARSymbol } from "@/components/ui/sar-symbol";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import { ModuleTableProps } from "@/types/common.type";
 
@@ -19,6 +20,7 @@ import useUserStore from "@/stores/use-user-store";
 
 const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Expense>) => {
   const t = useTranslations();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
   const { mutate: updateExpense } = useUpdateExpense();
   const selectedRows = useExpenseStore((state) => state.selectedRows);
   const setSelectedRows = useExpenseStore((state) => state.setSelectedRows);
@@ -62,7 +64,7 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         return (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(row.getValue("amount"))}
-            <SARSymbol className="size-3" />
+            {getCurrencySymbol(currency || "sar").symbol}
           </span>
         );
       },

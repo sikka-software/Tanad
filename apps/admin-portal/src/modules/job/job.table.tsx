@@ -8,7 +8,8 @@ import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { MoneyFormatter } from "@/components/ui/currency-input";
-import { SARSymbol } from "@/components/ui/sar-symbol";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import { ModuleTableProps } from "@/types/common.type";
 
@@ -20,6 +21,7 @@ import useUserStore from "@/stores/use-user-store";
 
 const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Job>) => {
   const t = useTranslations();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
   const { mutateAsync: updateJob } = useUpdateJob();
   const setSelectedRows = useJobsStore((state) => state.setSelectedRows);
   const selectedRows = useJobsStore((state) => state.selectedRows);
@@ -61,7 +63,11 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
         props.row.original.salary ? (
           <span className="flex flex-row items-center gap-1 text-sm font-medium">
             {MoneyFormatter(props.row.original.salary)}
-            <SARSymbol className="size-3" />
+            {
+              getCurrencySymbol(currency || "sar", {
+                usdClassName: "-ms-1",
+              }).symbol
+            }
           </span>
         ) : (
           "N/A"
