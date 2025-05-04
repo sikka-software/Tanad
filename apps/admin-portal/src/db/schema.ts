@@ -1111,6 +1111,8 @@ export const jobs = pgTable(
     title: varchar({ length: 255 }).notNull(),
     description: text(),
     requirements: text(),
+    responsibilities: text(),
+    benefits: text(),
     location: varchar({ length: 255 }),
     department: varchar({ length: 255 }),
     type: varchar({ length: 50 }).notNull(),

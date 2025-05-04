@@ -176,6 +176,13 @@
       "when": 1746320220488,
       "tag": "0024_yellow_the_anarchist",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1746365248834,
+      "tag": "0025_glamorous_mimic",
+      "breakpoints": true
     }
   ]
 }

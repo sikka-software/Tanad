@@ -47,6 +47,8 @@ const createJobFormSchema = (t: (key: string) => string) =>
     title: z.string().min(1, t("Jobs.form.title.required")),
     description: z.string().optional(),
     requirements: z.string().optional(),
+    responsibilities: z.string().optional(),
+    benefits: z.string().optional(),
     location: z.string().optional(),
     department: z.string().optional(),
     type: z.string().min(1, t("Jobs.form.type.required")),
@@ -96,6 +98,8 @@ export function JobForm({
       title: defaultValues?.title || "",
       description: defaultValues?.description || "",
       requirements: defaultValues?.requirements || "",
+      responsibilities: defaultValues?.responsibilities || "",
+      benefits: defaultValues?.benefits || "",
       location: defaultValues?.location || "",
       department: defaultValues?.department || "",
       type: defaultValues?.type || "Full-time",
@@ -129,6 +133,8 @@ export function JobForm({
               title: data.title.trim(),
               description: data.description?.trim() || null,
               requirements: data.requirements?.trim() || null,
+              responsibilities: data.responsibilities?.trim() || null,
+              benefits: data.benefits?.trim() || null,
               location: data.location?.trim() || null,
               department: data.department?.trim() || null,
               type: data.type.trim(),
@@ -152,6 +158,8 @@ export function JobForm({
             title: data.title.trim(),
             description: data.description?.trim() || null,
             requirements: data.requirements?.trim() || null,
+            responsibilities: data.responsibilities?.trim() || null,
+            benefits: data.benefits?.trim() || null,
             location: data.location?.trim() || null,
             department: data.department?.trim() || null,
             type: data.type.trim(),
@@ -381,6 +389,42 @@ export function JobForm({
                 <FormControl>
                   <Textarea
                     placeholder={t("Jobs.form.requirements.placeholder")}
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="responsibilities"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Jobs.form.responsibilities.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={t("Jobs.form.responsibilities.placeholder")}
+                    className="min-h-[100px]"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="benefits"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Jobs.form.benefits.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={t("Jobs.form.benefits.placeholder")}
                     className="min-h-[100px]"
                     {...field}
                   />
