@@ -15,6 +15,7 @@ import { Skeleton } from "@/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+
 import useUserStore from "@/stores/use-user-store";
 
 import BetaFlag from "../ui/beta-flag";
@@ -200,7 +201,7 @@ const GeneralSettings = ({
                         {isLoadingProfile ? (
                           <Skeleton className="h-10 w-full" />
                         ) : (
-                          <Input type="email" {...field} disabled={isSaving} />
+                          <Input type="email" {...field} disabled={true} />
                         )}
                       </FormControl>
                       <FormMessage />

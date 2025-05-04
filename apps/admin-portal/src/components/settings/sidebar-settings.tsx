@@ -26,9 +26,10 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
 import { Switch } from "@/ui/switch";
 
+import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+
 import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
-import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
 import useUserStore from "@/stores/use-user-store";
 
 interface SortableItemProps {
@@ -354,7 +355,7 @@ const SidebarSettings = ({
                         <SortableItem
                           key={item.title}
                           item={item}
-                          title={t(`${item.title}.title`)}
+                          title={t(item.translationKey)}
                           enabled={isEnabled}
                           onToggle={(enabled) => handleToggleItem(groupName, item.title, enabled)}
                         />

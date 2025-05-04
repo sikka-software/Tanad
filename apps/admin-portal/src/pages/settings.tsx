@@ -129,7 +129,7 @@ const SettingsPage = () => {
       />
       <div className="flex flex-col gap-4 p-4 lg:flex-row">
         {/* Sidebar */}
-        <div className="w-full shrink-0 lg:w-64  lg:max-w-[200px]">
+        <div className="w-full shrink-0 lg:w-64 lg:max-w-[200px]">
           <Card className="shadow-none">
             <CardContent className="p-0" dir={lang === "ar" ? "rtl" : "ltr"}>
               <div className="flex w-full flex-col">
@@ -183,47 +183,45 @@ const SettingsPage = () => {
               <TabsTrigger value="preferences">{t("Settings.tabs.preferences")}</TabsTrigger>
               <TabsTrigger value="notifications">{t("Settings.tabs.notifications")}</TabsTrigger>
             </TabsList>
-            <ScrollArea className="h-[calc(100vh-180px)]">
-              <TabsContent value="general" className="m-0">
-                <GeneralSettings
-                  onDirtyChange={setIsDirty}
-                  onSave={handleSaveStart}
-                  onSaveComplete={handleSaveComplete}
-                  isSaving={isSaving}
-                  formRef={generalSettingsFormRef}
-                />
-              </TabsContent>
+            <TabsContent value="general" className="m-0">
+              <GeneralSettings
+                onDirtyChange={setIsDirty}
+                onSave={handleSaveStart}
+                onSaveComplete={handleSaveComplete}
+                isSaving={isSaving}
+                formRef={generalSettingsFormRef}
+              />
+            </TabsContent>
 
-              <TabsContent value="navigation" className="m-0">
-                <SidebarSettings
-                  onDirtyChange={setIsDirty}
-                  onSave={handleSaveStart}
-                  onSaveComplete={handleSaveComplete}
-                  isSaving={isSaving}
-                  formRef={sidebarSettingsFormRef}
-                />
-              </TabsContent>
+            <TabsContent value="navigation" className="m-0">
+              <SidebarSettings
+                onDirtyChange={setIsDirty}
+                onSave={handleSaveStart}
+                onSaveComplete={handleSaveComplete}
+                isSaving={isSaving}
+                formRef={sidebarSettingsFormRef}
+              />
+            </TabsContent>
 
-              <TabsContent value="preferences" className="m-0">
-                <PreferenceSettings
-                  onDirtyChange={setIsDirty}
-                  onSave={handleSaveStart}
-                  onSaveComplete={handleSaveComplete}
-                  isSaving={isSaving}
-                  formRef={preferenceSettingsFormRef}
-                />
-              </TabsContent>
+            <TabsContent value="preferences" className="m-0">
+              <PreferenceSettings
+                onDirtyChange={setIsDirty}
+                onSave={handleSaveStart}
+                onSaveComplete={handleSaveComplete}
+                isSaving={isSaving}
+                formRef={preferenceSettingsFormRef}
+              />
+            </TabsContent>
 
-              <TabsContent value="notifications" className="m-0">
-                <NotificationSettings
-                  onDirtyChange={setIsDirty}
-                  onSave={handleSaveStart}
-                  onSaveComplete={handleSaveComplete}
-                  isSaving={isSaving}
-                  formRef={notificationSettingsFormRef}
-                />
-              </TabsContent>
-            </ScrollArea>
+            <TabsContent value="notifications" className="m-0">
+              <NotificationSettings
+                onDirtyChange={setIsDirty}
+                onSave={handleSaveStart}
+                onSaveComplete={handleSaveComplete}
+                isSaving={isSaving}
+                formRef={notificationSettingsFormRef}
+              />
+            </TabsContent>
           </Tabs>
         </div>
       </div>

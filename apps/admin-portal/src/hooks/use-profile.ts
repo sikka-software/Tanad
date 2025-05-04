@@ -114,17 +114,17 @@ export function useUpdateProfile() {
           username: data.username || userStore.profile.username,
           // Careful handling of user_settings to preserve the required fields
           user_settings: {
-            currency: userStore.profile.user_settings.currency,
-            calendar_type: userStore.profile.user_settings.calendar_type,
-            timezone: data.user_settings?.timezone || userStore.profile.user_settings.timezone,
-            notifications: userStore.profile.user_settings.notifications,
+            currency: userStore.profile.user_settings?.currency,
+            calendar_type: userStore.profile.user_settings?.calendar_type,
+            timezone: data.user_settings?.timezone || userStore.profile.user_settings?.timezone,
+            notifications: userStore.profile.user_settings?.notifications,
             // Preserve the navigation settings
             navigation:
-              data.user_settings?.navigation || userStore.profile.user_settings.navigation,
+              data.user_settings?.navigation || userStore.profile.user_settings?.navigation,
             // Preserve hidden menu items
             hidden_menu_items:
               data.user_settings?.hidden_menu_items ||
-              userStore.profile.user_settings.hidden_menu_items,
+              userStore.profile.user_settings?.hidden_menu_items,
           },
         };
 
