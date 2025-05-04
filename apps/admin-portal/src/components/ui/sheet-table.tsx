@@ -513,6 +513,8 @@ function SheetTable<
       const rowIndex = tanStackRow.index;
       const colKey = getColumnKey(colDef);
 
+      console.log("eddiging?");
+
       if (isRowDisabled(disabledRows, groupKey, rowIndex) || disabledColumns.includes(colKey)) {
         return;
       }
@@ -570,7 +572,7 @@ function SheetTable<
         };
         return { ...prev, [groupKey]: { ...groupErrors, [rowId]: rowErrors } };
       });
-
+      console.log("eddiging?");
       if (errorMessage) {
         console.error(`Row "${rowId}", Col "${colKey}" error: ${errorMessage}`);
       } else if (onEdit) {
@@ -859,36 +861,26 @@ function SheetTable<
                 contentEditable={colDef.enableEditing !== false ? !isDisabled : false}
                 suppressContentEditableWarning
                 onFocus={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    handleCellFocus(e, groupKey, rowData, colDef);
-                  }
+                  handleCellFocus(e, groupKey, rowData, colDef);
                 }}
                 onKeyDown={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    if (
-                      (e.ctrlKey || e.metaKey) &&
-                      // Let user do Ctrl+A, C, X, Z, V, etc.
-                      ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
-                    ) {
-                      return; // do not block copy/paste
-                    }
-                    handleKeyDown(e, colDef);
+                  if (
+                    (e.ctrlKey || e.metaKey) &&
+                    // Let user do Ctrl+A, C, X, Z, V, etc.
+                    ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
+                  ) {
+                    return; // do not block copy/paste
                   }
+                  handleKeyDown(e, colDef);
                 }}
                 onPaste={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    handlePaste(e, colDef);
-                  }
+                  handlePaste(e, colDef);
                 }}
                 onInput={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    handleCellInput(e, groupKey, rowData, colDef);
-                  }
+                  handleCellInput(e, groupKey, rowData, colDef);
                 }}
                 onBlur={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    handleCellBlur(e, groupKey, rowData, colDef);
-                  }
+                  handleCellBlur(e, groupKey, rowData, colDef);
                 }}
               >
                 {/** The actual content */}
