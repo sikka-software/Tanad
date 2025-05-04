@@ -86,6 +86,21 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   }
 
   // Invoice pages
+  if (router.pathname === "/job_listings/preview/[id]") {
+    return (
+      <div>
+        <NextIntlClientProvider
+          messages={pageProps.messages}
+          locale={router.locale}
+          timeZone="Asia/Riyadh"
+          now={new Date()}
+        >
+          <InvoicePages>{<Component {...pageProps} />}</InvoicePages>
+        </NextIntlClientProvider>
+      </div>
+    );
+  }
+  // Invoice pages
   if (router.pathname === "/pay/[id]") {
     return (
       <div>

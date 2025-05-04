@@ -10,7 +10,9 @@ const JobListingCard = ({ jobListing }: { jobListing: JobListing }) => {
         <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-semibold">{jobListing.title}</h3>
-            <p className="text-sm text-gray-500">{jobListing.jobs?.length || 0} jobs</p>
+            <p className="text-sm text-gray-500">
+              {jobListing.job_count ?? 0} {jobListing.job_count === 1 ? "job" : "jobs"}
+            </p>
           </div>
           <Badge variant={jobListing.is_active ? "default" : "secondary"}>
             {jobListing.is_active ? "Active" : "Inactive"}

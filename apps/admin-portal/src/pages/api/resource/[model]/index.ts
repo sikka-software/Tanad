@@ -177,7 +177,51 @@ const modelMap: Record<string, ModelConfig> = {
   quotes: { tableName: "quotes" },
   vendors: { tableName: "vendors" },
   employee_requests: { tableName: "employee_requests" },
-  job_listings: { tableName: "job_listings" },
+  job_listings: {
+    tableName: "job_listings",
+    customHandlers: {
+      GET: async (supabase: SupabaseClient<Database>, user_id: string, req: NextApiRequest) => {
+        // 1. Fetch enterprise_id for the user (required for filtering)
+        const { data: membership, error: enterpriseError } = await supabase
+          .from("memberships")
+          .select("enterprise_id")
+          .eq("profile_id", user_id)
+          .maybeSingle();
+
+        if (enterpriseError) {
+          console.error("Error fetching enterprise ID for job listing GET:", enterpriseError);
+          throw new Error("Failed to retrieve enterprise association");
+        }
+        if (!membership?.enterprise_id) {
+          throw new Error("User is not associated with an enterprise.");
+        }
+        const enterprise_id = membership.enterprise_id;
+
+        // 2. Fetch job listings with job count
+        const { data, error } = await supabase
+          .from("job_listings")
+          .select(
+            `
+            *,
+            job_listing_jobs (count)
+          `,
+          )
+          .eq("enterprise_id", enterprise_id)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching job listings with count:", error);
+          throw error;
+        }
+
+        // 3. Map result to flatten the count
+        return data.map((listing) => ({
+          ...listing,
+          job_count: listing.job_listing_jobs[0]?.count || 0,
+        }));
+      },
+    },
+  },
   activity: {
     tableName: "activity_logs",
     customHandlers: {
