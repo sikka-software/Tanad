@@ -1712,3 +1712,41 @@ export const activityLogs = pgTable(
     index("activity_logs_target_idx").on(table.target_type, table.target_id),
   ],
 );
+
+// Define the servers table
+export const servers = pgTable(
+  "servers",
+  {
+    id: uuid("id")
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    name: text("name").notNull(),
+    ip_address: inet("ip_address"),
+    location: text("location"),
+    provider: text("provider"),
+    os: text("os"),
+    status: text("status").default("active").notNull(), // Consider making this an enum later
+    tags: jsonb("tags").$type<string[]>().default([]),
+    notes: text("notes"),
+    created_at: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    updated_at: timestamp("updated_at", { withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    user_id: uuid("user_id")
+      .notNull()
+      .references(() => usersInAuth.id),
+    enterprise_id: uuid("enterprise_id")
+      .notNull()
+      .references(() => enterprises.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    index("servers_enterprise_id_idx").on(table.enterprise_id),
+    index("servers_user_id_idx").on(table.user_id),
+    index("servers_name_idx").on(table.name),
+    index("servers_ip_address_idx").on(table.ip_address),
+    index("servers_status_idx").on(table.status),
+  ],
+);
