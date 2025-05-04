@@ -17,14 +17,6 @@ import { Switch } from "@/components/ui/switch";
 
 import FormSectionHeader from "./form-section-header";
 
-// Define the shape of the form values this section controls
-interface JobListingOptionsFormValues {
-  currency: string; // Example: 'USD', 'EUR'
-  enableSearchFiltering: boolean;
-  locations: string[]; // Example: ['New York', 'Remote']
-  departments: string[]; // Example: ['Engineering', 'Marketing']
-}
-
 interface JobListingOptionsSectionProps {
   form: UseFormReturn<any>; // Use the specific form type if available
   // Example data sources - replace with your actual data fetching logic

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import { useTranslations } from "next-intl";
 import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -300,7 +301,16 @@ export function JobListingForm({
               </FormItem>
             )}
           />
+        </div>
+        <JobListingOptionsSection
+          form={form}
+          availableCurrencies={availableCurrencies}
+          availableLocations={availableLocations}
+          availableDepartments={availableDepartments}
+        />
 
+        <FormSectionHeader title={t("Jobs.title")} />
+        <div className="form-container">
           <FormField
             control={form.control}
             name="jobs"
@@ -342,12 +352,6 @@ export function JobListingForm({
             )}
           />
         </div>
-        <JobListingOptionsSection
-          form={form}
-          availableCurrencies={availableCurrencies}
-          availableLocations={availableLocations}
-          availableDepartments={availableDepartments}
-        />
       </form>
     </Form>
   );
