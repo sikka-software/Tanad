@@ -58,7 +58,7 @@ export function useCreateDomain() {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: domainKeys.lists() });
       toast.success(t("General.successful_operation"), {
-        description: t("Domains.success.update"),
+        description: t("Domains.success.create"),
       });
     },
   });

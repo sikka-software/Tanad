@@ -1,10 +1,117 @@
 import { PuklaThemeProps } from "./types";
+
 // Validation
 export const DOMAIN_REGEX = /^[a-zA-Z0-9-]+$/; // Allows letters, numbers, and hyphens
 export const MAX_SLUG_LENGTH = 32;
 
 export const CACHE_KEY = (user_id: string) => `user_cache_${user_id}`;
 export const FREE_PLAN_ID = "price_1QfPy8CVtUnAWEKBdr1JAb5w";
+
+export const SERVER_OS = [
+  {
+    label: "Windows",
+    value: "windows",
+  },
+  {
+    label: "Linux",
+    value: "linux",
+  },
+  {
+    label: "MacOS",
+    value: "macos",
+  },
+  {
+    label: "Ubuntu",
+    value: "ubuntu",
+  },
+  {
+    label: "Debian",
+    value: "debian",
+  },
+  {
+    label: "CentOS",
+    value: "centos",
+  },
+  {
+    label: "Fedora",
+    value: "fedora",
+  },
+  {
+    label: "Arch Linux",
+    value: "archlinux",
+  },
+  {
+    label: "OpenBSD",
+    value: "openbsd",
+  },
+  {
+    label: "FreeBSD",
+    value: "freebsd",
+  },
+  {
+    label: "Alpine Linux",
+    value: "alpine",
+  },
+  {
+    label: "Red Hat (RHEL)",
+    value: "rhel",
+  },
+  {
+    label: "Solaris",
+    value: "solaris",
+  },
+  {
+    label: "AIX",
+    value: "aix",
+  },
+  {
+    label: "HP-UX",
+    value: "hp-ux",
+  },
+  {
+    label: "Other",
+    value: "other",
+  },
+];
+
+export const SERVER_PROVIDERS = [
+  {
+    label: "AWS",
+    value: "aws",
+  },
+  {
+    label: "Azure",
+    value: "azure",
+  },
+  {
+    label: "Google Cloud",
+    value: "google",
+  },
+  {
+    label: "DigitalOcean",
+    value: "digitalocean",
+  },
+  {
+    label: "Linode",
+    value: "linode",
+  },
+  {
+    label: "Vultr",
+    value: "vultr",
+  },
+  {
+    label: "Hawsabah",
+    value: "hawsabah",
+  },
+  {
+    label: "GoDaddy",
+    value: "godaddy",
+  },
+  {
+    label: "Other",
+    value: "other",
+  },
+];
 
 export const fakeAnalyticsData = [
   {

@@ -38,7 +38,7 @@ type ComboboxTypes<T> = {
   preview?: boolean;
   hideInput?: boolean;
   direction?: "rtl" | "ltr";
-  inputProps?: any;
+  inputProps?: React.ComponentPropsWithoutRef<typeof CommandInput>;
   //   TODO: fix this
   //   inputProps?: CommandInputProps;
   id?: string;
@@ -89,7 +89,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
     return (
       <div
         className={cn(
-          "relative flex h-fit flex-col gap-2",
+          "relative flex h-9 flex-col gap-2",
           props.width === "fit" ? "w-fit" : "w-full",
         )}
         ref={containerRef}
@@ -97,10 +97,10 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
         {props.label && <Label {...labelProps}>{props.label}</Label>}
 
         <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
-          <PopoverTrigger asChild>
+          <PopoverTrigger asChild className="h-9">
             {props.isLoading ? (
-              <div className="pb-2">
-                <Skeleton className="h-[40px] min-h-[40px] w-full" />
+              <div className="">
+                <Skeleton className="h-9 w-full" />
               </div>
             ) : (
               <div className="flex flex-col items-start gap-2">
@@ -114,7 +114,8 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                   role="combobox"
                   type="button"
                   variant="outline"
-                  size="sm"
+                  // size="sm"
+                  disabled={inputProps?.disabled}
                   aria-expanded={open}
                   className={cn(
                     "ring-offset-background focus-visible:ring-ring inline-flex w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",

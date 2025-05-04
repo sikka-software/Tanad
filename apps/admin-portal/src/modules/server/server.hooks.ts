@@ -58,7 +58,7 @@ export function useCreateServer() {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
       toast.success(t("General.successful_operation"), {
-        description: t("Servers.success.update"),
+        description: t("Servers.success.create"),
       });
     },
   });

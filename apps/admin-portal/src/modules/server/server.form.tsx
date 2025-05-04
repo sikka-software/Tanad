@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { Combobox } from "@root/src/components/ui/combobox";
+import { countries } from "@root/src/lib/constants/countries";
+import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -9,21 +10,20 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
-import CodeInput from "@/components/ui/code-input";
-import PhoneInput from "@/components/ui/phone-input";
+import { SERVER_OS, SERVER_PROVIDERS } from "@/lib/constants";
 
 import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useServers, useCreateServer, useUpdateServer } from "./server.hooks";
+import { useCreateServer, useUpdateServer } from "./server.hooks";
 import useServerStore from "./server.store";
 import { Server, ServerCreateData, ServerUpdateData } from "./server.type";
 
 export const createServerSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("Servers.form.name.required")),
-    ip_address: z.string().min(1, t("Servers.form.ip_address.required")),
+    ip_address: z.string().optional().or(z.literal("")),
     location: z.string().optional().or(z.literal("")),
     provider: z.string().optional().or(z.literal("")),
     os: z.string().optional().or(z.literal("")),
@@ -36,13 +36,6 @@ export const createServerSchema = (t: (key: string) => string) =>
 
 export type ServerFormValues = z.input<ReturnType<typeof createServerSchema>>;
 
-export interface ServerFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: ServerUpdateData | null;
-  editMode?: boolean;
-}
-
 export function ServerForm({
   formHtmlId,
   onSuccess,
@@ -50,10 +43,10 @@ export function ServerForm({
   editMode,
 }: ModuleFormProps<ServerUpdateData>) {
   const t = useTranslations();
+  const lang = useLocale();
   const { user, enterprise } = useUserStore();
   const { mutate: createServer } = useCreateServer();
   const { mutate: updateServer } = useUpdateServer();
-  const { data: servers } = useServers();
 
   const isLoading = useServerStore((state) => state.isLoading);
   const setIsLoading = useServerStore((state) => state.setIsLoading);
@@ -157,11 +150,11 @@ export function ServerForm({
         description: t("Servers.error.create"),
       });
     }
-
-    if (typeof window !== "undefined") {
-      (window as any).serverForm = form;
-    }
   };
+
+  if (typeof window !== "undefined") {
+    (window as any).serverForm = form;
+  }
 
   return (
     <Form {...form}>
@@ -193,29 +186,11 @@ export function ServerForm({
                 <FormItem>
                   <FormLabel>{t("Servers.form.ip_address.label")} *</FormLabel>
                   <FormControl>
-                    <CodeInput
-                      onSerial={() => {
-                        const nextNumber = (servers?.length || 0) + 1;
-                        const paddedNumber = String(nextNumber).padStart(4, "0");
-                        form.setValue("ip_address", `BR-${paddedNumber}`);
-                      }}
-                      onRandom={() => {
-                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                        let randomCode = "";
-                        for (let i = 0; i < 5; i++) {
-                          randomCode += randomChars.charAt(
-                            Math.floor(Math.random() * randomChars.length),
-                          );
-                        }
-                        form.setValue("ip_address", `BR-${randomCode}`);
-                      }}
-                    >
-                      <Input
-                        placeholder={t("Servers.form.ip_address.placeholder")}
-                        {...field}
-                        disabled={isLoading}
-                      />
-                    </CodeInput>
+                    <Input
+                      placeholder={t("Servers.form.ip_address.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -231,10 +206,24 @@ export function ServerForm({
                 <FormItem>
                   <FormLabel>{t("Servers.form.location.label")}</FormLabel>
                   <FormControl>
-                    <PhoneInput
-                      value={field.value || ""}
+                    <Combobox
+                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      data={countries || []}
+                      labelKey="label"
+                      inputProps={{ disabled: isLoading }}
+                      valueKey="label"
+                      texts={{
+                        placeholder: t("Servers.form.location.placeholder"),
+                        searchPlaceholder: t("Servers.form.location.search_placeholder"),
+                        noItems: t("Servers.form.location.no_items"),
+                      }}
+                      renderOption={(item) => (
+                        <div>{t(`Country.${item.label.toLowerCase().split(" ").join("_")}`)}</div>
+                      )}
+                      renderSelected={(item) => (
+                        <div>{t(`Country.${item.label.toLowerCase().split(" ").join("_")}`)}</div>
+                      )}
                       onChange={field.onChange}
-                      ariaInvalid={form.formState.errors.location !== undefined}
                     />
                   </FormControl>
                   <FormMessage />
@@ -249,12 +238,20 @@ export function ServerForm({
                 <FormItem>
                   <FormLabel>{t("Servers.form.provider.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      dir="ltr"
-                      type="text"
-                      placeholder={t("Servers.form.provider.placeholder")}
-                      {...field}
-                      disabled={isLoading}
+                    <Combobox
+                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      data={SERVER_PROVIDERS || []}
+                      labelKey="label"
+                      valueKey="label"
+                      inputProps={{ disabled: isLoading }}
+                      texts={{
+                        placeholder: t("Servers.form.provider.placeholder"),
+                        searchPlaceholder: t("Servers.form.provider.search_placeholder"),
+                        noItems: t("Servers.form.provider.no_items"),
+                      }}
+                      renderOption={(item) => <div>{item.label}</div>}
+                      renderSelected={(item) => <div>{item.label}</div>}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />
@@ -269,10 +266,20 @@ export function ServerForm({
                 <FormItem>
                   <FormLabel>{t("Servers.form.os.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("Servers.form.os.placeholder")}
-                      {...field}
-                      disabled={isLoading}
+                    <Combobox
+                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      data={SERVER_OS || []}
+                      labelKey="label"
+                      valueKey="label"
+                      inputProps={{ disabled: isLoading }}
+                      texts={{
+                        placeholder: t("Servers.form.os.placeholder"),
+                        searchPlaceholder: t("Servers.form.os.search_placeholder"),
+                        noItems: t("Servers.form.os.no_items"),
+                      }}
+                      renderOption={(item) => <div>{item.label}</div>}
+                      renderSelected={(item) => <div>{item.label}</div>}
+                      onChange={field.onChange}
                     />
                   </FormControl>
                   <FormMessage />

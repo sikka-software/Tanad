@@ -58,7 +58,7 @@ export function useCreateBranch() {
       // Invalidate the list query to refetch
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
       toast.success(t("General.successful_operation"), {
-        description: t("Branches.success.update"),
+        description: t("Branches.success.create"),
       });
     },
   });

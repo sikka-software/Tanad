@@ -1,3 +1,5 @@
+import { SERVER_OS } from "@root/src/lib/constants";
+import { SERVER_PROVIDERS } from "@root/src/lib/constants";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -20,13 +22,15 @@ export default function AddServerPage() {
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
+
     const form = (window as any).serverForm;
+    console.log("form is ,", form);
     if (form) {
       form.setValue("name", dummyData.full_name);
       form.setValue("ip_address", dummyData.random_ip_address);
       form.setValue("location", dummyData.locations);
-      form.setValue("provider", "AWS");
-      form.setValue("os", dummyData.randomPicker(["Windows", "Linux", "MacOS"]));
+      form.setValue("provider", dummyData.randomPicker(SERVER_PROVIDERS).value);
+      form.setValue("os", dummyData.randomPicker(SERVER_OS).value);
       form.setValue("status", dummyData.randomPicker(["Active", "Inactive", "Pending"]));
       form.setValue("notes", dummyData.randomString);
     }
@@ -34,15 +38,15 @@ export default function AddServerPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Branches.add_new")} />
+      <CustomPageMeta title={t("Servers.add_new")} />
       <PageTitle
         formButtons
-        formId="branch-form"
+        formId="server-form"
         loading={isLoading}
-        onCancel={() => router.push("/branches")}
+        onCancel={() => router.push("/servers")}
         texts={{
-          title: t("Branches.add_new"),
-          submit_form: t("Branches.add_new"),
+          title: t("Servers.add_new"),
+          submit_form: t("Servers.add_new"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
