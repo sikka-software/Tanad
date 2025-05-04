@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -41,6 +41,10 @@ export const createJobListingFormSchema = (t: (key: string) => string) =>
     title: z.string().min(1, t("JobListings.form.title.required")),
     description: z.string().optional(),
     jobs: z.array(z.string()).min(1, t("JobListings.form.jobs.required")),
+    currency: z.string().optional(),
+    enableSearchFiltering: z.boolean().optional(),
+    locations: z.array(z.string()).optional(),
+    departments: z.array(z.string()).optional(),
   });
 
 export type JobListingFormValues = z.infer<ReturnType<typeof createJobListingFormSchema>>;
@@ -69,6 +73,10 @@ export function JobListingForm({
       title: "",
       description: "",
       jobs: [],
+      currency: "USD",
+      enableSearchFiltering: true,
+      locations: [],
+      departments: [],
     },
   });
 
@@ -100,7 +108,14 @@ export function JobListingForm({
       return;
     }
 
-    const { jobs, ...coreListingData } = data;
+    const {
+      jobs: selectedJobIds,
+      currency,
+      enableSearchFiltering,
+      locations,
+      departments,
+      ...coreListingData
+    } = data;
     const enterpriseId = membership.enterprise_id;
     const userId = profile.id;
 
@@ -129,7 +144,7 @@ export function JobListingForm({
 
               // Update associations
               try {
-                await updateListingJobAssociations(defaultValues.id!, data.jobs);
+                await updateListingJobAssociations(defaultValues.id!, selectedJobIds);
                 toast.info(t("JobListings.success.associations_updated"));
               } catch (assocError) {
                 console.error("Failed to update job associations:", assocError);
@@ -180,9 +195,9 @@ export function JobListingForm({
             toast.success(t("JobListings.success.create"));
 
             // Associate selected jobs
-            if (data.jobs.length > 0) {
+            if (selectedJobIds.length > 0) {
               try {
-                await bulkAssociateJobsWithListing(createdListing.id, data.jobs);
+                await bulkAssociateJobsWithListing(createdListing.id, selectedJobIds);
                 toast.info(t("JobListings.success.associations_created"));
               } catch (assocError) {
                 console.error("Failed to associate jobs:", assocError);
@@ -214,6 +229,41 @@ export function JobListingForm({
       });
     }
   };
+
+  // --- Prepare Options Data ---
+  const availableCurrencies = useMemo(
+    () => [
+      // Replace with your actual currency list source if needed
+      { value: "USD", label: "USD - US Dollar" },
+      { value: "EUR", label: "EUR - Euro" },
+      { value: "GBP", label: "GBP - British Pound" },
+      // Add other currencies as needed
+    ],
+    [],
+  );
+
+  const availableLocations = useMemo(() => {
+    if (!jobs) return [];
+    const uniqueLocations = new Set<string>();
+    jobs.forEach((job) => {
+      if (job.location) {
+        uniqueLocations.add(job.location);
+      }
+    });
+    return Array.from(uniqueLocations).map((loc) => ({ id: loc, name: loc })); // Assuming ID and Name are the same for now
+  }, [jobs]);
+
+  const availableDepartments = useMemo(() => {
+    if (!jobs) return [];
+    const uniqueDepartments = new Set<string>();
+    jobs.forEach((job) => {
+      if (job.department) {
+        uniqueDepartments.add(job.department);
+      }
+    });
+    return Array.from(uniqueDepartments).map((dept) => ({ id: dept, name: dept })); // Assuming ID and Name are the same for now
+  }, [jobs]);
+  // --- End Options Data ---
 
   return (
     <Form {...form}>
@@ -292,7 +342,12 @@ export function JobListingForm({
             )}
           />
         </div>
-        <JobListingOptionsSection />
+        <JobListingOptionsSection
+          form={form}
+          availableCurrencies={availableCurrencies}
+          availableLocations={availableLocations}
+          availableDepartments={availableDepartments}
+        />
       </form>
     </Form>
   );
