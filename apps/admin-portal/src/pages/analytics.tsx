@@ -328,7 +328,7 @@ export default function Analytics() {
             </CardContent>
           </Card>
         ) : (
-          <NoPuklas onCreate={() => router.push("/dashboard")} />
+          <div>Nothing here yet</div>
         )}
       </div>
     );

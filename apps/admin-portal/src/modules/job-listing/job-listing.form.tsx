@@ -277,7 +277,7 @@ export function JobListingForm({
   return (
     <>
       <Form {...form}>
-        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="mb-40">
           <div className="form-container">
             <FormField
               control={form.control}
