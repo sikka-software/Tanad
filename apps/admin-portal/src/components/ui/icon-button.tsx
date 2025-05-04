@@ -11,6 +11,7 @@ interface IconButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   buttonType?: "button" | "submit" | "reset";
   size?: "icon" | "default" | "sm" | "lg" | "icon_sm";
   contentClassName?: string;
+  disabled?: boolean;
 }
 
 const IconButton = ({
@@ -21,6 +22,7 @@ const IconButton = ({
   variant,
   size,
   contentClassName,
+  disabled,
   ...props
 }: IconButtonProps) => {
   return (
@@ -32,6 +34,7 @@ const IconButton = ({
             size={size || "icon"}
             className={cn("relative size-8", props.className)}
             type={buttonType || "button"}
+            disabled={disabled}
             {...props}
           >
             {icon}

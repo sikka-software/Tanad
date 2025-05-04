@@ -1,9 +1,10 @@
 "use client";
 
 import { format } from "date-fns";
-import { CalendarIcon, Download, Filter, Search, X } from "lucide-react";
+import { CalendarIcon, Download, Filter, Search, X, Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -20,13 +21,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { cn } from "@/lib/utils";
+import { downloadCSV } from "@/lib/csv-utils";
 
 import { ProfileType } from "@/stores/use-user-store";
 
 import { useUsers } from "../user/user.hooks";
+import { ActivityService } from "./activity.service";
 import { useActivityLogStore } from "./activity.store";
+import type { ActivityLogListData } from "./activity.type";
 
 interface ActivityLogFiltersProps {}
 
@@ -35,9 +38,48 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
   const locale = useLocale();
   const { filters, setFilters, clearFilters } = useActivityLogStore();
   const { data: users, isLoading: isLoadingUsers } = useUsers();
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleClearFilters = () => {
     clearFilters();
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    const toastId = toast.loading(t("ActivityLogs.export.loading"));
+    try {
+      const logsToExport = await ActivityService.exportList(filters);
+
+      if (logsToExport.length === 0) {
+        toast.info(t("ActivityLogs.export.noData"), { id: toastId });
+        return;
+      }
+
+      const headers = [
+        { label: t("ActivityLogs.export.headers.timestamp"), key: "created_at" },
+        { label: t("ActivityLogs.export.headers.userEmail"), key: "user_email" },
+        { label: t("ActivityLogs.export.headers.userName"), key: "user_full_name" },
+        { label: t("ActivityLogs.export.headers.actionType"), key: "action_type" },
+        { label: t("ActivityLogs.export.headers.targetType"), key: "target_type" },
+        { label: t("ActivityLogs.export.headers.targetName"), key: "target_name" },
+        { label: t("ActivityLogs.export.headers.targetId"), key: "target_id" },
+        { label: t("ActivityLogs.export.headers.details"), key: "details" },
+      ];
+
+      const formattedData = logsToExport.map((log) => ({
+        ...log,
+        created_at: format(new Date(log.created_at), "yyyy-MM-dd HH:mm:ss"),
+        details: typeof log.details === 'object' ? JSON.stringify(log.details) : log.details,
+      }));
+
+      downloadCSV(formattedData, headers, `activity_logs_${format(new Date(), "yyyyMMddHHmmss")}.csv`);
+      toast.success(t("ActivityLogs.export.success"), { id: toastId });
+    } catch (error) {
+      console.error("Failed to export activity logs:", error);
+      toast.error(t("ActivityLogs.export.error"), { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -140,10 +182,12 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
             </PopoverContent>
           </Popover>
           <IconButton
-            icon={<Download className="h-4 w-4" />}
+            icon={isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
             label={t("General.export")}
             variant="outline"
             className="size-9"
+            onClick={handleExport}
+            disabled={isExporting}
           />
         </div>
       </div>
