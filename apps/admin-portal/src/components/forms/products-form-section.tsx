@@ -281,7 +281,7 @@ export function ProductsFormSection({
       </div>
       {/* Table Section */}
       <div className="p-4">
-        <div className="rounded-md border">
+        <div className="rounded-md border  overflow-y-auto">
           <Table>
             <TableHeader>
               <TableRow>
