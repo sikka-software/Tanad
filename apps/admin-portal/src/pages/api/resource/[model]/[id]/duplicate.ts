@@ -46,6 +46,12 @@ const modelMap: Record<string, ModelConfig> = {
   invoices: { table: schema.invoices, query: db.query.invoices, idField: "id" },
   quotes: { table: schema.quotes, query: db.query.quotes, idField: "id" },
   vendors: { table: schema.vendors, query: db.query.vendors, idField: "id" },
+  job_listings: {
+    table: schema.job_listings,
+    query: db.query.job_listings,
+    idField: "id",
+    excludeFromDuplicate: ["slug"],
+  },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

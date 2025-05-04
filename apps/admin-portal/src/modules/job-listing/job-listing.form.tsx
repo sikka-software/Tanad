@@ -15,7 +15,11 @@ import { useJobs } from "@/job/job.hooks";
 
 import { useCreateJobListing, useUpdateJobListing } from "@/job-listing/job-listing.hooks";
 import useJobListingsStore from "@/job-listing/job-listing.store";
-import { JobListing, JobListingUpdateData } from "@/job-listing/job-listing.type";
+import {
+  JobListing,
+  JobListingUpdateData,
+  JobListingCreateData,
+} from "@/job-listing/job-listing.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -67,12 +71,12 @@ export function JobListingForm({
 
   const handleJobSelect = (job_id: string) => {
     setSelectedJobs((prev) => {
-      if (prev.includes(job_id)) {
-        return prev.filter((id) => id !== job_id);
-      }
-      return [...prev, job_id];
+      const newSelection = prev.includes(job_id)
+        ? prev.filter((id) => id !== job_id)
+        : [...prev, job_id];
+      form.setValue("jobs", newSelection);
+      return newSelection;
     });
-    form.setValue("jobs", selectedJobs);
   };
 
   const handleSubmit = async (data: JobListingFormValues) => {
@@ -81,8 +85,21 @@ export function JobListingForm({
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
+      setIsLoading(false);
       return;
     }
+
+    if (!membership?.enterprise_id) {
+      toast.error(t("General.error_operation"), {
+        description: t("JobListings.error.missing_enterprise"),
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    const { jobs, ...coreListingData } = data;
+    const enterpriseId = membership.enterprise_id;
+    const userId = profile.id;
 
     try {
       if (editMode && defaultValues) {
@@ -92,51 +109,70 @@ export function JobListingForm({
           setIsLoading(false);
           return;
         }
+
+        const updatePayload: JobListingUpdateData = {
+          title: coreListingData.title.trim(),
+          description: coreListingData.description?.trim() || null,
+        };
+
         await updateJobListing(
           {
             id: defaultValues.id,
-            jobListing: {
-              title: data.title.trim(),
-              description: data.description?.trim() || null,
-              jobs: data.jobs,
-              user_id: profile?.id || "",
-            },
+            jobListing: updatePayload,
           },
           {
             onSuccess: async () => {
+              toast.success(t("JobListings.success.update"));
               if (onSuccess) {
                 onSuccess();
               }
+            },
+            onError: (error) => {
+              console.error("Failed to update job listing:", error);
+              toast.error(t("General.error_operation"), {
+                description: t("JobListings.error.update"),
+              });
+            },
+            onSettled: () => {
+              setIsLoading(false);
             },
           },
         );
       } else {
-        await createJobListing(
-          {
-            title: data.title.trim(),
-            description: data.description?.trim() || null,
-            jobs: data.jobs,
-            user_id: profile?.id || "",
-            is_active: true,
-            slug: "",
-            updated_at: new Date().toISOString(),
-            enterprise_id: "",
-            is_public: true,
+        const createPayload: JobListingCreateData = {
+          title: coreListingData.title.trim(),
+          description: coreListingData.description?.trim() || null,
+          user_id: userId,
+          enterprise_id: enterpriseId,
+          is_active: true,
+          is_public: true,
+          slug: "",
+          updated_at: new Date().toISOString(),
+        };
+
+        await createJobListing(createPayload, {
+          onSuccess: async () => {
+            toast.success(t("JobListings.success.create"));
+            if (onSuccess) {
+              onSuccess();
+            }
           },
-          {
-            onSuccess: async () => {
-              if (onSuccess) {
-                onSuccess();
-              }
-            },
+          onError: (error) => {
+            console.error("Failed to create job listing:", error);
+            toast.error(t("General.error_operation"), {
+              description: t("JobListings.error.create"),
+            });
           },
-        );
+          onSettled: () => {
+            setIsLoading(false);
+          },
+        });
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Failed to save job listing:", error);
+      console.error("Failed to save job listing (outer catch):", error);
       toast.error(t("General.error_operation"), {
-        description: t("JobListings.error.create"),
+        description: t("JobListings.error.generic_save"),
       });
     }
   };

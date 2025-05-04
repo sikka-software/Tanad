@@ -112,6 +112,7 @@ const JobListingsTable = ({
       canViewAction={canViewJobListing}
       canArchiveAction={canArchiveJobListing}
       canDeleteAction={canDeleteJobListing}
+      canPreviewAction={true}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={jobListingTableOptions}
       onActionClicked={onActionClicked}
@@ -122,6 +123,7 @@ const JobListingsTable = ({
         view: t("General.view"),
         archive: t("General.archive"),
         delete: t("General.delete"),
+        preview: t("General.preview"),
       }}
     />
   );
