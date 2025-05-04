@@ -94,7 +94,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       translationKey: "ActivityLogs.title",
       url: "/activity",
       icon: TableOfContents,
-      is_active: pathname.startsWith("/activity-logs"),
+      is_active: pathname.startsWith("/activity"),
       requiredPermission: "activity_logs.read",
     },
 

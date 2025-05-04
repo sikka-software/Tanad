@@ -106,56 +106,124 @@ export default function Dashboard() {
     let isMounted = true;
 
     async function fetchDashboardStats() {
-      // Ensure user and enterprise IDs are available before fetching
       if (!isMounted || !user?.id || !enterprise?.id) {
         if (isMounted && !enterprise?.id && user?.id) {
-          // User exists but no enterprise, stop loading, show 0 stats (or a message)
           setLoading(false);
         } else if (isMounted) {
-          // Still waiting for user/enterprise info
           setLoading(true);
         }
         return;
       }
 
+      const enterpriseId = enterprise.id; // Cache enterprise ID
+
       try {
-        setLoading(true); // Set loading true before fetch
+        setLoading(true);
+        setError(null); // Reset error state
 
-        // Fetch stats from the view
-        const { data: viewStats, error: viewError } = await supabase
-          .from("enterprise_dashboard_stats")
-          .select("*") // Select all columns defined in the view
-          .eq("enterprise_id", enterprise.id)
-          .single(); // Expecting a single row for the enterprise
+        // Helper function to perform count queries
+        const fetchCount = async (
+          tableName: string,
+          additionalFilter?: object,
+        ): Promise<number> => {
+          const query = supabase
+            .from(tableName)
+            .select("id", { count: "exact", head: true })
+            .eq("enterprise_id", enterpriseId);
 
-        if (viewError) throw viewError;
-        if (!viewStats) throw new Error("No stats data found for this enterprise.");
+          if (additionalFilter) {
+            Object.entries(additionalFilter).forEach(([key, value]) => {
+              query.eq(key, value);
+            });
+          }
+
+          const { count, error } = await query;
+          if (error) throw error;
+          return count ?? 0;
+        };
+
+        // Helper function to perform sum queries (example for revenue)
+        const fetchSum = async (tableName: string, columnName: string): Promise<number> => {
+          const { data, error } = await supabase
+            .from(tableName)
+            .select(columnName)
+            .eq("enterprise_id", enterpriseId);
+
+          if (error) throw error;
+          return data?.reduce((sum, row) => sum + ((row as any)[columnName] || 0), 0) ?? 0;
+        };
+
+        // Fetch all stats concurrently
+        const [
+          totalInvoices,
+          pendingInvoicesCount,
+          totalRevenue, // Example: Assuming 'total' column in 'invoices'
+          totalProducts,
+          totalEmployees,
+          totalDepartments,
+          totalJobs,
+          totalClients,
+          totalCompanies,
+          totalVendors,
+          totalOffices,
+          totalWarehouses,
+          totalBranches,
+        ] = await Promise.all([
+          fetchCount("invoices"),
+          fetchCount("invoices", { status: "pending" }), // Filter for pending invoices
+          fetchSum("invoices", "total"), // Example sum query
+          fetchCount("products"),
+          fetchCount("employees"),
+          fetchCount("departments"),
+          fetchCount("jobs"),
+          fetchCount("clients"),
+          fetchCount("companies"),
+          fetchCount("vendors"),
+          fetchCount("offices"),
+          fetchCount("warehouses"),
+          fetchCount("branches"),
+        ]);
 
         if (!isMounted) return;
 
-        // Map the view data to the component's state structure
-        const fetchedStats: DashboardStatsViewData = viewStats; // Type assertion
         setStats({
-          totalInvoices: fetchedStats.total_invoices || 0,
-          totalProducts: fetchedStats.total_products || 0,
-          totalRevenue: fetchedStats.total_revenue || 0,
-          pendingInvoices: fetchedStats.pending_invoices || 0,
-          totalEmployees: fetchedStats.total_employees || 0,
-          totalDepartments: fetchedStats.total_departments || 0,
-          totalJobs: fetchedStats.total_jobs || 0,
-          totalClients: fetchedStats.total_clients || 0,
-          totalCompanies: fetchedStats.total_companies || 0,
-          totalVendors: fetchedStats.total_vendors || 0,
-          totalOffices: fetchedStats.total_offices || 0,
-          totalWarehouses: fetchedStats.total_warehouses || 0,
-          totalBranches: fetchedStats.total_branches || 0,
+          totalInvoices,
+          pendingInvoices: pendingInvoicesCount,
+          totalRevenue,
+          totalProducts,
+          totalEmployees,
+          totalDepartments,
+          totalJobs,
+          totalClients,
+          totalCompanies,
+          totalVendors,
+          totalOffices,
+          totalWarehouses,
+          totalBranches,
         });
       } catch (err) {
-        console.error("Error fetching dashboard stats from view:", err);
+        console.error("Error fetching dashboard stats individually:", err);
         if (isMounted) {
           setError(
             err instanceof Error ? err.message : "An error occurred while fetching dashboard stats",
           );
+          // Optionally set stats to 0 on error or keep previous state
+          setStats({
+            // Reset stats on error
+            totalInvoices: 0,
+            totalProducts: 0,
+            totalRevenue: 0,
+            pendingInvoices: 0,
+            totalEmployees: 0,
+            totalDepartments: 0,
+            totalJobs: 0,
+            totalClients: 0,
+            totalCompanies: 0,
+            totalVendors: 0,
+            totalOffices: 0,
+            totalWarehouses: 0,
+            totalBranches: 0,
+          });
         }
       } finally {
         if (isMounted) {
@@ -164,12 +232,11 @@ export default function Dashboard() {
       }
     }
 
-    fetchDashboardStats(); // Call fetch function
+    fetchDashboardStats();
 
     return () => {
       isMounted = false;
     };
-    // Update dependencies: only need user and enterprise IDs
   }, [user?.id, enterprise?.id, supabase]); // Add supabase as dependency
 
   // Show error state
