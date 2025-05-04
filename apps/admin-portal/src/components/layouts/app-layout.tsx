@@ -54,7 +54,9 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="flex w-full flex-row justify-between border-b p-2">
               <div className="flex flex-row items-center gap-0 p-0">
                 <SidebarTrigger />
-                <AppBreadcrumb />
+                <div className="hidden md:block">
+                  <AppBreadcrumb />
+                </div>
               </div>
               <div className="flex flex-row gap-2">
                 <Button
@@ -73,7 +75,12 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 <UserDropdown />
               </div>
             </div>
-            <div className="relative mx-auto">{children}</div>
+            <div className="relative mx-auto">
+              <div className="block md:hidden p-2 border-b">
+                <AppBreadcrumb />
+              </div>
+              {children}
+            </div>
           </div>
         </SidebarProvider>
       </ThemeProvider>
