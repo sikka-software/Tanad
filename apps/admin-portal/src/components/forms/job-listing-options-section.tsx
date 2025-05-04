@@ -33,7 +33,6 @@ import FormSectionHeader from "./form-section-header";
 interface JobListingOptionsSectionProps {
   form: UseFormReturn<any>; // Use the specific form type if available
   // Example data sources - replace with your actual data fetching logic
-  availableCurrencies: { value: string; label: string }[];
   availableLocations: { id: string; name: string }[];
   availableDepartments: { id: string; name: string }[];
   loadingLocations?: boolean; // Add loading state for locations
@@ -42,7 +41,6 @@ interface JobListingOptionsSectionProps {
 
 const JobListingOptionsSection = ({
   form,
-  availableCurrencies,
   availableLocations,
   availableDepartments,
   loadingLocations,
@@ -88,7 +86,6 @@ const JobListingOptionsSection = ({
               </Select>
               <FormMessage />
             </FormItem>
-         
           )}
         />
 

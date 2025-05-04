@@ -2629,8 +2629,6 @@
     "edit_job": "تعديل الوظيفة",
     "job_details": "تفاصيل الوظيفة",
     "add_new": "وظيفة جديدة",
-    "add_new_listing": "صفحة توظيف جديدة",
-    "listing_details": "تفاصيل صفحة توظيف",
     "back_to_list": "العودة إلى القائمة",
     "no_jobs_found": "لم يتم العثور على وظائف",
     "failed_to_fetch_jobs": "فشل في جلب الوظائف",
@@ -2720,7 +2718,7 @@
   "JobListings": {
     "title": "صفحات التوظيف",
     "create_listing": "إنشاء صفحة توظيف",
-    "add_new_listing": "صفحة توظيف جديدة",
+    "add_new": "صفحة توظيف جديدة",
     "search_listings": "البحث في صفحات التوظيف...",
     "listing_details": "تفاصيل صفحة التوظيف",
     "jobs_section": {
@@ -2765,7 +2763,8 @@
       },
       "jobs": {
         "label": "الوظائف",
-        "placeholder": "اختر الوظائف"
+        "placeholder": "اختر الوظائف",
+        "required": "يجب إختيار وظيفة واحدة على الأقل"
       },
       "is_active": {
         "label": "هل هذا الإعلان نشط؟",

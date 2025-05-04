@@ -2,8 +2,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { useTranslations } from "next-intl";
-import { useState, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useMemo, useEffect } from "react";
+import { useForm, FieldError } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -19,11 +19,7 @@ import { useJobs } from "@/job/job.hooks";
 
 import { useCreateJobListing, useUpdateJobListing } from "@/job-listing/job-listing.hooks";
 import useJobListingsStore from "@/job-listing/job-listing.store";
-import {
-  JobListing,
-  JobListingUpdateData,
-  JobListingCreateData,
-} from "@/job-listing/job-listing.type";
+import { JobListingUpdateData, JobListingCreateData } from "@/job-listing/job-listing.type";
 
 import { useBranches } from "@/modules/branch/branch.hooks";
 import { useDepartments } from "@/modules/department/department.hooks";
@@ -35,14 +31,6 @@ import { JobForm } from "../job/job.form";
 import useJobStore from "../job/job.store";
 import { Job } from "../job/job.type";
 import { bulkAssociateJobsWithListing, updateListingJobAssociations } from "./job-listing.service";
-
-interface JobListingFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  loading?: boolean;
-  defaultValues?: JobListingUpdateData | null;
-  editMode?: boolean;
-}
 
 export const createJobListingFormSchema = (t: (key: string) => string) =>
   z.object({
@@ -208,13 +196,14 @@ export function JobListingForm({
 
         await createJobListing(createPayloadWithSlug, {
           onSuccess: async (createdListing) => {
-            toast.success(t("JobListings.success.create"));
+            toast.success(t("General.successful_operation"), {
+              description: t("JobListings.success.create"),
+            });
 
             // Associate selected jobs
             if (selectedJobIds.length > 0) {
               try {
                 await bulkAssociateJobsWithListing(createdListing.id, selectedJobIds);
-                toast.info(t("JobListings.success.associations_created"));
               } catch (assocError) {
                 console.error("Failed to associate jobs:", assocError);
                 toast.warning(t("JobListings.warning.associations_failed_create"));
@@ -245,18 +234,6 @@ export function JobListingForm({
       });
     }
   };
-
-  // --- Prepare Options Data ---
-  const availableCurrencies = useMemo(
-    () => [
-      // Replace with your actual currency list source if needed
-      { value: "USD", label: "USD - US Dollar" },
-      { value: "EUR", label: "EUR - Euro" },
-      { value: "GBP", label: "GBP - British Pound" },
-      // Add other currencies as needed
-    ],
-    [],
-  );
 
   const isLoadingLocations = isLoadingWarehouses || isLoadingBranches || isLoadingOffices;
   const availableLocations = useMemo(() => {
@@ -289,6 +266,13 @@ export function JobListingForm({
       .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
   }, [departments]);
   // --- End Options Data ---
+
+  useEffect(() => {
+    //  if there's at least one job selected, remove the form validation error state
+    if (form.getValues("jobs").length > 0) {
+      form.clearErrors("jobs");
+    }
+  }, [form.getValues("jobs")]);
 
   return (
     <>
@@ -329,7 +313,6 @@ export function JobListingForm({
           </div>
           <JobListingOptionsSection
             form={form}
-            availableCurrencies={availableCurrencies}
             availableLocations={availableLocations}
             availableDepartments={availableDepartments}
             loadingLocations={isLoadingLocations}
@@ -341,6 +324,8 @@ export function JobListingForm({
             subtitle={t("JobListings.jobs_section.subtitle")}
             onCreateText={t("Jobs.add_new")}
             onCreate={() => setIsJobDialogOpen(true)}
+            isError={form.formState.errors.jobs as FieldError}
+            onErrorText={t("JobListings.form.jobs.required")}
           />
           <div className="form-container">
             <FormField
@@ -378,7 +363,6 @@ export function JobListingForm({
                       </div>
                     ))}
                   </div>
-                  <FormMessage />
                 </FormItem>
               )}
             />

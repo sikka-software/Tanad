@@ -135,6 +135,14 @@ export const dynamicRoutePatterns = [
     ],
   },
   {
+    pattern: /^\/job_listings\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/job_listings", labelKey: "JobListings.title" },
+      { path: "/job_listings/add", labelKey: "JobListings.add_new", is_active: true },
+    ],
+  },
+  {
     pattern: /^\/jobs\/edit\/(.+)$/,
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Dashboard.title" },

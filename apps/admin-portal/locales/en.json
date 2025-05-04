@@ -1937,8 +1937,6 @@
     "edit_job": "Edit Job",
     "job_details": "Job Details",
     "add_new": "Add New Job",
-    "add_new_listing": "Add New Job Listing",
-    "listing_details": "Job Listing Details",
     "back_to_list": "Back to List",
     "no_jobs_found": "No jobs found",
     "failed_to_fetch_jobs": "Failed to fetch jobs",
@@ -2015,7 +2013,7 @@
   "JobListings": {
     "title": "Job Listings",
     "create_listing": "Create Listing",
-    "add_new_listing": "Add New Listing",
+    "add_new": "Add New Listing",
     "search_listings": "Search listings...",
     "listing_details": "Listing Details",
     "messages": {

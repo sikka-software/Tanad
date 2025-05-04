@@ -8,15 +8,15 @@ import PageTitle from "@/ui/page-title";
 
 import { JobListingForm, type JobListingFormValues } from "@/job-listing/job-listing.form";
 import { useCreateJobListing } from "@/job-listing/job-listing.hooks";
+import useJobListingsStore from "@/job-listing/job-listing.store";
 
 import useUserStore from "@/stores/use-user-store";
 
 export default function AddJobListingPage() {
   const t = useTranslations();
   const router = useRouter();
-  const user = useUserStore((state) => state.user);
-  const { mutateAsync: createJobListing, isPending: isCreating } = useCreateJobListing();
-  const [loading, setLoading] = useState(false);
+  const setIsLoading = useJobListingsStore((state) => state.setIsLoading);
+  const loading = useJobListingsStore((state) => state.isLoading);
 
   return (
     <div>
@@ -26,15 +26,18 @@ export default function AddJobListingPage() {
         loading={loading}
         onCancel={() => router.push("/job_listings")}
         texts={{
-          title: t("JobListings.add_new_listing"),
-          submit_form: t("JobListings.add_new_listing"),
+          title: t("JobListings.add_new"),
+          submit_form: t("JobListings.add_new"),
           cancel: t("General.cancel"),
         }}
       />
 
       <JobListingForm
         formHtmlId="job-listing-form"
-        onSuccess={() => router.push("/job_listings")}
+        onSuccess={() => {
+          router.push("/job_listings");
+          setIsLoading(false);
+        }}
       />
     </div>
   );
