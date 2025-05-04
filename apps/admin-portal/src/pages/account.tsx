@@ -14,6 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs";
 
 import { createClient } from "@/utils/supabase/component";
 
+import PasswordInput from "@/components/ui/password-input";
+
 interface ProfileFormValues {
   name: string;
   email: string;
@@ -34,9 +36,6 @@ export default function Account() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
   const {
     register: registerProfile,
     handleSubmit: handleProfileSubmit,
@@ -158,7 +157,7 @@ export default function Account() {
   if (!user) return null;
 
   return (
-    <div dir={lang === "ar" ? "rtl" : "ltr"}>
+    <div dir={lang === "ar" ? "rtl" : "ltr"} className="p-4 max-w-2xl mx-auto">
       <Tabs defaultValue="general" className="w-full">
         <TabsList className="grid w-full grid-cols-2" dir={lang === "ar" ? "rtl" : "ltr"}>
           <TabsTrigger value="general">{t("Profile.general")}</TabsTrigger>
@@ -224,33 +223,17 @@ export default function Account() {
           <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="flex flex-col gap-4">
             <div className="w-full space-y-2">
               <Label htmlFor="currentPassword">{t("Profile.current_password")}</Label>
-              <div className="relative">
-                <Input
-                  id="currentPassword"
-                  type={showCurrentPassword ? "text" : "password"}
-                  {...registerPassword("currentPassword", {
-                    required: t("Profile.current_password_required"),
-                    minLength: {
-                      value: 6,
-                      message: t("Profile.password_min_length"),
-                    },
-                  })}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute end-0 top-0 h-10 w-10 px-3 py-2"
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  tabIndex={-1}
-                >
-                  {showCurrentPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
+              <PasswordInput
+                id="currentPassword"
+                {...registerPassword("currentPassword", {
+                  required: t("Profile.current_password_required"),
+                  minLength: {
+                    value: 6,
+                    message: t("Profile.password_min_length"),
+                  },
+                })}
+              />
+
               {passwordErrors.currentPassword && (
                 <p className="text-sm text-red-500">{passwordErrors.currentPassword.message}</p>
               )}
@@ -258,29 +241,16 @@ export default function Account() {
 
             <div className="w-full space-y-2">
               <Label htmlFor="newPassword">{t("Profile.new_password")}</Label>
-              <div className="relative">
-                <Input
-                  id="newPassword"
-                  type={showNewPassword ? "text" : "password"}
-                  {...registerPassword("newPassword", {
-                    required: t("Profile.new_password_required"),
-                    minLength: {
-                      value: 6,
-                      message: t("Profile.password_min_length"),
-                    },
-                  })}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute end-0 top-0 h-10 w-10 px-3 py-2"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  tabIndex={-1}
-                >
-                  {showNewPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                </Button>
-              </div>
+              <PasswordInput
+                id="newPassword"
+                {...registerPassword("newPassword", {
+                  required: t("Profile.new_password_required"),
+                  minLength: {
+                    value: 6,
+                    message: t("Profile.password_min_length"),
+                  },
+                })}
+              />
 
               {passwordErrors.newPassword && (
                 <p className="text-sm text-red-500">{passwordErrors.newPassword.message}</p>
@@ -288,34 +258,16 @@ export default function Account() {
             </div>
             <div className="w-full space-y-2">
               <Label htmlFor="confirmNewPassword">{t("Profile.confirm_new_password")}</Label>
-              <div className="relative">
-                <Input
-                  id="confirmNewPassword"
-                  type={showConfirmNewPassword ? "text" : "password"}
-                  {...registerPassword("confirmNewPassword", {
-                    required: t("Profile.confirm_new_password_required"),
-                    minLength: {
-                      value: 6,
-                      message: t("Profile.password_min_length"),
-                    },
-                  })}
-                />
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute end-0 top-0 h-10 w-10 px-3 py-2"
-                  onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
-                  tabIndex={-1}
-                >
-                  {showConfirmNewPassword ? (
-                    <Eye className="h-4 w-4" />
-                  ) : (
-                    <EyeOff className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
+              <PasswordInput
+                id="confirmNewPassword"
+                {...registerPassword("confirmNewPassword", {
+                  required: t("Profile.confirm_new_password_required"),
+                  minLength: {
+                    value: 6,
+                    message: t("Profile.password_min_length"),
+                  },
+                })}
+              />
 
               {passwordErrors.confirmNewPassword && (
                 <p className="text-sm text-red-500">{passwordErrors.confirmNewPassword.message}</p>

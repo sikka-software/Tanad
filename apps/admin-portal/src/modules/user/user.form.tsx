@@ -11,6 +11,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 
+import PasswordInput from "@/components/ui/password-input";
+
 import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -333,8 +335,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
                   )}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
+                  <PasswordInput
                     placeholder={t("Users.form.password.placeholder")}
                     {...field}
                     disabled={isFormSubmitting}
