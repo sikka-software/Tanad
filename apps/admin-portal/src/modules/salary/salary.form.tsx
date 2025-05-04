@@ -23,6 +23,7 @@ import { ModuleFormProps } from "@/types/common.type";
 import { EmployeeForm } from "@/employee/employee.form";
 import { useEmployees } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
+import { Employee } from "@/employee/employee.types";
 
 import { useCreateSalary, useUpdateSalary } from "@/salary/salary.hooks";
 import useSalaryStore from "@/salary/salary.store";
@@ -165,7 +166,23 @@ export function SalaryForm({
                       data={employeeOptions}
                       isLoading={employeesLoading}
                       defaultValue={field.value}
-                      onChange={(value) => field.onChange(value || null)}
+                      onChange={(value) => {
+                        field.onChange(value || null);
+
+                        const selectedEmployee = employees.find(
+                          (emp: Employee) => `${emp.first_name} ${emp.last_name}` === value,
+                        );
+
+                        if (selectedEmployee && selectedEmployee.salary) {
+                          const totalSalary = selectedEmployee.salary.reduce(
+                            (sum, component) => sum + (component.amount || 0),
+                            0,
+                          );
+                          form.setValue("gross_amount", totalSalary);
+                        } else {
+                          form.setValue("gross_amount", 0);
+                        }
+                      }}
                       texts={{
                         placeholder: t("Salaries.form.employee_name.placeholder"),
                         searchPlaceholder: t("Employees.search_employees"),
