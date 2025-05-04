@@ -89,7 +89,7 @@ export function JobListingForm({
       title: "",
       description: "",
       jobs: [],
-      currency: "USD",
+      currency: "sar",
       enableSearchFiltering: true,
       locations: [],
       departments: [],
@@ -337,7 +337,8 @@ export function JobListingForm({
           />
 
           <FormSectionHeader
-            title={t("Jobs.title")}
+            title={t("JobListings.jobs_section.title")}
+            subtitle={t("JobListings.jobs_section.subtitle")}
             onCreateText={t("Jobs.add_new")}
             onCreate={() => setIsJobDialogOpen(true)}
           />
@@ -347,7 +348,6 @@ export function JobListingForm({
               name="jobs"
               render={() => (
                 <FormItem>
-                  <FormLabel>{t("Jobs.title")} *</FormLabel>
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {jobs?.map((job: Job) => (
                       <div

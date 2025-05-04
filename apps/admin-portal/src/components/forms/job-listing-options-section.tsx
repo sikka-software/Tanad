@@ -1,7 +1,18 @@
-import { useTranslations } from "next-intl";
+import { useProfile } from "@root/src/hooks/use-profile";
+import { getCurrencySymbol } from "@root/src/lib/currency-utils";
+import { currencies } from "@root/tanad.config";
+import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import {
   Select,
@@ -12,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 
+import { Skeleton } from "../ui/skeleton";
 // Assuming you have a multi-select component or will use checkboxes
 // import MultiSelect from "@/components/ui/multi-select";
 // import { Checkbox } from "@/components/ui/checkbox";
@@ -37,6 +49,8 @@ const JobListingOptionsSection = ({
   loadingDepartments,
 }: JobListingOptionsSectionProps) => {
   const t = useTranslations();
+  const lang = useLocale();
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("");
   return (
     <div>
       <FormSectionHeader title={t("JobListings.options.title")} />
@@ -48,22 +62,33 @@ const JobListingOptionsSection = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t("JobListings.options.currencyLabel")}</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                dir={lang === "ar" ? "rtl" : "ltr"}
+                onValueChange={(val) => {
+                  field.onChange(val);
+                  setSelectedCurrency(val);
+                }}
+                value={field.value || selectedCurrency}
+              >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder={t("JobListings.options.currencyPlaceholder")} />
+                    <SelectValue placeholder={t("General.select")} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {availableCurrencies.map((currency) => (
-                    <SelectItem key={currency.value} value={currency.value}>
-                      {currency.label}
+                  {currencies.map((currency) => (
+                    <SelectItem key={currency} value={currency}>
+                      <div className="flex flex-row items-center gap-2">
+                        <span>{t(`Settings.preferences.currency.${currency}`)}</span>
+                        {getCurrencySymbol(currency).symbol}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
               <FormMessage />
             </FormItem>
+         
           )}
         />
 
@@ -77,6 +102,9 @@ const JobListingOptionsSection = ({
                 <FormLabel className="text-base">
                   {t("JobListings.options.searchFilteringLabel")}
                 </FormLabel>
+                <FormDescription>
+                  {t("JobListings.options.searchFilteringDescription")}
+                </FormDescription>
               </div>
               <FormControl>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />

@@ -2723,17 +2723,23 @@
     "add_new_listing": "صفحة توظيف جديدة",
     "search_listings": "البحث في صفحات التوظيف...",
     "listing_details": "تفاصيل صفحة التوظيف",
+    "jobs_section": {
+      "title": "الوظائف",
+      "subtitle": "إختر الوظائف التي تريد نشرها في هذه الصفحة",
+      "add_new": "وظيفة جديدة"
+    },
     "options": {
       "title": "إعدادات صفحة التوظيف",
-      "currencyLabel": "العملة",
-      "currencyPlaceholder": "اختر العملة",
+      "currencyLabel": "عملة الرواتب",
+      "currencyPlaceholder": "اختر عملة الرواتب",
       "searchFilteringLabel": "البحث والتصفية",
       "locationsLabel": "المواقع",
       "locationsPlaceholder": "اختر المواقع",
       "departmentsLabel": "الأقسام",
       "departmentsPlaceholder": "اختر الأقسام",
       "enableSearchFilteringLabel": "البحث والتصفية",
-      "enableSearchFilteringPlaceholder": "تفعيل البحث والتصفية"
+      "enableSearchFilteringPlaceholder": "تفعيل البحث والتصفية",
+      "searchFilteringDescription": "يمكنك تفعيل البحث والتصفية لصفحة التوظيف للمستخدمين للبحث عن الوظائف التي يحتاجونها"
     },
     "messages": {
       "auth_required": "يجب تسجيل الدخول لإنشاء إعلان وظيفي",
