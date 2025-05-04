@@ -40,6 +40,7 @@ const landingPages = [
   "/appeal",
   "/404",
   "/directory",
+  "/custom-pricing",
 ];
 
 function AppContent({ Component, pageProps, router }: AppProps) {
