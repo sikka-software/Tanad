@@ -3,6 +3,7 @@
     "sikka": "سِكَّة",
     "tanad": "تند",
     "dark": "داكن",
+    "ready": "جاهز",
     "light": "فاتح",
     "language": "اللغة",
     "theme": "طابع الموقع",
@@ -3467,7 +3468,7 @@
     "export": {
       "exportAs": "{fileType} تصدير كملف",
       "generatingPDF": "جاري إنشاء الملف المرفق...",
-      "downloadPDF": "تحميل الملف المرفق",
+      "downloadPDF": "{fileType} تحميل ملف",
       "preparingPDF": "جاري إعادة ترتيب البيانات للطباعة...",
       "preparingPDFShort": "جاري إعادة ترتيب البيانات للطباعة...",
       "readyPDF": "تم إعادة ترتيب البيانات للطباعة",

@@ -1,12 +1,23 @@
 "use client";
 
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Document, Page, PDFDownloadLink, Text, pdf } from "@react-pdf/renderer";
 import { format } from "date-fns";
-import { CalendarIcon, Download, Filter, Search, X, Loader2, ChevronDown } from "lucide-react";
+import {
+  CalendarIcon,
+  Download,
+  Filter,
+  Search,
+  X,
+  Loader2,
+  ChevronDown,
+  DownloadIcon,
+  FileIcon,
+} from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useMemo } from "react";
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -49,7 +60,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
   const { data: users, isLoading: isLoadingUsers } = useUsers();
   const [isProcessingExport, setIsProcessingExport] = useState(false);
   const [pdfData, setPdfData] = useState<ActivityLogListData[] | null>(null);
-  const [triggerPdfDownload, setTriggerPdfDownload] = useState(false);
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
 
   const handleClearFilters = () => {
     clearFilters();
@@ -119,6 +130,34 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
       setPdfData(null);
     } finally {
       setTimeout(() => setIsProcessingExport(false), 500);
+    }
+  };
+
+  const handleDownloadPdfClick = async () => {
+    if (!pdfData || pdfData.length === 0 || isGeneratingLink) return;
+
+    setIsGeneratingLink(true);
+    const toastId = toast.loading(t("ActivityLogs.export.generatingPDF"));
+
+    try {
+      const docElement = (
+        <ActivityLogPDFDocument data={pdfData} title={t("ActivityLogs.pdfTitle")} />
+      );
+      const blob = await pdf(docElement).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `activity_logs_${format(new Date(), "yyyyMMddHHmmss")}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success(t("ActivityLogs.export.successPDF"), { id: toastId });
+    } catch (error) {
+      console.error("Failed to generate or download PDF:", error);
+      toast.error(t("ActivityLogs.export.errorPDF"), { id: toastId });
+    } finally {
+      setIsGeneratingLink(false);
     }
   };
 
@@ -253,34 +292,46 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
               <DropdownMenuItem
                 onSelect={(e) => {
                   e.preventDefault();
-                  if (!pdfData) {
+                  if (pdfData && pdfData.length > 0 && !isGeneratingLink) {
+                    handleDownloadPdfClick();
+                  } else if (!pdfData && !isProcessingExport) {
                     handlePreparePDF();
                   }
                 }}
-                disabled={isProcessingExport}
-                className="relative p-0"
+                disabled={
+                  isProcessingExport ||
+                  isGeneratingLink ||
+                  (pdfData !== null && pdfData.length === 0)
+                }
+                className={cn(
+                  "relative",
+                  (isProcessingExport ||
+                    isGeneratingLink ||
+                    (pdfData !== null && pdfData.length === 0)) &&
+                    "cursor-not-allowed opacity-50",
+                  !isProcessingExport &&
+                    !isGeneratingLink &&
+                    (pdfData === null || (pdfData && pdfData.length > 0)) &&
+                    "cursor-pointer",
+                )}
               >
-                {pdfData ? (
-                  <PDFDownloadLink
-                    document={
-                      <ActivityLogPDFDocument data={pdfData} title={t("ActivityLogs.pdfTitle")} />
-                    }
-                    fileName={`activity_logs_${format(new Date(), "yyyyMMddHHmmss")}.pdf`}
-                    className="block w-full px-2 py-1.5 text-sm"
-                  >
-                    {({ blob, url, loading, error }) =>
-                      loading
-                        ? t("ActivityLogs.export.generatingPDF")
-                        : t("ActivityLogs.export.downloadPDF")
-                    }
-                  </PDFDownloadLink>
+                {isProcessingExport ? (
+                  <span>{t("ActivityLogs.export.preparingPDFShort")}</span>
+                ) : isGeneratingLink ? (
+                  <span>{t("ActivityLogs.export.generatingPDF")}</span>
+                ) : pdfData === null ? (
+                  <span>
+                    {t("ActivityLogs.export.exportAs", {
+                      fileType: "PDF",
+                    })}
+                  </span>
+                ) : pdfData.length === 0 ? (
+                  <span className="text-muted-foreground">{t("ActivityLogs.export.noData")}</span>
                 ) : (
-                  <span className="block w-full px-2 py-1.5 text-sm">
-                    {isProcessingExport
-                      ? t("ActivityLogs.export.preparingPDFShort")
-                      : t("ActivityLogs.export.exportAs", {
-                          fileType: "PDF",
-                        })}
+                  <span>
+                    {t("ActivityLogs.export.downloadPDF", {
+                      fileType: "PDF",
+                    })}
                   </span>
                 )}
               </DropdownMenuItem>
