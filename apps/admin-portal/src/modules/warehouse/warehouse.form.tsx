@@ -11,6 +11,7 @@ import { Textarea } from "@/ui/textarea";
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
 import CodeInput from "@/components/ui/code-input";
+import PhoneInput from "@/components/ui/phone-input";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -24,6 +25,7 @@ export const createWarehouseFormSchema = (t: (key: string) => string) => {
   const baseWarehouseFormSchema = z.object({
     name: z.string().min(1, t("Warehouses.form.name.required")),
     code: z.string().min(1, t("Warehouses.form.code.required")),
+    phone: z.string().optional(),
     capacity: z.string().optional(),
     is_active: z.boolean().default(true),
     notes: z.string().optional(),
@@ -217,7 +219,20 @@ export function WarehouseForm({
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Warehouses.form.phone.label")}</FormLabel>
+                  <FormControl>
+                    <PhoneInput value={field.value || ""} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="capacity"

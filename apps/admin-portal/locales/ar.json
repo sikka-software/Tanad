@@ -2094,6 +2094,10 @@
         "placeholder": "أدخل اسم المستودع",
         "required": "الاسم مطلوب"
       },
+      "phone": {
+        "label": "الهاتف",
+        "placeholder": "أدخل رقم الهاتف"
+      },
       "code": {
         "label": "الرمز",
         "placeholder": "أدخل رمز المستودع",

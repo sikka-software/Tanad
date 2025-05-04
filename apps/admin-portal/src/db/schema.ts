@@ -1185,6 +1185,7 @@ export const warehouses = pgTable(
     region: text(),
     country: text(),
     zip_code: text(),
+    phone: text(),
     capacity: numeric({ precision: 10, scale: 2 }),
     is_active: boolean().default(true).notNull(),
     notes: text(),
