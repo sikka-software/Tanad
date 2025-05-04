@@ -1,78 +1,59 @@
-import { useQueryClient } from "@tanstack/react-query";
+import useDomainStore from "@root/src/modules/domain/domain.store";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
-
-import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { BranchForm } from "@/branch/branch.form";
-import { branchKeys } from "@/branch/branch.hooks";
-import useBranchStore from "@/branch/branch.store";
+import { DomainForm } from "@/modules/domain/domain.form";
 
-import useUserStore from "@/stores/use-user-store";
-
-export default function AddBranchPage() {
-  const supabase = createClient();
+export default function AddDomainPage() {
   const router = useRouter();
   const t = useTranslations();
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
 
-  const setIsLoading = useBranchStore((state) => state.setIsLoading);
-  const isLoading = useBranchStore((state) => state.isLoading);
+  const setIsLoading = useDomainStore((state) => state.setIsLoading);
+  const isLoading = useDomainStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
-    const form = (window as any).branchForm;
+    const form = (window as any).domainForm;
     if (form) {
-      form.setValue("name", dummyData.full_name);
-      form.setValue("code", "BR-" + Math.random().toString(36).substr(2, 6));
-      form.setValue("email", dummyData.email);
-      form.setValue("phone", dummyData.phone);
-      form.setValue("address", dummyData.address);
-      form.setValue("city", dummyData.city);
-      form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zip_code);
-      form.setValue("manager", dummyData.full_name);
-      form.setValue("is_active", true);
-      form.setValue("notes", "Test branch notes");
+      form.setValue("domain_name", dummyData.full_name);
+      form.setValue("registrar", dummyData.email);
+      form.setValue("monthly_cost", dummyData.phone);
+      form.setValue("annual_cost", dummyData.address);
+      form.setValue("payment_cycle", dummyData.city);
+      form.setValue("notes", dummyData.state);
     }
-  };
-
-  const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Branches.success.create"),
-    });
-    router.push("/branches");
-    setIsLoading(false);
   };
 
   return (
     <div>
-      <CustomPageMeta title={t("Branches.add_new")} />
+      <CustomPageMeta title={t("Domains.add_new")} />
       <PageTitle
         formButtons
-        formId="branch-form"
+        formId="domain-form"
         loading={isLoading}
-        onCancel={() => router.push("/branches")}
+        onCancel={() => router.push("/domains")}
         texts={{
-          title: t("Branches.add_new"),
-          submit_form: t("Branches.add_new"),
+          title: t("Domains.add_new"),
+          submit_form: t("Domains.add_new"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
       />
 
-      <BranchForm formHtmlId="branch-form" onSuccess={onAddSuccess} />
+      <DomainForm
+        formHtmlId="domain-form"
+        onSuccess={() => {
+          router.push("/domains");
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

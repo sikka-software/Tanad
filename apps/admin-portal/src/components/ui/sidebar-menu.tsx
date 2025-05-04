@@ -210,10 +210,12 @@ const NonCollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][numb
         </SidebarMenuButton>
       </Link>
       {item.action && (
-        <SidebarMenuAction className="absolute !end-1 top-1/2 -translate-y-1/2">
-          <Plus className="!size-3" />
-          <span className="sr-only">More</span>
-        </SidebarMenuAction>
+        <Link href={item.action}>
+          <SidebarMenuAction className="absolute !end-1 top-1/2 -translate-y-1/2">
+            <Plus className="!size-3" />
+            <span className="sr-only">More</span>
+          </SidebarMenuAction>
+        </Link>
       )}
     </SidebarMenuItem>
   );

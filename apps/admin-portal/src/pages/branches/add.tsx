@@ -1,31 +1,19 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
-
-import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
 import { BranchForm } from "@/branch/branch.form";
-import { branchKeys } from "@/branch/branch.hooks";
 import useBranchStore from "@/branch/branch.store";
 
-import useUserStore from "@/stores/use-user-store";
-
 export default function AddBranchPage() {
-  const supabase = createClient();
   const router = useRouter();
   const t = useTranslations();
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
 
   const setIsLoading = useBranchStore((state) => state.setIsLoading);
   const isLoading = useBranchStore((state) => state.isLoading);
@@ -48,14 +36,6 @@ export default function AddBranchPage() {
     }
   };
 
-  const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Branches.success.create"),
-    });
-    router.push("/branches");
-    setIsLoading(false);
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Branches.add_new")} />
@@ -72,7 +52,13 @@ export default function AddBranchPage() {
         dummyButton={handleDummyData}
       />
 
-      <BranchForm formHtmlId="branch-form" onSuccess={onAddSuccess} />
+      <BranchForm
+        formHtmlId="branch-form"
+        onSuccess={() => {
+          router.push("/branches");
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

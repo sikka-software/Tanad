@@ -111,7 +111,7 @@ export default function DomainsPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Domains.title")}
             onAddClick={canCreateDomains ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Domains.create_domain")}
+            createLabel={t("Domains.create_new")}
             searchPlaceholder={t("Domains.search_domains")}
             count={domains?.length}
             hideOptions={domains?.length === 0}

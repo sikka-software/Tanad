@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Select } from "@radix-ui/react-select";
+import { CurrencyInput } from "@root/src/components/ui/currency-input";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -172,29 +173,11 @@ export function DomainForm({
                 <FormItem>
                   <FormLabel>{t("Domains.form.registrar.label")} *</FormLabel>
                   <FormControl>
-                    <CodeInput
-                      onSerial={() => {
-                        const nextNumber = (domains?.length || 0) + 1;
-                        const paddedNumber = String(nextNumber).padStart(4, "0");
-                        form.setValue("registrar", `BR-${paddedNumber}`);
-                      }}
-                      onRandom={() => {
-                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                        let randomCode = "";
-                        for (let i = 0; i < 5; i++) {
-                          randomCode += randomChars.charAt(
-                            Math.floor(Math.random() * randomChars.length),
-                          );
-                        }
-                        form.setValue("registrar", `BR-${randomCode}`);
-                      }}
-                    >
-                      <Input
-                        placeholder={t("Domains.form.registrar.placeholder")}
-                        {...field}
-                        disabled={isLoading}
-                      />
-                    </CodeInput>
+                    <Input
+                      placeholder={t("Domains.form.registrar.placeholder")}
+                      {...field}
+                      disabled={isLoading}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -202,7 +185,7 @@ export function DomainForm({
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="monthly_cost"
@@ -210,7 +193,14 @@ export function DomainForm({
                 <FormItem>
                   <FormLabel>{t("Domains.form.monthly_cost.label")}</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <CurrencyInput
+                      placeholder={t("Domains.form.monthly_cost.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                      showCommas={true}
+                      value={field.value ? parseFloat(String(field.value)) : undefined}
+                      onChange={(value) => field.onChange(value?.toString() || "")}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -224,7 +214,14 @@ export function DomainForm({
                 <FormItem>
                   <FormLabel>{t("Domains.form.annual_cost.label")}</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <CurrencyInput
+                      placeholder={t("Domains.form.annual_cost.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                      showCommas={true}
+                      value={field.value ? parseFloat(String(field.value)) : undefined}
+                      onChange={(value) => field.onChange(value?.toString() || "")}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -244,26 +241,25 @@ export function DomainForm({
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Domains.form.notes.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={t("Domains.form.notes.placeholder")}
+                    className="min-h-[120px]"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Domains.form.notes.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder={t("Domains.form.notes.placeholder")}
-                  className="min-h-[120px]"
-                  {...field}
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </form>
     </Form>
   );

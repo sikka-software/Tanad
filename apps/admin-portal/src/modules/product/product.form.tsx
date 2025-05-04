@@ -17,7 +17,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateProduct, useUpdateProduct, useProducts } from "./product.hooks";
 import useProductStore from "./product.store";
-import { Product, ProductUpdateData } from "./product.type";
+import { ProductUpdateData } from "./product.type";
 
 export const createProductSchema = (t: (key: string) => string) =>
   z.object({

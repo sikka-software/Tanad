@@ -1540,7 +1540,7 @@
     "no_description": "لا يوجد وصف",
     "sku_label": "رمز المنتج: {value}",
     "stock_label": "المخزون: {value}",
-    "create_invoice": "إنشاء فاتورة",
+    "create_new": "إنشاء فاتورة",
     "creating": "جاري الإنشاء...",
     "no_invoices_found": "لم يتم العثور على فواتير",
     "add_first_invoice": "أضف أول فاتورة",
@@ -2098,7 +2098,7 @@
     "singular": "فرع",
     "add_new": "فرع جديد",
     "branch_details": "تفاصيل الفرع",
-    "create_branch": "إنشاء فرع",
+    "create_new": "إنشاء فرع",
     "no_branches_found": "لا توجد فروع",
     "search_branches": "بحث عن فروع...",
     "manager": "المدير",
@@ -3539,7 +3539,69 @@
   },
   "Domains": {
     "title": "النطاقات",
-    "add_new": "نطاق جديد"
+    "add_new": "نطاق جديد",
+    "singular": "نطاق",
+    "domain_details": "تفاصيل النطاق",
+    "create_new": "إنشاء نطاق",
+    "no_domains_found": "لا توجد نطاقات",
+    "search_domains": "بحث عن نطاقات...",
+    "manager": "المدير",
+    "edit": "تعديل النطاق",
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "form": {
+      "domain_name": {
+        "label": "الاسم",
+        "placeholder": "أدخل اسم النطاق",
+        "required": "الاسم مطلوب"
+      },
+      "registrar": {
+        "label": "المسوق",
+        "placeholder": "أدخل المسوق",
+        "required": "المسوق مطلوب"
+      },
+      "monthly_cost": {
+        "label": "التكلفة الشهرية",
+        "placeholder": "أدخل التكلفة الشهرية",
+        "required": "التكلفة الشهرية مطلوبة"
+      },
+      "annual_cost": {
+        "label": "التكلفة السنوية",
+        "placeholder": "أدخل التكلفة السنوية",
+        "required": "التكلفة السنوية مطلوبة"
+      },
+      "payment_cycle": {
+        "label": "دورة الدفع",
+        "placeholder": "أدخل دورة الدفع",
+        "required": "دورة الدفع مطلوبة"
+      },
+      "notes": {
+        "label": "الملاحظات",
+        "placeholder": "أدخل الملاحظات"
+      },
+      "update_button": "تحديث النطاق",
+      "create_button": "إنشاء نطاق"
+    },
+    "success": {
+      "create": "تم إنشاء النطاق بنجاح",
+      "update": "تم تحديث النطاق بنجاح",
+      "delete": "تم حذف النطاق بنجاح",
+      "duplicate": "تم تكرار النطاق بنجاح"
+    },
+    "loading": {
+      "create": "جاري إنشاء النطاق...",
+      "update": "جاري تحديث النطاق...",
+      "delete": "جاري حذف النطاق...",
+      "duplicate": "جاري تكرار النطاق..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء النطاق",
+      "update": "حدث خطأ أثناء تحديث النطاق",
+      "delete": "حدث خطأ أثناء حذف النطاق",
+      "duplicate": "حدث خطأ أثناء تكرار النطاق"
+    }
   },
   "Websites": {
     "title": "المواقع الإلكترونية",

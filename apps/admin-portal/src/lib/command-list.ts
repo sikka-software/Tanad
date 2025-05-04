@@ -120,6 +120,36 @@ export const commandList = [
     ],
   },
   {
+    heading: "Internet.title",
+    items: [
+      {
+        icon: ModulesOptions.domains.icon,
+        label: ModulesOptions.domains.label,
+        shortcut: "⌘D",
+        href: ModulesOptions.domains.url,
+      },
+
+      {
+        icon: ModulesOptions.websites.icon,
+        label: ModulesOptions.websites.label,
+        shortcut: "⌘W",
+        href: ModulesOptions.websites.url,
+      },
+      {
+        icon: ModulesOptions.online_stores.icon,
+        label: ModulesOptions.online_stores.label,
+        shortcut: "⌘O",
+        href: ModulesOptions.online_stores.url,
+      },
+      {
+        icon: ModulesOptions.servers.icon,
+        label: ModulesOptions.servers.label,
+        shortcut: "⌘S",
+        href: ModulesOptions.servers.url,
+      },
+    ],
+  },
+  {
     heading: "Navigation.organization",
     items: [
       {
