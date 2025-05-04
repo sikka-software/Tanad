@@ -9,11 +9,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
 
+import CodeInput from "@/components/ui/code-input";
+
 import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateProduct, useUpdateProduct } from "./product.hooks";
+import { useCreateProduct, useUpdateProduct, useProducts } from "./product.hooks";
 import useProductStore from "./product.store";
 import { Product, ProductUpdateData } from "./product.type";
 
@@ -52,6 +54,8 @@ export function ProductForm({
   const { profile, membership } = useUserStore();
   const { mutateAsync: createProduct, isPending: isCreating } = useCreateProduct();
   const { mutateAsync: updateProduct, isPending: isUpdating } = useUpdateProduct();
+
+  const { data: products } = useProducts();
 
   const isLoading = useProductStore((state) => state.isLoading);
   const setIsLoading = useProductStore((state) => state.setIsLoading);
@@ -172,35 +176,35 @@ export function ProductForm({
                 <FormItem>
                   <FormLabel>{t("Products.form.sku.label")}</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder={t("Products.form.sku.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
+                    <CodeInput
+                      onSerial={() => {
+                        const nextNumber = (products?.length || 0) + 1;
+                        const paddedNumber = String(nextNumber).padStart(4, "0");
+                        form.setValue("sku", `SKU-${paddedNumber}`);
+                      }}
+                      onRandom={() => {
+                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        let randomCode = "";
+                        for (let i = 0; i < 5; i++) {
+                          randomCode += randomChars.charAt(
+                            Math.floor(Math.random() * randomChars.length),
+                          );
+                        }
+                        form.setValue("sku", `SKU-${randomCode}`);
+                      }}
+                    >
+                      <Input
+                        placeholder={t("Products.form.sku.placeholder")}
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </CodeInput>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Products.form.description.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Products.form.description.placeholder")}
-                    rows={4}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
@@ -237,6 +241,24 @@ export function ProductForm({
               )}
             />
           </div>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Products.form.description.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder={t("Products.form.description.placeholder")}
+                    rows={4}
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="notes"
