@@ -2886,6 +2886,92 @@
     }
   },
   "ActivityLogs": {
-    "title": "Activity Logs"
+    "title": "Activity Log",
+    "description": "Log of activities performed in the enterprise within a specific period",
+    "dialog": {
+      "title": "Activity Details"
+    },
+    "error_fetching": "An error occurred while fetching activities",
+    "no_activity_logs_found": "No activities found",
+    "export": {
+      "exportAs": "Export As {fileType}",
+      "generatingPDF": "Generating PDF file...",
+      "downloadPDF": "Download PDF file",
+      "preparingPDF": "Preparing data for printing...",
+      "preparingPDFShort": "Preparing PDF...",
+      "readyPDF": "Data ready for printing",
+      "noData": "No data to export",
+      "errorPDF": "An error occurred while generating the PDF file",
+      "errorCSV": "An error occurred while generating the CSV file",
+      "successPDF": "PDF file generated successfully",
+      "successCSV": "CSV file generated successfully"
+    },
+    "filters": {
+      "date_range": "Date Range",
+      "select_date_range": "Select Date Range",
+      "event_type": "Event Type",
+      "select_event_type": "Select Event Type",
+      "all_events": "All Events",
+      "login": "Login",
+      "logout": "Logout",
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "view": "View",
+      "manage": "Manage",
+      "approve": "Approve",
+      "process": "Process",
+      "report": "Report",
+      "configure": "Configure",
+      "manage_users": "Manage Users",
+      "invite": "Invite",
+      "export": "Export",
+      "import": "Import",
+      "print": "Print",
+      "send": "Send",
+      "receive": "Receive",
+      "assign": "Assign",
+      "unassign": "Unassign",
+      "edit": "Edit",
+      "clearFilters": "Clear Filters",
+      "selectUser": "Select User",
+      "selectTimeRange": "Select Time Range",
+      "lastHour": "Last Hour",
+      "last24Hours": "Last 24 Hours",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "last90Days": "Last 90 Days",
+      "customRange": "Custom Range",
+      "allUsers": "All Users",
+      "administrators": "Administrators",
+      "developers": "Developers",
+      "viewers": "Viewers",
+      "user": "User",
+      "timeRange": "Time Range",
+      "pickDate": "Pick Date",
+      "filter": "Filters",
+      "search": "Search"
+    },
+
+    "fields": {
+      "id": "ID",
+      "user_full_name": "User Full Name",
+      "user_email": "User Email",
+      "action_type": "Action Type",
+      "target_type": "Target Type",
+      "target_name": "Target Name",
+      "target_id": "Target ID",
+      "details": "Details",
+      "created_at": "Created At",
+      "enterprise_id": "Enterprise ID",
+      "user_id": "User ID"
+    },
+    "action_description": {
+      "created": "Created {target} named {name}",
+      "updated": "Updated {target} named {name}",
+      "deleted": "Deleted {target} named {name}",
+      "unknown": "Performed {action} on {target}"
+    }
   }
 }

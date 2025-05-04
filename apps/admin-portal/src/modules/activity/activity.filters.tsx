@@ -1,14 +1,21 @@
 "use client";
 
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { format } from "date-fns";
-import { CalendarIcon, Download, Filter, Search, X, Loader2 } from "lucide-react";
+import { CalendarIcon, Download, Filter, Search, X, Loader2, ChevronDown } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { DatePicker } from "@/components/ui/date-picker";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import IconButton from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,12 +28,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+
 import { downloadCSV } from "@/lib/csv-utils";
+import { cn } from "@/lib/utils";
 
 import { ProfileType } from "@/stores/use-user-store";
 
 import { useUsers } from "../user/user.hooks";
+import { ActivityLogPDFDocument } from "./activity.pdf";
 import { ActivityService } from "./activity.service";
 import { useActivityLogStore } from "./activity.store";
 import type { ActivityLogListData } from "./activity.type";
@@ -38,14 +47,17 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
   const locale = useLocale();
   const { filters, setFilters, clearFilters } = useActivityLogStore();
   const { data: users, isLoading: isLoadingUsers } = useUsers();
-  const [isExporting, setIsExporting] = useState(false);
+  const [isProcessingExport, setIsProcessingExport] = useState(false);
+  const [pdfData, setPdfData] = useState<ActivityLogListData[] | null>(null);
+  const [triggerPdfDownload, setTriggerPdfDownload] = useState(false);
 
   const handleClearFilters = () => {
     clearFilters();
   };
 
-  const handleExport = async () => {
-    setIsExporting(true);
+  const handleExportCSV = async () => {
+    setPdfData(null);
+    setIsProcessingExport(true);
     const toastId = toast.loading(t("ActivityLogs.export.loading"));
     try {
       const logsToExport = await ActivityService.exportList(filters);
@@ -69,16 +81,44 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
       const formattedData = logsToExport.map((log) => ({
         ...log,
         created_at: format(new Date(log.created_at), "yyyy-MM-dd HH:mm:ss"),
-        details: typeof log.details === 'object' ? JSON.stringify(log.details) : log.details,
+        details: typeof log.details === "object" ? JSON.stringify(log.details) : log.details,
       }));
 
-      downloadCSV(formattedData, headers, `activity_logs_${format(new Date(), "yyyyMMddHHmmss")}.csv`);
-      toast.success(t("ActivityLogs.export.success"), { id: toastId });
+      downloadCSV(
+        formattedData,
+        headers,
+        `activity_logs_${format(new Date(), "yyyyMMddHHmmss")}.csv`,
+      );
+      toast.success(t("ActivityLogs.export.successCSV"), { id: toastId });
     } catch (error) {
-      console.error("Failed to export activity logs:", error);
-      toast.error(t("ActivityLogs.export.error"), { id: toastId });
+      console.error("Failed to export activity logs as CSV:", error);
+      toast.error(t("ActivityLogs.export.errorCSV"), { id: toastId });
     } finally {
-      setIsExporting(false);
+      setIsProcessingExport(false);
+    }
+  };
+
+  const handlePreparePDF = async () => {
+    setPdfData(null);
+    setIsProcessingExport(true);
+    const toastId = toast.loading(t("ActivityLogs.export.preparingPDF"));
+    try {
+      const logsToExport = await ActivityService.exportList(filters);
+
+      if (logsToExport.length === 0) {
+        toast.info(t("ActivityLogs.export.noData"), { id: toastId });
+        setPdfData([]);
+        return;
+      }
+
+      setPdfData(logsToExport);
+      toast.success(t("ActivityLogs.export.readyPDF"), { id: toastId, duration: 2000 });
+    } catch (error) {
+      console.error("Failed to prepare activity logs for PDF export:", error);
+      toast.error(t("ActivityLogs.export.errorPDF"), { id: toastId });
+      setPdfData(null);
+    } finally {
+      setTimeout(() => setIsProcessingExport(false), 500);
     }
   };
 
@@ -181,14 +221,71 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
               </div>
             </PopoverContent>
           </Popover>
-          <IconButton
-            icon={isExporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            label={t("General.export")}
-            variant="outline"
-            className="size-9"
-            onClick={handleExport}
-            disabled={isExporting}
-          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <IconButton
+                icon={
+                  isProcessingExport ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4" />
+                  )
+                }
+                label={t("General.export")}
+                variant="outline"
+                className="size-9"
+                disabled={isProcessingExport}
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem
+                onClick={handleExportCSV}
+                disabled={isProcessingExport}
+                dir="ltr"
+                style={{
+                  direction: "ltr",
+                }}
+              >
+                {t("ActivityLogs.export.exportAs", {
+                  fileType: "CSV",
+                })}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  if (!pdfData) {
+                    handlePreparePDF();
+                  }
+                }}
+                disabled={isProcessingExport}
+                className="relative p-0"
+              >
+                {pdfData ? (
+                  <PDFDownloadLink
+                    document={
+                      <ActivityLogPDFDocument data={pdfData} title={t("ActivityLogs.pdfTitle")} />
+                    }
+                    fileName={`activity_logs_${format(new Date(), "yyyyMMddHHmmss")}.pdf`}
+                    className="block w-full px-2 py-1.5 text-sm"
+                  >
+                    {({ blob, url, loading, error }) =>
+                      loading
+                        ? t("ActivityLogs.export.generatingPDF")
+                        : t("ActivityLogs.export.downloadPDF")
+                    }
+                  </PDFDownloadLink>
+                ) : (
+                  <span className="block w-full px-2 py-1.5 text-sm">
+                    {isProcessingExport
+                      ? t("ActivityLogs.export.preparingPDFShort")
+                      : t("ActivityLogs.export.exportAs", {
+                          fileType: "PDF",
+                        })}
+                  </span>
+                )}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
