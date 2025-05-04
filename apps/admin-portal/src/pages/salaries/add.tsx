@@ -32,16 +32,14 @@ export default function AddSalaryPage() {
         dummyButton={generateDummySalary}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <SalaryForm
-          formHtmlId="salary-form"
-          onSuccess={() =>
-            router.push("/salaries").then(() => {
-              setLoading(false);
-            })
-          }
-        />
-      </div>
+      <SalaryForm
+        formHtmlId="salary-form"
+        onSuccess={() =>
+          router.push("/salaries").then(() => {
+            setLoading(false);
+          })
+        }
+      />
     </div>
   );
 }
