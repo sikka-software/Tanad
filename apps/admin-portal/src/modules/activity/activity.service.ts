@@ -99,16 +99,20 @@ export class ActivityService {
         const fromDate = dateRange?.from ? startOfDay(dateRange.from) : null;
         const toDate = dateRange?.to ? endOfDay(dateRange.to) : null;
         console.log(
-          `Filtering Log ID: ${log.id}, Log Date: ${logDate.toISOString()}, Filter From: ${fromDate?.toISOString() || 'N/A'}, Filter To: ${toDate?.toISOString() || 'N/A'}`,
+          `Filtering Log ID: ${log.id}, Log Date: ${logDate.toISOString()}, Filter From: ${fromDate?.toISOString() || "N/A"}, Filter To: ${toDate?.toISOString() || "N/A"}`,
         );
 
         // Date range filter
         if (fromDate) {
-          console.log(`Comparing: ${logDate.toISOString()} < ${fromDate.toISOString()} = ${logDate < fromDate}`);
+          console.log(
+            `Comparing: ${logDate.toISOString()} < ${fromDate.toISOString()} = ${logDate < fromDate}`,
+          );
           if (logDate < fromDate) return false;
         }
         if (toDate) {
-          console.log(`Comparing: ${logDate.toISOString()} > ${toDate.toISOString()} = ${logDate > toDate}`);
+          console.log(
+            `Comparing: ${logDate.toISOString()} > ${toDate.toISOString()} = ${logDate > toDate}`,
+          );
           if (logDate > toDate) return false;
         }
 
@@ -181,7 +185,10 @@ export class ActivityService {
       error: sessionError,
     } = await supabase.auth.getSession();
     if (sessionError || !session?.user) {
-      console.error("ActivityService.exportList: Error fetching session or no user found", sessionError);
+      console.error(
+        "ActivityService.exportList: Error fetching session or no user found",
+        sessionError,
+      );
       throw new Error("User session not found.");
     }
     const user_id = session.user.id;
@@ -261,6 +268,70 @@ export class ActivityService {
 
     // 5. Return ALL filtered data (no pagination)
     return formattedData;
+  }
+
+  // --- New Method ---
+  /**
+   * Fetches activity log counts grouped by date for a given period using RPC.
+   */
+  static async getActivityCountsByDate(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<{ date: string; count: number }[]> {
+    const supabase = createClient();
+
+    // 1. Get enterprise ID
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+    if (sessionError || !session?.user) {
+      console.error(
+        "ActivityService.getActivityCountsByDate: Error fetching session or no user found",
+        sessionError,
+      );
+      throw new Error("User session not found.");
+    }
+    const user_id = session.user.id;
+
+    const { data: membership, error: enterpriseError } = await supabase
+      .from("memberships")
+      .select("enterprise_id")
+      .eq("profile_id", user_id)
+      .maybeSingle();
+
+    if (enterpriseError) {
+      console.error(
+        "ActivityService.getActivityCountsByDate: Error fetching enterprise ID:",
+        enterpriseError,
+      );
+      throw new Error("Failed to retrieve enterprise association.");
+    }
+    if (!membership?.enterprise_id) {
+      console.warn(
+        "ActivityService.getActivityCountsByDate: User is not associated with an enterprise.",
+      );
+      return []; // Return empty if no enterprise
+    }
+    const enterprise_id = membership.enterprise_id;
+
+    // 2. Call the RPC function
+    const { data, error } = await supabase.rpc("get_daily_activity_counts", {
+      p_enterprise_id: enterprise_id,
+      p_start_date: startDate.toISOString(),
+      p_end_date: endDate.toISOString(),
+    });
+
+    if (error) {
+      console.error("ActivityService.getActivityCountsByDate RPC error:", error);
+      throw error;
+    }
+
+    // 3. Map the result (ensure date is string YYYY-MM-DD, count is number)
+    return (data || []).map((row: { activity_date: string; activity_count: number }) => ({
+      date: row.activity_date, // Assuming this is YYYY-MM-DD string from the 'date' type in PG
+      count: Number(row.activity_count), // Ensure count is a number
+    }));
   }
 
   // --- Other standard service methods (Create, Update, Delete, BulkDelete, Duplicate) ---

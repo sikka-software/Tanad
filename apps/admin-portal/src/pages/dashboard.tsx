@@ -1,3 +1,4 @@
+import { Terminal } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -10,7 +11,10 @@ import { createClient } from "@/utils/supabase/component";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import ActivityCalendar from "@/components/ui/activity-calendar";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
+import { ActivityService } from "@/modules/activity/activity.service";
 import useUserStore from "@/stores/use-user-store";
 
 // Interface for the data returned by the view
@@ -47,6 +51,12 @@ interface DashboardStats {
   totalBranches: number;
 }
 
+// New interface for activity count data
+interface ActivityCountData {
+  date: string; // YYYY-MM-DD
+  count: number;
+}
+
 export default function Dashboard() {
   const supabase = createClient();
   const [stats, setStats] = useState<DashboardStats>({
@@ -64,8 +74,14 @@ export default function Dashboard() {
     totalWarehouses: 0,
     totalBranches: 0,
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
+
+  // State for activity calendar
+  const [activityCounts, setActivityCounts] = useState<ActivityCountData[]>([]);
+  const [loadingActivity, setLoadingActivity] = useState(true);
+  const [activityError, setActivityError] = useState<string | null>(null);
+
   const t = useTranslations();
   const router = useRouter();
   const { user, profile, enterprise } = useUserStore();
@@ -101,152 +117,185 @@ export default function Dashboard() {
     }
   };
 
-  // Fetch dashboard stats using the view
+  // Fetch dashboard stats and activity data
   useEffect(() => {
     let isMounted = true;
 
-    async function fetchDashboardStats() {
+    async function fetchData() {
       if (!isMounted || !user?.id || !enterprise?.id) {
-        if (isMounted && !enterprise?.id && user?.id) {
-          setLoading(false);
-        } else if (isMounted) {
-          setLoading(true);
+        if (isMounted) {
+          setLoadingStats(false);
+          setLoadingActivity(false);
         }
         return;
       }
 
       const enterpriseId = enterprise.id; // Cache enterprise ID
 
-      try {
-        setLoading(true);
-        setError(null); // Reset error state
+      // Reset states on new fetch
+      setLoadingStats(true);
+      setLoadingActivity(true);
+      setStatsError(null);
+      setActivityError(null);
 
-        // Helper function to perform count queries
-        const fetchCount = async (
-          tableName: string,
-          additionalFilter?: object,
-        ): Promise<number> => {
-          const query = supabase
-            .from(tableName)
-            .select("id", { count: "exact", head: true })
-            .eq("enterprise_id", enterpriseId);
+      // --- Fetch Stats --- (extracted logic)
+      const fetchStats = async () => {
+        try {
+          const fetchCount = async (
+            tableName: string,
+            additionalFilter?: object,
+          ): Promise<number> => {
+            const query = supabase
+              .from(tableName)
+              .select("id", { count: "exact", head: true })
+              .eq("enterprise_id", enterpriseId);
 
-          if (additionalFilter) {
-            Object.entries(additionalFilter).forEach(([key, value]) => {
-              query.eq(key, value);
+            if (additionalFilter) {
+              Object.entries(additionalFilter).forEach(([key, value]) => {
+                query.eq(key, value);
+              });
+            }
+
+            const { count, error } = await query;
+            if (error) throw error;
+            return count ?? 0;
+          };
+
+          const fetchSum = async (tableName: string, columnName: string): Promise<number> => {
+            const { data, error } = await supabase
+              .from(tableName)
+              .select(columnName)
+              .eq("enterprise_id", enterpriseId);
+
+            if (error) throw error;
+            return data?.reduce((sum, row) => sum + ((row as any)[columnName] || 0), 0) ?? 0;
+          };
+
+          const [
+            totalInvoices,
+            pendingInvoicesCount,
+            totalRevenue,
+            totalProducts,
+            totalEmployees,
+            totalDepartments,
+            totalJobs,
+            totalClients,
+            totalCompanies,
+            totalVendors,
+            totalOffices,
+            totalWarehouses,
+            totalBranches,
+          ] = await Promise.all([
+            fetchCount("invoices"),
+            fetchCount("invoices", { status: "pending" }),
+            fetchSum("invoices", "total"),
+            fetchCount("products"),
+            fetchCount("employees"),
+            fetchCount("departments"),
+            fetchCount("jobs"),
+            fetchCount("clients"),
+            fetchCount("companies"),
+            fetchCount("vendors"),
+            fetchCount("offices"),
+            fetchCount("warehouses"),
+            fetchCount("branches"),
+          ]);
+
+          if (isMounted) {
+            setStats({
+              totalInvoices,
+              pendingInvoices: pendingInvoicesCount,
+              totalRevenue,
+              totalProducts,
+              totalEmployees,
+              totalDepartments,
+              totalJobs,
+              totalClients,
+              totalCompanies,
+              totalVendors,
+              totalOffices,
+              totalWarehouses,
+              totalBranches,
             });
           }
-
-          const { count, error } = await query;
-          if (error) throw error;
-          return count ?? 0;
-        };
-
-        // Helper function to perform sum queries (example for revenue)
-        const fetchSum = async (tableName: string, columnName: string): Promise<number> => {
-          const { data, error } = await supabase
-            .from(tableName)
-            .select(columnName)
-            .eq("enterprise_id", enterpriseId);
-
-          if (error) throw error;
-          return data?.reduce((sum, row) => sum + ((row as any)[columnName] || 0), 0) ?? 0;
-        };
-
-        // Fetch all stats concurrently
-        const [
-          totalInvoices,
-          pendingInvoicesCount,
-          totalRevenue, // Example: Assuming 'total' column in 'invoices'
-          totalProducts,
-          totalEmployees,
-          totalDepartments,
-          totalJobs,
-          totalClients,
-          totalCompanies,
-          totalVendors,
-          totalOffices,
-          totalWarehouses,
-          totalBranches,
-        ] = await Promise.all([
-          fetchCount("invoices"),
-          fetchCount("invoices", { status: "pending" }), // Filter for pending invoices
-          fetchSum("invoices", "total"), // Example sum query
-          fetchCount("products"),
-          fetchCount("employees"),
-          fetchCount("departments"),
-          fetchCount("jobs"),
-          fetchCount("clients"),
-          fetchCount("companies"),
-          fetchCount("vendors"),
-          fetchCount("offices"),
-          fetchCount("warehouses"),
-          fetchCount("branches"),
-        ]);
-
-        if (!isMounted) return;
-
-        setStats({
-          totalInvoices,
-          pendingInvoices: pendingInvoicesCount,
-          totalRevenue,
-          totalProducts,
-          totalEmployees,
-          totalDepartments,
-          totalJobs,
-          totalClients,
-          totalCompanies,
-          totalVendors,
-          totalOffices,
-          totalWarehouses,
-          totalBranches,
-        });
-      } catch (err) {
-        console.error("Error fetching dashboard stats individually:", err);
-        if (isMounted) {
-          setError(
-            err instanceof Error ? err.message : "An error occurred while fetching dashboard stats",
-          );
-          // Optionally set stats to 0 on error or keep previous state
-          setStats({
+        } catch (err) {
+          console.error("Error fetching dashboard stats:", err);
+          if (isMounted) {
+            setStatsError(
+              err instanceof Error
+                ? err.message
+                : "An error occurred while fetching dashboard stats",
+            );
             // Reset stats on error
-            totalInvoices: 0,
-            totalProducts: 0,
-            totalRevenue: 0,
-            pendingInvoices: 0,
-            totalEmployees: 0,
-            totalDepartments: 0,
-            totalJobs: 0,
-            totalClients: 0,
-            totalCompanies: 0,
-            totalVendors: 0,
-            totalOffices: 0,
-            totalWarehouses: 0,
-            totalBranches: 0,
-          });
+            setStats({
+              totalInvoices: 0,
+              totalProducts: 0,
+              totalRevenue: 0,
+              pendingInvoices: 0,
+              totalEmployees: 0,
+              totalDepartments: 0,
+              totalJobs: 0,
+              totalClients: 0,
+              totalCompanies: 0,
+              totalVendors: 0,
+              totalOffices: 0,
+              totalWarehouses: 0,
+              totalBranches: 0,
+            });
+          }
+        } finally {
+          if (isMounted) {
+            setLoadingStats(false);
+          }
         }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
+      };
+
+      // --- Fetch Activity Counts ---
+      const fetchActivity = async () => {
+        try {
+          const endDate = new Date(); // Today
+          const startDate = new Date();
+          startDate.setFullYear(endDate.getFullYear() - 1);
+          startDate.setDate(startDate.getDate() + 1); // Start from the day *after* one year ago
+
+          const counts = await ActivityService.getActivityCountsByDate(startDate, endDate);
+          if (isMounted) {
+            setActivityCounts(counts);
+          }
+        } catch (err) {
+          console.error("Error fetching activity counts:", err);
+          if (isMounted) {
+            setActivityError(
+              err instanceof Error ? err.message : "An error occurred while fetching activity data",
+            );
+            setActivityCounts([]); // Clear data on error
+          }
+        } finally {
+          if (isMounted) {
+            setLoadingActivity(false);
+          }
         }
-      }
+      };
+
+      // Run fetches concurrently
+      await Promise.all([fetchStats(), fetchActivity()]);
     }
 
-    fetchDashboardStats();
+    fetchData();
 
     return () => {
       isMounted = false;
     };
   }, [user?.id, enterprise?.id, supabase]); // Add supabase as dependency
 
-  // Show error state
-  if (error) {
+  // Show error state for stats (kept separate for now)
+  if (statsError) {
     return (
       <DataPageLayout>
         <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
         <div className="flex flex-col items-center justify-center gap-4 p-8">
           <h2 className="text-xl font-semibold">{t("Dashboard.error_loading")}</h2>
-          <p className="text-muted-foreground">{error}</p>
+          <p className="text-muted-foreground">{statsError}</p>
         </div>
       </DataPageLayout>
     );
@@ -260,13 +309,6 @@ export default function Dashboard() {
           ✓ Premium Account
         </div>
       )}
-      {/* <PageTitle
-        texts={{
-          title: t("Dashboard.title"),
-          submit_form: t("Dashboard.title"),
-          cancel: t("General.cancel"),
-        }}
-      /> */}
       <div className="space-y-8 p-4">
         {/* Contacts Section */}
         <div>
@@ -275,19 +317,19 @@ export default function Dashboard() {
             <StatCard
               title={t("Clients.title")}
               value={stats.totalClients}
-              loading={loading}
+              loading={loadingStats}
               link="/clients"
             />
             <StatCard
               title={t("Companies.title")}
               value={stats.totalCompanies}
-              loading={loading}
+              loading={loadingStats}
               link="/companies"
             />
             <StatCard
               title={t("Vendors.title")}
               value={stats.totalVendors}
-              loading={loading}
+              loading={loadingStats}
               link="/vendors"
             />
           </div>
@@ -300,19 +342,19 @@ export default function Dashboard() {
             <StatCard
               title={t("Offices.title")}
               value={stats.totalOffices}
-              loading={loading}
+              loading={loadingStats}
               link="/offices"
             />
             <StatCard
               title={t("Warehouses.title")}
               value={stats.totalWarehouses}
-              loading={loading}
+              loading={loadingStats}
               link="/warehouses"
             />
             <StatCard
               title={t("Branches.title")}
               value={stats.totalBranches}
-              loading={loading}
+              loading={loadingStats}
               link="/branches"
             />
           </div>
@@ -325,21 +367,20 @@ export default function Dashboard() {
             <StatCard
               title={t("Invoices.title")}
               value={stats.totalInvoices}
-              loading={loading}
+              loading={loadingStats}
               link="/invoices"
               additionalText={`${stats.pendingInvoices} ${t("Dashboard.pending")}`}
             />
             <StatCard
               title={t("Products.title")}
               value={stats.totalProducts}
-              loading={loading}
+              loading={loadingStats}
               link="/products"
             />
-
             <StatCard
-              title={t("Invoices.title")}
+              title={`${t("Invoices.pending")} ${t("Invoices.title").toLowerCase()}`}
               value={stats.pendingInvoices}
-              loading={loading}
+              loading={loadingStats}
               additionalText={
                 stats.totalInvoices > 0
                   ? `${((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}% ${t(
@@ -358,24 +399,38 @@ export default function Dashboard() {
             <StatCard
               title={t("Employees.title")}
               value={stats.totalEmployees}
-              loading={loading}
+              loading={loadingStats}
               link="/employees"
             />
             <StatCard
               title={t("Departments.title")}
               value={stats.totalDepartments}
-              loading={loading}
+              loading={loadingStats}
               link="/departments"
             />
             <StatCard
               title={t("Jobs.title")}
               value={stats.totalJobs}
-              loading={loading}
+              loading={loadingStats}
               link="/jobs"
             />
           </div>
 
-          <ActivityCalendar />
+          <div className="mt-8">
+            <h3 className="mb-4 text-lg font-semibold">{t("ActivityLogs.title")}</h3>
+            {activityError && (
+              <Alert variant="destructive" className="mb-4">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Error Loading Activity</AlertTitle>
+                <AlertDescription>{activityError}</AlertDescription>
+              </Alert>
+            )}
+            {loadingActivity ? (
+              <Skeleton className="h-[180px] w-full rounded-md" />
+            ) : (
+              <ActivityCalendar data={activityCounts} />
+            )}
+          </div>
         </div>
       </div>
     </div>

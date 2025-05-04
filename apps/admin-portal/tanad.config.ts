@@ -15,6 +15,9 @@ import {
   Settings,
   ShoppingCart,
   BriefcaseBusiness,
+  Globe,
+  Server,
+  Link,
 } from "lucide-react";
 
 const ModulesOptions = {
@@ -155,6 +158,35 @@ const ModulesOptions = {
     label: "Settings.title",
     translationKey: "Settings.title",
     url: "/settings",
+  },
+  internet: {
+    label: "Internet.title",
+    translationKey: "Internet.title",
+    url: "/internet",
+  },
+  websites: {
+    icon: Globe,
+    label: "Websites.title",
+    translationKey: "Websites.title",
+    url: "/websites",
+  },
+  servers: {
+    icon: Server,
+    label: "Servers.title",
+    translationKey: "Servers.title",
+    url: "/servers",
+  },
+  domains: {
+    icon: Link,
+    label: "Domains.title",
+    translationKey: "Domains.title",
+    url: "/domains",
+  },
+  online_stores: {
+    icon: Store,
+    label: "OnlineStores.title",
+    translationKey: "OnlineStores.title",
+    url: "/online_stores",
   },
 };
 

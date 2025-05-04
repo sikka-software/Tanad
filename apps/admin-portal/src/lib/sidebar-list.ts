@@ -355,6 +355,46 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
     // },
   ];
 }
+// Internet menu items
+function getInternetMenus(pathname: string): SidebarMenuGroupProps["items"] {
+  return [
+    {
+      title: ModulesOptions.domains.label,
+      translationKey: ModulesOptions.domains.label,
+      url: ModulesOptions.domains.url,
+      icon: ModulesOptions.domains.icon,
+      action: ModulesOptions.domains.url + "/add",
+      is_active: pathname.startsWith(ModulesOptions.domains.url),
+      requiredPermission: "domains.read",
+    },
+    {
+      title: ModulesOptions.servers.label,
+      translationKey: ModulesOptions.servers.label,
+      url: ModulesOptions.servers.url,
+      icon: ModulesOptions.servers.icon,
+      action: ModulesOptions.servers.url + "/add",
+      is_active: pathname.startsWith(ModulesOptions.servers.url),
+    },
+    {
+      title: ModulesOptions.websites.label,
+      translationKey: ModulesOptions.websites.label,
+      url: ModulesOptions.websites.url,
+      icon: ModulesOptions.websites.icon,
+      action: ModulesOptions.websites.url + "/add",
+      is_active: pathname.startsWith(ModulesOptions.websites.url),
+      requiredPermission: "websites.read",
+    },
+    {
+      title: ModulesOptions.online_stores.label,
+      translationKey: ModulesOptions.online_stores.label,
+      url: ModulesOptions.online_stores.url,
+      icon: ModulesOptions.online_stores.icon,
+      action: ModulesOptions.online_stores.url + "/add",
+      is_active: pathname.startsWith(ModulesOptions.online_stores.url),
+      requiredPermission: "online_stores.read",
+    },
+  ];
+}
 // System admin menu items
 function getSystemAdminMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
@@ -380,6 +420,7 @@ export function getMenuList(pathname?: string): Record<string, SidebarMenuGroupP
     Administration: getAdministrationMenus(pathname || ""),
     Accounting: getAccountingMenus(pathname || ""),
     HumanResources: getHrMenus(pathname || ""),
+    Internet: getInternetMenus(pathname || ""),
     SystemAdmin: getSystemAdminMenus(pathname || ""),
   };
 }

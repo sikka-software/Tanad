@@ -243,11 +243,17 @@ export function AppSidebar() {
         {searchableMenuGroups.Administration && searchableMenuGroups.Administration.length > 0 && (
           <NavMain title={t("Administration.title")} items={searchableMenuGroups.Administration} />
         )}
+
         {searchableMenuGroups.Accounting && searchableMenuGroups.Accounting.length > 0 && (
           <NavMain title={t("Accounting.title")} items={searchableMenuGroups.Accounting} />
         )}
+
         {searchableMenuGroups.HumanResources && searchableMenuGroups.HumanResources.length > 0 && (
           <NavMain title={t("HumanResources.title")} items={searchableMenuGroups.HumanResources} />
+        )}
+
+        {searchableMenuGroups.Internet && searchableMenuGroups.Internet.length > 0 && (
+          <NavMain title={t("Internet.title")} items={searchableMenuGroups.Internet} />
         )}
 
         {searchableMenuGroups.SystemAdmin && searchableMenuGroups.SystemAdmin.length > 0 && (
