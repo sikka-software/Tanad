@@ -215,7 +215,7 @@ export function ClientForm({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-1">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="email"
@@ -241,7 +241,11 @@ export function ClientForm({
                   <FormItem>
                     <FormLabel>{t("Clients.form.phone.label")} *</FormLabel>
                     <FormControl>
-                      <PhoneInput value={field.value || ""} onChange={field.onChange} />
+                      <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        ariaInvalid={form.formState.errors.phone !== undefined}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

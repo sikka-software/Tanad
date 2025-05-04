@@ -227,7 +227,11 @@ export function WarehouseForm({
                 <FormItem>
                   <FormLabel>{t("Warehouses.form.phone.label")}</FormLabel>
                   <FormControl>
-                    <PhoneInput value={field.value || ""} onChange={field.onChange} />
+                    <PhoneInput
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      ariaInvalid={form.formState.errors.phone !== undefined}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

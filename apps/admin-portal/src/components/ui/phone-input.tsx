@@ -24,9 +24,10 @@ interface PhoneInputProps {
   value: string;
   defaultValue?: string;
   onChange: (value: string) => void;
+  ariaInvalid?: boolean;
 }
 
-export default function PhoneInput({ value, defaultValue, onChange }: PhoneInputProps) {
+export default function PhoneInput({ value, defaultValue, onChange, ...props }: PhoneInputProps) {
   const t = useTranslations();
   const locale = useLocale();
   const [open, setOpen] = React.useState(false);
@@ -87,14 +88,19 @@ export default function PhoneInput({ value, defaultValue, onChange }: PhoneInput
   }, [value, selectedCountry.code]);
 
   return (
-    <div className="flex rounded-md shadow-xs transition-[color,box-shadow]" dir="ltr">
+    <div className={cn("flex rounded-md shadow-xs transition-[color,box-shadow]")} dir="ltr">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="h-9 w-fit justify-between gap-0 rounded-e-none border-e-0"
+            className={cn(
+              "h-9 w-fit justify-between gap-0 rounded-e-none border-e-0",
+
+              props.ariaInvalid &&
+                "ring-destructive/20 dark:ring-destructive/40 border-destructive border-e-none",
+            )}
             size="sm"
           >
             <div className="flex items-center">
@@ -162,6 +168,7 @@ export default function PhoneInput({ value, defaultValue, onChange }: PhoneInput
         onChange={handleInputChange}
         placeholder={selectedCountry.placeholder}
         className="flex-1 rounded-s-none shadow-none"
+        aria-invalid={props.ariaInvalid}
       />
     </div>
   );

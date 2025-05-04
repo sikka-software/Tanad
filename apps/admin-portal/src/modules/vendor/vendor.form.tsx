@@ -249,7 +249,11 @@ export function VendorForm({
                   <FormItem>
                     <FormLabel>{t("Vendors.form.phone.label")} *</FormLabel>
                     <FormControl>
-                      <PhoneInput value={field.value || ""} onChange={field.onChange} />
+                      <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        ariaInvalid={form.formState.errors.phone !== undefined}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

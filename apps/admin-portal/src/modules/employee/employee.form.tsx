@@ -294,6 +294,7 @@ export function EmployeeForm({
                         disabled={isEmployeeSaving}
                         {...field}
                         value={field.value ?? ""}
+                        ariaInvalid={form.formState.errors.phone !== undefined}
                       />
                     </FormControl>
                     <FormMessage />
