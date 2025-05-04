@@ -3,6 +3,8 @@ export interface Job {
   title: string;
   description: string | null;
   requirements: string | null;
+  responsibilities: string | null;
+  benefits: string | null;
   location: string | null;
   department: string | null;
   type: string;
@@ -10,7 +12,6 @@ export interface Job {
   is_active: boolean;
   start_date: string | null;
   end_date: string | null;
-
   created_at: string;
   updated_at: string;
   user_id: string;

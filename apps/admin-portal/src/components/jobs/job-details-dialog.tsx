@@ -1,6 +1,10 @@
 "use client";
 
+import { Calendar, MapPin, Briefcase, DollarSign } from "lucide-react";
 import { useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,18 +13,17 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Briefcase, DollarSign } from "lucide-react";
-import ApplicationForm from "@/components/application-form";
-import { JobListing } from "@/data";
+
+import { Job } from "@/job/job.type";
+
+import ApplicationForm from "./application-form";
 
 export default function JobDetailsModal({
   job,
   isOpen,
   onClose,
 }: {
-  job: JobListing;
+  job: Job;
   isOpen: boolean;
   onClose: () => void;
 }) {
@@ -29,34 +32,29 @@ export default function JobDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <DialogHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
-              <DialogTitle className="text-xl font-bold">
-                {job.title}
-              </DialogTitle>
-              <DialogDescription className="flex flex-wrap gap-2 mt-1">
+              <DialogTitle className="text-xl font-bold">{job.title}</DialogTitle>
+              <DialogDescription className="mt-1 flex flex-wrap gap-2">
                 <span className="flex items-center text-sm text-gray-500">
-                  <Briefcase className="h-4 w-4 mr-1" /> {job.department}
+                  <Briefcase className="mr-1 h-4 w-4" /> {job.department}
                 </span>
                 <span className="flex items-center text-sm text-gray-500">
-                  <MapPin className="h-4 w-4 mr-1" /> {job.location}
+                  <MapPin className="mr-1 h-4 w-4" /> {job.location}
                 </span>
                 <span className="flex items-center text-sm text-gray-500">
-                  <Calendar className="h-4 w-4 mr-1" /> Posted {job.postedDate}
+                  <Calendar className="mr-1 h-4 w-4" /> Posted {job.created_at}
                 </span>
                 {job.salary && (
                   <span className="flex items-center text-sm text-gray-500">
-                    <DollarSign className="h-4 w-4 mr-1" /> {job.salary}
+                    <DollarSign className="mr-1 h-4 w-4" /> {job.salary}
                   </span>
                 )}
               </DialogDescription>
             </div>
-            <Badge
-              variant={job.type === "Full-time" ? "default" : "outline"}
-              className="h-fit"
-            >
+            <Badge variant={job.type === "Full-time" ? "default" : "outline"} className="h-fit">
               {job.type}
             </Badge>
           </div>
@@ -70,47 +68,33 @@ export default function JobDetailsModal({
 
           <TabsContent value="details" className="mt-4 space-y-6">
             <div>
-              <h3 className="text-lg font-medium mb-2">Overview</h3>
+              <h3 className="mb-2 text-lg font-medium">Overview</h3>
               <p className="text-gray-700">{job.description}</p>
             </div>
 
             {job.responsibilities && (
               <div>
-                <h3 className="text-lg font-medium mb-2">Responsibilities</h3>
-                <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                  {job.responsibilities.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
+                <h3 className="mb-2 text-lg font-medium">Responsibilities</h3>
+                {job.responsibilities}
               </div>
             )}
 
             {job.requirements && (
               <div>
-                <h3 className="text-lg font-medium mb-2">Requirements</h3>
-                <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                  {job.requirements.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
+                <h3 className="mb-2 text-lg font-medium">Requirements</h3>
+                {job.requirements}
               </div>
             )}
 
             {job.benefits && (
               <div>
-                <h3 className="text-lg font-medium mb-2">Benefits</h3>
-                <ul className="list-disc pl-5 space-y-1 text-gray-700">
-                  {job.benefits.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
+                <h3 className="mb-2 text-lg font-medium">Benefits</h3>
+                {job.benefits}
               </div>
             )}
 
             <div className="pt-4">
-              <Button onClick={() => setActiveTab("apply")}>
-                Apply for this position
-              </Button>
+              <Button onClick={() => setActiveTab("apply")}>Apply for this position</Button>
             </div>
           </TabsContent>
 

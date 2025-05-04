@@ -1,19 +1,25 @@
 import { JobListingNotFound } from "@root/src/components/app/job-listing-not-found";
-import JobListings from "@root/src/components/jobs/job-listings";
+import JobCard from "@root/src/components/jobs/job-card";
+import JobDetailsModal from "@root/src/components/jobs/job-details-dialog";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useTranslations } from "next-intl";
 import Head from "next/head";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
-// Assuming AppLayout exists
 import { Alert, AlertDescription, AlertTitle } from "@/ui/alert";
 import { Badge } from "@/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
-import { Separator } from "@/ui/separator";
-
-// Ensure JobListing type handles nested jobs
 
 import { createClient } from "@/utils/supabase/server-props";
+
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Assuming server client path
 import { Job } from "@/job/job.type";
@@ -87,12 +93,37 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
   }
 };
 
+// --- Helper function to adapt Job to JobCard/Modal expected props ---
+// Adjust this based on the actual props needed by JobCard and JobDetailsModal
+// This might involve mapping fields or ensuring the components accept the 'Job' type.
+// Example mapping (adjust fields as necessary):
+const adaptJobForCard = (job: Job): any => ({
+  // Use a more specific type if possible
+  id: job.id,
+  title: job.title,
+  description: job.description || "N/A",
+  department: job.department || "N/A",
+  location: job.location || "N/A",
+  type: job.type || "N/A",
+  postedDate: job.created_at || new Date().toISOString(), // Use created_at or a default
+  // Add other fields expected by JobCard/JobDetailsModal, mapping from 'Job'
+  salary: job.salary?.toString() || "N/A", // Example: convert salary if needed
+  requirements: job.requirements || "N/A", // Example: handle potentially null fields
+  // responsibilities, benefits etc.
+});
+
 export default function JobListingPreviewPage({
   jobListing,
   error,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const t = useTranslations();
   const router = useRouter();
+
+  // State from job-listings.tsx
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const [selectedLocation, setSelectedLocation] = useState("all");
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null); // Use Job type
 
   if (router.isFallback) {
     return <div>Loading...</div>; // Handle fallback state if using getStaticProps with fallback: true
@@ -114,84 +145,139 @@ export default function JobListingPreviewPage({
   // Extract jobs from the nested structure
   const jobs: Job[] = jobListing?.job_listing_jobs.map((jlj) => jlj.jobs).filter(Boolean) || [];
 
+  // Logic from job-listings.tsx for filters
+  // Ensure departments/locations are derived correctly from the Job type
+  const departments = [...new Set(jobs.map((job) => job.department || "N/A"))];
+  const locations = [...new Set(jobs.map((job) => job.location || "N/A"))];
+
+  // Filtering logic from job-listings.tsx, adapted for Job type
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch =
+      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (job.description || "").toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDepartment =
+      selectedDepartment === "all" || (job.department || "N/A") === selectedDepartment;
+    const matchesLocation =
+      selectedLocation === "all" || (job.location || "N/A") === selectedLocation;
+
+    return matchesSearch && matchesDepartment && matchesLocation;
+  });
+
+  const handleJobClick = (job: Job) => {
+    setSelectedJob(job); // Set the DB Job type
+  };
+
+  const handleCloseModal = () => {
+    setSelectedJob(null);
+  };
+
   return (
     <main className="bg-background min-h-screen">
+      <Head>
+        {/* Add Head details if needed, e.g., listing title */}
+        <title>{jobListing.title || "Career Opportunities"}</title>
+        <meta
+          name="description"
+          content={jobListing.description || "View available job positions."}
+        />
+      </Head>
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
-          <h1 className="text-foreground mb-2 text-3xl font-bold">Career Opportunities</h1>
-          <p className="text-muted-foreground max-w-2xl">
-            Join our team and help us build the future. We're looking for talented individuals who
-            are passionate about making a difference.
-          </p>
+          <h1 className="text-foreground mb-2 text-3xl font-bold">{jobListing.title}</h1>
+          {jobListing.description && (
+            <p className="text-muted-foreground max-w-2xl">{jobListing.description}</p>
+          )}
+          <div className="flex items-center space-x-2 pt-2">
+            <Badge variant={jobListing.is_active ? "default" : "outline"}>
+              {jobListing.is_active ? t("Status.active") : t("Status.inactive")}
+            </Badge>
+            <Badge variant={jobListing.is_public ? "default" : "outline"}>
+              {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
+            </Badge>
+          </div>
         </header>
 
-        <JobListings />
+        {/* Filter UI from job-listings.tsx */}
+        <div className="bg-background border-border mb-8 rounded-lg border p-6 shadow-sm">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div>
+              <Input
+                placeholder={t("JobListings.search_placeholder") || "Search jobs..."}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={t("JobListings.department_placeholder") || "Department"}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {t("JobListings.all_departments") || "All Departments"}
+                  </SelectItem>
+                  {departments.map((department) => (
+                    <SelectItem key={department} value={department}>
+                      {department}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t("JobListings.location_placeholder") || "Location"} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {t("JobListings.all_locations") || "All Locations"}
+                  </SelectItem>
+                  {locations.map((location) => (
+                    <SelectItem key={location} value={location}>
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Job Grid UI from job-listings.tsx */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filteredJobs.length > 0 ? (
+            filteredJobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={adaptJobForCard(job)}
+                onClick={() => handleJobClick(job)}
+              />
+            ))
+          ) : (
+            <div className="col-span-full py-12 text-center">
+              <h3 className="text-foreground mb-2 text-lg font-medium">
+                {t("JobListings.no_jobs_found") || "No jobs found"}
+              </h3>
+              <p className="text-muted-foreground">
+                {t("JobListings.adjust_filters") || "Try adjusting your search or filters"}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Job Details Modal */}
+        {selectedJob && (
+          <JobDetailsModal
+            job={adaptJobForCard(selectedJob)}
+            isOpen={!!selectedJob}
+            onClose={handleCloseModal}
+          />
+        )}
       </div>
     </main>
   );
-  // return (
-  //   <div className="container mx-auto max-w-4xl py-8">
-  //     <Card>
-  //       <CardHeader>
-  //         <CardTitle className="text-2xl font-bold">{jobListing.title}</CardTitle>
-  //         <div className="flex items-center space-x-2 pt-2">
-  //           <Badge variant={jobListing.is_active ? "default" : "outline"}>
-  //             {jobListing.is_active ? t("Status.active") : t("Status.inactive")}
-  //           </Badge>
-  //           <Badge variant={jobListing.is_public ? "default" : "outline"}>
-  //             {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
-  //           </Badge>
-  //         </div>
-  //       </CardHeader>
-  //       <CardContent>
-  //         {jobListing.description && (
-  //           <div className="prose dark:prose-invert max-w-none">
-  //             <p>{jobListing.description}</p>
-  //           </div>
-  //         )}
-
-  //         <Separator className="my-6" />
-
-  //         <h2 className="mb-4 text-xl font-semibold">{t("JobListings.preview.associated_jobs")}</h2>
-  //         {jobs && jobs.length > 0 ? (
-  //           <div className="space-y-4">
-  //             {jobs.map((job: Job) => (
-  //               <Card key={job.id}>
-  //                 <CardHeader>
-  //                   <CardTitle className="text-lg">{job.title}</CardTitle>
-  //                   <div className="flex items-center space-x-2 pt-1">
-  //                     {job.type && <Badge variant="secondary">{job.type}</Badge>}
-  //                     {job.department && <Badge variant="outline">{job.department}</Badge>}
-  //                     {job.location && <Badge variant="outline">{job.location}</Badge>}
-  //                   </div>
-  //                 </CardHeader>
-  //                 <CardContent>
-  //                   {job.description && (
-  //                     <p className="text-muted-foreground mb-2 text-sm">{job.description}</p>
-  //                   )}
-  //                   {job.requirements && (
-  //                     <div>
-  //                       <h4 className="mb-1 text-sm font-medium">
-  //                         {t("Jobs.fields.requirements")}
-  //                       </h4>
-  //                       <p className="text-muted-foreground text-sm">{job.requirements}</p>
-  //                     </div>
-  //                   )}
-  //                   {job.salary && (
-  //                     <p className="mt-2 text-sm">
-  //                       <strong>{t("Jobs.fields.salary")}:</strong> {job.salary}{" "}
-  //                       {/* Add currency formatting if needed */}
-  //                     </p>
-  //                   )}
-  //                 </CardContent>
-  //               </Card>
-  //             ))}
-  //           </div>
-  //         ) : (
-  //           <p className="text-muted-foreground">{t("JobListings.preview.no_jobs")}</p>
-  //         )}
-  //       </CardContent>
-  //     </Card>
-  //   </div>
-  // );
 }
