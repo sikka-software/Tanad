@@ -1,64 +1,64 @@
-import { Branch, BranchCreateData } from "@/branch/branch.type";
+import { Server, ServerCreateData } from "@/modules/server/server.type";
 
-export async function fetchBranches(): Promise<Branch[]> {
+export async function fetchServers(): Promise<Server[]> {
   try {
-    const response = await fetch("/api/resource/branches");
+    const response = await fetch("/api/resource/servers");
     if (!response.ok) {
-      console.error("Failed to fetch branches:", response.statusText);
+      console.error("Failed to fetch servers:", response.statusText);
       return [];
     }
     return response.json();
   } catch (error) {
-    console.error("Error fetching branches:", error);
+    console.error("Error fetching servers:", error);
     return [];
   }
 }
 
-export async function fetchBranchById(id: string): Promise<Branch> {
-  const response = await fetch(`/api/resource/branches/${id}`);
+export async function fetchServerById(id: string): Promise<Server> {
+  const response = await fetch(`/api/resource/servers/${id}`);
   if (!response.ok) {
-    throw new Error(`Branch with id ${id} not found`);
+    throw new Error(`Server with id ${id} not found`);
   }
   return response.json();
 }
 
-export async function createBranch(branch: BranchCreateData): Promise<Branch> {
-  const response = await fetch("/api/resource/branches", {
+export async function createServer(server: ServerCreateData): Promise<Server> {
+  const response = await fetch("/api/resource/servers", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(branch),
+    body: JSON.stringify(server),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to create branch");
+    throw new Error("Failed to create server");
   }
 
   return response.json();
 }
 
-export async function updateBranch(
+export async function updateServer(
   id: string,
-  branch: Partial<Omit<Branch, "id" | "created_at">>,
-): Promise<Branch> {
-  const response = await fetch(`/api/resource/branches/${id}`, {
+  server: Partial<Omit<Server, "id" | "created_at">>,
+): Promise<Server> {
+  const response = await fetch(`/api/resource/servers/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(branch),
+    body: JSON.stringify(server),
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to update branch with id ${id}`);
+    throw new Error(`Failed to update server with id ${id}`);
   }
 
   return response.json();
 }
 
-export async function duplicateBranch(id: string): Promise<Branch> {
-  const response = await fetch(`/api/resource/branches/${id}/duplicate`, {
+export async function duplicateServer(id: string): Promise<Server> {
+  const response = await fetch(`/api/resource/servers/${id}/duplicate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -66,24 +66,24 @@ export async function duplicateBranch(id: string): Promise<Branch> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to duplicate branch");
+    throw new Error("Failed to duplicate server");
   }
 
   return response.json();
 }
 
-export async function deleteBranch(id: string): Promise<void> {
-  const response = await fetch(`/api/resource/branches/${id}`, {
+export async function deleteServer(id: string): Promise<void> {
+  const response = await fetch(`/api/resource/servers/${id}`, {
     method: "DELETE",
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to delete branch with id ${id}`);
+    throw new Error(`Failed to delete server with id ${id}`);
   }
 }
 
-export async function bulkDeleteBranches(ids: string[]): Promise<void> {
-  const response = await fetch("/api/resource/branches", {
+export async function bulkDeleteServers(ids: string[]): Promise<void> {
+  const response = await fetch("/api/resource/servers", {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -92,6 +92,6 @@ export async function bulkDeleteBranches(ids: string[]): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to delete branches");
+    throw new Error("Failed to delete servers");
   }
 }

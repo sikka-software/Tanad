@@ -177,7 +177,12 @@ const systemRolePermissions: Record<string, string[]> = {
     "domains.update",
     "domains.export",
 
-    // Add any other superadmin permissions here
+    "servers.read",
+    "servers.create",
+    "servers.delete",
+    "servers.update",
+    "servers.duplicate",
+    "servers.export",
   ],
   human_resources: [
     "jobs.read",

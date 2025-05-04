@@ -8,76 +8,80 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useBranchStore from "@/branch/branch.store";
-import { Branch } from "@/branch/branch.type";
-
+import useServerStore from "@/modules/server/server.store";
+import { Server } from "@/modules/server/server.type";
 import useUserStore from "@/stores/use-user-store";
 
-import { useUpdateBranch } from "./branch.hooks";
+import { useUpdateServer } from "./server.hooks";
 
 const nameSchema = z.string().min(1, "Required");
-const codeSchema = z.string().min(1, "Required");
-const addressSchema = z.string().min(1, "Required");
-const citySchema = z.string().min(1, "Required");
-const stateSchema = z.string().min(1, "Required");
-const zipCodeSchema = z.string().min(1, "Required");
-const phoneSchema = z.string().nullable();
-const emailSchema = z.string().email().nullable();
-const managerSchema = z.string().nullable();
-const isActiveSchema = z.boolean();
+const ipAddressSchema = z.string().min(1, "Required");
+const locationSchema = z.string().min(1, "Required");
+const providerSchema = z.string().min(1, "Required");
+const osSchema = z.string().min(1, "Required");
+const statusSchema = z.string().min(1, "Required");
+const tagsSchema = z.array(z.string()).min(1, "Required");
+const notesSchema = z.string().min(1, "Required");
 
-const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Branch>) => {
+const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Server>) => {
   const t = useTranslations();
-  const { mutate: updateBranch } = useUpdateBranch();
-  const selectedRows = useBranchStore((state) => state.selectedRows);
-  const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
+  const { mutate: updateServer } = useUpdateServer();
+  const selectedRows = useServerStore((state) => state.selectedRows);
+  const setSelectedRows = useServerStore((state) => state.setSelectedRows);
 
-  const canEditBranch = useUserStore((state) => state.hasPermission("branches.update"));
-  const canDuplicateBranch = useUserStore((state) => state.hasPermission("branches.duplicate"));
-  const canViewBranch = useUserStore((state) => state.hasPermission("branches.view"));
-  const canArchiveBranch = useUserStore((state) => state.hasPermission("branches.archive"));
-  const canDeleteBranch = useUserStore((state) => state.hasPermission("branches.delete"));
+  const canEditServer = useUserStore((state) => state.hasPermission("servers.update"));
+  const canDuplicateServer = useUserStore((state) => state.hasPermission("servers.duplicate"));
+  const canViewServer = useUserStore((state) => state.hasPermission("servers.view"));
+  const canArchiveServer = useUserStore((state) => state.hasPermission("servers.archive"));
+  const canDeleteServer = useUserStore((state) => state.hasPermission("servers.delete"));
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
-  const columns: ExtendedColumnDef<Branch>[] = [
-    { accessorKey: "name", header: t("Branches.form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "code", header: t("Branches.form.code.label"), validationSchema: codeSchema },
+  const columns: ExtendedColumnDef<Server>[] = [
+    { accessorKey: "name", header: t("Servers.form.name.label"), validationSchema: nameSchema },
     {
-      accessorKey: "address",
-      header: t("Branches.form.address.label"),
-      validationSchema: addressSchema,
-    },
-    { accessorKey: "city", header: t("Branches.form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("Branches.form.state.label"), validationSchema: stateSchema },
-    {
-      accessorKey: "zip_code",
-      header: t("Branches.form.zip_code.label"),
-      validationSchema: zipCodeSchema,
-    },
-    { accessorKey: "phone", header: t("Branches.form.phone.label"), validationSchema: phoneSchema },
-    { accessorKey: "email", header: t("Branches.form.email.label"), validationSchema: emailSchema },
-    {
-      accessorKey: "manager",
-      header: t("Branches.form.manager.label"),
-      validationSchema: managerSchema,
+      accessorKey: "ip_address",
+      header: t("Servers.form.ip_address.label"),
+      validationSchema: ipAddressSchema,
     },
     {
-      accessorKey: "is_active",
-      header: t("Branches.form.is_active.label"),
-      cell: ({ row }) => (row.getValue("is_active") ? t("active") : t("inactive")),
-      validationSchema: isActiveSchema,
+      accessorKey: "location",
+      header: t("Servers.form.location.label"),
+      validationSchema: locationSchema,
+    },
+    {
+      accessorKey: "provider",
+      header: t("Servers.form.provider.label"),
+      validationSchema: providerSchema,
+    },
+    { accessorKey: "os", header: t("Servers.form.os.label"), validationSchema: osSchema },
+    {
+      accessorKey: "status",
+      header: t("Servers.form.status.label"),
+      validationSchema: statusSchema,
+    },
+    { accessorKey: "tags", header: t("Servers.form.tags.label"), validationSchema: tagsSchema },
+    { accessorKey: "notes", header: t("Servers.form.notes.label"), validationSchema: notesSchema },
+    {
+      accessorKey: "user_id",
+      header: t("Servers.form.user_id.label"),
+      validationSchema: z.string().min(1, "Required"),
+    },
+    {
+      accessorKey: "enterprise_id",
+      header: t("Servers.form.enterprise_id.label"),
+      validationSchema: z.string().min(1, "Required"),
     },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    if (columnId === "branch_id") return;
-    await updateBranch({ id: rowId, data: { [columnId]: value } });
+    if (columnId === "server_id") return;
+    await updateServer({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(
-    (rows: Branch[]) => {
+    (rows: Server[]) => {
       const newSelectedIds = rows.map((row) => row.id);
       if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
         setSelectedRows(newSelectedIds);
@@ -96,13 +100,13 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     return <ErrorComponent errorMessage={error.message} />;
   }
 
-  const branchTableOptions = {
+  const serverTableOptions = {
     state: {
       rowSelection,
     },
     enableRowSelection: true,
     enableMultiRowSelection: true,
-    getRowId: (row: Branch) => row.id,
+    getRowId: (row: Server) => row.id,
     onRowSelectionChange: (updater: any) => {
       const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
       const selectedRows = data.filter((row) => newSelection[row.id]);
@@ -118,13 +122,13 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
-      canEditAction={canEditBranch}
-      canDuplicateAction={canDuplicateBranch}
-      canViewAction={canViewBranch}
-      canArchiveAction={canArchiveBranch}
-      canDeleteAction={canDeleteBranch}
+      canEditAction={canEditServer}
+      canDuplicateAction={canDuplicateServer}
+      canViewAction={canViewServer}
+      canArchiveAction={canArchiveServer}
+      canDeleteAction={canDeleteServer}
       onRowSelectionChange={handleRowSelectionChange}
-      tableOptions={branchTableOptions}
+      tableOptions={serverTableOptions}
       onActionClicked={onActionClicked}
       texts={{
         actions: t("General.actions"),
@@ -138,4 +142,4 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   );
 };
 
-export default BranchesTable;
+export default ServersTable;

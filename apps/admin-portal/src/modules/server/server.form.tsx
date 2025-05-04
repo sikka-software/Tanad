@@ -18,71 +18,70 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useBranches, useCreateBranch, useUpdateBranch } from "./branch.hooks";
-import useBranchStore from "./branch.store";
-import { Branch, BranchUpdateData } from "./branch.type";
+import { useServers, useCreateServer, useUpdateServer } from "./server.hooks";
+import useServerStore from "./server.store";
+import { Server, ServerUpdateData } from "./server.type";
 
-export const createBranchSchema = (t: (key: string) => string) => {
-  const baseBranchSchema = z.object({
-    name: z.string().min(1, t("Branches.form.name.required")),
-    code: z.string().min(1, t("Branches.form.code.required")),
-    phone: z.string().optional().or(z.literal("")),
-    email: z.string().email().optional().or(z.literal("")),
-    manager: z.string().optional().or(z.literal("")),
-    is_active: z.boolean().default(true),
+export const createServerSchema = (t: (key: string) => string) => {
+  const baseServerSchema = z.object({
+    name: z.string().min(1, t("Servers.form.name.required")),
+    ip_address: z.string().min(1, t("Servers.form.ip_address.required")),
+    location: z.string().optional().or(z.literal("")),
+    provider: z.string().optional().or(z.literal("")),
+    os: z.string().optional().or(z.literal("")),
+    status: z.string().optional().or(z.literal("")),
+    tags: z.array(z.string()).optional().or(z.literal("")),
     notes: z.string().optional().or(z.literal("")),
+    user_id: z.string().optional().or(z.literal("")),
+    enterprise_id: z.string().optional().or(z.literal("")),
   });
 
   const addressSchema = createAddressSchema(t);
 
-  return baseBranchSchema.merge(addressSchema);
+  return baseServerSchema.merge(addressSchema);
 };
 
-export type BranchFormValues = z.input<ReturnType<typeof createBranchSchema>>;
+export type ServerFormValues = z.input<ReturnType<typeof createServerSchema>>;
 
-export interface BranchFormProps {
+export interface ServerFormProps {
   id?: string;
   onSuccess?: () => void;
-  defaultValues?: BranchUpdateData | null;
+  defaultValues?: ServerUpdateData | null;
   editMode?: boolean;
 }
 
-export function BranchForm({
+export function ServerForm({
   formHtmlId,
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<BranchUpdateData>) {
+}: ModuleFormProps<ServerUpdateData>) {
   const t = useTranslations();
   const { user } = useUserStore();
-  const { mutate: createBranch } = useCreateBranch();
-  const { mutate: updateBranch } = useUpdateBranch();
-  const { data: branches } = useBranches();
+  const { mutate: createServer } = useCreateServer();
+  const { mutate: updateServer } = useUpdateServer();
+  const { data: servers } = useServers();
 
-  const isLoading = useBranchStore((state) => state.isLoading);
-  const setIsLoading = useBranchStore((state) => state.setIsLoading);
+  const isLoading = useServerStore((state) => state.isLoading);
+  const setIsLoading = useServerStore((state) => state.setIsLoading);
 
-  const form = useForm<BranchFormValues>({
-    resolver: zodResolver(createBranchSchema(t)),
+  const form = useForm<ServerFormValues>({
+    resolver: zodResolver(createServerSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
-      code: defaultValues?.code || "",
-      short_address: defaultValues?.short_address || "",
-      building_number: defaultValues?.building_number || "",
-      street_name: defaultValues?.street_name || "",
-      city: defaultValues?.city || "",
-      region: defaultValues?.region || "",
-      country: defaultValues?.country || "",
-      zip_code: defaultValues?.zip_code || "",
-      phone: defaultValues?.phone || "",
-      email: defaultValues?.email || "",
-      manager: defaultValues?.manager || "",
-      is_active: defaultValues?.is_active || true,
+      ip_address: defaultValues?.ip_address || "",
+      location: defaultValues?.location || "",
+      provider: defaultValues?.provider || "",
+      os: defaultValues?.os || "",
+      status: defaultValues?.status || "",
+      tags: defaultValues?.tags || [],
       notes: defaultValues?.notes || "",
+      user_id: defaultValues?.user_id || "",
+      enterprise_id: defaultValues?.enterprise_id || "",
     },
   });
 
-  const handleSubmit = async (data: BranchFormValues) => {
+  const handleSubmit = async (data: ServerFormValues) => {
     setIsLoading(true);
     if (!user?.id) {
       toast.error(t("General.unauthorized"), {
@@ -93,17 +92,19 @@ export function BranchForm({
 
     try {
       if (editMode) {
-        await updateBranch(
+        await updateServer(
           {
             id: defaultValues?.id || "",
             data: {
               name: data.name.trim(),
-              code: data.code?.trim() || "",
-              phone: data.phone?.trim() || null,
-              email: data.email?.trim() || null,
-              manager: data.manager?.trim() || null,
+              ip_address: data.ip_address?.trim() || "",
+              location: data.location?.trim() || null,
+              provider: data.provider?.trim() || null,
+              os: data.os?.trim() || null,
+              status: data.status?.trim() || null,
+              tags: data.tags?.trim() || null,
               notes: data.notes?.trim() || null,
-              is_active: data.is_active || true,
+              enterprise_id: data.enterprise_id?.trim() || null,
             },
           },
           {
@@ -115,16 +116,17 @@ export function BranchForm({
           },
         );
       } else {
-        await createBranch(
+        await createServer(
           {
             name: data.name.trim(),
-            code: data.code.trim(),
-            phone: data.phone?.trim() || null,
-            email: data.email?.trim() || null,
-            manager: data.manager?.trim() || null,
+            ip_address: data.ip_address?.trim() || "",
+            location: data.location?.trim() || null,
+            provider: data.provider?.trim() || null,
+            os: data.os?.trim() || null,
+            status: data.status?.trim() || null,
+            tags: data.tags?.trim() || null,
             notes: data.notes?.trim() || null,
-            is_active: data.is_active || true,
-            user_id: user?.id,
+            enterprise_id: data.enterprise_id?.trim() || null,
           },
           {
             onSuccess: async (response) => {
@@ -137,16 +139,16 @@ export function BranchForm({
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Failed to save branch:", error);
+      console.error("Failed to save server:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Branches.error.create"),
+        description: t("Servers.error.create"),
       });
     }
   };
 
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
-    (window as any).branchForm = form;
+    (window as any).serverForm = form;
   }
 
   return (
@@ -159,10 +161,10 @@ export function BranchForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Branches.form.name.label")} *</FormLabel>
+                  <FormLabel>{t("Servers.form.name.label")} *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Branches.form.name.placeholder")}
+                      placeholder={t("Servers.form.name.placeholder")}
                       {...field}
                       disabled={isLoading}
                     />
@@ -174,16 +176,16 @@ export function BranchForm({
 
             <FormField
               control={form.control}
-              name="code"
+              name="ip_address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Branches.form.code.label")} *</FormLabel>
+                  <FormLabel>{t("Servers.form.ip_address.label")} *</FormLabel>
                   <FormControl>
                     <CodeInput
                       onSerial={() => {
-                        const nextNumber = (branches?.length || 0) + 1;
+                        const nextNumber = (servers?.length || 0) + 1;
                         const paddedNumber = String(nextNumber).padStart(4, "0");
-                        form.setValue("code", `BR-${paddedNumber}`);
+                        form.setValue("ip_address", `BR-${paddedNumber}`);
                       }}
                       onRandom={() => {
                         const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -193,11 +195,11 @@ export function BranchForm({
                             Math.floor(Math.random() * randomChars.length),
                           );
                         }
-                        form.setValue("code", `BR-${randomCode}`);
+                        form.setValue("ip_address", `BR-${randomCode}`);
                       }}
                     >
                       <Input
-                        placeholder={t("Branches.form.code.placeholder")}
+                        placeholder={t("Servers.form.ip_address.placeholder")}
                         {...field}
                         disabled={isLoading}
                       />
@@ -212,15 +214,15 @@ export function BranchForm({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <FormField
               control={form.control}
-              name="phone"
+              name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Branches.form.phone.label")}</FormLabel>
+                  <FormLabel>{t("Servers.form.location.label")}</FormLabel>
                   <FormControl>
                     <PhoneInput
                       value={field.value || ""}
                       onChange={field.onChange}
-                      ariaInvalid={form.formState.errors.phone !== undefined}
+                      ariaInvalid={form.formState.errors.location !== undefined}
                     />
                   </FormControl>
                   <FormMessage />
@@ -230,15 +232,15 @@ export function BranchForm({
 
             <FormField
               control={form.control}
-              name="email"
+              name="provider"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Branches.form.email.label")}</FormLabel>
+                  <FormLabel>{t("Servers.form.provider.label")}</FormLabel>
                   <FormControl>
                     <Input
                       dir="ltr"
-                      type="email"
-                      placeholder={t("Branches.form.email.placeholder")}
+                      type="text"
+                      placeholder={t("Servers.form.provider.placeholder")}
                       {...field}
                       disabled={isLoading}
                     />
@@ -250,13 +252,13 @@ export function BranchForm({
 
             <FormField
               control={form.control}
-              name="manager"
+              name="os"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Branches.form.manager.label")}</FormLabel>
+                  <FormLabel>{t("Servers.form.os.label")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Branches.form.manager.placeholder")}
+                      placeholder={t("Servers.form.os.placeholder")}
                       {...field}
                       disabled={isLoading}
                     />
@@ -271,10 +273,10 @@ export function BranchForm({
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Branches.form.notes.label")}</FormLabel>
+                <FormLabel>{t("Servers.form.notes.label")}</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder={t("Branches.form.notes.placeholder")}
+                    placeholder={t("Servers.form.notes.placeholder")}
                     className="min-h-[120px]"
                     {...field}
                     disabled={isLoading}
@@ -285,12 +287,6 @@ export function BranchForm({
             )}
           />
         </div>
-
-        <AddressFormSection
-          title={t("Branches.form.address.label")}
-          control={form.control}
-          isLoading={isLoading}
-        />
       </form>
     </Form>
   );

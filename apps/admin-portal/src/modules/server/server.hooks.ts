@@ -3,119 +3,119 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import {
-  createBranch,
-  deleteBranch,
-  fetchBranchById,
-  fetchBranches,
-  updateBranch,
-  bulkDeleteBranches,
-  duplicateBranch,
-} from "@/branch/branch.service";
-import type { Branch, BranchCreateData } from "@/branch/branch.type";
+  createServer,
+  deleteServer,
+  fetchServerById,
+  fetchServers,
+  updateServer,
+  bulkDeleteServers,
+  duplicateServer,
+} from "@/modules/server/server.service";
+import type { Server, ServerCreateData } from "@/modules/server/server.type";
 
-// Query keys for branches
-export const branchKeys = {
-  all: ["branches"] as const,
-  lists: () => [...branchKeys.all, "list"] as const,
-  list: (filters: any) => [...branchKeys.lists(), { filters }] as const,
-  details: () => [...branchKeys.all, "detail"] as const,
-  detail: (id: string) => [...branchKeys.details(), id] as const,
+// Query keys for servers
+export const serverKeys = {
+  all: ["servers"] as const,
+  lists: () => [...serverKeys.all, "list"] as const,
+  list: (filters: any) => [...serverKeys.lists(), { filters }] as const,
+  details: () => [...serverKeys.all, "detail"] as const,
+  detail: (id: string) => [...serverKeys.details(), id] as const,
 };
 
-// Hook to fetch all branches
-export function useBranches() {
+// Hook to fetch all servers
+export function useServers() {
   return useQuery({
-    queryKey: branchKeys.lists(),
-    queryFn: fetchBranches,
+    queryKey: serverKeys.lists(),
+    queryFn: fetchServers,
   });
 }
 
-// Hook to fetch a single branch by ID
-export function useBranch(id: string) {
+// Hook to fetch a single server by ID
+export function useServer(id: string) {
   return useQuery({
-    queryKey: branchKeys.detail(id),
-    queryFn: () => fetchBranchById(id),
+    queryKey: serverKeys.detail(id),
+    queryFn: () => fetchServerById(id),
     enabled: !!id, // Only run query if id is truthy
   });
 }
 
-// Hook for creating a new branch
-export function useCreateBranch() {
+// Hook for creating a new server
+export function useCreateServer() {
   const queryClient = useQueryClient();
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: (newBranch: Omit<Branch, "id" | "created_at"> & { user_id: string }) => {
+    mutationFn: (newServer: Omit<Server, "id" | "created_at"> & { user_id: string }) => {
       // Map user_id to user_id for the service function
-      const { user_id, ...rest } = newBranch;
-      const branchData: BranchCreateData = {
+      const { user_id, ...rest } = newServer;
+      const serverData: ServerCreateData = {
         ...rest,
         user_id: user_id,
       };
-      return createBranch(branchData);
+      return createServer(serverData);
     },
     onSuccess: () => {
       // Invalidate the list query to refetch
-      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
       toast.success(t("General.successful_operation"), {
-        description: t("Branches.success.update"),
+        description: t("Servers.success.update"),
       });
     },
   });
 }
 
-// Hook for updating an existing branch
-export function useUpdateBranch() {
+// Hook for updating an existing server
+export function useUpdateServer() {
   const queryClient = useQueryClient();
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Branch> }) => updateBranch(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<Server> }) => updateServer(id, data),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
-      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: serverKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
       toast.success(t("General.successful_operation"), {
-        description: t("Branches.success.update"),
+        description: t("Servers.success.update"),
       });
     },
   });
 }
 
-// Hook for duplicating a branch
-export function useDuplicateBranch() {
+// Hook for duplicating a server
+export function useDuplicateServer() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => duplicateBranch(id),
+    mutationFn: (id: string) => duplicateServer(id),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
-      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: serverKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
     },
   });
 }
 
-// Hook for deleting a branch
-export function useDeleteBranch() {
+// Hook for deleting a server
+export function useDeleteServer() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => deleteBranch(id),
+    mutationFn: (id: string) => deleteServer(id),
     onSuccess: (_, variables) => {
       // Invalidate the list and remove the specific detail query from cache
-      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
-      queryClient.removeQueries({ queryKey: branchKeys.detail(variables) });
+      queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
+      queryClient.removeQueries({ queryKey: serverKeys.detail(variables) });
     },
   });
 }
 
-// Hook for bulk deleting branches
-export function useBulkDeleteBranches() {
+// Hook for bulk deleting servers
+export function useBulkDeleteServers() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: bulkDeleteBranches,
+    mutationFn: bulkDeleteServers,
     onSuccess: () => {
       // Invalidate the list query
-      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: serverKeys.lists() });
     },
   });
 }
