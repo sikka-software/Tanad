@@ -211,7 +211,7 @@ export const allModules: Module[] = [
     integrations: [
       {
         id: "gosi",
-        label: "Integrations.gosi",
+        label: "Pricing.custom_pricing.integrations.gosi",
         pricingType: "per_unit",
         monthlyPrice: 0.5, // 0.5 per employee per month
         annualPrice: 5, // 5 per employee per year
@@ -325,9 +325,23 @@ export const allModules: Module[] = [
     annualPrice: 169,
     monthlyPrice: 15,
     quantity: 1,
-    unit: "store",
+    unit: "online_store",
     step: 1,
     maxQuantity: 5,
+    minQuantity: 1,
+  },
+  {
+    id: "employee_requests",
+    name: "Pricing.custom_pricing.employee_requests.title",
+    description: "Pricing.custom_pricing.employee_requests.description",
+    icon: "User",
+    category: "hr",
+    annualPrice: 10,
+    monthlyPrice: 1,
+    quantity: 10,
+    unit: "employee_request",
+    step: 1,
+    maxQuantity: 100,
     minQuantity: 1,
   },
 ];

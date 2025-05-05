@@ -1,3 +1,4 @@
+import { cn } from "@root/src/lib/utils";
 import { DollarSign } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useId } from "react";
@@ -53,37 +54,43 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
 
   return (
     <div
-      className={`border-input has-data-[state=checked]:border-primary/50 relative flex w-full flex-col items-start gap-2 rounded-md border p-4 shadow-xs transition-colors outline-none ${isSelected ? "border-primary/50 bg-primary/5" : ""}`}
+      className={cn(
+        "has-data-[state=checked]:border-primary/50 border-input hadow-xs h-ft relative flex min-h-[200px] w-full flex-col items-start gap-2 rounded-md border p-4 transition-colors outline-none",
+        isSelected ? "border-primary/50 bg-primary/5" : "",
+      )}
     >
-      <div className="flex w-full items-start gap-2">
-        <Checkbox
-          id={id}
-          className="order-1 mt-1 after:absolute after:inset-0"
-          aria-describedby={`${id}-description`}
-          checked={isSelected}
-          onCheckedChange={onToggle}
-        />
-        <div className="flex grow items-center gap-3">
-          <IconComponent size={20} className="mt-1" />
-          <div className="grid flex-1 gap-1">
-            <Label htmlFor={id}>{t(module.name)}</Label>
+      <div className={`bg--500 relative flex h-full flex-col justify-between`}>
+        <div className="flex flex-col gap-2">
+          <div className="flex w-full items-start gap-2">
+            <Checkbox
+              id={id}
+              className="order-1 after:absolute after:inset-0"
+              aria-describedby={`${id}-description`}
+              checked={isSelected}
+              onCheckedChange={onToggle}
+            />
+            <div className="flex grow items-center gap-3">
+              <IconComponent size={20} className="" />
+              <div className="grid flex-1 gap-1">
+                <Label htmlFor={id}>{t(module.name)}</Label>
+              </div>
+            </div>
           </div>
+          <p id={`${id}-description`} className="text-muted-foreground text-xs">
+            {t(module.description)}
+          </p>
+        </div>
+        <div className="mt-2 flex w-full flex-row items-center justify-between gap-1 text-sm font-semibold text-blue-600">
+          <div className="flex flex-row items-center gap-1">
+            <span>{currentModulePrice.toFixed(2)}</span>
+            <span>{currencySymbol}</span>
+            <span>/ {cycleText}</span>
+          </div>
+          <span className="text-muted-foreground ms-1 text-xs font-normal">
+            {displayQuantity} {t(`General.${module.unit}`)}
+          </span>
         </div>
       </div>
-      <p id={`${id}-description`} className="text-muted-foreground text-xs">
-        {t(module.description)}
-      </p>
-      <div className="mt-2 flex w-full flex-row items-center justify-between gap-1 text-sm font-semibold text-blue-600">
-        <div className="flex flex-row items-center gap-1">
-          <span>{currentModulePrice.toFixed(2)}</span>
-          <span>{currencySymbol}</span>
-          <span>/ {cycleText}</span>
-        </div>
-        <span className="text-muted-foreground ml-1 text-xs font-normal">
-          {displayQuantity} {t(`General.${module.unit}`)}
-        </span>
-      </div>
-
       {isSelected && (
         <div className="border-border mt-3 w-full space-y-2 border-t pt-3">
           <Slider
@@ -97,20 +104,18 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
           />
 
           {fullModuleData?.integrations && fullModuleData.integrations.length > 0 && (
-            <div className="mt-3 space-y-2 border-t pt-3">
-              <Label className="text-xs font-semibold text-gray-600">
-                {t("Pricing.custom_pricing.integrations.title")}
-              </Label>
+            <div className="mt-3 space-y-2 border-t pt-3" onClick={(e) => e.stopPropagation()}>
               {fullModuleData.integrations.map((integration) => {
                 const integrationId = `${id}-integration-${integration.id}`;
                 const isIntegrationSelected = moduleState?.selectedIntegrations?.includes(
                   integration.id,
                 );
-                const integrationPrice = currentCycle === "monthly" ? integration.monthlyPrice : integration.annualPrice;
+                const integrationPrice =
+                  currentCycle === "monthly" ? integration.monthlyPrice : integration.annualPrice;
                 const priceLabel =
                   integration.pricingType === "fixed"
-                    ? `+${integrationPrice.toFixed(2)}${currencySymbol.props.className ? "" : "/"}${cycleText}`
-                    : `+${integrationPrice.toFixed(2)}${currencySymbol.props.className ? "" : "/"}${t(`General.${module.unit}`)}`;
+                    ? `+${integrationPrice.toFixed(2)}${currencySymbol.props.className ? "" : "/"}${t(`General.${module.unit}`)}`
+                    : `+${integrationPrice.toFixed(2)}${currencySymbol.props.className ? "" : "/"} / ${t(`General.${module.unit}`)}`;
 
                 return (
                   <div key={integration.id} className="flex items-center space-x-2">
@@ -123,9 +128,10 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
                     />
                     <Label
                       htmlFor={integrationId}
-                      className="flex w-full cursor-pointer items-center justify-between text-sm font-normal"
+                      className="flex w-full cursor-pointer items-center justify-between font-normal"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <span>{t(integration.label)}</span>
+                      <span className="text-xs">{t(integration.label)}</span>
                       <span className="text-xs text-blue-600">({priceLabel})</span>
                     </Label>
                   </div>
