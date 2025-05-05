@@ -2,9 +2,13 @@ import { DollarSign } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React from "react";
 
+// Import allModules
+import { Button } from "@/components/ui/button";
+
 import { useLandingPricingStore } from "@/stores/landing-pricing-store";
-import { allModules } from "@/stores/landing-pricing-store"; // Import allModules
-import { Button } from "@/components/ui/button"; // Import Button
+import { allModules } from "@/stores/landing-pricing-store";
+
+// Import Button
 
 import { SARSymbol } from "../../ui/sar-symbol";
 
@@ -38,7 +42,8 @@ const PricingCalculator: React.FC = () => {
     );
   }, 0);
 
-  const discount = selectedTier.discount > 0 ? (basePrice + actualModulesPrice) * selectedTier.discount : 0;
+  const discount =
+    selectedTier.discount > 0 ? (basePrice + actualModulesPrice) * selectedTier.discount : 0;
 
   return (
     <div className="overflow-hidden rounded-xl bg-white shadow-lg">
@@ -73,18 +78,19 @@ const PricingCalculator: React.FC = () => {
               <div key={dept.id} className="border-t border-gray-100 pt-2">
                 <div className="mb-2 flex justify-between">
                   <span className="text-gray-600">
-                    {t(dept.name)} {t("Pricing.custom_pricing.modules")} ({dept.modules.length})
+                    {t(dept.name)} ({dept.modules.length})
                   </span>
                   <div className="flex flex-row items-center gap-1">
                     {/* Display calculated department total */}
-                    <span className="font-semibold">{deptTotal.toFixed(2)}</span> 
+                    <span className="font-semibold">{deptTotal.toFixed(2)}</span>
                     <span className="font-semibold">{currencySymbol}</span>
                   </div>
                 </div>
 
                 {/* Display individual module price based on its quantity */}
                 {dept.modules.map((mod) => {
-                  const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
+                  const pricePerUnit =
+                    currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
                   const calculatedModulePrice = pricePerUnit * (mod.quantity / mod.step);
                   const fullModuleData = allModules.find((m) => m.id === mod.id);
 
@@ -97,9 +103,7 @@ const PricingCalculator: React.FC = () => {
                         {/* Check threshold for module price display */}
                         {fullModuleData?.contactUsThreshold &&
                         mod.quantity >= fullModuleData.contactUsThreshold ? (
-                          <span className="font-semibold ">
-                            {t("Pricing.special_quote")}
-                          </span>
+                          <span className="font-semibold">{t("Pricing.special_quote")}</span>
                         ) : (
                           <div className="flex flex-row items-center gap-1">
                             <span>{calculatedModulePrice.toFixed(2)}</span>
@@ -108,7 +112,10 @@ const PricingCalculator: React.FC = () => {
                         )}
                       </div>
                       {/* Display selected integrations for this module (only if below threshold) */}
-                      {!(fullModuleData?.contactUsThreshold && mod.quantity >= fullModuleData.contactUsThreshold) &&
+                      {!(
+                        fullModuleData?.contactUsThreshold &&
+                        mod.quantity >= fullModuleData.contactUsThreshold
+                      ) &&
                         mod.selectedIntegrations &&
                         mod.selectedIntegrations.length > 0 &&
                         fullModuleData?.integrations && (
@@ -172,10 +179,6 @@ const PricingCalculator: React.FC = () => {
               <span className="text-lg font-bold text-gray-900">
                 {t("Pricing.custom_pricing.total_monthly_price")}
               </span>
-              <p className="text-sm text-gray-500">
-                {totalModules} {t("Pricing.custom_pricing.modules")} on {t(selectedTier.name)}{" "}
-                {t("Pricing.custom_pricing.plan")}
-              </p>
             </div>
             {/* Conditional rendering for Total Price or Contact Us Button */}
             {showContactUs ? (
