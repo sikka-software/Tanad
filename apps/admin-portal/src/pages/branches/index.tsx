@@ -25,6 +25,7 @@ import useBranchStore from "@/branch/branch.store";
 import BranchesTable from "@/branch/branch.table";
 import { BranchUpdateData } from "@/branch/branch.type";
 
+import BranchDatasheet from "@/modules/branch/branch.datasheet";
 import useUserStore from "@/stores/use-user-store";
 
 export default function BranchesPage() {
@@ -114,6 +115,8 @@ export default function BranchesPage() {
             hideOptions={branches?.length === 0}
           />
         )}
+
+        <BranchDatasheet />
 
         <div>
           {viewMode === "table" ? (

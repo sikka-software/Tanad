@@ -8,9 +8,11 @@ import { Label } from "../../ui/label";
 
 interface ModuleCardProps {
   module: Module;
+  isSelected: boolean;
+  onToggle: () => void;
 }
 
-const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
+const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle }) => {
   const IconComponent = getIconComponent(module.icon);
   const id = useId();
   return (
@@ -19,6 +21,8 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module }) => {
         id={id}
         className="order-1 after:absolute after:inset-0"
         aria-describedby={`${id}-description`}
+        checked={isSelected}
+        onCheckedChange={onToggle}
       />
       <div className="flex grow items-start gap-3">
         <IconComponent size={20} />
