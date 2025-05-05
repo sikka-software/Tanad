@@ -1,38 +1,34 @@
-import { useState } from "react";
-import { DataSheetGrid, checkboxColumn, textColumn, keyColumn } from "react-datasheet-grid";
+import {
+  DataSheetGrid,
+  checkboxColumn,
+  textColumn,
+  keyColumn,
+  DataSheetGridProps,
+} from "react-datasheet-grid";
 // Import the style only once in your app!
 import "react-datasheet-grid/dist/style.css";
 import { useTranslations } from "next-intl";
+import { Branch } from "./branch.type";
 
-const BranchDatasheet = () => {
-  const [data, setData] = useState([
-    // Sample data - needs to be updated to match Branch type
-    {
-      name: "Main Branch",
-      code: "MB001",
-      address: "123 Main St",
-      city: "Anytown",
-      state: "CA",
-      zip_code: "90210",
-      phone: "555-1234",
-      email: "main@example.com",
-      manager: "John Doe",
-      is_active: true,
-    },
-    {
-      name: "Downtown Branch",
-      code: "DB002",
-      address: "456 Oak Ave",
-      city: "Metropolis",
-      state: "NY",
-      zip_code: "10001",
-      phone: null,
-      email: null,
-      manager: "Jane Smith",
-      is_active: false,
-    },
-  ]);
+// Infer the Operation type from the props
+type OnChangeType = DataSheetGridProps<Branch>["onChange"];
+
+interface BranchDatasheetProps {
+  data: Branch[];
+  onChange: OnChangeType;
+}
+
+const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   const t = useTranslations();
+
+  // Cast onChange to the expected type by DataSheetGrid
+  const handleGridChange: DataSheetGridProps["onChange"] = (value, operations) => {
+    // We know the value will be Branch[], so we can cast it back if needed inside the handler
+    // Or handle the logic directly in the parent component which receives Branch[]
+    if (onChange) {
+      onChange(value as Branch[], operations as any); // Cast operations as well for consistency, though its type might be compatible
+    }
+  };
 
   const columns = [
     { ...keyColumn("name", textColumn), title: t("Branches.form.name.label") },
@@ -49,14 +45,7 @@ const BranchDatasheet = () => {
 
   return (
     <div className="h-full w-full" dir="rtl">
-      <DataSheetGrid
-        value={data}
-        // onChange={setData} // Consider implementing a proper onChange handler
-        onChange={() => {
-          console.log("changed");
-        }}
-        columns={columns}
-      />
+      <DataSheetGrid value={data} onChange={handleGridChange} columns={columns} />
     </div>
   );
 };

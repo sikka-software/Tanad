@@ -17,13 +17,21 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
+import { FilterCondition } from "@/types/common.type";
+import { ViewMode } from "@/types/generic-store-types";
+
 import BranchCard from "@/branch/branch.card";
 import { BranchForm } from "@/branch/branch.form";
-import { useBranches, useBulkDeleteBranches, useDuplicateBranch } from "@/branch/branch.hooks";
+import {
+  useBranches,
+  useBulkDeleteBranches,
+  useDuplicateBranch,
+  useUpdateBranch,
+} from "@/branch/branch.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/branch/branch.options";
 import useBranchStore from "@/branch/branch.store";
 import BranchesTable from "@/branch/branch.table";
-import { BranchUpdateData } from "@/branch/branch.type";
+import { Branch, BranchUpdateData } from "@/branch/branch.type";
 
 import BranchDatasheet from "@/modules/branch/branch.datasheet";
 import useUserStore from "@/stores/use-user-store";
@@ -54,10 +62,12 @@ export default function BranchesPage() {
   const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
   const getFilteredBranches = useBranchStore((state) => state.getFilteredData);
   const getSortedBranches = useBranchStore((state) => state.getSortedData);
+  const setViewMode = useBranchStore((state) => state.setViewMode);
 
   const { data: branches, isLoading: loadingFetchBranches, error } = useBranches();
   const { mutate: duplicateBranch } = useDuplicateBranch();
   const { mutateAsync: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
+  const { mutate: updateBranch } = useUpdateBranch();
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
@@ -88,6 +98,40 @@ export default function BranchesPage() {
     return getSortedBranches(filteredBranches);
   }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
 
+  const handleDatasheetChange = (updatedData: Branch[], operations: any[]) => {
+    operations.forEach((op) => {
+      if (op.type === "update") {
+        const changedRowIndex = op.fromRowIndex;
+        const changedRow = updatedData[changedRowIndex];
+        if (changedRow && changedRow.id) {
+          const originalRow = branches?.find((b) => b.id === changedRow.id);
+          if (originalRow) {
+            type BranchPayload = Partial<Omit<Branch, "id" | "created_at" | "enterprise_id">>;
+            const updatePayload: BranchPayload = {};
+            let fieldChanged: keyof BranchPayload | null = null;
+
+            const updateableKeys = Object.keys(originalRow).filter(
+              (k) => k !== "id" && k !== "created_at" && k !== "enterprise_id",
+            ) as (keyof BranchPayload)[];
+
+            for (const K of updateableKeys) {
+              if (changedRow[K] !== originalRow[K]) {
+                fieldChanged = K;
+                updatePayload[fieldChanged] = changedRow[K] as any;
+                break;
+              }
+            }
+
+            if (fieldChanged && Object.keys(updatePayload).length > 0) {
+              console.log(`Updating branch ${changedRow.id}:`, updatePayload);
+              updateBranch({ id: changedRow.id, data: updatePayload });
+            }
+          }
+        }
+      }
+    });
+  };
+
   if (!canReadBranches) {
     return <NoPermission />;
   }
@@ -116,17 +160,10 @@ export default function BranchesPage() {
           />
         )}
 
-        <BranchDatasheet />
-
         <div>
           {viewMode === "table" ? (
-            <BranchesTable
-              data={sortedBranches}
-              isLoading={loadingFetchBranches}
-              error={error as Error | null}
-              onActionClicked={onActionClicked}
-            />
-          ) : (
+            <BranchDatasheet data={sortedBranches} onChange={handleDatasheetChange} />
+          ) : viewMode === "cards" ? (
             <div className="p-4">
               <DataModelList
                 data={sortedBranches}
@@ -137,7 +174,7 @@ export default function BranchesPage() {
                 gridCols="3"
               />
             </div>
-          )}
+          ) : null}
         </div>
 
         <FormDialog
