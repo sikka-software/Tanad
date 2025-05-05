@@ -22,21 +22,20 @@ const PricingCalculator: React.FC = () => {
     ) : (
       <DollarSign className="size-3" />
     );
-  const modulesPrice = departments.reduce((total, dept) => {
+
+  // Recalculate total modules price based on quantity for accurate discount display
+  const actualModulesPrice = departments.reduce((total, dept) => {
     return (
       total +
-      dept.modules.reduce((deptTotal, module) => {
-        if (currentCycle === "monthly") {
-          return deptTotal + module.monthlyPrice;
-        } else {
-          return deptTotal + module.annualPrice;
-        }
+      dept.modules.reduce((deptTotal, mod) => {
+        const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
+        const calculatedModulePrice = pricePerUnit * (mod.quantity / mod.step);
+        return deptTotal + calculatedModulePrice;
       }, 0)
     );
   }, 0);
 
-  const discount =
-    selectedTier.discount > 0 ? (basePrice + modulesPrice) * selectedTier.discount : 0;
+  const discount = selectedTier.discount > 0 ? (basePrice + actualModulesPrice) * selectedTier.discount : 0;
 
   return (
     <div className="overflow-hidden rounded-xl bg-white shadow-lg">
@@ -60,13 +59,11 @@ const PricingCalculator: React.FC = () => {
           {departments.map((dept) => {
             if (dept.modules.length === 0) return null;
 
+            // Calculate department total respecting quantity and steps
             const deptTotal = dept.modules.reduce((total, mod) => {
-              const currentCycle = useLandingPricingStore.getState().currentCycle;
-              if (currentCycle === "monthly") {
-                return total + mod.monthlyPrice;
-              } else {
-                return total + mod.annualPrice;
-              }
+              const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
+              const calculatedModulePrice = pricePerUnit * (mod.quantity / mod.step);
+              return total + calculatedModulePrice;
             }, 0);
 
             return (
@@ -76,20 +73,27 @@ const PricingCalculator: React.FC = () => {
                     {t(dept.name)} {t("Pricing.custom_pricing.modules")} ({dept.modules.length})
                   </span>
                   <div className="flex flex-row items-center gap-1">
-                    <span className="font-semibold">{deptTotal}</span>
+                    {/* Display calculated department total */}
+                    <span className="font-semibold">{deptTotal.toFixed(2)}</span> 
                     <span className="font-semibold">{currencySymbol}</span>
                   </div>
                 </div>
 
-                {dept.modules.map((mod) => (
-                  <div key={mod.id} className="flex justify-between pl-4 text-sm text-gray-500">
-                    <span>{t(mod.name)}</span>
-                    <div className="flex flex-row items-center gap-1">
-                      <span>{currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice}</span>
-                      <span>{currencySymbol}</span>
-                    </div>
-                  </div>
-                ))}
+                {/* Display individual module price based on its quantity */}
+                {dept.modules.map((mod) => {
+                   const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
+                   const calculatedModulePrice = pricePerUnit * (mod.quantity / mod.step);
+                  return (
+                     <div key={mod.id} className="flex justify-between pl-4 text-sm text-gray-500">
+                        <span>{t(mod.name)} ({mod.quantity} {t(`General.${mod.unit}`)})</span>
+                       <div className="flex flex-row items-center gap-1">
+                          {/* Display calculated module price */}
+                          <span>{calculatedModulePrice.toFixed(2)}</span> 
+                         <span>{currencySymbol}</span>
+                       </div>
+                     </div>
+                   );
+                })}
               </div>
             );
           })}
