@@ -15,6 +15,21 @@ import {
 } from "lucide-react";
 import { create } from "zustand";
 
+export interface Module {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  annualPrice: number; // Price per unit/step per year
+  monthlyPrice: number; // Price per unit/step per month
+  quantity: number; // Selected quantity/steps
+  unit: string; // Unit of measurement (e.g., 'invoices', 'users')
+  step: number; // Slider step increment
+  maxQuantity: number; // Maximum value for the slider
+  minQuantity: number; // Minimum value for the slider (usually same as step or 1)
+}
+
 export const allModules: Module[] = [
   {
     id: "offices",
@@ -24,6 +39,11 @@ export const allModules: Module[] = [
     category: "infrastructure",
     annualPrice: 99,
     monthlyPrice: 9,
+    quantity: 1,
+    unit: "office",
+    step: 1,
+    maxQuantity: 10,
+    minQuantity: 1,
   },
   {
     id: "branches",
@@ -33,6 +53,11 @@ export const allModules: Module[] = [
     category: "infrastructure",
     annualPrice: 89,
     monthlyPrice: 8,
+    quantity: 1,
+    unit: "branch",
+    step: 1,
+    maxQuantity: 20,
+    minQuantity: 1,
   },
   {
     id: "warehouses",
@@ -42,6 +67,11 @@ export const allModules: Module[] = [
     category: "infrastructure",
     annualPrice: 129,
     monthlyPrice: 12,
+    quantity: 1,
+    unit: "warehouse",
+    step: 1,
+    maxQuantity: 5,
+    minQuantity: 1,
   },
   {
     id: "clients",
@@ -49,8 +79,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.clients.description",
     icon: "Users",
     category: "business",
-    annualPrice: 149,
-    monthlyPrice: 14,
+    annualPrice: 30,
+    monthlyPrice: 3,
+    quantity: 50,
+    unit: "client",
+    step: 50,
+    maxQuantity: 1000,
+    minQuantity: 50,
   },
   {
     id: "vendors",
@@ -60,6 +95,11 @@ export const allModules: Module[] = [
     category: "business",
     annualPrice: 109,
     monthlyPrice: 10,
+    quantity: 10,
+    unit: "vendor",
+    step: 10,
+    maxQuantity: 500,
+    minQuantity: 10,
   },
   {
     id: "invoices",
@@ -67,8 +107,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.invoices.description",
     icon: "FileText",
     category: "finance",
-    annualPrice: 139,
-    monthlyPrice: 13,
+    annualPrice: 20,
+    monthlyPrice: 2,
+    quantity: 100,
+    unit: "invoice",
+    step: 100,
+    maxQuantity: 5000,
+    minQuantity: 100,
   },
   {
     id: "products",
@@ -76,8 +121,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.products.description",
     icon: "ShoppingCart",
     category: "business",
-    annualPrice: 139,
-    monthlyPrice: 13,
+    annualPrice: 50,
+    monthlyPrice: 5,
+    quantity: 1000,
+    unit: "product",
+    step: 1000,
+    maxQuantity: 10000,
+    minQuantity: 1000,
   },
   {
     id: "quotes",
@@ -85,8 +135,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.quotes.description",
     icon: "FileText",
     category: "business",
-    annualPrice: 89,
-    monthlyPrice: 8,
+    annualPrice: 15,
+    monthlyPrice: 1.5,
+    quantity: 100,
+    unit: "quote",
+    step: 100,
+    maxQuantity: 2000,
+    minQuantity: 100,
   },
   {
     id: "expenses",
@@ -94,8 +149,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.expenses.description",
     icon: "DollarSign",
     category: "finance",
-    annualPrice: 99,
-    monthlyPrice: 9,
+    annualPrice: 10,
+    monthlyPrice: 1,
+    quantity: 50,
+    unit: "expense",
+    step: 50,
+    maxQuantity: 1000,
+    minQuantity: 50,
   },
   {
     id: "purchases",
@@ -103,8 +163,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.purchases.description",
     icon: "CreditCard",
     category: "finance",
-    annualPrice: 119,
-    monthlyPrice: 11,
+    annualPrice: 12,
+    monthlyPrice: 1.2,
+    quantity: 50,
+    unit: "purchase",
+    step: 50,
+    maxQuantity: 1000,
+    minQuantity: 50,
   },
   {
     id: "employees",
@@ -112,8 +177,27 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.employees.description",
     icon: "User",
     category: "hr",
-    annualPrice: 149,
-    monthlyPrice: 14,
+    annualPrice: 10,
+    monthlyPrice: 1,
+    quantity: 10,
+    unit: "employee",
+    step: 1,
+    maxQuantity: 100,
+    minQuantity: 1,
+  },
+  {
+    id: "salaries",
+    name: "Pricing.custom_pricing.salaries.title",
+    description: "Pricing.custom_pricing.salaries.description",
+    icon: "DollarSign",
+    category: "finance",
+    annualPrice: 10,
+    monthlyPrice: 1,
+    quantity: 10,
+    unit: "salary",
+    step: 1,
+    maxQuantity: 100,
+    minQuantity: 1,
   },
   {
     id: "jobs",
@@ -121,8 +205,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.jobs.description",
     icon: "Briefcase",
     category: "hr",
-    annualPrice: 89,
-    monthlyPrice: 8,
+    annualPrice: 20,
+    monthlyPrice: 2,
+    quantity: 5,
+    unit: "job",
+    step: 5,
+    maxQuantity: 50,
+    minQuantity: 5,
   },
   {
     id: "departments",
@@ -130,8 +219,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.departments.description",
     icon: "Users",
     category: "hr",
-    annualPrice: 89,
-    monthlyPrice: 8,
+    annualPrice: 30,
+    monthlyPrice: 3,
+    quantity: 1,
+    unit: "department",
+    step: 1,
+    maxQuantity: 20,
+    minQuantity: 1,
   },
   {
     id: "job_listings",
@@ -139,8 +233,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.job_listings.description",
     icon: "FileText",
     category: "hr",
-    annualPrice: 109,
-    monthlyPrice: 10,
+    annualPrice: 25,
+    monthlyPrice: 2.5,
+    quantity: 5,
+    unit: "job_listing",
+    step: 5,
+    maxQuantity: 30,
+    minQuantity: 5,
   },
   {
     id: "applicants",
@@ -148,8 +247,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.applicants.description",
     icon: "User",
     category: "hr",
-    annualPrice: 109,
-    monthlyPrice: 10,
+    annualPrice: 15,
+    monthlyPrice: 1.5,
+    quantity: 100,
+    unit: "applicant",
+    step: 100,
+    maxQuantity: 1000,
+    minQuantity: 100,
   },
   {
     id: "servers",
@@ -159,6 +263,11 @@ export const allModules: Module[] = [
     category: "it",
     annualPrice: 149,
     monthlyPrice: 14,
+    quantity: 1,
+    unit: "server",
+    step: 1,
+    maxQuantity: 10,
+    minQuantity: 1,
   },
   {
     id: "domains",
@@ -166,8 +275,13 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.domains.description",
     icon: "Globe",
     category: "it",
-    annualPrice: 89,
-    monthlyPrice: 8,
+    annualPrice: 10,
+    monthlyPrice: 1,
+    quantity: 1,
+    unit: "domain",
+    step: 1,
+    maxQuantity: 50,
+    minQuantity: 1,
   },
   {
     id: "websites",
@@ -177,6 +291,11 @@ export const allModules: Module[] = [
     category: "it",
     annualPrice: 129,
     monthlyPrice: 12,
+    quantity: 1,
+    unit: "website",
+    step: 1,
+    maxQuantity: 10,
+    minQuantity: 1,
   },
   {
     id: "ecommerce",
@@ -186,6 +305,11 @@ export const allModules: Module[] = [
     category: "it",
     annualPrice: 169,
     monthlyPrice: 15,
+    quantity: 1,
+    unit: "store",
+    step: 1,
+    maxQuantity: 5,
+    minQuantity: 1,
   },
 ];
 
@@ -278,17 +402,6 @@ export const getIconComponent = (iconName: string) => {
 
   return icons[iconName] || Building2;
 };
-// Assuming this data exists
-
-export interface Module {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  annualPrice: number;
-  monthlyPrice: number;
-}
 
 export interface Department {
   id: string;
@@ -308,35 +421,25 @@ export interface PricingTier {
   discount: number;
 }
 
-// Helper function to calculate total price based on departments and tier
 const calculateTotalPriceHelper = (
   departments: Department[],
   currentCycle: string,
   selectedTier: PricingTier,
 ): number => {
   const modulesPrice = departments.reduce((total, dept) => {
-    // Ensure dept.modules is always an array
     const currentDeptModules = Array.isArray(dept.modules) ? dept.modules : [];
     return (
       total +
       currentDeptModules.reduce((deptTotal, module) => {
-        if (currentCycle === "monthly") {
-          return deptTotal + module.monthlyPrice;
-        } else {
-          return deptTotal + module.annualPrice;
-        }
+        const pricePerUnit = currentCycle === "monthly" ? module.monthlyPrice : module.annualPrice;
+        const effectiveQuantity = module.quantity;
+        return deptTotal + pricePerUnit * (effectiveQuantity / module.step);
       }, 0)
     );
   }, 0);
 
   const totalBeforeDiscount = selectedTier.basePrice + modulesPrice;
   const discount = totalBeforeDiscount * selectedTier.discount;
-
-  // Apply tier limits if necessary (e.g., Enterprise has unlimited)
-  const moduleCount = departments.reduce((count, dept) => {
-    const currentDeptModules = Array.isArray(dept.modules) ? dept.modules : [];
-    return count + currentDeptModules.length;
-  }, 0);
 
   return Math.round(totalBeforeDiscount - discount);
 };
@@ -347,51 +450,73 @@ interface LandingPricingState {
   currentCurrency: string;
   selectedTier: PricingTier;
   totalPrice: number;
-  allModules: Module[]; // Keep track of all available modules if needed for toggling
+  allModules: Module[];
   toggleModule: (moduleId: string, departmentId: string) => void;
+  updateModuleQuantity: (moduleId: string, quantity: number) => void;
   resetModules: () => void;
   setSelectedTier: (tier: PricingTier) => void;
   getTotalModulesCount: () => number;
   setCurrentCycle: (cycle: string) => void;
   setCurrentCurrency: (currency: string) => void;
-  // calculateTotalPrice is now implicitly handled by updates
 }
 
 export const useLandingPricingStore = create<LandingPricingState>((set, get) => ({
-  departments: initialDepartments.map((dept: Department) => ({ ...dept, modules: [] })), // Start with empty modules in each department
+  departments: initialDepartments.map((dept: Department) => ({ ...dept, modules: [] })),
   selectedTier: pricingTiers[0],
   currentCycle: "monthly",
   currentCurrency: "sar",
   totalPrice: pricingTiers[0].basePrice,
-  allModules: allModules, // Store all modules for easy lookup
+  allModules: allModules.map((m) => ({ ...m, quantity: m.minQuantity || m.step || 1 })),
+
   setCurrentCycle: (cycle: string) =>
     set((state) => {
       const newPrice = calculateTotalPriceHelper(state.departments, cycle, state.selectedTier);
       return { currentCycle: cycle, totalPrice: newPrice };
     }),
   setCurrentCurrency: (currency: string) => set({ currentCurrency: currency }),
+
+  updateModuleQuantity: (moduleId: string, quantity: number) => {
+    set((state) => {
+      const newDepartments = state.departments.map((dept) => ({
+        ...dept,
+        modules: dept.modules.map((mod) =>
+          mod.id === moduleId ? { ...mod, quantity: quantity } : mod,
+        ),
+      }));
+
+      const newTotalPrice = calculateTotalPriceHelper(
+        newDepartments,
+        state.currentCycle,
+        state.selectedTier,
+      );
+      return { departments: newDepartments, totalPrice: newTotalPrice };
+    });
+  },
+
   toggleModule: (moduleId: string, departmentId: string) => {
-    const moduleToAdd = get().allModules.find((m) => m.id === moduleId);
-    // Ensure the module exists and belongs to the correct category (department)
-    if (!moduleToAdd || moduleToAdd.category !== departmentId) {
-      console.warn(`Module ${moduleId} not found or does not belong to department ${departmentId}`);
+    const moduleData = get().allModules.find((m) => m.id === moduleId);
+    if (!moduleData) {
+      console.warn(`Module definition ${moduleId} not found in allModules`);
       return;
     }
+    if (moduleData.category !== departmentId) {
+      console.warn(
+        `Module ${moduleId} category ${moduleData.category} does not match department ${departmentId}`,
+      );
+      return;
+    }
+    const moduleToAdd = { ...moduleData, quantity: moduleData.minQuantity || moduleData.step || 1 };
 
     set((state) => {
-      const currentTier = state.selectedTier;
-      const currentDepartments = state.departments;
-      let moduleCount = state.getTotalModulesCount();
-
-      const newDepartments = currentDepartments.map((dept) => {
+      let moduleExistsInDept = false;
+      const newDepartments = state.departments.map((dept) => {
         if (dept.id !== departmentId) return dept;
 
-        // Ensure dept.modules is always an array
         const currentDeptModules = Array.isArray(dept.modules) ? dept.modules : [];
         const moduleIndex = currentDeptModules.findIndex((m) => m.id === moduleId);
 
         if (moduleIndex > -1) {
-          // Module exists, remove it
+          moduleExistsInDept = true;
           return {
             ...dept,
             modules: currentDeptModules.filter((m) => m.id !== moduleId),
@@ -404,9 +529,15 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
         }
       });
 
-      // Only update if departments actually changed
-      if (newDepartments === currentDepartments) {
-        return {}; // No change needed
+      const wasAdded =
+        !moduleExistsInDept &&
+        newDepartments.find((d) => d.id === departmentId)?.modules.some((m) => m.id === moduleId);
+      const wasRemoved =
+        moduleExistsInDept &&
+        !newDepartments.find((d) => d.id === departmentId)?.modules.some((m) => m.id === moduleId);
+
+      if (!wasAdded && !wasRemoved) {
+        return {};
       }
 
       const newTotalPrice = calculateTotalPriceHelper(
@@ -435,17 +566,8 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
 
   setSelectedTier: (tier: PricingTier) => {
     set((state) => {
-      // When changing tiers, re-evaluate module limits and potentially remove excess modules
-      let currentDepartments = state.departments;
-      let moduleCount = state.getTotalModulesCount();
-      let adjustedDepartments = currentDepartments;
-
-      const newTotalPrice = calculateTotalPriceHelper(
-        adjustedDepartments,
-        state.currentCycle,
-        tier,
-      );
-      return { selectedTier: tier, totalPrice: newTotalPrice, departments: adjustedDepartments };
+      const newTotalPrice = calculateTotalPriceHelper(state.departments, state.currentCycle, tier);
+      return { selectedTier: tier, totalPrice: newTotalPrice };
     });
   },
 

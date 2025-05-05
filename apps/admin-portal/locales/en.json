@@ -460,6 +460,136 @@
       "button-text": "Get Started Now",
       "title": "Diamond Plan",
       "subtitle": ""
+    },
+    "custom_pricing": {
+      "title": "Custom Pricing",
+      "description": "Choose the features you need and we will provide a custom quote for you",
+      "your_custom_solution": "Your Custom Solution",
+      "plan": "The Plan",
+      "modules": "The Modules",
+      "estimated_price": "Estimated Price",
+      "click_on_modules_to_add_or_remove_them_from_your_solution": "Click on the modules to add or remove them from your solution",
+      "unlimited_modules": "Unlimited",
+      "up_to_modules": "Up to",
+      "price_breakdown": "Price Breakdown",
+      "see_how_your_selected_modules_affect_your_price": "See how your selected modules affect your price",
+      "base_price": "Base Price",
+      "need_to_start_over": "Need to start over?",
+      "reset_selections": "Reset Selections",
+      "discount": "Discount",
+      "total_monthly_price": "Total Monthly Price",
+      "billing_cycle": {
+        "monthly": "Monthly",
+        "annually": "Annually"
+      },
+      "offices": {
+        "title": "Offices",
+        "description": "Oversee all aspects of company office locations, including employee and department assignments, rent contract management, cost tracking, and seamless integration with expense and purchasing systems for comprehensive facility oversight."
+      },
+      "branches": {
+        "title": "Branches",
+        "description": "Control operations for distinct company branches. Handle staff and department allocation, lease agreements, financial outlays, link with procurement and expense records, and manage branch-specific inventory levels."
+      },
+      "warehouses": {
+        "title": "Warehouses",
+        "description": "Direct warehouse operations efficiently. Assign personnel, oversee lease details and costs, integrate with purchasing and expense data, maintain accurate inventory counts, and connect warehouse activities directly to sales fulfillment and logistics coordination."
+      },
+      "clients": {
+        "title": "Clients",
+        "description": "Utilize a comprehensive Customer Relationship Management (CRM) system to nurture client relationships, track interactions, generate and dispatch professional quotes and invoices, and streamline the entire client lifecycle."
+      },
+      "vendors": {
+        "title": "Vendors",
+        "description": "Implement a robust Vendor Relationship Management system. Organize vendor information, issue purchase orders, process vendor invoices efficiently, and maintain strong supplier partnerships."
+      },
+      "invoices": {
+        "title": "Invoices",
+        "description": "Streamline the entire invoicing process. Create, customize, and send professional invoices to clients, track payment statuses, link invoices to corresponding quotes, and manage accounts receivable effectively."
+      },
+      "products": {
+        "title": "Products",
+        "description": "Maintain a detailed catalog of company products or services. Easily incorporate items into sales quotes and invoices, track product inventory across different warehouses, and manage product details and pricing."
+      },
+      "quotes": {
+        "title": "Quotes",
+        "description": "Generate accurate and professional sales quotations for clients. Track quote status from creation to conversion, easily transform accepted quotes into invoices, and manage the sales pipeline efficiently."
+      },
+      "expenses": {
+        "title": "Expenses",
+        "description": "Gain complete control over company expenditures. Track and categorize all business expenses, linking them to specific purchases, operational costs like rent, employee compensation, and other financial outflows for detailed analysis."
+      },
+      "purchases": {
+        "title": "Purchases",
+        "description": "Oversee the entire procurement lifecycle. Create purchase orders, track supplier deliveries, manage vendor invoices related to purchases, and integrate purchasing data with inventory and expense management."
+      },
+      "employees": {
+        "title": "Employees",
+        "description": "Centralize all employee information and HR processes. Maintain detailed employee records, manage contracts, track time off, oversee performance reviews, and handle payroll data within a unified system."
+      },
+      "jobs": {
+        "title": "Jobs",
+        "description": "Define and manage job roles and positions within the organization. Outline responsibilities, required skills, salary ranges, and reporting structures for each distinct job title."
+      },
+      "departments": {
+        "title": "Departments",
+        "description": "Structure your organization by creating and managing distinct departments. Assign employees, allocate resources, define departmental goals, and track performance at the department level."
+      },
+      "job_listings": {
+        "title": "Job Listings",
+        "description": "Create, publish, and manage job openings across various platforms. Track the status of listings, define application requirements, and attract potential candidates for open positions."
+      },
+      "applicants": {
+        "title": "Applicants",
+        "description": "Streamline the recruitment process by managing candidate applications. Track applicant progress through hiring stages, store resumes and documents, schedule interviews, and collaborate on hiring decisions."
+      },
+      "servers": {
+        "title": "Servers",
+        "description": "Monitor and maintain the company's server infrastructure. Track server specifications, manage configurations, monitor performance and uptime, and schedule maintenance tasks for physical or virtual servers."
+      },
+      "domains": {
+        "title": "Domains",
+        "description": "Keep track of all registered domain names owned by the company. Manage registration details, renewal dates, DNS settings, and associated services for each domain."
+      },
+      "websites": {
+        "title": "Websites",
+        "description": "Oversee the company's online presence by managing website details. Track hosting information, content management systems, development status, analytics integration, and maintenance schedules for corporate websites."
+      },
+      "ecommerce": {
+        "title": "E-commerce",
+        "description": "Control all aspects of the company's online sales operations. Manage product listings, process orders, handle customer data, integrate payment gateways, and track sales performance for e-commerce platforms."
+      },
+      "infrastructure": {
+        "title": "Infrastructure",
+        "description": "Gain a holistic view of the company's core operational infrastructure, encompassing IT assets, physical facilities, network components, and essential systems required for business continuity."
+      },
+      "business": {
+        "title": "Business",
+        "description": "Oversee strategic business operations, including planning, performance monitoring, market analysis, and key decision-making processes to drive overall company growth and success."
+      },
+      "finance": {
+        "title": "Finance",
+        "description": "Handle all financial aspects of the company, including accounting, budgeting, financial reporting, cash flow management, tax compliance, and investment tracking for sound fiscal health."
+      },
+      "hr": {
+        "title": "Human Resources",
+        "description": "Direct the full spectrum of Human Resources functions, from recruitment and onboarding to employee relations, benefits administration, compliance, training, and talent management."
+      },
+      "it": {
+        "title": "Technology",
+        "description": "Supervise the company's technology landscape, including hardware, software, network administration, cybersecurity, technical support, and IT project management to ensure efficient and secure operations."
+      },
+      "starter": {
+        "title": "Starter",
+        "description": "Start using Pukla"
+      },
+      "professional": {
+        "title": "Professional",
+        "description": "Professional level for companies"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "description": "Enterprise level for companies"
+      }
     }
   },
   "FAQ": {
