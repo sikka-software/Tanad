@@ -80,11 +80,25 @@ export const ComboboxAddCell: CellComponent<
 
     const handleValueChange = useCallback(
       (newValue: string | null) => {
-        setRowData(newValue ?? null); // Update external data
-        // No need to call stopEditing here, ComboboxAdd selection closes popover
-        // DataSheetGrid handles focus shift based on user action (e.g., Tab, Enter outside popover)
+        // console.log("ComboboxAddCell handleValueChange: Setting row data to:", newValue); // <-- Remove log
+
+        // Check if the rowData prop seems to be the full object (e.g., by checking for an 'id' property)
+        if (typeof rowData === 'object' && rowData !== null && 'id' in rowData) {
+          // If it looks like the full object, construct the updated full object
+          const updatedRowData = {
+            ...(rowData as object), // Spread the existing object
+            manager: newValue ?? null, // Update the manager field
+          };
+          // Pass the updated full object back. Cast setRowData to any to bypass strict typing
+          // based on the CellComponent signature, as we're adapting to observed behavior.
+          (setRowData as any)(updatedRowData);
+        } else {
+          // Otherwise, assume rowData was just the cell value and update with the new cell value.
+          // This is the scenario likely causing the row reset if the grid isn't using column.setValue
+          setRowData(newValue ?? null);
+        }
       },
-      [setRowData],
+      [rowData, setRowData], // Add rowData to dependency array
     );
 
     // Handle Escape key specifically to close the popover and stop editing
