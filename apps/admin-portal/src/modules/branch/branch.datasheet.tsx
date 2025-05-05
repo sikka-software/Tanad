@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import React, { useState, useEffect, useRef, useCallback } from "react";
+
 import {
   DataSheetGrid,
   checkboxColumn,
@@ -7,9 +8,9 @@ import {
   keyColumn,
   DataSheetGridProps,
   CellComponent,
-} from "react-datasheet-grid";
+} from "@/components/datasheet";
 // Import the style only once in your app!
-import "react-datasheet-grid/dist/style.css";
+import "@/components/datasheet/style.css";
 
 import { Branch } from "./branch.type";
 
@@ -43,7 +44,12 @@ const CustomTextComponent: CellComponent<string | null, any> = React.memo(
     }, []);
 
     const handleBlur = useCallback(() => {
-      console.log("CustomTextComponent handleBlur. isSavingRef:", isSavingRef.current, "Current value:", value);
+      console.log(
+        "CustomTextComponent handleBlur. isSavingRef:",
+        isSavingRef.current,
+        "Current value:",
+        value,
+      );
       // If save was already triggered by keydown, reset flag and exit
       if (isSavingRef.current) {
         isSavingRef.current = false;
@@ -164,6 +170,12 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
 
   return (
     <div className="h-full w-full" dir="rtl">
+      <style jsx global>{`
+        .dsg-header-cell {
+          background-color: hsl(var(--muted));
+          color: hsl(var(--primary));
+        }
+      `}</style>
       <DataSheetGrid
         value={data}
         onChange={handleGridChange}
