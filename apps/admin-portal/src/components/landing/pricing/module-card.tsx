@@ -109,13 +109,13 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
             </div>
           ) : (
             <div className="flex flex-row items-center gap-1 h-7">
-              <span>{displayedModulePrice.toFixed(2)}</span>
+              <span>{Number(displayedModulePrice.toFixed(2)).toLocaleString()}</span>
               <span>{currencySymbol}</span>
               <span>/ {cycleText}</span>
             </div>
           )}
           <span className="text-muted-foreground ms-1 text-xs font-normal">
-            {displayQuantity} {t(`General.${module.unit}`)}
+            {displayQuantity.toLocaleString()} {t(`General.${module.unit}`)}
           </span>
         </div>
       </div>

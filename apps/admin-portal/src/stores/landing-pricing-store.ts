@@ -205,7 +205,7 @@ export const allModules: Module[] = [
     icon: "DollarSign",
     category: "finance",
     annualPrice: 10,
-    monthlyPrice: 1,
+    monthlyPrice: 100,
     quantity: 10,
     unit: "salary",
     step: 1,
@@ -216,7 +216,7 @@ export const allModules: Module[] = [
         id: "gosi",
         label: "Pricing.custom_pricing.integrations.gosi",
         pricingType: "per_unit",
-        monthlyPrice: 0.5, // 0.5 per employee per month
+        monthlyPrice: 50.5, // 0.5 per employee per month
         annualPrice: 5, // 5 per employee per year
       },
     ],

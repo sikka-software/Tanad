@@ -74,17 +74,31 @@ const PricingCalculator: React.FC = () => {
               return total + calculatedModulePrice;
             }, 0);
 
+            // Check if any module in the department needs a special quote
+            const departmentNeedsQuote = dept.modules.some((mod) => {
+              const fm = allModules.find((m) => m.id === mod.id);
+              return fm?.contactUsThreshold && mod.quantity >= fm.contactUsThreshold;
+            });
+
             return (
               <div key={dept.id} className="border-t border-gray-100 pt-2">
                 <div className="mb-2 flex justify-between">
                   <span className="text-gray-600">
                     {t(dept.name)} ({dept.modules.length})
                   </span>
-                  <div className="flex flex-row items-center gap-1">
-                    {/* Display calculated department total */}
-                    <span className="font-semibold">{deptTotal.toFixed(2)}</span>
-                    <span className="font-semibold">{currencySymbol}</span>
-                  </div>
+                  {/* Display department total or special quote text */}
+                  {departmentNeedsQuote ? (
+                    <span className="font-semibold text-orange-600">
+                      {t("Pricing.special_quote")}
+                    </span>
+                  ) : (
+                    <div className="flex flex-row items-center gap-1">
+                      <span className="font-semibold">
+                        {Number(deptTotal.toFixed(2)).toLocaleString()}
+                      </span>
+                      <span className="font-semibold">{currencySymbol}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Display individual module price based on its quantity */}
@@ -98,7 +112,7 @@ const PricingCalculator: React.FC = () => {
                     <React.Fragment key={mod.id}>
                       <div className="flex justify-between pl-4 text-sm text-gray-500">
                         <span>
-                          {t(mod.name)} ({mod.quantity} {t(`General.${mod.unit}`)})
+                          {t(mod.name)} ({mod.quantity.toLocaleString()} {t(`General.${mod.unit}`)})
                         </span>
                         {/* Check threshold for module price display */}
                         {fullModuleData?.contactUsThreshold &&
@@ -106,7 +120,7 @@ const PricingCalculator: React.FC = () => {
                           <span className="font-semibold">{t("Pricing.special_quote")}</span>
                         ) : (
                           <div className="flex flex-row items-center gap-1">
-                            <span>{calculatedModulePrice.toFixed(2)}</span>
+                            <span>{Number(calculatedModulePrice.toFixed(2)).toLocaleString()}</span>
                             <span>{currencySymbol}</span>
                           </div>
                         )}
@@ -145,7 +159,11 @@ const PricingCalculator: React.FC = () => {
                                 >
                                   <span>+ {t(integrationData.label)}</span>
                                   <div className="flex flex-row items-center gap-1">
-                                    <span>{calculatedIntegrationPrice.toFixed(2)}</span>
+                                    <span>
+                                      {Number(
+                                        calculatedIntegrationPrice.toFixed(2),
+                                      ).toLocaleString()}
+                                    </span>
                                     <span>{currencySymbol}</span>
                                   </div>
                                 </div>
@@ -185,7 +203,9 @@ const PricingCalculator: React.FC = () => {
               <Button>{t("Pricing.contact_us")}</Button>
             ) : (
               <div className="flex flex-row items-center gap-1">
-                <span className="text-2xl font-bold text-blue-600">{totalPrice}</span>
+                <span className="text-2xl font-bold text-blue-600">
+                  {totalPrice.toLocaleString()}
+                </span>
                 <span className="text-2xl font-bold text-blue-600">
                   {currentCurrency === "sar" ? (
                     <SARSymbol className="size-5" />
