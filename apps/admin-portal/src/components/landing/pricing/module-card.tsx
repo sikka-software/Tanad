@@ -52,6 +52,23 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
 
   const fullModuleData = allModules.find((m) => m.id === module.id);
 
+  // Recalculate module price to include integrations
+  let displayedModulePrice = currentModulePrice;
+  if (moduleState?.selectedIntegrations && fullModuleData?.integrations) {
+    moduleState.selectedIntegrations.forEach((integrationId) => {
+      const integrationData = fullModuleData.integrations!.find((int) => int.id === integrationId);
+      if (integrationData) {
+        const integrationPricePerCycle =
+          currentCycle === "monthly" ? integrationData.monthlyPrice : integrationData.annualPrice;
+        if (integrationData.pricingType === "fixed") {
+          displayedModulePrice += integrationPricePerCycle;
+        } else if (integrationData.pricingType === "per_unit") {
+          displayedModulePrice += integrationPricePerCycle * (displayQuantity / module.step);
+        }
+      }
+    });
+  }
+
   return (
     <div
       className={cn(
@@ -82,7 +99,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
         </div>
         <div className="mt-2 flex w-full flex-row items-center justify-between gap-1 text-sm font-semibold text-blue-600">
           <div className="flex flex-row items-center gap-1">
-            <span>{currentModulePrice.toFixed(2)}</span>
+            <span>{displayedModulePrice.toFixed(2)}</span>
             <span>{currencySymbol}</span>
             <span>/ {cycleText}</span>
           </div>
