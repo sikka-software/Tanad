@@ -1,5 +1,5 @@
 import cx from "classnames";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { z } from "zod";
 
@@ -20,28 +20,22 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Branch } from "./branch.type";
 // Import the schema function from the form file
 import { createBranchSchema } from "./branch.form";
+// Import the new cell and its exported columnData type
+import {
+  ComboboxAddCell,
+  ComboboxAddColumnData,
+} from "@/components/datasheet/components/ComboboxAddCell";
+import { useEmployees } from "../employee/employee.hooks"; // Import hooks to get employees
+import useEmployeeStore from "../employee/employee.store"; // Import store for dialog state
+import { EmployeeForm } from "../employee/employee.form"; // Import employee form
+import { FormDialog } from "@/components/ui/form-dialog"; // Import FormDialog
 
-// --- Remove Local Zod Schemas ---
-// const nameSchema = z.string().min(1, "Required");
-// const codeSchema = z.string().min(1, "Required");
-// const addressSchema = z.string().min(1, "Required"); // Assuming short_address maps to address
-// const citySchema = z.string().min(1, "Required");
-// const stateSchema = z.string().min(1, "Required"); // Assuming region maps to state
-// const zipCodeSchema = z.string().min(1, "Required");
-// // Allow empty strings for optional fields
-// const phoneSchema = z.string();
-// const emailSchema = z.string().email({ message: "Invalid email" }).or(z.literal(""));
-// const managerSchema = z.string();
-// const isActiveSchema = z.boolean();
-// --- End Zod Schemas ---
-
-// --- CustomTextComponent with Validation ---
+// --- CustomTextComponent ---
 type CustomTextComponentProps<T> = {
   rowData: T | null;
   setRowData: (value: T | null) => void;
   focus: boolean;
   stopEditing: (opts?: { nextRow?: boolean }) => void;
-  // Add validationSchema to props
   columnData?: { validationSchema?: z.ZodSchema<any> };
 };
 
@@ -65,7 +59,6 @@ const CustomTextComponent: CellComponent<string | null, { validationSchema?: z.Z
         setValidationError(null);
         setIsPopoverOpen(false);
       } else {
-        // Don't blur here, let the natural blur event trigger handleBlur
         // ref.current?.blur();
       }
     }, [focus]);
@@ -85,58 +78,52 @@ const CustomTextComponent: CellComponent<string | null, { validationSchema?: z.Z
         }
 
         setValidationError(errorMsg);
-        setIsPopoverOpen(!isValid); // Open popover only if invalid
+        setIsPopoverOpen(!isValid);
 
         if (isValid && currentValue !== (rowData ?? "")) {
-          setRowData(currentValue); // Save valid data if changed
+          setRowData(currentValue);
         }
 
         return isValid;
       },
       [columnData, rowData, setRowData],
-    ); // Added dependencies
+    );
 
     const handleChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         setValue(e.target.value);
-        // Clear error immediately as user types
         if (validationError) {
           setValidationError(null);
           setIsPopoverOpen(false);
         }
       },
       [validationError],
-    ); // Added dependency
+    );
 
     const handleBlur = useCallback(() => {
-      // Validate on blur. If valid, stop editing. If invalid,
-      // validateAndSave handled setting the error state and opening the popover.
       const isValid = validateAndSave(value);
       if (isValid) {
         stopEditing({ nextRow: false });
       }
-      // If !isValid, do nothing - cell remains focused (or should), popover is open
-    }, [value, stopEditing, validateAndSave]); // Added dependencies
+    }, [value, stopEditing, validateAndSave]);
 
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter" || e.key === "Tab") {
           e.preventDefault();
-          const isValid = validateAndSave(value); // Validate
+          const isValid = validateAndSave(value);
           if (isValid) {
-            // Only move focus if valid
             stopEditing({ nextRow: e.key === "Enter" });
           }
-          // If invalid, do nothing, keep focus here, popover is open
         } else if (e.key === "Escape") {
           e.preventDefault();
-          setValue(rowData ?? ""); // Revert
-          setValidationError(null); // Clear error
+          setValue(rowData ?? "");
+          setValidationError(null);
           setIsPopoverOpen(false);
-          stopEditing({ nextRow: false }); // Close editor
+          stopEditing({ nextRow: false });
         }
       },
-      [value, rowData, stopEditing, validateAndSave], // Added dependencies
+      [value, rowData, stopEditing, validateAndSave],
     );
 
     return (
@@ -168,22 +155,19 @@ const CustomTextComponent: CellComponent<string | null, { validationSchema?: z.Z
       </Popover>
     );
   });
+CustomTextComponent.displayName = "CustomTextComponent";
 
-// --- End CustomTextComponent ---
-
-// Helper function to create validated columns
+// --- createValidatedColumn ---
 const createValidatedColumn = <T extends Record<string, any>>(
   key: keyof T & string,
   title: string,
   validationSchema?: z.ZodSchema<any>,
 ): Partial<Column<T, any, string>> => {
-  // Define the specific column part for string | null
   const stringOrNullColumn: Partial<Column<string | null, any, string>> = {
-    ...customTextColumn,
-    columnData: { validationSchema }, // Pass validation schema here
+    ...customTextColumn, // Use the base customTextColumn config here
+    columnData: { validationSchema },
   };
 
-  // Use keyColumn and cast the result, assuming the key maps to string | null
   return {
     ...keyColumn<T, typeof key, string>(
       key,
@@ -193,8 +177,19 @@ const createValidatedColumn = <T extends Record<string, any>>(
   };
 };
 
-// Infer the Operation type from the props
-// Use 'any' for operations if Operation type is not available/exported
+// --- Define comboboxAddColumn base configuration --- NEW
+// Use the imported ComboboxAddColumnData type correctly
+const comboboxAddColumnBase: Partial<
+  Column<string | null, ComboboxAddColumnData<any>, string | null> // Cell value is string | null
+> = {
+  component: ComboboxAddCell,
+  deleteValue: () => null,
+  copyValue: ({ rowData }) => rowData ?? "",
+  pasteValue: ({ value }) => value,
+  cellClassName: "p-0",
+};
+// --- End comboboxAddColumn base definition ---
+
 type OnChangeType = (value: Branch[], operations: any) => void;
 
 interface BranchDatasheetProps {
@@ -204,9 +199,14 @@ interface BranchDatasheetProps {
 
 const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   const t = useTranslations();
-
-  // Instantiate the schema from the form file
+  const locale = useLocale();
   const branchSchema = createBranchSchema(t);
+
+  const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
+  const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
+  const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
+
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
 
   const handleGridChange = (value: Record<string, any>[], operations: any) => {
     if (onChange) {
@@ -214,55 +214,46 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     }
   };
 
-  // Define columns using the helper function and the imported schema
-  const columns: Partial<Column<Branch, any, string>>[] = [
-    createValidatedColumn<Branch>(
-      "name",
-      t("Branches.form.name.label"),
-      branchSchema.shape.name, // Use extracted schema
-    ),
-    createValidatedColumn<Branch>(
-      "code",
-      t("Branches.form.code.label"),
-      branchSchema.shape.code, // Use extracted schema
-    ),
-    createValidatedColumn<Branch>(
-      "short_address",
-      t("Branches.form.address.label"),
-      branchSchema.shape.short_address, // Use extracted schema
-    ),
-    createValidatedColumn<Branch>(
-      "city",
-      t("Branches.form.city.label"),
-      branchSchema.shape.city, // Use extracted schema
-    ),
-    createValidatedColumn<Branch>(
-      "region",
-      t("Branches.form.state.label"),
-      branchSchema.shape.region, // Use extracted schema
-    ),
-    createValidatedColumn<Branch>(
-      "zip_code",
-      t("Branches.form.zip_code.label"),
-      branchSchema.shape.zip_code, // Use extracted schema
-    ),
-    createValidatedColumn<Branch>(
-      "phone",
-      t("Branches.form.phone.label"),
-      branchSchema.shape.phone, // Use extracted schema
-    ),
-    createValidatedColumn<Branch>(
-      "email",
-      t("Branches.form.email.label"),
-      branchSchema.shape.email, // Use extracted schema
-    ),
-    createValidatedColumn<Branch>(
-      "manager",
-      t("Branches.form.manager.label"),
-      branchSchema.shape.manager, // Use extracted schema
-    ),
-    // Checkbox column doesn't need text validation
-    { ...keyColumn("is_active", checkboxColumn), title: t("Branches.form.is_active.label") },
+  const employeeOptions = employees.map((emp) => ({
+    label: `${emp.first_name} ${emp.last_name}`,
+    value: `${emp.first_name} ${emp.last_name}`,
+  }));
+
+  // Define columns array with explicit types
+  const columns: Column<Branch, any, any>[] = [
+    // Use Column<Branch, any, string> for text columns
+    createValidatedColumn<Branch>("name", t("Branches.form.name.label"), branchSchema.shape.name) as Column<Branch, any, string>,
+    createValidatedColumn<Branch>("code", t("Branches.form.code.label"), branchSchema.shape.code) as Column<Branch, any, string>,
+    createValidatedColumn<Branch>("short_address", t("Branches.form.address.label"), branchSchema.shape.short_address) as Column<Branch, any, string>,
+    createValidatedColumn<Branch>("city", t("Branches.form.city.label"), branchSchema.shape.city) as Column<Branch, any, string>,
+    createValidatedColumn<Branch>("region", t("Branches.form.state.label"), branchSchema.shape.region) as Column<Branch, any, string>,
+    createValidatedColumn<Branch>("zip_code", t("Branches.form.zip_code.label"), branchSchema.shape.zip_code) as Column<Branch, any, string>,
+    createValidatedColumn<Branch>("phone", t("Branches.form.phone.label"), branchSchema.shape.phone) as Column<Branch, any, string>,
+    createValidatedColumn<Branch>("email", t("Branches.form.email.label"), branchSchema.shape.email) as Column<Branch, any, string>,
+
+    // Define the manager column explicitly using the base and providing specific columnData
+    {
+      id: "manager",
+      title: t("Branches.form.manager.label"),
+      ...comboboxAddColumnBase, // Spread the base config (component, copy/paste etc)
+      // Provide the specific columnData for ComboboxAddCell
+      columnData: {
+        options: employeeOptions,
+        isLoading: employeesLoading,
+        texts: {
+          placeholder: t("Branches.form.manager.placeholder"),
+          searchPlaceholder: t("Employees.search_employees"),
+          noItems: t("Branches.form.manager.no_employees"),
+        },
+        addText: t("Employees.add_new"),
+        onAddClick: () => setIsEmployeeDialogOpen(true),
+      } as ComboboxAddColumnData<any>, // Assert the type here
+      // Map the specific field from the row data to the cell value
+      getValue: ({ rowData }) => rowData.manager,
+    } as Column<Branch, ComboboxAddColumnData<any>, string | null>,
+
+    // Use Column<Branch, any, boolean> for checkbox
+    { ...keyColumn("is_active", checkboxColumn), title: t("Branches.form.is_active.label") } as Column<Branch, any, boolean>,
   ];
 
   const createNewRow = (): Branch => ({
@@ -275,7 +266,7 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     zip_code: "",
     phone: "",
     email: "",
-    manager: "",
+    manager: null,
     is_active: false,
     notes: null,
     building_number: "",
@@ -286,25 +277,42 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   });
 
   return (
-    <div className="" dir="rtl">
-      <DataSheetGrid
-        value={data}
-        onChange={handleGridChange}
-        columns={columns}
-        createRow={createNewRow}
-        rowKey="id"
-      />
+    <div>
+      <div className="" dir={locale === "ar" ? "rtl" : "ltr"}>
+        <DataSheetGrid
+          columns={columns as Partial<Column<Branch, any, any>>[]}
+          value={data}
+          onChange={handleGridChange}
+          createRow={createNewRow}
+          rowKey="id"
+        />
+      </div>
+
+      <FormDialog
+        open={isEmployeeDialogOpen}
+        onOpenChange={setIsEmployeeDialogOpen}
+        title={t("Employees.add_new")}
+        formId="employee-form-dialog"
+        loadingSave={isEmployeeSaving}
+      >
+        <EmployeeForm
+          formHtmlId="employee-form-dialog"
+          onSuccess={() => {
+            setIsEmployeeSaving(false);
+            setIsEmployeeDialogOpen(false);
+          }}
+        />
+      </FormDialog>
     </div>
   );
 };
 
 export default BranchDatasheet;
 
-// Define a custom text column configuration using the custom component
+// --- customTextColumn Definition ---
 const customTextColumn: Partial<Column<string | null, any, string>> = {
   component: CustomTextComponent,
-  // Keep copy/paste/delete behavior similar to textColumn
-  deleteValue: () => "", // Returns string, matching expected type
-  copyValue: ({ rowData }) => rowData ?? "", // Returns string
-  pasteValue: ({ value }) => value, // Returns string
+  deleteValue: () => "",
+  copyValue: ({ rowData }) => rowData ?? "",
+  pasteValue: ({ value }) => value,
 };

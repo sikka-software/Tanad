@@ -1229,7 +1229,7 @@ export const branches = pgTable(
     zip_code: text(),
     phone: text(),
     email: text(),
-    manager: text(),
+    manager: uuid().references(() => employees.id, { onDelete: "set null" }),
     is_active: boolean().default(true).notNull(),
     notes: text(),
     user_id: uuid().notNull(),
@@ -1239,6 +1239,7 @@ export const branches = pgTable(
     index("branches_code_idx").using("btree", table.code.asc().nullsLast().op("text_ops")),
     index("branches_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("branches_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("idx_branches_manager").using("btree", table.manager.asc().nullsLast().op("uuid_ops")),
     unique("branches_code_key").on(table.code),
   ],
 );
