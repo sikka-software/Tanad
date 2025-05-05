@@ -1,12 +1,10 @@
-import { DataSheetGridProps, DataSheetGridRef } from '../types'
-import { useState } from 'react'
-import { DataSheetGrid } from './DataSheetGrid'
-import React from 'react'
+import { useState } from "react";
+import React from "react";
 
-export const StaticDataSheetGrid = React.forwardRef<
-  DataSheetGridRef,
-  DataSheetGridProps<any>
->(
+import { DataSheetGridProps, DataSheetGridRef } from "../types";
+import { DataSheetGrid } from "./DataSheetGrid";
+
+export const StaticDataSheetGrid = React.forwardRef<DataSheetGridRef, DataSheetGridProps<any>>(
   <T extends any>(
     {
       columns,
@@ -25,7 +23,7 @@ export const StaticDataSheetGrid = React.forwardRef<
       rowHeight,
       ...rest
     }: DataSheetGridProps<T>,
-    ref: React.ForwardedRef<DataSheetGridRef>
+    ref: React.ForwardedRef<DataSheetGridRef>,
   ) => {
     const [staticProps] = useState({
       columns,
@@ -42,19 +40,17 @@ export const StaticDataSheetGrid = React.forwardRef<
       onSelectionChange,
       rowClassName,
       rowHeight,
-    })
+    });
 
     return (
       <DataSheetGrid
         {...staticProps}
         {...rest}
-        rowHeight={
-          typeof rowHeight === 'number' ? rowHeight : staticProps.rowHeight
-        }
+        rowHeight={typeof rowHeight === "number" ? rowHeight : staticProps.rowHeight}
         ref={ref}
       />
-    )
-  }
+    );
+  },
 ) as <T extends any>(
-  props: DataSheetGridProps<T> & { ref?: React.ForwardedRef<DataSheetGridRef> }
-) => JSX.Element
+  props: DataSheetGridProps<T> & { ref?: React.ForwardedRef<DataSheetGridRef> },
+) => React.ReactNode;
