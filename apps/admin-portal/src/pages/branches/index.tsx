@@ -99,12 +99,19 @@ export default function BranchesPage() {
   }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
 
   const handleDatasheetChange = (updatedData: Branch[], operations: any[]) => {
+    console.log("handleDatasheetChange called:", { updatedData, operations });
+
     operations.forEach((op) => {
-      if (op.type === "update") {
+      console.log("Processing operation:", op);
+      if (op.type?.toUpperCase() === "UPDATE") {
         const changedRowIndex = op.fromRowIndex;
         const changedRow = updatedData[changedRowIndex];
+        console.log("Update operation - changedRow:", changedRow);
+
         if (changedRow && changedRow.id) {
           const originalRow = branches?.find((b) => b.id === changedRow.id);
+          console.log("Update operation - originalRow:", originalRow);
+
           if (originalRow) {
             type BranchPayload = Partial<Omit<Branch, "id" | "created_at" | "enterprise_id">>;
             const updatePayload: BranchPayload = {};
@@ -113,20 +120,28 @@ export default function BranchesPage() {
             const updateableKeys = Object.keys(originalRow).filter(
               (k) => k !== "id" && k !== "created_at" && k !== "enterprise_id",
             ) as (keyof BranchPayload)[];
+            console.log("Updateable keys:", updateableKeys);
 
             for (const K of updateableKeys) {
               if (changedRow[K] !== originalRow[K]) {
                 fieldChanged = K;
                 updatePayload[fieldChanged] = changedRow[K] as any;
+                console.log(`Field ${K} changed to:`, changedRow[K]);
                 break;
               }
             }
 
             if (fieldChanged && Object.keys(updatePayload).length > 0) {
-              console.log(`Updating branch ${changedRow.id}:`, updatePayload);
+              console.log(`Calling updateBranch for ID ${changedRow.id} with payload:`, updatePayload);
               updateBranch({ id: changedRow.id, data: updatePayload });
+            } else {
+              console.log("No changes detected or no field identified.");
             }
+          } else {
+            console.log("Original row not found for ID:", changedRow.id);
           }
+        } else {
+          console.log("Changed row or row ID is missing.");
         }
       }
     });

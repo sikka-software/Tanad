@@ -1,14 +1,38 @@
+import { DollarSign } from "lucide-react";
+import { useTranslations } from "next-intl";
 import React from "react";
 
 import { useLandingPricingStore } from "@/stores/landing-pricing-store";
 
+import { SARSymbol } from "../../ui/sar-symbol";
+
 const PricingCalculator: React.FC = () => {
+  const t = useTranslations();
   const { departments, selectedTier, totalPrice, resetModules } = useLandingPricingStore();
 
   const totalModules = departments.reduce((count, dept) => count + dept.modules.length, 0);
   const basePrice = selectedTier.basePrice;
+  const currentCycle = useLandingPricingStore((state) => state.currentCycle);
+  const currentCurrency = useLandingPricingStore((state) => state.currentCurrency);
+
+  //  if currenyCurrency is sar use <SARSymbol/> else use <Dollar/>. Also make sure the texts for the cyclces is correct
+  const currencySymbol =
+    currentCurrency === "sar" ? (
+      <SARSymbol className="size-3" />
+    ) : (
+      <DollarSign className="size-3" />
+    );
   const modulesPrice = departments.reduce((total, dept) => {
-    return total + dept.modules.reduce((deptTotal, module) => deptTotal + module.basePrice, 0);
+    return (
+      total +
+      dept.modules.reduce((deptTotal, module) => {
+        if (currentCycle === "monthly") {
+          return deptTotal + module.monthlyPrice;
+        } else {
+          return deptTotal + module.annualPrice;
+        }
+      }, 0)
+    );
   }, 0);
 
   const discount =
@@ -17,33 +41,53 @@ const PricingCalculator: React.FC = () => {
   return (
     <div className="overflow-hidden rounded-xl bg-white shadow-lg">
       <div className="p-6">
-        <h2 className="text-2xl font-bold text-gray-900">Price Breakdown</h2>
-        <p className="mb-6 text-gray-600">See how your selected modules affect your price</p>
+        <h2 className="text-2xl font-bold text-gray-900">
+          {t("Pricing.custom_pricing.price_breakdown")}
+        </h2>
+        <p className="mb-6 text-gray-600">
+          {t("Pricing.custom_pricing.see_how_your_selected_modules_affect_your_price")}
+        </p>
 
         <div className="mb-6 space-y-4">
-          <div className="flex justify-between">
-            <span className="text-gray-600">{selectedTier.name} plan base price</span>
+          {/* <div className="flex justify-between">
+            <span className="text-gray-600">
+              {t(selectedTier.name)} {t("Pricing.custom_pricing.plan")}{" "}
+              {t("Pricing.custom_pricing.base_price")}
+            </span>
             <span className="font-semibold">${basePrice}</span>
-          </div>
+          </div> */}
 
           {departments.map((dept) => {
             if (dept.modules.length === 0) return null;
 
-            const deptTotal = dept.modules.reduce((total, mod) => total + mod.basePrice, 0);
+            const deptTotal = dept.modules.reduce((total, mod) => {
+              const currentCycle = useLandingPricingStore.getState().currentCycle;
+              if (currentCycle === "monthly") {
+                return total + mod.monthlyPrice;
+              } else {
+                return total + mod.annualPrice;
+              }
+            }, 0);
 
             return (
               <div key={dept.id} className="border-t border-gray-100 pt-2">
                 <div className="mb-2 flex justify-between">
                   <span className="text-gray-600">
-                    {dept.name} modules ({dept.modules.length})
+                    {t(dept.name)} {t("Pricing.custom_pricing.modules")} ({dept.modules.length})
                   </span>
-                  <span className="font-semibold">${deptTotal}</span>
+                  <div className="flex flex-row items-center gap-1">
+                    <span className="font-semibold">{deptTotal}</span>
+                    <span className="font-semibold">{currencySymbol}</span>
+                  </div>
                 </div>
 
                 {dept.modules.map((mod) => (
                   <div key={mod.id} className="flex justify-between pl-4 text-sm text-gray-500">
-                    <span>{mod.name}</span>
-                    <span>${mod.basePrice}</span>
+                    <span>{t(mod.name)}</span>
+                    <div className="flex flex-row items-center gap-1">
+                      <span>{currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice}</span>
+                      <span>{currencySymbol}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -53,9 +97,12 @@ const PricingCalculator: React.FC = () => {
           {selectedTier.discount > 0 && (
             <div className="flex justify-between border-t border-gray-100 pt-2 text-green-600">
               <span>
-                {selectedTier.name} plan discount ({selectedTier.discount * 100}%)
+                {t(selectedTier.name)} {t("Pricing.custom_pricing.plan")}{" "}
+                {t("Pricing.custom_pricing.discount")} ({selectedTier.discount * 100}%)
               </span>
-              <span>-${Math.round(discount)}</span>
+              <span>
+                -{currencySymbol} {Math.round(discount)}
+              </span>
             </div>
           )}
         </div>
@@ -63,12 +110,30 @@ const PricingCalculator: React.FC = () => {
         <div className="border-t-2 border-gray-200 pt-4">
           <div className="flex justify-between">
             <div>
-              <span className="text-lg font-bold text-gray-900">Total monthly price</span>
+              <span className="text-lg font-bold text-gray-900">
+                {t("Pricing.custom_pricing.total_monthly_price")}
+              </span>
               <p className="text-sm text-gray-500">
-                {totalModules} modules on {selectedTier.name} plan
+                {totalModules} {t("Pricing.custom_pricing.modules")} on {t(selectedTier.name)}{" "}
+                {t("Pricing.custom_pricing.plan")}
               </p>
             </div>
-            <span className="text-2xl font-bold text-blue-600">${totalPrice}</span>
+            <div className="flex flex-row items-center gap-1">
+              <span className="text-2xl font-bold text-blue-600">{totalPrice}</span>
+              <span className="text-2xl font-bold text-blue-600">
+                {currentCurrency === "sar" ? (
+                  <SARSymbol className="size-5" />
+                ) : (
+                  <DollarSign className="size-5" />
+                )}
+              </span>
+              <span>
+                {" \\ "}
+                {currentCycle === "monthly"
+                  ? t("Pricing.custom_pricing.billing_cycle.monthly")
+                  : t("Pricing.custom_pricing.billing_cycle.annually")}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -76,13 +141,15 @@ const PricingCalculator: React.FC = () => {
       <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600">Need to start over?</p>
+            <p className="text-sm text-gray-600">
+              {t("Pricing.custom_pricing.need_to_start_over")}
+            </p>
           </div>
           <button
             onClick={resetModules}
             className="rounded-md border border-gray-300 px-4 py-2 text-sm transition-colors hover:bg-gray-100"
           >
-            Reset Selections
+            {t("Pricing.custom_pricing.reset_selections")}
           </button>
         </div>
       </div>

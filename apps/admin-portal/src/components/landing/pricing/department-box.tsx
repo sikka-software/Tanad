@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 
 import {
@@ -15,18 +16,23 @@ interface DepartmentBoxProps {
 }
 
 const DepartmentBox: React.FC<DepartmentBoxProps> = ({ department: departmentProp }) => {
+  const t = useTranslations();
   const toggleModule = useLandingPricingStore((state) => state.toggleModule);
-  
-  const selectedModules = useLandingPricingStore((state) => 
-    state.departments.find(d => d.id === departmentProp.id)?.modules || departmentProp.modules
+
+  const selectedModules = useLandingPricingStore(
+    (state) =>
+      state.departments.find((d) => d.id === departmentProp.id)?.modules || departmentProp.modules,
   );
 
   const IconComponent = getIconComponent(departmentProp.icon);
   const availableModules = allModules.filter((m) => m.category === departmentProp.id);
 
-  const handleToggle = useCallback((moduleId: string) => {
-    toggleModule(moduleId, departmentProp.id);
-  }, [toggleModule, departmentProp.id]);
+  const handleToggle = useCallback(
+    (moduleId: string) => {
+      toggleModule(moduleId, departmentProp.id);
+    },
+    [toggleModule, departmentProp.id],
+  );
 
   return (
     <div className="flex flex-col rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -34,7 +40,7 @@ const DepartmentBox: React.FC<DepartmentBoxProps> = ({ department: departmentPro
         className={`flex items-center gap-2 rounded-t-lg px-4 py-3 ${departmentProp.color} text-white`}
       >
         <IconComponent size={20} />
-        <h3 className="font-semibold">{departmentProp.name}</h3>
+        <h3 className="font-semibold">{t(departmentProp.name)}</h3>
       </div>
 
       <div className="flex-1 p-4">

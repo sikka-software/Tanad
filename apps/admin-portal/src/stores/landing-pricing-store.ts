@@ -18,195 +18,214 @@ import { create } from "zustand";
 export const allModules: Module[] = [
   {
     id: "offices",
-    name: "Offices",
-    description: "Manage office locations and resources",
+    name: "Pricing.custom_pricing.offices.title",
+    description: "Pricing.custom_pricing.offices.description",
     icon: "Building2",
     category: "infrastructure",
-    basePrice: 49,
+    annualPrice: 99,
+    monthlyPrice: 9,
   },
   {
     id: "branches",
-    name: "Branches",
-    description: "Track branch operations and performance",
+    name: "Pricing.custom_pricing.branches.title",
+    description: "Pricing.custom_pricing.branches.description",
     icon: "Building2",
     category: "infrastructure",
-    basePrice: 39,
+    annualPrice: 89,
+    monthlyPrice: 8,
   },
   {
     id: "warehouses",
-    name: "Warehouses",
-    description: "Inventory and warehouse management",
+    name: "Pricing.custom_pricing.warehouses.title",
+    description: "Pricing.custom_pricing.warehouses.description",
     icon: "Warehouse",
     category: "infrastructure",
-    basePrice: 59,
+    annualPrice: 129,
+    monthlyPrice: 12,
   },
   {
     id: "clients",
-    name: "Clients",
-    description: "Client relationship management",
+    name: "Pricing.custom_pricing.clients.title",
+    description: "Pricing.custom_pricing.clients.description",
     icon: "Users",
     category: "business",
-    basePrice: 69,
+    annualPrice: 149,
+    monthlyPrice: 14,
   },
   {
     id: "vendors",
-    name: "Vendors",
-    description: "Vendor relationship management",
+    name: "Pricing.custom_pricing.vendors.title",
+    description: "Pricing.custom_pricing.vendors.description",
     icon: "Store",
     category: "business",
-    basePrice: 49,
+    annualPrice: 109,
+    monthlyPrice: 10,
   },
   {
     id: "invoices",
-    name: "Invoices",
-    description: "Invoice generation and tracking",
+    name: "Pricing.custom_pricing.invoices.title",
+    description: "Pricing.custom_pricing.invoices.description",
     icon: "FileText",
     category: "finance",
-    basePrice: 49,
+    annualPrice: 139,
+    monthlyPrice: 13,
   },
   {
     id: "products",
-    name: "Products",
-    description: "Product catalog and management",
+    name: "Pricing.custom_pricing.products.title",
+    description: "Pricing.custom_pricing.products.description",
     icon: "ShoppingCart",
     category: "business",
-    basePrice: 59,
+    annualPrice: 139,
+    monthlyPrice: 13,
   },
   {
     id: "quotes",
-    name: "Quotes",
-    description: "Quote generation and tracking",
+    name: "Pricing.custom_pricing.quotes.title",
+    description: "Pricing.custom_pricing.quotes.description",
     icon: "FileText",
     category: "business",
-    basePrice: 39,
+    annualPrice: 89,
+    monthlyPrice: 8,
   },
   {
     id: "expenses",
-    name: "Expenses",
-    description: "Expense tracking and management",
+    name: "Pricing.custom_pricing.expenses.title",
+    description: "Pricing.custom_pricing.expenses.description",
     icon: "DollarSign",
     category: "finance",
-    basePrice: 39,
+    annualPrice: 99,
+    monthlyPrice: 9,
   },
   {
     id: "purchases",
-    name: "Purchases",
-    description: "Purchase order management",
+    name: "Pricing.custom_pricing.purchases.title",
+    description: "Pricing.custom_pricing.purchases.description",
     icon: "CreditCard",
     category: "finance",
-    basePrice: 49,
+    annualPrice: 119,
+    monthlyPrice: 11,
   },
   {
     id: "employees",
-    name: "Employees",
-    description: "Employee management and records",
+    name: "Pricing.custom_pricing.employees.title",
+    description: "Pricing.custom_pricing.employees.description",
     icon: "User",
     category: "hr",
-    basePrice: 59,
+    annualPrice: 149,
+    monthlyPrice: 14,
   },
   {
     id: "jobs",
-    name: "Jobs",
-    description: "Job role definitions and assignments",
+    name: "Pricing.custom_pricing.jobs.title",
+    description: "Pricing.custom_pricing.jobs.description",
     icon: "Briefcase",
     category: "hr",
-    basePrice: 39,
+    annualPrice: 89,
+    monthlyPrice: 8,
   },
   {
     id: "departments",
-    name: "Departments",
-    description: "Department structure and management",
+    name: "Pricing.custom_pricing.departments.title",
+    description: "Pricing.custom_pricing.departments.description",
     icon: "Users",
     category: "hr",
-    basePrice: 39,
+    annualPrice: 89,
+    monthlyPrice: 8,
   },
   {
     id: "job_listings",
-    name: "Job Listings",
-    description: "Post and manage job openings",
+    name: "Pricing.custom_pricing.job_listings.title",
+    description: "Pricing.custom_pricing.job_listings.description",
     icon: "FileText",
     category: "hr",
-    basePrice: 49,
+    annualPrice: 109,
+    monthlyPrice: 10,
   },
   {
     id: "applicants",
-    name: "Applicants",
-    description: "Track and manage job applicants",
+    name: "Pricing.custom_pricing.applicants.title",
+    description: "Pricing.custom_pricing.applicants.description",
     icon: "User",
     category: "hr",
-    basePrice: 49,
+    annualPrice: 109,
+    monthlyPrice: 10,
   },
   {
     id: "servers",
-    name: "Servers",
-    description: "Server infrastructure management",
+    name: "Pricing.custom_pricing.servers.title",
+    description: "Pricing.custom_pricing.servers.description",
     icon: "Server",
     category: "it",
-    basePrice: 69,
+    annualPrice: 149,
+    monthlyPrice: 14,
   },
   {
     id: "domains",
-    name: "Domains",
-    description: "Domain registration and management",
+    name: "Pricing.custom_pricing.domains.title",
+    description: "Pricing.custom_pricing.domains.description",
     icon: "Globe",
     category: "it",
-    basePrice: 39,
+    annualPrice: 89,
+    monthlyPrice: 8,
   },
   {
     id: "websites",
-    name: "Websites",
-    description: "Website hosting and management",
+    name: "Pricing.custom_pricing.websites.title",
+    description: "Pricing.custom_pricing.websites.description",
     icon: "Globe",
     category: "it",
-    basePrice: 59,
+    annualPrice: 129,
+    monthlyPrice: 12,
   },
   {
     id: "ecommerce",
-    name: "E-commerce",
-    description: "E-commerce platform integration",
+    name: "Pricing.custom_pricing.ecommerce.title",
+    description: "Pricing.custom_pricing.ecommerce.description",
     icon: "ShoppingBag",
     category: "it",
-    basePrice: 79,
+    annualPrice: 169,
+    monthlyPrice: 15,
   },
 ];
 
 export const initialDepartments: Department[] = [
   {
     id: "infrastructure",
-    name: "Infrastructure",
-    description: "Physical assets and locations",
+    name: "Pricing.custom_pricing.infrastructure.title",
+    description: "Pricing.custom_pricing.infrastructure.description",
     icon: "Building2",
     color: "bg-blue-500",
     modules: [],
   },
   {
     id: "business",
-    name: "Business",
-    description: "Core business operations",
+    name: "Pricing.custom_pricing.business.title",
+    description: "Pricing.custom_pricing.business.description",
     icon: "Briefcase",
     color: "bg-purple-500",
     modules: [],
   },
   {
     id: "finance",
-    name: "Finance",
-    description: "Financial management",
+    name: "Pricing.custom_pricing.finance.title",
+    description: "Pricing.custom_pricing.finance.description",
     icon: "DollarSign",
     color: "bg-green-500",
     modules: [],
   },
   {
     id: "hr",
-    name: "Human Resources",
-    description: "Employee management",
+    name: "Pricing.custom_pricing.hr.title",
+    description: "Pricing.custom_pricing.hr.description",
     icon: "Users",
     color: "bg-orange-500",
     modules: [],
   },
   {
     id: "it",
-    name: "IT & Digital",
-    description: "Technology infrastructure",
+    name: "Pricing.custom_pricing.it.title",
+    description: "Pricing.custom_pricing.it.description",
     icon: "Server",
     color: "bg-indigo-500",
     modules: [],
@@ -215,25 +234,28 @@ export const initialDepartments: Department[] = [
 
 export const pricingTiers: PricingTier[] = [
   {
-    name: "Starter",
-    description: "Perfect for small businesses",
-    basePrice: 99,
-    maxModules: 5,
+    name: "Pricing.custom_pricing.starter.title",
+    description: "Pricing.custom_pricing.starter.description",
+    basePrice: 0,
+    monthlyPrice: 0,
+    annualPrice: 0,
     discount: 0,
   },
   {
-    name: "Professional",
-    description: "Ideal for growing businesses",
-    basePrice: 199,
-    maxModules: 10,
-    discount: 0.1,
+    name: "Pricing.custom_pricing.professional.title",
+    description: "Pricing.custom_pricing.professional.description",
+    basePrice: 0,
+    monthlyPrice: 0,
+    annualPrice: 0,
+    discount: 0,
   },
   {
-    name: "Enterprise",
-    description: "For large organizations",
-    basePrice: 399,
-    maxModules: 999,
-    discount: 0.15,
+    name: "Pricing.custom_pricing.enterprise.title",
+    description: "Pricing.custom_pricing.enterprise.description",
+    basePrice: 0,
+    monthlyPrice: 0,
+    annualPrice: 0,
+    discount: 0,
   },
 ];
 
@@ -264,7 +286,8 @@ export interface Module {
   description: string;
   icon: string;
   category: string;
-  basePrice: number;
+  annualPrice: number;
+  monthlyPrice: number;
 }
 
 export interface Department {
@@ -280,20 +303,29 @@ export interface PricingTier {
   name: string;
   description: string;
   basePrice: number;
-  maxModules: number;
+  monthlyPrice: number;
+  annualPrice: number;
   discount: number;
 }
 
 // Helper function to calculate total price based on departments and tier
 const calculateTotalPriceHelper = (
   departments: Department[],
+  currentCycle: string,
   selectedTier: PricingTier,
 ): number => {
   const modulesPrice = departments.reduce((total, dept) => {
     // Ensure dept.modules is always an array
     const currentDeptModules = Array.isArray(dept.modules) ? dept.modules : [];
     return (
-      total + currentDeptModules.reduce((deptTotal, module) => deptTotal + module.basePrice, 0)
+      total +
+      currentDeptModules.reduce((deptTotal, module) => {
+        if (currentCycle === "monthly") {
+          return deptTotal + module.monthlyPrice;
+        } else {
+          return deptTotal + module.annualPrice;
+        }
+      }, 0)
     );
   }, 0);
 
@@ -306,17 +338,13 @@ const calculateTotalPriceHelper = (
     return count + currentDeptModules.length;
   }, 0);
 
-  if (selectedTier.name !== "Enterprise" && moduleCount > selectedTier.maxModules) {
-    // Handle pricing if module limit is exceeded - perhaps return Infinity or a specific error state?
-    // For now, let's just calculate based on selected modules, but this might need adjustment
-    // based on business rules.
-  }
-
   return Math.round(totalBeforeDiscount - discount);
 };
 
 interface LandingPricingState {
   departments: Department[];
+  currentCycle: string;
+  currentCurrency: string;
   selectedTier: PricingTier;
   totalPrice: number;
   allModules: Module[]; // Keep track of all available modules if needed for toggling
@@ -324,15 +352,24 @@ interface LandingPricingState {
   resetModules: () => void;
   setSelectedTier: (tier: PricingTier) => void;
   getTotalModulesCount: () => number;
+  setCurrentCycle: (cycle: string) => void;
+  setCurrentCurrency: (currency: string) => void;
   // calculateTotalPrice is now implicitly handled by updates
 }
 
 export const useLandingPricingStore = create<LandingPricingState>((set, get) => ({
   departments: initialDepartments.map((dept: Department) => ({ ...dept, modules: [] })), // Start with empty modules in each department
   selectedTier: pricingTiers[0],
+  currentCycle: "monthly",
+  currentCurrency: "sar",
   totalPrice: pricingTiers[0].basePrice,
   allModules: allModules, // Store all modules for easy lookup
-
+  setCurrentCycle: (cycle: string) =>
+    set((state) => {
+      const newPrice = calculateTotalPriceHelper(state.departments, cycle, state.selectedTier);
+      return { currentCycle: cycle, totalPrice: newPrice };
+    }),
+  setCurrentCurrency: (currency: string) => set({ currentCurrency: currency }),
   toggleModule: (moduleId: string, departmentId: string) => {
     const moduleToAdd = get().allModules.find((m) => m.id === moduleId);
     // Ensure the module exists and belongs to the correct category (department)
@@ -360,14 +397,6 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
             modules: currentDeptModules.filter((m) => m.id !== moduleId),
           };
         } else {
-          // Module doesn't exist, add it, respecting tier limits
-          if (currentTier.name !== "Enterprise" && moduleCount >= currentTier.maxModules) {
-            // Optionally show a notification to the user
-            console.warn(
-              `Cannot add module. ${currentTier.name} plan limit of ${currentTier.maxModules} modules reached.`,
-            );
-            return dept; // Return department unchanged
-          }
           return {
             ...dept,
             modules: [...currentDeptModules, moduleToAdd],
@@ -380,7 +409,11 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
         return {}; // No change needed
       }
 
-      const newTotalPrice = calculateTotalPriceHelper(newDepartments, state.selectedTier);
+      const newTotalPrice = calculateTotalPriceHelper(
+        newDepartments,
+        state.currentCycle,
+        state.selectedTier,
+      );
       return { departments: newDepartments, totalPrice: newTotalPrice };
     });
   },
@@ -391,7 +424,11 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
         ...dept,
         modules: [],
       }));
-      const newTotalPrice = calculateTotalPriceHelper(resetDepartments, state.selectedTier);
+      const newTotalPrice = calculateTotalPriceHelper(
+        resetDepartments,
+        state.currentCycle,
+        state.selectedTier,
+      );
       return { departments: resetDepartments, totalPrice: newTotalPrice };
     });
   },
@@ -403,16 +440,11 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
       let moduleCount = state.getTotalModulesCount();
       let adjustedDepartments = currentDepartments;
 
-      if (tier.name !== "Enterprise" && moduleCount > tier.maxModules) {
-        console.warn(
-          `Switching to ${tier.name}. Module limit is ${tier.maxModules}. You currently have ${moduleCount}. Excess modules may need to be removed.`,
-        );
-        // Implement logic here if modules should be automatically removed or user prompted
-        // For now, we'll just recalculate price based on the new tier rules with existing modules.
-        // A better UX might involve clearing modules or prompting the user.
-      }
-
-      const newTotalPrice = calculateTotalPriceHelper(adjustedDepartments, tier);
+      const newTotalPrice = calculateTotalPriceHelper(
+        adjustedDepartments,
+        state.currentCycle,
+        tier,
+      );
       return { selectedTier: tier, totalPrice: newTotalPrice, departments: adjustedDepartments };
     });
   },

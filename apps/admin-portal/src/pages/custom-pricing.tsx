@@ -1,11 +1,20 @@
 import { GetStaticProps } from "next";
+import { useTranslations } from "next-intl";
+import { useId } from "react";
+import { useState } from "react";
 
 import DepartmentBox from "../components/landing/pricing/department-box";
 import PricingCalculator from "../components/landing/pricing/pricing-calculator";
 import PricingHero from "../components/landing/pricing/pricing-hero";
-import { initialDepartments } from "../stores/landing-pricing-store";
+import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
+import { initialDepartments, useLandingPricingStore } from "../stores/landing-pricing-store";
 
 const CustomPricingPage = () => {
+  const t = useTranslations();
+  const id = useId();
+  const { currentCycle, currentCurrency, setCurrentCycle, setCurrentCurrency } =
+    useLandingPricingStore();
+
   return (
     <div className="my-20">
       {" "}

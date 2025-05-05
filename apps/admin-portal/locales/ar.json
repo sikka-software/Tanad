@@ -410,8 +410,8 @@
       "subtitle": "إختر الباقة المناسبة لتستفيد من المزايا المقدمة في كل باقة"
     },
     "billing-currency": {
-      "sar": "ريال",
-      "usd": "دولار"
+      "sar": "ريال سعودي",
+      "usd": "دولار أمريكي"
     },
     "billing-cycle": {
       "monthly": "شهريا",
@@ -460,6 +460,136 @@
       "button-text": "إبدأ الآن",
       "title": "باقة الألماسية",
       "subtitle": ""
+    },
+    "custom_pricing": {
+      "title": "التكلفة المخصصة",
+      "description": "اختر الميزات التي تحتاجها و سنقوم بتقديم عرض سعر مخصص لك",
+      "your_custom_solution": "حلك المخصص",
+      "plan": "الباقة",
+      "modules": "الميزات",
+      "estimated_price": "السعر المقدر",
+      "click_on_modules_to_add_or_remove_them_from_your_solution": "اضغط على الميزات لإضافة أو إزالتها من حلك",
+      "unlimited_modules": "غير محدود",
+      "up_to_modules": "إلى",
+      "price_breakdown": "تفصيل السعر",
+      "see_how_your_selected_modules_affect_your_price": "رايح تعرف كيف يؤثر تغيير الميزات على السعر",
+      "base_price": "السعر الأساسي",
+      "need_to_start_over": "محتاج تعيد البدء؟",
+      "reset_selections": "اعيد البدء",
+      "discount": "الخصم",
+      "total_monthly_price": "السعر الشهري الكلي",
+      "billing_cycle": {
+        "monthly": "شهريا",
+        "annually": "سنويا"
+      },
+      "offices": {
+        "title": "المكاتب",
+        "description": "إدارة المكاتب للمؤسسة"
+      },
+      "branches": {
+        "title": "الفروع",
+        "description": "إدارة الفروع للمؤسسة"
+      },
+      "warehouses": {
+        "title": "المخازن",
+        "description": "إدارة المخازن للمؤسسة"
+      },
+      "clients": {
+        "title": "العملاء",
+        "description": "إدارة العملاء للمؤسسة"
+      },
+      "vendors": {
+        "title": "الموردين",
+        "description": "إدارة الموردين للمؤسسة"
+      },
+      "invoices": {
+        "title": "الفواتير",
+        "description": "إدارة الفواتير للمؤسسة"
+      },
+      "products": {
+        "title": "المنتجات",
+        "description": "إدارة المنتجات للمؤسسة"
+      },
+      "quotes": {
+        "title": "العروض",
+        "description": "إدارة العروض للمؤسسة"
+      },
+      "expenses": {
+        "title": "المصروفات",
+        "description": "إدارة المصروفات للمؤسسة"
+      },
+      "purchases": {
+        "title": "المشتريات",
+        "description": "إدارة المشتريات للمؤسسة"
+      },
+      "employees": {
+        "title": "الموظفين",
+        "description": "إدارة الموظفين للمؤسسة"
+      },
+      "jobs": {
+        "title": "الوظائف",
+        "description": "إدارة الوظائف للمؤسسة"
+      },
+      "departments": {
+        "title": "القسم",
+        "description": "إدارة القسم للمؤسسة"
+      },
+      "job_listings": {
+        "title": "الوظائف المعلنة",
+        "description": "إدارة الوظائف المعلنة للمؤسسة"
+      },
+      "applicants": {
+        "title": "المتقدمين",
+        "description": "إدارة المتقدمين للمؤسسة"
+      },
+      "servers": {
+        "title": "الخوادم",
+        "description": "إدارة الخوادم للمؤسسة"
+      },
+      "domains": {
+        "title": "المجالات",
+        "description": "إدارة المجالات للمؤسسة"
+      },
+      "websites": {
+        "title": "المواقع",
+        "description": "إدارة المواقع للمؤسسة"
+      },
+      "ecommerce": {
+        "title": "التجارة الإلكترونية",
+        "description": "إدارة التجارة الإلكترونية للمؤسسة"
+      },
+      "infrastructure": {
+        "title": "البنية التحتية",
+        "description": "إدارة البنية التحتية للمؤسسة"
+      },
+      "business": {
+        "title": "الأعمال",
+        "description": "إدارة الأعمال للمؤسسة"
+      },
+      "finance": {
+        "title": "المالية",
+        "description": "إدارة المالية للمؤسسة"
+      },
+      "hr": {
+        "title": "الموارد البشرية",
+        "description": "إدارة الموارد البشرية للمؤسسة"
+      },
+      "it": {
+        "title": "التكنولوجيا",
+        "description": "إدارة التكنولوجيا للمؤسسة"
+      },
+      "starter": {
+        "title": "البدء",
+        "description": "البدء في الاستخدام"
+      },
+      "professional": {
+        "title": "المستوى المناسب",
+        "description": "المستوى المناسب للمؤسسة"
+      },
+      "enterprise": {
+        "title": "المستوى المناسب",
+        "description": "المستوى المناسب للمؤسسة"
+      }
     }
   },
   "FAQ": {
