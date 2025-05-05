@@ -15,6 +15,14 @@ import {
 } from "lucide-react";
 import { create } from "zustand";
 
+export interface ModuleIntegration {
+  id: string; // e.g., 'gosi', 'ejar'
+  label: string; // Translation key e.g., 'Integrations.gosi'
+  pricingType: "fixed" | "per_unit";
+  monthlyPrice: number; // Fixed price or price per unit
+  annualPrice: number; // Fixed price or price per unit
+}
+
 export interface Module {
   id: string;
   name: string;
@@ -28,6 +36,8 @@ export interface Module {
   step: number; // Slider step increment
   maxQuantity: number; // Maximum value for the slider
   minQuantity: number; // Minimum value for the slider (usually same as step or 1)
+  integrations?: ModuleIntegration[]; // Optional integrations for the module
+  selectedIntegrations?: string[]; // IDs of selected integrations
 }
 
 export const allModules: Module[] = [
@@ -198,6 +208,15 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 100,
     minQuantity: 1,
+    integrations: [
+      {
+        id: "gosi",
+        label: "Integrations.gosi",
+        pricingType: "per_unit",
+        monthlyPrice: 0.5, // 0.5 per employee per month
+        annualPrice: 5, // 5 per employee per year
+      },
+    ],
   },
   {
     id: "jobs",
@@ -409,7 +428,7 @@ export interface Department {
   description: string;
   icon: string;
   color: string;
-  modules: Module[];
+  modules: (Module & { selectedIntegrations?: string[] })[]; // Ensure selectedIntegrations is tracked here
 }
 
 export interface PricingTier {
@@ -426,22 +445,45 @@ const calculateTotalPriceHelper = (
   currentCycle: string,
   selectedTier: PricingTier,
 ): number => {
-  const modulesPrice = departments.reduce((total, dept) => {
-    const currentDeptModules = Array.isArray(dept.modules) ? dept.modules : [];
-    return (
-      total +
-      currentDeptModules.reduce((deptTotal, module) => {
-        const pricePerUnit = currentCycle === "monthly" ? module.monthlyPrice : module.annualPrice;
-        const effectiveQuantity = module.quantity;
-        return deptTotal + pricePerUnit * (effectiveQuantity / module.step);
-      }, 0)
-    );
-  }, 0);
+  let modulesTotal = 0;
 
-  const totalBeforeDiscount = selectedTier.basePrice + modulesPrice;
-  const discount = totalBeforeDiscount * selectedTier.discount;
+  departments.forEach((dept) => {
+    dept.modules.forEach((mod) => {
+      // Base module price calculation
+      const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
+      const moduleBasePrice = pricePerUnit * (mod.quantity / mod.step);
+      modulesTotal += moduleBasePrice;
 
-  return Math.round(totalBeforeDiscount - discount);
+      // Integration price calculation
+      if (mod.selectedIntegrations && mod.selectedIntegrations.length > 0) {
+        const fullModuleData = allModules.find((m) => m.id === mod.id);
+        if (fullModuleData && fullModuleData.integrations) {
+          mod.selectedIntegrations.forEach((integrationId) => {
+            const integrationData = fullModuleData.integrations!.find((int) => int.id === integrationId);
+            if (integrationData) {
+              const integrationPricePerCycle =
+                currentCycle === "monthly" ? integrationData.monthlyPrice : integrationData.annualPrice;
+
+              if (integrationData.pricingType === "fixed") {
+                modulesTotal += integrationPricePerCycle;
+              } else if (integrationData.pricingType === "per_unit") {
+                // Price per unit is based on the module's quantity step
+                modulesTotal += integrationPricePerCycle * (mod.quantity / mod.step);
+              }
+            }
+          });
+        }
+      }
+    });
+  });
+
+  const basePrice = selectedTier.basePrice; // Assuming base price is fixed regardless of cycle? Adjust if needed.
+  const totalBeforeDiscount = basePrice + modulesTotal;
+  const discountAmount = selectedTier.discount > 0 ? totalBeforeDiscount * selectedTier.discount : 0;
+
+  const finalTotal = totalBeforeDiscount - discountAmount;
+  // round to 2 decimal places
+  return Math.round(finalTotal * 100) / 100;
 };
 
 interface LandingPricingState {
@@ -458,6 +500,7 @@ interface LandingPricingState {
   getTotalModulesCount: () => number;
   setCurrentCycle: (cycle: string) => void;
   setCurrentCurrency: (currency: string) => void;
+  toggleIntegration: (departmentId: string, moduleId: string, integrationId: string) => void;
 }
 
 export const useLandingPricingStore = create<LandingPricingState>((set, get) => ({
@@ -549,20 +592,19 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
     });
   },
 
-  resetModules: () => {
+  resetModules: () =>
     set((state) => {
-      const resetDepartments = initialDepartments.map((dept: Department) => ({
+      const initialDeps = initialDepartments.map((dept: Department) => ({
         ...dept,
         modules: [],
       }));
       const newTotalPrice = calculateTotalPriceHelper(
-        resetDepartments,
+        initialDeps,
         state.currentCycle,
         state.selectedTier,
       );
-      return { departments: resetDepartments, totalPrice: newTotalPrice };
-    });
-  },
+      return { departments: initialDeps, totalPrice: newTotalPrice, currentCurrency: state.currentCurrency };
+    }),
 
   setSelectedTier: (tier: PricingTier) => {
     set((state) => {
@@ -578,4 +620,28 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
       return count + currentDeptModules.length;
     }, 0);
   },
+
+  toggleIntegration: (departmentId, moduleId, integrationId) =>
+    set((state) => {
+      const newDepartments = state.departments.map((dept) => {
+        if (dept.id === departmentId) {
+          const newModules = dept.modules.map((mod) => {
+            if (mod.id === moduleId) {
+              const currentIntegrations = mod.selectedIntegrations || [];
+              const isSelected = currentIntegrations.includes(integrationId);
+              const updatedIntegrations = isSelected
+                ? currentIntegrations.filter((id) => id !== integrationId)
+                : [...currentIntegrations, integrationId];
+              return { ...mod, selectedIntegrations: updatedIntegrations };
+            }
+            return mod;
+          });
+          return { ...dept, modules: newModules };
+        }
+        return dept;
+      });
+
+      const totalPrice = calculateTotalPriceHelper(newDepartments, state.currentCycle, state.selectedTier);
+      return { departments: newDepartments, totalPrice };
+    }),
 }));

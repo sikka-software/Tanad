@@ -5,7 +5,7 @@ import React, { useId } from "react";
 import { Slider } from "@/components/ui/slider";
 
 import { getIconComponent, useLandingPricingStore } from "@/stores/landing-pricing-store";
-import { Module } from "@/stores/landing-pricing-store";
+import { Module, allModules } from "@/stores/landing-pricing-store";
 
 import { Checkbox } from "../../ui/checkbox";
 import { Label } from "../../ui/label";
@@ -22,7 +22,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
   const locale = useLocale();
   const t = useTranslations();
   const id = useId();
-  const { currentCycle, currentCurrency, updateModuleQuantity, departments } =
+  const { currentCycle, currentCurrency, updateModuleQuantity, departments, toggleIntegration } =
     useLandingPricingStore();
 
   const moduleState = departments
@@ -48,6 +48,8 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
 
   const pricePerUnit = currentCycle === "monthly" ? module.monthlyPrice : module.annualPrice;
   const currentModulePrice = pricePerUnit * (displayQuantity / module.step);
+
+  const fullModuleData = allModules.find((m) => m.id === module.id);
 
   return (
     <div
@@ -93,6 +95,44 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
             step={module.step}
             className="w-full"
           />
+
+          {fullModuleData?.integrations && fullModuleData.integrations.length > 0 && (
+            <div className="mt-3 space-y-2 border-t pt-3">
+              <Label className="text-xs font-semibold text-gray-600">
+                {t("Pricing.custom_pricing.integrations.title")}
+              </Label>
+              {fullModuleData.integrations.map((integration) => {
+                const integrationId = `${id}-integration-${integration.id}`;
+                const isIntegrationSelected = moduleState?.selectedIntegrations?.includes(
+                  integration.id,
+                );
+                const integrationPrice = currentCycle === "monthly" ? integration.monthlyPrice : integration.annualPrice;
+                const priceLabel =
+                  integration.pricingType === "fixed"
+                    ? `+${integrationPrice.toFixed(2)}${currencySymbol.props.className ? "" : "/"}${cycleText}`
+                    : `+${integrationPrice.toFixed(2)}${currencySymbol.props.className ? "" : "/"}${t(`General.${module.unit}`)}`;
+
+                return (
+                  <div key={integration.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={integrationId}
+                      checked={isIntegrationSelected}
+                      onCheckedChange={(e) => {
+                        toggleIntegration(module.category, module.id, integration.id);
+                      }}
+                    />
+                    <Label
+                      htmlFor={integrationId}
+                      className="flex w-full cursor-pointer items-center justify-between text-sm font-normal"
+                    >
+                      <span>{t(integration.label)}</span>
+                      <span className="text-xs text-blue-600">({priceLabel})</span>
+                    </Label>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

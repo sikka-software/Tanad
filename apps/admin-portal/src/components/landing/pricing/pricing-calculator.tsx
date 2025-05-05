@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import React from "react";
 
 import { useLandingPricingStore } from "@/stores/landing-pricing-store";
+import { allModules } from "@/stores/landing-pricing-store"; // Import allModules
 
 import { SARSymbol } from "../../ui/sar-symbol";
 
@@ -81,18 +82,61 @@ const PricingCalculator: React.FC = () => {
 
                 {/* Display individual module price based on its quantity */}
                 {dept.modules.map((mod) => {
-                   const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
-                   const calculatedModulePrice = pricePerUnit * (mod.quantity / mod.step);
+                  const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
+                  const calculatedModulePrice = pricePerUnit * (mod.quantity / mod.step);
+                  const fullModuleData = allModules.find((m) => m.id === mod.id);
+
                   return (
-                     <div key={mod.id} className="flex justify-between pl-4 text-sm text-gray-500">
-                        <span>{t(mod.name)} ({mod.quantity} {t(`General.${mod.unit}`)})</span>
-                       <div className="flex flex-row items-center gap-1">
-                          {/* Display calculated module price */}
-                          <span>{calculatedModulePrice.toFixed(2)}</span> 
-                         <span>{currencySymbol}</span>
-                       </div>
-                     </div>
-                   );
+                    <React.Fragment key={mod.id}>
+                      <div className="flex justify-between pl-4 text-sm text-gray-500">
+                        <span>
+                          {t(mod.name)} ({mod.quantity} {t(`General.${mod.unit}`)})
+                        </span>
+                        <div className="flex flex-row items-center gap-1">
+                          <span>{calculatedModulePrice.toFixed(2)}</span>
+                          <span>{currencySymbol}</span>
+                        </div>
+                      </div>
+                      {/* Display selected integrations for this module */}
+                      {mod.selectedIntegrations &&
+                        mod.selectedIntegrations.length > 0 &&
+                        fullModuleData?.integrations && (
+                          <div className="pl-8">
+                            {mod.selectedIntegrations.map((integrationId) => {
+                              const integrationData = fullModuleData.integrations!.find(
+                                (int) => int.id === integrationId,
+                              );
+                              if (!integrationData) return null;
+
+                              const integrationPricePerCycle =
+                                currentCycle === "monthly"
+                                  ? integrationData.monthlyPrice
+                                  : integrationData.annualPrice;
+                              let calculatedIntegrationPrice = 0;
+                              if (integrationData.pricingType === "fixed") {
+                                calculatedIntegrationPrice = integrationPricePerCycle;
+                              } else if (integrationData.pricingType === "per_unit") {
+                                calculatedIntegrationPrice =
+                                  integrationPricePerCycle * (mod.quantity / mod.step);
+                              }
+
+                              return (
+                                <div
+                                  key={integrationId}
+                                  className="flex justify-between text-xs text-gray-400"
+                                >
+                                  <span>+ {t(integrationData.label)}</span>
+                                  <div className="flex flex-row items-center gap-1">
+                                    <span>{calculatedIntegrationPrice.toFixed(2)}</span>
+                                    <span>{currencySymbol}</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                    </React.Fragment>
+                  );
                 })}
               </div>
             );
