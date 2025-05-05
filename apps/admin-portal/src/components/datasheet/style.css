@@ -7,7 +7,7 @@
   --dsg-selection-disabled-border-color: #9da6ab;
   --dsg-selection-disabled-background-color: rgba(0, 0, 0, 0.04);
   --dsg-corner-indicator-width: 10px;
-  --dsg-header-text-color: rgb(157, 166, 171);
+  --dsg-header-text-color: var(--primary);
   --dsg-header-active-text-color: black;
   --dsg-cell-background-color: white;
   --dsg-cell-disabled-background-color: rgb(250, 250, 250);
@@ -90,6 +90,9 @@
   color: var(--dsg-header-text-color);
   transition: color var(--dsg-transition-duration);
   box-shadow: none;
+  background-color: var(--muted);
+  font-weight: 500;
+  font-size: 14px;
 }
 
 .dsg-cell-header-container {
