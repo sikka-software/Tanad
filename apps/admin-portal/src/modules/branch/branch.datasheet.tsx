@@ -175,12 +175,14 @@ const createValidatedColumn = <T extends Record<string, any>>(
   key: keyof T & string,
   title: string,
   validationSchema?: z.ZodSchema<any>,
+  width?: number,
 ): Partial<Column<T, any, string | null>> => {
   const specificColumn: Partial<
     Column<string | null, { validationSchema?: z.ZodSchema<any> }, string | null>
   > = {
     ...customTextColumn,
     columnData: { validationSchema },
+    minWidth: width,
   };
 
   return {
@@ -221,7 +223,11 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
 
-  const { data: employees = [], isLoading: employeesLoading, error: employeesError } = useEmployees();
+  const {
+    data: employees = [],
+    isLoading: employeesLoading,
+    error: employeesError,
+  } = useEmployees();
 
   const handleGridChange = (value: Record<string, any>[], operations: any) => {
     if (onChange) {
@@ -251,14 +257,15 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
       t("Branches.form.zip_code.label"),
       branchSchema.shape.zip_code,
     ),
-    createValidatedColumn("phone", t("Branches.form.phone.label"), branchSchema.shape.phone),
-    createValidatedColumn("email", t("Branches.form.email.label"), branchSchema.shape.email),
+    createValidatedColumn("phone", t("Branches.form.phone.label"), branchSchema.shape.phone, 150),
+    createValidatedColumn("email", t("Branches.form.email.label"), branchSchema.shape.email, 200),
 
     // Manager Column using ComboboxAddCell (Reverted to manual definition)
     {
       id: "manager",
       title: t("Branches.form.manager.label"),
       ...comboboxAddColumnBase, // component: ComboboxAddCell, etc.
+      minWidth: 200,
       columnData: {
         options: employeeOptions,
         isLoading: employeesLoading,
@@ -308,7 +315,7 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     <div>
       <div className="" dir={locale === "ar" ? "rtl" : "ltr"}>
         <DataSheetGrid
-          key={employeesLoading ? 'loading' : 'loaded'}
+          key={employeesLoading ? "loading" : "loaded"}
           columns={columns as Partial<Column<Branch, any, any>>[]}
           value={data}
           onChange={handleGridChange}
