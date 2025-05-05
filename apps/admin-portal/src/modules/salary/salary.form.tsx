@@ -64,12 +64,10 @@ export function SalaryForm({
 }: ModuleFormProps<SalaryUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const { user } = useUserStore();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
-  const queryClient = useQueryClient();
   const salarySchema = createSalarySchema(t);
   const setLoading = useSalaryStore((state) => state.setIsLoading);
   const loading = useSalaryStore((state) => state.isLoading);

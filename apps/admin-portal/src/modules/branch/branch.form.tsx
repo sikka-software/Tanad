@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -18,6 +20,10 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { EmployeeForm } from "../employee/employee.form";
+import { useEmployees } from "../employee/employee.hooks";
+import useEmployeeStore from "../employee/employee.store";
+import { Employee } from "../employee/employee.types";
 import { useBranches, useCreateBranch, useUpdateBranch } from "./branch.hooks";
 import useBranchStore from "./branch.store";
 import { Branch, BranchUpdateData } from "./branch.type";
@@ -54,10 +60,17 @@ export function BranchForm({
   editMode,
 }: ModuleFormProps<BranchUpdateData>) {
   const t = useTranslations();
+  const locale = useLocale();
+
   const { user } = useUserStore();
   const { mutate: createBranch } = useCreateBranch();
   const { mutate: updateBranch } = useUpdateBranch();
   const { data: branches } = useBranches();
+
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
+  const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
+  const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
 
   const isLoading = useBranchStore((state) => state.isLoading);
   const setIsLoading = useBranchStore((state) => state.setIsLoading);
@@ -144,121 +157,163 @@ export function BranchForm({
     }
   };
 
+  const employeeOptions = employees.map((emp) => ({
+    label: `${emp.first_name} ${emp.last_name}`,
+    value: `${emp.first_name} ${emp.last_name}`,
+  }));
+
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
     (window as any).branchForm = form;
   }
 
   return (
-    <Form {...form}>
-      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Branches.form.name.label")} *</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t("Branches.form.name.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Branches.form.code.label")} *</FormLabel>
-                  <FormControl>
-                    <CodeInput
-                      onSerial={() => {
-                        const nextNumber = (branches?.length || 0) + 1;
-                        const paddedNumber = String(nextNumber).padStart(4, "0");
-                        form.setValue("code", `BR-${paddedNumber}`);
-                      }}
-                      onRandom={() => {
-                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                        let randomCode = "";
-                        for (let i = 0; i < 5; i++) {
-                          randomCode += randomChars.charAt(
-                            Math.floor(Math.random() * randomChars.length),
-                          );
-                        }
-                        form.setValue("code", `BR-${randomCode}`);
-                      }}
-                    >
+    <div>
+      <Form {...form}>
+        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Branches.form.name.label")} *</FormLabel>
+                    <FormControl>
                       <Input
-                        placeholder={t("Branches.form.code.placeholder")}
+                        placeholder={t("Branches.form.name.placeholder")}
                         {...field}
                         disabled={isLoading}
                       />
-                    </CodeInput>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Branches.form.phone.label")}</FormLabel>
-                  <FormControl>
-                    <PhoneInput
-                      value={field.value || ""}
-                      onChange={field.onChange}
-                      ariaInvalid={form.formState.errors.phone !== undefined}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Branches.form.code.label")} *</FormLabel>
+                    <FormControl>
+                      <CodeInput
+                        onSerial={() => {
+                          const nextNumber = (branches?.length || 0) + 1;
+                          const paddedNumber = String(nextNumber).padStart(4, "0");
+                          form.setValue("code", `BR-${paddedNumber}`);
+                        }}
+                        onRandom={() => {
+                          const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                          let randomCode = "";
+                          for (let i = 0; i < 5; i++) {
+                            randomCode += randomChars.charAt(
+                              Math.floor(Math.random() * randomChars.length),
+                            );
+                          }
+                          form.setValue("code", `BR-${randomCode}`);
+                        }}
+                      >
+                        <Input
+                          placeholder={t("Branches.form.code.placeholder")}
+                          {...field}
+                          disabled={isLoading}
+                        />
+                      </CodeInput>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Branches.form.email.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      dir="ltr"
-                      type="email"
-                      placeholder={t("Branches.form.email.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Branches.form.phone.label")}</FormLabel>
+                    <FormControl>
+                      <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        ariaInvalid={form.formState.errors.phone !== undefined}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="manager"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Branches.form.manager.label")}</FormLabel>
-                  <FormControl>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Branches.form.email.label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        dir="ltr"
+                        type="email"
+                        placeholder={t("Branches.form.email.placeholder")}
+                        {...field}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="manager"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Branches.form.manager.label")}</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        data={employeeOptions}
+                        isLoading={employeesLoading}
+                        defaultValue={field.value}
+                        onChange={(value) => {
+                          field.onChange(value || null);
+                        }}
+                        texts={{
+                          placeholder: t("Branches.form.manager.placeholder"),
+                          searchPlaceholder: t("Employees.search_employees"),
+                          noItems: t("Branches.form.manager.no_employees"),
+                        }}
+                        addText={t("Employees.add_new")}
+                        onAddClick={() => setIsEmployeeDialogOpen(true)}
+                      />
+                      {/*                     
                     <Input
                       placeholder={t("Branches.form.manager.placeholder")}
                       {...field}
                       disabled={isLoading}
+                    /> */}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Branches.form.notes.label")}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={t("Branches.form.notes.placeholder")}
+                      className="min-h-[120px]"
+                      {...field}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -266,32 +321,30 @@ export function BranchForm({
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Branches.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Branches.form.notes.placeholder")}
-                    className="min-h-[120px]"
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
 
-        <AddressFormSection
-          title={t("Branches.form.address.label")}
-          control={form.control}
-          isLoading={isLoading}
+          <AddressFormSection
+            title={t("Branches.form.address.label")}
+            control={form.control}
+            isLoading={isLoading}
+          />
+        </form>
+      </Form>
+
+      <FormDialog
+        open={isEmployeeDialogOpen}
+        onOpenChange={setIsEmployeeDialogOpen}
+        title={t("Employees.add_new")}
+        formId="employee-form"
+        loadingSave={isEmployeeSaving}
+      >
+        <EmployeeForm
+          formHtmlId="employee-form"
+          onSuccess={() => {
+            setIsEmployeeSaving(false);
+            setIsEmployeeDialogOpen(false);
+          }}
         />
-      </form>
-    </Form>
+      </FormDialog>
+    </div>
   );
 }
