@@ -4,6 +4,7 @@ import React from "react";
 
 import { useLandingPricingStore } from "@/stores/landing-pricing-store";
 import { allModules } from "@/stores/landing-pricing-store"; // Import allModules
+import { Button } from "@/components/ui/button"; // Import Button
 
 import { SARSymbol } from "../../ui/sar-symbol";
 
@@ -15,6 +16,7 @@ const PricingCalculator: React.FC = () => {
   const basePrice = selectedTier.basePrice;
   const currentCycle = useLandingPricingStore((state) => state.currentCycle);
   const currentCurrency = useLandingPricingStore((state) => state.currentCurrency);
+  const showContactUs = useLandingPricingStore((state) => state.showContactUs); // Get showContactUs state
 
   //  if currenyCurrency is sar use <SARSymbol/> else use <Dollar/>. Also make sure the texts for the cyclces is correct
   const currencySymbol =
@@ -166,22 +168,27 @@ const PricingCalculator: React.FC = () => {
                 {t("Pricing.custom_pricing.plan")}
               </p>
             </div>
-            <div className="flex flex-row items-center gap-1">
-              <span className="text-2xl font-bold text-blue-600">{totalPrice}</span>
-              <span className="text-2xl font-bold text-blue-600">
-                {currentCurrency === "sar" ? (
-                  <SARSymbol className="size-5" />
-                ) : (
-                  <DollarSign className="size-5" />
-                )}
-              </span>
-              <span>
-                {" \\ "}
-                {currentCycle === "monthly"
-                  ? t("Pricing.custom_pricing.billing_cycle.monthly")
-                  : t("Pricing.custom_pricing.billing_cycle.annually")}
-              </span>
-            </div>
+            {/* Conditional rendering for Total Price or Contact Us Button */}
+            {showContactUs ? (
+              <Button>{t("Pricing.contact_us")}</Button>
+            ) : (
+              <div className="flex flex-row items-center gap-1">
+                <span className="text-2xl font-bold text-blue-600">{totalPrice}</span>
+                <span className="text-2xl font-bold text-blue-600">
+                  {currentCurrency === "sar" ? (
+                    <SARSymbol className="size-5" />
+                  ) : (
+                    <DollarSign className="size-5" />
+                  )}
+                </span>
+                <span>
+                  {" \\ "}
+                  {currentCycle === "monthly"
+                    ? t("Pricing.custom_pricing.billing_cycle.monthly")
+                    : t("Pricing.custom_pricing.billing_cycle.annually")}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

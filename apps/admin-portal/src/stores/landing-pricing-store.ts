@@ -38,6 +38,7 @@ export interface Module {
   minQuantity: number; // Minimum value for the slider (usually same as step or 1)
   integrations?: ModuleIntegration[]; // Optional integrations for the module
   selectedIntegrations?: string[]; // IDs of selected integrations
+  contactUsThreshold?: number; // Quantity threshold to show "Contact Us"
 }
 
 export const allModules: Module[] = [
@@ -124,6 +125,7 @@ export const allModules: Module[] = [
     step: 100,
     maxQuantity: 5000,
     minQuantity: 100,
+    contactUsThreshold: 4500, // Example threshold
   },
   {
     id: "products",
@@ -138,6 +140,7 @@ export const allModules: Module[] = [
     step: 1000,
     maxQuantity: 10000,
     minQuantity: 1000,
+    contactUsThreshold: 9000, // Example threshold
   },
   {
     id: "quotes",
@@ -454,12 +457,13 @@ export interface PricingTier {
   discount: number;
 }
 
-const calculateTotalPriceHelper = (
+const calculatePriceAndThreshold = (
   departments: Department[],
   currentCycle: string,
   selectedTier: PricingTier,
-): number => {
+): { totalPrice: number; showContactUs: boolean } => {
   let modulesTotal = 0;
+  let contactUsTriggered = false;
 
   departments.forEach((dept) => {
     dept.modules.forEach((mod) => {
@@ -468,20 +472,32 @@ const calculateTotalPriceHelper = (
       const moduleBasePrice = pricePerUnit * (mod.quantity / mod.step);
       modulesTotal += moduleBasePrice;
 
+      // Check for contact us threshold
+      const fullModuleData = allModules.find((m) => m.id === mod.id);
+      if (fullModuleData?.contactUsThreshold && mod.quantity >= fullModuleData.contactUsThreshold) {
+        contactUsTriggered = true;
+        // No need to calculate further price if threshold is met for this calculation?
+        // Or maybe calculate full price anyway but just set the flag?
+        // Let's calculate full price for now, UI will handle display.
+      }
+
       // Integration price calculation
       if (mod.selectedIntegrations && mod.selectedIntegrations.length > 0) {
-        const fullModuleData = allModules.find((m) => m.id === mod.id);
+        // const fullModuleData = allModules.find((m) => m.id === mod.id); // Already fetched above
         if (fullModuleData && fullModuleData.integrations) {
           mod.selectedIntegrations.forEach((integrationId) => {
-            const integrationData = fullModuleData.integrations!.find((int) => int.id === integrationId);
+            const integrationData = fullModuleData.integrations!.find(
+              (int) => int.id === integrationId,
+            );
             if (integrationData) {
               const integrationPricePerCycle =
-                currentCycle === "monthly" ? integrationData.monthlyPrice : integrationData.annualPrice;
+                currentCycle === "monthly"
+                  ? integrationData.monthlyPrice
+                  : integrationData.annualPrice;
 
               if (integrationData.pricingType === "fixed") {
                 modulesTotal += integrationPricePerCycle;
               } else if (integrationData.pricingType === "per_unit") {
-                // Price per unit is based on the module's quantity step
                 modulesTotal += integrationPricePerCycle * (mod.quantity / mod.step);
               }
             }
@@ -491,13 +507,16 @@ const calculateTotalPriceHelper = (
     });
   });
 
-  const basePrice = selectedTier.basePrice; // Assuming base price is fixed regardless of cycle? Adjust if needed.
+  const basePrice = selectedTier.basePrice;
   const totalBeforeDiscount = basePrice + modulesTotal;
-  const discountAmount = selectedTier.discount > 0 ? totalBeforeDiscount * selectedTier.discount : 0;
+  const discountAmount =
+    selectedTier.discount > 0 ? totalBeforeDiscount * selectedTier.discount : 0;
 
   const finalTotal = totalBeforeDiscount - discountAmount;
-  // round to 2 decimal places
-  return Math.round(finalTotal * 100) / 100;
+  return {
+    totalPrice: Math.round(finalTotal * 100) / 100,
+    showContactUs: contactUsTriggered,
+  };
 };
 
 interface LandingPricingState {
@@ -515,6 +534,7 @@ interface LandingPricingState {
   setCurrentCycle: (cycle: string) => void;
   setCurrentCurrency: (currency: string) => void;
   toggleIntegration: (departmentId: string, moduleId: string, integrationId: string) => void;
+  showContactUs: boolean; // Add state for contact us flag
 }
 
 export const useLandingPricingStore = create<LandingPricingState>((set, get) => ({
@@ -524,11 +544,16 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
   currentCurrency: "sar",
   totalPrice: pricingTiers[0].basePrice,
   allModules: allModules.map((m) => ({ ...m, quantity: m.minQuantity || m.step || 1 })),
+  showContactUs: false, // Initial state
 
   setCurrentCycle: (cycle: string) =>
     set((state) => {
-      const newPrice = calculateTotalPriceHelper(state.departments, cycle, state.selectedTier);
-      return { currentCycle: cycle, totalPrice: newPrice };
+      const { totalPrice, showContactUs } = calculatePriceAndThreshold(
+        state.departments,
+        cycle,
+        state.selectedTier,
+      );
+      return { currentCycle: cycle, totalPrice, showContactUs };
     }),
   setCurrentCurrency: (currency: string) => set({ currentCurrency: currency }),
 
@@ -541,12 +566,12 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
         ),
       }));
 
-      const newTotalPrice = calculateTotalPriceHelper(
+      const { totalPrice, showContactUs } = calculatePriceAndThreshold(
         newDepartments,
         state.currentCycle,
         state.selectedTier,
       );
-      return { departments: newDepartments, totalPrice: newTotalPrice };
+      return { departments: newDepartments, totalPrice, showContactUs };
     });
   },
 
@@ -597,12 +622,12 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
         return {};
       }
 
-      const newTotalPrice = calculateTotalPriceHelper(
+      const { totalPrice, showContactUs } = calculatePriceAndThreshold(
         newDepartments,
         state.currentCycle,
         state.selectedTier,
       );
-      return { departments: newDepartments, totalPrice: newTotalPrice };
+      return { departments: newDepartments, totalPrice, showContactUs };
     });
   },
 
@@ -612,18 +637,27 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
         ...dept,
         modules: [],
       }));
-      const newTotalPrice = calculateTotalPriceHelper(
+      const { totalPrice, showContactUs } = calculatePriceAndThreshold(
         initialDeps,
         state.currentCycle,
         state.selectedTier,
       );
-      return { departments: initialDeps, totalPrice: newTotalPrice, currentCurrency: state.currentCurrency };
+      return {
+        departments: initialDeps,
+        totalPrice,
+        showContactUs, // Reset flag as well
+        currentCurrency: state.currentCurrency,
+      };
     }),
 
   setSelectedTier: (tier: PricingTier) => {
     set((state) => {
-      const newTotalPrice = calculateTotalPriceHelper(state.departments, state.currentCycle, tier);
-      return { selectedTier: tier, totalPrice: newTotalPrice };
+      const { totalPrice, showContactUs } = calculatePriceAndThreshold(
+        state.departments,
+        state.currentCycle,
+        tier,
+      );
+      return { selectedTier: tier, totalPrice, showContactUs };
     });
   },
 
@@ -655,7 +689,11 @@ export const useLandingPricingStore = create<LandingPricingState>((set, get) => 
         return dept;
       });
 
-      const totalPrice = calculateTotalPriceHelper(newDepartments, state.currentCycle, state.selectedTier);
-      return { departments: newDepartments, totalPrice };
+      const { totalPrice, showContactUs } = calculatePriceAndThreshold(
+        newDepartments,
+        state.currentCycle,
+        state.selectedTier,
+      );
+      return { departments: newDepartments, totalPrice, showContactUs };
     }),
 }));

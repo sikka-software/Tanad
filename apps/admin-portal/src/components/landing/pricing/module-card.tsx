@@ -3,6 +3,7 @@ import { DollarSign } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useId } from "react";
 
+import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
 import { getIconComponent, useLandingPricingStore } from "@/stores/landing-pricing-store";
@@ -93,16 +94,26 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
               </div>
             </div>
           </div>
-          <p id={`${id}-description`} className="text-muted-foreground text-xs">
+          <p id={`${id}-description`} className="text-muted-foreground mb-4 text-xs">
             {t(module.description)}
           </p>
         </div>
+
         <div className="mt-2 flex w-full flex-row items-center justify-between gap-1 text-sm font-semibold text-blue-600">
-          <div className="flex flex-row items-center gap-1">
-            <span>{displayedModulePrice.toFixed(2)}</span>
-            <span>{currencySymbol}</span>
-            <span>/ {cycleText}</span>
-          </div>
+          {fullModuleData?.contactUsThreshold &&
+          displayQuantity >= fullModuleData.contactUsThreshold ? (
+            <div className="">
+              <Button size="sm" className="h-7 w-fit">
+                {t("Pricing.contact_us")}
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-row items-center gap-1 h-7">
+              <span>{displayedModulePrice.toFixed(2)}</span>
+              <span>{currencySymbol}</span>
+              <span>/ {cycleText}</span>
+            </div>
+          )}
           <span className="text-muted-foreground ms-1 text-xs font-normal">
             {displayQuantity} {t(`General.${module.unit}`)}
           </span>
