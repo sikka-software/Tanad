@@ -52,11 +52,9 @@ type ComboboxAddTypes<T> = {
   onAddClick?: () => void;
   containerClassName?: string;
   ariaInvalid?: boolean;
+  inCell?: boolean;
 };
-export const ComboboxAdd = React.forwardRef<
-  HTMLButtonElement,
-  ComboboxAddTypes<any>
->(
+export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<any>>(
   (
     {
       labelKey = "label",
@@ -72,6 +70,7 @@ export const ComboboxAdd = React.forwardRef<
       renderSelected,
       addText = "Add Category",
       ariaInvalid,
+      inCell = false,
       ...props
     },
     ref,
@@ -133,6 +132,7 @@ export const ComboboxAdd = React.forwardRef<
                       : "bg-background px-3",
                     ariaInvalid &&
                       "ring-destructive/20 dark:ring-destructive/40 border-destructive",
+                    inCell && "rounded-none",
                   )}
                 >
                   {selectedItem
@@ -163,7 +163,8 @@ export const ComboboxAdd = React.forwardRef<
           <PopoverContent
             sideOffset={0}
             className={cn(
-              "w-[var(--radix-popover-trigger-width)] p-0",
+              "p-0",
+              !inCell && "w-[var(--radix-popover-trigger-width)]",
               props.helperText && "-mt-4",
               popoverClassName,
             )}
@@ -230,7 +231,9 @@ export const ComboboxAdd = React.forwardRef<
                         strokeLinejoin="round"
                         className={cn(
                           "icon shrink-0",
-                          selectedValue === getProperty(item, valueKey) ? "opacity-100" : "opacity-0",
+                          selectedValue === getProperty(item, valueKey)
+                            ? "opacity-100"
+                            : "opacity-0",
                         )}
                         style={{ marginInlineEnd: "0.5rem" }}
                       >

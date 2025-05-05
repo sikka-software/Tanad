@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+
 import { cn } from "@/lib/utils";
-import { CellComponent } from "../types"; // Assuming types are exported from here
+
+import { CellComponent } from "../types";
+
+// Assuming types are exported from here
 
 // Export the interface
 export interface ComboboxAddColumnData<T> {
@@ -94,13 +98,14 @@ export const ComboboxAddCell: CellComponent<
     // stopEditing will be called by DataSheetGrid when navigating away.
 
     return (
-      <div className={cn("dsg-input", "p-0 h-full")} onKeyDown={handleKeyDown}>
+      <div className={cn("dsg-input", "h-full !p-0")} onKeyDown={handleKeyDown}>
         <ComboboxAdd
+          inCell={true}
           ref={triggerRef} // Pass the ref to ComboboxAdd
           data={columnData.options}
           labelKey={columnData.labelKey || "label"}
           valueKey={columnData.valueKey || "value"}
-          defaultValue={rowData || ""} // Directly use rowData for defaultValue
+          // defaultValue={rowData || ""} // Directly use rowData for defaultValue
           onChange={handleValueChange}
           onAddClick={columnData.onAddClick}
           addText={columnData.addText}
@@ -120,4 +125,4 @@ export const ComboboxAddCell: CellComponent<
       </div>
     );
   },
-); 
+);
