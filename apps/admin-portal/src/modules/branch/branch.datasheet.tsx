@@ -6,7 +6,6 @@ import { z } from "zod";
 import {
   DataSheetGrid,
   checkboxColumn,
-  textColumn,
   keyColumn,
   DataSheetGridProps,
   CellComponent,
@@ -155,40 +154,46 @@ const CustomTextComponent: CellComponent<string | null, { validationSchema?: z.Z
       </Popover>
     );
   });
-CustomTextComponent.displayName = "CustomTextComponent";
 
-// --- createValidatedColumn ---
+// --- customTextColumn Definition (base for validated text columns) ---
+const customTextColumn: Partial<Column<string | null, { validationSchema?: z.ZodSchema<any> }, string | null>> = {
+  component: CustomTextComponent,
+  deleteValue: () => null,
+  copyValue: ({ rowData }) => rowData ?? "",
+  pasteValue: ({ value }) => value,
+};
+
+// --- createValidatedColumn Helper --- (uses customTextColumn)
 const createValidatedColumn = <T extends Record<string, any>>(
   key: keyof T & string,
   title: string,
   validationSchema?: z.ZodSchema<any>,
-): Partial<Column<T, any, string>> => {
-  const stringOrNullColumn: Partial<Column<string | null, any, string>> = {
-    ...customTextColumn, // Use the base customTextColumn config here
+): Partial<Column<T, any, string | null>> => {
+  const specificColumn: Partial<Column<string | null, { validationSchema?: z.ZodSchema<any> }, string | null>> = {
+    ...customTextColumn,
     columnData: { validationSchema },
   };
 
   return {
-    ...keyColumn<T, typeof key, string>(
+    ...keyColumn<T, typeof key, string | null>(
       key,
-      stringOrNullColumn as Partial<Column<T[typeof key], any, string>>,
+      specificColumn as Partial<Column<T[typeof key], any, string | null>>,
     ),
     title,
   };
 };
 
-// --- Define comboboxAddColumn base configuration --- NEW
-// Use the imported ComboboxAddColumnData type correctly
+// --- comboboxAddColumnBase Definition ---
 const comboboxAddColumnBase: Partial<
-  Column<string | null, ComboboxAddColumnData<any>, string | null> // Cell value is string | null
+  Column<string | null, ComboboxAddColumnData<any>, string | null>
 > = {
   component: ComboboxAddCell,
   deleteValue: () => null,
   copyValue: ({ rowData }) => rowData ?? "",
   pasteValue: ({ value }) => value,
-  cellClassName: "p-0",
+  cellClassName: "p-0 h-full", // Ensure full height
 };
-// --- End comboboxAddColumn base definition ---
+// ---
 
 type OnChangeType = (value: Branch[], operations: any) => void;
 
@@ -200,6 +205,7 @@ interface BranchDatasheetProps {
 const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   const t = useTranslations();
   const locale = useLocale();
+  // Get the schema once
   const branchSchema = createBranchSchema(t);
 
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
@@ -214,31 +220,30 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     }
   };
 
+  // Update employeeOptions to use ID for value
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
-    value: `${emp.first_name} ${emp.last_name}`,
+    value: emp.id,
   }));
 
-  // Define columns array with explicit types
+  // Define columns using helper and explicit definitions
   const columns: Column<Branch, any, any>[] = [
-    // Use Column<Branch, any, string> for text columns
-    createValidatedColumn<Branch>("name", t("Branches.form.name.label"), branchSchema.shape.name) as Column<Branch, any, string>,
-    createValidatedColumn<Branch>("code", t("Branches.form.code.label"), branchSchema.shape.code) as Column<Branch, any, string>,
-    createValidatedColumn<Branch>("short_address", t("Branches.form.address.label"), branchSchema.shape.short_address) as Column<Branch, any, string>,
-    createValidatedColumn<Branch>("city", t("Branches.form.city.label"), branchSchema.shape.city) as Column<Branch, any, string>,
-    createValidatedColumn<Branch>("region", t("Branches.form.state.label"), branchSchema.shape.region) as Column<Branch, any, string>,
-    createValidatedColumn<Branch>("zip_code", t("Branches.form.zip_code.label"), branchSchema.shape.zip_code) as Column<Branch, any, string>,
-    createValidatedColumn<Branch>("phone", t("Branches.form.phone.label"), branchSchema.shape.phone) as Column<Branch, any, string>,
-    createValidatedColumn<Branch>("email", t("Branches.form.email.label"), branchSchema.shape.email) as Column<Branch, any, string>,
+    createValidatedColumn("name", t("Branches.form.name.label"), branchSchema.shape.name),
+    createValidatedColumn("code", t("Branches.form.code.label"), branchSchema.shape.code),
+    createValidatedColumn("short_address", t("Branches.form.address.label"), branchSchema.shape.short_address),
+    createValidatedColumn("city", t("Branches.form.city.label"), branchSchema.shape.city),
+    createValidatedColumn("region", t("Branches.form.state.label"), branchSchema.shape.region),
+    createValidatedColumn("zip_code", t("Branches.form.zip_code.label"), branchSchema.shape.zip_code),
+    createValidatedColumn("phone", t("Branches.form.phone.label"), branchSchema.shape.phone),
+    createValidatedColumn("email", t("Branches.form.email.label"), branchSchema.shape.email),
 
-    // Define the manager column explicitly using the base and providing specific columnData
+    // Manager Column using ComboboxAddCell
     {
       id: "manager",
       title: t("Branches.form.manager.label"),
-      ...comboboxAddColumnBase, // Spread the base config (component, copy/paste etc)
-      // Provide the specific columnData for ComboboxAddCell
+      ...comboboxAddColumnBase,
       columnData: {
-        options: employeeOptions,
+        options: employeeOptions, // Use options with ID as value
         isLoading: employeesLoading,
         texts: {
           placeholder: t("Branches.form.manager.placeholder"),
@@ -247,15 +252,19 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
         },
         addText: t("Employees.add_new"),
         onAddClick: () => setIsEmployeeDialogOpen(true),
-      } as ComboboxAddColumnData<any>, // Assert the type here
-      // Map the specific field from the row data to the cell value
-      getValue: ({ rowData }) => rowData.manager,
+        labelKey: "label", // Explicitly state keys if needed
+        valueKey: "value", // Explicitly state keys if needed
+      } as ComboboxAddColumnData<typeof employeeOptions[0]>,
+      // Add type for rowData in getValue
+      getValue: ({ rowData }: { rowData: Branch }) => rowData.manager,
+      // The cell component (ComboboxAddCell) handles setting the UUID
     } as Column<Branch, ComboboxAddColumnData<any>, string | null>,
 
-    // Use Column<Branch, any, boolean> for checkbox
+    // Active Column (remains the same)
     { ...keyColumn("is_active", checkboxColumn), title: t("Branches.form.is_active.label") } as Column<Branch, any, boolean>,
   ];
 
+  // createNewRow remains the same, manager defaults to null
   const createNewRow = (): Branch => ({
     id: crypto.randomUUID(),
     name: "",
@@ -264,8 +273,8 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     city: "",
     region: "",
     zip_code: "",
-    phone: "",
-    email: "",
+    phone: null,
+    email: null,
     manager: null,
     is_active: false,
     notes: null,
@@ -308,11 +317,3 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
 };
 
 export default BranchDatasheet;
-
-// --- customTextColumn Definition ---
-const customTextColumn: Partial<Column<string | null, any, string>> = {
-  component: CustomTextComponent,
-  deleteValue: () => "",
-  copyValue: ({ rowData }) => rowData ?? "",
-  pasteValue: ({ value }) => value,
-};

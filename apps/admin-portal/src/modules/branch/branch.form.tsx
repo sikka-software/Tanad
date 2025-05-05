@@ -26,7 +26,7 @@ import useEmployeeStore from "../employee/employee.store";
 import { Employee } from "../employee/employee.types";
 import { useBranches, useCreateBranch, useUpdateBranch } from "./branch.hooks";
 import useBranchStore from "./branch.store";
-import { Branch, BranchUpdateData } from "./branch.type";
+import { Branch, BranchUpdateData, BranchCreateData } from "./branch.type";
 
 export const createBranchSchema = (t: (key: string) => string) => {
   const baseBranchSchema = z.object({
@@ -34,7 +34,11 @@ export const createBranchSchema = (t: (key: string) => string) => {
     code: z.string().min(1, t("Branches.form.code.required")),
     phone: z.string().optional().or(z.literal("")),
     email: z.string().email().optional().or(z.literal("")),
-    manager: z.string().optional().or(z.literal("")),
+    manager: z
+      .string({ invalid_type_error: t("Branches.form.manager.invalid_uuid") })
+      .uuid({ message: t("Branches.form.manager.invalid_uuid") })
+      .optional()
+      .nullable(),
     is_active: z.boolean().default(true),
     notes: z.string().optional().or(z.literal("")),
   });
@@ -89,8 +93,8 @@ export function BranchForm({
       zip_code: defaultValues?.zip_code || "",
       phone: defaultValues?.phone || "",
       email: defaultValues?.email || "",
-      manager: defaultValues?.manager || "",
-      is_active: defaultValues?.is_active || true,
+      manager: defaultValues?.manager || null,
+      is_active: defaultValues?.is_active ?? true,
       notes: defaultValues?.notes || "",
     },
   });
@@ -104,47 +108,66 @@ export function BranchForm({
       return;
     }
 
+    // Helper to convert empty string/null to undefined
+    const optionalString = (val: string | null | undefined): string | undefined => {
+      return val?.trim() || undefined;
+    };
+
+    // Prepare payload - ensure optional fields are undefined if empty
+    const payload = {
+      name: data.name.trim(), // Required field
+      code: data.code?.trim() || "", // Required field, ensure not undefined
+      phone: optionalString(data.phone),
+      email: optionalString(data.email),
+      manager: data.manager || undefined, // Manager is UUID string or undefined
+      notes: optionalString(data.notes),
+      is_active: data.is_active ?? true,
+      short_address: optionalString(data.short_address),
+      building_number: optionalString(data.building_number),
+      street_name: optionalString(data.street_name),
+      city: optionalString(data.city),
+      region: optionalString(data.region),
+      country: optionalString(data.country),
+      zip_code: optionalString(data.zip_code),
+      additional_number: optionalString((data as any).additional_number),
+    };
+
+    // Filter out undefined values explicitly if needed by the backend/service
+    // (Often not necessary, but good practice if the receiving end is strict)
+    const definedPayload = Object.fromEntries(
+      Object.entries(payload).filter(([_, v]) => v !== undefined),
+    );
+
     try {
       if (editMode) {
+        if (!defaultValues?.id) {
+          throw new Error("Branch ID is missing for update.");
+        }
         await updateBranch(
           {
-            id: defaultValues?.id || "",
-            data: {
-              name: data.name.trim(),
-              code: data.code?.trim() || "",
-              phone: data.phone?.trim() || null,
-              email: data.email?.trim() || null,
-              manager: data.manager?.trim() || null,
-              notes: data.notes?.trim() || null,
-              is_active: data.is_active || true,
-            },
+            id: defaultValues.id,
+            data: definedPayload as Partial<Branch>, // Use filtered payload
           },
           {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
+            onSuccess: () => {
+              setIsLoading(false);
+              if (onSuccess) onSuccess();
             },
+            onError: () => setIsLoading(false),
           },
         );
       } else {
         await createBranch(
           {
-            name: data.name.trim(),
-            code: data.code.trim(),
-            phone: data.phone?.trim() || null,
-            email: data.email?.trim() || null,
-            manager: data.manager?.trim() || null,
-            notes: data.notes?.trim() || null,
-            is_active: data.is_active || true,
-            user_id: user?.id,
-          },
+            ...definedPayload, // Use filtered payload
+            user_id: user.id,
+          } as BranchCreateData & { user_id: string }, // Adjust type assertion
           {
-            onSuccess: async (response) => {
-              if (onSuccess) {
-                onSuccess();
-              }
+            onSuccess: () => {
+              setIsLoading(false);
+              if (onSuccess) onSuccess();
             },
+            onError: () => setIsLoading(false),
           },
         );
       }
@@ -159,10 +182,9 @@ export function BranchForm({
 
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
-    value: `${emp.first_name} ${emp.last_name}`,
+    value: emp.id,
   }));
 
-  // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
     (window as any).branchForm = form;
   }
@@ -278,7 +300,7 @@ export function BranchForm({
                         direction={locale === "ar" ? "rtl" : "ltr"}
                         data={employeeOptions}
                         isLoading={employeesLoading}
-                        defaultValue={field.value}
+                        defaultValue={field.value || ""}
                         onChange={(value) => {
                           field.onChange(value || null);
                         }}
@@ -289,13 +311,8 @@ export function BranchForm({
                         }}
                         addText={t("Employees.add_new")}
                         onAddClick={() => setIsEmployeeDialogOpen(true)}
+                        ariaInvalid={!!form.formState.errors.manager}
                       />
-                      {/*                     
-                    <Input
-                      placeholder={t("Branches.form.manager.placeholder")}
-                      {...field}
-                      disabled={isLoading}
-                    /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
