@@ -485,10 +485,10 @@
       "unlimited_modules": "غير محدود",
       "up_to_modules": "إلى",
       "price_breakdown": "تفصيل السعر",
-      "see_how_your_selected_modules_affect_your_price": "رايح تعرف كيف يؤثر تغيير الميزات على السعر",
+      "see_how_your_selected_modules_affect_your_price": "تفاصيل السعر النهائي من الميزات المختارة",
       "base_price": "السعر الأساسي",
-      "need_to_start_over": "محتاج تعيد البدء؟",
-      "reset_selections": "اعيد البدء",
+      "need_to_start_over": "تريد إعادة البدء؟",
+      "reset_selections": "إعادة البدء",
       "discount": "الخصم",
       "total_monthly_price": "السعر الشهري الكلي",
       "integrations": {

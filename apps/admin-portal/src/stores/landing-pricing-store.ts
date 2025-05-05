@@ -522,7 +522,10 @@ export const initialDepartments: Department[] = [
     name: "Pricing.custom_pricing.infrastructure.title",
     description: "Pricing.custom_pricing.infrastructure.description",
     icon: "Building2",
-    color: "bg-blue-500",
+    color: {
+      light: "bg-blue-500",
+      dark: "bg-blue-300",
+    },
     modules: [],
   },
   {
@@ -530,7 +533,10 @@ export const initialDepartments: Department[] = [
     name: "Pricing.custom_pricing.business.title",
     description: "Pricing.custom_pricing.business.description",
     icon: "Briefcase",
-    color: "bg-purple-500",
+    color: {
+      light: "bg-purple-500",
+      dark: "bg-purple-300",
+    },
     modules: [],
   },
   {
@@ -538,7 +544,10 @@ export const initialDepartments: Department[] = [
     name: "Pricing.custom_pricing.finance.title",
     description: "Pricing.custom_pricing.finance.description",
     icon: "DollarSign",
-    color: "bg-green-500",
+    color: {
+      light: "bg-green-500",
+      dark: "bg-green-300",
+    },
     modules: [],
   },
   {
@@ -546,7 +555,10 @@ export const initialDepartments: Department[] = [
     name: "Pricing.custom_pricing.hr.title",
     description: "Pricing.custom_pricing.hr.description",
     icon: "Users",
-    color: "bg-orange-500",
+    color: {
+      light: "bg-orange-500",
+      dark: "bg-orange-300",
+    },
     modules: [],
   },
   {
@@ -554,7 +566,10 @@ export const initialDepartments: Department[] = [
     name: "Pricing.custom_pricing.it.title",
     description: "Pricing.custom_pricing.it.description",
     icon: "Server",
-    color: "bg-indigo-500",
+    color: {
+      light: "bg-indigo-500",
+      dark: "bg-indigo-300",
+    },
     modules: [],
   },
   {
@@ -562,7 +577,10 @@ export const initialDepartments: Department[] = [
     name: "Pricing.custom_pricing.logistics.title",
     description: "Pricing.custom_pricing.logistics.description",
     icon: "Truck",
-    color: "bg-red-500",
+    color: {
+      light: "bg-red-500",
+      dark: "bg-red-300",
+    },
     modules: [],
   },
 ];
@@ -621,7 +639,10 @@ export interface Department {
   name: string;
   description: string;
   icon: string;
-  color: string;
+  color: {
+    light: string;
+    dark: string;
+  };
   modules: (Module & { selectedIntegrations?: string[] })[]; // Ensure selectedIntegrations is tracked here
 }
 
