@@ -157,15 +157,8 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   });
 
   return (
-    <div className="h-screen w-full bg-red-400" dir="rtl">
-      <style jsx global>{`
-        .dsg-header-cell {
-          background-color: hsl(var(--muted));
-          color: hsl(var(--primary));
-        }
-      `}</style>
+    <div className="" dir="rtl">
       <DataSheetGrid
-        className="h-full"
         value={data}
         onChange={handleGridChange}
         columns={columns}

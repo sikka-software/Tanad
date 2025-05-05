@@ -38,7 +38,7 @@ export const Grid = <T extends any>({
   innerRef: RefObject<HTMLDivElement>;
   columnWidths?: number[];
   hasStickyRightColumn: boolean;
-  displayHeight: number;
+  displayHeight: number | string;
   headerRowHeight: number;
   rowHeight: (index: number) => { height: number };
   rowKey: DataSheetGridProps<T>["rowKey"];

@@ -159,7 +159,9 @@ export default function BranchesPage() {
           console.log("Changed row or row ID is missing in updatedData.");
         }
       } else if (op.type?.toUpperCase() === "CREATE") {
-        console.log("CREATE operation detected. Display state updated. No backend call needed yet.");
+        console.log(
+          "CREATE operation detected. Display state updated. No backend call needed yet.",
+        );
       }
     });
   };
@@ -194,7 +196,7 @@ export default function BranchesPage() {
 
         <div>
           {viewMode === "table" ? (
-            <BranchDatasheet data={sortedBranches} onChange={handleDatasheetChange} />
+            <BranchDatasheet data={displayData} onChange={handleDatasheetChange} />
           ) : viewMode === "cards" ? (
             <div className="p-4">
               <DataModelList
