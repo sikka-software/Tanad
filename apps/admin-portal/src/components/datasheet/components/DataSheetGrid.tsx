@@ -985,6 +985,8 @@ export const DataSheetGrid = React.memo(
             activeCell.row === cursorIndex.row &&
             !isCellDisabled(activeCell);
 
+          const previousEditingState = editing; // Remember if we were editing
+
           if (clickOnActiveCell && editing) {
             return;
           }
@@ -1128,6 +1130,16 @@ export const DataSheetGrid = React.memo(
               event.preventDefault();
             }
           }
+
+          // ADDED: Blur if editing state changed from true to false
+          if (
+            previousEditingState &&
+            !clickOnActiveCell && // Ensure the click wasn't on the cell we were just editing
+            innerRef.current?.contains(document.activeElement) &&
+            document.activeElement instanceof HTMLElement
+          ) {
+            document.activeElement.blur();
+          }
         },
         [
           contextMenu,
@@ -1145,6 +1157,7 @@ export const DataSheetGrid = React.memo(
           setSelectionCell,
           selectionCell,
           data.length,
+          innerRef,
         ],
       );
       useDocumentEventListener("mousedown", onMouseDown);
@@ -1389,6 +1402,8 @@ export const DataSheetGrid = React.memo(
               return;
             }
 
+            const previousEditingState = editing; // Remember if we were editing
+
             const add = ([x, y]: [number, number], cell: Cell | null): Cell | null =>
               cell && {
                 col: Math.max(
@@ -1424,6 +1439,15 @@ export const DataSheetGrid = React.memo(
             }
             setEditing(false);
 
+            // ADDED: Blur if editing state changed from true to false
+            if (
+              previousEditingState &&
+              innerRef.current?.contains(document.activeElement) &&
+              document.activeElement instanceof HTMLElement
+            ) {
+              document.activeElement.blur();
+            }
+
             event.preventDefault();
           } else if (event.key === "Escape") {
             if (!editing && !selectionCell) {
@@ -1431,7 +1455,16 @@ export const DataSheetGrid = React.memo(
             }
 
             setSelectionCell(null);
+            const previousEditingState = editing; // Remember if we were editing
             setEditing(false);
+            // ADDED: Blur if editing state changed from true to false
+            if (
+              previousEditingState &&
+              innerRef.current?.contains(document.activeElement) &&
+              document.activeElement instanceof HTMLElement
+            ) {
+              document.activeElement.blur();
+            }
           } else if (
             (event.key === "Enter" || event.key === "F2") &&
             !event.ctrlKey &&
@@ -1521,6 +1554,7 @@ export const DataSheetGrid = React.memo(
           stopEditing,
           hasStickyRightColumn,
           handleOnChange,
+          innerRef,
         ],
       );
       useDocumentEventListener("keydown", onKeyDown);
