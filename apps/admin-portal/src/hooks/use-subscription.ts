@@ -207,7 +207,7 @@ export function useSubscription() {
       const supabase = createClient();
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, stripe_customer_id, subscribed_to, price_id")
         .eq("id", user.id)
         .single();
 
@@ -243,18 +243,18 @@ export function useSubscription() {
 
           // Just use the profile data if it's clearly showing a subscription
           setSubscriptionData({
-            id: null,
+            id: "profile-based",
             name: getNameFromLookupKey(profile.subscribed_to),
             price: getPriceFromLookupKey(profile.subscribed_to),
             billingCycle: "month",
             nextBillingDate: "-",
             planLookupKey: profile.subscribed_to,
-            status: "active",
+            status: "active", // Assume active if in profile
             isExpired: false,
             cancelAt: null,
           });
-
-          // Still fetch from Stripe to get additional details
+          setLoading(false);
+          return;
         }
       }
 

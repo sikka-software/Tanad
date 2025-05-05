@@ -233,28 +233,64 @@ export function PaymentDialog({
     }
   }, [open, selectedPlan]);
 
-  // In the PaymentDialog component, above the useEffect for fetchSetupIntent
-  useEffect(() => {
-    // Debug function to check for customer ID
-    if (open) {
-      console.log("Payment Dialog Debug Info:", {
-        userObj: {
-          id: user?.id,
-          stripe_customer_id: user?.stripe_customer_id,
-          hasProfile: !!user?.profile,
-          profileStripeId: user?.profile?.stripe_customer_id,
-        },
-        passedCustomerId: customerId,
-        selectedPlan,
-      });
+  // Debug function to check for customer ID
+  const debugCustomerData = async () => {
+    // Log existing data
+    console.log("PaymentDialog Debug Info:", {
+      userObj: {
+        id: user?.id,
+        email: user?.email,
+        stripe_customer_id: user?.stripe_customer_id,
+        hasProfile: !!user?.profile,
+        profileStripeId: user?.profile?.stripe_customer_id,
+      },
+      passedCustomerId: customerId,
+      selectedPlan,
+    });
 
-      // If no stripe_customer_id but we have a passed customerId, use that
-      if (user && !user.stripe_customer_id && customerId) {
-        console.log("Setting stripe_customer_id from passed prop:", customerId);
-        // This is just client-side for this session
-        const updatedUser = { ...user, stripe_customer_id: customerId } as any;
-        useUserStore.getState().setUser(updatedUser);
+    if (user?.id) {
+      try {
+        // Fetch the profile directly from the database for comparison
+        const supabase = createClient();
+        const { data: dbProfile, error } = await supabase
+          .from("profiles")
+          .select("id, stripe_customer_id, email")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching profile from DB:", error);
+        } else {
+          console.log("Profile data from database:", dbProfile);
+
+          // If we found a customer ID in the database but not in the current profile
+          if (dbProfile?.stripe_customer_id && !customerId && !user?.stripe_customer_id) {
+            console.log(
+              "Found stripe_customer_id in database but not in current state:",
+              dbProfile.stripe_customer_id,
+            );
+            return dbProfile.stripe_customer_id;
+          }
+        }
+      } catch (err) {
+        console.error("Error in debugCustomerData:", err);
       }
+    }
+    return null;
+  };
+
+  // In the PaymentDialog component, before the useEffect for fetchSetupIntent
+  useEffect(() => {
+    // Run diagnostics when dialog opens
+    if (open) {
+      debugCustomerData().then((dbCustomerId) => {
+        if (dbCustomerId && !user.stripe_customer_id) {
+          console.log("Setting stripe_customer_id from database lookup:", dbCustomerId);
+          // This is just client-side for this session
+          const updatedUser = { ...user, stripe_customer_id: dbCustomerId } as any;
+          useUserStore.getState().setUser(updatedUser);
+        }
+      });
     }
   }, [open, user, customerId, selectedPlan]);
 
@@ -274,6 +310,18 @@ export function PaymentDialog({
         isAuthenticated: !!user,
         hasProfile: !!user?.profile,
       });
+
+      // Try to get customer ID from database if not available from state
+      if (!customerId && !user?.stripe_customer_id && !user?.profile?.stripe_customer_id) {
+        const dbCustomerId = await debugCustomerData();
+        if (dbCustomerId) {
+          console.log("Using customer ID from database lookup:", dbCustomerId);
+          const updatedUser = { ...user, stripe_customer_id: dbCustomerId } as any;
+          useUserStore.getState().setUser(updatedUser);
+          // Now we can use this ID
+          customerId = dbCustomerId;
+        }
+      }
 
       // Fetch price details first
       const priceResponse = await fetch(`/api/stripe/get-price?priceId=${selectedPlan}`);
@@ -740,10 +788,44 @@ function PaymentFormContent({
       customerIdToUse = customerId;
     }
 
+    // Final attempt - try looking up directly in the database
+    if (!customerIdToUse && user?.id) {
+      try {
+        console.log("Making final attempt to lookup customer ID in database");
+        const supabase = createClient();
+        const { data: dbProfile, error } = await supabase
+          .from("profiles")
+          .select("stripe_customer_id")
+          .eq("id", user.id)
+          .single();
+
+        if (!error && dbProfile?.stripe_customer_id) {
+          console.log(
+            "Found customer ID in database as last resort:",
+            dbProfile.stripe_customer_id,
+          );
+          customerIdToUse = dbProfile.stripe_customer_id;
+
+          // Also update the user object for future use
+          const updatedUser = { ...user, stripe_customer_id: customerIdToUse } as any;
+          useUserStore.getState().setUser(updatedUser);
+        }
+      } catch (err) {
+        console.error("Error in final database lookup:", err);
+      }
+    }
+
     if (!customerIdToUse) {
-      console.error("No Stripe customer ID available from any source");
+      console.error("No Stripe customer ID available from any source", {
+        userId: user?.id,
+        email: user?.email,
+        hasStripeId: !!user?.stripe_customer_id,
+        hasProfileStripeId: !!user?.profile?.stripe_customer_id,
+        passedCustomerId: customerId,
+      });
       setError({
-        message: "Customer ID not found. Please try refreshing the page.",
+        message:
+          "Payment setup error: Could not find your payment profile. Please try refreshing the page. If the problem persists, please contact support.",
         type: "general",
       });
       setIsProcessing(false);

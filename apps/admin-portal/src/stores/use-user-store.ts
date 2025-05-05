@@ -166,11 +166,20 @@ const useUserStore = create<UserState>((set, get) => ({
       // Get profile data
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("*")
+        .select(
+          "id, email, full_name, created_at, stripe_customer_id, avatar_url, address, subscribed_to, price_id, username, user_settings",
+        )
         .eq("id", session.user.id)
         .single();
 
       if (profileData) {
+        // Make sure subscribed_to is accessible
+        console.log("Profile data fetched:", {
+          id: profileData.id,
+          subscribed_to: profileData.subscribed_to,
+          price_id: profileData.price_id,
+        });
+
         set({ profile: profileData as ProfileType });
 
         // Get membership data

@@ -172,6 +172,18 @@ export default function SubscriptionSelection({
     ) {
       setCurrentPlan(newCurrentPlan);
     }
+
+    // Debug logging
+    console.log("SubscriptionSelection: Current plan data", {
+      priceId: currentPlan.priceId,
+      lookup_key: currentPlan.lookup_key,
+      subscriptionStatus,
+      cancelAt: subscriptionCancelAt,
+      profile: {
+        price_id: profile?.price_id,
+        subscribed_to: profile?.subscribed_to,
+      },
+    });
   }, [pricesLoading, profile?.price_id, profile?.subscribed_to, freePlan, plans]);
 
   // Function to update the selected plan with debounce protection
@@ -204,6 +216,20 @@ export default function SubscriptionSelection({
 
   const handleSelectPlan = async (priceId: string) => {
     setSelectedPlan(priceId);
+
+    // Make sure we have the latest user profile data with customer ID
+    if (!profile?.stripe_customer_id) {
+      console.log("No Stripe customer ID found in profile, refreshing user data");
+      // Try refreshing the user profile to get updated customer ID
+      try {
+        await fetchUserAndProfile();
+        console.log("User profile refreshed, checking for customer ID");
+      } catch (err) {
+        console.error("Error refreshing user profile:", err);
+      }
+    }
+
+    // Now open the payment dialog
     setIsPaymentDialogOpen(true);
   };
 
@@ -328,17 +354,6 @@ export default function SubscriptionSelection({
 
   if (pricesLoading) {
     return <Skeleton className="h-[400px] w-full" />;
-  }
-
-  // Hide if user has an active subscription or promotion
-  if (
-    subscriptionStatus === "active" &&
-    !subscriptionCancelAt &&
-    planLookupKey &&
-    planLookupKey !== "tanad_free"
-  ) {
-    console.log("SubscriptionSelection: Hiding component due to active paid subscription");
-    return null;
   }
 
   return (

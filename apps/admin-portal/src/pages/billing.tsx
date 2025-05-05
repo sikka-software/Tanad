@@ -9,9 +9,11 @@ import { useEffect, useRef, useState } from "react";
 import { useSubscription } from "@/hooks/use-subscription";
 
 import CurrentPlan, { SUBSCRIPTION_UPDATED_EVENT } from "@/components/billing/CurrentPlan";
+import SubscriptionSelection from "@/components/billing/SubscriptionSelection";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -19,7 +21,7 @@ export default function Billing() {
   const router = useRouter();
   const t = useTranslations();
   const locale = useLocale();
-  const { user, fetchUserAndProfile } = useUserStore();
+  const { user, fetchUserAndProfile, profile } = useUserStore();
   const subscription = useSubscription();
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
   const initialized = useRef(false);
@@ -28,7 +30,6 @@ export default function Billing() {
   // Force refresh when refresh query parameter is present
   useEffect(() => {
     if (router.query.refresh && user) {
-      console.log("Billing page: Force refresh due to query parameter");
       setIsUpdatingSubscription(true);
 
       // Remove the refresh query parameter without page reload
@@ -138,10 +139,6 @@ export default function Billing() {
     };
   }, [subscription, fetchUserAndProfile, router]);
 
-  // Show subscription management for active subscriptions (including canceled ones)
-  const showSubscriptionManagement =
-    subscription.status === "active" && subscription.name !== t("Billing.free_plan");
-
   // Improved condition to determine what counts as a free plan
   const isFreePlan =
     !subscription.planLookupKey ||
@@ -152,10 +149,15 @@ export default function Billing() {
 
   // If we know the user has a paid subscription, don't show selection
   const hasActivePaidSubscription =
-    subscription.status === "active" &&
-    subscription.planLookupKey &&
-    subscription.planLookupKey !== "tanad_free" &&
-    !subscription.cancelAt;
+    // Check subscription status from the subscription hook
+    (subscription.status === "active" &&
+      subscription.planLookupKey &&
+      subscription.planLookupKey !== "tanad_free" &&
+      !subscription.cancelAt) ||
+    // As a fallback, also check the profile data directly
+    (profile?.subscribed_to &&
+      profile.subscribed_to !== "tanad_free" &&
+      profile.subscribed_to !== null);
 
   // Show subscription selection for new/free/expired users
   const showSubscriptionSelection =
@@ -172,39 +174,6 @@ export default function Billing() {
   if (!user) {
     return <Skeleton className="h-[300px] w-full" />;
   }
-
-  // Format the next billing date if available
-  const formatNextBillingDate = () => {
-    if (!subscription.nextBillingDate || subscription.nextBillingDate === "-") return null;
-
-    try {
-      let date;
-      if (subscription.nextBillingDate.includes("/")) {
-        // Parse DD/MM/YYYY format
-        const parts = subscription.nextBillingDate.split("/");
-        date = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-      } else {
-        // Try to parse as regular date
-        date = new Date(subscription.nextBillingDate);
-      }
-
-      if (isNaN(date.getTime())) return subscription.nextBillingDate;
-
-      // Format the date
-      return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch (error) {
-      console.error("Error formatting date:", error);
-      return subscription.nextBillingDate;
-    }
-  };
-
-  const nextBillingDate = formatNextBillingDate();
-  console.log("hasActivePaidSubscription", hasActivePaidSubscription);
-  console.log("showSubscriptionSelection :", showSubscriptionSelection);
   return (
     <>
       <CustomPageMeta title={t("Billing.title")} description={t("Billing.description")} />
@@ -229,6 +198,53 @@ export default function Billing() {
             <CurrentPlan />
           )}
         </div>
+
+        {/* Subscription Selection Section - with Tabs */}
+        {showSubscriptionSelection && (
+          <div className="w-full" id="plans">
+            <div className="mb-6">
+              <h2 className="mb-2 text-2xl font-bold">{t("Billing.available_plans")}</h2>
+              <p className="text-muted-foreground">
+                {t("Billing.choose_plan_description", {
+                  fallback: "Choose the plan that works best for you and your team",
+                })}
+              </p>
+            </div>
+            <Tabs
+              defaultValue="monthly"
+              value={billingPeriod}
+              onValueChange={(value) => setBillingPeriod(value as "monthly" | "yearly")}
+              className="mb-8"
+            >
+              <div className="mb-8 flex justify-center">
+                <TabsList>
+                  <TabsTrigger value="monthly">{t("Billing.monthly_billing")}</TabsTrigger>
+                  <TabsTrigger value="yearly">
+                    {t("Billing.yearly_billing", {
+                      discount: "20%",
+                      fallback: "Yearly Billing (Save 20%)",
+                    })}
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="monthly" className="mt-0">
+                <div id="monthlyPlans">
+                  <SubscriptionSelection />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="yearly" className="mt-0">
+                <div id="yearlyPlans">
+                  <Skeleton className="h-32 w-full" />
+                  <div className="text-muted-foreground mt-4 text-center">
+                    {t("Billing.yearly_plans_coming_soon")}
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )}
 
         {/* Show loading skeleton when updating subscription */}
         {isUpdatingSubscription && !showSubscriptionSelection && (

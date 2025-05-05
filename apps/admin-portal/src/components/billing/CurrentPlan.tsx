@@ -273,8 +273,7 @@ export default function CurrentPlan() {
               variant="outline"
               className="bg-background hover:bg-accent"
               onClick={async () => {
-                // Refresh user data before opening dialog
-                await refreshData();
+                // Open the dialog without forcing a refresh
                 setIsHistoryDialogOpen(true);
               }}
             >
