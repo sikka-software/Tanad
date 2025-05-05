@@ -115,11 +115,11 @@ export function BranchForm({
 
     // Prepare payload - ensure optional fields are undefined if empty
     const payload = {
-      name: data.name.trim(), // Required field
-      code: data.code?.trim() || "", // Required field, ensure not undefined
+      name: data.name.trim(),
+      code: data.code?.trim() || "",
       phone: optionalString(data.phone),
       email: optionalString(data.email),
-      manager: data.manager || undefined, // Manager is UUID string or undefined
+      manager: data.manager && data.manager.trim() !== "" ? data.manager : undefined,
       notes: optionalString(data.notes),
       is_active: data.is_active ?? true,
       short_address: optionalString(data.short_address),
@@ -132,12 +132,10 @@ export function BranchForm({
       additional_number: optionalString((data as any).additional_number),
     };
 
-    // Filter out undefined values explicitly if needed by the backend/service
-    // (Often not necessary, but good practice if the receiving end is strict)
     const definedPayload = Object.fromEntries(
       Object.entries(payload).filter(([_, v]) => v !== undefined),
     );
-
+    
     try {
       if (editMode) {
         if (!defaultValues?.id) {
@@ -159,9 +157,9 @@ export function BranchForm({
       } else {
         await createBranch(
           {
-            ...definedPayload, // Use filtered payload
+            ...definedPayload,
             user_id: user.id,
-          } as BranchCreateData & { user_id: string }, // Adjust type assertion
+          } as BranchCreateData & { user_id: string },
           {
             onSuccess: () => {
               setIsLoading(false);
