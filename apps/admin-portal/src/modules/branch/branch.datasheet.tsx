@@ -21,21 +21,17 @@ const CustomTextComponent: CellComponent<string | null, any> = React.memo(
     const ref = useRef<HTMLInputElement>(null);
     const isSavingRef = useRef(false); // Ref to track if save is in progress
 
-    // Log focus prop on render
-    console.log("CustomTextComponent render, focus:", focus, "value:", rowData);
-
-    // Update local state when the grid value changes (rowData)
     useEffect(() => {
       setValue(rowData ?? "");
     }, [rowData]);
 
     // Focus the input when the cell is focused
     useEffect(() => {
-      console.log("CustomTextComponent focus effect, focus:", focus);
       if (focus && ref.current) {
-        console.log("CustomTextComponent focus effect: Applying focus!");
         ref.current.focus();
-        ref.current.select(); // Optional: select text on focus
+        ref.current.select();
+      } else {
+        ref.current?.blur();
       }
     }, [focus]);
 
@@ -44,12 +40,6 @@ const CustomTextComponent: CellComponent<string | null, any> = React.memo(
     }, []);
 
     const handleBlur = useCallback(() => {
-      console.log(
-        "CustomTextComponent handleBlur. isSavingRef:",
-        isSavingRef.current,
-        "Current value:",
-        value,
-      );
       // If save was already triggered by keydown, reset flag and exit
       if (isSavingRef.current) {
         isSavingRef.current = false;
@@ -59,7 +49,6 @@ const CustomTextComponent: CellComponent<string | null, any> = React.memo(
 
       // Otherwise, proceed with blur save logic
       if (value !== (rowData ?? "")) {
-        console.log("Saving data on blur");
         setRowData(value);
       }
       stopEditing({ nextRow: false }); // Stop editing on blur
@@ -71,7 +60,6 @@ const CustomTextComponent: CellComponent<string | null, any> = React.memo(
         if (e.key === "Enter" || e.key === "Tab") {
           e.preventDefault();
           if (value !== (rowData ?? "")) {
-            console.log("Saving data on keydown (Enter/Tab)");
             isSavingRef.current = true; // Set flag before calling setRowData
             setRowData(value);
           }
