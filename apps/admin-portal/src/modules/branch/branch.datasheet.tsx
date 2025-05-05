@@ -221,7 +221,7 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
 
-  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const { data: employees = [], isLoading: employeesLoading, error: employeesError } = useEmployees();
 
   const handleGridChange = (value: Record<string, any>[], operations: any) => {
     if (onChange) {
@@ -309,6 +309,7 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     <div>
       <div className="" dir={locale === "ar" ? "rtl" : "ltr"}>
         <DataSheetGrid
+          key={employeesLoading ? 'loading' : 'loaded'}
           columns={columns as Partial<Column<Branch, any, any>>[]}
           value={data}
           onChange={handleGridChange}
