@@ -9,11 +9,9 @@ import { useEffect, useRef, useState } from "react";
 import { useSubscription } from "@/hooks/use-subscription";
 
 import CurrentPlan, { SUBSCRIPTION_UPDATED_EVENT } from "@/components/billing/CurrentPlan";
-import SubscriptionSelection from "@/components/billing/SubscriptionSelection";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -152,23 +150,24 @@ export default function Billing() {
     subscription.price === "0 SAR" ||
     !subscription.price;
 
-  // Show subscription selection for new/free/expired users
-  const showSubscriptionSelection =
-    !subscription.loading &&
-    !isUpdatingSubscription &&
-    (!subscription.status || // No subscription
-      subscription.status === "canceled" || // Canceled subscription
-      subscription.status === "incomplete_expired" || // Failed subscription
-      subscription.status === "unpaid" || // Unpaid subscription
-      (subscription.status === "active" && isFreePlan) || // Free plan
-      (subscription.cancelAt && new Date(Number(subscription.cancelAt) * 1000) < new Date())); // Expired subscription
-
   // If we know the user has a paid subscription, don't show selection
   const hasActivePaidSubscription =
     subscription.status === "active" &&
     subscription.planLookupKey &&
     subscription.planLookupKey !== "tanad_free" &&
     !subscription.cancelAt;
+
+  // Show subscription selection for new/free/expired users
+  const showSubscriptionSelection =
+    !subscription.loading &&
+    !isUpdatingSubscription &&
+    !hasActivePaidSubscription && // Check if user has an active paid subscription
+    (!subscription.status || // No subscription
+      subscription.status === "canceled" || // Canceled subscription
+      subscription.status === "incomplete_expired" || // Failed subscription
+      subscription.status === "unpaid" || // Unpaid subscription
+      (subscription.status === "active" && isFreePlan) || // Free plan
+      (subscription.cancelAt && new Date(Number(subscription.cancelAt) * 1000) < new Date())); // Expired subscription
 
   if (!user) {
     return <Skeleton className="h-[300px] w-full" />;
@@ -204,7 +203,8 @@ export default function Billing() {
   };
 
   const nextBillingDate = formatNextBillingDate();
-
+  console.log("hasActivePaidSubscription", hasActivePaidSubscription);
+  console.log("showSubscriptionSelection :", showSubscriptionSelection);
   return (
     <>
       <CustomPageMeta title={t("Billing.title")} description={t("Billing.description")} />
@@ -229,53 +229,6 @@ export default function Billing() {
             <CurrentPlan />
           )}
         </div>
-
-        {/* Subscription Selection Section - with Tabs */}
-        {showSubscriptionSelection && (
-          <div className="w-full" id="plans">
-            <div className="mb-6">
-              <h2 className="mb-2 text-2xl font-bold">{t("Billing.available_plans")}</h2>
-              <p className="text-muted-foreground">
-                {t("Billing.choose_plan_description", {
-                  fallback: "Choose the plan that works best for you and your team",
-                })}
-              </p>
-            </div>
-            <Tabs
-              defaultValue="monthly"
-              value={billingPeriod}
-              onValueChange={(value) => setBillingPeriod(value as "monthly" | "yearly")}
-              className="mb-8"
-            >
-              <div className="mb-8 flex justify-center">
-                <TabsList>
-                  <TabsTrigger value="monthly">{t("Billing.monthly_billing")}</TabsTrigger>
-                  <TabsTrigger value="yearly">
-                    {t("Billing.yearly_billing", {
-                      discount: "20%",
-                      fallback: "Yearly Billing (Save 20%)",
-                    })}
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-
-              <TabsContent value="monthly" className="mt-0">
-                <div id="monthlyPlans">
-                  <SubscriptionSelection />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="yearly" className="mt-0">
-                <div id="yearlyPlans">
-                  <Skeleton className="h-32 w-full" />
-                  <div className="text-muted-foreground mt-4 text-center">
-                    {t("Billing.yearly_plans_coming_soon")}
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        )}
 
         {/* Show loading skeleton when updating subscription */}
         {isUpdatingSubscription && !showSubscriptionSelection && (

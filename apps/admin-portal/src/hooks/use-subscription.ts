@@ -244,7 +244,7 @@ export function useSubscription() {
           // Just use the profile data if it's clearly showing a subscription
           setSubscriptionData({
             id: null,
-            name: profile.subscribed_to,
+            name: getNameFromLookupKey(profile.subscribed_to),
             price: getPriceFromLookupKey(profile.subscribed_to),
             billingCycle: "month",
             nextBillingDate: "-",
@@ -296,7 +296,67 @@ export function useSubscription() {
 
         const stripeData = await stripeResponse.json();
 
-        if (stripeData.subscription) {
+        // Use the new subscription_info field for faster access to key data
+        if (stripeData.subscription_info) {
+          const subInfo = stripeData.subscription_info;
+
+          // If we have an active subscription from Stripe
+          if (subInfo.id) {
+            const subscription = stripeData.subscription;
+
+            // Get the price details from the subscription
+            const price = subscription.plan?.amount
+              ? `${(subscription.plan.amount / 100).toFixed(2)} ${subscription.plan.currency.toUpperCase()}`
+              : "0 SAR";
+
+            // Use the most reliable source for lookup key in this order:
+            // 1. Profile's subscribed_to from database
+            // 2. Lookup key from Stripe price
+            // 3. Default to free plan
+            const planLookupKey = subInfo.subscribed_to || subInfo.lookup_key || "tanad_free";
+
+            setSubscriptionData({
+              id: subInfo.id,
+              status: subInfo.status,
+              name: getNameFromLookupKey(planLookupKey),
+              price,
+              planLookupKey,
+              billingCycle: subscription.plan?.interval || "month",
+              cancelAt: subscription.cancel_at || null,
+              nextBillingDate: convertTimestampToDate(subscription.current_period_end),
+              isExpired: subInfo.status === "canceled" || subInfo.status === "incomplete_expired",
+            });
+          }
+          // If we only have profile data (no active Stripe subscription)
+          else if (subInfo.subscribed_to && subInfo.subscribed_to !== "tanad_free") {
+            setSubscriptionData({
+              id: null,
+              name: getNameFromLookupKey(subInfo.subscribed_to),
+              price: getPriceFromLookupKey(subInfo.subscribed_to),
+              billingCycle: "month",
+              nextBillingDate: "-",
+              planLookupKey: subInfo.subscribed_to,
+              status: "active",
+              isExpired: false,
+              cancelAt: null,
+            });
+          } else {
+            // Default to free plan if no subscription detected
+            setSubscriptionData({
+              id: null,
+              name: t("Billing.free_plan", { fallback: "Free Plan" }),
+              price: "0 SAR",
+              billingCycle: "-",
+              nextBillingDate: "-",
+              planLookupKey: "tanad_free",
+              status: "active",
+              isExpired: false,
+              cancelAt: null,
+            });
+          }
+        }
+        // Fallback to old method if subscription_info is not available
+        else if (stripeData.subscription) {
           const subscription = stripeData.subscription;
 
           console.log("Received stripe subscription data:", {
@@ -332,7 +392,7 @@ export function useSubscription() {
           if (profile.subscribed_to && profile.subscribed_to !== "tanad_free") {
             setSubscriptionData({
               id: null,
-              name: profile.subscribed_to,
+              name: getNameFromLookupKey(profile.subscribed_to),
               price: getPriceFromLookupKey(profile.subscribed_to),
               billingCycle: "month",
               nextBillingDate: "-",
@@ -363,7 +423,7 @@ export function useSubscription() {
         if (profile.subscribed_to && profile.subscribed_to !== "tanad_free") {
           setSubscriptionData({
             id: null,
-            name: profile.subscribed_to,
+            name: getNameFromLookupKey(profile.subscribed_to),
             price: getPriceFromLookupKey(profile.subscribed_to),
             billingCycle: "month",
             nextBillingDate: "-",

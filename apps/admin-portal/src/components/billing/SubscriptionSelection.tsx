@@ -55,37 +55,6 @@ const planDescriptions: Record<string, string> = {
   tanad_enterprise: "Custom solution for large organizations",
 };
 
-// Plan color configurations
-const planColors: Record<string, any> = {
-  tanad_free: {
-    bgClass: "bg-gray-100 dark:bg-gray-800",
-    textClass: "text-gray-800 dark:text-gray-200",
-    headerClass: "bg-gray-800 text-white",
-  },
-  tanad_standard: {
-    bgClass: "bg-blue-100 dark:bg-blue-900",
-    textClass: "text-blue-800 dark:text-blue-200",
-    headerClass: "bg-blue-800 text-white",
-  },
-  tanad_pro: {
-    bgClass: "bg-purple-100 dark:bg-purple-900",
-    textClass: "text-purple-800 dark:text-purple-200",
-    headerClass: "bg-purple-800 text-white",
-    badge: "POPULAR",
-    badgeClass: "bg-purple-600",
-  },
-  tanad_business: {
-    bgClass: "bg-amber-100 dark:bg-amber-900",
-    textClass: "text-amber-800 dark:text-amber-200",
-    headerClass: "bg-amber-800 text-white",
-  },
-  tanad_enterprise: {
-    bgClass: "bg-emerald-100 dark:bg-emerald-900",
-    textClass: "text-emerald-800 dark:text-emerald-200",
-    headerClass: "bg-emerald-800 text-white",
-  },
-};
-
 // Helper function to format price in Arabic
 function formatPriceForLocale(price: string, locale: string): string {
   if (locale !== "ar") return price;
@@ -368,6 +337,7 @@ export default function SubscriptionSelection({
     planLookupKey &&
     planLookupKey !== "tanad_free"
   ) {
+    console.log("SubscriptionSelection: Hiding component due to active paid subscription");
     return null;
   }
 

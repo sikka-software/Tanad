@@ -23,6 +23,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    // Fetch the user by the stripe_customer_id first - this is faster
+    const supabase = createClient();
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("stripe_customer_id", customerId)
+      .limit(1);
+
+    const profile = profiles && profiles.length > 0 ? profiles[0] : null;
+
     // Initialize Stripe
     const stripe = getStripeInstance();
 
@@ -38,46 +48,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (subscriptions.data.length > 0) {
       const subscription = subscriptions.data[0];
 
-      // Fetch the user by the stripe_customer_id
-      const supabase = createClient();
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("stripe_customer_id", customerId)
-        .limit(1);
-
-      const profile = profiles && profiles.length > 0 ? profiles[0] : null;
-
-      // Log what we found for debugging
-      console.log(`Found subscription for ${customerId}:`, {
-        id: subscription.id,
-        status: subscription.status,
-        plan: subscription.plan?.nickname || subscription.items?.data[0]?.price?.nickname,
-        lookup_key: subscription.plan?.lookup_key || subscription.items?.data[0]?.price?.lookup_key,
-        profile_subscribed_to: profile?.subscribed_to,
-      });
-
       return res.status(200).json({
         subscription,
         profile,
+        subscription_info: {
+          id: subscription.id,
+          status: subscription.status,
+          lookup_key: subscription.items?.data[0]?.price?.lookup_key,
+          price_id: subscription.items?.data[0]?.price?.id,
+          subscribed_to: profile?.subscribed_to || null,
+        },
       });
     }
 
-    // If no subscription is found, try to get the profile info
-    const supabase = createClient();
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("stripe_customer_id", customerId)
-      .limit(1);
-
-    if (profiles && profiles.length > 0) {
-      console.log(`No subscription found, but profile exists for ${customerId}:`, {
-        subscribed_to: profiles[0].subscribed_to,
-      });
+    // If no subscription is found, return profile info
+    if (profile) {
       return res.status(200).json({
         subscription: null,
-        profile: profiles[0],
+        profile,
+        subscription_info: {
+          id: null,
+          status: null,
+          lookup_key: null,
+          price_id: profile.price_id || null,
+          subscribed_to: profile.subscribed_to || null,
+        },
       });
     }
 
@@ -85,6 +80,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       subscription: null,
       profile: null,
+      subscription_info: {
+        id: null,
+        status: null,
+        lookup_key: null,
+        price_id: null,
+        subscribed_to: null,
+      },
     });
   } catch (error) {
     console.error("Error fetching subscription:", error);
