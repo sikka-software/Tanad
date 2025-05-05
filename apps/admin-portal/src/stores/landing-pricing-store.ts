@@ -12,6 +12,8 @@ import {
   Server,
   Globe,
   ShoppingBag,
+  Truck,
+  Car,
 } from "lucide-react";
 import { create } from "zustand";
 
@@ -350,6 +352,36 @@ export const allModules: Module[] = [
     maxQuantity: 100,
     minQuantity: 1,
   },
+  // Trucks
+  {
+    id: "trucks",
+    name: "Pricing.custom_pricing.trucks.title",
+    description: "Pricing.custom_pricing.trucks.description",
+    icon: "Truck",
+    category: "logistics",
+    annualPrice: 10,
+    monthlyPrice: 1,
+    quantity: 1,
+    unit: "truck",
+    step: 1,
+    maxQuantity: 10,
+    minQuantity: 1,
+  },
+  // cars
+  {
+    id: "cars",
+    name: "Pricing.custom_pricing.cars.title",
+    description: "Pricing.custom_pricing.cars.description",
+    icon: "Car",
+    category: "logistics",
+    annualPrice: 10,
+    monthlyPrice: 1,
+    quantity: 1,
+    unit: "car",
+    step: 1,
+    maxQuantity: 10,
+    minQuantity: 1,
+  },
 ];
 
 export const initialDepartments: Department[] = [
@@ -391,6 +423,14 @@ export const initialDepartments: Department[] = [
     description: "Pricing.custom_pricing.it.description",
     icon: "Server",
     color: "bg-indigo-500",
+    modules: [],
+  },
+  {
+    id: "logistics",
+    name: "Pricing.custom_pricing.logistics.title",
+    description: "Pricing.custom_pricing.logistics.description",
+    icon: "Truck",
+    color: "bg-red-500",
     modules: [],
   },
 ];
@@ -437,6 +477,8 @@ export const getIconComponent = (iconName: string) => {
     Server,
     Globe,
     ShoppingBag,
+    Truck,
+    Car,
   };
 
   return icons[iconName] || Building2;
