@@ -134,15 +134,15 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   };
 
   const columns = [
-    { ...keyColumn("name", textColumn), title: t("Branches.form.name.label") },
-    { ...keyColumn("code", textColumn), title: t("Branches.form.code.label") },
-    { ...keyColumn("short_address", textColumn), title: t("Branches.form.address.label") },
-    { ...keyColumn("city", textColumn), title: t("Branches.form.city.label") },
-    { ...keyColumn("region", textColumn), title: t("Branches.form.state.label") },
-    { ...keyColumn("zip_code", textColumn), title: t("Branches.form.zip_code.label") },
-    { ...keyColumn("phone", textColumn), title: t("Branches.form.phone.label") },
-    { ...keyColumn("email", textColumn), title: t("Branches.form.email.label") },
-    { ...keyColumn("manager", textColumn), title: t("Branches.form.manager.label") },
+    { ...keyColumn("name", customTextColumn), title: t("Branches.form.name.label") },
+    { ...keyColumn("code", customTextColumn), title: t("Branches.form.code.label") },
+    { ...keyColumn("short_address", customTextColumn), title: t("Branches.form.address.label") },
+    { ...keyColumn("city", customTextColumn), title: t("Branches.form.city.label") },
+    { ...keyColumn("region", customTextColumn), title: t("Branches.form.state.label") },
+    { ...keyColumn("zip_code", customTextColumn), title: t("Branches.form.zip_code.label") },
+    { ...keyColumn("phone", customTextColumn), title: t("Branches.form.phone.label") },
+    { ...keyColumn("email", customTextColumn), title: t("Branches.form.email.label") },
+    { ...keyColumn("manager", customTextColumn), title: t("Branches.form.manager.label") },
     { ...keyColumn("is_active", checkboxColumn), title: t("Branches.form.is_active.label") },
   ];
 
