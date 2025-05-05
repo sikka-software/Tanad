@@ -36,8 +36,28 @@ const PricingCalculator: React.FC = () => {
       total +
       dept.modules.reduce((deptTotal, mod) => {
         const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
-        const calculatedModulePrice = pricePerUnit * (mod.quantity / mod.step);
-        return deptTotal + calculatedModulePrice;
+        const fullModuleData = allModules.find((m) => m.id === mod.id);
+        const freeUnits = fullModuleData?.freeUnits ?? 0;
+        const chargeableQuantity = Math.max(0, mod.quantity - freeUnits);
+        const calculatedModulePrice = pricePerUnit * (chargeableQuantity / mod.step);
+
+        // Include integration prices in discount calculation base
+        let integrationsPrice = 0;
+        if (mod.selectedIntegrations && fullModuleData?.integrations) {
+          mod.selectedIntegrations.forEach((intId) => {
+            const integrationData = fullModuleData.integrations!.find((int) => int.id === intId);
+            if (integrationData) {
+              const intPrice = currentCycle === "monthly" ? integrationData.monthlyPrice : integrationData.annualPrice;
+              if (integrationData.pricingType === "fixed") {
+                integrationsPrice += intPrice;
+              } else if (integrationData.pricingType === "per_unit") {
+                integrationsPrice += intPrice * (chargeableQuantity / mod.step);
+              }
+            }
+          });
+        }
+
+        return deptTotal + calculatedModulePrice + integrationsPrice;
       }, 0)
     );
   }, 0);
@@ -70,8 +90,28 @@ const PricingCalculator: React.FC = () => {
             // Calculate department total respecting quantity and steps
             const deptTotal = dept.modules.reduce((total, mod) => {
               const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
-              const calculatedModulePrice = pricePerUnit * (mod.quantity / mod.step);
-              return total + calculatedModulePrice;
+              const fullModuleData = allModules.find((m) => m.id === mod.id);
+              const freeUnits = fullModuleData?.freeUnits ?? 0;
+              const chargeableQuantity = Math.max(0, mod.quantity - freeUnits);
+              const calculatedModulePrice = pricePerUnit * (chargeableQuantity / mod.step);
+
+              // Calculate integration prices based on chargeable quantity for per_unit type
+              let integrationsTotal = 0;
+              if (mod.selectedIntegrations && fullModuleData?.integrations) {
+                mod.selectedIntegrations.forEach((intId) => {
+                  const integrationData = fullModuleData.integrations!.find((int) => int.id === intId);
+                  if (integrationData) {
+                    const integrationPrice = currentCycle === "monthly" ? integrationData.monthlyPrice : integrationData.annualPrice;
+                    if (integrationData.pricingType === "fixed") {
+                      integrationsTotal += integrationPrice;
+                    } else if (integrationData.pricingType === "per_unit") {
+                      integrationsTotal += integrationPrice * (chargeableQuantity / mod.step);
+                    }
+                  }
+                });
+              }
+
+              return total + calculatedModulePrice + integrationsTotal;
             }, 0);
 
             // Check if any module in the department needs a special quote
@@ -105,8 +145,10 @@ const PricingCalculator: React.FC = () => {
                 {dept.modules.map((mod) => {
                   const pricePerUnit =
                     currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
-                  const calculatedModulePrice = pricePerUnit * (mod.quantity / mod.step);
                   const fullModuleData = allModules.find((m) => m.id === mod.id);
+                  const freeUnits = fullModuleData?.freeUnits ?? 0;
+                  const chargeableQuantity = Math.max(0, mod.quantity - freeUnits);
+                  const calculatedModulePrice = pricePerUnit * (chargeableQuantity / mod.step);
 
                   return (
                     <React.Fragment key={mod.id}>
@@ -149,7 +191,7 @@ const PricingCalculator: React.FC = () => {
                                 calculatedIntegrationPrice = integrationPricePerCycle;
                               } else if (integrationData.pricingType === "per_unit") {
                                 calculatedIntegrationPrice =
-                                  integrationPricePerCycle * (mod.quantity / mod.step);
+                                  integrationPricePerCycle * (chargeableQuantity / mod.step);
                               }
 
                               return (

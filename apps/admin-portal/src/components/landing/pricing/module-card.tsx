@@ -49,9 +49,12 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
       : t("Pricing.custom_pricing.billing_cycle.annually");
 
   const pricePerUnit = currentCycle === "monthly" ? module.monthlyPrice : module.annualPrice;
-  const currentModulePrice = pricePerUnit * (displayQuantity / module.step);
-
   const fullModuleData = allModules.find((m) => m.id === module.id);
+  const freeUnits = fullModuleData?.freeUnits ?? 0;
+  const chargeableQuantity = Math.max(0, displayQuantity - freeUnits);
+
+  // Use chargeable quantity for base module price
+  const currentModulePrice = pricePerUnit * (chargeableQuantity / module.step);
 
   // Recalculate module price to include integrations
   let displayedModulePrice = currentModulePrice;
@@ -64,7 +67,8 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
         if (integrationData.pricingType === "fixed") {
           displayedModulePrice += integrationPricePerCycle;
         } else if (integrationData.pricingType === "per_unit") {
-          displayedModulePrice += integrationPricePerCycle * (displayQuantity / module.step);
+          // Use chargeable quantity for per-unit integration pricing
+          displayedModulePrice += integrationPricePerCycle * (chargeableQuantity / module.step);
         }
       }
     });

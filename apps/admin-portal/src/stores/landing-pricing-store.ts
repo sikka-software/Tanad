@@ -39,6 +39,7 @@ export interface Module {
   integrations?: ModuleIntegration[]; // Optional integrations for the module
   selectedIntegrations?: string[]; // IDs of selected integrations
   contactUsThreshold?: number; // Quantity threshold to show "Contact Us"
+  freeUnits?: number; // Number of units provided for free
 }
 
 export const allModules: Module[] = [
@@ -49,12 +50,13 @@ export const allModules: Module[] = [
     icon: "Building2",
     category: "infrastructure",
     annualPrice: 99,
-    monthlyPrice: 9,
+    monthlyPrice: 3,
     quantity: 1,
     unit: "office",
     step: 1,
     maxQuantity: 10,
     minQuantity: 1,
+    freeUnits: 3, // Offer first 3 offices for free
   },
   {
     id: "branches",
@@ -126,6 +128,7 @@ export const allModules: Module[] = [
     maxQuantity: 5000,
     minQuantity: 100,
     contactUsThreshold: 4500, // Example threshold
+    freeUnits: 10, // Offer first 4500 invoices for free
   },
   {
     id: "products",
@@ -469,11 +472,15 @@ const calculatePriceAndThreshold = (
     dept.modules.forEach((mod) => {
       // Base module price calculation
       const pricePerUnit = currentCycle === "monthly" ? mod.monthlyPrice : mod.annualPrice;
-      const moduleBasePrice = pricePerUnit * (mod.quantity / mod.step);
+      const fullModuleData = allModules.find((m) => m.id === mod.id);
+      const freeUnits = fullModuleData?.freeUnits ?? 0;
+      const chargeableQuantity = Math.max(0, mod.quantity - freeUnits);
+
+      // Use chargeable quantity for base price
+      const moduleBasePrice = pricePerUnit * (chargeableQuantity / mod.step);
       modulesTotal += moduleBasePrice;
 
       // Check for contact us threshold
-      const fullModuleData = allModules.find((m) => m.id === mod.id);
       if (fullModuleData?.contactUsThreshold && mod.quantity >= fullModuleData.contactUsThreshold) {
         contactUsTriggered = true;
         // No need to calculate further price if threshold is met for this calculation?
@@ -483,7 +490,6 @@ const calculatePriceAndThreshold = (
 
       // Integration price calculation
       if (mod.selectedIntegrations && mod.selectedIntegrations.length > 0) {
-        // const fullModuleData = allModules.find((m) => m.id === mod.id); // Already fetched above
         if (fullModuleData && fullModuleData.integrations) {
           mod.selectedIntegrations.forEach((integrationId) => {
             const integrationData = fullModuleData.integrations!.find(
@@ -498,7 +504,8 @@ const calculatePriceAndThreshold = (
               if (integrationData.pricingType === "fixed") {
                 modulesTotal += integrationPricePerCycle;
               } else if (integrationData.pricingType === "per_unit") {
-                modulesTotal += integrationPricePerCycle * (mod.quantity / mod.step);
+                // Use chargeable quantity for per-unit integration pricing
+                modulesTotal += integrationPricePerCycle * (chargeableQuantity / mod.step);
               }
             }
           });
