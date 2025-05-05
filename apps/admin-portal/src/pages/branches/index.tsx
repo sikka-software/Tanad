@@ -132,7 +132,10 @@ export default function BranchesPage() {
             }
 
             if (fieldChanged && Object.keys(updatePayload).length > 0) {
-              console.log(`Calling updateBranch for ID ${changedRow.id} with payload:`, updatePayload);
+              console.log(
+                `Calling updateBranch for ID ${changedRow.id} with payload:`,
+                updatePayload,
+              );
               updateBranch({ id: changedRow.id, data: updatePayload });
             } else {
               console.log("No changes detected or no field identified.");

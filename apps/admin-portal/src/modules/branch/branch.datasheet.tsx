@@ -128,21 +128,49 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   };
 
   const columns = [
-    { ...keyColumn("name", customTextColumn), title: t("Branches.form.name.label") },
-    { ...keyColumn("code", customTextColumn), title: t("Branches.form.code.label") },
-    { ...keyColumn("address", customTextColumn), title: t("Branches.form.address.label") },
-    { ...keyColumn("city", customTextColumn), title: t("Branches.form.city.label") },
-    { ...keyColumn("state", customTextColumn), title: t("Branches.form.state.label") },
-    { ...keyColumn("zip_code", customTextColumn), title: t("Branches.form.zip_code.label") },
-    { ...keyColumn("phone", customTextColumn), title: t("Branches.form.phone.label") },
-    { ...keyColumn("email", customTextColumn), title: t("Branches.form.email.label") },
-    { ...keyColumn("manager", customTextColumn), title: t("Branches.form.manager.label") },
+    { ...keyColumn("name", textColumn), title: t("Branches.form.name.label") },
+    { ...keyColumn("code", textColumn), title: t("Branches.form.code.label") },
+    { ...keyColumn("short_address", textColumn), title: t("Branches.form.address.label") },
+    { ...keyColumn("city", textColumn), title: t("Branches.form.city.label") },
+    { ...keyColumn("region", textColumn), title: t("Branches.form.state.label") },
+    { ...keyColumn("zip_code", textColumn), title: t("Branches.form.zip_code.label") },
+    { ...keyColumn("phone", textColumn), title: t("Branches.form.phone.label") },
+    { ...keyColumn("email", textColumn), title: t("Branches.form.email.label") },
+    { ...keyColumn("manager", textColumn), title: t("Branches.form.manager.label") },
     { ...keyColumn("is_active", checkboxColumn), title: t("Branches.form.is_active.label") },
   ];
 
+  // Define the structure for a new row
+  const createNewRow = (): Branch => ({
+    id: crypto.randomUUID(), // Add a unique ID
+    name: "",
+    code: "",
+    short_address: "", // Corresponds to 'address' column
+    city: "",
+    region: "", // Corresponds to 'state' column
+    zip_code: "",
+    phone: "",
+    email: "",
+    manager: "",
+    is_active: false, // Default checkbox state
+    // Add other optional fields from BranchProps/AddressProps if needed with defaults
+    notes: null,
+    building_number: "",
+    street_name: "",
+    country: "",
+    additional_number: "",
+    created_at: new Date().toISOString(), // Add created_at to satisfy Branch type
+  });
+
   return (
     <div className="h-full w-full" dir="rtl">
-      <DataSheetGrid value={data} onChange={handleGridChange} columns={columns} />
+      <DataSheetGrid
+        value={data}
+        onChange={handleGridChange}
+        columns={columns}
+        createRow={createNewRow}
+        rowKey="id" // Tell the grid to use the 'id' field as the key
+      />
     </div>
   );
 };
