@@ -1645,7 +1645,6 @@ export const DataSheetGrid = React.memo(
             outerRef={outerRef as React.RefObject<HTMLDivElement>}
             columnWidths={columnWidths}
             hasStickyRightColumn={hasStickyRightColumn}
-            // displayHeight={displayHeight}
             displayHeight={"calc(100vh - 153px)"}
             data={data}
             fullWidth={fullWidth}
