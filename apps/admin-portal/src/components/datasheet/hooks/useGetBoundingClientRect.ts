@@ -7,7 +7,7 @@ export const useGetBoundingClientRect = (ref: RefObject<HTMLElement>, delay = 20
 
   const throttledCompute = useMemo(
     () =>
-      throttle(delay, true, () => {
+      throttle(delay, () => {
         setTimeout(() => (boundingRect.current = ref.current?.getBoundingClientRect() || null), 0);
       }),
     [ref, delay],
