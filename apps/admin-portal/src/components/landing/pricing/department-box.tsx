@@ -35,9 +35,9 @@ const DepartmentBox: React.FC<DepartmentBoxProps> = ({ department: departmentPro
   );
 
   return (
-    <div className="flex flex-col rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div className="border-input bg-background flex flex-col rounded-lg border shadow-sm">
       <div
-        className={`flex items-center gap-2 rounded-t-lg px-4 py-3 ${departmentProp.color} text-white`}
+        className={`flex items-center gap-2 rounded-t-lg from-white px-4 py-3 text-white to-${departmentProp.color} bg-gradient-to-r`}
       >
         <IconComponent size={20} />
         <h3 className="font-semibold">{t(departmentProp.name)}</h3>

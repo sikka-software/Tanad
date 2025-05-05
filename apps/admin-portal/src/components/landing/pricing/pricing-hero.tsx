@@ -1,24 +1,23 @@
 import { useTranslations } from "next-intl";
 import React, { useId } from "react";
 
-import { pricingTiers, useLandingPricingStore } from "@/stores/landing-pricing-store";
+import { useLandingPricingStore } from "@/stores/landing-pricing-store";
 
 import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
 
 const PricingHero: React.FC = () => {
-  const { selectedTier, setSelectedTier, totalPrice, getTotalModulesCount } =
-    useLandingPricingStore();
-  const { currentCycle, currentCurrency, setCurrentCycle, setCurrentCurrency } =
-    useLandingPricingStore();
   const t = useTranslations();
   const id = useId();
+  const { currentCycle, currentCurrency, setCurrentCycle, setCurrentCurrency } =
+    useLandingPricingStore();
+
   return (
     <div className="px-4 py-24 pb-0">
       <div className="container mx-auto max-w-4xl text-center">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900 md:text-5xl">
+        <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white md:text-5xl">
           {t("Pricing.custom_pricing.title")}
         </h1>
-        <p className="mx-auto mb-8 max-w-2xl text-xl text-gray-600">
+        <p className="mx-auto mb-8 max-w-2xl text-xl text-gray-600 dark:text-gray-400">
           {t("Pricing.custom_pricing.description")}
         </p>
 

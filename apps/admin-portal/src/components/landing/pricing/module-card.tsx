@@ -103,7 +103,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
           </p>
         </div>
 
-        <div className="mt-2 flex w-full flex-row items-center justify-between gap-1 text-sm font-semibold text-blue-600">
+        <div className="mt-2 flex w-full flex-row items-center justify-between gap-1 text-sm font-semibold text-blue-600 dark:text-blue-400">
           {fullModuleData?.contactUsThreshold &&
           displayQuantity >= fullModuleData.contactUsThreshold ? (
             <div className="">
@@ -173,7 +173,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span className="text-xs">{t(integration.label)}</span>
-                      <div className="flex flex-row text-nowrap items-center gap-1 text-xs text-blue-600">
+                      <div className="flex flex-row text-nowrap items-center gap-1 text-xs text-blue-600 dark:text-blue-400">
                         <span>{priceLabel}</span>
                         <span>{currencySymbol}</span>
                         <span>

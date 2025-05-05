@@ -69,24 +69,16 @@ const PricingCalculator: React.FC = () => {
     selectedTier.discount > 0 ? (basePrice + actualModulesPrice) * selectedTier.discount : 0;
 
   return (
-    <div className="overflow-hidden rounded-xl bg-white shadow-lg">
+    <div className="border-input bg-background overflow-hidden rounded-xl border shadow-lg">
       <div className="p-6">
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           {t("Pricing.custom_pricing.price_breakdown")}
         </h2>
-        <p className="mb-6 text-gray-600">
+        <p className="mb-6 text-gray-600 dark:text-gray-400">
           {t("Pricing.custom_pricing.see_how_your_selected_modules_affect_your_price")}
         </p>
 
         <div className="mb-6 space-y-4">
-          {/* <div className="flex justify-between">
-            <span className="text-gray-600">
-              {t(selectedTier.name)} {t("Pricing.custom_pricing.plan")}{" "}
-              {t("Pricing.custom_pricing.base_price")}
-            </span>
-            <span className="font-semibold">${basePrice}</span>
-          </div> */}
-
           {departments.map((dept) => {
             if (dept.modules.length === 0) return null;
 
@@ -129,9 +121,9 @@ const PricingCalculator: React.FC = () => {
             });
 
             return (
-              <div key={dept.id} className="border-t border-gray-100 pt-2">
+              <div key={dept.id} className="border-input border-t pt-2">
                 <div className="mb-2 flex justify-between">
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 dark:text-gray-400">
                     {t(dept.name)} ({dept.modules.length})
                   </span>
                   {/* Display department total or special quote text */}
@@ -158,7 +150,7 @@ const PricingCalculator: React.FC = () => {
 
                   return (
                     <React.Fragment key={mod.id}>
-                      <div className="flex justify-between pl-4 text-sm text-gray-500">
+                      <div className="flex justify-between ps-4 text-sm text-gray-500 dark:text-gray-400">
                         <span>
                           {t(mod.name)} ({mod.quantity.toLocaleString()} {t(`General.${mod.unit}`)})
                         </span>
@@ -203,7 +195,7 @@ const PricingCalculator: React.FC = () => {
                               return (
                                 <div
                                   key={integrationId}
-                                  className="flex justify-between text-xs text-gray-400"
+                                  className="flex justify-between text-xs text-gray-400 dark:text-gray-400"
                                 >
                                   <span>+ {t(integrationData.label)}</span>
                                   <div className="flex flex-row items-center gap-1">
@@ -227,7 +219,7 @@ const PricingCalculator: React.FC = () => {
           })}
 
           {selectedTier.discount > 0 && (
-            <div className="flex justify-between border-t border-gray-100 pt-2 text-green-600">
+            <div className="border-input flex justify-between border-t pt-2 text-green-600 dark:text-green-400">
               <span>
                 {t(selectedTier.name)} {t("Pricing.custom_pricing.plan")}{" "}
                 {t("Pricing.custom_pricing.discount")} ({selectedTier.discount * 100}%)
@@ -239,10 +231,10 @@ const PricingCalculator: React.FC = () => {
           )}
         </div>
 
-        <div className="border-t-2 border-gray-200 pt-4">
+        <div className="border-input border-t pt-4">
           <div className="flex justify-between">
             <div>
-              <span className="text-lg font-bold text-gray-900">
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
                 {t("Pricing.custom_pricing.total_monthly_price")}
               </span>
             </div>
@@ -251,10 +243,10 @@ const PricingCalculator: React.FC = () => {
               <Button>{t("Pricing.contact_us")}</Button>
             ) : (
               <div className="flex flex-row items-center gap-1">
-                <span className="text-2xl font-bold text-blue-600">
+                <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {totalPrice.toLocaleString()}
                 </span>
-                <span className="text-2xl font-bold text-blue-600">
+                <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {currentCurrency === "sar" ? (
                     <SARSymbol className="size-5" />
                   ) : (
@@ -273,16 +265,16 @@ const PricingCalculator: React.FC = () => {
         </div>
       </div>
 
-      <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
+      <div className="border-input bg-background border-t px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               {t("Pricing.custom_pricing.need_to_start_over")}
             </p>
           </div>
           <button
             onClick={resetModules}
-            className="rounded-md border border-gray-300 px-4 py-2 text-sm transition-colors hover:bg-gray-100"
+            className="border-input hover:bg-input rounded-md border px-4 py-2 text-sm transition-colors"
           >
             {t("Pricing.custom_pricing.reset_selections")}
           </button>
