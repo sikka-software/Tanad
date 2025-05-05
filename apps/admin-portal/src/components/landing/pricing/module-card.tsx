@@ -120,6 +120,9 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
           )}
           <span className="text-muted-foreground ms-1 text-xs font-normal">
             {displayQuantity.toLocaleString()} {t(`General.${module.unit}`)}
+            {(fullModuleData?.showCycleWithUnit ?? true) && 
+              <span> / {cycleText}</span>
+            }
           </span>
         </div>
       </div>

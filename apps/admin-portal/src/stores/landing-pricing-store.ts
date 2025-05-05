@@ -42,6 +42,7 @@ export interface Module {
   selectedIntegrations?: string[]; // IDs of selected integrations
   contactUsThreshold?: number; // Quantity threshold to show "Contact Us"
   freeUnits?: number; // Number of units provided for free
+  showCycleWithUnit?: boolean; // Whether to show '/ month' or '/ year' next to the unit on the card
 }
 
 export const allModules: Module[] = [
@@ -51,14 +52,16 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.offices.description",
     icon: "Building2",
     category: "infrastructure",
-    annualPrice: 99,
+    annualPrice: 30,
     monthlyPrice: 3,
     quantity: 1,
     unit: "office",
     step: 1,
     maxQuantity: 10,
     minQuantity: 1,
-    freeUnits: 3, // Offer first 3 offices for free
+    contactUsThreshold: 9,
+    freeUnits: 1, // Offer first 3 offices for free
+    showCycleWithUnit: false, // Don't show cycle for offices unit
   },
   {
     id: "branches",
@@ -66,13 +69,15 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.branches.description",
     icon: "Building2",
     category: "infrastructure",
-    annualPrice: 89,
-    monthlyPrice: 8,
+    annualPrice: 40,
+    monthlyPrice: 4,
     quantity: 1,
     unit: "branch",
     step: 1,
     maxQuantity: 20,
+    freeUnits: 1,
     minQuantity: 1,
+    showCycleWithUnit: false, // Don't show cycle for branches unit
   },
   {
     id: "warehouses",
@@ -87,6 +92,7 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 5,
     minQuantity: 1,
+    showCycleWithUnit: false, // Don't show cycle for warehouses unit
   },
   {
     id: "clients",
@@ -130,7 +136,8 @@ export const allModules: Module[] = [
     maxQuantity: 5000,
     minQuantity: 100,
     contactUsThreshold: 4500, // Example threshold
-    freeUnits: 10, // Offer first 4500 invoices for free
+    freeUnits: 10, // Offer first 10 invoices for free
+    showCycleWithUnit: true, // Show cycle for invoices unit
   },
   {
     id: "products",
@@ -174,6 +181,7 @@ export const allModules: Module[] = [
     step: 50,
     maxQuantity: 1000,
     minQuantity: 50,
+    showCycleWithUnit: true, // Show cycle for expenses unit
   },
   {
     id: "purchases",
