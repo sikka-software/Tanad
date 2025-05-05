@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { useState, useCallback, useEffect } from "react";
 
 import {
   createBranch,
@@ -118,4 +119,87 @@ export function useBulkDeleteBranches() {
       queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
     },
   });
+}
+
+// Define the type for the operations array from DataSheetGrid
+// Using 'any' for now, can be refined if specific operation types are known/needed
+type DataSheetOperation = any;
+
+export function useBranchDatasheet(initialData: Branch[] = []) {
+  const t = useTranslations();
+  const queryClient = useQueryClient();
+  const [datasheetData, setDatasheetData] = useState<Branch[]>(initialData);
+
+  // Update Mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Branch> }) => updateBranch(id, data),
+    onSuccess: (updatedBranch) => {
+      // Option 1: Manually update the specific branch in the main query cache
+      // queryClient.setQueryData(['branches'], (oldData: Branch[] | undefined) =>
+      //   oldData ? oldData.map(b => b.id === updatedBranch.id ? updatedBranch : b) : []
+      // );
+
+      // Option 2: Manually update the specific branch detail query cache
+      queryClient.setQueryData(branchKeys.detail(updatedBranch.id), updatedBranch);
+
+      // Avoid invalidating the whole list immediately to prevent flicker
+      // queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+
+      toast.success(t("Branches.notifications.updateSuccess"));
+    },
+    onError: (error, variables) => {
+      console.error("Failed to update branch:", error);
+      toast.error(t("Branches.notifications.updateError"));
+      // Attempt to revert by refetching the specific branch data
+      queryClient.invalidateQueries({ queryKey: branchKeys.detail(variables.id) });
+      // And potentially refetch the list if the local state might be too out of sync
+      // queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+    },
+  });
+
+  // onChange handler for the DataSheetGrid
+  const handleDatasheetChange = useCallback(
+    (updatedData: Branch[], operations: DataSheetOperation[]) => {
+      // Update local state immediately for responsive UI
+      setDatasheetData(updatedData);
+
+      // Process operations to find what changed and trigger API calls
+      operations.forEach((op) => {
+        // Example: Handle updates (most common case for cell edits)
+        if (op.type === "UPDATE") {
+          // Assuming UPDATE operation affects rows from fromRow to toRow
+          for (let i = op.fromRow; i <= op.toRow; i++) {
+            const changedBranch = updatedData[i];
+            if (changedBranch && changedBranch.id) {
+              // Extract only the changed fields if possible, or send the whole row
+              // For simplicity, sending the relevant part of the row object
+              // Ensure you are not sending fields that shouldn't be updated (like id, created_at)
+              const { id, created_at, ...updatePayload } = changedBranch;
+              console.log("Updating branch:", id, updatePayload);
+              updateMutation.mutate({ id: changedBranch.id, data: updatePayload });
+            } else {
+              console.warn("Skipping update for row without ID:", i, changedBranch);
+            }
+          }
+        }
+        // TODO: Handle CREATE and DELETE operations if the datasheet supports them
+        // else if (op.type === 'CREATE') { ... }
+        // else if (op.type === 'DELETE') { ... }
+      });
+    },
+    [updateMutation], // Add other dependencies if needed (like t)
+  );
+
+  // Effect to update local state if initialData changes from parent
+  // Useful if the parent component refetches data externally
+  useEffect(() => {
+    setDatasheetData(initialData);
+  }, [initialData]);
+
+  return {
+    datasheetData,
+    handleDatasheetChange,
+    // Expose mutation status if needed by the UI
+    isUpdating: updateMutation.isPending,
+  };
 }
