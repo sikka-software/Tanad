@@ -94,13 +94,22 @@ const PricingCalculator: React.FC = () => {
                         <span>
                           {t(mod.name)} ({mod.quantity} {t(`General.${mod.unit}`)})
                         </span>
-                        <div className="flex flex-row items-center gap-1">
-                          <span>{calculatedModulePrice.toFixed(2)}</span>
-                          <span>{currencySymbol}</span>
-                        </div>
+                        {/* Check threshold for module price display */}
+                        {fullModuleData?.contactUsThreshold &&
+                        mod.quantity >= fullModuleData.contactUsThreshold ? (
+                          <span className="font-semibold ">
+                            {t("Pricing.special_quote")}
+                          </span>
+                        ) : (
+                          <div className="flex flex-row items-center gap-1">
+                            <span>{calculatedModulePrice.toFixed(2)}</span>
+                            <span>{currencySymbol}</span>
+                          </div>
+                        )}
                       </div>
-                      {/* Display selected integrations for this module */}
-                      {mod.selectedIntegrations &&
+                      {/* Display selected integrations for this module (only if below threshold) */}
+                      {!(fullModuleData?.contactUsThreshold && mod.quantity >= fullModuleData.contactUsThreshold) &&
+                        mod.selectedIntegrations &&
                         mod.selectedIntegrations.length > 0 &&
                         fullModuleData?.integrations && (
                           <div className="pl-8">
