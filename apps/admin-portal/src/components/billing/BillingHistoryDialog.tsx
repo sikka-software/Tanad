@@ -22,6 +22,9 @@ import {
 
 import useUserStore from "@/stores/use-user-store";
 
+// Import the subscription event constant
+import { SUBSCRIPTION_UPDATED_EVENT } from "./CurrentPlan";
+
 // Map plan lookup keys to plan titles
 const planTitles: Record<string, string> = {
   tanad_free: "Free Plan",
@@ -69,6 +72,26 @@ export function BillingHistoryDialog({ open, onOpenChange, user }: BillingHistor
       }
     }
   }, [open, user]);
+
+  // Listen for subscription update events
+  useEffect(() => {
+    const handleSubscriptionUpdated = () => {
+      console.log("BillingHistoryDialog: Subscription update detected");
+      if (open) {
+        // If the dialog is open, refetch the billing history
+        fetchBillingHistory();
+      }
+    };
+
+    // Listen for both event types for better compatibility
+    window.addEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
+    window.addEventListener("subscription_updated", handleSubscriptionUpdated);
+
+    return () => {
+      window.removeEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
+      window.removeEventListener("subscription_updated", handleSubscriptionUpdated);
+    };
+  }, [open]);
 
   // Create a local refresh function that doesn't depend on parent scope
   const refreshUserData = async () => {

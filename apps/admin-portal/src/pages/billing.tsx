@@ -3,11 +3,12 @@
 import { Info } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
 import { useSubscription } from "@/hooks/use-subscription";
 
-import CurrentPlan from "@/components/billing/CurrentPlan";
+import CurrentPlan, { SUBSCRIPTION_UPDATED_EVENT } from "@/components/billing/CurrentPlan";
 import SubscriptionSelection from "@/components/billing/SubscriptionSelection";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
@@ -17,12 +18,56 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useUserStore from "@/stores/use-user-store";
 
 export default function Billing() {
+  const router = useRouter();
   const t = useTranslations();
   const locale = useLocale();
-  const { user } = useUserStore();
+  const { user, fetchUserAndProfile } = useUserStore();
   const subscription = useSubscription();
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
   const initialized = useRef(false);
+  const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
+
+  // Force refresh when refresh query parameter is present
+  useEffect(() => {
+    if (router.query.refresh && user) {
+      console.log("Billing page: Force refresh due to query parameter");
+      setIsUpdatingSubscription(true);
+
+      // Remove the refresh query parameter without page reload
+      const { refresh, ...restQuery } = router.query;
+      router.replace(
+        {
+          pathname: router.pathname,
+          query: restQuery,
+        },
+        undefined,
+        { shallow: true },
+      );
+
+      // Force a full data refresh with multiple retries
+      const refreshData = async () => {
+        console.log("Billing page: Forcing data refresh from query parameter");
+        for (let i = 0; i < 3; i++) {
+          try {
+            await subscription.refetch();
+            await fetchUserAndProfile();
+            console.log(`Query-triggered data refresh attempt ${i + 1} completed`);
+            break;
+          } catch (err) {
+            console.error(`Query-triggered data refresh attempt ${i + 1} failed:`, err);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+        }
+
+        // Reset loading state after a reasonable delay
+        setTimeout(() => {
+          setIsUpdatingSubscription(false);
+        }, 1000);
+      };
+
+      refreshData();
+    }
+  }, [router.query.refresh, user, fetchUserAndProfile, subscription, router]);
 
   // Cleanup subscription on unmount
   useEffect(() => {
@@ -35,38 +80,95 @@ export default function Billing() {
       console.log("Billing page: Initial mount");
     }
 
-    // Handle window focus events to prevent refreshes
-    const handleWindowFocus = () => {
-      console.log("Billing page: Window focus detected, preventing refresh");
+    // Listen for subscription update events
+    const handleSubscriptionUpdated = () => {
+      console.log("Billing page: Subscription update detected");
+      setIsUpdatingSubscription(true);
+
+      // Force a full data refresh with multiple retries
+      const refreshData = async () => {
+        console.log("Billing page: Forcing full data refresh");
+        for (let i = 0; i < 3; i++) {
+          try {
+            await subscription.refetch();
+            await fetchUserAndProfile();
+            console.log(`Data refresh attempt ${i + 1} completed`);
+            break;
+          } catch (err) {
+            console.error(`Data refresh attempt ${i + 1} failed:`, err);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+        }
+
+        // If still mounted, reset loading state
+        if (mounted) {
+          setTimeout(() => {
+            setIsUpdatingSubscription(false);
+          }, 1000);
+        }
+      };
+
+      refreshData();
+
+      // Last resort - force reload after a delay if UI still doesn't update
+      setTimeout(() => {
+        if (
+          mounted &&
+          (subscription.planLookupKey === "tanad_free" || !subscription.planLookupKey)
+        ) {
+          console.log("Forcing page reload to refresh subscription data");
+          // Use router.push with refresh parameter instead of window.location.reload
+          router.push({
+            pathname: router.pathname,
+            query: { refresh: Date.now() },
+          });
+        }
+      }, 5000);
     };
 
-    window.addEventListener("focus", handleWindowFocus);
+    window.addEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
+    window.addEventListener("subscription_updated", handleSubscriptionUpdated);
 
     // Return cleanup function
     return () => {
       mounted = false;
       // Clear any refresh timers or flags
       window.lastSubscriptionRefresh = undefined;
-      window.removeEventListener("focus", handleWindowFocus);
+      // Remove event listeners
+      window.removeEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
+      window.removeEventListener("subscription_updated", handleSubscriptionUpdated);
     };
-  }, []);
+  }, [subscription, fetchUserAndProfile, router]);
 
   // Show subscription management for active subscriptions (including canceled ones)
   const showSubscriptionManagement =
     subscription.status === "active" && subscription.name !== t("Billing.free_plan");
 
+  // Improved condition to determine what counts as a free plan
+  const isFreePlan =
+    !subscription.planLookupKey ||
+    subscription.planLookupKey === "tanad_free" ||
+    subscription.price === "0" ||
+    subscription.price === "0 SAR" ||
+    !subscription.price;
+
   // Show subscription selection for new/free/expired users
   const showSubscriptionSelection =
     !subscription.loading &&
+    !isUpdatingSubscription &&
     (!subscription.status || // No subscription
       subscription.status === "canceled" || // Canceled subscription
       subscription.status === "incomplete_expired" || // Failed subscription
       subscription.status === "unpaid" || // Unpaid subscription
-      (subscription.status === "active" && subscription.price === "0") || // Free plan
-      (subscription.status === "active" && subscription.price === "0 SAR") || // Free plan (with SAR)
-      subscription.planLookupKey === "tanad_free" || // When plan is tanad_free
-      !subscription.planLookupKey || // No plan lookup key (null)
+      (subscription.status === "active" && isFreePlan) || // Free plan
       (subscription.cancelAt && new Date(Number(subscription.cancelAt) * 1000) < new Date())); // Expired subscription
+
+  // If we know the user has a paid subscription, don't show selection
+  const hasActivePaidSubscription =
+    subscription.status === "active" &&
+    subscription.planLookupKey &&
+    subscription.planLookupKey !== "tanad_free" &&
+    !subscription.cancelAt;
 
   if (!user) {
     return <Skeleton className="h-[300px] w-full" />;
@@ -106,7 +208,6 @@ export default function Billing() {
   return (
     <>
       <CustomPageMeta title={t("Billing.title")} description={t("Billing.description")} />
-      {/* Show subscription selection for new/free/expired users */}
       <main
         className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8"
         dir={locale === "ar" ? "rtl" : "ltr"}
@@ -122,10 +223,12 @@ export default function Billing() {
 
         {/* Current Plan Card */}
         <div className="mb-10">
-          <CurrentPlan />
+          {isUpdatingSubscription ? (
+            <Skeleton className="h-24 w-full rounded-lg" />
+          ) : (
+            <CurrentPlan />
+          )}
         </div>
-
-        {/* Available Plans */}
 
         {/* Subscription Selection Section - with Tabs */}
         {showSubscriptionSelection && (
@@ -171,6 +274,13 @@ export default function Billing() {
                 </div>
               </TabsContent>
             </Tabs>
+          </div>
+        )}
+
+        {/* Show loading skeleton when updating subscription */}
+        {isUpdatingSubscription && !showSubscriptionSelection && (
+          <div className="mb-8 w-full">
+            <Skeleton className="h-[400px] w-full" />
           </div>
         )}
 

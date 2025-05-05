@@ -532,7 +532,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           const { error: createError } = await supabase.from("profiles").insert({
             id: userId,
-            user_id: userId, // Ensure user_id is set
             email: emailToUse, // Required field
             subscribed_to: lookupKey,
             price_id: priceId,
@@ -607,7 +606,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             stripe_customer_id: customerIdToUse,
             // Include email since it's a required field
             email: emailToUse,
-            user_id: userId, // Ensure user_id is set
           });
 
           if (upsertError) {

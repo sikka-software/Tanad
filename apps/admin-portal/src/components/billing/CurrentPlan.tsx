@@ -1,5 +1,6 @@
 import { RefreshCcw } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -20,6 +21,7 @@ import { BillingHistoryDialog } from "./BillingHistoryDialog";
 export const SUBSCRIPTION_UPDATED_EVENT = "subscription_updated";
 
 export default function CurrentPlan() {
+  const router = useRouter();
   const t = useTranslations();
   const locale = useLocale();
   const subscription = useSubscription();
@@ -27,6 +29,7 @@ export default function CurrentPlan() {
   const { getPlans } = usePricing(TANAD_PRODUCT_ID);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(Date.now());
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   console.log("CurrentPlan rendering with:", {
     user: user?.id,
@@ -45,9 +48,21 @@ export default function CurrentPlan() {
     },
   });
 
+  // Add a function to handle forced refresh with router
+  const forcePageRefresh = () => {
+    console.log("CurrentPlan: Forcing page refresh via router");
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, refresh: Date.now() },
+    });
+  };
+
   // Memoize the refresh function to prevent unnecessary re-renders
   const refreshData = useCallback(async () => {
     if (!user) return;
+
+    // Set refreshing state to show loading indicators
+    setIsRefreshing(true);
 
     // Refresh both subscription data and user data
     try {
@@ -58,8 +73,20 @@ export default function CurrentPlan() {
       console.log("Data refresh complete");
     } catch (error) {
       console.error("Error refreshing data:", error);
+
+      // If refresh fails, try forcing a page refresh as last resort
+      setTimeout(() => {
+        if (error) {
+          forcePageRefresh();
+        }
+      }, 2000);
+    } finally {
+      // Allow some minimum time for the refreshing state to be visible
+      setTimeout(() => {
+        setIsRefreshing(false);
+      }, 500);
     }
-  }, [user, fetchUserAndProfile, subscription]);
+  }, [user, fetchUserAndProfile, subscription, router]);
 
   // Listen for subscription update events
   useEffect(() => {
@@ -68,18 +95,28 @@ export default function CurrentPlan() {
       refreshData();
     };
 
+    // Use both event types for better compatibility
     window.addEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
+    window.addEventListener("subscription_updated", handleSubscriptionUpdated);
 
     return () => {
       window.removeEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
+      window.removeEventListener("subscription_updated", handleSubscriptionUpdated);
     };
   }, [refreshData]);
 
-  // Remove the initial refresh effect entirely
   // Use a ref to track initial refresh
   const refreshedInitially = React.useRef(false);
 
-  if (subscription.loading || !user) {
+  // Initial refresh when component mounts
+  useEffect(() => {
+    if (!refreshedInitially.current && user) {
+      refreshedInitially.current = true;
+      refreshData();
+    }
+  }, [user, refreshData]);
+
+  if (subscription.loading || !user || isRefreshing) {
     return <Skeleton className="h-24 w-full rounded-lg" />;
   }
 
@@ -253,8 +290,9 @@ export default function CurrentPlan() {
               }}
               className="ml-2 h-9 w-9"
               title={t("Billing.current_plan.refresh", { fallback: "Refresh" })}
+              disabled={isRefreshing}
             >
-              <RefreshCcw className="h-4 w-4" />
+              <RefreshCcw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
             </Button>
           </div>
         </div>

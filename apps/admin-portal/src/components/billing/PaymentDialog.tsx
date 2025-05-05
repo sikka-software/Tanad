@@ -3,6 +3,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { AlertTriangle, CreditCard, Loader2, ShieldAlert, Wallet, XCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -10,6 +11,7 @@ import { createClient } from "@/utils/supabase/component";
 
 import { useSubscription } from "@/hooks/use-subscription";
 
+// Import the subscription event constant to make sure it's available
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -207,6 +209,7 @@ export function PaymentDialog({
   onSuccess: () => void;
   customerId: string;
 }) {
+  const router = useRouter();
   const t = useTranslations();
   const { resolvedTheme } = useTheme();
   const locale = useLocale();
@@ -382,31 +385,32 @@ export function PaymentDialog({
 
     console.log("Payment successful, closing dialog");
 
-    // Allow some time for the backend to process the subscription
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Show a loading toast immediately
+    const loadingToast = toast.loading("Processing your subscription...");
+
+    // Allow more time for the backend to process the subscription
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // Attempt to refresh data directly to reflect changes immediately
+    try {
+      await Promise.all([fetchUserAndProfile(), refetchSubscription()]);
+      console.log("Initial data refresh completed");
+    } catch (error) {
+      console.error("Error in initial refresh:", error);
+    }
 
     // Close dialog
     onOpenChange(false);
 
     // Additional delay before calling parent's success handler
-    // This helps ensure the subscription data is ready when components refresh
     setTimeout(() => {
       console.log("Executing onSuccess callback");
+
+      // Call success callback to trigger any parent component updates
       onSuccess();
 
-      // Force re-render of other components
-      try {
-        // Additional direct refresh of subscription data
-        refetchSubscription()
-          .then(() => {
-            console.log("Subscription data refreshed directly");
-          })
-          .catch((err) => {
-            console.error("Error in direct subscription refresh:", err);
-          });
-      } catch (error) {
-        console.error("Error in delayed refresh:", error);
-      }
+      // Dismiss loading toast
+      toast.dismiss(loadingToast);
 
       // Show success message
       toast.success(
@@ -414,7 +418,16 @@ export function PaymentDialog({
           fallback: "Payment successful! Your subscription has been updated.",
         }),
       );
-    }, 1500);
+
+      // Silently reload the page without confirmation dialog, preserving locale
+      setTimeout(() => {
+        // Use router.push instead of window.location to preserve locale and Next.js context
+        router.push({
+          pathname: "/billing",
+          query: { refresh: Date.now() }, // Add timestamp to force full refresh
+        });
+      }, 1500);
+    }, 1000);
   };
 
   // Check if Stripe key is available
@@ -918,25 +931,31 @@ function PaymentFormContent({
         window.dispatchEvent(new CustomEvent("subscription_updated"));
 
         // Also dispatch as named constant from CurrentPlan
-        if (typeof window !== "undefined") {
-          try {
-            console.log("Broadcasting subscription update to CurrentPlan");
-            // Try importing the constant
-            import("@/components/billing/CurrentPlan")
-              .then((module) => {
-                if (module.SUBSCRIPTION_UPDATED_EVENT) {
-                  const eventName = module.SUBSCRIPTION_UPDATED_EVENT;
-                  console.log(`Dispatching ${eventName} event`);
-                  window.dispatchEvent(new CustomEvent(eventName));
-                }
-              })
-              .catch((err) => {
-                console.warn("Could not import from CurrentPlan:", err);
-              });
-          } catch (err) {
-            console.warn("Error dispatching additional event:", err);
+        try {
+          // Import directly instead of dynamic import for better reliability
+          const module = await import("@/components/billing/CurrentPlan");
+          if (module.SUBSCRIPTION_UPDATED_EVENT) {
+            console.log(`Dispatching ${module.SUBSCRIPTION_UPDATED_EVENT} event`);
+            window.dispatchEvent(new CustomEvent(module.SUBSCRIPTION_UPDATED_EVENT));
           }
+        } catch (err) {
+          console.warn("Error dispatching SUBSCRIPTION_UPDATED_EVENT:", err);
         }
+
+        // Add a loading indicator toast to show progress
+        const loadingToast = toast.loading("Updating your subscription...");
+
+        // Short delay to allow backend systems to update
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+
+        // Clear the loading toast and show success
+        toast.dismiss(loadingToast);
+        toast.success(
+          t("Billing.subscription_successful", {
+            fallback: "Subscription updated successfully",
+          }),
+        );
+
         // Call success handler
         console.log("Payment process completed successfully");
         setIsProcessing(false);

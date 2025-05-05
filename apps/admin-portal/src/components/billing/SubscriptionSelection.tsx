@@ -2,6 +2,7 @@
 
 import { Check, Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -131,6 +132,7 @@ export default function SubscriptionSelection({
   subscription = {},
   disabled = false,
 }: SubscriptionSelectionProps) {
+  const router = useRouter();
   const t = useTranslations();
   const locale = useLocale();
   const {
@@ -232,9 +234,7 @@ export default function SubscriptionSelection({
   };
 
   const handleSelectPlan = async (priceId: string) => {
-    setIsLoading(true);
     setSelectedPlan(priceId);
-
     setIsPaymentDialogOpen(true);
   };
 
@@ -271,13 +271,31 @@ export default function SubscriptionSelection({
 
   const handlePaymentSuccess = async () => {
     setIsPaymentDialogOpen(false);
-    setIsLoading(false);
+    setIsLoading(true);
     setSelectedPlan("");
 
     // Clear any caches to ensure fresh data
     console.log("Payment successful, refreshing subscription data");
 
     try {
+      // Show a loading toast
+      const loadingToast = toast.loading("Updating your subscription...");
+
+      // Dispatch custom events immediately to notify other components
+      console.log("Broadcasting subscription update events");
+      window.dispatchEvent(new CustomEvent("subscription_updated"));
+
+      // Import and use the constant from CurrentPlan
+      try {
+        const module = await import("@/components/billing/CurrentPlan");
+        if (module.SUBSCRIPTION_UPDATED_EVENT) {
+          console.log(`Dispatching ${module.SUBSCRIPTION_UPDATED_EVENT} event`);
+          window.dispatchEvent(new CustomEvent(module.SUBSCRIPTION_UPDATED_EVENT));
+        }
+      } catch (err) {
+        console.warn("Error dispatching SUBSCRIPTION_UPDATED_EVENT:", err);
+      }
+
       // Refresh data with multiple retries
       const maxRetries = 3;
       let retryCount = 0;
@@ -288,36 +306,45 @@ export default function SubscriptionSelection({
           // Wait a moment for backend to process the subscription
           await new Promise((resolve) => setTimeout(resolve, 1000));
 
-          // Refresh the data - but use a debounce to prevent infinite loops
-          const now = Date.now();
-          const lastRefresh = window.lastSubscriptionRefresh || 0;
-          if (now - lastRefresh > 2000) {
-            window.lastSubscriptionRefresh = now;
-            await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
-            console.log("Subscription data refreshed successfully");
-            success = true;
-          } else {
-            console.log("Skipping refresh - too soon since last refresh");
-            success = true;
-          }
+          // Refresh the data
+          await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
+          console.log("Subscription data refreshed successfully");
+          success = true;
         } catch (error) {
           console.error(`Retry ${retryCount + 1}/${maxRetries} failed:`, error);
           retryCount++;
+          // Wait longer between retries
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         }
       }
 
-      // Dispatch custom events to notify other components - ONLY ONCE
-      console.log("Broadcasting subscription update events");
+      // Clear loading toast
+      toast.dismiss(loadingToast);
 
-      // Use setTimeout to ensure we don't trigger another refresh immediately
+      // Show success message
+      toast.success(
+        t("Billing.subscription_updated_successfully", {
+          fallback: "Subscription updated successfully",
+        }),
+      );
+
+      // Force reload the page without confirmation to ensure all components are updated correctly
       setTimeout(() => {
-        window.dispatchEvent(new CustomEvent("subscription_updated"));
-
-        // Force UI refresh
-        window.location.hash = "billing";
-      }, 500);
+        // Use router.push instead of window.location to preserve locale and Next.js context
+        router.push({
+          pathname: "/billing",
+          query: { refresh: Date.now() }, // Add timestamp to force full refresh
+        });
+      }, 1500);
     } catch (error) {
       console.error("Error refreshing subscription data:", error);
+      toast.error(
+        t("Billing.error_updating_subscription", {
+          fallback: "There was an error updating your subscription. Please refresh the page.",
+        }),
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -336,9 +363,9 @@ export default function SubscriptionSelection({
 
   // Hide if user has an active subscription or promotion
   if (
-    subscriptionStatus &&
-    (subscriptionStatus as string) === "active" &&
+    subscriptionStatus === "active" &&
     !subscriptionCancelAt &&
+    planLookupKey &&
     planLookupKey !== "tanad_free"
   ) {
     return null;
@@ -352,155 +379,167 @@ export default function SubscriptionSelection({
       }}
       className="w-full"
     >
-      <Card className="border-none shadow-none">
-        <CardHeader className="pb-2 text-center">
-          <h2 className="text-3xl font-bold">
-            {t("Billing.subscription_plans", { fallback: "Subscription Plans" })}
-          </h2>
-          <p className="text-muted-foreground">
-            {t("Billing.choose_the_right_plan", {
-              fallback: "Choose the plan that best fits your business needs",
-            })}
-          </p>
-          {subscriptionCancelAt && (
-            <div className="mt-4 rounded-md bg-amber-50 p-2 text-amber-800 dark:bg-amber-950 dark:text-amber-200">
-              <p className="text-sm font-medium">
-                {t("Billing.subscription_cancels_on", {
-                  date: new Date(Number(subscriptionCancelAt) * 1000).toLocaleDateString(
-                    locale === "ar" ? "ar-SA" : "en-US",
-                  ),
-                  fallback: `Subscription cancels on ${new Date(Number(subscriptionCancelAt) * 1000).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")}`,
-                })}
-              </p>
-            </div>
-          )}
-        </CardHeader>
-        <CardContent dir={locale === "ar" ? "rtl" : "ltr"} className="pt-6">
-          <div dir={locale === "ar" ? "rtl" : "ltr"}>
-            <RadioGroup
-              value={selectedPlan || ""}
-              onValueChange={handlePlanChange}
-              className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
-              key={`plan-selection-${selectedPlan}`}
-            >
-              {displayPlans.map((plan) => {
-                const isCurrentPlan = currentPlan.priceId === plan.priceId;
-                const isDisabled =
-                  plan.lookup_key === "tanad_free" && currentPlan.lookup_key === "tanad_free";
-                const isPopular =
-                  plan.lookup_key === "tanad_pro" || plan.lookup_key?.includes("_pro");
-                const isSelected = selectedPlan === plan.priceId;
-
-                // Get the plan title based on lookup key or translation
-                const planTitle = t(`Billing.${plan.lookup_key}`, {
-                  fallback: planTitles[plan.lookup_key] || plan.name,
-                });
-
-                // Get plan description from our mapping
-                const planDesc = t(`Billing.${plan.lookup_key}_description`, {
-                  fallback: planDescriptions[plan.lookup_key] || `${planTitle} subscription plan`,
-                });
-
-                // Format price for display based on locale
-                const displayPrice = formatPriceForLocale(plan.price, locale);
-                const priceValue = displayPrice.split(" ")[0];
-                const priceInterval = locale === "ar" ? "شهرياً" : "/month";
-
-                return (
-                  <Card
-                    key={plan.priceId}
-                    className={cn(
-                      "hover:border-primary/70 relative cursor-pointer transition-all duration-200 hover:shadow-sm",
-                      isPopular ? "border-primary shadow-md" : "",
-                      isSelected
-                        ? "border-primary ring-primary/30 bg-primary/5 shadow-sm ring-2"
-                        : "",
-                      isCurrentPlan && !isSelected ? "bg-muted/50" : "",
-                      isDisabled ? "cursor-not-allowed opacity-60" : "",
-                    )}
-                    onClick={() => {
-                      if (!isDisabled) {
-                        if (selectedPlan === plan.priceId) {
-                          // Use debounced method for re-selecting the same plan
-                          updateSelectedPlan(plan.priceId);
-                        } else {
-                          setSelectedPlan(plan.priceId);
-                        }
-                      }
-                    }}
-                  >
-                    <RadioGroupItem
-                      className="sr-only"
-                      value={plan.priceId}
-                      id={plan.priceId}
-                      disabled={isDisabled}
-                    />
-
-                    {isPopular && (
-                      <div className="absolute -top-3 right-0 left-0 flex justify-center">
-                        <Badge className="bg-primary hover:bg-primary/90">
-                          {t("Billing.most_popular", { fallback: "Most Popular" })}
-                        </Badge>
-                      </div>
-                    )}
-
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-xl">{planTitle}</CardTitle>
-                      <CardDescription>{planDesc}</CardDescription>
-                    </CardHeader>
-
-                    <CardContent className="pb-3">
-                      <div className="mb-4">
-                        <span className="text-3xl font-bold">{priceValue}</span>
-                        <span className="text-muted-foreground ml-1">{priceInterval}</span>
-                      </div>
-
-                      <ul className="space-y-2 text-sm">
-                        {getTranslatedFeatures(plan, plan.features).map((feature, index) => (
-                          <li key={index} className="flex items-start">
-                            <Check
-                              className={`${locale === "ar" ? "ml-2" : "mr-2"} mt-0.5 h-4 w-4 shrink-0 text-green-500`}
-                            />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-
-                    {isSelected && (
-                      <div className="absolute right-2 bottom-2">
-                        <Badge variant="outline" className="bg-primary text-primary-foreground">
-                          {t("Billing.selected_plan_button", { fallback: "Selected" })}
-                        </Badge>
-                      </div>
-                    )}
-                  </Card>
-                );
-              })}
-            </RadioGroup>
+      {isLoading ? (
+        <div className="w-full space-y-4">
+          <Skeleton className="mx-auto h-8 w-48" />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Skeleton className="h-[450px] w-full rounded-lg" />
+            <Skeleton className="h-[450px] w-full rounded-lg" />
+            <Skeleton className="h-[450px] w-full rounded-lg" />
+            <Skeleton className="h-[450px] w-full rounded-lg" />
           </div>
-        </CardContent>
-        <CardFooter className="flex justify-center pt-6">
-          <Button
-            type="submit"
-            size="lg"
-            className="px-8"
-            disabled={
-              loading ||
-              !selectedPlan ||
-              (currentPlan.priceId === selectedPlan && !subscriptionCancelAt)
-            }
-          >
-            {loading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : currentPlan.priceId === selectedPlan && !subscriptionCancelAt ? (
-              t("Billing.current_plan", { fallback: "Current Plan" })
-            ) : (
-              t("Billing.update_plan", { fallback: "Update Plan" })
+        </div>
+      ) : (
+        <Card className="border-none shadow-none">
+          <CardHeader className="pb-2 text-center">
+            <h2 className="text-3xl font-bold">
+              {t("Billing.subscription_plans", { fallback: "Subscription Plans" })}
+            </h2>
+            <p className="text-muted-foreground">
+              {t("Billing.choose_the_right_plan", {
+                fallback: "Choose the plan that best fits your business needs",
+              })}
+            </p>
+            {subscriptionCancelAt && (
+              <div className="mt-4 rounded-md bg-amber-50 p-2 text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                <p className="text-sm font-medium">
+                  {t("Billing.subscription_cancels_on", {
+                    date: new Date(Number(subscriptionCancelAt) * 1000).toLocaleDateString(
+                      locale === "ar" ? "ar-SA" : "en-US",
+                    ),
+                    fallback: `Subscription cancels on ${new Date(Number(subscriptionCancelAt) * 1000).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US")}`,
+                  })}
+                </p>
+              </div>
             )}
-          </Button>
-        </CardFooter>
-      </Card>
+          </CardHeader>
+          <CardContent dir={locale === "ar" ? "rtl" : "ltr"} className="pt-6">
+            <div dir={locale === "ar" ? "rtl" : "ltr"}>
+              <RadioGroup
+                value={selectedPlan || ""}
+                onValueChange={handlePlanChange}
+                className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4"
+                key={`plan-selection-${selectedPlan}`}
+              >
+                {displayPlans.map((plan) => {
+                  const isCurrentPlan = currentPlan.priceId === plan.priceId;
+                  const isDisabled =
+                    plan.lookup_key === "tanad_free" && currentPlan.lookup_key === "tanad_free";
+                  const isPopular =
+                    plan.lookup_key === "tanad_pro" || plan.lookup_key?.includes("_pro");
+                  const isSelected = selectedPlan === plan.priceId;
+
+                  // Get the plan title based on lookup key or translation
+                  const planTitle = t(`Billing.${plan.lookup_key}`, {
+                    fallback: planTitles[plan.lookup_key] || plan.name,
+                  });
+
+                  // Get plan description from our mapping
+                  const planDesc = t(`Billing.${plan.lookup_key}_description`, {
+                    fallback: planDescriptions[plan.lookup_key] || `${planTitle} subscription plan`,
+                  });
+
+                  // Format price for display based on locale
+                  const displayPrice = formatPriceForLocale(plan.price, locale);
+                  const priceValue = displayPrice.split(" ")[0];
+                  const priceInterval = locale === "ar" ? "شهرياً" : "/month";
+
+                  return (
+                    <Card
+                      key={plan.priceId}
+                      className={cn(
+                        "hover:border-primary/70 relative cursor-pointer transition-all duration-200 hover:shadow-sm",
+                        isPopular ? "border-primary shadow-md" : "",
+                        isSelected
+                          ? "border-primary ring-primary/30 bg-primary/5 shadow-sm ring-2"
+                          : "",
+                        isCurrentPlan && !isSelected ? "bg-muted/50" : "",
+                        isDisabled ? "cursor-not-allowed opacity-60" : "",
+                      )}
+                      onClick={() => {
+                        if (!isDisabled) {
+                          if (selectedPlan === plan.priceId) {
+                            // Use debounced method for re-selecting the same plan
+                            updateSelectedPlan(plan.priceId);
+                          } else {
+                            setSelectedPlan(plan.priceId);
+                          }
+                        }
+                      }}
+                    >
+                      <RadioGroupItem
+                        className="sr-only"
+                        value={plan.priceId}
+                        id={plan.priceId}
+                        disabled={isDisabled}
+                      />
+
+                      {isPopular && (
+                        <div className="absolute -top-3 right-0 left-0 flex justify-center">
+                          <Badge className="bg-primary hover:bg-primary/90">
+                            {t("Billing.most_popular", { fallback: "Most Popular" })}
+                          </Badge>
+                        </div>
+                      )}
+
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl">{planTitle}</CardTitle>
+                        <CardDescription>{planDesc}</CardDescription>
+                      </CardHeader>
+
+                      <CardContent className="pb-3">
+                        <div className="mb-4">
+                          <span className="text-3xl font-bold">{priceValue}</span>
+                          <span className="text-muted-foreground ml-1">{priceInterval}</span>
+                        </div>
+
+                        <ul className="space-y-2 text-sm">
+                          {getTranslatedFeatures(plan, plan.features).map((feature, index) => (
+                            <li key={index} className="flex items-start">
+                              <Check
+                                className={`${locale === "ar" ? "ml-2" : "mr-2"} mt-0.5 h-4 w-4 shrink-0 text-green-500`}
+                              />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+
+                      {isSelected && (
+                        <div className="absolute right-2 bottom-2">
+                          <Badge variant="outline" className="bg-primary text-primary-foreground">
+                            {t("Billing.selected_plan_button", { fallback: "Selected" })}
+                          </Badge>
+                        </div>
+                      )}
+                    </Card>
+                  );
+                })}
+              </RadioGroup>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-center pt-6">
+            <Button
+              type="submit"
+              size="lg"
+              className="px-8"
+              disabled={
+                loading ||
+                !selectedPlan ||
+                (currentPlan.priceId === selectedPlan && !subscriptionCancelAt)
+              }
+            >
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : currentPlan.priceId === selectedPlan && !subscriptionCancelAt ? (
+                t("Billing.current_plan", { fallback: "Current Plan" })
+              ) : (
+                t("Billing.update_plan", { fallback: "Update Plan" })
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
 
       {/* <Dialog open={isPaymentDialogOpen} onOpenChange={setIsPaymentDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">

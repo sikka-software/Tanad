@@ -62,6 +62,7 @@ interface UserState {
   permissions: string[];
   loading: boolean;
   error: string | null;
+  lastFetchTime: number | null;
   fetchUserAndProfile: () => Promise<void>;
   signOut: () => Promise<void>;
   setUser: (user: User | null) => void;
@@ -84,6 +85,7 @@ const useUserStore = create<UserState>((set, get) => ({
   permissions: [],
   loading: false,
   error: null,
+  lastFetchTime: null,
 
   setUser: (user) => set({ user }),
   setProfile: (profile) => set({ profile }),
@@ -110,6 +112,7 @@ const useUserStore = create<UserState>((set, get) => ({
         permissions: [],
         loading: false,
         error: null,
+        lastFetchTime: null,
       });
       return Promise.resolve();
     } catch (error) {
@@ -121,6 +124,20 @@ const useUserStore = create<UserState>((set, get) => ({
   fetchUserAndProfile: async () => {
     // Skip if already loading
     if (get().loading) return;
+
+    // Skip if window just regained focus and we've fetched recently
+    if (window.tanadSubscriptionDataCached) {
+      console.log("Skipping user data fetch - window just regained focus");
+      return;
+    }
+
+    // Throttle fetches to once every 10 seconds
+    const now = Date.now();
+    const lastFetch = get().lastFetchTime;
+    if (lastFetch && now - lastFetch < 10000) {
+      console.log("Skipping user data fetch - fetched recently");
+      return;
+    }
 
     try {
       set({ loading: true, error: null });
@@ -138,6 +155,7 @@ const useUserStore = create<UserState>((set, get) => ({
           membership: null,
           permissions: [],
           loading: false,
+          lastFetchTime: now,
         });
         return;
       }
@@ -189,6 +207,9 @@ const useUserStore = create<UserState>((set, get) => ({
           }
         }
       }
+
+      // Update last fetch time
+      set({ lastFetchTime: now });
     } catch (error: any) {
       console.error("Error fetching user data:", error);
       set({ error: error.message });
@@ -211,6 +232,7 @@ supabase.auth.onAuthStateChange((event, session) => {
       permissions: [],
       loading: false,
       error: null,
+      lastFetchTime: null,
     });
   }
 });

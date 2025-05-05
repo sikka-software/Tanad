@@ -1,6 +1,8 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
+import { createClient } from "@/utils/supabase/component";
+
 import { usePricing } from "@/hooks/use-pricing";
 
 import { TANAD_PRODUCT_ID } from "@/lib/constants";
@@ -15,6 +17,7 @@ declare global {
     subscriptionInitialized?: boolean;
     subscriptionFetchAttempts?: number;
     tanadSubscriptionDataCached?: boolean;
+    lastFocusTime?: number; // Track when window was last focused
   }
 }
 
@@ -66,6 +69,53 @@ interface CancelSubscriptionResponse {
   error?: string;
 }
 
+// Add helper function for date conversion
+const convertTimestampToDate = (timestamp: number | null): string => {
+  if (!timestamp) return "-";
+  try {
+    return new Date(timestamp * 1000).toLocaleDateString();
+  } catch (error) {
+    console.error("Error converting timestamp to date:", error);
+    return "-";
+  }
+};
+
+// Add helper function to get price from lookup key
+const getPriceFromLookupKey = (lookupKey: string): string => {
+  if (!lookupKey) return "0 SAR";
+
+  switch (lookupKey) {
+    case "tanad_standard":
+      return "19.99 SAR";
+    case "tanad_pro":
+      return "49.99 SAR";
+    case "tanad_business":
+      return "99.99 SAR";
+    case "tanad_enterprise":
+      return "199.99 SAR";
+    default:
+      return "0 SAR";
+  }
+};
+
+// Add helper function to get name from lookup key
+const getNameFromLookupKey = (lookupKey: string): string => {
+  if (!lookupKey) return "Free Plan";
+
+  switch (lookupKey) {
+    case "tanad_standard":
+      return "Standard Plan";
+    case "tanad_pro":
+      return "Pro Plan";
+    case "tanad_business":
+      return "Business Plan";
+    case "tanad_enterprise":
+      return "Enterprise Plan";
+    default:
+      return "Free Plan";
+  }
+};
+
 export function useSubscription() {
   const t = useTranslations();
   const { getPlans, loading: plansLoading } = usePricing(TANAD_PRODUCT_ID);
@@ -84,20 +134,25 @@ export function useSubscription() {
   const [error, setError] = useState<string | null>(null);
   const { user, profile, loading: userLoading, fetchUserAndProfile } = useUserStore();
   const lastRefetchRef = useRef<number | null>(null);
+  const initialLoadDone = useRef(false);
+  const lastFetchTime = useRef<number | null>(null);
 
   // Add visibility change listener to prevent refreshes when tab regains focus
   useEffect(() => {
+    const cacheDuration = 30000; // 30 seconds to prevent refreshes after focus
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         // Page has become visible again after tab switch
         console.log("Page visibility changed to visible - preventing subscription refresh");
         // Set a flag to prevent refreshes for a short time
         window.tanadSubscriptionDataCached = true;
+        window.lastFocusTime = Date.now();
 
-        // Clear the flag after a short delay
+        // Clear the flag after a longer delay to prevent unwanted refreshes
         setTimeout(() => {
           window.tanadSubscriptionDataCached = false;
-        }, 5000);
+        }, cacheDuration);
       }
     };
 
@@ -107,13 +162,19 @@ export function useSubscription() {
     const handleWindowFocus = () => {
       console.log("Window regained focus - preventing subscription refresh");
       window.tanadSubscriptionDataCached = true;
+      window.lastFocusTime = Date.now();
 
       setTimeout(() => {
         window.tanadSubscriptionDataCached = false;
-      }, 5000);
+      }, cacheDuration);
     };
 
     window.addEventListener("focus", handleWindowFocus);
+
+    // Set initial focus time if not set
+    if (!window.lastFocusTime) {
+      window.lastFocusTime = Date.now();
+    }
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -121,85 +182,44 @@ export function useSubscription() {
     };
   }, []);
 
-  const fetchSubscription = async () => {
-    // If we've just switched back to the tab/window, skip fetching
-    if (window.tanadSubscriptionDataCached) {
-      console.log("Skipping subscription fetch - page just regained focus");
+  /**
+   * Fetch subscription data from the server
+   */
+  const fetchSubscription = async (forceRefresh = false) => {
+    if (!user) {
+      console.log("No user, skipping subscription fetch");
       return;
     }
 
-    setLoading(true);
-    setError(null);
-
-    // Increment fetch attempt counter
-    window.subscriptionFetchAttempts = (window.subscriptionFetchAttempts || 0) + 1;
-
-    // If we've tried too many times, just set free plan and stop
-    if (window.subscriptionFetchAttempts > 2) {
-      console.log("Too many subscription fetch attempts, defaulting to free plan");
-      const freePlan = getPlans().find(
-        (plan) => plan.lookup_key === "tanad_free" || plan.lookup_key?.includes("free"),
-      );
-      setSubscriptionData({
-        id: null,
-        name: freePlan?.name || t("Billing.free_plan", { fallback: "Free Plan" }),
-        price: "0 SAR",
-        billingCycle: "-",
-        nextBillingDate: "-",
-        planLookupKey: freePlan?.lookup_key || "tanad_free",
-        status: null,
-        isExpired: false,
-        cancelAt: null,
-      });
-      setLoading(false);
-      window.subscriptionInitialized = true;
+    // Prevent rapid refetching unless forced
+    const now = Date.now();
+    const lastFetch = lastFetchTime.current;
+    if (!forceRefresh && lastFetch && now - lastFetch < 3000) {
+      console.log("Throttling subscription fetch - last fetch too recent");
       return;
     }
 
+    console.log("Fetching subscription data for user:", user.id);
     try {
-      const plans = getPlans();
+      setLoading(true);
 
-      // Wait until plans are loaded
-      if (plansLoading || plans.length === 0) {
-        console.log("Plans are still loading or empty, waiting...");
-        return;
-      }
+      // First, get the stripe_customer_id from the profile
+      const supabase = createClient();
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
 
-      // Log current profile data
-      console.log("Current profile data:", {
-        id: profile?.id,
-        email: profile?.email,
-        stripe_customer_id: profile?.stripe_customer_id,
-        subscribed_to: profile?.subscribed_to,
-        price_id: profile?.price_id,
-      });
-
-      // Find free plan
-      const freePlan = plans.find(
-        (plan) => plan.lookup_key === "tanad_free" || plan.lookup_key?.includes("free"),
-      );
-
-      // Check if user has a subscription in their profile
-      if (profile?.subscribed_to && profile.subscribed_to !== "tanad_free") {
-        console.log(`Profile indicates user is subscribed to: ${profile.subscribed_to}`);
-
-        // Try to find matching plan from the subscribed_to value
-        const profilePlan = plans.find((plan) => plan.lookup_key === profile.subscribed_to);
-        if (profilePlan) {
-          console.log("Found matching plan from profile.subscribed_to:", profilePlan);
-        }
-      }
-
-      // If no user or customer ID, return free plan
-      if (!user || !profile?.stripe_customer_id) {
-        console.log("No customer ID found, returning free plan");
+      if (profileError) {
+        console.error("Profile fetch error:", profileError);
         setSubscriptionData({
           id: null,
-          name: freePlan?.name || t("plans.free.title"),
+          name: t("Billing.free_plan", { fallback: "Free Plan" }),
           price: "0 SAR",
           billingCycle: "-",
           nextBillingDate: "-",
-          planLookupKey: freePlan?.lookup_key || null,
+          planLookupKey: null,
           status: null,
           isExpired: false,
           cancelAt: null,
@@ -208,177 +228,180 @@ export function useSubscription() {
         return;
       }
 
-      // Use cached request if it's recent enough (within 2 seconds)
-      const now = Date.now();
-      if (requestPromise && now - lastRequestTime < 2000) {
-        console.log("Using cached subscription request");
-        await requestPromise;
-        return;
+      // Store the updated profile info - this is important for fresh subscription data
+      if (profile && user) {
+        console.log("Subscription check: profile data:", {
+          subscribed_to: profile.subscribed_to,
+          price_id: profile.price_id,
+          stripe_customer_id: profile.stripe_customer_id,
+        });
+
+        // If profile shows a subscription but we don't see it in Stripe yet,
+        // we can rely on the profile data
+        if (profile.subscribed_to && profile.subscribed_to !== "tanad_free") {
+          console.log("Profile indicates active subscription:", profile.subscribed_to);
+
+          // Just use the profile data if it's clearly showing a subscription
+          setSubscriptionData({
+            id: null,
+            name: profile.subscribed_to,
+            price: getPriceFromLookupKey(profile.subscribed_to),
+            billingCycle: "month",
+            nextBillingDate: "-",
+            planLookupKey: profile.subscribed_to,
+            status: "active",
+            isExpired: false,
+            cancelAt: null,
+          });
+
+          // Still fetch from Stripe to get additional details
+        }
       }
 
-      // Fetch subscription from API
-      lastRequestTime = now;
-      requestPromise = (async () => {
-        const response = await fetch("/api/stripe/subscription", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            customerId: profile?.stripe_customer_id,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch subscription: ${response.status}`);
-        }
-
-        return await response.json();
-      })();
-
-      const { subscription } = await requestPromise;
-      if (subscription) {
-        // Access plan details directly from the plan property
-        const planDetails = subscription.plan || {};
-
-        // Get price ID directly from plan
-        const currentPriceId = planDetails.id || subscription.items?.data[0]?.price?.id;
-
-        // Get plan name from multiple possible sources
-        const planName =
-          planDetails.nickname ||
-          subscription.items?.data[0]?.price?.nickname ||
-          subscription.product?.name ||
-          "Unknown Plan";
-
-        // Get the lookup_key from the plan
-        const planLookupKey =
-          planDetails.lookup_key || subscription.items?.data[0]?.price?.lookup_key || null;
-
-        // Try to find matching plan
-        let currentPlan = plans.find((plan) => {
-          return plan.priceId === currentPriceId;
-        });
-
-        // Format next billing date from billing_cycle_anchor
-        const nextBillingTimestamp =
-          subscription.billing_cycle_anchor || subscription.current_period_end;
-        const nextBillingDate = nextBillingTimestamp
-          ? new Date(nextBillingTimestamp * 1000).toLocaleDateString()
-          : "-";
-
-        if (currentPlan) {
-          // Calculate price from plan or subscription
-          const priceAmount = planDetails.amount
-            ? (planDetails.amount / 100).toFixed(2)
-            : subscription.items?.data[0]?.price?.unit_amount
-              ? (subscription.items.data[0].price.unit_amount / 100).toFixed(2)
-              : "0";
-
-          const priceCurrency =
-            planDetails.currency?.toUpperCase() ||
-            subscription.items?.data[0]?.price?.currency?.toUpperCase() ||
-            "SAR";
-
-          // Build subscription data
-          const newSubscriptionData: SubscriptionData = {
-            id: subscription.id,
-            name: currentPlan.name || planName,
-            price: `${priceAmount} ${priceCurrency}`,
-            billingCycle:
-              planDetails.interval ||
-              subscription.items?.data[0]?.price?.recurring?.interval ||
-              "-",
-            nextBillingDate,
-            planLookupKey: currentPlan.lookup_key || planLookupKey,
-            status: subscription.status,
-            isExpired:
-              subscription.status === "canceled" || subscription.status === "incomplete_expired",
-            cancelAt: subscription.cancel_at,
-          };
-
-          setSubscriptionData(newSubscriptionData);
-          console.log("Subscription loaded:", newSubscriptionData);
-        } else {
-          // If plan not found but subscription exists, use subscription data directly
-          console.log("Plan not found in available plans, using subscription data directly");
-
-          const priceAmount = planDetails.amount
-            ? (planDetails.amount / 100).toFixed(2)
-            : subscription.items?.data[0]?.price?.unit_amount
-              ? (subscription.items.data[0].price.unit_amount / 100).toFixed(2)
-              : "0";
-
-          const priceCurrency =
-            planDetails.currency?.toUpperCase() ||
-            subscription.items?.data[0]?.price?.currency?.toUpperCase() ||
-            "SAR";
-
-          setSubscriptionData({
-            id: subscription.id,
-            name: planName,
-            price: `${priceAmount} ${priceCurrency}`,
-            billingCycle:
-              planDetails.interval ||
-              subscription.items?.data[0]?.price?.recurring?.interval ||
-              "-",
-            nextBillingDate,
-            planLookupKey,
-            status: subscription.status,
-            isExpired:
-              subscription.status === "canceled" || subscription.status === "incomplete_expired",
-            cancelAt: subscription.cancel_at,
-          });
-        }
-      } else {
-        // No subscription found from Stripe API
-        console.log("No active subscription found from Stripe API");
-
-        // Check if profile has subscribed_to that's not the free plan
-        if (profile?.subscribed_to && profile.subscribed_to !== "tanad_free") {
-          console.log(`Using subscription info from profile: ${profile.subscribed_to}`);
-
-          // Try to find the plan based on the profile's subscribed_to value
-          const profilePlan = plans.find((plan) => plan.lookup_key === profile.subscribed_to);
-
-          if (profilePlan) {
-            console.log("Found matching plan from profile:", profilePlan);
-
-            // Use the profile plan details
-            setSubscriptionData({
-              id: "profile-based", // Placeholder ID
-              name: profilePlan.name || profile.subscribed_to,
-              price: profilePlan.price || profile.price_id || "Price unavailable",
-              billingCycle: "month", // Default to month
-              nextBillingDate: "-", // No next billing date available
-              planLookupKey: profilePlan.lookup_key || profile.subscribed_to,
-              status: "active", // Assume active since it's in the profile
-              isExpired: false,
-              cancelAt: null,
-            });
-            setLoading(false);
-            return;
-          }
-        }
-
-        // If no profile subscription info or no matching plan, default to free plan
+      // Check if we have a customer ID to query
+      if (!profile?.stripe_customer_id) {
+        console.log("No Stripe customer ID in profile, using free plan");
         setSubscriptionData({
           id: null,
-          name: freePlan?.name || t("plans.free.title"),
+          name: t("Billing.free_plan", { fallback: "Free Plan" }),
           price: "0 SAR",
           billingCycle: "-",
           nextBillingDate: "-",
-          planLookupKey: freePlan?.lookup_key || null,
-          status: null,
+          planLookupKey: "tanad_free",
+          status: "active",
           isExpired: false,
           cancelAt: null,
         });
+        setLoading(false);
+        return;
+      }
+
+      const stripeCustomerId = profile.stripe_customer_id;
+
+      try {
+        // Get the subscription data from Stripe
+        const stripeResponse = await fetch(
+          `/api/stripe/get-subscription?customerId=${stripeCustomerId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        if (!stripeResponse.ok) {
+          throw new Error("Failed to fetch subscription");
+        }
+
+        const stripeData = await stripeResponse.json();
+
+        if (stripeData.subscription) {
+          const subscription = stripeData.subscription;
+
+          console.log("Received stripe subscription data:", {
+            id: subscription.id,
+            status: subscription.status,
+            plan: subscription.plan?.nickname || "Unknown",
+            lookupKey: subscription.plan?.lookup_key,
+          });
+
+          // Get the price details from the subscription
+          const price = subscription.plan?.amount
+            ? `${(subscription.plan.amount / 100).toFixed(2)} ${subscription.plan.currency.toUpperCase()}`
+            : "0 SAR";
+
+          // Use profile's subscribed_to value if available
+          const planLookupKey =
+            profile.subscribed_to || subscription.plan?.lookup_key || "tanad_free";
+
+          setSubscriptionData({
+            id: subscription.id,
+            status: subscription.status,
+            name: getNameFromLookupKey(planLookupKey),
+            price,
+            planLookupKey,
+            billingCycle: subscription.plan?.interval || "month",
+            cancelAt: subscription.cancel_at || null,
+            nextBillingDate: convertTimestampToDate(subscription.current_period_end),
+            isExpired:
+              subscription.status === "canceled" || subscription.status === "incomplete_expired",
+          });
+        } else {
+          // Use profile data as fallback
+          if (profile.subscribed_to && profile.subscribed_to !== "tanad_free") {
+            setSubscriptionData({
+              id: null,
+              name: profile.subscribed_to,
+              price: getPriceFromLookupKey(profile.subscribed_to),
+              billingCycle: "month",
+              nextBillingDate: "-",
+              planLookupKey: profile.subscribed_to,
+              status: "active",
+              isExpired: false,
+              cancelAt: null,
+            });
+          } else {
+            // Default to free plan if no subscription detected
+            setSubscriptionData({
+              id: null,
+              name: t("Billing.free_plan", { fallback: "Free Plan" }),
+              price: "0 SAR",
+              billingCycle: "-",
+              nextBillingDate: "-",
+              planLookupKey: "tanad_free",
+              status: "active",
+              isExpired: false,
+              cancelAt: null,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Stripe fetch error:", error);
+
+        // Fallback to profile data if available
+        if (profile.subscribed_to && profile.subscribed_to !== "tanad_free") {
+          setSubscriptionData({
+            id: null,
+            name: profile.subscribed_to,
+            price: getPriceFromLookupKey(profile.subscribed_to),
+            billingCycle: "month",
+            nextBillingDate: "-",
+            planLookupKey: profile.subscribed_to,
+            status: "active",
+            isExpired: false,
+            cancelAt: null,
+          });
+        } else {
+          setSubscriptionData({
+            id: null,
+            name: t("Billing.free_plan", { fallback: "Free Plan" }),
+            price: "0 SAR",
+            billingCycle: "-",
+            nextBillingDate: "-",
+            planLookupKey: "tanad_free",
+            status: "active",
+            isExpired: false,
+            cancelAt: null,
+          });
+        }
       }
     } catch (error) {
-      console.error("Error fetching subscription:", error);
-      setError(error instanceof Error ? error.message : "Failed to fetch subscription");
+      console.error("Subscription fetch error:", error);
+      setSubscriptionData({
+        id: null,
+        name: t("Billing.free_plan", { fallback: "Free Plan" }),
+        price: "0 SAR",
+        billingCycle: "-",
+        nextBillingDate: "-",
+        planLookupKey: null,
+        status: null,
+        isExpired: false,
+        cancelAt: null,
+      });
     } finally {
       setLoading(false);
+      lastFetchTime.current = Date.now();
     }
   };
 
@@ -531,6 +554,11 @@ export function useSubscription() {
       return;
     }
 
+    // Skip if initial load was already done
+    if (initialLoadDone.current) {
+      return;
+    }
+
     // Generate a unique ID for this effect execution for logging
     const fetchId = Math.random().toString(36).slice(2, 9);
     console.log(`[${fetchId}] Subscription hook effect running - first load check`);
@@ -544,6 +572,7 @@ export function useSubscription() {
     if (subscriptionData.id && subscriptionData.id !== "profile-based") {
       console.log(`[${fetchId}] Subscription data already exists, marking as initialized`);
       window.subscriptionInitialized = true;
+      initialLoadDone.current = true;
       return;
     }
 
@@ -552,6 +581,7 @@ export function useSubscription() {
 
     // Mark as initialized immediately to prevent duplicate executions
     window.subscriptionInitialized = true;
+    initialLoadDone.current = true;
 
     // Execute the fetch once
     const doFetch = async () => {
@@ -571,34 +601,11 @@ export function useSubscription() {
   }, [userLoading, user, plansLoading]);
 
   /**
-   * Refetch the subscription data
+   * Force a refresh of the subscription data
    */
-  const refetch = async () => {
-    console.log("Refetching subscription data");
-
-    // Check if we've recently refetched to prevent excessive API calls
-    const now = Date.now();
-    const lastRefetch = lastRefetchRef.current || 0;
-    if (now - lastRefetch < 2000) {
-      console.log("Skipping refetch - too soon since last refetch");
-      return true;
-    }
-    lastRefetchRef.current = now;
-
-    // First refresh user and profile data
-    try {
-      await fetchUserAndProfile();
-      console.log("User and profile data refreshed");
-    } catch (profileError) {
-      console.error("Error refreshing user profile:", profileError);
-    }
-
-    // Then fetch subscription data
-    await fetchSubscription();
-    console.log("Subscription refetch complete");
-
-    // Update state to indicate data was refreshed
-    return true;
+  const refetch = async (forceRefresh = true) => {
+    console.log("Forcing subscription refresh");
+    return fetchSubscription(forceRefresh);
   };
 
   // Ensure we have at least the free plan when no subscription data is loaded
@@ -630,7 +637,7 @@ export function useSubscription() {
     }
   }, [loading]);
 
-  // The subscription data and utility functions to expose
+  // Expose the API
   return {
     ...subscriptionData,
     loading,
