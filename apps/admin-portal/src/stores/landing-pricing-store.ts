@@ -61,7 +61,25 @@ export const allModules: Module[] = [
     minQuantity: 1,
     contactUsThreshold: 9,
     freeUnits: 1, // Offer first 3 offices for free
-    showCycleWithUnit: false, // Don't show cycle for offices unit
+    showCycleWithUnit: false,
+    integrations: [
+      {
+        id: "ejar",
+        label: "Pricing.custom_pricing.integrations.ejar",
+        pricingType: "fixed",
+
+        monthlyPrice: 50.5, // 0.5 per employee per month
+        annualPrice: 5, // 5 per employee per year
+      },
+      {
+        id: "electricity",
+        label: "Pricing.custom_pricing.integrations.electricity",
+        pricingType: "fixed",
+
+        monthlyPrice: 12, // 0.5 per employee per month
+        annualPrice: 12, // 5 per employee per year
+      },
+    ],
   },
   {
     id: "branches",
@@ -75,9 +93,33 @@ export const allModules: Module[] = [
     unit: "branch",
     step: 1,
     maxQuantity: 20,
-    freeUnits: 1,
     minQuantity: 1,
-    showCycleWithUnit: false, // Don't show cycle for branches unit
+    freeUnits: 1,
+    contactUsThreshold: 19,
+    showCycleWithUnit: false,
+    integrations: [
+      {
+        id: "ejar",
+        label: "Pricing.custom_pricing.integrations.ejar",
+        pricingType: "per_unit",
+        monthlyPrice: 50.5, // 0.5 per employee per month
+        annualPrice: 5, // 5 per employee per year
+      },
+      {
+        id: "electricity",
+        label: "Pricing.custom_pricing.integrations.electricity",
+        pricingType: "per_unit",
+        monthlyPrice: 12, // 0.5 per employee per month
+        annualPrice: 12, // 5 per employee per year
+      },
+      {
+        id: "foodics",
+        label: "Pricing.custom_pricing.integrations.foodics",
+        pricingType: "per_unit",
+        monthlyPrice: 12, // 0.5 per employee per month
+        annualPrice: 12, // 5 per employee per year
+      },
+    ],
   },
   {
     id: "warehouses",
@@ -85,14 +127,25 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.warehouses.description",
     icon: "Warehouse",
     category: "infrastructure",
-    annualPrice: 129,
-    monthlyPrice: 12,
+    annualPrice: 50,
+    monthlyPrice: 5,
     quantity: 1,
     unit: "warehouse",
     step: 1,
-    maxQuantity: 5,
+    maxQuantity: 20,
     minQuantity: 1,
-    showCycleWithUnit: false, // Don't show cycle for warehouses unit
+    freeUnits: 1,
+    contactUsThreshold: 19,
+    showCycleWithUnit: false,
+    integrations: [
+      {
+        id: "ejar",
+        label: "Pricing.custom_pricing.integrations.ejar",
+        pricingType: "per_unit",
+        monthlyPrice: 50.5, // 0.5 per employee per month
+        annualPrice: 5, // 5 per employee per year
+      },
+    ],
   },
   {
     id: "clients",
@@ -107,6 +160,9 @@ export const allModules: Module[] = [
     step: 50,
     maxQuantity: 1000,
     minQuantity: 50,
+    freeUnits: 50,
+    contactUsThreshold: 500,
+    showCycleWithUnit: true,
   },
   {
     id: "vendors",
@@ -114,13 +170,16 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.vendors.description",
     icon: "Store",
     category: "business",
-    annualPrice: 109,
+    annualPrice: 100,
     monthlyPrice: 10,
-    quantity: 10,
+    quantity: 1,
     unit: "vendor",
-    step: 10,
-    maxQuantity: 500,
-    minQuantity: 10,
+    step: 1,
+    maxQuantity: 50,
+    minQuantity: 1,
+    freeUnits: 1,
+    contactUsThreshold: 30,
+    showCycleWithUnit: false,
   },
   {
     id: "invoices",
@@ -128,14 +187,14 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.invoices.description",
     icon: "FileText",
     category: "finance",
-    annualPrice: 20,
-    monthlyPrice: 2,
-    quantity: 100,
+    annualPrice: 90,
+    monthlyPrice: 9,
+    quantity: 10,
     unit: "invoice",
-    step: 100,
-    maxQuantity: 5000,
-    minQuantity: 100,
-    contactUsThreshold: 4500, // Example threshold
+    step: 10,
+    maxQuantity: 40,
+    minQuantity: 10,
+    contactUsThreshold: 30, // Example threshold
     freeUnits: 10, // Offer first 10 invoices for free
     showCycleWithUnit: true, // Show cycle for invoices unit
   },
@@ -152,7 +211,9 @@ export const allModules: Module[] = [
     step: 1000,
     maxQuantity: 10000,
     minQuantity: 1000,
+    freeUnits: 10,
     contactUsThreshold: 9000, // Example threshold
+    showCycleWithUnit: true,
   },
   {
     id: "quotes",
@@ -167,6 +228,9 @@ export const allModules: Module[] = [
     step: 100,
     maxQuantity: 2000,
     minQuantity: 100,
+    freeUnits: 100,
+    contactUsThreshold: 1900,
+    showCycleWithUnit: true,
   },
   {
     id: "expenses",
@@ -181,6 +245,8 @@ export const allModules: Module[] = [
     step: 50,
     maxQuantity: 1000,
     minQuantity: 50,
+    freeUnits: 50,
+    contactUsThreshold: 500,
     showCycleWithUnit: true, // Show cycle for expenses unit
   },
   {
@@ -196,6 +262,9 @@ export const allModules: Module[] = [
     step: 50,
     maxQuantity: 1000,
     minQuantity: 50,
+    freeUnits: 50,
+    contactUsThreshold: 500,
+    showCycleWithUnit: true,
   },
   {
     id: "employees",
@@ -210,6 +279,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 100,
     minQuantity: 1,
+    freeUnits: 1,
+    contactUsThreshold: 9,
+    showCycleWithUnit: false,
   },
   {
     id: "salaries",
@@ -224,6 +296,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 100,
     minQuantity: 1,
+    freeUnits: 1,
+    contactUsThreshold: 9,
+    showCycleWithUnit: true,
     integrations: [
       {
         id: "gosi",
@@ -247,6 +322,9 @@ export const allModules: Module[] = [
     step: 5,
     maxQuantity: 50,
     minQuantity: 5,
+    freeUnits: 1,
+    contactUsThreshold: 49,
+    showCycleWithUnit: false,
   },
   {
     id: "departments",
@@ -261,6 +339,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 20,
     minQuantity: 1,
+    freeUnits: 1,
+    contactUsThreshold: 19,
+    showCycleWithUnit: false,
   },
   {
     id: "job_listings",
@@ -275,6 +356,7 @@ export const allModules: Module[] = [
     step: 5,
     maxQuantity: 30,
     minQuantity: 5,
+    showCycleWithUnit: false,
   },
   {
     id: "applicants",
@@ -303,6 +385,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 10,
     minQuantity: 1,
+    freeUnits: 1,
+    contactUsThreshold: 9,
+    showCycleWithUnit: false,
   },
   {
     id: "domains",
@@ -317,6 +402,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 50,
     minQuantity: 1,
+    showCycleWithUnit: false,
+    freeUnits: 1,
+    contactUsThreshold: 49,
   },
   {
     id: "websites",
@@ -331,6 +419,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 10,
     minQuantity: 1,
+    freeUnits: 1,
+    contactUsThreshold: 9,
+    showCycleWithUnit: false,
   },
   {
     id: "ecommerce",
@@ -345,6 +436,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 5,
     minQuantity: 1,
+    freeUnits: 1,
+    contactUsThreshold: 4,
+    showCycleWithUnit: false,
   },
   {
     id: "employee_requests",
@@ -359,6 +453,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 100,
     minQuantity: 1,
+    freeUnits: 10,
+    contactUsThreshold: 90,
+    showCycleWithUnit: true,
   },
   // Trucks
   {
@@ -374,6 +471,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 10,
     minQuantity: 1,
+    freeUnits: 1,
+    contactUsThreshold: 9,
+    showCycleWithUnit: false,
   },
   // cars
   {
@@ -389,6 +489,9 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 10,
     minQuantity: 1,
+    contactUsThreshold: 9,
+    freeUnits: 1,
+    showCycleWithUnit: false,
   },
 ];
 
