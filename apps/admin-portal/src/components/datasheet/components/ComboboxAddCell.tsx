@@ -105,19 +105,14 @@ export const ComboboxAddCell: CellComponent<
           data={columnData.options}
           labelKey={columnData.labelKey || "label"}
           valueKey={columnData.valueKey || "value"}
-          // defaultValue={rowData || ""} // Directly use rowData for defaultValue
+          defaultValue={rowData || ""} // Directly use rowData for defaultValue
           onChange={handleValueChange}
           onAddClick={columnData.onAddClick}
           addText={columnData.addText}
-          texts={columnData.texts}
+          texts={{ ...columnData.texts, placeholder: " . . . " }}
           isLoading={columnData.isLoading}
           renderOption={columnData.renderOption}
           renderSelected={columnData.renderSelected}
-          preview={!focus} // Show preview when not focused
-          containerClassName={cn(
-            "h-full", // Make container fill height
-            !focus ? "!p-0" : "",
-          )}
           popoverClassName="z-50"
           disabled={disabled} // Use the disabled prop passed down
           hideInput={true}

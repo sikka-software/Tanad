@@ -11,23 +11,28 @@ import {
   CellComponent,
   Column,
 } from "@/components/datasheet";
-// Import the style only once in your app!
-import "@/components/datasheet/style.css";
-// Assuming Popover components are available in ui (adjust path if needed)
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
-import { Branch } from "./branch.type";
-// Import the schema function from the form file
-import { createBranchSchema } from "./branch.form";
 // Import the new cell and its exported columnData type
 import {
   ComboboxAddCell,
   ComboboxAddColumnData,
 } from "@/components/datasheet/components/ComboboxAddCell";
-import { useEmployees } from "../employee/employee.hooks"; // Import hooks to get employees
-import useEmployeeStore from "../employee/employee.store"; // Import store for dialog state
-import { EmployeeForm } from "../employee/employee.form"; // Import employee form
-import { FormDialog } from "@/components/ui/form-dialog"; // Import FormDialog
+// Import the style only once in your app!
+import "@/components/datasheet/style.css";
+// Import employee form
+import { FormDialog } from "@/components/ui/form-dialog";
+// Assuming Popover components are available in ui (adjust path if needed)
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+// Import store for dialog state
+import { EmployeeForm } from "../employee/employee.form";
+import { useEmployees } from "../employee/employee.hooks";
+// Import hooks to get employees
+import useEmployeeStore from "../employee/employee.store";
+// Import the schema function from the form file
+import { createBranchSchema } from "./branch.form";
+import { Branch } from "./branch.type";
+
+// Import FormDialog
 
 // --- CustomTextComponent ---
 type CustomTextComponentProps<T> = {
@@ -156,7 +161,9 @@ const CustomTextComponent: CellComponent<string | null, { validationSchema?: z.Z
   });
 
 // --- customTextColumn Definition (base for validated text columns) ---
-const customTextColumn: Partial<Column<string | null, { validationSchema?: z.ZodSchema<any> }, string | null>> = {
+const customTextColumn: Partial<
+  Column<string | null, { validationSchema?: z.ZodSchema<any> }, string | null>
+> = {
   component: CustomTextComponent,
   deleteValue: () => null,
   copyValue: ({ rowData }) => rowData ?? "",
@@ -169,7 +176,9 @@ const createValidatedColumn = <T extends Record<string, any>>(
   title: string,
   validationSchema?: z.ZodSchema<any>,
 ): Partial<Column<T, any, string | null>> => {
-  const specificColumn: Partial<Column<string | null, { validationSchema?: z.ZodSchema<any> }, string | null>> = {
+  const specificColumn: Partial<
+    Column<string | null, { validationSchema?: z.ZodSchema<any> }, string | null>
+  > = {
     ...customTextColumn,
     columnData: { validationSchema },
   };
@@ -230,10 +239,18 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   const columns: Column<Branch, any, any>[] = [
     createValidatedColumn("name", t("Branches.form.name.label"), branchSchema.shape.name),
     createValidatedColumn("code", t("Branches.form.code.label"), branchSchema.shape.code),
-    createValidatedColumn("short_address", t("Branches.form.address.label"), branchSchema.shape.short_address),
+    createValidatedColumn(
+      "short_address",
+      t("Branches.form.address.label"),
+      branchSchema.shape.short_address,
+    ),
     createValidatedColumn("city", t("Branches.form.city.label"), branchSchema.shape.city),
     createValidatedColumn("region", t("Branches.form.state.label"), branchSchema.shape.region),
-    createValidatedColumn("zip_code", t("Branches.form.zip_code.label"), branchSchema.shape.zip_code),
+    createValidatedColumn(
+      "zip_code",
+      t("Branches.form.zip_code.label"),
+      branchSchema.shape.zip_code,
+    ),
     createValidatedColumn("phone", t("Branches.form.phone.label"), branchSchema.shape.phone),
     createValidatedColumn("email", t("Branches.form.email.label"), branchSchema.shape.email),
 
@@ -254,14 +271,17 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
         onAddClick: () => setIsEmployeeDialogOpen(true),
         labelKey: "label", // Explicitly state keys if needed
         valueKey: "value", // Explicitly state keys if needed
-      } as ComboboxAddColumnData<typeof employeeOptions[0]>,
+      } as ComboboxAddColumnData<(typeof employeeOptions)[0]>,
       // Add type for rowData in getValue
       getValue: ({ rowData }: { rowData: Branch }) => rowData.manager,
       // The cell component (ComboboxAddCell) handles setting the UUID
     } as Column<Branch, ComboboxAddColumnData<any>, string | null>,
 
     // Active Column (remains the same)
-    { ...keyColumn("is_active", checkboxColumn), title: t("Branches.form.is_active.label") } as Column<Branch, any, boolean>,
+    {
+      ...keyColumn("is_active", checkboxColumn),
+      title: t("Branches.form.is_active.label"),
+    } as Column<Branch, any, boolean>,
   ];
 
   // createNewRow remains the same, manager defaults to null

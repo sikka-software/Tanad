@@ -110,7 +110,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
         >
           <PopoverTrigger disabled={props.disabled} asChild>
             {props.isLoading ? (
-              <Skeleton className="h-9 w-full" />
+              <Skeleton className={cn("h-9 w-full", inCell && "rounded-none h-10")} />
             ) : (
               <div className={cn("flex flex-col items-start gap-2", containerClassName)}>
                 <div
@@ -132,7 +132,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                       : "bg-background px-3",
                     ariaInvalid &&
                       "ring-destructive/20 dark:ring-destructive/40 border-destructive",
-                    inCell && "rounded-none",
+                    inCell && "rounded-none h-10 border-none",
                   )}
                 >
                   {selectedItem
