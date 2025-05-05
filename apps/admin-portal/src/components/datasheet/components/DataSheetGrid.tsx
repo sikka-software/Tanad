@@ -51,6 +51,9 @@ const DEFAULT_DUPLICATE_ROW: DataSheetGridProps<any>["duplicateRow"] = ({ rowDat
   ...rowData,
 });
 
+// Add state for validation errors
+type ValidationErrors = Record<number, Record<number, string | null>>;
+
 type ScrollBehavior = {
   doNotScrollX?: boolean;
   doNotScrollY?: boolean;
@@ -106,6 +109,8 @@ export const DataSheetGrid = React.memo(
 
       // Default value is 1 for the border
       const [heightDiff, setHeightDiff] = useDebounceState(1, 100);
+      // Add state for validation errors
+      const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
       const { getRowSize, totalSize, getRowIndex } = useRowHeights({
         value: data,
@@ -296,6 +301,110 @@ export const DataSheetGrid = React.memo(
         [columns],
       );
 
+      const handleOnChange = useCallback(
+        (newData: T[], operations: Operation[]) => {
+          const newErrors: ValidationErrors = JSON.parse(JSON.stringify(validationErrors)); // Deep copy for mutation
+          let validationStateChanged = false;
+
+          operations.forEach((op) => {
+            if (op.type === "UPDATE" || op.type === "CREATE") {
+              for (let rowIndex = op.fromRowIndex; rowIndex < op.toRowIndex; rowIndex++) {
+                // Ensure row data exists, especially for CREATE operations
+                const rowData = newData[rowIndex];
+                if (!rowData) continue;
+
+                newErrors[rowIndex] = newErrors[rowIndex] ?? {};
+                columns.forEach((column, colIndexWithGutter) => {
+                  // Skip gutter and sticky right column placeholder
+                  if (
+                    colIndexWithGutter === 0 ||
+                    (hasStickyRightColumn && colIndexWithGutter === columns.length - 1)
+                  ) {
+                    return;
+                  }
+                  const colIndex = colIndexWithGutter - 1;
+                  const {
+                    validationSchema,
+                    id: columnId,
+                    isCellEmpty = (opts) => {
+                      // Default check if T is object and columnId exists
+                      const val = columnId ? opts.rowData?.[columnId as keyof T] : undefined;
+                      return val === null || val === undefined || val === "";
+                    },
+                  } = column;
+
+                  if (validationSchema && columnId) {
+                    const value = rowData[columnId as keyof T];
+
+                    // Always run safeParse and let the schema handle optionality/emptiness
+                    const validationResult = validationSchema.safeParse(value);
+                    const currentError = newErrors[rowIndex]?.[colIndex];
+
+                    if (!validationResult.success) {
+                      const newError = validationResult.error.errors[0]?.message || "Invalid";
+                      if (currentError !== newError) {
+                        newErrors[rowIndex][colIndex] = newError;
+                        validationStateChanged = true;
+                      }
+                    } else if (currentError) {
+                      newErrors[rowIndex][colIndex] = null; // Clear previous error
+                      validationStateChanged = true;
+                    }
+                  } else if (newErrors[rowIndex]?.[colIndex]) {
+                    // Clear error if column has no validation or ID, but somehow had an error recorded
+                    newErrors[rowIndex][colIndex] = null;
+                    validationStateChanged = true;
+                  }
+                });
+                // Clean up row entry if no errors exist
+                if (Object.values(newErrors[rowIndex] ?? {}).every((e) => e === null)) {
+                  delete newErrors[rowIndex];
+                  // We still need to check if the state *actually* changed overall
+                }
+              }
+            } else if (op.type === "DELETE") {
+              const newErrorsState: ValidationErrors = {};
+              const numDeleted = op.toRowIndex - op.fromRowIndex;
+              let changed = false;
+
+              Object.keys(validationErrors).forEach((rIdxStr) => {
+                const rIdx = parseInt(rIdxStr, 10);
+                if (rIdx < op.fromRowIndex) {
+                  newErrorsState[rIdx] = validationErrors[rIdx];
+                } else if (rIdx >= op.toRowIndex) {
+                  newErrorsState[rIdx - numDeleted] = validationErrors[rIdx];
+                  if (!validationErrors[rIdx - numDeleted]) changed = true; // Mark change if new index didn't exist before
+                } else {
+                  // Rows being deleted had errors? Mark change.
+                  if (Object.values(validationErrors[rIdx] ?? {}).some((e) => e !== null)) {
+                    changed = true;
+                  }
+                }
+              });
+
+              // Compare keys count and deep compare values
+              if (Object.keys(newErrorsState).length !== Object.keys(validationErrors).length) {
+                changed = true;
+              }
+
+              if (changed && !deepEqual(validationErrors, newErrorsState)) {
+                setValidationErrors(newErrorsState);
+                // No need to set validationStateChanged here, outer call handles final state update
+              }
+            }
+          });
+
+          // Update errors state only if necessary after all operations
+          if (validationStateChanged && !deepEqual(validationErrors, newErrors)) {
+            setValidationErrors(newErrors);
+          }
+
+          // Call the original onChange prop
+          onChange(newData, operations);
+        },
+        [onChange, columns, hasStickyRightColumn, validationErrors, setValidationErrors], // Added dependencies
+      );
+
       const insertRowAfter = useCallback(
         (row: number, count = 1) => {
           if (lockRows) {
@@ -305,7 +414,7 @@ export const DataSheetGrid = React.memo(
           setSelectionCell(null);
           setEditing(false);
 
-          onChange(
+          handleOnChange(
             [
               ...dataRef.current.slice(0, row + 1),
               ...new Array(count).fill(0).map(createRow),
@@ -325,7 +434,7 @@ export const DataSheetGrid = React.memo(
             doNotScrollX: true,
           }));
         },
-        [createRow, lockRows, onChange, setActiveCell, setSelectionCell],
+        [createRow, lockRows, handleOnChange, setActiveCell, setSelectionCell],
       );
 
       const duplicateRows = useCallback(
@@ -334,7 +443,7 @@ export const DataSheetGrid = React.memo(
             return;
           }
 
-          onChange(
+          handleOnChange(
             [
               ...dataRef.current.slice(0, rowMax + 1),
               ...dataRef.current
@@ -362,7 +471,7 @@ export const DataSheetGrid = React.memo(
           columns.length,
           duplicateRow,
           lockRows,
-          onChange,
+          handleOnChange,
           setActiveCell,
           setSelectionCell,
           hasStickyRightColumn,
@@ -440,7 +549,7 @@ export const DataSheetGrid = React.memo(
 
       const setRowData = useCallback(
         (rowIndex: number, item: T) => {
-          onChange(
+          handleOnChange(
             [...dataRef.current?.slice(0, rowIndex), item, ...dataRef.current?.slice(rowIndex + 1)],
             [
               {
@@ -451,7 +560,7 @@ export const DataSheetGrid = React.memo(
             ],
           );
         },
-        [onChange],
+        [handleOnChange],
       );
 
       const deleteRows = useCallback(
@@ -471,7 +580,7 @@ export const DataSheetGrid = React.memo(
             return a && { col: a.col, row };
           });
           setSelectionCell(null);
-          onChange(
+          handleOnChange(
             [...dataRef.current.slice(0, rowMin), ...dataRef.current.slice(rowMax + 1)],
             [
               {
@@ -482,7 +591,7 @@ export const DataSheetGrid = React.memo(
             ],
           );
         },
-        [lockRows, onChange, setActiveCell, setSelectionCell],
+        [lockRows, handleOnChange, setActiveCell, setSelectionCell],
       );
 
       const deleteSelection = useCallback(
@@ -495,6 +604,7 @@ export const DataSheetGrid = React.memo(
           const min: Cell = selection?.min || activeCell;
           const max: Cell = selection?.max || activeCell;
 
+          // Check if the entire selection is already empty
           if (
             data
               .slice(min.row, max.row + 1)
@@ -502,37 +612,48 @@ export const DataSheetGrid = React.memo(
                 columns.every((column) => column.isCellEmpty({ rowData, rowIndex: i + min.row })),
               )
           ) {
+            // If it's already empty and smart delete is on, delete the rows
             if (smartDelete) {
               deleteRows(min.row, max.row);
             }
-            return;
+            return; // Otherwise, do nothing
           }
 
           const newData = [...data];
+          let changed = false; // Flag to track if any cell actually changed
 
           for (let row = min.row; row <= max.row; ++row) {
             for (let col = min.col; col <= max.col; ++col) {
               if (!isCellDisabled({ col, row })) {
                 const { deleteValue = ({ rowData }) => rowData } = columns[col + 1];
+                const originalRowData = newData[row]; // Store original
                 newData[row] = deleteValue({
                   rowData: newData[row],
                   rowIndex: row,
                 });
+                // Check if the row data actually changed after deleteValue (our validation might prevent it)
+                if (!deepEqual(originalRowData, newData[row])) {
+                  changed = true;
+                }
               }
             }
           }
 
-          if (smartDelete && deepEqual(newData, data)) {
-            setActiveCell({ col: 0, row: min.row, doNotScrollX: true });
-            setSelectionCell({
-              col: columns.length - (hasStickyRightColumn ? 3 : 2),
-              row: max.row,
-              doNotScrollX: true,
-            });
+          // If smart delete is on AND no cells actually changed (likely due to validation preventing deletion)
+          if (smartDelete && !changed) {
+            // setActiveCell({ col: 0, row: min.row, doNotScrollX: true }); // REMOVED
+            // setSelectionCell({                          // REMOVED
+            //   col: columns.length - (hasStickyRightColumn ? 3 : 2), // REMOVED
+            //   row: max.row,                             // REMOVED
+            //   doNotScrollX: true,                       // REMOVED
+            // });                                         // REMOVED
+            // Simply return, doing nothing, as the deletion was prevented.
             return;
           }
 
-          onChange(newData, [
+          // If we reached here, either smartDelete is off, or some cells did change.
+          // Apply the changes through the handler which includes validation.
+          handleOnChange(newData, [
             {
               type: "UPDATE",
               fromRowIndex: min.row,
@@ -546,12 +667,11 @@ export const DataSheetGrid = React.memo(
           data,
           deleteRows,
           isCellDisabled,
-          onChange,
+          handleOnChange,
           selection?.max,
           selection?.min,
-          setActiveCell,
-          setSelectionCell,
           hasStickyRightColumn,
+          disableSmartDelete,
         ],
       );
 
@@ -690,23 +810,26 @@ export const DataSheetGrid = React.memo(
                         row: rowIndex,
                       })
                     ) {
+                      const originalValue = newData[rowIndex];
                       newData[rowIndex] = await pasteValue({
                         rowData: newData[rowIndex],
                         value: pasteData[0][columnIndex],
                         rowIndex,
                       });
+                      if (!deepEqual(originalValue, newData[rowIndex])) {
+                        handleOnChange(newData, [
+                          {
+                            type: "UPDATE",
+                            fromRowIndex: rowIndex,
+                            toRowIndex: rowIndex + 1,
+                          },
+                        ]);
+                      }
                     }
                   }
                 }
               }
 
-              onChange(newData, [
-                {
-                  type: "UPDATE",
-                  fromRowIndex: min.row,
-                  toRowIndex: max.row + 1,
-                },
-              ]);
               setActiveCell({ col: min.col, row: min.row });
               setSelectionCell({
                 col: Math.min(
@@ -744,11 +867,21 @@ export const DataSheetGrid = React.memo(
                         row: min.row + rowIndex,
                       })
                     ) {
+                      const originalValueMulti = newData[min.row + rowIndex];
                       newData[min.row + rowIndex] = await pasteValue({
                         rowData: newData[min.row + rowIndex],
                         value: pasteData[rowIndex][columnIndex],
                         rowIndex: min.row + rowIndex,
                       });
+                      if (!deepEqual(originalValueMulti, newData[min.row + rowIndex])) {
+                        handleOnChange(newData, [
+                          {
+                            type: "UPDATE",
+                            fromRowIndex: min.row + rowIndex,
+                            toRowIndex: min.row + rowIndex + 1,
+                          },
+                        ]);
+                      }
                     }
                   }
                 }
@@ -766,12 +899,12 @@ export const DataSheetGrid = React.memo(
               if (missingRows > 0 && !lockRows) {
                 operations.push({
                   type: "CREATE",
-                  fromRowIndex: min.row + pasteData.length - missingRows,
-                  toRowIndex: min.row + pasteData.length,
+                  fromRowIndex: data.length, // Original length before adding rows
+                  toRowIndex: newData.length, // New length after adding rows
                 });
               }
 
-              onChange(newData, operations);
+              handleOnChange(newData, operations);
               setActiveCell({ col: min.col, row: min.row });
               setSelectionCell({
                 col: Math.min(
@@ -792,7 +925,7 @@ export const DataSheetGrid = React.memo(
           hasStickyRightColumn,
           isCellDisabled,
           lockRows,
-          onChange,
+          handleOnChange,
           selection?.max,
           selection?.min,
           setActiveCell,
@@ -1072,7 +1205,7 @@ export const DataSheetGrid = React.memo(
                 }
               }
 
-              onChange(newData, [
+              handleOnChange(newData, [
                 {
                   type: "UPDATE",
                   fromRowIndex: max.row + 1,
@@ -1110,7 +1243,7 @@ export const DataSheetGrid = React.memo(
         selection?.min,
         selection?.max,
         data,
-        onChange,
+        handleOnChange,
         setActiveCell,
         setSelectionCell,
         columns,
@@ -1387,6 +1520,7 @@ export const DataSheetGrid = React.memo(
           setSelectionCell,
           stopEditing,
           hasStickyRightColumn,
+          handleOnChange,
         ],
       );
       useDocumentEventListener("keydown", onKeyDown);
@@ -1535,6 +1669,7 @@ export const DataSheetGrid = React.memo(
         onCut,
         onCopy,
         applyPasteDataToDatasheet,
+        handleOnChange,
       ]);
 
       const contextMenuItemsRef = useRef(contextMenuItems);
@@ -1664,6 +1799,7 @@ export const DataSheetGrid = React.memo(
             stopEditing={stopEditing}
             cellClassName={cellClassName}
             onScroll={onScroll}
+            validationErrors={validationErrors}
           >
             <SelectionRect
               columnRights={columnRights}

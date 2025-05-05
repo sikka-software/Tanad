@@ -1,4 +1,5 @@
 import React, { JSX } from "react";
+import { z } from "zod";
 
 export type Cell = {
   col: number;
@@ -49,6 +50,7 @@ export type Column<T, C, PasteValue> = {
   pasteValue: (opt: { rowData: T; value: PasteValue; rowIndex: number }) => T;
   prePasteValues: (values: string[]) => PasteValue[] | Promise<PasteValue[]>;
   isCellEmpty: (opt: { rowData: T; rowIndex: number }) => boolean;
+  validationSchema?: z.ZodSchema<any>;
 };
 
 export type SelectionContextType = {

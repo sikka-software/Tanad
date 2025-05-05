@@ -6,6 +6,9 @@ import { useMemoizedIndexCallback } from "../hooks/useMemoizedIndexCallback";
 import { Cell, Column, ContextMenuItem, DataSheetGridProps, Selection } from "../types";
 import { Cell as CellComponent } from "./Cell";
 
+// Define the ValidationErrors type here as well, or import if shared
+type ValidationErrors = Record<number, Record<number, string | null>>;
+
 export const Grid = <T extends any>({
   data,
   columns,
@@ -31,6 +34,7 @@ export const Grid = <T extends any>({
   insertRowAfter,
   stopEditing,
   onScroll,
+  validationErrors,
 }: {
   data: T[];
   columns: Column<T, any, any>[];
@@ -56,6 +60,7 @@ export const Grid = <T extends any>({
   insertRowAfter: (row: number, count?: number) => void;
   stopEditing: (opts?: { nextRow?: boolean }) => void;
   onScroll?: React.UIEventHandler<HTMLDivElement>;
+  validationErrors: ValidationErrors;
 }) => {
   const rowVirtualizer = useVirtualizer({
     count: data.length,
@@ -194,6 +199,10 @@ export const Grid = <T extends any>({
                 const cellIsActive =
                   activeCell?.row === row.index && activeCell.col === col.index - 1;
 
+                // Check for validation errors
+                const cellError = validationErrors?.[row.index]?.[col.index - 1];
+                const isInvalid = !!cellError;
+
                 return (
                   <CellComponent
                     key={col.key}
@@ -216,6 +225,7 @@ export const Grid = <T extends any>({
                             columnId: columns[col.index].id,
                           })
                         : cellClassName,
+                      { "dsg-cell-invalid": isInvalid },
                     )}
                     width={col.size}
                     left={col.start}

@@ -1,9 +1,16 @@
 import React, { useCallback, useRef } from "react";
+import { z } from "zod";
 
-import { CellComponent, Column } from "../types";
+import { CellComponent, CellProps, Column } from "../types";
 
-type ColumnData = { key: string; original: Partial<Column<any, any, any>> };
+// The data passed to the cell component wrapper. Contains the key and the original column definition.
+type ColumnData = {
+  key: string;
+  original: Partial<Column<any, { validationSchema?: z.ZodSchema<any> }, any>>;
+};
 
+// Component wrapper that extracts the relevant key and calls the original component
+// Reverted to original structure to fix type issues
 const KeyComponent: CellComponent<any, ColumnData> = ({
   columnData: { key, original },
   rowData,
@@ -30,11 +37,10 @@ const KeyComponent: CellComponent<any, ColumnData> = ({
 
   return (
     <Component
-      columnData={original.columnData}
+      columnData={original.columnData ?? {}}
       setRowData={setKeyData}
-      // We only pass the value of the desired key, this is why each cell does not have to re-render everytime
-      // another cell in the same row changes!
-      rowData={rowData[key]}
+      // We only pass the value of the desired key
+      rowData={rowData?.[key]}
       {...rest}
     />
   );
@@ -46,20 +52,38 @@ export const keyColumn = <
   PasteValue = string,
 >(
   key: K,
-  column: Partial<Column<T[K], any, PasteValue>>,
+  column: Partial<Column<T[K], { validationSchema?: z.ZodSchema<any> }, PasteValue>>,
 ): Partial<Column<T, ColumnData, PasteValue>> => ({
   id: key as string,
   ...column,
-  // We pass the key and the original column as columnData to be able to retrieve them in the cell component
   columnData: { key: key as string, original: column },
-  component: KeyComponent,
-  // Here we simply wrap all functions to only pass the value of the desired key to the column, and not the entire row
+  component: KeyComponent, // Use the original KeyComponent structure
   copyValue: ({ rowData, rowIndex }) =>
     column.copyValue?.({ rowData: rowData[key], rowIndex }) ?? null,
-  deleteValue: ({ rowData, rowIndex }) => ({
-    ...rowData,
-    [key]: column.deleteValue?.({ rowData: rowData[key], rowIndex }) ?? null,
-  }),
+  deleteValue: ({ rowData, rowIndex }) => {
+    const deletedValue = column.deleteValue?.({ rowData: rowData[key], rowIndex }) ?? null;
+
+    // Explicitly check if columnData and validationSchema exist
+    if (column.columnData && column.columnData.validationSchema) {
+      const schema = column.columnData.validationSchema;
+      const result = schema.safeParse(deletedValue);
+      if (!result.success) {
+        console.warn(
+          `Validation failed for key "${String(key)}" after delete attempt: ${result.error.errors
+            .map((e) => e.message)
+            .join(", ")}. Change prevented.`,
+        );
+        // Validation failed, prevent deletion by returning original rowData
+        return rowData;
+      }
+    }
+
+    // Validation passed or no schema/columnData, proceed with deletion
+    return {
+      ...rowData,
+      [key]: deletedValue,
+    };
+  },
   pasteValue: ({ rowData, value, rowIndex }) => ({
     ...rowData,
     [key]: column.pasteValue?.({ rowData: rowData[key], value, rowIndex }) ?? null,
