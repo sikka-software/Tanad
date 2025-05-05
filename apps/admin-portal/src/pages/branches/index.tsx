@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
@@ -45,6 +45,7 @@ export default function BranchesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
+  const [displayData, setDisplayData] = useState<Branch[]>([]);
 
   const loadingSaveBranch = useBranchStore((state) => state.isLoading);
   const setLoadingSaveBranch = useBranchStore((state) => state.setIsLoading);
@@ -70,8 +71,16 @@ export default function BranchesPage() {
   const { mutate: updateBranch } = useUpdateBranch();
   const { createDeleteHandler } = useDeleteHandler();
 
+  useEffect(() => {
+    if (branches) {
+      setDisplayData(branches);
+    } else {
+      setDisplayData([]);
+    }
+  }, [branches]);
+
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: branches,
+    data: displayData,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
@@ -85,14 +94,15 @@ export default function BranchesPage() {
     success: "Branches.success.delete",
     error: "Branches.error.delete",
     onSuccess: () => {
+      setDisplayData((current) => current.filter((row) => !selectedRows.includes(row.id)));
       clearSelection();
       setIsDeleteDialogOpen(false);
     },
   });
 
   const filteredBranches = useMemo(() => {
-    return getFilteredBranches(branches || []);
-  }, [branches, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredBranches(displayData);
+  }, [displayData, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedBranches = useMemo(() => {
     return getSortedBranches(filteredBranches);
@@ -100,6 +110,8 @@ export default function BranchesPage() {
 
   const handleDatasheetChange = (updatedData: Branch[], operations: any[]) => {
     console.log("handleDatasheetChange called:", { updatedData, operations });
+
+    setDisplayData(updatedData);
 
     operations.forEach((op) => {
       console.log("Processing operation:", op);
@@ -138,14 +150,16 @@ export default function BranchesPage() {
               );
               updateBranch({ id: changedRow.id, data: updatePayload });
             } else {
-              console.log("No changes detected or no field identified.");
+              console.log("No changes detected or no field identified for backend update.");
             }
           } else {
-            console.log("Original row not found for ID:", changedRow.id);
+            console.log("Original row not found in fetched data for ID:", changedRow.id);
           }
         } else {
-          console.log("Changed row or row ID is missing.");
+          console.log("Changed row or row ID is missing in updatedData.");
         }
+      } else if (op.type?.toUpperCase() === "CREATE") {
+        console.log("CREATE operation detected. Display state updated. No backend call needed yet.");
       }
     });
   };
@@ -173,8 +187,8 @@ export default function BranchesPage() {
             onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Branches.create_new")}
             searchPlaceholder={t("Branches.search_branches")}
-            count={branches?.length}
-            hideOptions={branches?.length === 0}
+            count={displayData?.length}
+            hideOptions={displayData?.length === 0}
           />
         )}
 
