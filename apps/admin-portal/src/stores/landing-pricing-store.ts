@@ -34,7 +34,7 @@ export interface Module {
   annualPrice: number; // Price per unit/step per year
   monthlyPrice: number; // Price per unit/step per month
   quantity: number; // Selected quantity/steps
-  unit: string; // Unit of measurement (e.g., 'invoices', 'users')
+  unit: string;
   step: number; // Slider step increment
   maxQuantity: number; // Maximum value for the slider
   minQuantity: number; // Minimum value for the slider (usually same as step or 1)
@@ -145,6 +145,13 @@ export const allModules: Module[] = [
         monthlyPrice: 50.5, // 0.5 per employee per month
         annualPrice: 5, // 5 per employee per year
       },
+      {
+        id: "electricity",
+        label: "Pricing.custom_pricing.integrations.electricity",
+        pricingType: "per_unit",
+        monthlyPrice: 12, // 0.5 per employee per month
+        annualPrice: 12, // 5 per employee per year
+      },
     ],
   },
   {
@@ -191,12 +198,12 @@ export const allModules: Module[] = [
     monthlyPrice: 9,
     quantity: 10,
     unit: "invoice",
-    step: 10,
-    maxQuantity: 40,
+    step: 50,
+    maxQuantity: 200,
     minQuantity: 10,
-    contactUsThreshold: 30, // Example threshold
-    freeUnits: 10, // Offer first 10 invoices for free
-    showCycleWithUnit: true, // Show cycle for invoices unit
+    contactUsThreshold: 199,
+    freeUnits: 10,
+    showCycleWithUnit: true,
   },
   {
     id: "products",
@@ -206,13 +213,13 @@ export const allModules: Module[] = [
     category: "business",
     annualPrice: 50,
     monthlyPrice: 5,
-    quantity: 1000,
+    quantity: 100,
     unit: "product",
-    step: 1000,
-    maxQuantity: 10000,
-    minQuantity: 1000,
-    freeUnits: 10,
-    contactUsThreshold: 9000, // Example threshold
+    step: 100,
+    maxQuantity: 1000,
+    minQuantity: 100,
+    freeUnits: 100,
+    contactUsThreshold: 700, // Example threshold
     showCycleWithUnit: true,
   },
   {
@@ -282,6 +289,15 @@ export const allModules: Module[] = [
     freeUnits: 1,
     contactUsThreshold: 9,
     showCycleWithUnit: false,
+    integrations: [
+      {
+        id: "gosi",
+        label: "Pricing.custom_pricing.integrations.gosi",
+        pricingType: "per_unit",
+        monthlyPrice: 50.5, // 0.5 per employee per month
+        annualPrice: 5, // 5 per employee per year
+      },
+    ],
   },
   {
     id: "salaries",
@@ -339,8 +355,8 @@ export const allModules: Module[] = [
     step: 1,
     maxQuantity: 20,
     minQuantity: 1,
-    freeUnits: 1,
-    contactUsThreshold: 19,
+    freeUnits: 3,
+    contactUsThreshold: 10,
     showCycleWithUnit: false,
   },
   {
@@ -349,13 +365,15 @@ export const allModules: Module[] = [
     description: "Pricing.custom_pricing.job_listings.description",
     icon: "FileText",
     category: "hr",
-    annualPrice: 25,
-    monthlyPrice: 2.5,
-    quantity: 5,
+    annualPrice: 50,
+    monthlyPrice: 5,
+    quantity: 1,
     unit: "job_listing",
-    step: 5,
+    step: 1,
     maxQuantity: 30,
-    minQuantity: 5,
+    minQuantity: 1,
+    freeUnits: 0,
+    contactUsThreshold: 10,
     showCycleWithUnit: false,
   },
   {
@@ -366,11 +384,14 @@ export const allModules: Module[] = [
     category: "hr",
     annualPrice: 15,
     monthlyPrice: 1.5,
-    quantity: 100,
+    quantity: 50,
     unit: "applicant",
-    step: 100,
+    step: 50,
     maxQuantity: 1000,
-    minQuantity: 100,
+    minQuantity: 50,
+    freeUnits: 50,
+    contactUsThreshold: 500,
+    showCycleWithUnit: true,
   },
   {
     id: "servers",

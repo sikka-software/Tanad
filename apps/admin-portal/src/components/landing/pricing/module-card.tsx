@@ -173,11 +173,13 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
                       onClick={(e) => e.stopPropagation()}
                     >
                       <span className="text-xs">{t(integration.label)}</span>
-                      <div className="flex flex-row items-center gap-1 text-xs text-blue-600">
+                      <div className="flex flex-row text-nowrap items-center gap-1 text-xs text-blue-600">
                         <span>{priceLabel}</span>
                         <span>{currencySymbol}</span>
-                        {integration.pricingType === "per_unit" &&
-                          `\\ ${t(`General.${module.unit}`)}`}
+                        <span>
+                          {integration.pricingType === "per_unit" &&
+                            `\\ ${t(`General.${module.unit}`)}`}
+                        </span>
                       </div>
                     </Label>
                   </div>

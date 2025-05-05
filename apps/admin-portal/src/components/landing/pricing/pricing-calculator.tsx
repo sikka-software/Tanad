@@ -47,11 +47,14 @@ const PricingCalculator: React.FC = () => {
           mod.selectedIntegrations.forEach((intId) => {
             const integrationData = fullModuleData.integrations!.find((int) => int.id === intId);
             if (integrationData) {
-              const intPrice = currentCycle === "monthly" ? integrationData.monthlyPrice : integrationData.annualPrice;
+              const intPrice =
+                currentCycle === "monthly"
+                  ? integrationData.monthlyPrice
+                  : integrationData.annualPrice;
               if (integrationData.pricingType === "fixed") {
                 integrationsPrice += intPrice;
               } else if (integrationData.pricingType === "per_unit") {
-                integrationsPrice += intPrice * (chargeableQuantity / mod.step);
+                integrationsPrice += intPrice * (mod.quantity / mod.step);
               }
             }
           });
@@ -99,13 +102,18 @@ const PricingCalculator: React.FC = () => {
               let integrationsTotal = 0;
               if (mod.selectedIntegrations && fullModuleData?.integrations) {
                 mod.selectedIntegrations.forEach((intId) => {
-                  const integrationData = fullModuleData.integrations!.find((int) => int.id === intId);
+                  const integrationData = fullModuleData.integrations!.find(
+                    (int) => int.id === intId,
+                  );
                   if (integrationData) {
-                    const integrationPrice = currentCycle === "monthly" ? integrationData.monthlyPrice : integrationData.annualPrice;
+                    const integrationPrice =
+                      currentCycle === "monthly"
+                        ? integrationData.monthlyPrice
+                        : integrationData.annualPrice;
                     if (integrationData.pricingType === "fixed") {
                       integrationsTotal += integrationPrice;
                     } else if (integrationData.pricingType === "per_unit") {
-                      integrationsTotal += integrationPrice * (chargeableQuantity / mod.step);
+                      integrationsTotal += integrationPrice * (mod.quantity / mod.step);
                     }
                   }
                 });
@@ -128,9 +136,7 @@ const PricingCalculator: React.FC = () => {
                   </span>
                   {/* Display department total or special quote text */}
                   {departmentNeedsQuote ? (
-                    <span className="font-semibold text-orange-600">
-                      {t("Pricing.special_quote")}
-                    </span>
+                    <span className="font-semibold">{t("Pricing.special_quote")}</span>
                   ) : (
                     <div className="flex flex-row items-center gap-1">
                       <span className="font-semibold">
@@ -191,7 +197,7 @@ const PricingCalculator: React.FC = () => {
                                 calculatedIntegrationPrice = integrationPricePerCycle;
                               } else if (integrationData.pricingType === "per_unit") {
                                 calculatedIntegrationPrice =
-                                  integrationPricePerCycle * (chargeableQuantity / mod.step);
+                                  integrationPricePerCycle * (mod.quantity / mod.step);
                               }
 
                               return (

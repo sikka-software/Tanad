@@ -14,7 +14,9 @@ const ServerCard = ({ server }: { server: Server }) => {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold">{server.name}</h3>
-            <p className="text-sm text-gray-500">IP: {typeof server.ip_address === 'string' ? server.ip_address : 'N/A'}</p>
+            <p className="text-sm text-gray-500">
+              IP: {typeof server.ip_address === "string" ? server.ip_address : "N/A"}
+            </p>
           </div>
           <Badge variant={server.status === "active" ? "default" : "secondary"}>
             {server.status === "active" ? t("status.active") : t("status.inactive")}
@@ -37,7 +39,7 @@ const ServerCard = ({ server }: { server: Server }) => {
               </a>
             </div>
           )}
-          {typeof server.ip_address === 'string' && server.ip_address && (
+          {typeof server.ip_address === "string" && server.ip_address && (
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <Phone className="h-4 w-4" />
               <a href={`tel:${server.ip_address}`} className="hover:text-primary">

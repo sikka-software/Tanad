@@ -1,10 +1,10 @@
 import { createGenericStore } from "@/utils/generic-store";
 
-import { Branch } from "./branch.type";
+import { Server } from "./server.type";
 
-const searchBranchFn = (branch: Branch, searchQuery: string) =>
-  branch.name.toLowerCase().includes(searchQuery.toLowerCase());
+const searchServerFn = (server: Server, searchQuery: string) =>
+  server.name.toLowerCase().includes(searchQuery.toLowerCase());
 
-const useBranchStore = createGenericStore<Branch>("branches", searchBranchFn);
+const useServerStore = createGenericStore<Server>("servers", searchServerFn);
 
-export default useBranchStore;
+export default useServerStore;
