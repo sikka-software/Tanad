@@ -254,13 +254,13 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     createValidatedColumn("phone", t("Branches.form.phone.label"), branchSchema.shape.phone),
     createValidatedColumn("email", t("Branches.form.email.label"), branchSchema.shape.email),
 
-    // Manager Column using ComboboxAddCell
+    // Manager Column using ComboboxAddCell (Reverted to manual definition)
     {
       id: "manager",
       title: t("Branches.form.manager.label"),
-      ...comboboxAddColumnBase,
+      ...comboboxAddColumnBase, // component: ComboboxAddCell, etc.
       columnData: {
-        options: employeeOptions, // Use options with ID as value
+        options: employeeOptions,
         isLoading: employeesLoading,
         texts: {
           placeholder: t("Branches.form.manager.placeholder"),
@@ -269,12 +269,11 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
         },
         addText: t("Employees.add_new"),
         onAddClick: () => setIsEmployeeDialogOpen(true),
-        labelKey: "label", // Explicitly state keys if needed
-        valueKey: "value", // Explicitly state keys if needed
+        labelKey: "label",
+        valueKey: "value",
       } as ComboboxAddColumnData<(typeof employeeOptions)[0]>,
-      // Add type for rowData in getValue
+      // Explicitly define getValue again
       getValue: ({ rowData }: { rowData: Branch }) => rowData.manager,
-      // The cell component (ComboboxAddCell) handles setting the UUID
     } as Column<Branch, ComboboxAddColumnData<any>, string | null>,
 
     // Active Column (remains the same)

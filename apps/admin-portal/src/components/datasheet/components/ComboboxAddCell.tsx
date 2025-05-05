@@ -59,6 +59,14 @@ export const ComboboxAddCell: CellComponent<
     // Ref for the ComboboxAdd's trigger button
     const triggerRef = useRef<HTMLButtonElement>(null);
 
+    // HACK: Check if rowData is the full object and extract manager ID if necessary
+    // This assumes the component is used for a field named 'manager' if rowData is an object.
+    // Ideally, DataSheetGrid should pass the correct value based on `getValue`.
+    const cellValue = 
+      typeof rowData === 'object' && rowData !== null && 'manager' in rowData
+      ? (rowData as any).manager // Extract manager ID if full object is passed
+      : rowData; // Otherwise, assume rowData is the correct string | null value
+
     // Trigger click when focus becomes true
     useEffect(() => {
       if (focus && triggerRef.current) {
@@ -105,7 +113,7 @@ export const ComboboxAddCell: CellComponent<
           data={columnData.options}
           labelKey={columnData.labelKey || "label"}
           valueKey={columnData.valueKey || "value"}
-          defaultValue={rowData || ""} // Directly use rowData for defaultValue
+          defaultValue={cellValue || ""} // Use the potentially extracted cellValue
           onChange={handleValueChange}
           onAddClick={columnData.onAddClick}
           addText={columnData.addText}
