@@ -1,9 +1,9 @@
-import { useRef } from 'react'
+import { useRef } from "react";
 
 export const useFirstRender = () => {
-  const firstRenderRef = useRef(true)
-  const firstRender = firstRenderRef.current
-  firstRenderRef.current = false
+  const firstRenderRef = useRef(true);
+  const firstRender = firstRenderRef.current;
+  firstRenderRef.current = false;
 
-  return firstRender
-}
+  return firstRender;
+};

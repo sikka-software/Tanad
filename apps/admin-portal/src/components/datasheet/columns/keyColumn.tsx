@@ -1,7 +1,8 @@
-import React, { useCallback, useRef } from 'react'
-import { CellComponent, Column } from '../types'
+import React, { useCallback, useRef } from "react";
 
-type ColumnData = { key: string; original: Partial<Column<any, any, any>> }
+import { CellComponent, Column } from "../types";
+
+type ColumnData = { key: string; original: Partial<Column<any, any, any>> };
 
 const KeyComponent: CellComponent<any, ColumnData> = ({
   columnData: { key, original },
@@ -10,22 +11,22 @@ const KeyComponent: CellComponent<any, ColumnData> = ({
   ...rest
 }) => {
   // We use a ref so useCallback does not produce a new setKeyData function every time the rowData changes
-  const rowDataRef = useRef(rowData)
-  rowDataRef.current = rowData
+  const rowDataRef = useRef(rowData);
+  rowDataRef.current = rowData;
 
   // We wrap the setRowData function to assign the value to the desired key
   const setKeyData = useCallback(
     (value: any) => {
-      setRowData({ ...rowDataRef.current, [key]: value })
+      setRowData({ ...rowDataRef.current, [key]: value });
     },
-    [key, setRowData]
-  )
+    [key, setRowData],
+  );
 
   if (!original.component) {
-    return <></>
+    return <></>;
   }
 
-  const Component = original.component
+  const Component = original.component;
 
   return (
     <Component
@@ -36,16 +37,16 @@ const KeyComponent: CellComponent<any, ColumnData> = ({
       rowData={rowData[key]}
       {...rest}
     />
-  )
-}
+  );
+};
 
 export const keyColumn = <
   T extends Record<string, any>,
   K extends keyof T = keyof T,
-  PasteValue = string
+  PasteValue = string,
 >(
   key: K,
-  column: Partial<Column<T[K], any, PasteValue>>
+  column: Partial<Column<T[K], any, PasteValue>>,
 ): Partial<Column<T, ColumnData, PasteValue>> => ({
   id: key as string,
   ...column,
@@ -61,25 +62,24 @@ export const keyColumn = <
   }),
   pasteValue: ({ rowData, value, rowIndex }) => ({
     ...rowData,
-    [key]:
-      column.pasteValue?.({ rowData: rowData[key], value, rowIndex }) ?? null,
+    [key]: column.pasteValue?.({ rowData: rowData[key], value, rowIndex }) ?? null,
   }),
   disabled:
-    typeof column.disabled === 'function'
+    typeof column.disabled === "function"
       ? ({ rowData, rowIndex }) => {
-          return typeof column.disabled === 'function'
+          return typeof column.disabled === "function"
             ? column.disabled({ rowData: rowData[key], rowIndex })
-            : column.disabled ?? false
+            : (column.disabled ?? false);
         }
       : column.disabled,
   cellClassName:
-    typeof column.cellClassName === 'function'
+    typeof column.cellClassName === "function"
       ? ({ rowData, rowIndex, columnId }) => {
-          return typeof column.cellClassName === 'function'
+          return typeof column.cellClassName === "function"
             ? column.cellClassName({ rowData: rowData[key], rowIndex, columnId })
-            : column.cellClassName ?? undefined
+            : (column.cellClassName ?? undefined);
         }
       : column.cellClassName,
   isCellEmpty: ({ rowData, rowIndex }) =>
     column.isCellEmpty?.({ rowData: rowData[key], rowIndex }) ?? false,
-})
+});

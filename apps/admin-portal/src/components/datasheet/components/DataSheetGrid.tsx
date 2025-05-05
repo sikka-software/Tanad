@@ -1,5 +1,7 @@
 import deepEqual from "fast-deep-equal";
 import React, {
+  JSXElementConstructor,
+  ReactElement,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -18,9 +20,11 @@ import { useEdges } from "../hooks/useEdges";
 import { useGetBoundingClientRect } from "../hooks/useGetBoundingClientRect";
 import { useRowHeights } from "../hooks/useRowHeights";
 import {
+  AddRowsComponentProps,
   Cell,
   Column,
   ContextMenuItem,
+  ContextMenuComponentProps,
   DataSheetGridProps,
   DataSheetGridRef,
   Operation,
@@ -68,14 +72,18 @@ export const DataSheetGrid = React.memo(
         gutterColumn,
         stickyRightColumn,
         rowKey,
-        addRowsComponent: AddRowsComponent = AddRows,
+        addRowsComponent: AddRowsComponent = AddRows as (
+          props: AddRowsComponentProps,
+        ) => ReactElement | null,
         createRow = DEFAULT_CREATE_ROW as () => T,
         autoAddRow = false,
         lockRows = false,
         disableExpandSelection = false,
         disableSmartDelete = false,
         duplicateRow = DEFAULT_DUPLICATE_ROW,
-        contextMenuComponent: ContextMenuComponent = ContextMenu,
+        contextMenuComponent: ContextMenuComponent = ContextMenu as (
+          props: ContextMenuComponentProps,
+        ) => ReactElement | null,
         disableContextMenu: disableContextMenuRaw = false,
         onFocus = DEFAULT_EMPTY_CALLBACK,
         onBlur = DEFAULT_EMPTY_CALLBACK,
@@ -119,7 +127,7 @@ export const DataSheetGrid = React.memo(
 
       setHeightDiff(height ? displayHeight - height : 0);
 
-      const edges = useEdges(outerRef, width, height);
+      const edges = useEdges(outerRef as React.RefObject<HTMLElement>, width, height);
 
       const {
         fullWidth,
@@ -201,8 +209,12 @@ export const DataSheetGrid = React.memo(
           ? null
           : expandSelectionRowsCount;
 
-      const getInnerBoundingClientRect = useGetBoundingClientRect(innerRef);
-      const getOuterBoundingClientRect = useGetBoundingClientRect(outerRef);
+      const getInnerBoundingClientRect = useGetBoundingClientRect(
+        innerRef as React.RefObject<HTMLElement>,
+      );
+      const getOuterBoundingClientRect = useGetBoundingClientRect(
+        outerRef as React.RefObject<HTMLElement>,
+      );
 
       // Blur any element on focusing the grid
       useEffect(() => {
@@ -1630,7 +1642,7 @@ export const DataSheetGrid = React.memo(
           />
           <Grid
             columns={columns}
-            outerRef={outerRef}
+            outerRef={outerRef as React.RefObject<HTMLDivElement>}
             columnWidths={columnWidths}
             hasStickyRightColumn={hasStickyRightColumn}
             displayHeight={displayHeight}
@@ -1638,7 +1650,7 @@ export const DataSheetGrid = React.memo(
             fullWidth={fullWidth}
             headerRowHeight={headerRowHeight}
             activeCell={activeCell}
-            innerRef={innerRef}
+            innerRef={innerRef as React.RefObject<HTMLDivElement>}
             rowHeight={getRowSize}
             rowKey={rowKey}
             selection={selection}
@@ -1700,7 +1712,7 @@ export const DataSheetGrid = React.memo(
   ),
 ) as <T extends any>(
   props: DataSheetGridProps<T> & { ref?: React.ForwardedRef<DataSheetGridRef> },
-) => JSX.Element;
+) => React.ReactNode;
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore

@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { debounce } from 'throttle-debounce'
+import { useEffect, useMemo, useRef, useState } from "react";
+import { debounce } from "throttle-debounce";
 
-export const useDebounceState = <T>(
-  defaultValue: T,
-  delay: number
-): [T, (nextVal: T) => void] => {
-  const [debouncedValue, setDebouncedValue] = useState(defaultValue)
-  const cancelRef = useRef<debounce<(newValue: T) => void>>()
+export const useDebounceState = <T>(defaultValue: T, delay: number): [T, (nextVal: T) => void] => {
+  const [debouncedValue, setDebouncedValue] = useState(defaultValue);
+  const cancelRef = useRef<debounce<(newValue: T) => void>>(debounce(delay, () => {}));
 
-  useEffect(() => () => cancelRef.current?.cancel(), [])
+  useEffect(() => () => cancelRef.current?.cancel(), []);
 
   const setValue = useMemo(
     () =>
       (cancelRef.current = debounce(delay, (newValue: T) => {
-        setDebouncedValue(newValue)
+        setDebouncedValue(newValue);
       })),
-    [delay]
-  )
+    [delay],
+  );
 
-  return [debouncedValue, setValue]
-}
+  return [debouncedValue, setValue];
+};
