@@ -67,8 +67,8 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ module, isSelected, onToggle })
         if (integrationData.pricingType === "fixed") {
           displayedModulePrice += integrationPricePerCycle;
         } else if (integrationData.pricingType === "per_unit") {
-          // Use chargeable quantity for per-unit integration pricing
-          displayedModulePrice += integrationPricePerCycle * (chargeableQuantity / module.step);
+          // Use displayQuantity for per-unit integration pricing, as freeUnits usually apply to base module only
+          displayedModulePrice += integrationPricePerCycle * (displayQuantity / module.step);
         }
       }
     });
