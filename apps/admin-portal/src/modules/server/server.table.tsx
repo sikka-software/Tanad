@@ -1,3 +1,4 @@
+import { SERVER_OS, SERVER_PROVIDERS } from "@root/src/lib/constants";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
@@ -54,10 +55,23 @@ const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       accessorKey: "provider",
       header: t("Servers.form.provider.label"),
       validationSchema: providerSchema,
+      cellType: "select",
+      options: SERVER_PROVIDERS,
     },
-    { accessorKey: "os", header: t("Servers.form.os.label"), validationSchema: osSchema },
+    {
+      accessorKey: "os",
+      header: t("Servers.form.os.label"),
+      validationSchema: osSchema,
+      cellType: "select",
+      options: SERVER_OS,
+    },
     {
       accessorKey: "status",
+      cellType: "select",
+      options: [
+        { label: t("Branches.form.status.active"), value: "active" },
+        { label: t("Branches.form.status.inactive"), value: "inactive" },
+      ],
       header: t("Servers.form.status.label"),
       validationSchema: statusSchema,
     },

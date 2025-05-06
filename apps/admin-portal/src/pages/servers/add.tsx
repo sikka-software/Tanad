@@ -31,7 +31,6 @@ export default function AddServerPage() {
       form.setValue("location", dummyData.locations);
       form.setValue("provider", dummyData.randomPicker(SERVER_PROVIDERS).value);
       form.setValue("os", dummyData.randomPicker(SERVER_OS).value);
-      form.setValue("status", dummyData.randomPicker(["Active", "Inactive", "Pending"]));
       form.setValue("notes", dummyData.randomString);
     }
   };

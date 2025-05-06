@@ -211,7 +211,7 @@ export function ServerForm({
                       data={countries || []}
                       labelKey="label"
                       inputProps={{ disabled: isLoading }}
-                      valueKey="label"
+                      valueKey="value"
                       texts={{
                         placeholder: t("Servers.form.location.placeholder"),
                         searchPlaceholder: t("Servers.form.location.search_placeholder"),
@@ -242,7 +242,7 @@ export function ServerForm({
                       direction={lang === "ar" ? "rtl" : "ltr"}
                       data={SERVER_PROVIDERS || []}
                       labelKey="label"
-                      valueKey="label"
+                      valueKey="value"
                       inputProps={{ disabled: isLoading }}
                       texts={{
                         placeholder: t("Servers.form.provider.placeholder"),
@@ -270,7 +270,7 @@ export function ServerForm({
                       direction={lang === "ar" ? "rtl" : "ltr"}
                       data={SERVER_OS || []}
                       labelKey="label"
-                      valueKey="label"
+                      valueKey="value"
                       inputProps={{ disabled: isLoading }}
                       texts={{
                         placeholder: t("Servers.form.os.placeholder"),

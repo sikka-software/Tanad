@@ -809,6 +809,8 @@ function SheetTable<
                     defaultValue={String(cellValue)}
                     popoverClassName="w-fit"
                     buttonClassName="bg-transparent"
+                    valueKey="value"
+                    labelKey="label"
                     onChange={async (value) => {
                       if (onEdit) {
                         onEdit(rowId, colKey as keyof T, value as T[keyof T]);
