@@ -2,7 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { createApiHandler } from "@/lib/api-handler";
-import type { Database } from "@/lib/db_types";
+import type { Database } from "@/lib/database.types";
 
 // Assuming this path is correct
 
