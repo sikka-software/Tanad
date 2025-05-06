@@ -1,7 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { toast } from "sonner";
 
 import PageTitle from "@/ui/page-title";
 

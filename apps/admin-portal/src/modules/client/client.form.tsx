@@ -19,7 +19,7 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import { useCreateClient, useUpdateClient } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
-import { Client, ClientUpdateData } from "@/client/client.type";
+import { ClientCreateData, ClientUpdateData } from "@/client/client.type";
 
 import { CompanyForm } from "@/company/company.form";
 import { useCompanies } from "@/company/company.hooks";
@@ -50,7 +50,7 @@ export function ClientForm({
   onSuccess,
   defaultValues,
   editMode = false,
-}: ModuleFormProps<ClientUpdateData>) {
+}: ModuleFormProps<ClientCreateData | ClientUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();
@@ -104,19 +104,19 @@ export function ClientForm({
       if (editMode && defaultValues) {
         await updateClient(
           {
-            id: defaultValues.id,
+            id: defaultValues.id || "",
             client: {
               name: data.name.trim(),
               email: data.email.trim(),
               phone: data.phone.trim(),
-              company: data.company || undefined,
-              short_address: data.short_address?.trim() || undefined,
-              building_number: data.building_number?.trim() || undefined,
-              street_name: data.street_name?.trim() || undefined,
-              city: data.city?.trim() || undefined,
-              region: data.region?.trim() || undefined,
-              country: data.country?.trim() || undefined,
-              zip_code: data.zip_code?.trim() || undefined,
+              company: data.company || null,
+              short_address: data.short_address?.trim() || null,
+              building_number: data.building_number?.trim() || null,
+              street_name: data.street_name?.trim() || null,
+              city: data.city?.trim() || null,
+              region: data.region?.trim() || null,
+              country: data.country?.trim() || null,
+              zip_code: data.zip_code?.trim() || null,
               notes: data.notes?.trim() || null,
             },
           },
@@ -134,14 +134,14 @@ export function ClientForm({
             name: data.name.trim(),
             email: data.email.trim(),
             phone: data.phone.trim(),
-            company: data.company || undefined,
-            short_address: data.short_address?.trim() || undefined,
-            building_number: data.building_number?.trim() || undefined,
-            street_name: data.street_name?.trim() || undefined,
-            city: data.city?.trim() || undefined,
-            region: data.region?.trim() || undefined,
-            country: data.country?.trim() || undefined,
-            zip_code: data.zip_code?.trim() || undefined,
+            company: data.company || null,
+            short_address: data.short_address?.trim() || null,
+            building_number: data.building_number?.trim() || null,
+            street_name: data.street_name?.trim() || null,
+            city: data.city?.trim() || null,
+            region: data.region?.trim() || null,
+            country: data.country?.trim() || null,
+            zip_code: data.zip_code?.trim() || null,
             notes: data.notes?.trim() || null,
             enterprise_id: membership?.enterprise_id || "",
           },

@@ -1,21 +1,5 @@
-import { AddressProps } from "@/types/common.type";
+import { Database } from "@/lib/database.types";
 
-export interface CompanyProps {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  website?: string;
-  industry?: string;
-  size?: string;
-  notes?: string;
-  status: string;
-  enterprise_id: string;
-  created_at: string;
-  user_id: string;
-}
-
-export interface Company extends CompanyProps, AddressProps {}
-
-export type CompanyCreateData = Omit<Company, "id" | "created_at"> & { user_id: string };
-export type CompanyUpdateData = Partial<Company>;
+export type Company = Database["public"]["Tables"]["companies"]["Row"];
+export type CompanyCreateData = Database["public"]["Tables"]["companies"]["Insert"];
+export type CompanyUpdateData = Database["public"]["Tables"]["companies"]["Update"];
