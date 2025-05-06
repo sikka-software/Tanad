@@ -111,8 +111,6 @@ export default function BranchesPage() {
   const handleDatasheetChange = (updatedData: Branch[], operations: any[]) => {
     console.log("handleDatasheetChange called:", { updatedData, operations });
 
-    setDisplayData(updatedData);
-
     operations.forEach((op) => {
       console.log("Processing operation:", op);
       if (op.type?.toUpperCase() === "UPDATE") {
@@ -125,7 +123,7 @@ export default function BranchesPage() {
           console.log("Update operation - originalRow:", originalRow);
 
           if (originalRow) {
-            type BranchPayload = Partial<Omit<Branch, "id" | "created_at" | "enterprise_id">>;
+            type BranchPayload = Partial<Omit<Branch, "created_at" | "enterprise_id">>;
             const updatePayload: BranchPayload = {};
             let fieldChanged: keyof BranchPayload | null = null;
 
@@ -146,9 +144,9 @@ export default function BranchesPage() {
             if (fieldChanged && Object.keys(updatePayload).length > 0) {
               console.log(
                 `Calling updateBranch for ID ${changedRow.id} with payload:`,
-                updatePayload,
+                updatePayload
               );
-              updateBranch({ id: changedRow.id, data: updatePayload });
+              updateBranch({ id: changedRow.id, data: updatePayload as BranchUpdateData });
             } else {
               console.log("No changes detected or no field identified for backend update.");
             }
@@ -196,7 +194,7 @@ export default function BranchesPage() {
 
         <div>
           {viewMode === "table" ? (
-            <BranchDatasheet data={displayData} onChange={handleDatasheetChange} />
+            <BranchDatasheet data={sortedBranches} onChange={handleDatasheetChange} />
           ) : viewMode === "cards" ? (
             <div className="p-4">
               <DataModelList

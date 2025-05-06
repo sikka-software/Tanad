@@ -12,7 +12,7 @@ import {
   bulkDeleteBranches,
   duplicateBranch,
 } from "@/branch/branch.service";
-import type { Branch, BranchCreateData } from "@/branch/branch.type";
+import type { Branch, BranchCreateData, BranchUpdateData } from "@/branch/branch.type";
 
 // Query keys for branches
 export const branchKeys = {
@@ -71,13 +71,65 @@ export function useUpdateBranch() {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Branch> }) => updateBranch(id, data),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: branchKeys.detail(data.id) });
-      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Branches.success.update"),
+    mutationFn: ({ id, data }: { id: string; data: BranchUpdateData }) => updateBranch(id, data),
+    onMutate: async ({ id, data }) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: branchKeys.detail(id) });
+      await queryClient.cancelQueries({ queryKey: branchKeys.lists() });
+
+      // Snapshot the previous value
+      const previousBranch = queryClient.getQueryData<Branch>(branchKeys.detail(id));
+      const previousBranches = queryClient.getQueryData<Branch[]>(branchKeys.lists());
+
+      // Optimistically update to the new value
+      // Update detail cache
+      if (previousBranch) {
+        queryClient.setQueryData<Branch>(branchKeys.detail(id), {
+          ...previousBranch,
+          ...data,
+          // Ensure created_at is preserved if not part of the update
+          created_at: previousBranch.created_at,
+        });
+      }
+
+      // Update list cache
+      if (previousBranches) {
+        queryClient.setQueryData<Branch[]>(
+          branchKeys.lists(),
+          previousBranches.map((branch) =>
+            branch.id === id
+              ? { ...branch, ...data, created_at: branch.created_at } // Preserve created_at here too
+              : branch,
+          ),
+        );
+      }
+
+      // Return a context object with the snapshotted value
+      return { previousBranch, previousBranches };
+    },
+    onError: (err, { id }, context) => {
+      console.error("Update failed:", err);
+      if (context?.previousBranch) {
+        queryClient.setQueryData(branchKeys.detail(id), context.previousBranch);
+      }
+      if (context?.previousBranches) {
+        queryClient.setQueryData(branchKeys.lists(), context.previousBranches);
+      }
+      toast.error(t("General.error_operation"), {
+        description: t("Branches.error.update"),
       });
+    },
+    onSettled: (data, error, { id }) => {
+      // Invalidate queries to ensure eventual consistency
+      queryClient.invalidateQueries({ queryKey: branchKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: branchKeys.lists() });
+
+      // Show success toast only if the mutation succeeded
+      if (!error && data) {
+        toast.success(t("General.successful_operation"), {
+          description: t("Branches.success.update"),
+        });
+      }
     },
   });
 }
@@ -174,9 +226,9 @@ export function useBranchDatasheet(initialData: Branch[] = []) {
               // Extract only the changed fields if possible, or send the whole row
               // For simplicity, sending the relevant part of the row object
               // Ensure you are not sending fields that shouldn't be updated (like id, created_at)
-              const { id, created_at, ...updatePayload } = changedBranch;
-              console.log("Updating branch:", id, updatePayload);
-              updateMutation.mutate({ id: changedBranch.id, data: updatePayload });
+              const { id: changedBranchId, created_at: _createdAt, ...updatePayload } = changedBranch;
+              console.log("Updating branch:", changedBranchId, updatePayload);
+              updateMutation.mutate({ id: changedBranchId, data: updatePayload as BranchUpdateData });
             } else {
               console.warn("Skipping update for row without ID:", i, changedBranch);
             }

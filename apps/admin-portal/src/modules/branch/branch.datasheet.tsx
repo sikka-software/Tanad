@@ -225,6 +225,14 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   // Get the schema once
   const branchSchema = createBranchSchema(t);
 
+  useEffect(() => {
+    console.log("[BranchDatasheet] Rendering or data prop updated.");
+    // Log the IDs of the first ~5 items to easily see order changes
+    console.log("[BranchDatasheet] Current data order (first 5 IDs):", data?.slice(0, 5).map(d => d.id)); 
+    // You could log the full data if needed, but IDs are usually sufficient
+    // console.log("[BranchDatasheet] Full Data prop:", data);
+  }, [data]); // Dependency array ensures this runs when 'data' prop changes
+
   const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
   const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
