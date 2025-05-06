@@ -919,7 +919,7 @@ function SheetTable<
 
           {/* Selection checkbox */}
           {enableRowActions && (
-            <div className="sticky end-0 z-2">
+            <TableCell className="sticky end-0 z-2 p-0">
               <RowActions
                 texts={texts}
                 onEdit={props.canEditAction ? () => onActionClicked?.("edit", rowId) : undefined}
@@ -937,7 +937,7 @@ function SheetTable<
                   props.canPreviewAction ? () => onActionClicked?.("preview", rowId) : undefined
                 }
               />
-            </div>
+            </TableCell>
           )}
         </TableRow>
 
