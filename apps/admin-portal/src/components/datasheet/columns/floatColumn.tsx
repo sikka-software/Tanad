@@ -1,3 +1,4 @@
+// ON HOLD
 import { createTextColumn } from "./textColumn";
 
 export const floatColumn = createTextColumn<number | null>({
