@@ -237,7 +237,12 @@ export default function BranchesPage() {
 
         <div>
           {viewMode === "table" ? (
-            <BranchDatasheet data={sortedBranches} onChange={handleDatasheetChange} />
+            <BranchesTable
+              data={sortedBranches}
+              isLoading={loadingFetchBranches}
+              error={error instanceof Error ? error : null}
+              onActionClicked={onActionClicked}
+            />
           ) : viewMode === "cards" ? (
             <div className="p-4">
               <DataModelList

@@ -27,29 +27,21 @@ export type CodeInputCellColumnData<TRowData> = {
 // --- CodeInputCell Component ---
 const CodeInputCellComponent = React.memo(
   <TRowData extends Record<string, any>>(
-    props: CellProps<string | null, CodeInputCellColumnData<TRowData>>
+    props: CellProps<string | null, CodeInputCellColumnData<TRowData>>,
   ) => {
-    const {
-      rowData,
-      active,
-      focus,
-      stopEditing,
-      columnData,
-      rowIndex,
-      fullGridData,
-      columnId,
-    } = props as CellProps<string | null, CodeInputCellColumnData<TRowData>> & {
-      fullGridData?: TRowData[];
-      columnId?: keyof TRowData | string;
-      rowData?: TRowData;
-    };
+    const { rowData, active, focus, stopEditing, columnData, rowIndex, fullGridData, columnId } =
+      props as CellProps<string | null, CodeInputCellColumnData<TRowData>> & {
+        fullGridData?: TRowData[];
+        columnId?: keyof TRowData | string;
+        rowData?: TRowData;
+      };
 
     const t = useTranslations();
     const locale = useLocale();
 
     const getInitialValue = useCallback(() => {
       let initialVal = "";
-      if (rowData && columnId && typeof columnId === 'string' && columnId in rowData) {
+      if (rowData && columnId && typeof columnId === "string" && columnId in rowData) {
         const val = rowData[columnId as keyof TRowData];
         initialVal = val === null || val === undefined ? "" : String(val);
       }
@@ -62,6 +54,7 @@ const CodeInputCellComponent = React.memo(
     const [validationError, setValidationError] = useState<string | null>(null);
     const [isValidationPopoverOpen, setIsValidationPopoverOpen] = useState(false);
     const [isGeneratorPopoverOpen, setIsGeneratorPopoverOpen] = useState(false);
+    const ignoreBlurRef = useRef(false);
 
     const validateAndTriggerChange = useCallback(
       (currentValue: string): boolean => {
@@ -81,7 +74,12 @@ const CodeInputCellComponent = React.memo(
         setIsValidationPopoverOpen(!isValid && focus);
 
         const originalValue = getInitialValue();
-        if (isValid && currentValue !== originalValue && columnData?.onCodeChange && rowIndex !== undefined) {
+        if (
+          isValid &&
+          currentValue !== originalValue &&
+          columnData?.onCodeChange &&
+          rowIndex !== undefined
+        ) {
           columnData.onCodeChange(rowIndex, currentValue);
         }
 
@@ -101,12 +99,19 @@ const CodeInputCellComponent = React.memo(
       [validationError],
     );
 
-    const handleBlur = useCallback(() => {
-      const isValid = validateAndTriggerChange(value);
-      if (isValid) {
-        stopEditing({ nextRow: false });
-      }
-    }, [value, stopEditing, validateAndTriggerChange]);
+    const handleBlur = useCallback(
+      (e?: React.FocusEvent<HTMLInputElement>) => {
+        if (ignoreBlurRef.current) {
+          // Don't commit edit or close cell if blur was caused by popover/button
+          return;
+        }
+        const isValid = validateAndTriggerChange(value);
+        if (isValid) {
+          stopEditing({ nextRow: false });
+        }
+      },
+      [value, stopEditing, validateAndTriggerChange],
+    );
 
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -163,14 +168,14 @@ const CodeInputCellComponent = React.memo(
 
     if (!focus) {
       return (
-        <div className="dsg-cell-display flex items-center px-2 h-full overflow-hidden text-ellipsis whitespace-nowrap">
+        <div className="dsg-cell-display flex h-full items-center overflow-hidden px-2 text-ellipsis whitespace-nowrap">
           {getInitialValue()}
         </div>
       );
     }
 
     return (
-      <div 
+      <div
         className={cx("dsg-input-wrapper relative h-full", { "dsg-input-wrapper-focus": focus })}
       >
         <Popover open={isValidationPopoverOpen} onOpenChange={setIsValidationPopoverOpen}>
@@ -204,8 +209,8 @@ const CodeInputCellComponent = React.memo(
         </Popover>
 
         <div className="absolute inset-y-0 end-0 flex items-center pe-0.5">
-          <Popover 
-            open={isGeneratorPopoverOpen} 
+          <Popover
+            open={isGeneratorPopoverOpen}
             onOpenChange={(open) => {
               setIsGeneratorPopoverOpen(open);
               if (!open && focus) {
@@ -219,7 +224,14 @@ const CodeInputCellComponent = React.memo(
                 size="icon_sm"
                 type="button"
                 variant="ghost"
-                onMouseDown={(e) => e.preventDefault()}
+                tabIndex={-1}
+                onMouseDown={(e) => {
+                  ignoreBlurRef.current = true;
+                  setTimeout(() => {
+                    ignoreBlurRef.current = false;
+                  }, 0);
+                  e.preventDefault();
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsGeneratorPopoverOpen(true);
@@ -228,9 +240,17 @@ const CodeInputCellComponent = React.memo(
                 <Hash className="size-5" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-1">
+            <PopoverContent
+              className="w-auto p-1"
+              onMouseDown={() => {
+                ignoreBlurRef.current = true;
+                setTimeout(() => {
+                  ignoreBlurRef.current = false;
+                }, 0);
+              }}
+            >
               <div className="flex flex-col space-y-1">
-                {typeof columnData?.onSerial === 'function' && (
+                {typeof columnData?.onSerial === "function" && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -244,7 +264,7 @@ const CodeInputCellComponent = React.memo(
                     <DiamondPlus className="me-2 size-4" /> {t("General.next_number")}
                   </Button>
                 )}
-                {typeof columnData?.onRandom === 'function' && (
+                {typeof columnData?.onRandom === "function" && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -286,4 +306,4 @@ export const codeInputColumnBase: Partial<
   },
   pasteValue: ({ value }: { value?: string | null }) => value ?? null,
   cellClassName: "p-0 h-full",
-}; 
+};
