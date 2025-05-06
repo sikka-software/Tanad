@@ -27,7 +27,7 @@ export const createWarehouseFormSchema = (t: (key: string) => string) => {
     code: z.string().min(1, t("Warehouses.form.code.required")),
     phone: z.string().optional(),
     capacity: z.string().optional(),
-    is_active: z.boolean().default(true),
+    status: z.string().default("active"),
     notes: z.string().optional(),
   });
 
@@ -69,7 +69,7 @@ export function WarehouseForm({
       country: "",
       zip_code: "",
       capacity: "",
-      is_active: true,
+      status: "active",
       notes: "",
     },
   });
@@ -98,7 +98,7 @@ export function WarehouseForm({
               name: data.name.trim(),
               code: data.code.trim(),
               capacity: data.capacity ? parseInt(data.capacity) : null,
-              is_active: data.is_active ?? true,
+              status: data.status ?? "active",
               notes: data.notes?.trim() || null,
               short_address: data.short_address?.trim() || undefined,
               building_number: data.building_number?.trim() || undefined,
@@ -126,7 +126,7 @@ export function WarehouseForm({
             code: data.code.trim(),
             capacity: data.capacity ? parseInt(data.capacity) : null,
             notes: data.notes?.trim() || null,
-            is_active: data.is_active ?? true,
+            status: data.status ?? "active",
             user_id: profile?.id || "",
             short_address: data.short_address?.trim() || undefined,
             building_number: data.building_number?.trim() || undefined,

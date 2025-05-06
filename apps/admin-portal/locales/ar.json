@@ -2236,8 +2236,10 @@
         "label": "السعة",
         "placeholder": "أدخل سعة المستودع"
       },
-      "is_active": {
-        "label": "نشط"
+      "status": {
+        "label": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط"
       },
       "notes": {
         "label": "ملاحظات",
@@ -2273,6 +2275,10 @@
     "create_new": "إنشاء فرع",
     "no_branches_found": "لا توجد فروع",
     "search_branches": "بحث عن فروع...",
+    "description": "الوصف",
+    "enter_description": "أدخل وصف الفرع",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف هذا الفرع؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بهذا الفرع",
     "manager": "المدير",
     "edit": "تعديل الفرع",
     "status": {
@@ -2321,10 +2327,14 @@
       },
       "manager": {
         "label": "المدير",
-        "placeholder": "أدخل اسم المدير"
+        "placeholder": "أدخل اسم المدير",
+        "required": "المدير مطلوب",
+        "no_employees": "لا يوجد موظفين"
       },
-      "is_active": {
-        "label": "الحالة النشطة"
+      "status": {
+        "label": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط"
       },
       "notes": {
         "label": "ملاحظات",
@@ -2762,10 +2772,7 @@
         "placeholder": "أدخل الراتب",
         "required": "الراتب مطلوب"
       },
-      "status": {
-        "label": "الحالة",
-        "placeholder": "اختر الحالة"
-      },
+
       "start_date": {
         "label": "تاريخ البدء",
         "placeholder": "أدخل تاريخ البدء"
@@ -2774,8 +2781,11 @@
         "label": "تاريخ الانتهاء",
         "placeholder": "أدخل تاريخ الانتهاء"
       },
-      "is_active": {
-        "label": "هل هذه الوظيفة نشطة؟"
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط"
       },
       "created_at": {
         "label": "تاريخ الإنشاء"
@@ -2854,15 +2864,13 @@
         "placeholder": "اختر الوظائف",
         "required": "يجب إختيار وظيفة واحدة على الأقل"
       },
-      "is_active": {
-        "label": "حالة الصفحة",
-        "placeholder": "اختر إذا كان الصفحة نشطة أم لا"
-      },
       "status": {
         "label": "الحالة",
         "placeholder": "اختر الحالة",
         "active": "نشط",
-        "inactive": "غير نشط"
+        "inactive": "غير نشط",
+        "published": "منشور",
+        "unpublished": "غير منشور"
       },
       "created_at": {
         "label": "تاريخ الإنشاء"
@@ -3174,9 +3182,6 @@
         "total_label": "المجموع",
         "total_placeholder": "أدخل المجموع"
       },
-      "is_active": {
-        "label": "الحالة النشطة"
-      },
       "status": {
         "label": "الحالة",
         "active": "نشط",
@@ -3289,8 +3294,12 @@
       "label": "ملاحظات",
       "placeholder": "أدخل الملاحظات"
     },
-    "is_active": {
-      "label": "حالة النشاط"
+    "status": {
+      "label": "الحالة",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "published": "منشور",
+      "unpublished": "غير منشور"
     },
     "validation": {
       "name_required": "اسم الشركة مطلوب",
@@ -3382,8 +3391,12 @@
         "label": "ملاحظات",
         "placeholder": "أدخل الملاحظات"
       },
-      "is_active": {
-        "label": "حالة النشاط"
+      "status": {
+        "label": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "published": "منشور",
+        "unpublished": "غير منشور"
       },
       "validation": {
         "name_required": "اسم الشركة مطلوب",
@@ -3470,8 +3483,12 @@
         "placeholder": "أدخل البريد الإلكتروني",
         "invalid": "صيغة البريد الإلكتروني غير صحيحة"
       },
-      "is_active": {
-        "label": "حالة النشاط"
+      "status": {
+        "label": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "published": "منشور",
+        "unpublished": "غير منشور"
       },
       "notes": {
         "label": "ملاحظات",

@@ -188,8 +188,8 @@ export default function JobListingPreviewPage({
             <p className="text-muted-foreground max-w-2xl">{jobListing.description}</p>
           )}
           <div className="flex items-center space-x-2 pt-2">
-            <Badge variant={jobListing.is_active ? "default" : "outline"}>
-              {jobListing.is_active ? t("Status.active") : t("Status.inactive")}
+            <Badge variant={jobListing.status === "active" ? "default" : "outline"}>
+              {jobListing.status === "active" ? t("Status.active") : t("Status.inactive")}
             </Badge>
             <Badge variant={jobListing.is_public ? "default" : "outline"}>
               {jobListing.is_public ? t("Visibility.public") : t("Visibility.private")}
@@ -211,9 +211,7 @@ export default function JobListingPreviewPage({
             <div>
               <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                 <SelectTrigger>
-                  <SelectValue
-                    placeholder={t("Jobs.department_placeholder") || "Department"}
-                  />
+                  <SelectValue placeholder={t("Jobs.department_placeholder") || "Department"} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">

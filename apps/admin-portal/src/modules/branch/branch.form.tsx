@@ -39,7 +39,7 @@ export const createBranchSchema = (t: (key: string) => string) => {
       .uuid({ message: t("Branches.form.manager.invalid_uuid") })
       .optional()
       .nullable(),
-    is_active: z.boolean().default(true),
+    status: z.enum(["active", "inactive"]),
     notes: z.string().optional().or(z.literal("")),
   });
 
@@ -94,7 +94,7 @@ export function BranchForm({
       phone: defaultValues?.phone || "",
       email: defaultValues?.email || "",
       manager: defaultValues?.manager || null,
-      is_active: defaultValues?.is_active ?? true,
+      status: defaultValues?.status || "active",
       notes: defaultValues?.notes || "",
     },
   });
@@ -121,7 +121,7 @@ export function BranchForm({
       email: optionalString(data.email),
       manager: data.manager && data.manager.trim() !== "" ? data.manager : undefined,
       notes: optionalString(data.notes),
-      is_active: data.is_active ?? true,
+      status: data.status,
       short_address: optionalString(data.short_address),
       building_number: optionalString(data.building_number),
       street_name: optionalString(data.street_name),
@@ -144,7 +144,7 @@ export function BranchForm({
         await updateBranch(
           {
             id: defaultValues.id,
-            data: definedPayload as Partial<Branch>, // Use filtered payload
+            data: definedPayload as BranchUpdateData, // Use filtered payload
           },
           {
             onSuccess: () => {

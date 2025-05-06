@@ -177,7 +177,7 @@ export function JobListingForm({
           description: coreListingData.description?.trim() || null,
           user_id: userId,
           enterprise_id: enterpriseId,
-          is_active: true,
+          status: "active",
           is_public: true,
           slug: "",
           updated_at: new Date().toISOString(),

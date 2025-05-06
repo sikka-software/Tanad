@@ -5,7 +5,7 @@ export interface WarehouseProps {
   name: string;
   code: string;
   capacity: number | null;
-  is_active: boolean;
+  status: string;
   notes: string | null;
   created_at: string;
   enterprise_id: string;

@@ -37,7 +37,7 @@ export const createCompanySchema = (t: (key: string) => string) => {
     industry: z.string().optional(),
     size: z.string().optional(),
     notes: z.string().optional(),
-    is_active: z.boolean().default(true),
+    status: z.string().default("active"),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -72,7 +72,7 @@ export function CompanyForm({
       industry: defaultValues?.industry || "",
       size: defaultValues?.size || "",
       notes: defaultValues?.notes || "",
-      is_active: defaultValues?.is_active || true,
+      status: defaultValues?.status || "active",
       short_address: defaultValues?.short_address || "",
       additional_number: defaultValues?.additional_number || "",
       building_number: defaultValues?.building_number || "",
@@ -144,7 +144,7 @@ export function CompanyForm({
               industry: data.industry?.trim() || undefined,
               size: data.size?.trim() || undefined,
               notes: data.notes?.trim() || undefined,
-              is_active: data.is_active ?? true,
+              status: data.status ?? "active",
               short_address: data.short_address?.trim() || undefined,
               building_number: data.building_number?.trim() || undefined,
               street_name: data.street_name?.trim() || undefined,
@@ -174,7 +174,7 @@ export function CompanyForm({
             industry: data.industry?.trim() || undefined,
             size: data.size?.trim() || undefined,
             notes: data.notes?.trim() || undefined,
-            is_active: data.is_active ?? true,
+            status: data.status ?? "active",
             user_id: profile?.id || "",
             short_address: data.short_address?.trim() || undefined,
             building_number: data.building_number?.trim() || undefined,

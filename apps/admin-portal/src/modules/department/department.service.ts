@@ -62,7 +62,7 @@ export async function createDepartmentWithLocations(
       name: department.name,
       description: department.description,
       user_id: department.user_id,
-      is_active: department.is_active,
+      status: department.status,
     }),
   });
 

@@ -14,8 +14,8 @@ const JobListingCard = ({ jobListing }: { jobListing: JobListing }) => {
               {jobListing.jobs_count ?? 0} {jobListing.jobs_count === 1 ? "job" : "jobs"}
             </p>
           </div>
-          <Badge variant={jobListing.is_active ? "default" : "secondary"}>
-            {jobListing.is_active ? "Active" : "Inactive"}
+          <Badge variant={jobListing.status === "active" ? "default" : "secondary"}>
+            {jobListing.status === "active" ? "Active" : "Inactive"}
           </Badge>
         </div>
       </CardHeader>

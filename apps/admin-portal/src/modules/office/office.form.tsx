@@ -120,7 +120,7 @@ export function OfficeForm({
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
             enterprise_id: membership.enterprise_id,
-            is_active: true,
+            status: "active",
           },
           {
             onSuccess: async (response) => {

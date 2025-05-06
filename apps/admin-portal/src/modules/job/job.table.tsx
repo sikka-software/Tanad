@@ -74,10 +74,10 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
         ),
     },
     {
-      accessorKey: "is_active",
-      header: t("Jobs.form.is_active.label"),
+      accessorKey: "status",
+      header: t("Jobs.form.status.label"),
       validationSchema: z.boolean(),
-      cell: (props: CellContext<Job, unknown>) => (props.row.original.is_active ? "Yes" : "No"),
+      cell: (props: CellContext<Job, unknown>) => (props.row.original.status ? "Yes" : "No"),
     },
   ];
 

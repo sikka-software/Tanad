@@ -9,7 +9,7 @@ export interface CompanyProps {
   industry?: string;
   size?: string;
   notes?: string;
-  is_active: boolean;
+  status: string;
   enterprise_id: string;
   created_at: string;
   user_id: string;

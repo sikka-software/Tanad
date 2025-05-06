@@ -33,7 +33,7 @@ export default function AddJobPage() {
       form.setValue("department", dummyData.job_department);
       form.setValue("type", dummyData.job_type);
       form.setValue("salary", dummyData.job_salary);
-      form.setValue("is_active", dummyData.job_is_active);
+      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
       form.setValue("start_date", dummyData.job_start_date);
       form.setValue("end_date", dummyData.job_end_date);
     }

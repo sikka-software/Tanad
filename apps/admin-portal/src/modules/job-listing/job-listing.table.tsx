@@ -50,19 +50,18 @@ const JobListingsTable = ({
       validationSchema: z.string().min(1, t("JobListings.form.description.required")),
     },
     {
-      accessorKey: "is_active",
-      header: t("JobListings.form.is_active.label"),
+      accessorKey: "status",
+      header: t("JobListings.form.status.label"),
       validationSchema: z.boolean(),
       cell: ({ row }) => (
         <Badge
-          variant={row.original.is_active ? "default" : "secondary"}
+          variant={row.original.status ? "default" : "secondary"}
           className={cn(
-            row.original.is_active &&
-              "text-primary border-green-500 bg-green-200 hover:bg-green-200",
-            !row.original.is_active && "text-primary border-red-500 bg-red-200 hover:bg-red-200",
+            row.original.status && "text-primary border-green-500 bg-green-200 hover:bg-green-200",
+            !row.original.status && "text-primary border-red-500 bg-red-200 hover:bg-red-200",
           )}
         >
-          {row.original.is_active
+          {row.original.status
             ? t("JobListings.form.status.active")
             : t("JobListings.form.status.inactive")}
         </Badge>

@@ -60,6 +60,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
   style?: React.CSSProperties; // style for inline styles
   enableEditing?: boolean;
+  noPadding?: boolean;
 };
 
 /**
@@ -852,6 +853,7 @@ function SheetTable<
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,
                   },
+                  colDef.noPadding ? "p-0" : "",
                   typeof colDef.className === "function"
                     ? colDef.className(rowData)
                     : colDef.className,

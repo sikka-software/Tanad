@@ -16,8 +16,8 @@ const BranchCard = ({ branch }: { branch: Branch }) => {
             <h3 className="text-lg font-semibold">{branch.name}</h3>
             <p className="text-sm text-gray-500">Code: {branch.code}</p>
           </div>
-          <Badge variant={branch.is_active ? "default" : "secondary"}>
-            {branch.is_active ? t("status.active") : t("status.inactive")}
+          <Badge variant={branch.status ? "default" : "secondary"}>
+            {t(`status.${branch.status}`)}
           </Badge>
         </div>
       </CardHeader>

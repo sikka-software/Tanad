@@ -389,10 +389,10 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     createValidatedColumn("notes", t("Forms.notes.label"), branchSchema.shape.notes, 200),
 
     // Active Column (remains the same)
-    {
-      ...keyColumn("is_active", checkboxColumn),
-      title: t("Branches.form.is_active.label"),
-    } as Column<Branch, any, boolean>,
+    // {
+    //   ...keyColumn("status", checkboxColumn),
+    //   title: t("Branches.form.status.label"),
+    // } as Column<Branch, any, boolean>,
   ];
 
   // createNewRow remains the same, manager defaults to null
@@ -407,7 +407,7 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     phone: null,
     email: null,
     manager: null,
-    is_active: false,
+    status: "active",
     notes: null,
     building_number: "",
     street_name: "",

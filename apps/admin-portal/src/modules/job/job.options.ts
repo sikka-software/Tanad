@@ -18,7 +18,7 @@ export const SORTABLE_COLUMNS: SortableColumn[] = [
   { value: "department", translationKey: "Jobs.form.department.label" },
   { value: "type", translationKey: "Jobs.form.type.label" },
   { value: "salary", translationKey: "Jobs.form.salary.label" },
-  { value: "is_active", translationKey: "Jobs.form.is_active.label" },
+  { value: "status", translationKey: "Jobs.form.status.label" },
   { value: "start_date", translationKey: "Jobs.form.start_date.label" },
   { value: "end_date", translationKey: "Jobs.form.end_date.label" },
 ];

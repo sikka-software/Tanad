@@ -32,7 +32,7 @@ export interface ProfileType {
         title: string;
         translationKey?: string;
         url?: string;
-        is_active?: boolean;
+        status?: string;
         action?: string;
       }>
     >;

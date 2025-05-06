@@ -7,7 +7,7 @@ export interface BranchProps {
   phone?: string | null;
   email?: string | null;
   manager?: string | null;
-  is_active: boolean;
+  status: "active" | "inactive";
   notes?: string | null;
   created_at: string;
 }

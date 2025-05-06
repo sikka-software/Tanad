@@ -61,10 +61,10 @@ const createJobFormSchema = (t: (key: string) => string) =>
       ),
     start_date: z.date().optional(),
     end_date: z.date().optional(),
-    is_active: z.boolean(),
+    status: z.string().default("active"),
   });
 
-export type JobFormValues = z.infer<ReturnType<typeof createJobFormSchema>>;
+export type JobFormValues = z.input<ReturnType<typeof createJobFormSchema>>;
 
 export function JobForm({
   formHtmlId,
@@ -106,7 +106,7 @@ export function JobForm({
       salary: defaultValues?.salary ? String(defaultValues.salary) : undefined,
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
-      is_active: defaultValues?.is_active || true,
+      status: defaultValues?.status || "active",
     },
   });
 
@@ -139,7 +139,7 @@ export function JobForm({
               department: data.department?.trim() || null,
               type: data.type.trim(),
               salary: data.salary ? parseFloat(data.salary) : null,
-              is_active: data.is_active,
+              status: data.status,
               start_date: data.start_date?.toISOString() || null,
               end_date: data.end_date?.toISOString() || null,
             },
@@ -164,7 +164,7 @@ export function JobForm({
             department: data.department?.trim() || null,
             type: data.type.trim(),
             salary: data.salary ? parseFloat(data.salary) : null,
-            is_active: data.is_active,
+            status: data.status ?? "active",
             start_date: data.start_date?.toISOString() || null,
             end_date: data.end_date?.toISOString() || null,
             user_id: user?.id,
@@ -436,14 +436,14 @@ export function JobForm({
 
           <FormField
             control={form.control}
-            name="is_active"
+            name="status"
             render={({ field }) => (
               <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                 <div className="space-y-0.5">
-                  <FormLabel className="text-base">{t("Jobs.form.is_active.label")}</FormLabel>
+                  <FormLabel className="text-base">{t("Jobs.form.status.label")}</FormLabel>
                 </div>
                 <FormControl>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch checked={field.value === "active"} onCheckedChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}

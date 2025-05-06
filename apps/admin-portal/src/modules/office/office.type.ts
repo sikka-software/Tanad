@@ -10,7 +10,7 @@ export interface OfficeProps {
   city?: string;
   state?: string;
   zip_code?: string;
-  is_active: boolean;
+  status: string;
   created_at: string;
   updated_at: string;
   enterprise_id: string;

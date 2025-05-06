@@ -9,7 +9,7 @@ export interface Job {
   department: string | null;
   type: string;
   salary: number | null;
-  is_active: boolean;
+  status: string;
   start_date: string | null;
   end_date: string | null;
   created_at: string;

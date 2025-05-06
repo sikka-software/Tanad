@@ -13,8 +13,8 @@ const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">{warehouse.name}</h3>
-          <Badge variant={warehouse.is_active ? "default" : "secondary"}>
-            {warehouse.is_active ? t("status.active") : t("status.inactive")}
+          <Badge variant={warehouse.status === "active" ? "default" : "secondary"}>
+            {warehouse.status === "active" ? t("status.active") : t("status.inactive")}
           </Badge>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-500">

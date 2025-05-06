@@ -172,7 +172,7 @@ export default function DepartmentForm({
             name: data.name,
             description: data.description || null,
             user_id: user.id,
-            is_active: defaultValues.is_active,
+            status: defaultValues.status,
             locations: locationsForUpdate,
           };
 
@@ -209,7 +209,7 @@ export default function DepartmentForm({
             name: data.name,
             description: data.description || null,
             user_id: user.id,
-            is_active: true,
+            status: "active",
             locations: locationsForCreate,
           };
 

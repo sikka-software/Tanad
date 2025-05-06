@@ -1,3 +1,4 @@
+import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
@@ -13,6 +14,7 @@ import { Branch } from "@/branch/branch.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { useEmployees } from "../employee/employee.hooks";
 import { useUpdateBranch } from "./branch.hooks";
 
 const nameSchema = z.string().min(1, "Required");
@@ -38,6 +40,13 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canArchiveBranch = useUserStore((state) => state.hasPermission("branches.archive"));
   const canDeleteBranch = useUserStore((state) => state.hasPermission("branches.delete"));
 
+  // Employees for manager combobox
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const employeeOptions = employees.map((emp) => ({
+    label: `${emp.first_name} ${emp.last_name}`,
+    value: emp.id,
+  }));
+
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
@@ -61,19 +70,62 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     {
       accessorKey: "manager",
       header: t("Branches.form.manager.label"),
+      noPadding: true,
       validationSchema: managerSchema,
+      cell: ({ row }) => {
+        const branch = row.original;
+        return (
+          <ComboboxAdd
+            inCell
+            data={employeeOptions}
+            isLoading={employeesLoading}
+            defaultValue={branch.manager || ""}
+            onChange={async (value) => {
+              await updateBranch({
+                id: branch.id,
+                data: {
+                  id: branch.id,
+                  name: branch.name,
+                  status: branch.status,
+                  manager: value || null,
+                },
+              });
+            }}
+            texts={{
+              placeholder: ". . .",
+              searchPlaceholder: t("Employees.search_employees"),
+              noItems: t("Branches.form.manager.no_employees"),
+            }}
+            addText={t("Employees.add_new")}
+            ariaInvalid={false}
+          />
+        );
+      },
     },
     {
-      accessorKey: "is_active",
-      header: t("Branches.form.is_active.label"),
-      cell: ({ row }) => (row.getValue("is_active") ? t("active") : t("inactive")),
+      accessorKey: "status",
+      header: t("Branches.form.status.label"),
+      cell: ({ row }) =>
+        row.getValue("status") === "active"
+          ? t("Branches.form.status.active")
+          : t("Branches.form.status.inactive"),
       validationSchema: isActiveSchema,
     },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "branch_id") return;
-    await updateBranch({ id: rowId, data: { [columnId]: value } });
+    const branch = data.find((b) => b.id === rowId);
+    if (!branch) return;
+    await updateBranch({
+      id: branch.id,
+      data: {
+        id: branch.id,
+        name: branch.name,
+        status: branch.status,
+        [columnId]: value,
+      },
+    });
   };
 
   const handleRowSelectionChange = useCallback(

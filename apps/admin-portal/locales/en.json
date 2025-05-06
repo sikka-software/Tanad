@@ -2189,8 +2189,10 @@
         "label": "Capacity",
         "placeholder": "Enter warehouse capacity"
       },
-      "is_active": {
-        "label": "Active"
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive"
       },
       "notes": {
         "label": "Notes",
@@ -2276,8 +2278,10 @@
         "label": "Manager",
         "placeholder": "Enter manager name"
       },
-      "is_active": {
-        "label": "Active Status"
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive"
       },
       "notes": {
         "label": "Notes",
@@ -2715,10 +2719,7 @@
         "placeholder": "Enter salary",
         "required": "Salary is required"
       },
-      "status": {
-        "label": "Status",
-        "placeholder": "Select status"
-      },
+
       "start_date": {
         "label": "Start Date",
         "placeholder": "Enter start date"
@@ -2727,8 +2728,11 @@
         "label": "End Date",
         "placeholder": "Enter end date"
       },
-      "is_active": {
-        "label": "Is this job active?"
+      "status": {
+        "label": "Status",
+        "placeholder": "Select status",
+        "active": "Active",
+        "inactive": "Inactive"
       },
       "created_at": {
         "label": "Created At"
@@ -2807,15 +2811,14 @@
         "placeholder": "Select jobs",
         "required": "At least one job must be selected"
       },
-      "is_active": {
-        "label": "Listing Status",
-        "placeholder": "Select if the listing is active or not"
-      },
+
       "status": {
         "label": "Status",
         "placeholder": "Select status",
         "active": "Active",
-        "inactive": "Inactive"
+        "inactive": "Inactive",
+        "published": "Published",
+        "unpublished": "Unpublished"
       },
       "created_at": {
         "label": "Created At"
@@ -3127,9 +3130,6 @@
         "total_label": "Total",
         "total_placeholder": "Enter total"
       },
-      "is_active": {
-        "label": "Active Status"
-      },
       "status": {
         "label": "Status",
         "active": "Active",
@@ -3253,8 +3253,12 @@
         "label": "Notes",
         "placeholder": "Enter notes"
       },
-      "is_active": {
-        "label": "Active Status"
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "published": "Published",
+        "unpublished": "Unpublished"
       },
       "validation": {
         "name_required": "Company name is required",
@@ -3341,8 +3345,12 @@
         "placeholder": "Enter email",
         "invalid": "Invalid email format"
       },
-      "is_active": {
-        "label": "Active Status"
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "published": "Published",
+        "unpublished": "Unpublished"
       },
       "notes": {
         "label": "Notes",
