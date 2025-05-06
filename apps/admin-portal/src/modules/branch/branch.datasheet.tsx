@@ -243,20 +243,8 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
 
   // Define columns using helper and explicit definitions
   const columns: Column<Branch, any, any>[] = [
-    createValidatedColumn("name", t("Branches.form.name.label"), branchSchema.shape.name),
-    createValidatedColumn("code", t("Branches.form.code.label"), branchSchema.shape.code),
-    createValidatedColumn(
-      "short_address",
-      t("Branches.form.address.label"),
-      branchSchema.shape.short_address,
-    ),
-    createValidatedColumn("city", t("Branches.form.city.label"), branchSchema.shape.city),
-    createValidatedColumn("region", t("Branches.form.state.label"), branchSchema.shape.region),
-    createValidatedColumn(
-      "zip_code",
-      t("Branches.form.zip_code.label"),
-      branchSchema.shape.zip_code,
-    ),
+    createValidatedColumn("name", t("Branches.form.name.label"), branchSchema.shape.name,150),
+    createValidatedColumn("code", t("Branches.form.code.label"), branchSchema.shape.code, 140),
     createValidatedColumn("phone", t("Branches.form.phone.label"), branchSchema.shape.phone, 150),
     createValidatedColumn("email", t("Branches.form.email.label"), branchSchema.shape.email, 200),
 
@@ -282,6 +270,32 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
       // Explicitly define getValue again
       getValue: ({ rowData }: { rowData: Branch }) => rowData.manager,
     } as Column<Branch, ComboboxAddColumnData<any>, string | null>,
+    createValidatedColumn(
+      "short_address",
+      t("Forms.short_address.label"),
+      branchSchema.shape.short_address,
+      150,
+    ),
+    createValidatedColumn(
+      "building_number",
+      t("Forms.building_number.label"),
+      branchSchema.shape.building_number,
+    ),
+    createValidatedColumn(
+      "street_name",
+      t("Forms.street_name.label"),
+      branchSchema.shape.street_name,
+    ),
+    createValidatedColumn("city", t("Forms.city.label"), branchSchema.shape.city),
+    createValidatedColumn("region", t("Forms.region.label"), branchSchema.shape.region),
+    createValidatedColumn("country", t("Forms.country.label"), branchSchema.shape.country),
+    createValidatedColumn(
+      "additional_number",
+      t("Forms.additional_number.label"),
+      branchSchema.shape.additional_number,
+    ),
+    createValidatedColumn("zip_code", t("Forms.zip_code.label"), branchSchema.shape.zip_code),
+    createValidatedColumn("notes", t("Forms.notes.label"), branchSchema.shape.notes, 200),
 
     // Active Column (remains the same)
     {

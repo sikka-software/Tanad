@@ -44,12 +44,12 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
           name="short_address"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Companies.form.short_address.label")}</FormLabel>
+              <FormLabel>{t("Forms.short_address.label")}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Input
                     disabled={isLoading}
-                    placeholder={t("Companies.form.short_address.placeholder")}
+                    placeholder={t("Forms.short_address.placeholder")}
                     {...field}
                     value={field.value || ""} // Ensure controlled component
                   />
@@ -66,10 +66,10 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
                           {t("General.soon")}
                         </Badge>
                         <p className="text-sm font-medium">
-                          {t("Companies.form.short_address.explainer.title")}
+                          {t("Forms.short_address.explainer.title")}
                         </p>
                         <p className="text-muted-foreground text-xs">
-                          {t("Companies.form.short_address.explainer.description")}
+                          {t("Forms.short_address.explainer.description")}
                         </p>
                       </div>
                     }
@@ -87,11 +87,11 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
           name="building_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Companies.form.building_number.label")}</FormLabel>
+              <FormLabel>{t("Forms.building_number.label")}</FormLabel>
               <FormControl>
                 <Input
                   disabled={isLoading}
-                  placeholder={t("Companies.form.building_number.placeholder")}
+                  placeholder={t("Forms.building_number.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
                 />
@@ -105,11 +105,11 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
           name="street_name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Companies.form.street_name.label")}</FormLabel>
+              <FormLabel>{t("Forms.street_name.label")}</FormLabel>
               <FormControl>
                 <Input
                   disabled={isLoading}
-                  placeholder={t("Companies.form.street_name.placeholder")}
+                  placeholder={t("Forms.street_name.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
                 />
@@ -123,11 +123,11 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Companies.form.city.label")}</FormLabel>
+              <FormLabel>{t("Forms.city.label")}</FormLabel>
               <FormControl>
                 <Input
                   disabled={isLoading}
-                  placeholder={t("Companies.form.city.placeholder")}
+                  placeholder={t("Forms.city.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
                 />
@@ -141,11 +141,11 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
           name="region"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Companies.form.region.label")}</FormLabel>
+              <FormLabel>{t("Forms.region.label")}</FormLabel>
               <FormControl>
                 <Input
                   disabled={isLoading}
-                  placeholder={t("Companies.form.region.placeholder")}
+                  placeholder={t("Forms.region.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
                 />
@@ -159,11 +159,11 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
           name="country"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Companies.form.country.label")}</FormLabel>
+              <FormLabel>{t("Forms.country.label")}</FormLabel>
               <FormControl>
                 <Input
                   disabled={isLoading}
-                  placeholder={t("Companies.form.country.placeholder")}
+                  placeholder={t("Forms.country.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
                 />
@@ -177,11 +177,11 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
           name="zip_code"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Companies.form.zip_code.label")}</FormLabel>
+              <FormLabel>{t("Forms.zip_code.label")}</FormLabel>
               <FormControl>
                 <NumberInput
                   disabled={isLoading}
-                  placeholder={t("Companies.form.zip_code.placeholder")}
+                  placeholder={t("Forms.zip_code.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
                 />
@@ -195,11 +195,11 @@ export function AddressFormSection({ control, isLoading = false, title }: Addres
           name="additional_number"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t("Companies.form.additional_number.label")}</FormLabel>
+              <FormLabel>{t("Forms.additional_number.label")}</FormLabel>
               <FormControl>
                 <NumberInput
                   disabled={isLoading}
-                  placeholder={t("Companies.form.additional_number.placeholder")}
+                  placeholder={t("Forms.additional_number.placeholder")}
                   {...field}
                   value={field.value || ""} // Ensure controlled component
                 />

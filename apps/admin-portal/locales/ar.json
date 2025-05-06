@@ -3214,6 +3214,88 @@
     "updated_at": {
       "label": "تاريخ التحديث",
       "placeholder": "أدخل تاريخ التحديث"
+    },
+
+    "name": {
+      "label": "الاسم",
+      "placeholder": "أدخل اسم الشركة"
+    },
+    "email": {
+      "label": "البريد الإلكتروني",
+      "placeholder": "fulan@example.com"
+    },
+    "phone": {
+      "label": "الهاتف",
+      "placeholder": "أدخل رقم هاتف الشركة"
+    },
+    "website": {
+      "label": "الموقع الإلكتروني",
+      "placeholder": "https://www.example.com"
+    },
+    "address": {
+      "label": "عنوان الشركة",
+      "placeholder": "أدخل عنوان الشركة"
+    },
+    "short_address": {
+      "label": "العنوان الوطني المختصر",
+      "placeholder": "رمز مكون من ٤ أحرف و ٤ أرقام",
+      "explainer": {
+        "title": "جلب العنوان",
+        "description": "استخدم قاعدة بيانات البريد السعودي لجلب تفاصيل العنوان"
+      }
+    },
+    "building_number": {
+      "label": "رقم المبنى",
+      "placeholder": "أدخل رقم المبنى"
+    },
+    "street_name": {
+      "label": "اسم الشارع",
+      "placeholder": "أدخل اسم الشارع"
+    },
+    "additional_number": {
+      "label": "الرقم الإضافي",
+      "placeholder": "أدخل الرقم الإضافي"
+    },
+    "region": {
+      "label": "المنطقة",
+      "placeholder": "أدخل المنطقة"
+    },
+
+    "city": {
+      "label": "المدينة",
+      "placeholder": "أدخل المدينة"
+    },
+    "country": {
+      "label": "الدولة",
+      "placeholder": "أدخل الدولة"
+    },
+    "state": {
+      "label": "المنطقة",
+      "placeholder": "أدخل المنطقة"
+    },
+    "zip_code": {
+      "label": "الرمز البريدي",
+      "placeholder": "أدخل الرمز البريدي"
+    },
+    "industry": {
+      "label": "المجال",
+      "placeholder": "أدخل مجال الشركة"
+    },
+    "size": {
+      "label": "حجم الشركة",
+      "placeholder": "أدخل حجم الشركة"
+    },
+    "notes": {
+      "label": "ملاحظات",
+      "placeholder": "أدخل الملاحظات"
+    },
+    "is_active": {
+      "label": "حالة النشاط"
+    },
+    "validation": {
+      "name_required": "اسم الشركة مطلوب",
+      "email_required": "البريد الإلكتروني مطلوب",
+      "email_invalid": "البريد الإلكتروني غير صالح"
     }
   },
   "Companies": {

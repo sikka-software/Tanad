@@ -135,7 +135,7 @@ export function BranchForm({
     const definedPayload = Object.fromEntries(
       Object.entries(payload).filter(([_, v]) => v !== undefined),
     );
-    
+
     try {
       if (editMode) {
         if (!defaultValues?.id) {
