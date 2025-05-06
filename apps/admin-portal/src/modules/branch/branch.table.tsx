@@ -1,5 +1,13 @@
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
-import { useTranslations } from "next-intl";
+import { CommandSelect } from "@root/src/components/ui/command-select";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@root/src/components/ui/select";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
 
@@ -30,6 +38,7 @@ const isActiveSchema = z.boolean();
 
 const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Branch>) => {
   const t = useTranslations();
+  const locale = useLocale();
   const { mutate: updateBranch } = useUpdateBranch();
   const selectedRows = useBranchStore((state) => state.selectedRows);
   const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
@@ -53,20 +62,8 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const columns: ExtendedColumnDef<Branch>[] = [
     { accessorKey: "name", header: t("Branches.form.name.label"), validationSchema: nameSchema },
     { accessorKey: "code", header: t("Branches.form.code.label"), validationSchema: codeSchema },
-    {
-      accessorKey: "address",
-      header: t("Branches.form.address.label"),
-      validationSchema: addressSchema,
-    },
-    { accessorKey: "city", header: t("Branches.form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("Branches.form.state.label"), validationSchema: stateSchema },
-    {
-      accessorKey: "zip_code",
-      header: t("Branches.form.zip_code.label"),
-      validationSchema: zipCodeSchema,
-    },
-    { accessorKey: "phone", header: t("Branches.form.phone.label"), validationSchema: phoneSchema },
     { accessorKey: "email", header: t("Branches.form.email.label"), validationSchema: emailSchema },
+    { accessorKey: "phone", header: t("Branches.form.phone.label"), validationSchema: phoneSchema },
     {
       accessorKey: "manager",
       header: t("Branches.form.manager.label"),
@@ -102,13 +99,59 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         );
       },
     },
+
+    {
+      accessorKey: "address",
+      header: t("Branches.form.address.label"),
+      validationSchema: addressSchema,
+    },
+    { accessorKey: "city", header: t("Branches.form.city.label"), validationSchema: citySchema },
+    { accessorKey: "state", header: t("Branches.form.state.label"), validationSchema: stateSchema },
+    {
+      accessorKey: "zip_code",
+      header: t("Branches.form.zip_code.label"),
+      validationSchema: zipCodeSchema,
+    },
+
     {
       accessorKey: "status",
+      noPadding: true,
       header: t("Branches.form.status.label"),
-      cell: ({ row }) =>
-        row.getValue("status") === "active"
-          ? t("Branches.form.status.active")
-          : t("Branches.form.status.inactive"),
+      cell: ({ row }) => {
+        const branch = row.original;
+        return (
+          <CommandSelect
+            direction={locale === "ar" ? "rtl" : "ltr"}
+            data={[
+              { label: t("Branches.form.status.active"), value: "active" },
+              { label: t("Branches.form.status.inactive"), value: "inactive" },
+            ]}
+            inCell
+            isLoading={false}
+            defaultValue={branch.status as "active" | "inactive"}
+            popoverClassName="w-fit"
+            containerClassName=""
+            onChange={async (value) => {
+              console.log(value);
+              await updateBranch({
+                id: branch.id,
+                data: {
+                  id: branch.id,
+                  name: branch.name,
+                  status: value as "active" | "inactive",
+                },
+              });
+            }}
+            texts={{
+              placeholder: t("Branches.form.status.placeholder"),
+            }}
+            renderOption={(item) => {
+              return <div>{item.label}</div>;
+            }}
+            ariaInvalid={false}
+          />
+        );
+      },
       validationSchema: isActiveSchema,
     },
   ];

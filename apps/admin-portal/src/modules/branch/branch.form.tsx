@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
@@ -23,10 +24,9 @@ import useUserStore from "@/stores/use-user-store";
 import { EmployeeForm } from "../employee/employee.form";
 import { useEmployees } from "../employee/employee.hooks";
 import useEmployeeStore from "../employee/employee.store";
-import { Employee } from "../employee/employee.types";
 import { useBranches, useCreateBranch, useUpdateBranch } from "./branch.hooks";
 import useBranchStore from "./branch.store";
-import { Branch, BranchUpdateData, BranchCreateData } from "./branch.type";
+import { BranchUpdateData, BranchCreateData } from "./branch.type";
 
 export const createBranchSchema = (t: (key: string) => string) => {
   const baseBranchSchema = z.object({
@@ -39,7 +39,9 @@ export const createBranchSchema = (t: (key: string) => string) => {
       .uuid({ message: t("Branches.form.manager.invalid_uuid") })
       .optional()
       .nullable(),
-    status: z.enum(["active", "inactive"]),
+    status: z.enum(["active", "inactive"], {
+      message: t("Branches.form.status.required"),
+    }),
     notes: z.string().optional().or(z.literal("")),
   });
 
@@ -248,7 +250,7 @@ export function BranchForm({
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="phone"
@@ -286,7 +288,8 @@ export function BranchForm({
                   </FormItem>
                 )}
               />
-
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
                 name="manager"
@@ -316,7 +319,58 @@ export function BranchForm({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Branches.form.status.label")}</FormLabel>
+                    <FormControl>
+                      <CommandSelect
+                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        data={[
+                          { label: t("Branches.form.status.active"), value: "active" },
+                          { label: t("Branches.form.status.inactive"), value: "inactive" },
+                        ]}
+                        isLoading={false}
+                        defaultValue={field.value || ""}
+                        onChange={(value) => {
+                          field.onChange(value || null);
+                        }}
+                        texts={{
+                          placeholder: t("Branches.form.status.placeholder"),
+                        }}
+                        renderOption={(item) => {
+                          return <div>{item.label}</div>;
+                        }}
+                        ariaInvalid={!!form.formState.errors.manager}
+                        // value={field.value as "active" | "inactive"}
+                        // defaultValue={field.value as "active" | "inactive"}
+                        // onValueChange={async (value) => {
+                        //   field.onChange(value as "active" | "inactive");
+                        // }}
+                      />
+                      {/* <SelectTrigger>
+                          <SelectValue>
+                            {field.value === "active"
+                              ? t("Branches.form.status.active")
+                              : t("Branches.form.status.inactive")}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="active">{t("Branches.form.status.active")}</SelectItem>
+                          <SelectItem value="inactive">
+                            {t("Branches.form.status.inactive")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select> */}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+
             <FormField
               control={form.control}
               name="notes"

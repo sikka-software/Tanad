@@ -2334,7 +2334,9 @@
       "status": {
         "label": "الحالة",
         "active": "نشط",
-        "inactive": "غير نشط"
+        "inactive": "غير نشط",
+        "placeholder": "اختر الحالة",
+        "required": "الحالة مطلوبة"
       },
       "notes": {
         "label": "ملاحظات",

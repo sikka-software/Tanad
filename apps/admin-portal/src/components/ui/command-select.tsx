@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 import { Button } from "./button";
 
-type ComboboxAddTypes<T> = {
+type CommandSelectTypes<T> = {
   labelKey?: keyof T | any;
   valueKey?: keyof T | any;
   data: T[];
@@ -54,7 +54,7 @@ type ComboboxAddTypes<T> = {
   ariaInvalid?: boolean;
   inCell?: boolean;
 };
-export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<any>>(
+export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTypes<any>>(
   (
     {
       labelKey = "label",
@@ -99,7 +99,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
         dir={direction}
         className={cn(
           "relative flex h-fit flex-col gap-2",
-          props.width === "fit" ? "w-fit" : "w-full",
+          // props.width === "fit" ? "w-fit" : "w-full",
         )}
       >
         {props.label && <Label {...labelProps}>{props.label}</Label>}
@@ -127,7 +127,9 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                   aria-expanded={open}
                   className={cn(
                     "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-                    "bg-background px-3",
+                    props.preview
+                      ? "cursor-default rounded-none border-transparent px-0 !ring-0 !ring-offset-0 !outline-none"
+                      : "bg-background px-3",
                     ariaInvalid &&
                       "ring-destructive/20 dark:ring-destructive/40 border-destructive",
                     inCell && "h-10 rounded-none border-none",
@@ -181,27 +183,8 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                 return 0;
               }}
             >
-              {!props.hideInput && (
-                <CommandInput
-                  {...inputProps}
-                  dir={direction}
-                  placeholder={props.texts?.searchPlaceholder || "Search"}
-                />
-              )}
               <CommandEmpty>{props.texts?.noItems || "No items found."}</CommandEmpty>
-              <div className="flex flex-row items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="w-full rounded-none !text-blue-500 dark:!text-blue-400"
-                  onClick={() => {
-                    setOpen(false);
-                    props.onAddClick?.();
-                  }}
-                >
-                  {addText}
-                  <Plus className="size-4" />
-                </Button>
-              </div>
+
               <CommandList>
                 <CommandGroup className={cn("max-h-[200px]", data.length > 0 && "overflow-y-auto")}>
                   {data.map((item: any, i) => (
@@ -253,4 +236,4 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
     );
   },
 );
-ComboboxAdd.displayName = "ComboboxAdd";
+CommandSelect.displayName = "CommandSelect";
