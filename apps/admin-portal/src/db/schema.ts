@@ -1520,6 +1520,7 @@ export const salaries = pgTable(
     payment_frequency: text().default("monthly").notNull(),
     deductions: jsonb().default([]),
     start_date: date().notNull(),
+    payment_date: date(),
     end_date: date(),
   },
   (table) => [

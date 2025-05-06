@@ -1360,6 +1360,7 @@ export type Database = {
           enterprise_id: string
           id: string
           notes: string | null
+          payment_date: string | null
           payment_frequency: string
           start_date: string
           user_id: string
@@ -1374,6 +1375,7 @@ export type Database = {
           enterprise_id: string
           id?: string
           notes?: string | null
+          payment_date?: string | null
           payment_frequency?: string
           start_date: string
           user_id: string
@@ -1388,6 +1390,7 @@ export type Database = {
           enterprise_id?: string
           id?: string
           notes?: string | null
+          payment_date?: string | null
           payment_frequency?: string
           start_date?: string
           user_id?: string

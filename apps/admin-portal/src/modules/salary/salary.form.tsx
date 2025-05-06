@@ -51,7 +51,7 @@ const createDeductionSchema = (t: (key: string) => string) =>
       }
     });
 
-const createSalarySchema = (t: (key: string) => string) =>
+const createSalarySchema: (t: (key: string) => string) => z.ZodObject<any> = (t) =>
   z.object({
     employee_id: z.string().min(1, t("Salaries.form.employee_name.required")),
     pay_period_start: z.string().min(1, t("Salaries.form.pay_period_start.required")),
@@ -87,20 +87,30 @@ export function SalaryForm({
   const { mutate: createSalary } = useCreateSalary();
   const { mutate: updateSalary } = useUpdateSalary();
 
+  // Helper to ensure deductions is always an array of objects
+  function parseDeductions(val: unknown): { type: string; amount: number }[] {
+    if (!val) return [{ type: "", amount: 0 }];
+    if (Array.isArray(val)) return val as { type: string; amount: number }[];
+    if (typeof val === "string") {
+      try {
+        const parsed = JSON.parse(val);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
+    }
+    return [{ type: "", amount: 0 }];
+  }
+
   // Use SalaryFormValues directly with useForm
   const form = useForm<SalaryFormValues>({
     resolver: zodResolver(salarySchema),
+    mode: "onChange",
     defaultValues: {
       employee_id: "",
       pay_period_start: "",
       pay_period_end: "",
       payment_date: "",
-      gross_amount: 0, // Default as number
       net_amount: 0, // Default as number
-      deductions:
-        defaultValues?.deductions && defaultValues.deductions.length > 0
-          ? defaultValues.deductions
-          : [{ type: "", amount: 0 }],
+      deductions: parseDeductions(defaultValues?.deductions),
       notes: defaultValues?.notes || "",
     },
   });
@@ -114,31 +124,49 @@ export function SalaryForm({
   // Format employees for ComboboxAdd
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
-    value: `${emp.first_name} ${emp.last_name}`,
+    value: emp.id,
   }));
 
-  const handleSubmit = async (data: SalaryFormValues) => {
+  const handleSubmit: (data: SalaryFormValues) => Promise<void> = async (data) => {
+    console.log("data", data);
     setLoading(true);
     try {
       // Revert to stringifying; pass undefined if empty to match expected type signature
       const deductionsPayload =
         data.deductions && data.deductions.length > 0 ? JSON.stringify(data.deductions) : undefined;
 
+      // TODO: Replace these with actual values from context/store as needed
+      const enterprise_id = defaultValues?.enterprise_id || "";
+      const user_id = defaultValues?.user_id || "";
+      const amount = data.net_amount;
+      const start_date = data.pay_period_start;
+      const end_date = data.pay_period_end;
+      const created_at = defaultValues?.created_at || undefined;
+      const currency = defaultValues?.currency || undefined;
+      const payment_date = data.payment_date;
+      const notes = data.notes?.trim() || undefined;
+
+      const payload = {
+        amount,
+        enterprise_id,
+        user_id,
+        employee_id: data.employee_id,
+        start_date,
+        end_date,
+        created_at,
+        currency,
+        payment_date,
+        deductions: deductionsPayload ? JSON.parse(deductionsPayload) : undefined,
+        notes,
+      };
+
       if (editMode) {
         await updateSalary({
           id: defaultValues?.id || "",
-          data: {
-            ...data,
-            deductions: deductionsPayload ? JSON.parse(deductionsPayload) : undefined,
-            notes: data.notes?.trim() || undefined,
-          },
+          data: payload,
         });
       } else {
-        await createSalary({
-          ...data,
-          deductions: deductionsPayload ? JSON.parse(deductionsPayload) : undefined,
-          notes: data.notes?.trim() || undefined,
-        });
+        await createSalary(payload);
 
         toast.success(t("General.successful_operation"), {
           description: t("Salaries.messages.success_created"),
