@@ -53,6 +53,7 @@ type CommandSelectTypes<T> = {
   containerClassName?: string;
   ariaInvalid?: boolean;
   inCell?: boolean;
+  buttonClassName?: string;
 };
 export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTypes<any>>(
   (
@@ -71,6 +72,7 @@ export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTy
       addText = "Add Category",
       ariaInvalid,
       inCell = false,
+      buttonClassName,
       ...props
     },
     ref,
@@ -133,6 +135,7 @@ export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTy
                     ariaInvalid &&
                       "ring-destructive/20 dark:ring-destructive/40 border-destructive",
                     inCell && "h-10 rounded-none border-none",
+                    buttonClassName,
                   )}
                 >
                   {selectedItem

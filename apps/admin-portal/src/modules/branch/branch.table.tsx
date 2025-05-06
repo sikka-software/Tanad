@@ -76,6 +76,7 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
             inCell
             data={employeeOptions}
             isLoading={employeesLoading}
+            buttonClassName="bg-transparent"
             defaultValue={branch.manager || ""}
             onChange={async (value) => {
               await updateBranch({
@@ -130,7 +131,7 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
             isLoading={false}
             defaultValue={branch.status as "active" | "inactive"}
             popoverClassName="w-fit"
-            containerClassName=""
+            buttonClassName="bg-transparent"
             onChange={async (value) => {
               console.log(value);
               await updateBranch({
