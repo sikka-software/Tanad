@@ -1518,6 +1518,7 @@ export const salaries = pgTable(
     amount: numeric({ precision: 10, scale: 2 }).notNull(),
     currency: text().default("USD").notNull(),
     payment_frequency: text().default("monthly").notNull(),
+    deductions: jsonb().default([]),
     start_date: date().notNull(),
     end_date: date(),
   },

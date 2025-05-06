@@ -239,6 +239,13 @@
       "when": 1746511733778,
       "tag": "0033_many_natasha_romanoff",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1746514234624,
+      "tag": "0034_broad_gladiator",
+      "breakpoints": true
     }
   ]
 }

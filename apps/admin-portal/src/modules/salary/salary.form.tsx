@@ -28,19 +28,32 @@ import { Employee } from "@/employee/employee.types";
 import { useCreateSalary, useUpdateSalary } from "@/salary/salary.hooks";
 import useSalaryStore from "@/salary/salary.store";
 
-import useUserStore from "@/stores/use-user-store";
-
 import { DEDUCTION_TYPES } from "./salary.options";
 import { Salary, SalaryUpdateData } from "./salary.type";
 
-const deductionSchema = z.object({
-  type: z.string().min(1, "Type is required"),
-  amount: z.coerce.number().positive("Amount must be positive").or(z.literal(0)),
-});
+const createDeductionSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      type: z.string(),
+      amount: z.coerce
+        .number()
+        .positive(t("Salaries.form.deduction_amount.positive"))
+        .or(z.literal(0)),
+    })
+    .superRefine((val, ctx) => {
+      // Only require type if amount is filled (not 0 or empty)
+      if (val.amount !== undefined && val.amount !== 0 && (!val.type || val.type.trim() === "")) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t("Salaries.form.deduction_type.required"),
+          path: ["type"],
+        });
+      }
+    });
 
 const createSalarySchema = (t: (key: string) => string) =>
   z.object({
-    employee_name: z.string().min(1, t("Salaries.form.employee_name.required")),
+    employee_id: z.string().min(1, t("Salaries.form.employee_name.required")),
     pay_period_start: z.string().min(1, t("Salaries.form.pay_period_start.required")),
     pay_period_end: z.string().min(1, t("Salaries.form.pay_period_end.required")),
     payment_date: z.string().min(1, t("Salaries.form.payment_date.required")),
@@ -49,7 +62,7 @@ const createSalarySchema = (t: (key: string) => string) =>
       .positive(t("Salaries.form.gross_amount.positive"))
       .or(z.literal(0)),
     net_amount: z.coerce.number().positive(t("Salaries.form.net_amount.positive")).or(z.literal(0)),
-    deductions: z.array(deductionSchema).optional(),
+    deductions: z.array(createDeductionSchema(t)).optional(),
     notes: z.string().optional(),
   });
 
@@ -61,7 +74,7 @@ export function SalaryForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<SalaryUpdateData>) {
+}: ModuleFormProps<Salary>) {
   const t = useTranslations();
   const locale = useLocale();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();
@@ -78,13 +91,16 @@ export function SalaryForm({
   const form = useForm<SalaryFormValues>({
     resolver: zodResolver(salarySchema),
     defaultValues: {
-      employee_name: "",
+      employee_id: "",
       pay_period_start: "",
       pay_period_end: "",
       payment_date: "",
       gross_amount: 0, // Default as number
       net_amount: 0, // Default as number
-      deductions: defaultValues?.deductions || [],
+      deductions:
+        defaultValues?.deductions && defaultValues.deductions.length > 0
+          ? defaultValues.deductions
+          : [{ type: "", amount: 0 }],
       notes: defaultValues?.notes || "",
     },
   });
@@ -154,7 +170,7 @@ export function SalaryForm({
           <div className="form-container">
             <FormField
               control={form.control}
-              name="employee_name"
+              name="employee_id"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("Salaries.form.employee_name.label")} *</FormLabel>

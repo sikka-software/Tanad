@@ -1354,6 +1354,7 @@ export type Database = {
           amount: number
           created_at: string | null
           currency: string
+          deductions: Json | null
           employee_id: string
           end_date: string | null
           enterprise_id: string
@@ -1367,6 +1368,7 @@ export type Database = {
           amount: number
           created_at?: string | null
           currency?: string
+          deductions?: Json | null
           employee_id: string
           end_date?: string | null
           enterprise_id: string
@@ -1380,6 +1382,7 @@ export type Database = {
           amount?: number
           created_at?: string | null
           currency?: string
+          deductions?: Json | null
           employee_id?: string
           end_date?: string | null
           enterprise_id?: string
