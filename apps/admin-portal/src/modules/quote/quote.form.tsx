@@ -3,7 +3,7 @@ import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-tabl
 import { format } from "date-fns";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useEffect, useMemo, useState, RefObject } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";

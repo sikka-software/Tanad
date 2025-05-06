@@ -14,14 +14,14 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateJobListing } from "./job-listing.hooks";
 import useJobListingsStore from "./job-listing.store";
-import { JobListing } from "./job-listing.type";
+import { JobListingWithJobs } from "./job-listing.type";
 
 const JobListingsTable = ({
   data,
   isLoading,
   error,
   onActionClicked,
-}: ModuleTableProps<JobListing>) => {
+}: ModuleTableProps<JobListingWithJobs>) => {
   const t = useTranslations();
   const { mutate: updateJobListing } = useUpdateJobListing();
   const selectedRows = useJobListingsStore((state) => state.selectedRows);
@@ -38,7 +38,7 @@ const JobListingsTable = ({
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
-  const columns: ExtendedColumnDef<JobListing>[] = [
+  const columns: ExtendedColumnDef<JobListingWithJobs>[] = [
     {
       accessorKey: "title",
       header: t("JobListings.form.title.label"),
@@ -86,7 +86,7 @@ const JobListingsTable = ({
   };
 
   const handleRowSelectionChange = useCallback(
-    (rows: JobListing[]) => {
+    (rows: JobListingWithJobs[]) => {
       const newSelectedIds = rows.map((row) => row.id!);
       // Only update if the selection has actually changed
       if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
@@ -112,7 +112,7 @@ const JobListingsTable = ({
     },
     enableRowSelection: true,
     enableMultiRowSelection: true,
-    getRowId: (row: JobListing) => row.id!,
+    getRowId: (row: JobListingWithJobs) => row.id!,
     onRowSelectionChange: (updater: any) => {
       const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
       const selectedRows = data.filter((row) => newSelection[row.id!]);

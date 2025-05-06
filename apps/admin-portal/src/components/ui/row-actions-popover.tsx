@@ -106,6 +106,18 @@ const RowActionsPopover = ({
             {t("General.duplicate")}
           </Button>
         )}
+        {onPreview && (
+          <Button
+            onClick={onPreview}
+            variant="ghost"
+            className="flex flex-row items-center justify-start gap-2"
+            size="default"
+            type="button"
+          >
+            <Eye className="size-4" />
+            {t("General.preview")}
+          </Button>
+        )}
         {onView && (
           <Button
             onClick={onView}

@@ -1,6 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { toast } from "sonner";
 

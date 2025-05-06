@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -25,10 +25,8 @@ import {
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/job-listing/job-listing.options";
 import useJobListingsStore from "@/job-listing/job-listing.store";
 import JobListingsTable from "@/job-listing/job-listing.table";
-import { JobListing } from "@/job-listing/job-listing.type";
+import { JobListingWithJobs } from "@/job-listing/job-listing.type";
 
-import { CompanyForm } from "@/modules/company/company.form";
-import { CompanyUpdateData } from "@/modules/company/company.type";
 import { JobListingForm } from "@/modules/job-listing/job-listing.form";
 import useUserStore from "@/stores/use-user-store";
 
@@ -40,7 +38,7 @@ export default function JobListingsPage() {
   const canCreateJobListings = useUserStore((state) => state.hasPermission("job_listings.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableJobListing, setActionableJobListing] = useState<JobListing | null>(null);
+  const [actionableJobListing, setActionableJobListing] = useState<JobListingWithJobs | null>(null);
 
   const loadingSaveJobListing = useJobListingsStore((state) => state.isLoading);
   const setLoadingSaveJobListing = useJobListingsStore((state) => state.setIsLoading);
@@ -66,7 +64,7 @@ export default function JobListingsPage() {
   const { mutate: duplicateJobListing } = useDuplicateJobListing();
 
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: jobListings,
+    data: jobListings as JobListingWithJobs[],
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
@@ -96,10 +94,6 @@ export default function JobListingsPage() {
     return getSortedJobListings(filteredListings);
   }, [filteredListings, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  const handleCreateClick = () => {
-    router.push("/job_listings/add");
-  };
-
   if (!canReadJobListings) {
     return <NoPermission />;
   }
@@ -121,7 +115,9 @@ export default function JobListingsPage() {
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("JobListings.title")}
-            onAddClick={handleCreateClick}
+            onAddClick={
+              canCreateJobListings ? () => router.push(router.pathname + "/add") : undefined
+            }
             createLabel={t("JobListings.create_listing")}
             searchPlaceholder={t("JobListings.search_listings")}
             count={jobListings?.length}
@@ -132,7 +128,7 @@ export default function JobListingsPage() {
         <div>
           {viewMode === "table" ? (
             <JobListingsTable
-              data={sortedListings}
+              data={sortedListings as JobListingWithJobs[]}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
               onActionClicked={onActionClicked}
@@ -140,11 +136,11 @@ export default function JobListingsPage() {
           ) : (
             <div className="p-4">
               <DataModelList
-                data={sortedListings}
+                data={sortedListings as JobListingWithJobs[]}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("JobListings.no_listings_found")}
-                renderItem={(listing: JobListing) => (
+                renderItem={(listing: JobListingWithJobs) => (
                   <JobListingCard key={listing.id} jobListing={listing} />
                 )}
                 gridCols="3"
