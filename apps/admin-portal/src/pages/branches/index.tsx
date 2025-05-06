@@ -2,7 +2,6 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -17,9 +16,6 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { FilterCondition } from "@/types/common.type";
-import { ViewMode } from "@/types/generic-store-types";
-
 import BranchCard from "@/branch/branch.card";
 import { BranchForm } from "@/branch/branch.form";
 import {
@@ -33,7 +29,6 @@ import useBranchStore from "@/branch/branch.store";
 import BranchesTable from "@/branch/branch.table";
 import { Branch, BranchUpdateData } from "@/branch/branch.type";
 
-import BranchDatasheet from "@/modules/branch/branch.datasheet";
 import useUserStore from "@/stores/use-user-store";
 
 export default function BranchesPage() {

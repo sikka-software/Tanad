@@ -6,4 +6,4 @@ alwaysApply: true
 - if you want to know what's currently in the db, run use the execute_sql mcp tool with project_id: vcbrjspzfsvzgtjndjat
 - Anytime you want to understand our db schema refer to [schema.ts](mdc:src/db/schema.ts)
 - Anytime you want to make changes to the db run `supabase migration new FILE_NAME`
-- And to apply the migrations run `supabase migration up --include-all`
+- And to apply the migrations run `supabase db push --include-all`
