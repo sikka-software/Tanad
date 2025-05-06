@@ -46,7 +46,7 @@ export function useCreateBranch() {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: (newBranch: Omit<Branch, "id" | "created_at"> & { user_id: string }) => {
+    mutationFn: (newBranch: BranchCreateData & { user_id: string }) => {
       // Map user_id to user_id for the service function
       const { user_id, ...rest } = newBranch;
       const branchData: BranchCreateData = {
@@ -226,9 +226,16 @@ export function useBranchDatasheet(initialData: Branch[] = []) {
               // Extract only the changed fields if possible, or send the whole row
               // For simplicity, sending the relevant part of the row object
               // Ensure you are not sending fields that shouldn't be updated (like id, created_at)
-              const { id: changedBranchId, created_at: _createdAt, ...updatePayload } = changedBranch;
+              const {
+                id: changedBranchId,
+                created_at: _createdAt,
+                ...updatePayload
+              } = changedBranch;
               console.log("Updating branch:", changedBranchId, updatePayload);
-              updateMutation.mutate({ id: changedBranchId, data: updatePayload as BranchUpdateData });
+              updateMutation.mutate({
+                id: changedBranchId,
+                data: updatePayload as BranchUpdateData,
+              });
             } else {
               console.warn("Skipping update for row without ID:", i, changedBranch);
             }

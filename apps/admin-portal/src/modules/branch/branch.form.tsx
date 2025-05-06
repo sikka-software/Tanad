@@ -26,7 +26,7 @@ import { useEmployees } from "../employee/employee.hooks";
 import useEmployeeStore from "../employee/employee.store";
 import { useBranches, useCreateBranch, useUpdateBranch } from "./branch.hooks";
 import useBranchStore from "./branch.store";
-import { BranchUpdateData, BranchCreateData } from "./branch.type";
+import { BranchUpdateData, BranchCreateData, Branch } from "./branch.type";
 
 export const createBranchSchema = (t: (key: string) => string) => {
   const baseBranchSchema = z.object({
@@ -64,11 +64,11 @@ export function BranchForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<BranchUpdateData>) {
+}: ModuleFormProps<Branch>) {
   const t = useTranslations();
   const locale = useLocale();
 
-  const { user } = useUserStore();
+  const { user, enterprise } = useUserStore();
   const { mutate: createBranch } = useCreateBranch();
   const { mutate: updateBranch } = useUpdateBranch();
   const { data: branches } = useBranches();
@@ -96,7 +96,7 @@ export function BranchForm({
       phone: defaultValues?.phone || "",
       email: defaultValues?.email || "",
       manager: defaultValues?.manager || null,
-      status: defaultValues?.status || "active",
+      status: (defaultValues?.status as "active" | "inactive") || "active",
       notes: defaultValues?.notes || "",
     },
   });
@@ -107,36 +107,42 @@ export function BranchForm({
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
+      setIsLoading(false);
+      return;
+    }
+    if (!enterprise?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.no_enterprise_selected"),
+      });
+      setIsLoading(false);
       return;
     }
 
-    // Helper to convert empty string/null to undefined
-    const optionalString = (val: string | null | undefined): string | undefined => {
-      return val?.trim() || undefined;
+    // Helper to convert empty string/null to null
+    const optionalString = (val: string | null | undefined): string | null => {
+      return val && val.trim() !== "" ? val.trim() : null;
     };
 
-    // Prepare payload - ensure optional fields are undefined if empty
-    const payload = {
+    // Prepare payload - ensure optional fields are null if empty and required fields are present
+    const payload: BranchCreateData = {
       name: data.name.trim(),
-      code: data.code?.trim() || "",
-      phone: optionalString(data.phone),
-      email: optionalString(data.email),
-      manager: data.manager && data.manager.trim() !== "" ? data.manager : undefined,
-      notes: optionalString(data.notes),
+      code: data.code?.trim() || null,
+      phone: optionalString(data.phone) ?? null,
+      email: optionalString(data.email) ?? null,
+      manager: data.manager && data.manager.trim() !== "" ? data.manager : null,
+      notes: optionalString(data.notes) ?? null,
       status: data.status,
-      short_address: optionalString(data.short_address),
-      building_number: optionalString(data.building_number),
-      street_name: optionalString(data.street_name),
-      city: optionalString(data.city),
-      region: optionalString(data.region),
-      country: optionalString(data.country),
-      zip_code: optionalString(data.zip_code),
-      additional_number: optionalString((data as any).additional_number),
+      short_address: optionalString(data.short_address) ?? null,
+      building_number: optionalString(data.building_number) ?? null,
+      street_name: optionalString(data.street_name) ?? null,
+      city: optionalString(data.city) ?? null,
+      region: optionalString(data.region) ?? null,
+      country: optionalString(data.country) ?? null,
+      zip_code: optionalString(data.zip_code) ?? null,
+      additional_number: optionalString((data as any).additional_number) ?? null,
+      user_id: user.id,
+      enterprise_id: enterprise.id,
     };
-
-    const definedPayload = Object.fromEntries(
-      Object.entries(payload).filter(([_, v]) => v !== undefined),
-    );
 
     try {
       if (editMode) {
@@ -146,7 +152,7 @@ export function BranchForm({
         await updateBranch(
           {
             id: defaultValues.id,
-            data: definedPayload as BranchUpdateData, // Use filtered payload
+            data: payload as BranchUpdateData, // Use filtered payload
           },
           {
             onSuccess: () => {
@@ -157,19 +163,13 @@ export function BranchForm({
           },
         );
       } else {
-        await createBranch(
-          {
-            ...definedPayload,
-            user_id: user.id,
-          } as BranchCreateData & { user_id: string },
-          {
-            onSuccess: () => {
-              setIsLoading(false);
-              if (onSuccess) onSuccess();
-            },
-            onError: () => setIsLoading(false),
+        await createBranch(payload, {
+          onSuccess: () => {
+            setIsLoading(false);
+            if (onSuccess) onSuccess();
           },
-        );
+          onError: () => setIsLoading(false),
+        });
       }
     } catch (error) {
       setIsLoading(false);
