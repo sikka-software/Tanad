@@ -214,7 +214,14 @@ export const app_permission = pgEnum("app_permission", [
 ]);
 export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
 export const payment_cycle = pgEnum("payment_cycle", ["monthly", "annual"]);
-
+export const employee_status = pgEnum("employee_status", [
+  "active",
+  "inactive",
+  "terminated",
+  "on_leave",
+  "resigned",
+]);
+export const common_status = pgEnum("common_status", ["active", "inactive", "draft", "archived"]);
 export const branches = pgTable(
   "branches",
   {
@@ -238,7 +245,7 @@ export const branches = pgTable(
     phone: text(),
     email: text(),
     manager: uuid(),
-    status: text().default("active").notNull(),
+    status: common_status().default("active"),
     notes: text(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
@@ -325,7 +332,7 @@ export const companies = pgTable(
     industry: text(),
     size: text(),
     notes: text(),
-    status: text().default("active").notNull(),
+    status: common_status().default("active"),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
   },
@@ -356,7 +363,7 @@ export const departments = pgTable(
     updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
-    status: text().default("active").notNull(),
+    status: common_status().default("active"),
     enterprise_id: uuid().notNull(),
   },
   (table) => [
@@ -395,7 +402,7 @@ export const employees = pgTable(
     country: text(),
     zip_code: text(),
     termination_date: date(),
-    status: text().default("active").notNull(),
+    status: employee_status().default("active"),
     department_id: uuid(),
     position: text(),
     salary: jsonb().default([]),
@@ -610,7 +617,7 @@ export const products = pgTable(
     cost: numeric({ precision: 10, scale: 2 }),
     stock_quantity: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
     unit: text(),
-    status: text().default("active").notNull(),
+    status: common_status().default("active"),
     notes: text(),
   },
   (table) => [
@@ -646,7 +653,7 @@ export const offices = pgTable(
     phone: text(),
     email: text(),
     manager: uuid(),
-    status: text().default("active").notNull(),
+    status: common_status().default("active"),
     user_id: uuid().notNull(),
     notes: text(),
     enterprise_id: uuid().notNull(),
@@ -1573,7 +1580,7 @@ export const jobs = pgTable(
     department: varchar({ length: 255 }),
     type: varchar({ length: 50 }).notNull(),
     salary: numeric({ precision: 10, scale: 2 }),
-    status: text().default("active").notNull(),
+    status: common_status().default("active"),
     start_date: date(),
     end_date: date(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
@@ -1616,7 +1623,7 @@ export const warehouses = pgTable(
     country: text(),
     zip_code: text(),
     capacity: numeric({ precision: 10, scale: 2 }),
-    status: text().default("active").notNull(),
+    status: common_status().default("active"),
     notes: text(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
@@ -1773,7 +1780,7 @@ export const job_listings = pgTable(
     id: uuid().defaultRandom().primaryKey().notNull(),
     title: varchar({ length: 255 }).notNull(),
     description: text(),
-    status: text().default("active").notNull(),
+    status: common_status().default("active"),
     slug: varchar({ length: 255 }).notNull(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
@@ -1854,8 +1861,11 @@ export const servers = pgTable(
     location: text(),
     provider: text(),
     os: text(),
-    status: text().default("active").notNull(),
+    status: common_status().default("active"),
     tags: jsonb().default([]),
+    monthly_cost: numeric({ precision: 10, scale: 2 }),
+    annual_cost: numeric({ precision: 10, scale: 2 }),
+    payment_cycle: payment_cycle(),
     notes: text(),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)

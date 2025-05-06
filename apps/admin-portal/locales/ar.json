@@ -2669,20 +2669,24 @@
       "actions": "الإجراءات"
     },
     "form": {
+      "remove_deduction": "إزالة الاستقطاع",
       "employee_name": {
         "label": "اسم الموظف",
         "placeholder": "أدخل اسم الموظف",
-        "required": "اسم الموظف مطلوب"
+        "required": "اسم الموظف مطلوب",
+        "no_employees": "لا يوجد موظفين"
       },
       "gross_amount": {
         "label": "المبلغ الإجمالي",
         "placeholder": "أدخل المبلغ الإجمالي",
-        "required": "المبلغ الإجمالي مطلوب"
+        "required": "المبلغ الإجمالي مطلوب",
+        "positive": "المبلغ الإجمالي يجب أن يكون موجبًا"
       },
       "net_amount": {
         "label": "المبلغ الصافي",
         "placeholder": "أدخل المبلغ الصافي",
-        "required": "المبلغ الصافي مطلوب"
+        "required": "المبلغ الصافي مطلوب",
+        "positive": "المبلغ الصافي يجب أن يكون موجبًا"
       },
       "payment_date": {
         "label": "تاريخ الدفع",
@@ -3872,7 +3876,9 @@
       "payment_cycle": {
         "label": "دورة الدفع",
         "placeholder": "أدخل دورة الدفع",
-        "required": "دورة الدفع مطلوبة"
+        "required": "دورة الدفع مطلوبة",
+        "monthly": "شهري",
+        "annual": "سنوي"
       },
       "notes": {
         "label": "الملاحظات",

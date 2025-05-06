@@ -32,31 +32,33 @@ import { DEDUCTION_TYPES } from "./salary.options";
 import { Salary, SalaryUpdateData } from "./salary.type";
 
 const createDeductionSchema = (t: (key: string) => string) =>
-  z.object({
-    type: z.string(),
-    amount: z.coerce.number().or(z.literal(0)),
-  }).superRefine((val, ctx) => {
-    // If both are empty, it's valid (row will be filtered out)
-    if ((!val.type || val.type.trim() === "") && (!val.amount || val.amount === 0)) {
-      return;
-    }
-    // If type is filled but amount is empty/zero
-    if (val.type && (!val.amount || val.amount === 0)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: t("Salaries.form.deduction_amount.positive"),
-        path: ["amount"],
-      });
-    }
-    // If amount is filled but type is empty
-    if ((val.amount && val.amount !== 0) && (!val.type || val.type.trim() === "")) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: t("Salaries.form.deduction_type.required"),
-        path: ["type"],
-      });
-    }
-  });
+  z
+    .object({
+      type: z.string(),
+      amount: z.coerce.number().or(z.literal(0)),
+    })
+    .superRefine((val, ctx) => {
+      // If both are empty, it's valid (row will be filtered out)
+      if ((!val.type || val.type.trim() === "") && (!val.amount || val.amount === 0)) {
+        return;
+      }
+      // If type is filled but amount is empty/zero
+      if (val.type && (!val.amount || val.amount === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t("Salaries.form.deduction_amount.positive"),
+          path: ["amount"],
+        });
+      }
+      // If amount is filled but type is empty
+      if (val.amount && val.amount !== 0 && (!val.type || val.type.trim() === "")) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t("Salaries.form.deduction_type.required"),
+          path: ["type"],
+        });
+      }
+    });
 
 const createSalarySchema: (t: (key: string) => string) => z.ZodObject<any> = (t) =>
   z.object({
@@ -72,7 +74,7 @@ const createSalarySchema: (t: (key: string) => string) => z.ZodObject<any> = (t)
     deductions: z
       .array(createDeductionSchema(t))
       .transform((arr) => arr.filter((item) => item.type.trim() !== "" || item.amount !== 0))
-      .optional(),
+      .default([]),
     notes: z.string().optional(),
   });
 
@@ -138,7 +140,6 @@ export function SalaryForm({
   }));
 
   const handleSubmit: (data: SalaryFormValues) => Promise<void> = async (data) => {
-    console.log("data", data);
     setLoading(true);
     try {
       // Revert to stringifying; pass undefined if empty to match expected type signature

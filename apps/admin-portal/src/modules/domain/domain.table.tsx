@@ -6,6 +6,8 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import CurrencyCell from "@/components/tables/currency-cell";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
@@ -16,6 +18,7 @@ import { Domain } from "./domain.type";
 
 const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Domain>) => {
   const t = useTranslations();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
   const { mutate: updateDomain } = useUpdateDomain();
   const selectedRows = useDomainStore((state) => state.selectedRows);
   const setSelectedRows = useDomainStore((state) => state.setSelectedRows);
@@ -44,14 +47,21 @@ const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       accessorKey: "monthly_cost",
       header: t("Domains.form.monthly_cost.label"),
       validationSchema: z.number().min(0, "Required"),
+      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
       accessorKey: "annual_cost",
       header: t("Domains.form.annual_cost.label"),
       validationSchema: z.number().min(0, "Required"),
+      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
     {
       accessorKey: "payment_cycle",
+      cellType: "select",
+      options: [
+        { label: t("Domains.form.payment_cycle.monthly"), value: "monthly" },
+        { label: t("Domains.form.payment_cycle.annual"), value: "annual" },
+      ],
       header: t("Domains.form.payment_cycle.label"),
       validationSchema: z.string().min(1, "Required"),
     },

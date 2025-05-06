@@ -31,7 +31,10 @@ export default function AddJobPage() {
       form.setValue("requirements", dummyData.requirements);
       form.setValue("location", dummyData.job_location);
       form.setValue("department", dummyData.job_department);
-      form.setValue("type", dummyData.job_type);
+      form.setValue(
+        "type",
+        dummyData.randomPicker(["full-time", "part-time", "contract", "internship", "temporary"]),
+      );
       form.setValue("salary", dummyData.job_salary);
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
       form.setValue("start_date", dummyData.job_start_date);

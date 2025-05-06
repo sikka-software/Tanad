@@ -253,6 +253,13 @@
       "when": 1746514625965,
       "tag": "0035_overrated_kree",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1746517188680,
+      "tag": "0036_tidy_wendigo",
+      "breakpoints": true
     }
   ]
 }

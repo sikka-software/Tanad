@@ -1,4 +1,7 @@
-import { useTranslations } from "next-intl";
+import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import { MoneyFormatter } from "@root/src/components/ui/currency-input";
+import { getCurrencySymbol } from "@root/src/lib/currency-utils";
+import { useLocale, useTranslations } from "next-intl";
 import React from "react";
 import { z } from "zod";
 
@@ -6,7 +9,11 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import CurrencyCell from "@/components/tables/currency-cell";
+
 import { ModuleTableProps } from "@/types/common.type";
+
+import { useEmployees } from "@/employee/employee.hooks";
 
 import { useUpdateSalary } from "@/salary/salary.hooks";
 import useSalaryStore from "@/salary/salary.store";
@@ -14,16 +21,11 @@ import { Salary } from "@/salary/salary.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-const employeeNameSchema = z.string().min(1, "Required");
-const grossAmountSchema = z.number().min(0, "Must be positive");
-const netAmountSchema = z.number().min(0, "Must be positive");
-const paymentDateSchema = z.string().min(1, "Required");
-const payPeriodStartSchema = z.string().min(1, "Required");
-const payPeriodEndSchema = z.string().min(1, "Required");
-const notesSchema = z.string().optional();
-
 const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Salary>) => {
   const t = useTranslations();
+  const locale = useLocale();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
+
   const { mutateAsync: updateSalary } = useUpdateSalary();
   const selectedRows = useSalaryStore((state) => state.selectedRows);
   const setSelectedRows = useSalaryStore((state) => state.setSelectedRows);
@@ -34,48 +36,74 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canArchiveSalary = useUserStore((state) => state.hasPermission("salaries.archive"));
   const canDeleteSalary = useUserStore((state) => state.hasPermission("salaries.delete"));
 
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const employeeOptions = employees.map((employee) => ({
+    label: `${employee.first_name} ${employee.last_name}`,
+    value: employee.id,
+  }));
+
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Salary>[] = [
     {
       accessorKey: "employee_name",
       header: t("Salaries.form.employee_name.label"),
-      validationSchema: employeeNameSchema,
+      noPadding: true,
+      validationSchema: z.string().nullable(),
+      cell: ({ row }) => {
+        const salary = row.original;
+        return (
+          <ComboboxAdd
+            direction={locale === "ar" ? "rtl" : "ltr"}
+            inCell
+            data={employeeOptions}
+            isLoading={employeesLoading}
+            buttonClassName="bg-transparent"
+            defaultValue={salary.employee_id || ""}
+            onChange={async (value) => {
+              await updateSalary({
+                id: salary.id,
+                data: {
+                  id: salary.id,
+                  employee_id: value || null,
+                },
+              });
+            }}
+            texts={{
+              placeholder: ". . .",
+              searchPlaceholder: t("Employees.search_employees"),
+              noItems: t("Salaries.form.employee_name.no_employees"),
+            }}
+            addText={t("Employees.add_new")}
+            ariaInvalid={false}
+          />
+        );
+      },
     },
     {
-      accessorKey: "gross_amount",
+      accessorKey: "amount",
       header: t("Salaries.form.gross_amount.label"),
-      validationSchema: grossAmountSchema,
-      cell: ({ getValue }) => formatCurrency(getValue() as number),
+      cell: ({ getValue }) => <CurrencyCell value={getValue() as number} currency={currency} />,
     },
-    {
-      accessorKey: "net_amount",
-      header: t("Salaries.form.net_amount.label"),
-      validationSchema: netAmountSchema,
-      cell: ({ getValue }) => formatCurrency(getValue() as number),
-    },
+
     {
       accessorKey: "payment_date",
       header: t("Salaries.form.payment_date.label"),
-      validationSchema: paymentDateSchema,
-      cell: ({ getValue }) => formatDate(getValue() as string),
+      cell: ({ getValue }) => getValue() as string,
     },
-    {
-      accessorKey: "pay_period_start",
-      header: t("Salaries.form.pay_period_start.label"),
-      validationSchema: payPeriodStartSchema,
-      cell: ({ getValue }) => formatDate(getValue() as string),
-    },
-    {
-      accessorKey: "pay_period_end",
-      header: t("Salaries.form.pay_period_end.label"),
-      validationSchema: payPeriodEndSchema,
-      cell: ({ getValue }) => formatDate(getValue() as string),
-    },
+    // {
+    //   accessorKey: "pay_period_start",
+    //   header: t("Salaries.form.pay_period_start.label"),
+    //   cell: ({ getValue }) => getValue() as string,
+    // },
+    // {
+    //   accessorKey: "pay_period_end",
+    //   header: t("Salaries.form.pay_period_end.label"),
+    //   cell: ({ getValue }) => getValue() as string,
+    // },
     {
       accessorKey: "notes",
       header: t("Salaries.form.notes.label"),
-      validationSchema: notesSchema,
     },
   ];
 

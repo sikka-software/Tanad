@@ -102,7 +102,7 @@ export function JobForm({
       benefits: defaultValues?.benefits || "",
       location: defaultValues?.location || "",
       department: defaultValues?.department || "",
-      type: defaultValues?.type || "Full-time",
+      type: defaultValues?.type || "full-time",
       salary: defaultValues?.salary ? String(defaultValues.salary) : undefined,
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
@@ -229,11 +229,11 @@ export function JobForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="Full-time">{t("Jobs.form.type.full_time")}</SelectItem>
-                      <SelectItem value="Part-time">{t("Jobs.form.type.part_time")}</SelectItem>
-                      <SelectItem value="Contract">{t("Jobs.form.type.contract")}</SelectItem>
-                      <SelectItem value="Internship">{t("Jobs.form.type.internship")}</SelectItem>
-                      <SelectItem value="Temporary">{t("Jobs.form.type.temporary")}</SelectItem>
+                      <SelectItem value="full-time">{t("Jobs.form.type.full_time")}</SelectItem>
+                      <SelectItem value="part-time">{t("Jobs.form.type.part_time")}</SelectItem>
+                      <SelectItem value="contract">{t("Jobs.form.type.contract")}</SelectItem>
+                      <SelectItem value="internship">{t("Jobs.form.type.internship")}</SelectItem>
+                      <SelectItem value="temporary">{t("Jobs.form.type.temporary")}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
