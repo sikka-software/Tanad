@@ -48,31 +48,42 @@ const CodeInputCellComponent = React.memo(
     const locale = useLocale();
 
     const getInitialValue = useCallback(() => {
+      let initialVal = "";
       if (rowData && columnId && typeof columnId === 'string' && columnId in rowData) {
         const val = rowData[columnId as keyof TRowData];
-        return val === null || val === undefined ? "" : String(val);
+        initialVal = val === null || val === undefined ? "" : String(val);
       }
-      return "";
-    }, [rowData, columnId]);
+      return initialVal;
+    }, [rowData, columnId, rowIndex]);
 
     const [value, setValue] = useState<string>(getInitialValue());
-    const ref = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const triggerButtonRef = useRef<HTMLButtonElement>(null);
     const [validationError, setValidationError] = useState<string | null>(null);
-    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-    const isDropdownOpen = useRef(false);
+    const [isValidationPopoverOpen, setIsValidationPopoverOpen] = useState(false);
+    const [isGeneratorPopoverOpen, setIsGeneratorPopoverOpen] = useState(false);
 
     useEffect(() => {
-      setValue(getInitialValue());
-      setValidationError(null);
-      setIsPopoverOpen(false);
-    }, [getInitialValue]);
+      if (!focus) {
+         setValue(getInitialValue());
+         setValidationError(null);
+         setIsValidationPopoverOpen(false);
+         setIsGeneratorPopoverOpen(false);
+      }
+    }, [getInitialValue, focus]);
 
     useEffect(() => {
-      if (focus && ref.current) {
-        ref.current.focus();
-        ref.current.select();
+      if (focus && inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
         setValidationError(null);
-        setIsPopoverOpen(false);
+        setIsValidationPopoverOpen(false);
+      }
+    }, [focus]);
+
+    useEffect(() => {
+      if (focus && triggerButtonRef.current) {
+        triggerButtonRef.current.click();
       }
     }, [focus]);
 
@@ -91,7 +102,7 @@ const CodeInputCellComponent = React.memo(
         }
 
         setValidationError(errorMsg);
-        setIsPopoverOpen(!isValid && focus);
+        setIsValidationPopoverOpen(!isValid && focus);
 
         const originalValue = getInitialValue();
         if (isValid && currentValue !== originalValue && columnData?.onCodeChange && rowIndex !== undefined) {
@@ -108,16 +119,13 @@ const CodeInputCellComponent = React.memo(
         setValue(e.target.value);
         if (validationError) {
           setValidationError(null);
-          setIsPopoverOpen(false);
+          setIsValidationPopoverOpen(false);
         }
       },
       [validationError],
     );
 
     const handleBlur = useCallback(() => {
-      if (isDropdownOpen.current) {
-        return;
-      }
       const isValid = validateAndTriggerChange(value);
       if (isValid) {
         stopEditing({ nextRow: false });
@@ -138,7 +146,8 @@ const CodeInputCellComponent = React.memo(
           e.stopPropagation();
           setValue(getInitialValue());
           setValidationError(null);
-          setIsPopoverOpen(false);
+          setIsValidationPopoverOpen(false);
+          setIsGeneratorPopoverOpen(false);
           stopEditing({ nextRow: false });
         }
       },
@@ -148,32 +157,31 @@ const CodeInputCellComponent = React.memo(
     const handleGenerate = (generator: () => string) => {
       const newValue = generator();
       setValue(newValue);
-      validateAndTriggerChange(newValue);
-      ref.current?.focus();
+      if (columnData?.onCodeChange && rowIndex !== undefined) {
+        columnData.onCodeChange(rowIndex, newValue);
+      }
+      inputRef.current?.focus();
+      setValidationError(null);
+      setIsValidationPopoverOpen(false);
     };
 
     const handleSerialClick = () => {
       if (columnData?.onSerial && fullGridData && rowIndex !== undefined) {
         handleGenerate(() => columnData.onSerial(fullGridData, rowIndex));
       }
+      setIsGeneratorPopoverOpen(false);
     };
 
     const handleRandomClick = () => {
       if (columnData?.onRandom) {
         handleGenerate(columnData.onRandom);
       }
-    };
-
-    const handleDropdownOpenChange = (open: boolean) => {
-      isDropdownOpen.current = open;
-      if (!open && focus) {
-        ref.current?.focus();
-      }
+      setIsGeneratorPopoverOpen(false);
     };
 
     if (!focus) {
       return (
-        <div className="dsg-cell-display px-2 py-1 overflow-hidden text-ellipsis whitespace-nowrap">
+        <div className="dsg-cell-display flex items-center px-2 h-full overflow-hidden text-ellipsis whitespace-nowrap">
           {getInitialValue()}
         </div>
       );
@@ -181,10 +189,10 @@ const CodeInputCellComponent = React.memo(
 
     return (
       <div className={cx("dsg-input-wrapper relative h-full", { "dsg-input-wrapper-focus": focus })}>
-        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <Popover open={isValidationPopoverOpen} onOpenChange={setIsValidationPopoverOpen}>
           <PopoverTrigger asChild>
             <input
-              ref={ref}
+              ref={inputRef}
               type="text"
               value={value}
               onChange={handleLocalChange}
@@ -212,9 +220,10 @@ const CodeInputCellComponent = React.memo(
         </Popover>
 
         <div className="absolute inset-y-0 end-0 flex items-center pe-0.5">
-          <DropdownMenu dir={locale === "ar" ? "rtl" : "ltr"} onOpenChange={handleDropdownOpenChange}>
-            <DropdownMenuTrigger asChild>
+          <Popover open={isGeneratorPopoverOpen} onOpenChange={setIsGeneratorPopoverOpen}>
+            <PopoverTrigger asChild>
               <Button
+                ref={triggerButtonRef}
                 size="icon_sm"
                 type="button"
                 variant="ghost"
@@ -223,26 +232,32 @@ const CodeInputCellComponent = React.memo(
               >
                 <Hash className="size-5" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              {typeof columnData?.onSerial === 'function' && (
-                <DropdownMenuItem
-                  onClick={handleSerialClick}
-                  onSelect={(e) => e.preventDefault()}
-                >
-                  <DiamondPlus className="me-2 size-4" /> {t("General.next_number")}
-                </DropdownMenuItem>
-              )}
-              {typeof columnData?.onRandom === 'function' && (
-                <DropdownMenuItem
-                  onClick={handleRandomClick}
-                  onSelect={(e) => e.preventDefault()}
-                >
-                  <Shuffle className="me-2 size-4" /> {t("General.random")}
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-1">
+              <div className="flex flex-col space-y-1">
+                {typeof columnData?.onSerial === 'function' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto justify-start px-2 py-1.5"
+                    onClick={handleSerialClick}
+                  >
+                    <DiamondPlus className="me-2 size-4" /> {t("General.next_number")}
+                  </Button>
+                )}
+                {typeof columnData?.onRandom === 'function' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto justify-start px-2 py-1.5"
+                    onClick={handleRandomClick}
+                  >
+                    <Shuffle className="me-2 size-4" /> {t("General.random")}
+                  </Button>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     );

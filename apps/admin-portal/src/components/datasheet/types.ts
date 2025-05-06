@@ -22,6 +22,7 @@ export type CellProps<T, C> = {
   duplicateRow: () => void;
   deleteRow: () => void;
   getContextMenuItems: () => ContextMenuItem[];
+  columnId?: string;
 };
 
 export type CellComponent<T, C> = (props: CellProps<T, C>) => React.ReactNode;

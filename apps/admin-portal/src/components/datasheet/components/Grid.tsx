@@ -244,6 +244,7 @@ export const Grid = <T extends any>({
                       insertRowBelow={insertAfterGivenRow(row.index)}
                       setRowData={setGivenRowData(row.index)}
                       columnData={columns[col.index].columnData}
+                      columnId={columns[col.index].id}
                     />
                   </CellComponent>
                 );

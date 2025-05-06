@@ -235,11 +235,18 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     error: employeesError,
   } = useEmployees();
 
-  const handleGridChange = (value: Record<string, any>[], operations: any) => {
-    if (onChange) {
-      onChange(value as Branch[], operations);
-    }
-  };
+  const handleGridChange = useCallback(
+    (value: Branch[], operations: any) => {
+      // --- DEBUG LOGGING ---
+      console.log("[BranchDatasheet] handleGridChange called with operations:", operations);
+      console.log("[BranchDatasheet] handleGridChange updated value:", value);
+      // --- END DEBUG LOGGING ---
+      if (onChange) {
+        onChange(value, operations);
+      }
+    },
+    [onChange],
+  );
 
   // --- Callback functions for CodeInputCell ---
   const generateSerialCode = useCallback(
@@ -273,10 +280,16 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
   // --- Callback for CodeInputCell: onCodeChange ---
   const handleCodeChange = useCallback(
     (rowIndex: number, newCode: string) => {
+      // --- DEBUG LOGGING ---
+      console.log(`[BranchDatasheet] handleCodeChange called for row ${rowIndex} with code: ${newCode}`);
+      // --- END DEBUG LOGGING ---
       const updatedData = [...data]; // Create a new array
       if (updatedData[rowIndex]) {
         // Create a new object for the specific row
         updatedData[rowIndex] = { ...updatedData[rowIndex], code: newCode };
+        // --- DEBUG LOGGING ---
+        console.log("[BranchDatasheet] handleCodeChange - updatedData array:", updatedData);
+        // --- END DEBUG LOGGING ---
         // Call the main onChange handler with the updated data array
         handleGridChange(updatedData, [
           {
