@@ -5,7 +5,7 @@ export type ViewMode = "table" | "cards";
 
 export type SortRule = {
   field: string;
-  direction: string;
+  direction: "asc" | "desc";
 };
 
 export type BaseStates<T> = {

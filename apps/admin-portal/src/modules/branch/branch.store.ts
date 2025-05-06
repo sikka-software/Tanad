@@ -6,7 +6,7 @@ const searchBranchFn = (branch: Branch, searchQuery: string) =>
   branch.name.toLowerCase().includes(searchQuery.toLowerCase());
 
 const useBranchStore = createGenericStore<Branch>("branches", searchBranchFn, {
-  sortRules: [{ field: "created_at", direction: "desc" }],
+  sortRules: [{ field: "created_at", direction: "asc" }],
 });
 
 export default useBranchStore;

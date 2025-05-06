@@ -26,8 +26,8 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
     setViewMode: (viewMode: "table" | "cards") => void;
     isDeleteDialogOpen: boolean;
     setIsDeleteDialogOpen: (isDeleteDialogOpen: boolean) => void;
-    sortRules: { field: string; direction: string }[];
-    setSortRules: (sortRules: { field: string; direction: string }[]) => void;
+    sortRules: { field: string; direction: "asc" | "desc" }[];
+    setSortRules: (sortRules: { field: string; direction: "asc" | "desc" }[]) => void;
     sortCaseSensitive: boolean;
     setSortCaseSensitive: (sortCaseSensitive: boolean) => void;
     sortNullsFirst: boolean;

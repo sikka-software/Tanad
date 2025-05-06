@@ -219,7 +219,6 @@ const CodeInputCellComponent = React.memo(
                 size="icon_sm"
                 type="button"
                 variant="ghost"
-                className="h-full rounded-s-none"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={(e) => {
                   e.stopPropagation();
