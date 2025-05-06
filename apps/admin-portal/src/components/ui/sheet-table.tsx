@@ -25,6 +25,7 @@ import {
   Row as TanStackRow,
   ColumnSizingState,
 } from "@tanstack/react-table";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
@@ -597,30 +598,28 @@ function SheetTable<
     return out;
   }, [data]);
 
-  /**
-   * Attempt removing the row with the given rowId via handleRemoveRowFunction.
-   * You can also do the "recursive removal" in your parent with a similar approach to `updateNestedRow`.
-   */
-  const removeRow = useCallback(
-    (rowId: string) => {
-      if (handleRemoveRowFunction) {
-        handleRemoveRowFunction(rowId);
-      }
-    },
-    [handleRemoveRowFunction],
-  );
+  // Flatten all rows for virtualization (no sub-rows)
+  const flatRows = React.useMemo(() => {
+    const result: { row: TanStackRow<T>; groupKey: string; level: number }[] = [];
+    Object.entries(groupedData).forEach(([groupKey, topRows]) => {
+      topRows.forEach((rowData) => {
+        const row = table.getRowModel().flatRows.find((r) => r.original === rowData);
+        if (row) {
+          result.push({ row, groupKey, level: 0 });
+        }
+      });
+    });
+    return result;
+  }, [groupedData, table]);
 
-  /**
-   * Attempt adding a sub-row to the row with given rowId (the "parentRowId").
-   */
-  const addSubRow = useCallback(
-    (parentRowId: string) => {
-      if (handleAddRowFunction) {
-        handleAddRowFunction(parentRowId);
-      }
-    },
-    [handleAddRowFunction],
-  );
+  // Virtualizer setup
+  const parentRef = React.useRef<HTMLDivElement>(null);
+  const rowVirtualizer = useVirtualizer({
+    count: flatRows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 48, // Adjust to your row height
+    overscan: 10,
+  });
 
   // rowActions config
   const addPos = rowActions?.add ?? null; // "left" | "right" | null
@@ -697,7 +696,7 @@ function SheetTable<
               {showRowActions && (
                 <button
                   className="flex w-full items-center justify-center"
-                  onClick={() => addSubRow(rowId)}
+                  onClick={() => handleAddRowFunction(rowId)}
                 >
                   <Plus size={16} />
                 </button>
@@ -709,7 +708,7 @@ function SheetTable<
               {showRowActions && (
                 <button
                   className="flex w-full items-center justify-center"
-                  onClick={() => removeRow(rowId)}
+                  onClick={() => handleRemoveRowFunction(rowId)}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -895,7 +894,7 @@ function SheetTable<
               {showRowActions && (
                 <button
                   className="flex w-full items-center justify-center"
-                  onClick={() => addSubRow(rowId)}
+                  onClick={() => handleAddRowFunction(rowId)}
                 >
                   <Plus size={16} />
                 </button>
@@ -908,7 +907,7 @@ function SheetTable<
               {showRowActions && (
                 <button
                   className="flex w-full items-center justify-center"
-                  onClick={() => removeRow(rowId)}
+                  onClick={() => handleRemoveRowFunction(rowId)}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -945,6 +944,12 @@ function SheetTable<
       </React.Fragment>
     );
   };
+
+  // Memoize renderRow
+  const memoizedRenderRow = React.useCallback(
+    (row: TanStackRow<T>, groupKey: string, level = 0) => renderRow(row, groupKey, level),
+    [renderRow],
+  );
 
   /**
    * Renders optional footer (totals row + optional custom element) inside a <TableFooter>.
@@ -1023,7 +1028,7 @@ function SheetTable<
   }
 
   return (
-    <div className="relative max-h-[calc(100vh-5rem)] overflow-auto p-0 pb-2">
+    <div ref={parentRef} className="relative max-h-[calc(100vh-5rem)] overflow-auto p-0 pb-2">
       <Table id={id}>
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         {/* Primary header */}
@@ -1075,16 +1080,27 @@ function SheetTable<
         )}
 
         <TableBody>
-          {Object.entries(groupedData).map(([groupKey, topRows]) => (
-            <React.Fragment key={groupKey}>
-              {topRows.map((rowData) => {
-                const row = table.getRowModel().flatRows.find((r) => r.original === rowData);
-                if (!row) return null;
-
-                return renderRow(row, groupKey, 0);
-              })}
-            </React.Fragment>
-          ))}
+          {/* Top spacer */}
+          {rowVirtualizer.getVirtualItems().length > 0 && (
+            <tr style={{ height: `${rowVirtualizer.getVirtualItems()[0].start}px` }} />
+          )}
+          {/* Virtualized rows */}
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const { row, groupKey, level } = flatRows[virtualRow.index];
+            // Render as TableRow, not div
+            return React.cloneElement(
+              memoizedRenderRow(row, groupKey, level) as React.ReactElement,
+              { key: row.id },
+            );
+          })}
+          {/* Bottom spacer */}
+          {rowVirtualizer.getVirtualItems().length > 0 && (
+            <tr
+              style={{
+                height: `${rowVirtualizer.getTotalSize() - (rowVirtualizer.getVirtualItems().at(-1)?.end ?? 0)}px`,
+              }}
+            />
+          )}
         </TableBody>
       </Table>
     </div>
