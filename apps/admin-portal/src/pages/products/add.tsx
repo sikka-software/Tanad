@@ -24,8 +24,8 @@ export default function AddProductPage() {
     const dummyData = generateDummyData();
     const form = (window as any).productForm;
     if (form) {
-      form.setValue("name", "Product 1");
-      form.setValue("description", "Description 1");
+      form.setValue("name", `Product ${dummyData.randomNumber}`);
+      form.setValue("description", dummyData.randomString);
       form.setValue("price", String(dummyData.randomNumber));
       form.setValue("sku", dummyData.randomString);
       form.setValue("stock_quantity", String(dummyData.randomNumber));

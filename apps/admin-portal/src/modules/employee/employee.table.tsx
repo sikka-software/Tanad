@@ -82,13 +82,14 @@ const EmployeesTable = ({
     {
       accessorKey: "status",
       header: t("Employees.form.status.label"),
-      validationSchema: z.enum(["active", "inactive", "on_leave", "terminated"]),
+      validationSchema: z.enum(["active", "inactive", "on_leave", "terminated", "resigned"]),
       cellType: "select",
       options: [
         { label: t("Employees.form.status.active"), value: "active" },
         { label: t("Employees.form.status.inactive"), value: "inactive" },
         { label: t("Employees.form.status.on_leave"), value: "on_leave" },
         { label: t("Employees.form.status.terminated"), value: "terminated" },
+        { label: t("Employees.form.status.resigned"), value: "resigned" },
       ],
     },
   ];

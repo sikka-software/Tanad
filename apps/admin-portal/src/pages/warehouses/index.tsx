@@ -1,8 +1,9 @@
+import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { WarehouseForm } from "@root/src/modules/warehouse/warehouse.form";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -38,6 +39,9 @@ export default function WarehousesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableWarehouse, setActionableWarehouse] = useState<Warehouse | null>(null);
+
+  const loadingSaveWarehouse = useWarehouseStore((state) => state.isLoading);
+  const setLoadingSaveWarehouse = useWarehouseStore((state) => state.setIsLoading);
 
   const viewMode = useWarehouseStore((state) => state.viewMode);
   const isDeleteDialogOpen = useWarehouseStore((state) => state.isDeleteDialogOpen);
@@ -139,6 +143,25 @@ export default function WarehousesPage() {
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Warehouses.edit_warehouse")}
+          formId="warehouse-form"
+          loadingSave={loadingSaveWarehouse}
+        >
+          <WarehouseForm
+            formHtmlId={"warehouse-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableWarehouse(null);
+              setLoadingSaveWarehouse(false);
+            }}
+            defaultValues={actionableWarehouse}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

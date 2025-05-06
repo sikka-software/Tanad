@@ -645,6 +645,7 @@ export const offices = pgTable(
     zip_code: text(),
     phone: text(),
     email: text(),
+    manager: uuid(),
     status: text().default("active").notNull(),
     user_id: uuid().notNull(),
     notes: text(),
@@ -658,6 +659,12 @@ export const offices = pgTable(
     ),
     index("offices_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("offices_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    index("idx_offices_manager").using("btree", table.manager.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.manager],
+      foreignColumns: [employees.id],
+      name: "fk_office_manager",
+    }).onDelete("set null"),
   ],
 );
 
@@ -1601,6 +1608,7 @@ export const warehouses = pgTable(
     additional_number: text(),
     building_number: text(),
     street_name: text(),
+    manager: uuid(),
     city: text(),
     region: text(),
     country: text(),
@@ -1621,6 +1629,12 @@ export const warehouses = pgTable(
     index("warehouses_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
     index("warehouses_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
     unique("warehouses_code_key").on(table.code),
+    index("idx_warehouses_manager").using("btree", table.manager.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.manager],
+      foreignColumns: [employees.id],
+      name: "fk_warehouse_manager",
+    }).onDelete("set null"),
   ],
 );
 

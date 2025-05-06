@@ -1,40 +1,22 @@
-import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
-import { CommandSelect } from "@root/src/components/ui/command-select";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@root/src/components/ui/select";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
 
+import { ComboboxAdd } from "@/ui/combobox-add";
+import { CommandSelect } from "@/ui/command-select";
 import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useBranchStore from "@/branch/branch.store";
-import { Branch } from "@/branch/branch.type";
+import { useEmployees } from "@/employee/employee.hooks";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useEmployees } from "../employee/employee.hooks";
 import { useUpdateBranch } from "./branch.hooks";
-
-const nameSchema = z.string().min(1, "Required");
-const codeSchema = z.string().min(1, "Required");
-const addressSchema = z.string().min(1, "Required");
-const citySchema = z.string().min(1, "Required");
-const stateSchema = z.string().min(1, "Required");
-const zipCodeSchema = z.string().min(1, "Required");
-const phoneSchema = z.string().nullable();
-const emailSchema = z.string().email().nullable();
-const managerSchema = z.string().nullable();
-const isActiveSchema = z.boolean();
+import useBranchStore from "./branch.store";
+import { Branch } from "./branch.type";
 
 const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Branch>) => {
   const t = useTranslations();
@@ -60,19 +42,36 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Branch>[] = [
-    { accessorKey: "name", header: t("Branches.form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "code", header: t("Branches.form.code.label"), validationSchema: codeSchema },
-    { accessorKey: "email", header: t("Branches.form.email.label"), validationSchema: emailSchema },
-    { accessorKey: "phone", header: t("Branches.form.phone.label"), validationSchema: phoneSchema },
+    {
+      accessorKey: "name",
+      header: t("Branches.form.name.label"),
+      validationSchema: z.string().min(1, t("Branches.form.name.required")),
+    },
+    {
+      accessorKey: "code",
+      header: t("Branches.form.code.label"),
+      validationSchema: z.string().min(1, t("Branches.form.code.required")),
+    },
+    {
+      accessorKey: "email",
+      header: t("Branches.form.email.label"),
+      validationSchema: z.string().email(t("Branches.form.email.invalid")),
+    },
+    {
+      accessorKey: "phone",
+      header: t("Branches.form.phone.label"),
+      validationSchema: z.string().nullable(),
+    },
     {
       accessorKey: "manager",
       header: t("Branches.form.manager.label"),
       noPadding: true,
-      validationSchema: managerSchema,
+      validationSchema: z.string().nullable(),
       cell: ({ row }) => {
         const branch = row.original;
         return (
           <ComboboxAdd
+            direction={locale === "ar" ? "rtl" : "ltr"}
             inCell
             data={employeeOptions}
             isLoading={employeesLoading}
@@ -104,56 +103,33 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     {
       accessorKey: "address",
       header: t("Branches.form.address.label"),
-      validationSchema: addressSchema,
+      validationSchema: z.string().min(1, t("Branches.form.address.required")),
     },
-    { accessorKey: "city", header: t("Branches.form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("Branches.form.state.label"), validationSchema: stateSchema },
+    {
+      accessorKey: "city",
+      header: t("Branches.form.city.label"),
+      validationSchema: z.string().min(1, t("Branches.form.city.required")),
+    },
+    {
+      accessorKey: "state",
+      header: t("Branches.form.state.label"),
+      validationSchema: z.string().min(1, t("Branches.form.state.required")),
+    },
     {
       accessorKey: "zip_code",
       header: t("Branches.form.zip_code.label"),
-      validationSchema: zipCodeSchema,
+      validationSchema: z.string().min(1, t("Branches.form.zip_code.required")),
     },
 
     {
       accessorKey: "status",
-      noPadding: true,
       header: t("Branches.form.status.label"),
-      cell: ({ row }) => {
-        const branch = row.original;
-        return (
-          <CommandSelect
-            direction={locale === "ar" ? "rtl" : "ltr"}
-            data={[
-              { label: t("Branches.form.status.active"), value: "active" },
-              { label: t("Branches.form.status.inactive"), value: "inactive" },
-            ]}
-            inCell
-            isLoading={false}
-            defaultValue={branch.status as "active" | "inactive"}
-            popoverClassName="w-fit"
-            buttonClassName="bg-transparent"
-            onChange={async (value) => {
-              console.log(value);
-              await updateBranch({
-                id: branch.id,
-                data: {
-                  id: branch.id,
-                  name: branch.name,
-                  status: value as "active" | "inactive",
-                },
-              });
-            }}
-            texts={{
-              placeholder: t("Branches.form.status.placeholder"),
-            }}
-            renderOption={(item) => {
-              return <div>{item.label}</div>;
-            }}
-            ariaInvalid={false}
-          />
-        );
-      },
-      validationSchema: isActiveSchema,
+      validationSchema: z.enum(["active", "inactive"]),
+      cellType: "select",
+      options: [
+        { label: t("Branches.form.status.active"), value: "active" },
+        { label: t("Branches.form.status.inactive"), value: "inactive" },
+      ],
     },
   ];
 

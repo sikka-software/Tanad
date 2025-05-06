@@ -1,19 +1,5 @@
-import { AddressProps } from "@/types/common.type";
+import { Database } from "@/lib/database.types";
 
-export interface BranchProps {
-  id: string;
-  name: string;
-  code?: string;
-  phone?: string | null;
-  email?: string | null;
-  manager?: string | null;
-  status: "active" | "inactive";
-  notes?: string | null;
-  created_at: string;
-}
-
-export interface Branch extends BranchProps, AddressProps {}
-
-export type BranchCreateData = Omit<Branch, "id" | "created_at"> & { user_id: string };
-
-export type BranchUpdateData = Omit<Branch, "created_at" | "user_id">;
+export type Branch = Database["public"]["Tables"]["branches"]["Row"];
+export type BranchCreateData = Database["public"]["Tables"]["branches"]["Insert"];
+export type BranchUpdateData = Database["public"]["Tables"]["branches"]["Update"];

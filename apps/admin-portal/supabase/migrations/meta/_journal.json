@@ -225,6 +225,20 @@
       "when": 1746499795062,
       "tag": "0031_neat_xavin",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1746510538420,
+      "tag": "0032_complete_bucky",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1746511733778,
+      "tag": "0033_many_natasha_romanoff",
+      "breakpoints": true
     }
   ]
 }

@@ -2166,6 +2166,7 @@
     "title": "المستودعات",
     "singular": "مستودع",
     "add_new": "مستودع جديد",
+    "edit_warehouse": "تعديل المستودع",
     "warehouse_details": "تفاصيل المستودع",
     "search_warehouses": "بحث عن مستودعات...",
     "name": "الاسم",
@@ -2182,6 +2183,7 @@
     "enter_state": "أدخل المنطقة/الولاية",
     "zip_code": "الرمز البريدي",
     "enter_zip_code": "أدخل الرمز البريدي",
+
     "status": {
       "title": "الحالة",
       "active": "نشط",
@@ -2202,6 +2204,18 @@
         "label": "الاسم",
         "placeholder": "أدخل اسم المستودع",
         "required": "الاسم مطلوب"
+      },
+      "manager": {
+        "label": "المدير",
+        "placeholder": "أدخل اسم المدير",
+        "required": "المدير مطلوب",
+        "no_employees": "لا يوجد موظفين"
+      },
+      "email": {
+        "label": "البريد الإلكتروني",
+        "placeholder": "أدخل البريد الإلكتروني",
+        "required": "البريد الإلكتروني مطلوب",
+        "invalid": "البريد الإلكتروني غير صالح"
       },
       "phone": {
         "label": "الهاتف",
@@ -2239,7 +2253,9 @@
       "status": {
         "label": "الحالة",
         "active": "نشط",
-        "inactive": "غير نشط"
+        "inactive": "غير نشط",
+        "placeholder": "اختر الحالة",
+        "required": "الحالة مطلوبة"
       },
       "notes": {
         "label": "ملاحظات",
@@ -2975,7 +2991,8 @@
         "placeholder": "اختر الحالة",
         "pending": "معلق",
         "paid": "مدفوع",
-        "overdue": "متأخر"
+        "overdue": "متأخر",
+        "rejected": "مرفوض"
       },
       "notes": {
         "label": "ملاحظات",
@@ -3188,7 +3205,9 @@
         "label": "الحالة",
         "active": "نشط",
         "inactive": "غير نشط",
-        "on_leave": "في إجازة"
+        "on_leave": "في إجازة",
+        "terminated": "مفصول",
+        "resigned": "مستقيل"
       },
       "address": {
         "label": "العنوان",
@@ -3455,6 +3474,11 @@
         "label": "الرمز",
         "placeholder": "أدخل الرمز",
         "required": "الرمز مطلوب"
+      },
+      "manager": {
+        "label": "المدير",
+        "placeholder": "اختر المدير",
+        "required": "المدير مطلوب"
       },
       "address": {
         "label": "عنوان المكتب",

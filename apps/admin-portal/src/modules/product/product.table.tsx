@@ -8,7 +8,6 @@ import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { MoneyFormatter } from "@/components/ui/currency-input";
-import { SARSymbol } from "@/components/ui/sar-symbol";
 
 import { getCurrencySymbol } from "@/lib/currency-utils";
 
@@ -65,12 +64,17 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     {
       accessorKey: "stock_quantity",
       header: t("Products.form.stock_quantity.label"),
+      cell: (props: CellContext<Product, unknown>) => (
+        <span className="flex flex-row items-center gap-1 text-sm font-medium">
+          {props.row.original.stock_quantity?.toLocaleString()}
+        </span>
+      ),
       validationSchema: z.number().min(0, t("Products.form.stock_quantity.required")),
     },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
-    await updateProduct({ id: rowId, product: { [columnId]: value } });
+    await updateProduct({ id: rowId, data: { [columnId]: value } });
   };
 
   const handleRowSelectionChange = useCallback(

@@ -53,8 +53,14 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     {
       accessorKey: "status",
       header: t("Expenses.form.status.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.status.required")),
-      cell: ({ row }) => t(`Expenses.form.status.${row.getValue("status")}`),
+      validationSchema: z.enum(["paid", "pending", "rejected", "overdue"]),
+      cellType: "select",
+      options: [
+        { label: t("Expenses.form.status.paid"), value: "paid" },
+        { label: t("Expenses.form.status.pending"), value: "pending" },
+        { label: t("Expenses.form.status.rejected"), value: "rejected" },
+        { label: t("Expenses.form.status.overdue"), value: "overdue" },
+      ],
     },
     {
       accessorKey: "amount",
@@ -78,11 +84,6 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       accessorKey: "notes",
       header: t("Expenses.form.notes.label"),
       validationSchema: z.string().nullable(),
-    },
-    {
-      accessorKey: "client_id",
-      header: t("Expenses.form.client_id.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.client.required")),
     },
   ];
 

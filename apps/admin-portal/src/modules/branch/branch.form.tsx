@@ -344,26 +344,7 @@ export function BranchForm({
                           return <div>{item.label}</div>;
                         }}
                         ariaInvalid={!!form.formState.errors.manager}
-                        // value={field.value as "active" | "inactive"}
-                        // defaultValue={field.value as "active" | "inactive"}
-                        // onValueChange={async (value) => {
-                        //   field.onChange(value as "active" | "inactive");
-                        // }}
                       />
-                      {/* <SelectTrigger>
-                          <SelectValue>
-                            {field.value === "active"
-                              ? t("Branches.form.status.active")
-                              : t("Branches.form.status.inactive")}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="active">{t("Branches.form.status.active")}</SelectItem>
-                          <SelectItem value="inactive">
-                            {t("Branches.form.status.inactive")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -1,5 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import { CommandSelect } from "@root/src/components/ui/command-select";
+import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -17,9 +21,12 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { EmployeeForm } from "../employee/employee.form";
+import { useEmployees } from "../employee/employee.hooks";
+import useEmployeeStore from "../employee/employee.store";
 import { useCreateOffice, useOffices, useUpdateOffice } from "./office.hooks";
 import useOfficeStore from "./office.store";
-import { Office, OfficeUpdateData } from "./office.type";
+import { Office, OfficeCreateData, OfficeUpdateData } from "./office.type";
 
 const createOfficeSchema = (t: (key: string) => string) => {
   const baseOfficeSchema = z.object({
@@ -27,6 +34,14 @@ const createOfficeSchema = (t: (key: string) => string) => {
     code: z.string().optional().or(z.literal("")),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
+    manager: z
+      .string({ invalid_type_error: t("Offices.form.manager.invalid_uuid") })
+      .uuid({ message: t("Offices.form.manager.invalid_uuid") })
+      .optional()
+      .nullable(),
+    status: z.enum(["active", "inactive"], {
+      message: t("Offices.form.status.required"),
+    }),
     notes: z.string().optional().or(z.literal("")),
   });
 
@@ -42,14 +57,22 @@ export function OfficeForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<OfficeUpdateData>) {
+}: ModuleFormProps<OfficeCreateData | OfficeUpdateData>) {
   const t = useTranslations();
+  const locale = useLocale();
   const { data: offices } = useOffices();
   const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();
   const { mutateAsync: updateOffice, isPending: isUpdating } = useUpdateOffice();
+  const user = useUserStore((state) => state.user);
   const membership = useUserStore((state) => state.membership);
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
+
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
+  const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
+  const isEmployeeFormDialogOpen = useEmployeeStore((state) => state.isFormDialogOpen);
+  const setIsEmployeeFormDialogOpen = useEmployeeStore((state) => state.setIsFormDialogOpen);
 
   const form = useForm<OfficeFormValues>({
     resolver: zodResolver(createOfficeSchema(t)),
@@ -65,11 +88,19 @@ export function OfficeForm({
       region: defaultValues?.region || "",
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
+      manager: defaultValues?.manager || "",
+      status: (defaultValues?.status as "active" | "inactive") || "active",
     },
   });
 
   const handleSubmit = async (data: OfficeFormValues) => {
     setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
     try {
       if (editMode && defaultValues) {
         if (!defaultValues.id) {
@@ -121,6 +152,7 @@ export function OfficeForm({
             zip_code: data.zip_code?.trim() || undefined,
             enterprise_id: membership.enterprise_id,
             status: "active",
+            user_id: user.id,
           },
           {
             onSuccess: async (response) => {
@@ -138,102 +170,189 @@ export function OfficeForm({
     }
   };
 
+  const employeeOptions = employees.map((emp) => ({
+    label: `${emp.first_name} ${emp.last_name}`,
+    value: emp.id,
+  }));
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
     (window as any).officeForm = form;
   }
 
   return (
-    <Form {...form}>
-      <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Offices.form.name.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isLoading}
-                      placeholder={t("Offices.form.name.placeholder")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="code"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Offices.form.code.label")}</FormLabel>
-                  <FormControl>
-                    <CodeInput
-                      onSerial={() => {
-                        const nextNumber = (offices?.length || 0) + 1;
-                        const paddedNumber = String(nextNumber).padStart(4, "0");
-                        form.setValue("code", `OF-${paddedNumber}`);
-                      }}
-                      onRandom={() => {
-                        const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                        let randomCode = "";
-                        for (let i = 0; i < 5; i++) {
-                          randomCode += randomChars.charAt(
-                            Math.floor(Math.random() * randomChars.length),
-                          );
-                        }
-                        form.setValue("code", `OF-${randomCode}`);
-                      }}
-                    >
+    <div>
+      <Form {...form}>
+        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.name.label")}</FormLabel>
+                    <FormControl>
                       <Input
                         {...field}
                         disabled={isLoading}
-                        placeholder={t("Offices.form.code.placeholder")}
+                        placeholder={t("Offices.form.name.placeholder")}
                       />
-                    </CodeInput>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Offices.form.email.label")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      dir="ltr"
-                      {...field}
-                      type="email"
-                      disabled={isLoading}
-                      placeholder={t("Offices.form.email.placeholder")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.code.label")}</FormLabel>
+                    <FormControl>
+                      <CodeInput
+                        onSerial={() => {
+                          const nextNumber = (offices?.length || 0) + 1;
+                          const paddedNumber = String(nextNumber).padStart(4, "0");
+                          form.setValue("code", `OF-${paddedNumber}`);
+                        }}
+                        onRandom={() => {
+                          const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                          let randomCode = "";
+                          for (let i = 0; i < 5; i++) {
+                            randomCode += randomChars.charAt(
+                              Math.floor(Math.random() * randomChars.length),
+                            );
+                          }
+                          form.setValue("code", `OF-${randomCode}`);
+                        }}
+                      >
+                        <Input
+                          {...field}
+                          disabled={isLoading}
+                          placeholder={t("Offices.form.code.placeholder")}
+                        />
+                      </CodeInput>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.email.label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        dir="ltr"
+                        {...field}
+                        type="email"
+                        disabled={isLoading}
+                        placeholder={t("Offices.form.email.placeholder")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
+                    <FormControl>
+                      <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        ariaInvalid={form.formState.errors.phone !== undefined}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="manager"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.manager.label")}</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        data={employeeOptions}
+                        isLoading={employeesLoading}
+                        defaultValue={field.value || ""}
+                        onChange={(value) => {
+                          field.onChange(value || null);
+                        }}
+                        texts={{
+                          placeholder: t("Offices.form.manager.placeholder"),
+                          searchPlaceholder: t("Employees.search_employees"),
+                          noItems: t("Offices.form.manager.no_employees"),
+                        }}
+                        addText={t("Employees.add_new")}
+                        onAddClick={() => setIsEmployeeFormDialogOpen(true)}
+                        ariaInvalid={!!form.formState.errors.manager}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.status.label")}</FormLabel>
+                    <FormControl>
+                      <CommandSelect
+                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        data={[
+                          { label: t("Offices.form.status.active"), value: "active" },
+                          { label: t("Offices.form.status.inactive"), value: "inactive" },
+                        ]}
+                        isLoading={false}
+                        defaultValue={field.value || ""}
+                        onChange={(value) => {
+                          field.onChange(value || null);
+                        }}
+                        texts={{
+                          placeholder: t("Offices.form.status.placeholder"),
+                        }}
+                        renderOption={(item) => {
+                          return <div>{item.label}</div>;
+                        }}
+                        ariaInvalid={!!form.formState.errors.status}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
-              name="phone"
+              name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
+                  <FormLabel>{t("Vendors.form.notes.label")}</FormLabel>
                   <FormControl>
-                    <PhoneInput
-                      value={field.value || ""}
-                      onChange={field.onChange}
-                      ariaInvalid={form.formState.errors.phone !== undefined}
+                    <Textarea
+                      placeholder={t("Vendors.form.notes.placeholder")}
+                      {...field}
+                      value={field.value ?? ""}
                       disabled={isLoading}
                     />
                   </FormControl>
@@ -242,31 +361,28 @@ export function OfficeForm({
               )}
             />
           </div>
-          <FormField
+          <AddressFormSection
+            title={t("Offices.form.address.label")}
             control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Vendors.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Vendors.form.notes.placeholder")}
-                    {...field}
-                    value={field.value ?? ""}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+            isLoading={isLoading}
           />
-        </div>
-        <AddressFormSection
-          title={t("Offices.form.address.label")}
-          control={form.control}
-          isLoading={isLoading}
+        </form>
+      </Form>
+      <FormDialog
+        open={isEmployeeFormDialogOpen}
+        onOpenChange={setIsEmployeeFormDialogOpen}
+        title={t("Employees.add_new")}
+        formId="employee-form"
+        loadingSave={isEmployeeSaving}
+      >
+        <EmployeeForm
+          formHtmlId="employee-form"
+          onSuccess={() => {
+            setIsEmployeeSaving(false);
+            setIsEmployeeFormDialogOpen(false);
+          }}
         />
-      </form>
-    </Form>
+      </FormDialog>
+    </div>
   );
 }

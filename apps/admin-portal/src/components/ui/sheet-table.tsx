@@ -27,7 +27,7 @@ import {
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
@@ -46,7 +46,9 @@ import {
 // ** import lib
 import { cn } from "@/lib/utils";
 
+import { CommandSelect } from "./command-select";
 import RowActions from "./row-actions";
+import RowActionsPopover from "./row-actions-popover";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   ColumnDef<TData, TValue>,
@@ -372,6 +374,7 @@ function SheetTable<
   } = props;
 
   const t = useTranslations();
+  const locale = useLocale();
 
   /**
    * If column sizing is enabled, we track sizes in state.
@@ -690,30 +693,31 @@ function SheetTable<
               <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
             </TableCell>
           )}
-
-          {/* Left icon cells */}
-          {addPos === "left" && handleAddRowFunction && (
-            <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle}>
-              {showRowActions && (
-                <button
-                  className="flex w-full items-center justify-center"
-                  onClick={() => handleAddRowFunction(rowId)}
-                >
-                  <Plus size={16} />
-                </button>
-              )}
-            </TableCell>
-          )}
-          {removePos === "left" && handleRemoveRowFunction && (
-            <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle}>
-              {showRowActions && (
-                <button
-                  className="flex w-full items-center justify-center"
-                  onClick={() => handleRemoveRowFunction(rowId)}
-                >
-                  <Trash2 size={16} />
-                </button>
-              )}
+          {/* Row actions */}
+          {enableRowActions && (
+            <TableCell className="bg-background sticky start-8 z-2 min-w-4 border-y p-0">
+              <div className="bg-geen-400 flex h-auto min-h-9 items-center justify-center">
+                <RowActionsPopover
+                  texts={texts}
+                  onEdit={props.canEditAction ? () => onActionClicked?.("edit", rowId) : undefined}
+                  onDelete={
+                    props.canDeleteAction ? () => onActionClicked?.("delete", rowId) : undefined
+                  }
+                  onDuplicate={
+                    props.canDuplicateAction
+                      ? () => onActionClicked?.("duplicate", rowId)
+                      : undefined
+                  }
+                  onView={props.canViewAction ? () => onActionClicked?.("view", rowId) : undefined}
+                  onArchive={
+                    props.canArchiveAction ? () => onActionClicked?.("archive", rowId) : undefined
+                  }
+                  onPreview={
+                    props.canPreviewAction ? () => onActionClicked?.("preview", rowId) : undefined
+                  }
+                />
+              </div>
+              <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
             </TableCell>
           )}
 
@@ -747,48 +751,36 @@ function SheetTable<
             let cellContent: React.ReactNode = rawCellContent;
 
             // If first cell, show expand arrow if subRows exist
-            if (cellIndex === 0) {
-              cellContent = (
-                <div
-                  className="flex h-full w-full items-center gap-2"
-                  style={{ outline: "none" }} // Hide the focus outline
-                >
-                  {hasSubRows && (
-                    <button
-                      type="button"
-                      className={cn("flex-shrink-0", {
-                        "cursor-not-allowed opacity-50": !hasSubRows,
-                      })}
-                      onClick={() => row.toggleExpanded()}
-                      disabled={!hasSubRows}
-                    >
-                      {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    </button>
-                  )}
-                  <div
-                    className="flex-grow"
-                    contentEditable={!isDisabled}
-                    suppressContentEditableWarning
-                    style={{ outline: "none" }} // Hide the outline for editing
-                    onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
-                    onKeyDown={(e) => {
-                      if (
-                        (e.ctrlKey || e.metaKey) &&
-                        ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
-                      ) {
-                        return;
-                      }
-                      handleKeyDown(e, colDef);
-                    }}
-                    onPaste={(e) => handlePaste(e, colDef)}
-                    onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
-                    onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
-                  >
-                    {rawCellContent}
-                  </div>
-                </div>
-              );
-            }
+            // if (cellIndex === 0) {
+            //   cellContent = (
+            //     <div
+            //       className="flex h-full w-full items-center gap-2"
+            //       style={{ outline: "none" }} // Hide the focus outline
+            //     >
+            //       <div
+            //         className="flex-grow"
+            //         contentEditable={!isDisabled}
+            //         suppressContentEditableWarning
+            //         style={{ outline: "none" }} // Hide the outline for editing
+            //         onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
+            //         onKeyDown={(e) => {
+            //           if (
+            //             (e.ctrlKey || e.metaKey) &&
+            //             ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
+            //           ) {
+            //             return;
+            //           }
+            //           handleKeyDown(e, colDef);
+            //         }}
+            //         onPaste={(e) => handlePaste(e, colDef)}
+            //         onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
+            //         onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
+            //       >
+            //         {rawCellContent}
+            //       </div>
+            //     </div>
+            //   );
+            // }
 
             // if cell type is select, show a select element
             if (colDef.cellType === "select" && colDef.options) {
@@ -809,38 +801,27 @@ function SheetTable<
                       : colDef.className,
                   )}
                 >
-                  <Select
-                    value={String(cellValue)}
-                    onValueChange={(value) => {
+                  <CommandSelect
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    data={colDef.options}
+                    inCell
+                    isLoading={false}
+                    defaultValue={String(cellValue)}
+                    popoverClassName="w-fit"
+                    buttonClassName="bg-transparent"
+                    onChange={async (value) => {
                       if (onEdit) {
                         onEdit(rowId, colKey as keyof T, value as T[keyof T]);
                       }
                     }}
-                  >
-                    <SelectTrigger
-                      defaultStyles={false}
-                      className={cn(
-                        "focus:ring-none blur:outline-none relative border-none ring-0 outline-0 focus:ring-offset-0 focus:outline-none",
-                        {
-                          "bg-muted": isDisabled,
-                          "bg-destructive/25": errorMsg,
-                        },
-                        typeof colDef.className === "function"
-                          ? colDef.className(rowData)
-                          : colDef.className,
-                      )}
-                      hideIcon={true}
-                    >
-                      <SelectValue>{selectedOption?.label ?? cellValue}</SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {colDef.options.map((option) => (
-                        <SelectItem key={option.value} value={String(option.value)}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    texts={{
+                      placeholder: ". . .",
+                    }}
+                    renderOption={(item) => {
+                      return <div>{item.label}</div>;
+                    }}
+                    ariaInvalid={false}
+                  />
                 </TableCell>
               );
             }
@@ -914,29 +895,6 @@ function SheetTable<
                   <Trash2 size={16} />
                 </button>
               )}
-            </TableCell>
-          )}
-
-          {/* Selection checkbox */}
-          {enableRowActions && (
-            <TableCell className="sticky end-0 z-2 p-0">
-              <RowActions
-                texts={texts}
-                onEdit={props.canEditAction ? () => onActionClicked?.("edit", rowId) : undefined}
-                onDuplicate={
-                  props.canDuplicateAction ? () => onActionClicked?.("duplicate", rowId) : undefined
-                }
-                onView={props.canViewAction ? () => onActionClicked?.("view", rowId) : undefined}
-                onArchive={
-                  props.canArchiveAction ? () => onActionClicked?.("archive", rowId) : undefined
-                }
-                onDelete={
-                  props.canDeleteAction ? () => onActionClicked?.("delete", rowId) : undefined
-                }
-                onPreview={
-                  props.canPreviewAction ? () => onActionClicked?.("preview", rowId) : undefined
-                }
-              />
             </TableCell>
           )}
         </TableRow>
@@ -1039,7 +997,7 @@ function SheetTable<
             <TableRow className="border-none">
               {/* Selection checkbox header */}
               {enableRowSelection && (
-                <TableHead className="bg-muted sticky top-0 z-20 border text-start">
+                <TableHead className="bg-muted sticky start-0 top-0 z-30 border-none text-start">
                   <div className="flex h-full items-center justify-center">
                     <input
                       type="checkbox"
@@ -1051,6 +1009,9 @@ function SheetTable<
                   </div>
                   <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
                 </TableHead>
+              )}
+              {enableRowActions && (
+                <TableHead className="bg-muted sticky start-8 top-0 !z-20 border-e border-none text-start" />
               )}
 
               {table.getHeaderGroups().map((headerGroup) =>
@@ -1076,7 +1037,6 @@ function SheetTable<
                 }),
               )}
               {/* Action column */}
-              <TableHead className="bg-muted sticky top-0 !z-20 border-x text-start" />
             </TableRow>
           </TableHeader>
         )}

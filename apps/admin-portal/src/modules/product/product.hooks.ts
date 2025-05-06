@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import {
   bulkDeleteProducts,
@@ -9,7 +11,7 @@ import {
   updateProduct,
   duplicateProduct,
 } from "@/product/product.service";
-import type { Product } from "@/product/product.type";
+import type { Product, ProductUpdateData } from "@/product/product.type";
 
 // Query keys for products
 export const productKeys = {
@@ -67,18 +69,68 @@ export function useDuplicateProduct() {
 // Hook for updating an existing product
 export function useUpdateProduct() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      product,
-    }: {
-      id: string;
-      product: Partial<Omit<Product, "id" | "created_at">>;
-    }) => updateProduct(id, product),
-    onSuccess: (data: Product) => {
-      queryClient.invalidateQueries({ queryKey: productKeys.detail(data.id) });
+    mutationFn: ({ id, data }: { id: string; data: ProductUpdateData }) => updateProduct(id, data),
+    onMutate: async ({ id, data }) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: productKeys.detail(id) });
+      await queryClient.cancelQueries({ queryKey: productKeys.lists() });
+
+      // Snapshot the previous value
+      const previousProduct = queryClient.getQueryData<Product>(productKeys.detail(id));
+      const previousProducts = queryClient.getQueryData<Product[]>(productKeys.lists());
+
+      // Optimistically update to the new value
+      // Update detail cache
+      if (previousProduct) {
+        queryClient.setQueryData<Product>(productKeys.detail(id), {
+          ...previousProduct,
+          ...data,
+          // Ensure created_at is preserved if not part of the update
+          created_at: previousProduct.created_at,
+        });
+      }
+
+      // Update list cache
+      if (previousProducts) {
+        queryClient.setQueryData<Product[]>(
+          productKeys.lists(),
+          previousProducts.map((product) =>
+            product.id === id
+              ? { ...product, ...data, created_at: product.created_at } // Preserve created_at here too
+              : product,
+          ),
+        );
+      }
+
+      // Return a context object with the snapshotted value
+      return { previousProduct, previousProducts };
+    },
+    onError: (err, { id }, context) => {
+      console.error("Update failed:", err);
+      if (context?.previousProduct) {
+        queryClient.setQueryData(productKeys.detail(id), context.previousProduct);
+      }
+      if (context?.previousProducts) {
+        queryClient.setQueryData(productKeys.lists(), context.previousProducts);
+      }
+      toast.error(t("General.error_operation"), {
+        description: t("Products.error.update"),
+      });
+    },
+    onSettled: (data, error, { id }) => {
+      // Invalidate queries to ensure eventual consistency
+      queryClient.invalidateQueries({ queryKey: productKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: productKeys.lists() });
+
+      // Show success toast only if the mutation succeeded
+      if (!error && data) {
+        toast.success(t("General.successful_operation"), {
+          description: t("Products.success.update"),
+        });
+      }
     },
   });
 }
