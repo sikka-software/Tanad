@@ -13,7 +13,11 @@ import {
   bulkDeleteEmployeeRequests,
   duplicateEmployeeRequest,
 } from "./employee-request.service";
-import { EmployeeRequest, EmployeeRequestCreateData } from "./employee-request.type";
+import {
+  EmployeeRequest,
+  EmployeeRequestCreateData,
+  EmployeeRequestUpdateData,
+} from "./employee-request.type";
 
 export const employeeRequestKeys = {
   all: ["employee_requests"] as const,
@@ -74,7 +78,7 @@ export function useUpdateEmployeeRequest() {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<EmployeeRequest> }) =>
+    mutationFn: ({ id, updates }: { id: string; updates: EmployeeRequestUpdateData }) =>
       updateEmployeeRequest(id, updates),
     onMutate: async ({ id, updates }) => {
       // Cancel any outgoing refetches

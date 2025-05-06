@@ -11,7 +11,7 @@ import {
   bulkDeleteDomains,
   duplicateDomain,
 } from "@/modules/domain/domain.service";
-import type { Domain, DomainCreateData } from "@/modules/domain/domain.type";
+import type { Domain, DomainCreateData, DomainUpdateData } from "@/modules/domain/domain.type";
 
 // Query keys for domains
 export const domainKeys = {
@@ -45,7 +45,7 @@ export function useCreateDomain() {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: (newDomain: Omit<Domain, "id" | "created_at"> & { user_id: string }) => {
+    mutationFn: (newDomain: DomainCreateData) => {
       // Map user_id to user_id for the service function
       const { user_id, ...rest } = newDomain;
       const domainData: DomainCreateData = {
@@ -70,7 +70,7 @@ export function useUpdateDomain() {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Domain> }) => updateDomain(id, data),
+    mutationFn: ({ id, data }: { id: string; data: DomainUpdateData }) => updateDomain(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: domainKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: domainKeys.lists() });

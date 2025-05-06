@@ -11,7 +11,7 @@ import {
   bulkDeleteServers,
   duplicateServer,
 } from "@/modules/server/server.service";
-import type { Server, ServerCreateData } from "@/modules/server/server.type";
+import type { Server, ServerCreateData, ServerUpdateData } from "@/modules/server/server.type";
 
 // Query keys for servers
 export const serverKeys = {
@@ -70,7 +70,7 @@ export function useUpdateServer() {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Server> }) => updateServer(id, data),
+    mutationFn: ({ id, data }: { id: string; data: ServerUpdateData }) => updateServer(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: serverKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: serverKeys.lists() });

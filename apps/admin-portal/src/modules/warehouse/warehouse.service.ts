@@ -1,4 +1,4 @@
-import { Warehouse, WarehouseCreateData } from "@/warehouse/warehouse.type";
+import { Warehouse, WarehouseCreateData, WarehouseUpdateData } from "@/warehouse/warehouse.type";
 
 export async function fetchWarehouses(): Promise<Warehouse[]> {
   try {
@@ -67,7 +67,10 @@ export async function duplicateWarehouse(id: string): Promise<Warehouse> {
 }
 
 // Update operation
-export async function updateWarehouse(id: string, updates: Partial<Warehouse>): Promise<Warehouse> {
+export async function updateWarehouse(
+  id: string,
+  updates: WarehouseUpdateData,
+): Promise<Warehouse> {
   try {
     const response = await fetch(`/api/resource/warehouses/${id}`, {
       method: "PUT",

@@ -184,7 +184,7 @@ export function useBranchDatasheet(initialData: Branch[] = []) {
 
   // Update Mutation
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Branch> }) => updateBranch(id, data),
+    mutationFn: ({ id, data }: { id: string; data: BranchUpdateData }) => updateBranch(id, data),
     onSuccess: (updatedBranch) => {
       // Option 1: Manually update the specific branch in the main query cache
       // queryClient.setQueryData(['branches'], (oldData: Branch[] | undefined) =>

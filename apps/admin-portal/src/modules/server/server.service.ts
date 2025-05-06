@@ -1,4 +1,4 @@
-import { Server, ServerCreateData } from "@/modules/server/server.type";
+import { Server, ServerCreateData, ServerUpdateData } from "@/modules/server/server.type";
 
 export async function fetchServers(): Promise<Server[]> {
   try {
@@ -38,10 +38,7 @@ export async function createServer(server: ServerCreateData): Promise<Server> {
   return response.json();
 }
 
-export async function updateServer(
-  id: string,
-  server: Partial<Omit<Server, "id" | "created_at">>,
-): Promise<Server> {
+export async function updateServer(id: string, server: ServerUpdateData): Promise<Server> {
   const response = await fetch(`/api/resource/servers/${id}`, {
     method: "PUT",
     headers: {

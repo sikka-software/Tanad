@@ -13,7 +13,7 @@ import {
   updateEmployee,
   bulkDeleteEmployees,
 } from "@/employee/employee.service";
-import { Employee, EmployeeCreateData } from "@/employee/employee.types";
+import { Employee, EmployeeCreateData, EmployeeUpdateData } from "@/employee/employee.types";
 
 export const employeeKeys = {
   all: ["employees"] as const,
@@ -77,7 +77,7 @@ export const useUpdateEmployee = () => {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({ id, updates }: { id: string; updates: Partial<Employee> }) =>
+    mutationFn: ({ id, updates }: { id: string; updates: EmployeeUpdateData }) =>
       updateEmployee(id, updates),
     onMutate: async ({ id, updates }) => {
       // Cancel any outgoing refetches
@@ -103,7 +103,7 @@ export const useUpdateEmployee = () => {
 
             if (department) {
               // Set the department name for the optimistic update
-              optimisticUpdates.department = department.name;
+              optimisticUpdates.department_id = department.name;
             }
           }
         } catch (error) {

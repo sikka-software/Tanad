@@ -63,7 +63,7 @@ export function JobListingForm({
   const { mutateAsync: updateJobListing, isPending: isUpdating } = useUpdateJobListing();
 
   const [selectedJobs, setSelectedJobs] = useState<string[]>([]);
-  const { profile, membership } = useUserStore();
+  const { user, membership } = useUserStore();
 
   const [isJobDialogOpen, setIsJobDialogOpen] = useState(false);
   const isJobSaving = useJobStore((state) => state.isLoading);
@@ -96,7 +96,7 @@ export function JobListingForm({
 
   const handleSubmit = async (data: JobListingFormValues) => {
     setIsLoading(true);
-    if (!profile?.id) {
+    if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
@@ -121,7 +121,6 @@ export function JobListingForm({
       ...coreListingData
     } = data;
     const enterpriseId = membership.enterprise_id;
-    const userId = profile.id;
 
     try {
       if (editMode && defaultValues) {
@@ -175,7 +174,7 @@ export function JobListingForm({
         const createPayload: JobListingCreateData = {
           title: coreListingData.title.trim(),
           description: coreListingData.description?.trim() || null,
-          user_id: userId,
+          user_id: user?.id || "",
           enterprise_id: enterpriseId,
           status: "active",
           is_public: true,

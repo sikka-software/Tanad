@@ -1,4 +1,11 @@
-import { Quote, QuoteItem, QuoteCreateData, QuoteItemCreateData } from "@/quote/quote.type";
+import {
+  Quote,
+  QuoteItem,
+  QuoteCreateData,
+  QuoteItemCreateData,
+  QuoteUpdateData,
+  QuoteItemUpdateData,
+} from "@/quote/quote.type";
 
 export async function fetchQuotes(): Promise<Quote[]> {
   try {
@@ -59,7 +66,7 @@ export async function duplicateQuote(id: string): Promise<Quote> {
     throw new Error("Failed to duplicate quote");
   }
 }
-export async function updateQuote(id: string, updates: Partial<Quote>): Promise<Quote> {
+export async function updateQuote(id: string, updates: QuoteUpdateData): Promise<Quote> {
   try {
     const response = await fetch(`/api/resource/quotes/${id}`, {
       method: "PUT",
@@ -139,7 +146,7 @@ export async function createQuoteItem(quoteItem: QuoteItemCreateData) {
   }
 }
 
-export async function updateQuoteItem(id: string, quoteItem: Partial<QuoteItem>) {
+export async function updateQuoteItem(id: string, quoteItem: QuoteItemUpdateData) {
   try {
     const dbQuoteItem = {
       ...(quoteItem.quote_id && { quote_id: quoteItem.quote_id }),

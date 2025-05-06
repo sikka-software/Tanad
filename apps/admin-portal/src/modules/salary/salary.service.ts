@@ -1,4 +1,4 @@
-import { Salary, SalaryCreateData } from "@/salary/salary.type";
+import { Salary, SalaryCreateData, SalaryUpdateData } from "@/salary/salary.type";
 
 export async function fetchSalaries(): Promise<Salary[]> {
   try {
@@ -60,7 +60,7 @@ export async function duplicateSalary(id: string): Promise<Salary> {
   }
 }
 
-export async function updateSalary(id: string, data: Partial<Salary>): Promise<Salary> {
+export async function updateSalary(id: string, data: SalaryUpdateData): Promise<Salary> {
   try {
     const response = await fetch(`/api/resource/salaries/${id}`, {
       method: "PUT",

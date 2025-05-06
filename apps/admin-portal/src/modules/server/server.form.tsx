@@ -92,7 +92,7 @@ export function ServerForm({
 
     try {
       if (editMode) {
-        const updateData: Partial<Server> = {
+        const updateData: ServerUpdateData = {
           ...commonData,
           enterprise_id: data.enterprise_id?.trim() || undefined,
           ip_address: commonData.ip_address as unknown | null,

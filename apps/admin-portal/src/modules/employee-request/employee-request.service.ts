@@ -1,4 +1,8 @@
-import { EmployeeRequest, EmployeeRequestCreateData } from "./employee-request.type";
+import {
+  EmployeeRequest,
+  EmployeeRequestCreateData,
+  EmployeeRequestUpdateData,
+} from "./employee-request.type";
 
 export async function fetchEmployeeRequests(): Promise<EmployeeRequest[]> {
   try {
@@ -58,7 +62,7 @@ export async function duplicateEmployeeRequest(id: string): Promise<EmployeeRequ
 
 export async function updateEmployeeRequest(
   id: string,
-  updates: Partial<EmployeeRequest>,
+  updates: EmployeeRequestUpdateData,
 ): Promise<EmployeeRequest> {
   try {
     const response = await fetch(`/api/resource/employee_requests/${id}`, {

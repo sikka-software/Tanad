@@ -11,7 +11,7 @@ import {
   bulkDeleteClients,
   duplicateClient,
 } from "@/client/client.service";
-import { Client, ClientCreateData } from "@/client/client.type";
+import { Client, ClientCreateData, ClientUpdateData } from "@/client/client.type";
 
 export const clientKeys = {
   all: ["clients"] as const,
@@ -42,8 +42,7 @@ export function useCreateClient() {
   const t = useTranslations();
 
   return useMutation({
-    mutationFn: (newClient: Omit<Client, "id" | "created_at">) =>
-      createClient(newClient as ClientCreateData),
+    mutationFn: (newClient: ClientCreateData) => createClient(newClient),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });
       toast.success(t("General.successful_operation"), {
@@ -57,13 +56,8 @@ export function useUpdateClient() {
   const queryClient = useQueryClient();
   const t = useTranslations();
   return useMutation({
-    mutationFn: ({
-      id,
-      client,
-    }: {
-      id: string;
-      client: Partial<Omit<Client, "id" | "created_at">>;
-    }) => updateClient(id, client),
+    mutationFn: ({ id, client }: { id: string; client: ClientUpdateData }) =>
+      updateClient(id, client),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: clientKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: clientKeys.lists() });

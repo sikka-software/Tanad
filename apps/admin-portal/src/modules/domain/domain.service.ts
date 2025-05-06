@@ -1,4 +1,4 @@
-import { Domain, DomainCreateData } from "@/modules/domain/domain.type";
+import { Domain, DomainCreateData, DomainUpdateData } from "@/modules/domain/domain.type";
 
 export async function fetchDomains(): Promise<Domain[]> {
   try {
@@ -38,10 +38,7 @@ export async function createDomain(domain: DomainCreateData): Promise<Domain> {
   return response.json();
 }
 
-export async function updateDomain(
-  id: string,
-  domain: Partial<Omit<Domain, "id" | "created_at">>,
-): Promise<Domain> {
+export async function updateDomain(id: string, domain: DomainUpdateData): Promise<Domain> {
   const response = await fetch(`/api/resource/domains/${id}`, {
     method: "PUT",
     headers: {

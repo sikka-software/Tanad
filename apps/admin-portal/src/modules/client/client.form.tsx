@@ -53,7 +53,7 @@ export function ClientForm({
 }: ModuleFormProps<ClientCreateData | ClientUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const { profile, membership } = useUserStore();
+  const { user, membership } = useUserStore();
   const { data: companies, isLoading: companiesLoading } = useCompanies();
   const { mutateAsync: createClient, isPending: isCreating } = useCreateClient();
   const { mutateAsync: updateClient, isPending: isUpdating } = useUpdateClient();
@@ -93,7 +93,7 @@ export function ClientForm({
 
   const handleSubmit = async (data: ClientFormValues) => {
     setIsLoading(true);
-    if (!profile?.id) {
+    if (!user?.id) {
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
@@ -143,6 +143,8 @@ export function ClientForm({
             country: data.country?.trim() || null,
             zip_code: data.zip_code?.trim() || null,
             notes: data.notes?.trim() || null,
+            additional_number: null,
+            user_id: user?.id || "",
             enterprise_id: membership?.enterprise_id || "",
           },
           {

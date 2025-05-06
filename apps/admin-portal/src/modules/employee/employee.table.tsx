@@ -12,7 +12,7 @@ import { useDepartments } from "@/department/department.hooks";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
-import { Employee } from "@/employee/employee.types";
+import { Employee, EmployeeUpdateData } from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -35,7 +35,7 @@ const EmployeesTable = ({
   const canDeleteEmployee = useUserStore((state) => state.hasPermission("employees.delete"));
 
   const [currentData, setCurrentData] = useState<Employee[]>(data);
-  const [pendingUpdates, setPendingUpdates] = useState<Record<string, Partial<Employee>>>({});
+  const [pendingUpdates, setPendingUpdates] = useState<Record<string, EmployeeUpdateData>>({});
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
@@ -111,7 +111,7 @@ const EmployeesTable = ({
   // Create a memoized handleEdit function
   const handleEdit = useCallback(
     (rowId: string, columnId: string, value: unknown) => {
-      let updates: Partial<Employee> = {};
+      let updates: EmployeeUpdateData = {};
 
       if (columnId === "department_id") {
         // For department changes, handle department_id and department name
@@ -121,12 +121,12 @@ const EmployeesTable = ({
         if (department) {
           updates = {
             department_id: department_id,
-            department: department.name, // Set both department_id and department name
+              // department: department.name, // Set both department_id and department name
           };
         } else {
           updates = {
             department_id: null,
-            department: null,
+            // deFpartment: null,
           };
         }
       } else if (columnId === "status") {

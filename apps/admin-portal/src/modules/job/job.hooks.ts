@@ -11,7 +11,7 @@ import {
   bulkDeleteJobs,
   duplicateJob,
 } from "@/job/job.service";
-import { Job, JobCreateData } from "@/job/job.type";
+import { Job, JobCreateData, JobUpdateData } from "@/job/job.type";
 
 export const jobKeys = {
   all: ["jobs"] as const,
@@ -54,7 +54,7 @@ export function useUpdateJob() {
   const queryClient = useQueryClient();
   const t = useTranslations();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Job> }) => updateJob(id, data),
+    mutationFn: ({ id, data }: { id: string; data: JobUpdateData }) => updateJob(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: jobKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: jobKeys.lists() });

@@ -1,4 +1,4 @@
-import { JobListing, JobListingCreateData } from "./job-listing.type";
+import { JobListing, JobListingCreateData, JobListingUpdateData } from "./job-listing.type";
 
 export async function fetchJobListings(): Promise<JobListing[]> {
   try {
@@ -46,7 +46,7 @@ export async function createJobListing(jobListing: JobListingCreateData): Promis
 
 export async function updateJobListing(
   id: string,
-  updates: Partial<JobListing>,
+  updates: JobListingUpdateData,
 ): Promise<JobListing> {
   try {
     const response = await fetch(`/api/resource/job_listings/${id}`, {

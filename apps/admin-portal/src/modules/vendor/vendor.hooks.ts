@@ -9,7 +9,7 @@ import {
   updateVendor,
   duplicateVendor,
 } from "@/vendor/vendor.service";
-import type { Vendor, VendorCreateData } from "@/vendor/vendor.type";
+import type { Vendor, VendorCreateData, VendorUpdateData } from "@/vendor/vendor.type";
 
 // Query keys for vendors
 export const vendorKeys = {
@@ -42,14 +42,7 @@ export function useCreateVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newVendor: Omit<Vendor, "id" | "created_at"> & { user_id: string }) => {
-      const { user_id, ...rest } = newVendor;
-      const vendorData: VendorCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createVendor(vendorData);
-    },
+    mutationFn: (newVendor: VendorCreateData) => createVendor(newVendor),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: vendorKeys.lists() });
     },
@@ -73,13 +66,8 @@ export function useUpdateVendor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      vendor,
-    }: {
-      id: string;
-      vendor: Partial<Omit<Vendor, "id" | "created_at">>;
-    }) => updateVendor(id, vendor),
+    mutationFn: ({ id, vendor }: { id: string; vendor: VendorUpdateData }) =>
+      updateVendor(id, vendor),
     onSuccess: (data) => {
       // Invalidate both the specific detail and the list queries
       queryClient.invalidateQueries({ queryKey: vendorKeys.detail(data.id) });
