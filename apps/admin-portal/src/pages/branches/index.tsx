@@ -167,7 +167,7 @@ export default function BranchesPage() {
               setActionableBranch(null);
               setLoadingSaveBranch(false);
             }}
-            defaultValues={actionableBranch}
+            defaultValues={actionableBranch as Branch}
             editMode={true}
           />
         </FormDialog>
