@@ -63,30 +63,6 @@ const CodeInputCellComponent = React.memo(
     const [isValidationPopoverOpen, setIsValidationPopoverOpen] = useState(false);
     const [isGeneratorPopoverOpen, setIsGeneratorPopoverOpen] = useState(false);
 
-    useEffect(() => {
-      if (!focus) {
-         setValue(getInitialValue());
-         setValidationError(null);
-         setIsValidationPopoverOpen(false);
-         setIsGeneratorPopoverOpen(false);
-      }
-    }, [getInitialValue, focus]);
-
-    useEffect(() => {
-      if (focus && inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.select();
-        setValidationError(null);
-        setIsValidationPopoverOpen(false);
-      }
-    }, [focus]);
-
-    useEffect(() => {
-      if (focus && triggerButtonRef.current) {
-        triggerButtonRef.current.click();
-      }
-    }, [focus]);
-
     const validateAndTriggerChange = useCallback(
       (currentValue: string): boolean => {
         const schema = columnData?.validationSchema;
@@ -151,7 +127,7 @@ const CodeInputCellComponent = React.memo(
           stopEditing({ nextRow: false });
         }
       },
-      [value, stopEditing, validateAndTriggerChange, getInitialValue],
+      [value, stopEditing, validateAndTriggerChange, getInitialValue, setIsGeneratorPopoverOpen],
     );
 
     const handleGenerate = (generator: () => string) => {
@@ -166,6 +142,9 @@ const CodeInputCellComponent = React.memo(
     };
 
     const handleSerialClick = () => {
+      // --- DEBUG LOGGING ---
+      console.log(`[CodeInputCell] handleSerialClick invoked for row ${rowIndex}`);
+      // --- END DEBUG LOGGING ---
       if (columnData?.onSerial && fullGridData && rowIndex !== undefined) {
         handleGenerate(() => columnData.onSerial(fullGridData, rowIndex));
       }
@@ -173,6 +152,9 @@ const CodeInputCellComponent = React.memo(
     };
 
     const handleRandomClick = () => {
+      // --- DEBUG LOGGING ---
+      console.log(`[CodeInputCell] handleRandomClick invoked`);
+      // --- END DEBUG LOGGING ---
       if (columnData?.onRandom) {
         handleGenerate(columnData.onRandom);
       }
@@ -188,7 +170,9 @@ const CodeInputCellComponent = React.memo(
     }
 
     return (
-      <div className={cx("dsg-input-wrapper relative h-full", { "dsg-input-wrapper-focus": focus })}>
+      <div 
+        className={cx("dsg-input-wrapper relative h-full", { "dsg-input-wrapper-focus": focus })}
+      >
         <Popover open={isValidationPopoverOpen} onOpenChange={setIsValidationPopoverOpen}>
           <PopoverTrigger asChild>
             <input
@@ -220,7 +204,15 @@ const CodeInputCellComponent = React.memo(
         </Popover>
 
         <div className="absolute inset-y-0 end-0 flex items-center pe-0.5">
-          <Popover open={isGeneratorPopoverOpen} onOpenChange={setIsGeneratorPopoverOpen}>
+          <Popover 
+            open={isGeneratorPopoverOpen} 
+            onOpenChange={(open) => {
+              setIsGeneratorPopoverOpen(open);
+              if (!open && focus) {
+                inputRef.current?.focus();
+              }
+            }}
+          >
             <PopoverTrigger asChild>
               <Button
                 ref={triggerButtonRef}
@@ -229,6 +221,10 @@ const CodeInputCellComponent = React.memo(
                 variant="ghost"
                 className="h-full rounded-s-none"
                 onMouseDown={(e) => e.preventDefault()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsGeneratorPopoverOpen(true);
+                }}
               >
                 <Hash className="size-5" />
               </Button>
@@ -240,7 +236,11 @@ const CodeInputCellComponent = React.memo(
                     variant="ghost"
                     size="sm"
                     className="h-auto justify-start px-2 py-1.5"
-                    onClick={handleSerialClick}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleSerialClick();
+                    }}
                   >
                     <DiamondPlus className="me-2 size-4" /> {t("General.next_number")}
                   </Button>
@@ -250,7 +250,11 @@ const CodeInputCellComponent = React.memo(
                     variant="ghost"
                     size="sm"
                     className="h-auto justify-start px-2 py-1.5"
-                    onClick={handleRandomClick}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleRandomClick();
+                    }}
                   >
                     <Shuffle className="me-2 size-4" /> {t("General.random")}
                   </Button>
