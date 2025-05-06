@@ -16,6 +16,12 @@ import {
   ComboboxAddCell,
   ComboboxAddColumnData,
 } from "@/components/datasheet/components/ComboboxAddCell";
+// Import the CodeInputCell and its base config/types
+import {
+  CodeInputCell,
+  codeInputColumnBase,
+  CodeInputCellColumnData,
+} from "@/components/datasheet/components/CodeInputCell";
 // Import the style only once in your app!
 import "@/components/datasheet/style.css";
 // Import employee form
@@ -235,6 +241,56 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
     }
   };
 
+  // --- Callback functions for CodeInputCell ---
+  const generateSerialCode = useCallback(
+    (currentData: Branch[], currentIndex: number): string => {
+      // Find the highest existing numerical code (ignoring non-numeric)
+      let maxNum = 0;
+      currentData.forEach((branch, index) => {
+        if (index !== currentIndex && branch.code?.startsWith("BR-")) {
+          const numPart = parseInt(branch.code.substring(3), 10);
+          if (!isNaN(numPart)) {
+            maxNum = Math.max(maxNum, numPart);
+          }
+        }
+      });
+      const nextNumber = maxNum + 1;
+      const paddedNumber = String(nextNumber).padStart(4, "0");
+      return `BR-${paddedNumber}`;
+    },
+    [], // No external dependencies needed besides the passed data
+  );
+
+  const generateRandomCode = useCallback((): string => {
+    const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let randomCode = "";
+    for (let i = 0; i < 5; i++) {
+      randomCode += randomChars.charAt(Math.floor(Math.random() * randomChars.length));
+    }
+    return `BR-${randomCode}`;
+  }, []);
+
+  // --- Callback for CodeInputCell: onCodeChange ---
+  const handleCodeChange = useCallback(
+    (rowIndex: number, newCode: string) => {
+      const updatedData = [...data]; // Create a new array
+      if (updatedData[rowIndex]) {
+        // Create a new object for the specific row
+        updatedData[rowIndex] = { ...updatedData[rowIndex], code: newCode };
+        // Call the main onChange handler with the updated data array
+        handleGridChange(updatedData, [
+          {
+            type: "UPDATE",
+            fromRowIndex: rowIndex,
+            toRowIndex: rowIndex + 1,
+          },
+        ]);
+      }
+    },
+    [data, handleGridChange], // Depend on current data and the main handler
+  );
+  // ---
+
   // Update employeeOptions to use ID for value
   const employeeOptions = employees.map((emp) => ({
     label: `${emp.first_name} ${emp.last_name}`,
@@ -243,8 +299,22 @@ const BranchDatasheet = ({ data, onChange }: BranchDatasheetProps) => {
 
   // Define columns using helper and explicit definitions
   const columns: Column<Branch, any, any>[] = [
-    createValidatedColumn("name", t("Branches.form.name.label"), branchSchema.shape.name,150),
-    createValidatedColumn("code", t("Branches.form.code.label"), branchSchema.shape.code, 140),
+    createValidatedColumn("name", t("Branches.form.name.label"), branchSchema.shape.name, 150),
+    // -- Code Column using CodeInputCell --
+    {
+      id: "code",
+      title: t("Branches.form.code.label"),
+      ...codeInputColumnBase,
+      minWidth: 140,
+      columnData: {
+        validationSchema: branchSchema.shape.code,
+        onSerial: generateSerialCode,
+        onRandom: generateRandomCode,
+        onCodeChange: handleCodeChange, // Pass the new handler
+      } as CodeInputCellColumnData<Branch>,
+      getValue: ({ rowData }: { rowData: Branch }) => rowData.code,
+    } as Column<Branch, CodeInputCellColumnData<Branch>, string | null>,
+    // -- End Code Column --
     createValidatedColumn("phone", t("Branches.form.phone.label"), branchSchema.shape.phone, 150),
     createValidatedColumn("email", t("Branches.form.email.label"), branchSchema.shape.email, 200),
 
