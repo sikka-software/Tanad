@@ -130,15 +130,33 @@ export function EmployeeForm({
       department: defaultValues?.department_id || null,
       hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       salary: defaultValues?.salary as { type: string; amount: number }[] | undefined,
-      status: defaultValues?.status || "active",
+      status: (["active", "inactive", "on_leave", "terminated"].includes(
+        (defaultValues?.status || "") as string,
+      )
+        ? defaultValues?.status
+        : "active") as "active" | "inactive" | "on_leave" | "terminated",
       notes: defaultValues?.notes ?? "",
     },
   });
 
   useEffect(() => {
     if (defaultValues) {
-      console.log("Resetting form with defaultValues:", defaultValues);
-      form.reset(defaultValues);
+      // Map status to allowed union type for reset
+      const mappedStatus = ["active", "inactive", "on_leave", "terminated"].includes(
+        (defaultValues.status || "") as string,
+      )
+        ? defaultValues.status
+        : "active";
+      form.reset({
+        ...defaultValues,
+        status: mappedStatus as "active" | "inactive" | "on_leave" | "terminated",
+        hire_date: defaultValues.hire_date ? new Date(defaultValues.hire_date) : undefined,
+        position: defaultValues.position || "",
+        phone: defaultValues.phone || "",
+        salary:
+          (defaultValues.salary as { type: string; amount: number }[] | undefined) || undefined,
+        notes: defaultValues.notes ?? "",
+      });
     } else {
       // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
       // form.reset(mapDataToFormDefaults(null));
@@ -185,7 +203,7 @@ export function EmployeeForm({
       email: data.email.trim(),
       phone: data.phone?.trim() || undefined,
       position: data.position.trim(),
-      hire_date: data.hire_date,
+      hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
       notes: data.notes?.trim() || undefined,
       department_id: data.department || undefined,
       salary: (data.salary || []).map((comp) => ({
@@ -204,7 +222,12 @@ export function EmployeeForm({
         });
         onSuccess?.();
       } else {
-        await createEmployeeMutate(finalSubmitData);
+        const { membership, user } = useUserStore.getState();
+        await createEmployeeMutate({
+          ...finalSubmitData,
+          enterprise_id: membership?.enterprise_id || "",
+          user_id: user?.id || "",
+        });
         onSuccess?.();
       }
     } catch (error) {

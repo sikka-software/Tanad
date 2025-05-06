@@ -44,6 +44,7 @@ export function ExpenseForm({
   const t = useTranslations();
   const locale = useLocale();
   const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
   const { mutate: createExpense } = useCreateExpense();
   const { mutate: updateExpense } = useUpdateExpense();
   const { data: expenses } = useExpenses();
@@ -55,13 +56,13 @@ export function ExpenseForm({
     resolver: zodResolver(createExpenseSchema(t)),
     defaultValues: {
       expense_number: defaultValues?.expense_number || "",
-      issue_date: defaultValues?.issue_date || undefined,
-      due_date: defaultValues?.due_date || undefined,
-      status: defaultValues?.status || "pending",
+      issue_date: defaultValues?.issue_date ? new Date(defaultValues.issue_date) : undefined,
+      due_date: defaultValues?.due_date ? new Date(defaultValues.due_date) : undefined,
+      status: (defaultValues?.status || "pending") as "pending" | "paid" | "overdue",
       amount: defaultValues?.amount || 0,
       category: defaultValues?.category || "",
       notes: defaultValues?.notes || "",
-      client_id: defaultValues?.client_id || "",
+      // client_id: defaultValues?.client_id || "",
     },
   });
 
@@ -78,17 +79,22 @@ export function ExpenseForm({
       if (editMode) {
         await updateExpense({
           id: defaultValues?.id || "",
-          data: data,
+          data: {
+            ...data,
+            due_date: data.due_date.toISOString(),
+            issue_date: data.issue_date.toISOString(),
+          },
         });
       } else {
         await createExpense(
           {
             expense_number: data.expense_number.trim(),
-            issue_date: data.issue_date,
-            due_date: data.due_date,
+            issue_date: data.issue_date.toISOString(),
+            due_date: data.due_date.toISOString(),
             amount: data.amount,
+            enterprise_id: enterprise?.id || "",
             category: data.category.trim(),
-            ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
+            // ...(data.client_id?.trim() ? { client_id: data.client_id.trim() } : {}),
             status: data.status || "pending",
             notes: data.notes?.trim(),
             user_id: user?.id,

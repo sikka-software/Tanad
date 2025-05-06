@@ -6,6 +6,4 @@ export type JobListing = Database["public"]["Tables"]["job_listings"]["Row"];
 export type JobListingCreateData = Database["public"]["Tables"]["job_listings"]["Insert"];
 export type JobListingUpdateData = Database["public"]["Tables"]["job_listings"]["Update"];
 
-export type JobListingWithJobs = JobListing & {
-  jobs: Job[];
-};
+export type JobListingWithJobs = Database["public"]["Tables"]["job_listing_jobs"]["Row"];
