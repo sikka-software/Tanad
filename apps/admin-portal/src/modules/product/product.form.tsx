@@ -80,6 +80,12 @@ export function ProductForm({
       });
       return;
     }
+    if (!membership?.enterprise_id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
 
     try {
       if (editMode && defaultValues) {
@@ -92,14 +98,15 @@ export function ProductForm({
         await updateProduct(
           {
             id: defaultValues.id,
-            product: {
+            data: {
               name: data.name.trim(),
-              description: data.description?.trim() || undefined,
+              description: data.description?.trim() || null,
               price: parseFloat(data.price?.trim() || "0"),
-              sku: data.sku?.trim() || undefined,
+              sku: data.sku?.trim() || null,
               stock_quantity: data.stock_quantity?.trim()
                 ? parseInt(data.stock_quantity.trim())
-                : null,
+                : undefined,
+              notes: data.notes?.trim() || null,
             },
           },
           {
@@ -114,13 +121,14 @@ export function ProductForm({
         await createProduct(
           {
             name: data.name.trim(),
-            description: data.description?.trim() || undefined,
+            description: data.description?.trim() || null,
             price: parseFloat(data.price?.trim() || "0"),
-            sku: data.sku?.trim() || undefined,
+            sku: data.sku?.trim() || null,
             stock_quantity: data.stock_quantity?.trim()
               ? parseInt(data.stock_quantity.trim())
-              : null,
+              : undefined,
             user_id: profile?.id || "",
+            enterprise_id: membership.enterprise_id,
           },
           {
             onSuccess: async (response) => {

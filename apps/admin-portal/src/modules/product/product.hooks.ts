@@ -11,7 +11,7 @@ import {
   updateProduct,
   duplicateProduct,
 } from "@/product/product.service";
-import type { Product, ProductUpdateData } from "@/product/product.type";
+import type { Product, ProductUpdateData, ProductCreateData } from "@/product/product.type";
 
 // Query keys for products
 export const productKeys = {
@@ -44,7 +44,7 @@ export function useCreateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newProduct: Omit<Product, "id" | "created_at">) => {
+    mutationFn: (newProduct: ProductCreateData) => {
       return createProduct(newProduct);
     },
     onSuccess: () => {
