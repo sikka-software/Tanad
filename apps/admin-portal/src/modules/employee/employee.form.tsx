@@ -50,7 +50,7 @@ export function EmployeeForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<EmployeeUpdateData>) {
+}: ModuleFormProps<Employee>) {
   const t = useTranslations();
   const locale = useLocale();
 
@@ -69,19 +69,6 @@ export function EmployeeForm({
 
   const actualEmployeeId = editMode ? defaultValues?.id : undefined;
   const initialEmail = editMode ? defaultValues?.email : undefined;
-
-  const mapDataToFormDefaults = (data: EmployeeUpdateData | null | undefined) => ({
-    first_name: data?.first_name || "",
-    last_name: data?.last_name || "",
-    email: data?.email || "",
-    phone: data?.phone ?? "",
-    position: data?.position || "",
-    department: data?.department_id || null,
-    hire_date: data?.hire_date ? new Date(data.hire_date) : undefined,
-    salary: data?.salary || [],
-    status: data?.status || "active",
-    notes: data?.notes ?? "",
-  });
 
   const createEmployeeFormSchema = () => {
     const supabase = createClient();
@@ -134,13 +121,24 @@ export function EmployeeForm({
 
   const form = useForm<z.input<ReturnType<typeof createEmployeeFormSchema>>>({
     resolver: zodResolver(createEmployeeFormSchema()),
-    defaultValues: mapDataToFormDefaults(defaultValues),
+    defaultValues: {
+      first_name: defaultValues?.first_name || "",
+      last_name: defaultValues?.last_name || "",
+      email: defaultValues?.email || "",
+      phone: defaultValues?.phone ?? "",
+      position: defaultValues?.position || "",
+      department: defaultValues?.department_id || null,
+      hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
+      salary: defaultValues?.salary as { type: string; amount: number }[] | undefined,
+      status: defaultValues?.status || "active",
+      notes: defaultValues?.notes ?? "",
+    },
   });
 
   useEffect(() => {
     if (defaultValues) {
       console.log("Resetting form with defaultValues:", defaultValues);
-      form.reset(mapDataToFormDefaults(defaultValues));
+      form.reset(defaultValues);
     } else {
       // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
       // form.reset(mapDataToFormDefaults(null));
@@ -202,11 +200,11 @@ export function EmployeeForm({
       if (editMode) {
         await updateEmployeeMutate({
           id: actualEmployeeId!,
-          updates: { ...finalSubmitData } as EmployeeUpdateData,
+          updates: { ...finalSubmitData },
         });
         onSuccess?.();
       } else {
-        await createEmployeeMutate(finalSubmitData as EmployeeCreateData);
+        await createEmployeeMutate(finalSubmitData);
         onSuccess?.();
       }
     } catch (error) {

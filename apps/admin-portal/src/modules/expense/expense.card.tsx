@@ -44,13 +44,14 @@ const ExpenseCard = ({ expense }: { expense: Expense }) => {
             <Calendar className="h-4 w-4" />
             <span>
               {t("Expenses.form.issue_date.label")}:{" "}
-              {new Date(expense.issue_date).toLocaleDateString()}
+              {expense.issue_date ? new Date(expense.issue_date).toLocaleDateString() : "N/A"}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Calendar className="h-4 w-4" />
             <span>
-              {t("Expenses.form.due_date.label")}: {new Date(expense.due_date).toLocaleDateString()}
+              {t("Expenses.form.due_date.label")}:{" "}
+              {expense.due_date ? new Date(expense.due_date).toLocaleDateString() : "N/A"}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">

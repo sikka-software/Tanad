@@ -227,8 +227,11 @@ export function SalaryForm({
                         );
 
                         if (selectedEmployee && selectedEmployee.salary) {
-                          const totalSalary = selectedEmployee.salary.reduce(
-                            (sum, component) => sum + (component.amount || 0),
+                          const totalSalary = (
+                            selectedEmployee.salary as { amount: number }[]
+                          ).reduce(
+                            (sum: number, component: { amount: number }) =>
+                              sum + (component.amount || 0),
                             0,
                           );
                           form.setValue("gross_amount", totalSalary);

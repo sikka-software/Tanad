@@ -1,7 +1,6 @@
-import { Mail, MapPin, Phone, User } from "lucide-react";
+import { User } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Badge } from "@/ui/badge";
 import { Card, CardContent, CardHeader } from "@/ui/card";
 
 import { Domain } from "@/modules/domain/domain.type";

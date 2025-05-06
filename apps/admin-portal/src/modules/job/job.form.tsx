@@ -74,6 +74,7 @@ export function JobForm({
 }: ModuleFormProps<JobUpdateData>) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
   const locale = useLocale();
   const queryClient = useQueryClient();
   const [isDepartmentDialogOpen, setIsDepartmentDialogOpen] = useState(false);
@@ -162,6 +163,7 @@ export function JobForm({
             benefits: data.benefits?.trim() || null,
             location: data.location?.trim() || null,
             department: data.department?.trim() || null,
+            enterprise_id: enterprise?.id || "",
             type: data.type.trim(),
             salary: data.salary ? parseFloat(data.salary) : null,
             status: data.status ?? "active",

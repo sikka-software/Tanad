@@ -1,9 +1,9 @@
 import { Badge } from "@/ui/badge";
 import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { JobListing } from "@/job-listing/job-listing.type";
+import { JobListing, JobListingWithJobs } from "@/job-listing/job-listing.type";
 
-const JobListingCard = ({ jobListing }: { jobListing: JobListing }) => {
+const JobListingCard = ({ jobListing }: { jobListing: JobListingWithJobs }) => {
   return (
     <Card key={jobListing.id} className="transition-shadow hover:shadow-lg">
       <CardHeader>
@@ -11,7 +11,7 @@ const JobListingCard = ({ jobListing }: { jobListing: JobListing }) => {
           <div>
             <h3 className="text-lg font-semibold">{jobListing.title}</h3>
             <p className="text-sm text-gray-500">
-              {jobListing.jobs_count ?? 0} {jobListing.jobs_count === 1 ? "job" : "jobs"}
+              {jobListing.jobs.length} {jobListing.jobs.length === 1 ? "job" : "jobs"}
             </p>
           </div>
           <Badge variant={jobListing.status === "active" ? "default" : "secondary"}>
