@@ -32,24 +32,31 @@ import { DEDUCTION_TYPES } from "./salary.options";
 import { Salary, SalaryUpdateData } from "./salary.type";
 
 const createDeductionSchema = (t: (key: string) => string) =>
-  z
-    .object({
-      type: z.string(),
-      amount: z.coerce
-        .number()
-        .positive(t("Salaries.form.deduction_amount.positive"))
-        .or(z.literal(0)),
-    })
-    .superRefine((val, ctx) => {
-      // Only require type if amount is filled (not 0 or empty)
-      if (val.amount !== undefined && val.amount !== 0 && (!val.type || val.type.trim() === "")) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t("Salaries.form.deduction_type.required"),
-          path: ["type"],
-        });
-      }
-    });
+  z.object({
+    type: z.string(),
+    amount: z.coerce.number().or(z.literal(0)),
+  }).superRefine((val, ctx) => {
+    // If both are empty, it's valid (row will be filtered out)
+    if ((!val.type || val.type.trim() === "") && (!val.amount || val.amount === 0)) {
+      return;
+    }
+    // If type is filled but amount is empty/zero
+    if (val.type && (!val.amount || val.amount === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: t("Salaries.form.deduction_amount.positive"),
+        path: ["amount"],
+      });
+    }
+    // If amount is filled but type is empty
+    if ((val.amount && val.amount !== 0) && (!val.type || val.type.trim() === "")) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: t("Salaries.form.deduction_type.required"),
+        path: ["type"],
+      });
+    }
+  });
 
 const createSalarySchema: (t: (key: string) => string) => z.ZodObject<any> = (t) =>
   z.object({
@@ -62,7 +69,10 @@ const createSalarySchema: (t: (key: string) => string) => z.ZodObject<any> = (t)
       .positive(t("Salaries.form.gross_amount.positive"))
       .or(z.literal(0)),
     net_amount: z.coerce.number().positive(t("Salaries.form.net_amount.positive")).or(z.literal(0)),
-    deductions: z.array(createDeductionSchema(t)).optional(),
+    deductions: z
+      .array(createDeductionSchema(t))
+      .transform((arr) => arr.filter((item) => item.type.trim() !== "" || item.amount !== 0))
+      .optional(),
     notes: z.string().optional(),
   });
 
@@ -89,7 +99,7 @@ export function SalaryForm({
 
   // Helper to ensure deductions is always an array of objects
   function parseDeductions(val: unknown): { type: string; amount: number }[] {
-    if (!val) return [{ type: "", amount: 0 }];
+    if (!val) return [];
     if (Array.isArray(val)) return val as { type: string; amount: number }[];
     if (typeof val === "string") {
       try {
@@ -97,7 +107,7 @@ export function SalaryForm({
         if (Array.isArray(parsed)) return parsed;
       } catch {}
     }
-    return [{ type: "", amount: 0 }];
+    return [];
   }
 
   // Use SalaryFormValues directly with useForm
