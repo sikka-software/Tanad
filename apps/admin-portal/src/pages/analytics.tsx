@@ -1,4 +1,4 @@
-import { differenceInDays, endOfMonth, format, parseISO, startOfMonth } from "date-fns";
+import { differenceInDays, endOfDay, endOfMonth, format, parseISO, startOfMonth } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { GetStaticProps } from "next";
@@ -60,9 +60,14 @@ export default function Analytics() {
       }
       return {
         from: startOfMonth(new Date()),
-        to: endOfMonth(new Date()),
+        to: new Date(),
       };
     }
+    // Default for SSR or if window is not defined (though localStorage check handles this)
+    return {
+        from: startOfMonth(new Date()),
+        to: new Date(),
+    };
   });
 
   useEffect(() => {
@@ -89,11 +94,13 @@ export default function Analytics() {
     } = await supabase.auth.getUser();
     if (!user) return;
 
-    const daysDifference = differenceInDays(to, from);
+    const adjustedTo = endOfDay(to);
+
+    const daysDifference = differenceInDays(adjustedTo, from);
 
     const { data: dataRpc, error: errorRpc } = await supabase.rpc(selectedModule.rpc, {
       start_date: from.toISOString(),
-      end_date: to.toISOString(),
+      end_date: adjustedTo.toISOString(),
       time_interval:
         daysDifference <= 1
           ? "hour"
@@ -112,7 +119,7 @@ export default function Analytics() {
 
     if (dataRpc) {
       const formattedBranchChartData = dataRpc.map((item: any) => ({
-        label: format(new Date(item.period_start), "P"), // Format date for X-axis label
+        label: format(new Date(item.period_start), "MM/dd"), // Format date for X-axis label
         added: item[selectedModule.add],
         updated: item[selectedModule.update],
         removed: item[selectedModule.delete],
