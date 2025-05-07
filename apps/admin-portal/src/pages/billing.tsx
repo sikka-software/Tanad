@@ -54,14 +54,14 @@ export default function Billing() {
             break;
           } catch (err) {
             console.error(`Query-triggered data refresh attempt ${i + 1} failed:`, err);
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, 500));
           }
         }
 
-        // Reset loading state after a reasonable delay
+        // Reset loading state after a shorter delay
         setTimeout(() => {
           setIsUpdatingSubscription(false);
-        }, 1000);
+        }, 300);
       };
 
       refreshData();
@@ -95,7 +95,7 @@ export default function Billing() {
             break;
           } catch (err) {
             console.error(`Data refresh attempt ${i + 1} failed:`, err);
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, 500));
           }
         }
 
@@ -103,7 +103,7 @@ export default function Billing() {
         if (mounted) {
           setTimeout(() => {
             setIsUpdatingSubscription(false);
-          }, 1000);
+          }, 300);
         }
       };
 
@@ -122,7 +122,7 @@ export default function Billing() {
             query: { refresh: Date.now() },
           });
         }
-      }, 5000);
+      }, 3000);
     };
 
     window.addEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);

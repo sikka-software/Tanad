@@ -436,46 +436,47 @@ export function PaymentDialog({
     // Show a loading toast immediately
     const loadingToast = toast.loading("Processing your subscription...");
 
-    // Allow more time for the backend to process the subscription
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // Attempt to refresh data directly to reflect changes immediately
-    try {
-      await Promise.all([fetchUserAndProfile(), refetchSubscription()]);
-      console.log("Initial data refresh completed");
-    } catch (error) {
-      console.error("Error in initial refresh:", error);
-    }
-
-    // Close dialog
+    // Close dialog immediately
     onOpenChange(false);
 
-    // Additional delay before calling parent's success handler
-    setTimeout(() => {
-      console.log("Executing onSuccess callback");
+    try {
+      // Attempt to refresh data directly to reflect changes immediately
+      await Promise.all([fetchUserAndProfile(), refetchSubscription()]);
+      console.log("Initial data refresh completed");
 
       // Call success callback to trigger any parent component updates
       onSuccess();
 
-      // Dismiss loading toast
+      // Dismiss loading toast and show success message
       toast.dismiss(loadingToast);
-
-      // Show success message
       toast.success(
         t("Billing.payment.success", {
           fallback: "Payment successful! Your subscription has been updated.",
         }),
       );
 
-      // Silently reload the page without confirmation dialog, preserving locale
-      setTimeout(() => {
-        // Use router.push instead of window.location to preserve locale and Next.js context
-        router.push({
-          pathname: "/billing",
-          query: { refresh: Date.now() }, // Add timestamp to force full refresh
-        });
-      }, 1500);
-    }, 1000);
+      // Use router.push to refresh the page with minimal delay
+      router.push({
+        pathname: "/billing",
+        query: { refresh: Date.now() }, // Add timestamp to force full refresh
+      });
+    } catch (error) {
+      console.error("Error in data refresh:", error);
+
+      // Even if refresh fails, still show success and refresh the page
+      toast.dismiss(loadingToast);
+      toast.success(
+        t("Billing.payment.success", {
+          fallback: "Payment successful! Your subscription has been updated.",
+        }),
+      );
+
+      // Force page refresh as fallback
+      router.push({
+        pathname: "/billing",
+        query: { refresh: Date.now() },
+      });
+    }
   };
 
   // Check if Stripe key is available

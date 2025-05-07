@@ -84,7 +84,7 @@ export default function CurrentPlan() {
       // Allow some minimum time for the refreshing state to be visible
       setTimeout(() => {
         setIsRefreshing(false);
-      }, 500);
+      }, 200);
     }
   }, [user, fetchUserAndProfile, subscription, router]);
 
