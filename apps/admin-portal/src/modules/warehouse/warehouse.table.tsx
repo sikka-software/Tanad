@@ -132,7 +132,7 @@ const WarehouseTable = ({
       accessorKey: "status",
       header: t("Warehouses.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
-      cellType: "select",
+      cellType: "status",
       options: [
         { label: t("Warehouses.form.status.active"), value: "active" },
         { label: t("Warehouses.form.status.inactive"), value: "inactive" },

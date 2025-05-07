@@ -67,10 +67,10 @@ const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
     },
     {
       accessorKey: "status",
-      cellType: "select",
+      cellType: "status",
       options: [
-        { label: t("Branches.form.status.active"), value: "active" },
-        { label: t("Branches.form.status.inactive"), value: "inactive" },
+        { label: t("Servers.form.status.active"), value: "active" },
+        { label: t("Servers.form.status.inactive"), value: "inactive" },
       ],
       header: t("Servers.form.status.label"),
       validationSchema: statusSchema,

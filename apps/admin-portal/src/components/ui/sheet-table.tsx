@@ -26,13 +26,10 @@ import {
   ColumnSizingState,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { ChevronDown, ChevronRight, Plus, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-// ** import ui components
 import {
   Table,
   TableBody,
@@ -47,7 +44,6 @@ import {
 import { cn } from "@/lib/utils";
 
 import { CommandSelect } from "./command-select";
-import RowActions from "./row-actions";
 import RowActionsPopover from "./row-actions-popover";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
@@ -56,8 +52,8 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 > & {
   id?: string;
   accessorKey?: string;
-  cellType?: "text" | "select";
-  options?: Array<{ label: string; value: string | number }>;
+  cellType?: "text" | "select" | "status";
+  options?: Array<{ label: string; value: string | number | boolean }>;
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
   style?: React.CSSProperties; // style for inline styles
@@ -741,51 +737,71 @@ function SheetTable<
               if (colDef.minSize) style.minWidth = `${colDef.minSize}px`;
               if (colDef.maxSize) style.maxWidth = `${colDef.maxSize}px`;
             }
-            // if (cellIndex === 0) {
-            //   style.paddingLeft = `${level * 20}px`;
-            // }
 
             // Render cell content with customizations for the first cell
             const rawCellContent = flexRender(cell.column.columnDef.cell, cell.getContext());
 
             let cellContent: React.ReactNode = rawCellContent;
 
-            // If first cell, show expand arrow if subRows exist
-            // if (cellIndex === 0) {
-            //   cellContent = (
-            //     <div
-            //       className="flex h-full w-full items-center gap-2"
-            //       style={{ outline: "none" }} // Hide the focus outline
-            //     >
-            //       <div
-            //         className="flex-grow"
-            //         contentEditable={!isDisabled}
-            //         suppressContentEditableWarning
-            //         style={{ outline: "none" }} // Hide the outline for editing
-            //         onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
-            //         onKeyDown={(e) => {
-            //           if (
-            //             (e.ctrlKey || e.metaKey) &&
-            //             ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
-            //           ) {
-            //             return;
-            //           }
-            //           handleKeyDown(e, colDef);
-            //         }}
-            //         onPaste={(e) => handlePaste(e, colDef)}
-            //         onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
-            //         onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
-            //       >
-            //         {rawCellContent}
-            //       </div>
-            //     </div>
-            //   );
-            // }
+            // if cell type is status, show a status element
+            if (colDef.cellType === "status" && colDef.options) {
+              const cellValue = cell.getValue() as string | number;
+              const selectedOption = colDef.options.find((opt) => opt.value === cellValue);
 
+              return (
+                <TableCell
+                  key={cell.id}
+                  className={cn(
+                    "relative border p-0",
+                    {
+                      "bg-muted": isDisabled,
+                      "bg-destructive/25": errorMsg,
+                    },
+                    typeof colDef.className === "function"
+                      ? colDef.className(rowData)
+                      : colDef.className,
+                  )}
+                >
+                  <CommandSelect
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    data={colDef.options}
+                    inCell
+                    isLoading={false}
+                    defaultValue={String(selectedOption?.value)}
+                    popoverClassName="w-fit"
+                    buttonClassName="bg-transparent p-0"
+                    valueKey="value"
+                    labelKey="label"
+                    onChange={async (value) => {
+                      if (onEdit) {
+                        onEdit(rowId, colKey as keyof T, value as T[keyof T]);
+                      }
+                    }}
+                    texts={{
+                      placeholder: ". . .",
+                    }}
+                    renderSelected={(item) => {
+                      return (
+                        <div
+                          className={cn(
+                            "flex h-full w-full items-center justify-center bg-green-500 px-2 text-center text-xs font-bold",
+                            item.value === "active" &&
+                              "text-primary bg-green-200 hover:bg-green-200",
+                            item.value === "inactive" && "text-primary bg-red-200 hover:bg-red-200",
+                          )}
+                        >
+                          {item.label}
+                        </div>
+                      );
+                    }}
+                    ariaInvalid={false}
+                  />
+                </TableCell>
+              );
+            }
             // if cell type is select, show a select element
             if (colDef.cellType === "select" && colDef.options) {
               const cellValue = cell.getValue() as string | number;
-              const selectedOption = colDef.options.find((opt) => opt.value === cellValue);
 
               return (
                 <TableCell
@@ -827,9 +843,10 @@ function SheetTable<
                 </TableCell>
               );
             }
+
             return (
               <TableCell
-                key={cell.id}
+                key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
                   "relative border", // 'relative' for absolute icons if you prefer
                   {
@@ -872,37 +889,7 @@ function SheetTable<
               </TableCell>
             );
           })}
-
-          {/* Right icon cells */}
-          {addPos === "right" && handleAddRowFunction && (
-            <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle}>
-              {showRowActions && (
-                <button
-                  className="flex w-full items-center justify-center"
-                  onClick={() => handleAddRowFunction(rowId)}
-                >
-                  <Plus size={16} />
-                </button>
-              )}
-            </TableCell>
-          )}
-
-          {removePos === "right" && handleRemoveRowFunction && (
-            <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle}>
-              {showRowActions && (
-                <button
-                  className="flex w-full items-center justify-center"
-                  onClick={() => handleRemoveRowFunction(rowId)}
-                >
-                  <Trash2 size={16} />
-                </button>
-              )}
-            </TableCell>
-          )}
         </TableRow>
-
-        {/* If expanded, render each subRows recursively */}
-        {isExpanded && row.subRows.map((subRow) => renderRow(subRow, groupKey, level + 1))}
       </React.Fragment>
     );
   };

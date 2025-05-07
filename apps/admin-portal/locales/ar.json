@@ -3920,10 +3920,7 @@
     "search_servers": "بحث عن خوادم...",
     "manager": "المدير",
     "edit": "تعديل الخادم",
-    "status": {
-      "active": "نشط",
-      "inactive": "غير نشط"
-    },
+
     "form": {
       "name": {
         "label": "الاسم",
@@ -3959,7 +3956,9 @@
       "status": {
         "label": "الحالة",
         "placeholder": "أدخل الحالة",
-        "required": "الحالة مطلوبة"
+        "required": "الحالة مطلوبة",
+        "active": "نشط",
+        "inactive": "غير نشط"
       },
       "tags": {
         "label": "التصنيفات",

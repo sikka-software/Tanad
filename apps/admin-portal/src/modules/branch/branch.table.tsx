@@ -125,7 +125,7 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       accessorKey: "status",
       header: t("Branches.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
-      cellType: "select",
+      cellType: "status",
       options: [
         { label: t("Branches.form.status.active"), value: "active" },
         { label: t("Branches.form.status.inactive"), value: "inactive" },

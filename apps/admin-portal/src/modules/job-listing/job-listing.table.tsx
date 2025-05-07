@@ -49,24 +49,7 @@ const JobListingsTable = ({
       header: t("JobListings.form.description.label"),
       validationSchema: z.string().min(1, t("JobListings.form.description.required")),
     },
-    {
-      accessorKey: "status",
-      header: t("JobListings.form.status.label"),
-      validationSchema: z.boolean(),
-      cell: ({ row }) => (
-        <Badge
-          variant={row.original.status ? "default" : "secondary"}
-          className={cn(
-            row.original.status && "text-primary border-green-500 bg-green-200 hover:bg-green-200",
-            !row.original.status && "text-primary border-red-500 bg-red-200 hover:bg-red-200",
-          )}
-        >
-          {row.original.status
-            ? t("JobListings.form.status.active")
-            : t("JobListings.form.status.inactive")}
-        </Badge>
-      ),
-    },
+
     {
       accessorKey: "slug",
       header: t("JobListings.form.slug.label"),
@@ -77,6 +60,16 @@ const JobListingsTable = ({
       header: t("JobListings.jobs_count.label", { defaultMessage: "Jobs" }),
       enableEditing: false,
       cell: ({ row }) => row.original.jobs_count,
+    },
+    {
+      accessorKey: "status",
+      header: t("JobListings.form.status.label"),
+      validationSchema: z.boolean(),
+      cellType: "status",
+      options: [
+        { value: "active", label: t("JobListings.form.status.active") },
+        { value: "inactive", label: t("JobListings.form.status.inactive") },
+      ],
     },
   ];
 

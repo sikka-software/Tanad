@@ -85,7 +85,11 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
       accessorKey: "status",
       header: t("Jobs.form.status.label"),
       validationSchema: z.boolean(),
-      cell: (props: CellContext<Job, unknown>) => (props.row.original.status ? "Yes" : "No"),
+      cellType: "status",
+      options: [
+        { value: "active", label: t("Jobs.form.status.active") },
+        { value: "inactive", label: t("Jobs.form.status.inactive") },
+      ],
     },
   ];
 

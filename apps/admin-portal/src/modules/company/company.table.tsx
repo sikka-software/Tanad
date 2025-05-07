@@ -87,6 +87,11 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
       accessorKey: "status",
       header: t("Companies.form.status.label"),
       validationSchema: z.boolean(),
+      cellType: "status",
+      options: [
+        { value: "active", label: t("Companies.form.status.active") },
+        { value: "inactive", label: t("Companies.form.status.inactive") },
+      ],
     },
     {
       accessorKey: "notes",

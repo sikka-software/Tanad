@@ -125,7 +125,7 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       accessorKey: "status",
       header: t("Offices.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
-      cellType: "select",
+      cellType: "status",
       options: [
         { label: t("Offices.form.status.active"), value: "active" },
         { label: t("Offices.form.status.inactive"), value: "inactive" },
