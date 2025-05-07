@@ -1082,6 +1082,47 @@ export type Database = {
           },
         ]
       }
+      online_stores: {
+        Row: {
+          created_at: string
+          domain_name: string
+          enterprise_id: string
+          id: string
+          notes: string | null
+          status: Database["public"]["Enums"]["common_status"] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          domain_name: string
+          enterprise_id: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          domain_name?: string
+          enterprise_id?: string
+          id?: string
+          notes?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "online_stores_enterprise_id_enterprises_id_fk"
+            columns: ["enterprise_id"]
+            isOneToOne: false
+            referencedRelation: "enterprises"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permissions: {
         Row: {
           created_at: string | null
@@ -1987,6 +2028,15 @@ export type Database = {
           offices_updated: number
         }[]
       }
+      get_module_analytics_online_stores: {
+        Args: { start_date?: string; end_date?: string; time_interval?: string }
+        Returns: {
+          period_start: string
+          online_stores_added: number
+          online_stores_removed: number
+          online_stores_updated: number
+        }[]
+      }
       get_module_analytics_product: {
         Args: { start_date?: string; end_date?: string; time_interval?: string }
         Returns: {
@@ -2132,6 +2182,7 @@ export type Database = {
         | "EMPLOYEE_REQUEST"
         | "DOMAIN"
         | "WEBSITE"
+        | "ONLINE_STORE"
       app_permission:
         | "users.create"
         | "users.read"
@@ -2271,6 +2322,12 @@ export type Database = {
         | "websites.update"
         | "websites.export"
         | "websites.duplicate"
+        | "online_stores.read"
+        | "online_stores.create"
+        | "online_stores.delete"
+        | "online_stores.update"
+        | "online_stores.export"
+        | "online_stores.duplicate"
       app_role: "superadmin" | "admin" | "accounting" | "hr"
       common_status: "active" | "inactive" | "draft" | "archived"
       employee_status:
@@ -2442,6 +2499,7 @@ export const Constants = {
         "EMPLOYEE_REQUEST",
         "DOMAIN",
         "WEBSITE",
+        "ONLINE_STORE",
       ],
       app_permission: [
         "users.create",
@@ -2582,6 +2640,12 @@ export const Constants = {
         "websites.update",
         "websites.export",
         "websites.duplicate",
+        "online_stores.read",
+        "online_stores.create",
+        "online_stores.delete",
+        "online_stores.update",
+        "online_stores.export",
+        "online_stores.duplicate",
       ],
       app_role: ["superadmin", "admin", "accounting", "hr"],
       common_status: ["active", "inactive", "draft", "archived"],

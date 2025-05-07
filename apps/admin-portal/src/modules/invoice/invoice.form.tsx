@@ -28,7 +28,12 @@ import { ModuleFormProps } from "@/types/common.type";
 import { ClientForm } from "@/client/client.form";
 
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
-import { Invoice, InvoiceItem, InvoiceUpdateData } from "@/modules/invoice/invoice.type";
+import {
+  Invoice,
+  InvoiceItem,
+  InvoiceUpdateData,
+  InvoiceCreateData,
+} from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 import { CompanyFormValues } from "../company/company.form";
@@ -88,7 +93,7 @@ export function InvoiceForm({
   editMode,
   onSuccess,
   defaultValues,
-}: ModuleFormProps<InvoiceUpdateData>) {
+}: ModuleFormProps<InvoiceUpdateData | InvoiceCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();
@@ -104,8 +109,6 @@ export function InvoiceForm({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [clientsLoading, setClientsLoading] = useState(true);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
-  const [user_id, setuser_id] = useState<string | undefined>();
-  const [productsLoading, setProductsLoading] = useState(true);
 
   const isLoading = useInvoiceStore((state) => state.isLoading);
   const setIsLoading = useInvoiceStore((state) => state.setIsLoading);
@@ -129,12 +132,6 @@ export function InvoiceForm({
     // Get the current user ID and fetch clients
     const getClients = async () => {
       setClientsLoading(true);
-
-      // Get user ID
-      const { data: userData } = await supabase.auth.getUser();
-      if (userData.user) {
-        setuser_id(userData.user.id);
-      }
 
       // Fetch clients
       try {
@@ -202,8 +199,8 @@ export function InvoiceForm({
     try {
       if (editMode && defaultValues) {
         if (!defaultValues.id) {
-          console.error("Company ID missing in edit mode");
-          toast.error(t("Companies.error.missing_id"));
+          console.error("Invoice ID missing in edit mode");
+          toast.error(t("Invoices.error.missing_id"));
           setIsLoading(false);
           return;
         }

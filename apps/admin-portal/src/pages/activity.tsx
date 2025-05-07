@@ -1,16 +1,21 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+
+import { createClient } from "@/utils/supabase/component";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { ActivityLogDialog } from "@/modules/activity/activity.dialog";
 import { ActivityLogFilters } from "@/modules/activity/activity.filters";
-import { ActivityLogTable } from "@/modules/activity/activity.table";
 import { useActivityLogs, activityLogKeys } from "@/modules/activity/activity.hook";
-import { createClient } from "@/utils/supabase/component"; // Import Supabase client
+import { ActivityLogTable } from "@/modules/activity/activity.table";
+
+import CustomPageMeta from "../components/landing/CustomPageMeta";
+
+// Import Supabase client
 
 const ActivityPage = () => {
   const t = useTranslations();
@@ -51,17 +56,20 @@ const ActivityPage = () => {
   }, [queryClient]); // Add queryClient to dependency array
 
   return (
-    <DataPageLayout>
-      <CardHeader className="p-4 pb-0">
-        <CardTitle>{t("ActivityLogs.title")}</CardTitle>
-        <CardDescription>{t("ActivityLogs.description")}</CardDescription>
-      </CardHeader>
-      <div className="flex flex-col gap-4 p-4">
-        <ActivityLogFilters />
-        <ActivityLogTable />
-      </div>
-      <ActivityLogDialog />
-    </DataPageLayout>
+    <div>
+      <CustomPageMeta title={t("ActivityLogs.title")} description={t("ActivityLogs.description")} />
+      <DataPageLayout>
+        <CardHeader className="p-4 pb-0">
+          <CardTitle>{t("ActivityLogs.title")}</CardTitle>
+          <CardDescription>{t("ActivityLogs.description")}</CardDescription>
+        </CardHeader>
+        <div className="flex flex-col gap-4 p-4">
+          <ActivityLogFilters />
+          <ActivityLogTable />
+        </div>
+        <ActivityLogDialog />
+      </DataPageLayout>
+    </div>
   );
 };
 

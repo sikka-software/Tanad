@@ -28,7 +28,7 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import { useCreateJob, useUpdateJob } from "@/job/job.hooks";
 import useJobStore from "@/job/job.store";
-import { Job, JobUpdateData } from "@/job/job.type";
+import { Job, JobUpdateData, JobCreateData } from "@/job/job.type";
 
 import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
@@ -71,7 +71,7 @@ export function JobForm({
   defaultValues,
   editMode = false,
   onSuccess,
-}: ModuleFormProps<JobUpdateData>) {
+}: ModuleFormProps<JobUpdateData | JobCreateData>) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
   const enterprise = useUserStore((state) => state.enterprise);
@@ -140,7 +140,7 @@ export function JobForm({
               department: data.department?.trim() || null,
               type: data.type.trim(),
               salary: data.salary ? parseFloat(data.salary) : null,
-              status: data.status,
+              status: data.status as "active" | "inactive" | "draft" | "archived" | null,
               start_date: data.start_date?.toISOString() || null,
               end_date: data.end_date?.toISOString() || null,
             },
@@ -166,7 +166,7 @@ export function JobForm({
             enterprise_id: enterprise?.id || "",
             type: data.type.trim(),
             salary: data.salary ? parseFloat(data.salary) : null,
-            status: data.status ?? "active",
+            status: data.status as "active" | "inactive" | "draft" | "archived" | null,
             start_date: data.start_date?.toISOString() || null,
             end_date: data.end_date?.toISOString() || null,
             user_id: user?.id,

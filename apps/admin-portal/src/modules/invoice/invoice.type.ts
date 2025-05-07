@@ -25,7 +25,12 @@ export type InvoiceItemInput = {
   quantity: number;
   unit_price: number;
 };
-export type InvoiceCreateData = BaseInvoiceCreate & { items: InvoiceItemInput[] };
-export type InvoiceUpdateData = BaseInvoiceUpdate & { items?: InvoiceItemInput[] }; // Now this should work correctly
+
+export type InvoiceCreateData = Database["public"]["Tables"]["invoices"]["Insert"] & {
+  items: InvoiceItemInput[];
+};
+export type InvoiceUpdateData = Database["public"]["Tables"]["invoices"]["Update"] & {
+  items?: InvoiceItemInput[];
+};
 
 export type InvoiceItemCreateData = Omit<InvoiceItem, "id">;

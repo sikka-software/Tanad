@@ -33,6 +33,11 @@ const modelMap: Record<string, ModelConfig> = {
     idField: "id",
     excludeFromDuplicate: ["department_id"],
   },
+  online_stores: {
+    table: schema.online_stores,
+    query: db.query.online_stores,
+    idField: "id",
+  },
   salaries: { table: schema.salaries, query: db.query.salaries, idField: "id" },
   offices: { table: schema.offices, query: db.query.offices, idField: "id" },
   warehouses: {

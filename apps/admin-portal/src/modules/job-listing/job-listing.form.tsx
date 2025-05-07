@@ -50,7 +50,7 @@ export function JobListingForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<JobListingUpdateData>) {
+}: ModuleFormProps<JobListingUpdateData | JobListingCreateData>) {
   const t = useTranslations();
   const { data: jobs, isLoading: isLoadingJobs } = useJobs();
 

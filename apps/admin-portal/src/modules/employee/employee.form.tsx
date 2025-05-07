@@ -50,7 +50,7 @@ export function EmployeeForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Employee>) {
+}: ModuleFormProps<EmployeeUpdateData | EmployeeCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
 

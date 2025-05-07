@@ -19,7 +19,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateExpense, useUpdateExpense, useExpenses } from "./expense.hooks";
 import useExpenseStore from "./expense.store";
-import { Expense, ExpenseUpdateData } from "./expense.type";
+import { Expense, ExpenseCreateData, ExpenseUpdateData } from "./expense.type";
 
 export const createExpenseSchema = (t: (key: string) => string) =>
   z.object({
@@ -40,7 +40,7 @@ export function ExpenseForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<ExpenseUpdateData>) {
+}: ModuleFormProps<ExpenseUpdateData | ExpenseCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const user = useUserStore((state) => state.user);

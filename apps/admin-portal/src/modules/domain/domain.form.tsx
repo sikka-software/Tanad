@@ -22,7 +22,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useDomains, useCreateDomain, useUpdateDomain } from "./domain.hooks";
 import useDomainStore from "./domain.store";
-import { Domain, DomainUpdateData } from "./domain.type";
+import { Domain, DomainUpdateData, DomainCreateData } from "./domain.type";
 
 export const createDomainSchema = (t: (key: string) => string) => {
   const baseDomainSchema = z.object({
@@ -52,7 +52,7 @@ export function DomainForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<DomainUpdateData>) {
+}: ModuleFormProps<DomainUpdateData | DomainCreateData>) {
   const t = useTranslations();
 
   const user = useUserStore((state) => state.user);

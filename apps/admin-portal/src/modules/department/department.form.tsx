@@ -62,11 +62,13 @@ export default function DepartmentForm({
   onSuccess,
   defaultValues,
   editMode = false,
-}: ModuleFormProps<DepartmentUpdateData>) {
+}: ModuleFormProps<DepartmentUpdateData | DepartmentCreateData>) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
   const { mutateAsync: createDepartment } = useCreateDepartment();
   const { mutate: updateDepartment } = useUpdateDepartment();
+
   const setIsLoading = useDepartmentStore((state) => state.setIsLoading);
 
   const { data: offices, isLoading: isOfficesLoading } = useOffices();
@@ -78,7 +80,7 @@ export default function DepartmentForm({
   const initialFormLocations =
     defaultValues?.locations?.map((loc) => ({
       id: loc.location_id,
-      type: loc.location_type,
+      type: loc.location_type as "office" | "branch" | "warehouse",
     })) || [];
 
   const form = useForm<DepartmentFormValues>({
@@ -161,7 +163,7 @@ export default function DepartmentForm({
         }
         const departmentId = defaultValues.id;
         try {
-          const locationsForUpdate: Department["locations"] = data.locations.map((location) => ({
+          const locationsForUpdate: DepartmentLocation[] = data.locations.map((location) => ({
             department_id: departmentId,
             location_id: location.id,
             location_type: location.type,
@@ -197,20 +199,19 @@ export default function DepartmentForm({
         }
       } else {
         try {
-          const locationsForCreate: DepartmentCreateData["locations"] = data.locations.map(
-            (location) => ({
-              location_id: location.id,
-              location_type: location.type,
-              user_id: user.id,
-            }),
-          );
+          const locationsForCreate = data.locations.map((location) => ({
+            location_id: location.id,
+            location_type: location.type,
+            user_id: user.id,
+          }));
 
           const createData: DepartmentCreateData = {
             name: data.name,
             description: data.description || null,
             user_id: user.id,
             status: "active",
-            locations: locationsForCreate,
+            enterprise_id: enterprise?.id || "",
+            locations: locationsForCreate as DepartmentLocation[],
           };
 
           await createDepartment(createData);

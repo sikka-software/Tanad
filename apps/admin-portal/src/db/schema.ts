@@ -86,6 +86,7 @@ export const activity_target_type = pgEnum("activity_target_type", [
   "DOMAIN",
   "WEBSITE",
   "PURCHASE",
+  "ONLINE_STORE",
 ]);
 export const app_permission = pgEnum("app_permission", [
   "users.create",
@@ -226,6 +227,12 @@ export const app_permission = pgEnum("app_permission", [
   "websites.update",
   "websites.export",
   "websites.duplicate",
+  "online_stores.read",
+  "online_stores.create",
+  "online_stores.delete",
+  "online_stores.update",
+  "online_stores.export",
+  "online_stores.duplicate",
 ]);
 export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
 export const payment_cycle = pgEnum("payment_cycle", ["monthly", "annual"]);
@@ -1936,6 +1943,55 @@ export const websites = pgTable(
       name: "websites_user_id_users_id_fk",
     }),
     unique("websites_enterprise_id_domain_name_unique").on(table.domain_name, table.enterprise_id),
+  ],
+);
+
+export const online_stores = pgTable(
+  "online_stores",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    domain_name: text().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    status: common_status().default("active"),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    notes: text(),
+  },
+  (table) => [
+    index("online_stores_domain_name_idx").using(
+      "btree",
+      table.domain_name.asc().nullsLast().op("text_ops"),
+    ),
+    index("online_stores_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("online_stores_user_id_idx").using(
+      "btree",
+      table.user_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "online_stores_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "online_stores_user_id_users_id_fk",
+    }),
+    unique("online_stores_enterprise_id_domain_name_unique").on(
+      table.domain_name,
+      table.enterprise_id,
+    ),
   ],
 );
 

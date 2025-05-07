@@ -62,7 +62,7 @@ export function EmployeeRequestForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<EmployeeRequestUpdateData>) {
+}: ModuleFormProps<EmployeeRequestUpdateData | EmployeeRequestCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const user = useUserStore((state) => state.user);

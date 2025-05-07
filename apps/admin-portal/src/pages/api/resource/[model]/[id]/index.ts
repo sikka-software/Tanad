@@ -22,6 +22,7 @@ const modelMap: Record<string, ModelConfig> = {
   domains: { table: schema.domains, query: db.query.domains, idField: "id" },
   websites: { table: schema.websites, query: db.query.websites, idField: "id" },
   servers: { table: schema.servers, query: db.query.servers, idField: "id" },
+  online_stores: { table: schema.online_stores, query: db.query.online_stores, idField: "id" },
   clients: { table: schema.clients, query: db.query.clients, idField: "id" },
   expenses: { table: schema.expenses, query: db.query.expenses, idField: "id" },
   purchases: { table: schema.purchases, query: db.query.purchases, idField: "id" },
