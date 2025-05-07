@@ -29,6 +29,7 @@ export function ActivityLogTable() {
   const {
     data: activityLogResponse,
     isLoading,
+    isFetching,
     isError,
     error,
   } = useActivityLogs(page, itemsPerPage, debouncedFilters);
@@ -73,11 +74,11 @@ export function ActivityLogTable() {
       <div className="rounded-md border">
         <Table>
           <TableBody>
-            {isLoading ? (
+            {isFetching ? (
               Array.from({ length: itemsPerPage }).map((_, index) => (
-                <TableRow key={`skeleton-${index}`}>
+                <TableRow key={`skeleton-${index}-fetching`}>
                   <TableCell colSpan={5}>
-                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-[42px] w-full" />
                   </TableCell>
                 </TableRow>
               ))
