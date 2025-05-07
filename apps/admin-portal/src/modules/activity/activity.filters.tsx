@@ -47,7 +47,7 @@ import { ProfileType } from "@/stores/use-user-store";
 
 import { useUsers } from "../user/user.hooks";
 import { ActivityLogPDFDocument } from "./activity.pdf";
-import { ActivityService } from "./activity.service";
+import { exportActivities } from "./activity.service";
 import { useActivityLogStore } from "./activity.store";
 import type { ActivityLogListData } from "./activity.type";
 
@@ -71,7 +71,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
     setIsProcessingExport(true);
     const toastId = toast.loading(t("ActivityLogs.export.loading"));
     try {
-      const logsToExport = await ActivityService.exportList(filters);
+      const logsToExport = await exportActivities(filters);
 
       if (logsToExport.length === 0) {
         toast.info(t("ActivityLogs.export.noData"), { id: toastId });
@@ -114,7 +114,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
     setIsProcessingExport(true);
     const toastId = toast.loading(t("ActivityLogs.export.preparingPDF"));
     try {
-      const logsToExport = await ActivityService.exportList(filters);
+      const logsToExport = await exportActivities(filters);
 
       if (logsToExport.length === 0) {
         toast.info(t("ActivityLogs.export.noData"), { id: toastId });

@@ -1,75 +1,43 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
-import { ChevronLeft, ChevronRight, ArrowRight, Eye } from "lucide-react";
+import { ArrowRight, Eye } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDebounce } from "use-debounce";
 
+import TablePagination from "@/components/table-pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import IconButton from "@/components/ui/icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
-import { ActivityService } from "./activity.service";
+import { useActivityLogs } from "./activity.hook";
 import { useActivityLogStore } from "./activity.store";
 import type { ActivityLogListData } from "./activity.type";
 
-interface ActivityLogTableProps {
-  // Removed eventType as filtering is not implemented in service yet
-}
-
-export function ActivityLogTable({}: ActivityLogTableProps) {
+export function ActivityLogTable() {
   const t = useTranslations();
   const { openDialog, filters } = useActivityLogStore();
-  const [activityLogs, setActivityLogs] = useState<ActivityLogListData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
-  const [hasNextPage, setHasNextPage] = useState(true);
   const format = useFormatter();
   const now = new Date();
 
-  // Debounce the filters
-  const [debouncedFilters] = useDebounce(filters, 500); // 500ms debounce delay
+  const [debouncedFilters] = useDebounce(filters, 500);
 
-  useEffect(() => {
-    const fetchLogs = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        console.log(
-          "Fetching logs with debounced filters:",
-          JSON.stringify(debouncedFilters, null, 2),
-        );
-        const data = await ActivityService.list(page, itemsPerPage, debouncedFilters);
-        setActivityLogs(data);
-        setHasNextPage(data.length === itemsPerPage);
-      } catch (err) {
-        console.error("Failed to fetch activity logs:", err);
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
-        setHasNextPage(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const {
+    data: activityLogResponse,
+    isLoading,
+    isError,
+    error,
+  } = useActivityLogs(page, itemsPerPage, debouncedFilters);
 
-    void fetchLogs();
-  }, [page, debouncedFilters]); // Depend on debouncedFilters
+  const activityLogs = activityLogResponse || [];
+  const totalLogs = activityLogResponse?.length || 0;
 
-  const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage((prev) => prev - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (hasNextPage) {
-      setPage((prev) => prev + 1);
-    }
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
   };
 
   const getActionBadgeVariant = (
@@ -88,7 +56,6 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
   };
 
   const badgeColor = (actionType: string | null): string => {
-    console.log(actionType);
     switch (actionType?.toUpperCase()) {
       case "CREATED":
         return "bg-green-300 dark:bg-green-900";
@@ -109,27 +76,15 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
             {isLoading ? (
               Array.from({ length: itemsPerPage }).map((_, index) => (
                 <TableRow key={`skeleton-${index}`}>
-                  <TableCell>
-                    <Skeleton className="h-8 w-full" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-8 w-full" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-8 w-full" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-8 w-full" />
-                  </TableCell>
-                  <TableCell>
-                    <Skeleton className="h-8 w-full" />
+                  <TableCell colSpan={5}>
+                    <Skeleton className="h-10 w-full" />
                   </TableCell>
                 </TableRow>
               ))
-            ) : error ? (
+            ) : isError ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center text-red-500">
-                  {t("ActivityLogs.error_fetching")}: {error}
+                  {t("ActivityLogs.error_fetching")}: {error?.message || "Unknown error"}
                 </TableCell>
               </TableRow>
             ) : activityLogs.length === 0 ? (
@@ -139,28 +94,7 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              activityLogs.map((item) => {
-                const diffInSeconds = Math.floor(
-                  (now.getTime() - new Date(item.created_at).getTime()) / 1000,
-                );
-
-                let value: number;
-                let unit: Intl.RelativeTimeFormatUnit;
-
-                if (diffInSeconds < 60) {
-                  value = -diffInSeconds;
-                  unit = "second";
-                } else if (diffInSeconds < 3600) {
-                  value = -Math.floor(diffInSeconds / 60);
-                  unit = "minute";
-                } else if (diffInSeconds < 86400) {
-                  value = -Math.floor(diffInSeconds / 3600);
-                  unit = "hour";
-                } else {
-                  value = -Math.floor(diffInSeconds / 86400);
-                  unit = "day";
-                }
-
+              activityLogs.map((item: ActivityLogListData) => {
                 return (
                   <TableRow key={item.id}>
                     <TableCell>
@@ -207,17 +141,15 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
                             target: t(`General.${item.target_type?.toLowerCase()}`) || "item",
                             name: item.target_name || item.target_id || "N/A",
                           })}
-                          {/* {getActionPastTense(item.action_type)} */}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground max-w-[300px] truncate text-xs">
-                      {/* {typeof item.details === 'string' ? item.details : JSON.stringify(item.details)} */}
+                      {/* Details cell can be populated if needed */}
                     </TableCell>
                     <TableCell className="text-xs">
                       <div className="flex flex-col">
                         <span>{format.relativeTime(new Date(item.created_at))}</span>
-                        {/* <span>{localizedTimeDistance(item)}</span> */}
                         <span className="text-muted-foreground hidden text-[10px] lg:block">
                           {item.created_at
                             ? format.dateTime(new Date(item.created_at), "PPpp")
@@ -241,25 +173,13 @@ export function ActivityLogTable({}: ActivityLogTableProps) {
           </TableBody>
         </Table>
       </div>
-      {page > 1 && (
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePreviousPage}
-            disabled={page <= 1 || isLoading}
-          >
-            <ChevronLeft className="mr-2 h-4 w-4" /> Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleNextPage}
-            disabled={!hasNextPage || isLoading}
-          >
-            Next <ChevronRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
+      {totalLogs > 0 && !isLoading && !isError && (
+        <TablePagination
+          currentPage={page}
+          totalPages={Math.ceil(totalLogs / itemsPerPage)}
+          onPageChange={handlePageChange}
+          paginationItemsToDisplay={5}
+        />
       )}
     </div>
   );
