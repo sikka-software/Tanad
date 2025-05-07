@@ -55,7 +55,7 @@ function LinesChart({
   }
 
   return (
-    <Card className="w-1/2">
+    <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}

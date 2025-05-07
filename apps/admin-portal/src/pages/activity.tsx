@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,9 @@ import { ActivityLogTable } from "@/modules/activity/activity.table";
 
 const ActivityPage = () => {
   const t = useTranslations();
+
+  useEffect(() => {}, []);
+
   return (
     <DataPageLayout>
       <CardHeader className="p-4 pb-0">

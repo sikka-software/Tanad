@@ -61,7 +61,15 @@ export function CrudChart({
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey={xAxisKey} tickLine={false} tickMargin={10} axisLine={false} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  indicator="dot"
+                  labelFormatter={(_, payload) => payload[0].payload.tooltipLabel}
+                />
+              }
+            />
             {Object.keys(chartConfig).map((key) => (
               <Bar key={key} dataKey={key} fill={`var(--color-${key})`} radius={4} />
             ))}

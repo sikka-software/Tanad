@@ -17,15 +17,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createClient } from "@/utils/supabase/component";
 
 import { CrudChart } from "@/components/analytics/crud-chart";
+import LinesChart from "@/components/analytics/lines-chart";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { MODULE_ANALYTICS } from "@/lib/constants";
+
+import useUserStore from "../stores/use-user-store";
 
 export default function Analytics() {
   const supabase = createClient();
   const t = useTranslations();
   const router = useRouter();
   const { locale } = router;
+  const profile = useUserStore((state) => state.profile);
 
   const [selectedModule, setSelectedModule] = useState<{
     key: string;
@@ -85,17 +89,14 @@ export default function Analytics() {
   const chartConfig = {
     added: {
       label: t("Analytics.add_actions"),
-      // color: "#27B376"
       color: "var(--chart-green)",
     },
     updated: {
       label: t("Analytics.update_actions"),
-      //  color: "#3b82f6"
       color: "var(--chart-blue)",
     },
     removed: {
       label: t("Analytics.delete_actions"),
-      // color: "#ef4444"
       color: "var(--chart-red)",
     },
   } satisfies ChartConfig;
@@ -129,9 +130,22 @@ export default function Analytics() {
       return;
     }
 
+    let calType = profile?.user_settings.calendar_type;
     if (dataRpc) {
       const formattedChartData = dataRpc.map((item: any) => ({
-        label: format(new Date(item.period_start), "MM/dd"), // Format date for X-axis label
+        label: new Date(item.period_start).toLocaleString(calType === "hijri" ? "ar-SA" : "en-US", {
+          day: "2-digit",
+          month: "2-digit",
+          // year: "numeric",
+        }), // Format date for X-axis label
+        tooltipLabel: new Date(item.period_start).toLocaleString(
+          calType === "hijri" ? "ar-SA" : "en-US",
+          {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          },
+        ), // Format date for X-axis label
         added: item[selectedModule.add],
         updated: item[selectedModule.update],
         removed: item[selectedModule.delete],
@@ -256,13 +270,17 @@ export default function Analytics() {
         {/* <LinesChart
           title={t("Analytics.crud_analytics_title")}
           description={t("Analytics.crud_analytics_description")}
-          data={branchAnalyticsData.chartData}
-          config={branchChartConfig}
+          data={analyticsData.chartData}
+          config={chartConfig}
           xAxisKey="label"
           lines={[
-            { dataKey: "added", name: t("Analytics.add_actions"), stroke: "#3b82f6" },
-            { dataKey: "removed", name: t("Analytics.delete_actions"), stroke: "#ef4444" },
-            { dataKey: "updated", name: t("Analytics.update_actions"), stroke: "#3b82f6" },
+            { dataKey: "added", name: t("Analytics.add_actions"), stroke: "var(--chart-green)" },
+            { dataKey: "removed", name: t("Analytics.delete_actions"), stroke: "var(--chart-red)" },
+            {
+              dataKey: "updated",
+              name: t("Analytics.update_actions"),
+              stroke: "var(--chart-blue)",
+            },
           ]}
         /> */}
         <CrudChart
