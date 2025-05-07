@@ -1,6 +1,7 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import DataPageLayout from "@/components/layouts/data-page-layout";
 import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,11 +9,46 @@ import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ActivityLogDialog } from "@/modules/activity/activity.dialog";
 import { ActivityLogFilters } from "@/modules/activity/activity.filters";
 import { ActivityLogTable } from "@/modules/activity/activity.table";
+import { useActivityLogs, activityLogKeys } from "@/modules/activity/activity.hook";
+import { createClient } from "@/utils/supabase/component"; // Import Supabase client
 
 const ActivityPage = () => {
   const t = useTranslations();
+  const queryClient = useQueryClient(); // Get query client
+  const { data, isLoading, error } = useActivityLogs(1, 10); // Default page 1, pageSize 10
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    // Data fetching is handled by the useActivityLogs hook.
+    // Log data or error
+    if (data) {
+      // console.log("Activity logs:", data);
+    }
+    if (error) {
+      console.error("Error fetching activity logs:", error);
+    }
+  }, [data, error]);
+
+  useEffect(() => {
+    const supabase = createClient(); // Create Supabase client instance
+
+    const channel = supabase
+      .channel("activity_log_changes")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "activity_log" },
+        (payload) => {
+          console.log("New activity log received:", payload.new);
+          // Invalidate the query to refetch activity logs
+          queryClient.invalidateQueries({ queryKey: activityLogKeys.lists() });
+        },
+      )
+      .subscribe();
+
+    // Cleanup subscription on component unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]); // Add queryClient to dependency array
 
   return (
     <DataPageLayout>
