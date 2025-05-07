@@ -295,6 +295,13 @@
       "when": 1746606386849,
       "tag": "0041_oval_owl",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1746607780326,
+      "tag": "0042_perpetual_nick_fury",
+      "breakpoints": true
     }
   ]
 }

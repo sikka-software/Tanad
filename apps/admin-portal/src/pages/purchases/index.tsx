@@ -16,78 +16,78 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import BranchCard from "@/branch/branch.card";
-import { BranchForm } from "@/branch/branch.form";
+import PurchaseCard from "@/purchase/purchase.card";
+import { PurchaseForm } from "@/purchase/purchase.form";
 import {
-  useBranches,
-  useBulkDeleteBranches,
-  useDuplicateBranch,
-  useUpdateBranch,
-} from "@/branch/branch.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/branch/branch.options";
-import useBranchStore from "@/branch/branch.store";
-import BranchesTable from "@/branch/branch.table";
-import { Branch, BranchUpdateData } from "@/branch/branch.type";
+  usePurchases,
+  useBulkDeletePurchases,
+  useDuplicatePurchase,
+  useUpdatePurchase,
+} from "@/purchase/purchase.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/purchase/purchase.options";
+import usePurchaseStore from "@/purchase/purchase.store";
+import PurchasesTable from "@/purchase/purchase.table";
+import { Purchase, PurchaseUpdateData } from "@/purchase/purchase.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-export default function BranchesPage() {
+export default function PurchasesPage() {
   const t = useTranslations();
   const router = useRouter();
 
-  const canReadBranches = useUserStore((state) => state.hasPermission("branches.read"));
-  const canCreateBranches = useUserStore((state) => state.hasPermission("branches.create"));
+  const canReadPurchases = useUserStore((state) => state.hasPermission("purchases.read"));
+  const canCreatePurchases = useUserStore((state) => state.hasPermission("purchases.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
-  const [displayData, setDisplayData] = useState<Branch[]>([]);
+  const [actionablePurchase, setActionablePurchase] = useState<PurchaseUpdateData | null>(null);
+  const [displayData, setDisplayData] = useState<Purchase[]>([]);
 
-  const loadingSaveBranch = useBranchStore((state) => state.isLoading);
-  const setLoadingSaveBranch = useBranchStore((state) => state.setIsLoading);
-  const viewMode = useBranchStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useBranchStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useBranchStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useBranchStore((state) => state.selectedRows);
-  const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
-  const clearSelection = useBranchStore((state) => state.clearSelection);
-  const sortRules = useBranchStore((state) => state.sortRules);
-  const sortCaseSensitive = useBranchStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useBranchStore((state) => state.sortNullsFirst);
-  const searchQuery = useBranchStore((state) => state.searchQuery);
-  const filterConditions = useBranchStore((state) => state.filterConditions);
-  const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
-  const getFilteredBranches = useBranchStore((state) => state.getFilteredData);
-  const getSortedBranches = useBranchStore((state) => state.getSortedData);
-  const setViewMode = useBranchStore((state) => state.setViewMode);
+  const loadingSavePurchase = usePurchaseStore((state) => state.isLoading);
+  const setLoadingSavePurchase = usePurchaseStore((state) => state.setIsLoading);
+  const viewMode = usePurchaseStore((state) => state.viewMode);
+  const isDeleteDialogOpen = usePurchaseStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = usePurchaseStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = usePurchaseStore((state) => state.selectedRows);
+  const setSelectedRows = usePurchaseStore((state) => state.setSelectedRows);
+  const clearSelection = usePurchaseStore((state) => state.clearSelection);
+  const sortRules = usePurchaseStore((state) => state.sortRules);
+  const sortCaseSensitive = usePurchaseStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = usePurchaseStore((state) => state.sortNullsFirst);
+  const searchQuery = usePurchaseStore((state) => state.searchQuery);
+  const filterConditions = usePurchaseStore((state) => state.filterConditions);
+  const filterCaseSensitive = usePurchaseStore((state) => state.filterCaseSensitive);
+  const getFilteredPurchases = usePurchaseStore((state) => state.getFilteredData);
+  const getSortedPurchases = usePurchaseStore((state) => state.getSortedData);
+  const setViewMode = usePurchaseStore((state) => state.setViewMode);
 
-  const { data: branches, isLoading: loadingFetchBranches, error } = useBranches();
-  const { mutate: duplicateBranch } = useDuplicateBranch();
-  const { mutateAsync: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
-  const { mutate: updateBranch } = useUpdateBranch();
+  const { data: purchases, isLoading: loadingFetchPurchases, error } = usePurchases();
+  const { mutate: duplicatePurchase } = useDuplicatePurchase();
+  const { mutateAsync: deletePurchases, isPending: isDeleting } = useBulkDeletePurchases();
+  const { mutate: updatePurchase } = useUpdatePurchase();
   const { createDeleteHandler } = useDeleteHandler();
 
   useEffect(() => {
-    if (branches) {
-      setDisplayData(branches);
+    if (purchases) {
+      setDisplayData(purchases);
     } else {
       setDisplayData([]);
     }
-  }, [branches]);
+  }, [purchases]);
 
   const { handleAction: onActionClicked } = useDataTableActions({
     data: displayData,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableBranch,
-    duplicateMutation: duplicateBranch,
-    moduleName: "Branches",
+    setActionableItem: setActionablePurchase,
+    duplicateMutation: duplicatePurchase,
+    moduleName: "Purchases",
   });
 
-  const handleConfirmDelete = createDeleteHandler(deleteBranches, {
-    loading: "Branches.loading.delete",
-    success: "Branches.success.delete",
-    error: "Branches.error.delete",
+  const handleConfirmDelete = createDeleteHandler(deletePurchases, {
+    loading: "Purchases.loading.delete",
+    success: "Purchases.success.delete",
+    error: "Purchases.error.delete",
     onSuccess: () => {
       setDisplayData((current) => current.filter((row) => !selectedRows.includes(row.id)));
       clearSelection();
@@ -95,20 +95,20 @@ export default function BranchesPage() {
     },
   });
 
-  const filteredBranches = useMemo(() => {
-    return getFilteredBranches(displayData);
-  }, [displayData, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
+  const filteredPurchases = useMemo(() => {
+    return getFilteredPurchases(displayData);
+  }, [displayData, getFilteredPurchases, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const sortedBranches = useMemo(() => {
-    return getSortedBranches(filteredBranches);
-  }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
+  const sortedPurchases = useMemo(() => {
+    return getSortedPurchases(filteredPurchases);
+  }, [filteredPurchases, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  if (!canReadBranches) {
+  if (!canReadPurchases) {
     return <NoPermission />;
   }
   return (
     <div>
-      <CustomPageMeta title={t("Branches.title")} description={t("Branches.description")} />
+      <CustomPageMeta title={t("Purchases.title")} description={t("Purchases.description")} />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -119,13 +119,15 @@ export default function BranchesPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useBranchStore}
+            store={usePurchaseStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Branches.title")}
-            onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Branches.create_new")}
-            searchPlaceholder={t("Branches.search_branches")}
+            title={t("Purchases.title")}
+            onAddClick={
+              canCreatePurchases ? () => router.push(router.pathname + "/add") : undefined
+            }
+            createLabel={t("Purchases.create_new")}
+            searchPlaceholder={t("Purchases.search_purchases")}
             count={displayData?.length}
             hideOptions={displayData?.length === 0}
           />
@@ -133,20 +135,20 @@ export default function BranchesPage() {
 
         <div>
           {viewMode === "table" ? (
-            <BranchesTable
-              data={sortedBranches}
-              isLoading={loadingFetchBranches}
+            <PurchasesTable
+              data={sortedPurchases}
+              isLoading={loadingFetchPurchases}
               error={error instanceof Error ? error : null}
               onActionClicked={onActionClicked}
             />
           ) : viewMode === "cards" ? (
             <div className="p-4">
               <DataModelList
-                data={sortedBranches}
-                isLoading={loadingFetchBranches}
+                data={sortedPurchases}
+                isLoading={loadingFetchPurchases}
                 error={error as Error | null}
-                emptyMessage={t("Branches.no_branches_found")}
-                renderItem={(branch) => <BranchCard key={branch.id} branch={branch} />}
+                emptyMessage={t("Purchases.no_purchases_found")}
+                renderItem={(purchase) => <PurchaseCard key={purchase.id} purchase={purchase} />}
                 gridCols="3"
               />
             </div>
@@ -156,18 +158,18 @@ export default function BranchesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Branches.add_new")}
-          formId="branch-form"
-          loadingSave={loadingSaveBranch}
+          title={t("Purchases.add_new")}
+          formId="purchase-form"
+          loadingSave={loadingSavePurchase}
         >
-          <BranchForm
-            formHtmlId={"branch-form"}
+          <PurchaseForm
+            formHtmlId={"purchase-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableBranch(null);
-              setLoadingSaveBranch(false);
+              setActionablePurchase(null);
+              setLoadingSavePurchase(false);
             }}
-            defaultValues={actionableBranch as Branch}
+            defaultValues={actionablePurchase as Purchase}
             editMode={true}
           />
         </FormDialog>
@@ -177,8 +179,8 @@ export default function BranchesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Branches.confirm_delete")}
-          description={t("Branches.delete_description", { count: selectedRows.length })}
+          title={t("Purchases.confirm_delete")}
+          description={t("Purchases.delete_description", { count: selectedRows.length })}
         />
       </DataPageLayout>
     </div>

@@ -8,54 +8,44 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { BranchForm } from "@/branch/branch.form";
-import useBranchStore from "@/branch/branch.store";
+import { PurchaseForm } from "@/purchase/purchase.form";
+import usePurchaseStore from "@/purchase/purchase.store";
 
-export default function AddBranchPage() {
+export default function AddPurchasePage() {
   const router = useRouter();
   const t = useTranslations();
 
-  const setIsLoading = useBranchStore((state) => state.setIsLoading);
-  const isLoading = useBranchStore((state) => state.isLoading);
+  const setIsLoading = usePurchaseStore((state) => state.setIsLoading);
+  const isLoading = usePurchaseStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
-    const form = (window as any).branchForm;
+    const form = (window as any).purchaseForm;
     if (form) {
-      form.setValue("name", dummyData.full_name);
-      form.setValue("code", "BR-" + Math.random().toString(36).substr(2, 6));
-      form.setValue("email", dummyData.email);
-      form.setValue("phone", dummyData.phone);
-      form.setValue("address", dummyData.address);
-      form.setValue("city", dummyData.city);
-      form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zip_code);
-      form.setValue("manager", dummyData.full_name);
-      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-      form.setValue("notes", "Test branch notes");
+      form.setValue("purchase_number", dummyData.randomNumber);
     }
   };
 
   return (
     <div>
-      <CustomPageMeta title={t("Branches.add_new")} />
+      <CustomPageMeta title={t("Purchases.add_new")} />
       <PageTitle
         formButtons
-        formId="branch-form"
+        formId="purchase-form"
         loading={isLoading}
-        onCancel={() => router.push("/branches")}
+        onCancel={() => router.push("/purchases")}
         texts={{
-          title: t("Branches.add_new"),
-          submit_form: t("Branches.add_new"),
+          title: t("Purchases.add_new"),
+          submit_form: t("Purchases.add_new"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
       />
 
-      <BranchForm
-        formHtmlId="branch-form"
+      <PurchaseForm
+        formHtmlId="purchase-form"
         onSuccess={() => {
-          router.push("/branches");
+          router.push("/purchases");
           setIsLoading(false);
         }}
       />

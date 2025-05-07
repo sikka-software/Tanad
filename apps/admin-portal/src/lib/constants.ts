@@ -204,6 +204,14 @@ export const MODULE_ANALYTICS = [
     delete: "expenses_removed",
   },
   {
+    key: "purchase",
+    rpc: "get_module_analytics_purchases",
+    title: "Purchases.title",
+    add: "purchases_added",
+    update: "purchases_updated",
+    delete: "purchases_removed",
+  },
+  {
     key: "employee_request",
     rpc: "get_module_analytics_employee_request",
     title: "EmployeeRequests.title",

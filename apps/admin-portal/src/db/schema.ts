@@ -214,6 +214,18 @@ export const app_permission = pgEnum("app_permission", [
   "servers.update",
   "servers.export",
   "servers.duplicate",
+  "purchases.read",
+  "purchases.create",
+  "purchases.delete",
+  "purchases.update",
+  "purchases.export",
+  "purchases.duplicate",
+  "websites.read",
+  "websites.create",
+  "websites.delete",
+  "websites.update",
+  "websites.export",
+  "websites.duplicate",
 ]);
 export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
 export const payment_cycle = pgEnum("payment_cycle", ["monthly", "annual"]);

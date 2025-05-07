@@ -183,6 +183,20 @@ const systemRolePermissions: Record<string, string[]> = {
     "servers.update",
     "servers.duplicate",
     "servers.export",
+
+    "purchases.read",
+    "purchases.create",
+    "purchases.delete",
+    "purchases.update",
+    "purchases.duplicate",
+    "purchases.export",
+
+    "websites.read",
+    "websites.create",
+    "websites.delete",
+    "websites.update",
+    "websites.duplicate",
+    "websites.export",
   ],
   human_resources: [
     "jobs.read",
