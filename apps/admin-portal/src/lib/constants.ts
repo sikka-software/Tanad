@@ -113,6 +113,22 @@ export const SERVER_PROVIDERS = [
   },
 ];
 
+export const MODULE_ANALYTICS = [
+  {
+    rpc: "get_module_analytics_branch",
+    title: "Branches.title",
+    add: "branches_added",
+    update: "branches_updated",
+    delete: "branches_removed",
+  },
+  {
+    rpc: "get_module_analytics_job",
+    title: "Jobs.title",
+    add: "jobs_added",
+    update: "jobs_updated",
+    delete: "jobs_removed",
+  },
+];
 export const fakeAnalyticsData = [
   {
     country: "Saudi Arabia",

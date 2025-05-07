@@ -1,6 +1,7 @@
 "use client";
 
 import { TrendingUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -18,58 +19,75 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
+interface CrudChartProps {
+  title: string;
+  description?: string;
+  chartData: Array<Record<string, any>>;
+  chartConfig: ChartConfig;
+  xAxisKey: string;
+  footerPrimaryText?: string;
+  footerSecondaryText?: string;
+}
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--chart-1)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--chart-2)",
-  },
-} satisfies ChartConfig;
+export function CrudChart({
+  title,
+  description,
+  chartData,
+  chartConfig,
+  xAxisKey,
+  footerPrimaryText,
+  footerSecondaryText,
+}: CrudChartProps) {
+  const t = useTranslations("General");
 
-export function CrudChart() {
+  if (!chartData || chartData.length === 0) {
+    return (
+      <Card className="flex w-1/2 items-center justify-center" style={{ height: "350px" }}>
+        <CardContent>
+          <p>{t("no_data_available")}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="w-1/2">
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Bar Chart - Multiple</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey={xAxisKey}
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) =>
+                typeof value === "string" ? value.slice(0, 3) : String(value)
+              }
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+            {Object.keys(chartConfig).map((key) => (
+              <Bar key={key} dataKey={key} fill={`var(--color-${key})`} radius={4} />
+            ))}
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="text-muted-foreground leading-none">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
+      {(footerPrimaryText || footerSecondaryText) && (
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          {footerPrimaryText && (
+            <div className="flex gap-2 leading-none font-medium">
+              {footerPrimaryText} <TrendingUp className="h-4 w-4" />
+            </div>
+          )}
+          {footerSecondaryText && (
+            <div className="text-muted-foreground leading-none">{footerSecondaryText}</div>
+          )}
+        </CardFooter>
+      )}
     </Card>
   );
 }

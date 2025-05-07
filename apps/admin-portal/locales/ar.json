@@ -1125,7 +1125,12 @@
     "coming_soon": "التحليلات قادمة قريباً",
     "analytics_overview": "عرض التحليلات العامة",
     "analytics_overview_description": "عرض التحليلات العامة بالنسبة لبكلتك",
-    "select_date_range": "اختر نطاق التاريخ"
+    "select_date_range": "اختر نطاق التاريخ",
+    "crud_analytics_title": "حركة البيانات",
+    "crud_analytics_description": "تحليلات الإضافة والتحديث والحذف",
+    "add_actions": "الإضافات",
+    "update_actions": "التحديثات",
+    "delete_actions": "الحذف"
   },
   "Billing": {
     "pro_plan": "الباقة الإحترافية",

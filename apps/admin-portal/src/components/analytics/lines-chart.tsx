@@ -2,10 +2,7 @@
 
 import { TrendingUp } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Line } from "recharts";
-import { Legend, LineChart, Tooltip, YAxis } from "recharts";
-import { ResponsiveContainer } from "recharts";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Line, LineChart, CartesianGrid, XAxis, Tooltip } from "recharts";
 
 import {
   Card,
@@ -15,82 +12,81 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
+interface LineProps {
+  dataKey: string;
+  name: string;
+  stroke?: string;
+  label?: string;
+}
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--chart-1)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--chart-2)",
-  },
-} satisfies ChartConfig;
+interface LinesChartProps {
+  title: string;
+  description?: string;
+  data: Array<Record<string, any>>;
+  config: ChartConfig;
+  xAxisKey: string;
+  lines: LineProps[];
+  footerPrimaryText?: string;
+  footerSecondaryText?: string;
+}
 
-function LinesChart({ data, config }: { data: any[]; config: ChartConfig }) {
+function LinesChart({
+  title,
+  description,
+  data,
+  config,
+  xAxisKey,
+  lines,
+  footerPrimaryText,
+  footerSecondaryText,
+}: LinesChartProps) {
   const t = useTranslations();
 
   if (!data || data.length === 0) {
     return (
-      <div
-        style={{ height: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}
-      >
-        {t("General.no_data_available")}
-      </div>
+      <Card className="flex w-1/2 items-center justify-center" style={{ height: "350px" }}>
+        <CardContent>
+          <p>{t("General.no_data_available")}</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <Card className="w-1/2">
       <CardHeader>
-        <CardTitle>Bar Chart - Multiple</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
         <ChartContainer config={config}>
-          <LineChart
-            data={data}
-            // margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-          >
+          <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} />
-            {/* <YAxis tickLine={false} axisLine={false} allowDecimals={false} /> */}
+            <XAxis dataKey={xAxisKey} tickLine={false} axisLine={false} tickMargin={8} />
             <Tooltip
-              content={({ active, payload, label }) => {
+              content={({ active, payload, label: xAxisLabel }) => {
                 if (active && payload && payload.length) {
                   return (
                     <div className="bg-background rounded-lg border p-2 shadow-sm">
                       <div className="grid grid-cols-1 gap-1.5 text-sm">
-                        <span className="font-bold">{label}</span>
-                        {payload.map((entry) => (
-                          <div key={entry.name} className="flex items-center">
-                            <span
-                              className="mr-2 h-2.5 w-2.5 shrink-0 rounded-full"
-                              style={{ backgroundColor: entry.color }}
-                            />
-                            <span className="flex-1 truncate">
-                              {entry.name === "added"
-                                ? t("Analytics.branches_added")
-                                : t("Analytics.branches_removed")}
-                              {`: ${entry.value}`}
-                            </span>
-                          </div>
-                        ))}
+                        {xAxisLabel && <span className="font-bold">{xAxisLabel}</span>}
+                        {payload.map((entry) => {
+                          const lineConfig = lines.find((l) => l.dataKey === entry.name);
+                          const entryLabel = lineConfig?.label || entry.name;
+                          return (
+                            <div key={entry.name} className="flex items-center">
+                              <span
+                                className="mr-2 h-2.5 w-2.5 shrink-0 rounded-full"
+                                style={{ backgroundColor: entry.color }}
+                              />
+                              <span className="flex-1 truncate">
+                                {`${entryLabel}: ${entry.value}`}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
@@ -98,42 +94,33 @@ function LinesChart({ data, config }: { data: any[]; config: ChartConfig }) {
                 return null;
               }}
             />
-            {/* <Legend
-              formatter={(value) => {
-                if (value === "added") return t("Analytics.branches_added");
-                if (value === "removed") return t("Analytics.branches_removed");
-                return value;
-              }}
-            /> */}
-            <Line
-              type="monotone"
-              dataKey="added"
-              name="added"
-              stroke={config.added?.color || "#3b82f6"}
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="removed"
-              name="removed"
-              stroke={config.removed?.color || "#ef4444"}
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
+            {lines.map((line) => (
+              <Line
+                key={line.dataKey}
+                // type="monotone"
+                dataKey={line.dataKey}
+                name={line.name}
+                stroke={line.stroke || config[line.dataKey]?.color || "#8884d8"}
+                strokeWidth={2}
+                dot={{ r: 2 }}
+                activeDot={{ r: 6 }}
+              />
+            ))}
           </LineChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="text-muted-foreground leading-none">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
+      {(footerPrimaryText || footerSecondaryText) && (
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          {footerPrimaryText && (
+            <div className="flex gap-2 leading-none font-medium">
+              {footerPrimaryText} <TrendingUp className="h-4 w-4" />
+            </div>
+          )}
+          {footerSecondaryText && (
+            <div className="text-muted-foreground leading-none">{footerSecondaryText}</div>
+          )}
+        </CardFooter>
+      )}
     </Card>
   );
 }
