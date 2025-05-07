@@ -168,6 +168,7 @@ export default function CompaniesPage() {
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
           title={t("Companies.confirm_delete", { count: selectedRows.length })}
           description={t("Companies.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

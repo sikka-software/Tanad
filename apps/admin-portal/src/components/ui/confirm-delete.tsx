@@ -1,5 +1,6 @@
 import { Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 
 import {
   Dialog,
@@ -11,6 +12,7 @@ import {
 } from "@/ui/dialog";
 
 import { Button } from "./button";
+import { Input } from "./input";
 
 interface ConfirmDeleteProps {
   isDeleteDialogOpen: boolean;
@@ -19,6 +21,7 @@ interface ConfirmDeleteProps {
   handleConfirmDelete: () => void;
   title: string;
   description: string;
+  extraConfirm?: boolean;
 }
 const ConfirmDelete = ({
   isDeleteDialogOpen,
@@ -27,9 +30,14 @@ const ConfirmDelete = ({
   handleConfirmDelete,
   title,
   description,
+  extraConfirm,
 }: ConfirmDeleteProps) => {
   const t = useTranslations();
   const locale = useLocale();
+  const [confirmText, setConfirmText] = useState("");
+
+  const confirmString = locale === "ar" ? "نعم" : "confirm";
+
   return (
     <Dialog
       open={isDeleteDialogOpen}
@@ -44,13 +52,25 @@ const ConfirmDelete = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
+        {extraConfirm && (
+          <>
+            <DialogDescription>
+              {t("General.extra_confirm_typed", { confirmString: confirmString })}
+            </DialogDescription>
+            <Input
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder={t("General.yes")}
+            />
+          </>
+        )}
         <DialogFooter>
           <Button onClick={() => setIsDeleteDialogOpen(false)} disabled={isDeleting}>
             {t("General.cancel")}
           </Button>
           <Button
             onClick={handleConfirmDelete}
-            disabled={isDeleting}
+            disabled={isDeleting || (extraConfirm && confirmText !== confirmString)}
             className="bg-destructive hover:bg-destructive/90 min-w-24 text-white"
           >
             {isDeleting ? (

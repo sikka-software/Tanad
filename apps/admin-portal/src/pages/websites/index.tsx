@@ -174,9 +174,13 @@ export default function WebsitesPage() {
           isDeleteDialogOpen={isDeleteDialogOpen}
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
-          handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          // handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
+          handleConfirmDelete={() => {
+            console.log("pretend");
+          }}
           title={t("Websites.confirm_delete", { count: selectedRows.length })}
           description={t("Websites.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

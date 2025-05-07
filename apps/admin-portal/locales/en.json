@@ -43,6 +43,8 @@
     "role": "Role",
     "view": "View",
     "actions": "Actions",
+    "yes": "confirm",
+    "extra_confirm_typed": "Type \"{confirmString}\" to confirm the deletion",
     "duplicate": "Duplicate",
     "successful_operation": "Successful Operation",
     "error_operation": "Error Operation",
