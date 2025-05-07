@@ -101,7 +101,6 @@ export function WebsiteForm({
           {
             onSuccess: () => {
               setIsLoading(false);
-              toast.success(t("Websites.toast.update_success"));
               if (onSuccess) onSuccess();
             },
             onError: (error: any) => {
@@ -116,7 +115,6 @@ export function WebsiteForm({
         await createWebsite(payload as WebsiteCreateData, {
           onSuccess: () => {
             setIsLoading(false);
-            toast.success(t("Websites.toast.create_success"));
             if (onSuccess) onSuccess();
           },
           onError: (error: any) => {

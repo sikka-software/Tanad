@@ -16,78 +16,77 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import BranchCard from "@/branch/branch.card";
-import { BranchForm } from "@/branch/branch.form";
+import WebsiteCard from "@/modules/website/website.card";
+import { WebsiteForm } from "@/modules/website/website.form";
 import {
-  useBranches,
-  useBulkDeleteBranches,
-  useDuplicateBranch,
-  useUpdateBranch,
-} from "@/branch/branch.hooks";
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/branch/branch.options";
-import useBranchStore from "@/branch/branch.store";
-import BranchesTable from "@/branch/branch.table";
-import { Branch, BranchUpdateData } from "@/branch/branch.type";
+  useWebsites,
+  useBulkDeleteWebsites,
+  useDuplicateWebsite,
+  useUpdateWebsite,
+} from "@/modules/website/website.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/website/website.options";
+import useWebsiteStore from "@/modules/website/website.store";
+import WebsitesTable from "@/modules/website/website.table";
+import { Website, WebsiteUpdateData } from "@/modules/website/website.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-export default function BranchesPage() {
+export default function WebsitesPage() {
   const t = useTranslations();
   const router = useRouter();
 
-  const canReadBranches = useUserStore((state) => state.hasPermission("branches.read"));
-  const canCreateBranches = useUserStore((state) => state.hasPermission("branches.create"));
+  const canReadWebsites = useUserStore((state) => state.hasPermission("websites.read"));
+  const canCreateWebsites = useUserStore((state) => state.hasPermission("websites.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
-  const [displayData, setDisplayData] = useState<Branch[]>([]);
+  const [actionableWebsite, setActionableWebsite] = useState<Website | null>(null);
+  const [displayData, setDisplayData] = useState<Website[]>([]);
 
-  const loadingSaveBranch = useBranchStore((state) => state.isLoading);
-  const setLoadingSaveBranch = useBranchStore((state) => state.setIsLoading);
-  const viewMode = useBranchStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useBranchStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useBranchStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useBranchStore((state) => state.selectedRows);
-  const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
-  const clearSelection = useBranchStore((state) => state.clearSelection);
-  const sortRules = useBranchStore((state) => state.sortRules);
-  const sortCaseSensitive = useBranchStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useBranchStore((state) => state.sortNullsFirst);
-  const searchQuery = useBranchStore((state) => state.searchQuery);
-  const filterConditions = useBranchStore((state) => state.filterConditions);
-  const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
-  const getFilteredBranches = useBranchStore((state) => state.getFilteredData);
-  const getSortedBranches = useBranchStore((state) => state.getSortedData);
-  const setViewMode = useBranchStore((state) => state.setViewMode);
+  const loadingSaveWebsite = useWebsiteStore((state) => state.isLoading);
+  const setLoadingSaveWebsite = useWebsiteStore((state) => state.setIsLoading);
+  const viewMode = useWebsiteStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useWebsiteStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useWebsiteStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useWebsiteStore((state) => state.selectedRows);
+  const setSelectedRows = useWebsiteStore((state) => state.setSelectedRows);
+  const clearSelection = useWebsiteStore((state) => state.clearSelection);
+  const sortRules = useWebsiteStore((state) => state.sortRules);
+  const sortCaseSensitive = useWebsiteStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useWebsiteStore((state) => state.sortNullsFirst);
+  const searchQuery = useWebsiteStore((state) => state.searchQuery);
+  const filterConditions = useWebsiteStore((state) => state.filterConditions);
+  const filterCaseSensitive = useWebsiteStore((state) => state.filterCaseSensitive);
+  const getFilteredWebsites = useWebsiteStore((state) => state.getFilteredData);
+  const getSortedWebsites = useWebsiteStore((state) => state.getSortedData);
+  const setViewMode = useWebsiteStore((state) => state.setViewMode);
 
-  const { data: branches, isLoading: loadingFetchBranches, error } = useBranches();
-  const { mutate: duplicateBranch } = useDuplicateBranch();
-  const { mutateAsync: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
-  const { mutate: updateBranch } = useUpdateBranch();
+  const { data: websites, isLoading: loadingFetchWebsites, error } = useWebsites();
+  const { mutate: duplicateWebsite } = useDuplicateWebsite();
+  const { mutateAsync: deleteWebsites, isPending: isDeleting } = useBulkDeleteWebsites();
   const { createDeleteHandler } = useDeleteHandler();
 
   useEffect(() => {
-    if (branches) {
-      setDisplayData(branches);
+    if (websites) {
+      setDisplayData(websites);
     } else {
       setDisplayData([]);
     }
-  }, [branches]);
+  }, [websites]);
 
-  const { handleAction: onActionClicked } = useDataTableActions({
+  const { handleAction: onActionClicked } = useDataTableActions<Website>({
     data: displayData,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableBranch,
-    duplicateMutation: duplicateBranch,
-    moduleName: "Branches",
+    setActionableItem: setActionableWebsite,
+    duplicateMutation: duplicateWebsite,
+    moduleName: "Websites",
   });
 
-  const handleConfirmDelete = createDeleteHandler(deleteBranches, {
-    loading: "Branches.loading.delete",
-    success: "Branches.success.delete",
-    error: "Branches.error.delete",
+  const handleConfirmDelete = createDeleteHandler(deleteWebsites, {
+    loading: "Websites.loading.delete",
+    success: "Websites.success.delete",
+    error: "Websites.error.delete",
     onSuccess: () => {
       setDisplayData((current) => current.filter((row) => !selectedRows.includes(row.id)));
       clearSelection();
@@ -95,20 +94,20 @@ export default function BranchesPage() {
     },
   });
 
-  const filteredBranches = useMemo(() => {
-    return getFilteredBranches(displayData);
-  }, [displayData, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
+  const filteredWebsites = useMemo(() => {
+    return getFilteredWebsites(displayData);
+  }, [displayData, getFilteredWebsites, searchQuery, filterConditions, filterCaseSensitive]);
 
-  const sortedBranches = useMemo(() => {
-    return getSortedBranches(filteredBranches);
-  }, [filteredBranches, sortRules, sortCaseSensitive, sortNullsFirst]);
+  const sortedWebsites = useMemo(() => {
+    return getSortedWebsites(filteredWebsites);
+  }, [filteredWebsites, sortRules, sortCaseSensitive, sortNullsFirst]);
 
-  if (!canReadBranches) {
+  if (!canReadWebsites) {
     return <NoPermission />;
   }
   return (
     <div>
-      <CustomPageMeta title={t("Branches.title")} description={t("Branches.description")} />
+      <CustomPageMeta title={t("Websites.title")} description={t("Websites.description")} />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -119,13 +118,13 @@ export default function BranchesPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useBranchStore}
+            store={useWebsiteStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Branches.title")}
-            onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Branches.create_new")}
-            searchPlaceholder={t("Branches.search_branches")}
+            title={t("Websites.title")}
+            onAddClick={canCreateWebsites ? () => router.push(router.pathname + "/add") : undefined}
+            createLabel={t("Websites.create_new")}
+            searchPlaceholder={t("Websites.search_websites")}
             count={displayData?.length}
             hideOptions={displayData?.length === 0}
           />
@@ -133,20 +132,20 @@ export default function BranchesPage() {
 
         <div>
           {viewMode === "table" ? (
-            <BranchesTable
-              data={sortedBranches}
-              isLoading={loadingFetchBranches}
+            <WebsitesTable
+              data={sortedWebsites}
+              isLoading={loadingFetchWebsites}
               error={error instanceof Error ? error : null}
               onActionClicked={onActionClicked}
             />
           ) : viewMode === "cards" ? (
             <div className="p-4">
               <DataModelList
-                data={sortedBranches}
-                isLoading={loadingFetchBranches}
+                data={sortedWebsites}
+                isLoading={loadingFetchWebsites}
                 error={error as Error | null}
-                emptyMessage={t("Branches.no_branches_found")}
-                renderItem={(branch) => <BranchCard key={branch.id} branch={branch} />}
+                emptyMessage={t("Websites.no_websites_found")}
+                renderItem={(website) => <WebsiteCard key={website.id} website={website} />}
                 gridCols="3"
               />
             </div>
@@ -156,19 +155,19 @@ export default function BranchesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Branches.add_new")}
-          formId="branch-form"
-          loadingSave={loadingSaveBranch}
+          title={actionableWebsite?.id ? t("Websites.edit_title") : t("Websites.add_new")}
+          formId="website-form"
+          loadingSave={loadingSaveWebsite}
         >
-          <BranchForm
-            formHtmlId={"branch-form"}
+          <WebsiteForm
+            formHtmlId={"website-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
-              setActionableBranch(null);
-              setLoadingSaveBranch(false);
+              setActionableWebsite(null);
+              setLoadingSaveWebsite(false);
             }}
-            defaultValues={actionableBranch as Branch}
-            editMode={true}
+            defaultValues={actionableWebsite}
+            editMode={!!actionableWebsite?.id}
           />
         </FormDialog>
 
@@ -177,8 +176,8 @@ export default function BranchesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Branches.confirm_delete")}
-          description={t("Branches.delete_description", { count: selectedRows.length })}
+          title={t("Websites.confirm_delete")}
+          description={t("Websites.delete_description", { count: selectedRows.length })}
         />
       </DataPageLayout>
     </div>

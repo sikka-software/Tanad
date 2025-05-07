@@ -8,54 +8,47 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { BranchForm } from "@/branch/branch.form";
-import useBranchStore from "@/branch/branch.store";
+import { WebsiteForm } from "@/modules/website/website.form";
+import useWebsiteStore from "@/modules/website/website.store";
 
-export default function AddBranchPage() {
+export default function AddWebsitePage() {
   const router = useRouter();
   const t = useTranslations();
 
-  const setIsLoading = useBranchStore((state) => state.setIsLoading);
-  const isLoading = useBranchStore((state) => state.isLoading);
+  const setIsLoading = useWebsiteStore((state: any) => state.setIsLoading);
+  const isLoading = useWebsiteStore((state: any) => state.isLoading);
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
-    const form = (window as any).branchForm;
+    const form = (window as any).websiteForm;
     if (form) {
-      form.setValue("name", dummyData.full_name);
-      form.setValue("code", "BR-" + Math.random().toString(36).substr(2, 6));
-      form.setValue("email", dummyData.email);
-      form.setValue("phone", dummyData.phone);
-      form.setValue("address", dummyData.address);
-      form.setValue("city", dummyData.city);
-      form.setValue("state", dummyData.state);
-      form.setValue("zip_code", dummyData.zip_code);
-      form.setValue("manager", dummyData.full_name);
+      const randomSuffix = Math.random().toString(36).substr(2, 6);
+      form.setValue("domain_name", `example-${randomSuffix}.com`);
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-      form.setValue("notes", "Test branch notes");
+      form.setValue("notes", "This is a test website generated on " + new Date().toLocaleDateString());
     }
   };
 
   return (
     <div>
-      <CustomPageMeta title={t("Branches.add_new")} />
+      <CustomPageMeta title={t("Websites.add_new")} />
       <PageTitle
         formButtons
-        formId="branch-form"
+        formId="website-form"
         loading={isLoading}
-        onCancel={() => router.push("/branches")}
+        onCancel={() => router.push("/websites")}
         texts={{
-          title: t("Branches.add_new"),
-          submit_form: t("Branches.add_new"),
+          title: t("Websites.add_new"),
+          submit_form: t("Websites.add_new"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
       />
 
-      <BranchForm
-        formHtmlId="branch-form"
+      <WebsiteForm
+        formHtmlId="website-form"
         onSuccess={() => {
-          router.push("/branches");
+          router.push("/websites");
           setIsLoading(false);
         }}
       />
