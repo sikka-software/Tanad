@@ -85,6 +85,7 @@ export const activity_target_type = pgEnum("activity_target_type", [
   "EMPLOYEE_REQUEST",
   "DOMAIN",
   "WEBSITE",
+  "PURCHASE",
 ]);
 export const app_permission = pgEnum("app_permission", [
   "users.create",
@@ -1335,6 +1336,38 @@ export const expenses = pgTable(
       columns: [table.enterprise_id],
       foreignColumns: [enterprises.id],
       name: "expenses_enterprise_id_fkey",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const purchases = pgTable(
+  "purchases",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    enterprise_id: uuid().notNull(),
+    description: text(),
+    amount: numeric({ precision: 10, scale: 2 }).notNull(),
+    incurred_at: date().default(sql`CURRENT_DATE`),
+    created_by: uuid(),
+    created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
+    category: text().notNull(),
+    due_date: date(),
+    issue_date: date().default(sql`CURRENT_DATE`),
+    notes: text(),
+    purchase_number: text().notNull(),
+    status: text().default("pending").notNull(),
+    user_id: uuid().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.created_by],
+      foreignColumns: [profiles.id],
+      name: "purchases_created_by_fkey",
+    }),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "purchases_enterprise_id_fkey",
     }).onDelete("cascade"),
   ],
 );

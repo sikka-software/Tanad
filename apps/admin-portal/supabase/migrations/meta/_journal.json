@@ -281,6 +281,20 @@
       "when": 1746601296442,
       "tag": "0039_lame_mockingbird",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1746606254424,
+      "tag": "0040_petite_wiccan",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1746606386849,
+      "tag": "0041_oval_owl",
+      "breakpoints": true
     }
   ]
 }

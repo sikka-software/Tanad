@@ -23,6 +23,7 @@ const modelMap: Record<string, ModelConfig> = {
   servers: { table: schema.servers, query: db.query.servers, idField: "id" },
   clients: { table: schema.clients, query: db.query.clients, idField: "id" },
   expenses: { table: schema.expenses, query: db.query.expenses, idField: "id" },
+  purchases: { table: schema.purchases, query: db.query.purchases, idField: "id" },
   departments: { table: schema.departments, query: db.query.departments, idField: "id" },
   department_locations: {
     table: schema.department_locations,
