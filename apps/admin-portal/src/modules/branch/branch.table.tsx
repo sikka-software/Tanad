@@ -120,7 +120,6 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       header: t("Branches.form.zip_code.label"),
       validationSchema: z.string().min(1, t("Branches.form.zip_code.required")),
     },
-
     {
       accessorKey: "status",
       header: t("Branches.form.status.label"),

@@ -121,7 +121,7 @@ const EmployeesTable = ({
         if (department) {
           updates = {
             department_id: department_id,
-              // department: department.name, // Set both department_id and department name
+            // department: department.name, // Set both department_id and department name
           };
         } else {
           updates = {

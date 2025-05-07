@@ -64,11 +64,6 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
       },
     },
     {
-      accessorKey: "status",
-      header: t("Quotes.status.title"),
-      validationSchema: z.enum(["draft", "sent", "accepted", "rejected", "expired"]),
-    },
-    {
       accessorKey: "subtotal",
       header: t("Quotes.subtotal"),
       validationSchema: z.number().min(0, t("Quotes.subtotal.required")),
@@ -80,6 +75,11 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
       header: t("Quotes.tax_rate"),
       validationSchema: z.number().min(0, t("Quotes.tax_rate.required")),
       cell: (props: CellContext<Quote, unknown>) => `${props.row.original.tax_rate || 0}%`,
+    },
+    {
+      accessorKey: "status",
+      header: t("Quotes.status.title"),
+      validationSchema: z.enum(["draft", "sent", "accepted", "rejected", "expired"]),
     },
   ];
 

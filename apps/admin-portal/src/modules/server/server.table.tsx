@@ -65,6 +65,8 @@ const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       cellType: "select",
       options: SERVER_OS,
     },
+    { accessorKey: "tags", header: t("Servers.form.tags.label"), validationSchema: tagsSchema },
+    { accessorKey: "notes", header: t("Servers.form.notes.label"), validationSchema: notesSchema },
     {
       accessorKey: "status",
       cellType: "status",
@@ -75,8 +77,6 @@ const ServersTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       header: t("Servers.form.status.label"),
       validationSchema: statusSchema,
     },
-    { accessorKey: "tags", header: t("Servers.form.tags.label"), validationSchema: tagsSchema },
-    { accessorKey: "notes", header: t("Servers.form.notes.label"), validationSchema: notesSchema },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {

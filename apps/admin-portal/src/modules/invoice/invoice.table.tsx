@@ -103,23 +103,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       header: t("Invoices.form.status.label"),
       validationSchema: z.string().min(1, t("Invoices.form.status.required")),
     },
-    // {
-    //   enableEditing: false,
-    //   id: "preview",
-    //   header: t("General.preview"),
-    //   cell: ({ row }) => {
-    //     const invoice = row.original;
-    //     return (
-    //       <div className="flex space-x-2">
-    //         <Button variant="outline" className="h-4 p-0 !px-2 text-xs" asChild>
-    //           <Link href={`/pay/${invoice.id}`} target="_blank">
-    //             {t("General.preview")}
-    //           </Link>
-    //         </Button>
-    //       </div>
-    //     );
-    //   },
-    // },
+ 
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {

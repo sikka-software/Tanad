@@ -60,23 +60,7 @@ const EmployeeRequestsTable = ({
       header: t("EmployeeRequests.form.title.label"),
       validationSchema: z.string().min(1, t("EmployeeRequests.form.title.required")),
     },
-    {
-      accessorKey: "status",
-      header: t("EmployeeRequests.form.status.label"),
-      cell: ({ row }: { row: { original: EmployeeRequest } }) => {
-        const variant =
-          row.original.status === "approved"
-            ? "secondary"
-            : row.original.status === "rejected"
-              ? "destructive"
-              : "default";
-        return (
-          <Badge variant={variant} className="capitalize">
-            {row.original.status}
-          </Badge>
-        );
-      },
-    },
+
     {
       accessorKey: "start_date",
       header: t("EmployeeRequests.form.date_range.start"),
@@ -104,6 +88,23 @@ const EmployeeRequestsTable = ({
       accessorKey: "notes",
       header: t("EmployeeRequests.form.notes.label"),
       validationSchema: z.string().nullable(),
+    },
+    {
+      accessorKey: "status",
+      header: t("EmployeeRequests.form.status.label"),
+      cell: ({ row }: { row: { original: EmployeeRequest } }) => {
+        const variant =
+          row.original.status === "approved"
+            ? "secondary"
+            : row.original.status === "rejected"
+              ? "destructive"
+              : "default";
+        return (
+          <Badge variant={variant} className="capitalize">
+            {row.original.status}
+          </Badge>
+        );
+      },
     },
   ];
 

@@ -50,18 +50,7 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       header: t("Expenses.form.due_date.label"),
       validationSchema: z.string().min(1, t("Expenses.form.due_date.required")),
     },
-    {
-      accessorKey: "status",
-      header: t("Expenses.form.status.label"),
-      validationSchema: z.enum(["paid", "pending", "rejected", "overdue"]),
-      cellType: "select",
-      options: [
-        { label: t("Expenses.form.status.paid"), value: "paid" },
-        { label: t("Expenses.form.status.pending"), value: "pending" },
-        { label: t("Expenses.form.status.rejected"), value: "rejected" },
-        { label: t("Expenses.form.status.overdue"), value: "overdue" },
-      ],
-    },
+
     {
       accessorKey: "amount",
       header: t("Expenses.form.amount.label"),
@@ -84,6 +73,18 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       accessorKey: "notes",
       header: t("Expenses.form.notes.label"),
       validationSchema: z.string().nullable(),
+    },
+    {
+      accessorKey: "status",
+      header: t("Expenses.form.status.label"),
+      validationSchema: z.enum(["paid", "pending", "rejected", "overdue"]),
+      cellType: "select",
+      options: [
+        { label: t("Expenses.form.status.paid"), value: "paid" },
+        { label: t("Expenses.form.status.pending"), value: "pending" },
+        { label: t("Expenses.form.status.rejected"), value: "rejected" },
+        { label: t("Expenses.form.status.overdue"), value: "overdue" },
+      ],
     },
   ];
 

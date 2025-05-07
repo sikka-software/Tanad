@@ -1,6 +1,5 @@
 import {
   Quote,
-  QuoteItem,
   QuoteCreateData,
   QuoteItemCreateData,
   QuoteUpdateData,

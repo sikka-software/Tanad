@@ -4,6 +4,7 @@ import { Client } from "@/client/client.type";
 
 // Define the base type from the database row
 type QuoteRow = Database["public"]["Tables"]["quotes"]["Row"];
+type QuoteItemRow = Database["public"]["Tables"]["quote_items"]["Row"];
 
 // Extend the base type to include the related Client object
 export type Quote = QuoteRow & {
@@ -25,3 +26,4 @@ export type QuoteCreateData = Omit<Quote, "id" | "created_at" | "client"> & {
 
 export type QuoteUpdateData = Partial<Quote>;
 export type QuoteItemCreateData = Omit<QuoteItem, "id">;
+export type QuoteItemUpdateData = Database["public"]["Tables"]["quote_items"]["Update"];
