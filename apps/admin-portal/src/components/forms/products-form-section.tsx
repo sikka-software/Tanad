@@ -1,4 +1,4 @@
-import { PlusCircle, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useMemo } from "react";
 import type {
@@ -11,6 +11,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 
 import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/combobox-add";
+import { CurrencyInput, MoneyFormatter } from "@/ui/currency-input";
 import { FormField, FormItem, FormControl, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
@@ -20,8 +21,6 @@ import { getCurrencySymbol } from "@/lib/currency-utils";
 import { useProducts } from "@/modules/product/product.hooks";
 import useUserStore from "@/stores/use-user-store";
 
-import { CurrencyInput, MoneyFormatter } from "../ui/currency-input";
-import { SARSymbol } from "../ui/sar-symbol";
 import FormSectionHeader from "./form-section-header";
 
 // Define the props for the component
@@ -108,6 +107,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                     containerClassName="min-w-[150px] w-full"
                     isLoading={productsLoading}
                     defaultValue={formField.value}
+                    popoverClassName="w-full"
                     valueKey={"value"}
                     onChange={(value) => {
                       formField.onChange(value || null);
