@@ -1909,6 +1909,7 @@ export const websites = pgTable(
     updated_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),
+    status: common_status().default("active"),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
     notes: text(),

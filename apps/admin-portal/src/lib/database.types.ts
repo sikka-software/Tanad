@@ -1768,6 +1768,7 @@ export type Database = {
           enterprise_id: string
           id: string
           notes: string | null
+          status: Database["public"]["Enums"]["common_status"] | null
           updated_at: string
           user_id: string
         }
@@ -1777,6 +1778,7 @@ export type Database = {
           enterprise_id: string
           id?: string
           notes?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string
           user_id: string
         }
@@ -1786,6 +1788,7 @@ export type Database = {
           enterprise_id?: string
           id?: string
           notes?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string
           user_id?: string
         }
@@ -2244,6 +2247,18 @@ export type Database = {
         | "servers.update"
         | "servers.export"
         | "servers.duplicate"
+        | "purchases.read"
+        | "purchases.create"
+        | "purchases.delete"
+        | "purchases.update"
+        | "purchases.export"
+        | "purchases.duplicate"
+        | "websites.read"
+        | "websites.create"
+        | "websites.delete"
+        | "websites.update"
+        | "websites.export"
+        | "websites.duplicate"
       app_role: "superadmin" | "admin" | "accounting" | "hr"
       common_status: "active" | "inactive" | "draft" | "archived"
       employee_status:
@@ -2543,6 +2558,18 @@ export const Constants = {
         "servers.update",
         "servers.export",
         "servers.duplicate",
+        "purchases.read",
+        "purchases.create",
+        "purchases.delete",
+        "purchases.update",
+        "purchases.export",
+        "purchases.duplicate",
+        "websites.read",
+        "websites.create",
+        "websites.delete",
+        "websites.update",
+        "websites.export",
+        "websites.duplicate",
       ],
       app_role: ["superadmin", "admin", "accounting", "hr"],
       common_status: ["active", "inactive", "draft", "archived"],
