@@ -65,9 +65,6 @@ export function CrudChart({
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) =>
-                typeof value === "string" ? value.slice(0, 3) : String(value)
-              }
             />
             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
             {Object.keys(chartConfig).map((key) => (

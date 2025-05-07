@@ -3477,101 +3477,101 @@
     "title": "Job Listings"
   },
   "Roles": {
-    "title": "الأدوار",
-    "your_role": "دورك",
-    "create_role": "إنشاء دور جديد",
-    "add_new": "دور جديد",
-    "search_roles": "بحث عن الدور",
-    "role_details": "تفاصيل الدور",
-    "no_permissions": "لا يوجد صلاحيات",
+    "title": "Roles",
+    "your_role": "Your Role",
+    "create_role": "Create New Role",
+    "add_new": "New Role",
+    "search_roles": "Search Roles",
+    "role_details": "Role Details",
+    "no_permissions": "No Permissions",
     "permissions": {
-      "title": "الصلاحيات",
-      "description": "الصلاحيات المتاحة للدور",
-      "read": "القراءة",
-      "create": "إنشاء",
-      "update": "تحديث",
-      "delete": "حذف",
-      "duplicate": "تكرار",
-      "view": "عرض",
-      "manage": "إدارة",
-      "approve": "موافقة",
-      "process": "معالجة",
-      "report": "تقرير",
-      "configure": "تكوين",
-      "manage_users": "إدارة المستخدمين",
-      "invite": "دعوة",
-      "export": "تصدير",
-      "import": "استيراد",
-      "print": "طباعة",
-      "send": "إرسال",
-      "receive": "استلام",
-      "assign": "تعيين",
-      "unassign": "إلغاء التعيين",
-      "edit": "تعديل"
+      "title": "Permissions",
+      "description": "Available permissions for the role",
+      "read": "Read",
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "view": "View",
+      "manage": "Manage",
+      "approve": "Approve",
+      "process": "Process",
+      "report": "Report",
+      "configure": "Configure",
+      "manage_users": "Manage Users",
+      "invite": "Invite",
+      "export": "Export",
+      "import": "Import",
+      "print": "Print",
+      "send": "Send",
+      "receive": "Receive",
+      "assign": "Assign",
+      "unassign": "Unassign",
+      "edit": "Edit"
     },
     "form": {
       "name": {
-        "label": "الاسم",
-        "placeholder": "أدخل اسم الدور",
-        "required": "الاسم مطلوب",
-        "format": "يجب أن يحتوي اسم الدور على أحرف صغيرة وأرقام وشرطات سفلية فقط"
+        "label": "Name",
+        "placeholder": "Enter role name",
+        "required": "Name is required",
+        "format": "Role name must contain only lowercase letters, numbers and underscores"
       },
       "description": {
-        "label": "الوصف",
-        "placeholder": "أدخل وصف الدور",
-        "required": "الوصف مطلوب"
+        "label": "Description",
+        "placeholder": "Enter role description",
+        "required": "Description is required"
       },
       "permissions": {
-        "label": "الصلاحيات"
+        "label": "Permissions"
       }
     },
     "predefined": {
-      "system": "نظام",
+      "system": "System",
       "superadmin": {
-        "title": "مدير النظام",
-        "description": "مدير النظام لديه جميع الصلاحيات للتحكم في النظام والمستخدمين"
+        "title": "System Administrator",
+        "description": "System administrator has all permissions to control the system and users"
       },
       "admin": {
-        "title": "مدير المؤسسة",
-        "description": "مدير المؤسسة لديه جميع الصلاحيات للتحكم في المؤسسة والمستخدمين"
+        "title": "Enterprise Administrator",
+        "description": "Enterprise administrator has all permissions to control the enterprise and users"
       },
       "employee": {
-        "title": "موظف",
-        "description": "الموظف لديه صلاحيات الوصول إلى البيانات الخاصة به"
+        "title": "Employee",
+        "description": "Employee has permissions to access their own data"
       },
       "human_resources": {
-        "title": "مسؤول الموارد البشرية",
-        "description": "موظف الموارد البشرية لديه صلاحيات الوصول إلى البيانات الخاصة بالموارد البشرية"
+        "title": "HR Manager",
+        "description": "HR employee has permissions to access human resources data"
       },
       "accounting": {
-        "title": "مسؤول المحاسبة",
-        "description": "موظف المحاسبة لديه صلاحيات الوصول إلى البيانات الخاصة بالمحاسبة"
+        "title": "Accounting Manager",
+        "description": "Accounting employee has permissions to access accounting data"
       }
     },
     "roles": {
-      "superadmin": "مدير النظام",
-      "admin": "مدير المؤسسة",
-      "employee": "موظف",
-      "hr": "موظف الموارد البشرية",
-      "accounting": "موظف المحاسبة"
+      "superadmin": "System Administrator",
+      "admin": "Enterprise Administrator",
+      "employee": "Employee",
+      "hr": "HR Employee",
+      "accounting": "Accounting Employee"
     },
     "success": {
-      "create": "تم إنشاء الدور بنجاح",
-      "update": "تم تحديث الدور بنجاح",
-      "delete": "تم حذف الدور بنجاح",
-      "duplicate": "تم تكرار الدور بنجاح"
+      "create": "Role created successfully",
+      "update": "Role updated successfully",
+      "delete": "Role deleted successfully",
+      "duplicate": "Role duplicated successfully"
     },
     "loading": {
-      "create": "جاري إنشاء الدور...",
-      "update": "جاري تحديث الدور...",
-      "delete": "جاري حذف الدور...",
-      "duplicate": "جاري تكرار الدور..."
+      "create": "Creating role...",
+      "update": "Updating role...",
+      "delete": "Deleting role...",
+      "duplicate": "Duplicating role..."
     },
     "error": {
-      "create": "حدث خطأ أثناء إنشاء الدور",
-      "update": "حدث خطأ أثناء تحديث الدور",
-      "delete": "حدث خطأ أثناء حذف الدور",
-      "duplicate": "حدث خطأ أثناء تكرار الدور"
+      "create": "Error creating role",
+      "update": "Error updating role",
+      "delete": "Error deleting role",
+      "duplicate": "Error duplicating role"
     }
   },
   "OnlineShops": {
