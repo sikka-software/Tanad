@@ -1,62 +1,25 @@
-import { ColumnDef } from "@tanstack/react-table";
-import {
-  differenceInDays,
-  eachDayOfInterval,
-  eachMonthOfInterval,
-  eachWeekOfInterval,
-  endOfMonth,
-  endOfWeek,
-  format,
-  parseISO,
-  startOfMonth,
-  startOfWeek,
-} from "date-fns";
+import { differenceInDays, endOfMonth, format, parseISO, startOfMonth } from "date-fns";
 import { ar } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
+import { CardDescription } from "@/ui/card";
 import { ChartConfig } from "@/ui/chart";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-// UI Components
-import { Skeleton } from "@/ui/skeleton";
 
 import { createClient } from "@/utils/supabase/component";
 
 import { CrudChart } from "@/components/analytics/crud-chart";
-// Store
-// import { useMainStore } from "@/hooks/main.store"; // User removed this
-
-import AnalyticsTable from "@/components/app/AnalyticsTable";
-// import NoPuklas from "@/components/app/NoPuklas"; // User removed this
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { fakeAnalyticsData } from "@/lib/constants";
-
-// Utils
-// import { fetchPukla, fetchPuklasWithLinkCount } from "@/lib/operations"; // User removed this
-
-import useUserStore from "@/stores/use-user-store";
-
-import LinesChart from "../components/analytics/lines-chart";
+import { MODULE_ANALYTICS } from "@/lib/constants";
 
 export default function Analytics() {
   const supabase = createClient();
@@ -64,7 +27,19 @@ export default function Analytics() {
   const router = useRouter();
   const { locale } = router;
 
-  const [selectedModule, setSelectedModule] = useState<string>("branches");
+  const [selectedModule, setSelectedModule] = useState<{
+    key: string;
+    rpc: string;
+    add: string;
+    update: string;
+    delete: string;
+  }>({
+    key: "branch",
+    rpc: "get_module_analytics_branch",
+    add: "branches_added",
+    update: "branches_updated",
+    delete: "branches_removed",
+  });
 
   const [branchAnalyticsData, setBranchAnalyticsData] = useState<{
     chartData: any[];
@@ -116,39 +91,35 @@ export default function Analytics() {
 
     const daysDifference = differenceInDays(to, from);
 
-    if (selectedModule === "branches") {
-      const { data: branchDataRpc, error: branchError } = await supabase.rpc(
-        "get_module_analytics_branch",
-        {
-          start_date: from.toISOString(),
-          end_date: to.toISOString(),
-          time_interval:
-            daysDifference <= 1
-              ? "hour"
-              : daysDifference <= 7
-                ? "day"
-                : daysDifference <= 31
-                  ? "week"
-                  : "month",
-        },
-      );
+    const { data: dataRpc, error: errorRpc } = await supabase.rpc(selectedModule.rpc, {
+      start_date: from.toISOString(),
+      end_date: to.toISOString(),
+      time_interval:
+        daysDifference <= 1
+          ? "hour"
+          : daysDifference <= 7
+            ? "day"
+            : daysDifference <= 31
+              ? "week"
+              : "month",
+    });
 
-      if (branchError) {
-        console.error("Error fetching branch analytics:", branchError);
-        setBranchAnalyticsData({ chartData: [], tableData: [] }); // Clear data on error
-        return;
-      }
-
-      if (branchDataRpc) {
-        const formattedBranchChartData = branchDataRpc.map((item: any) => ({
-          label: format(new Date(item.period_start), "P"), // Format date for X-axis label
-          added: item.branches_added,
-          updated: item.branches_updated,
-          removed: item.branches_removed,
-        }));
-        setBranchAnalyticsData({ chartData: formattedBranchChartData, tableData: branchDataRpc });
-      }
+    if (errorRpc) {
+      console.error(`Error fetching ${selectedModule.key} analytics:`, errorRpc);
+      setBranchAnalyticsData({ chartData: [], tableData: [] }); // Clear data on error
+      return;
     }
+
+    if (dataRpc) {
+      const formattedBranchChartData = dataRpc.map((item: any) => ({
+        label: format(new Date(item.period_start), "P"), // Format date for X-axis label
+        added: item[selectedModule.add],
+        updated: item[selectedModule.update],
+        removed: item[selectedModule.delete],
+      }));
+      setBranchAnalyticsData({ chartData: formattedBranchChartData, tableData: dataRpc });
+    }
+
     // Add else if for other modules like 'jobs' here
   };
 
@@ -201,13 +172,29 @@ export default function Analytics() {
         </div>
 
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-          <Select value={selectedModule} onValueChange={setSelectedModule}>
+          <Select
+            value={selectedModule.key}
+            onValueChange={(value) => {
+              if (value) {
+                setSelectedModule({
+                  key: value,
+                  rpc: MODULE_ANALYTICS.find((m) => m.key === value)?.rpc || "",
+                  add: MODULE_ANALYTICS.find((m) => m.key === value)?.add || "",
+                  update: MODULE_ANALYTICS.find((m) => m.key === value)?.update || "",
+                  delete: MODULE_ANALYTICS.find((m) => m.key === value)?.delete || "",
+                });
+              }
+            }}
+          >
             <SelectTrigger className="w-full md:w-[180px]">
               <SelectValue placeholder={t("Analytics.select_module")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="branches">{t("Branches.title")}</SelectItem>
-              <SelectItem value="jobs">{t("Jobs.title")}</SelectItem>
+              {MODULE_ANALYTICS.map((module) => (
+                <SelectItem key={module.key} value={module.key}>
+                  {t(module.title)}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 

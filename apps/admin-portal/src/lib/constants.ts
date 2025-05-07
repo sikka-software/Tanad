@@ -115,6 +115,7 @@ export const SERVER_PROVIDERS = [
 
 export const MODULE_ANALYTICS = [
   {
+    key: "branch",
     rpc: "get_module_analytics_branch",
     title: "Branches.title",
     add: "branches_added",
@@ -122,6 +123,7 @@ export const MODULE_ANALYTICS = [
     delete: "branches_removed",
   },
   {
+    key: "job",
     rpc: "get_module_analytics_job",
     title: "Jobs.title",
     add: "jobs_added",
