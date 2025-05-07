@@ -1128,6 +1128,7 @@
     "select_date_range": "اختر نطاق التاريخ",
     "crud_analytics_title": "حركة البيانات",
     "crud_analytics_description": "تحليلات الإضافة والتحديث والحذف",
+    "no_data_available": "لا توجد بيانات متاحة",
     "add_actions": "الإضافات",
     "update_actions": "التحديثات",
     "delete_actions": "الحذف"

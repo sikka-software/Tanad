@@ -69,7 +69,7 @@ export async function deleteInvoice(id: string): Promise<void> {
 
 export async function bulkDeleteInvoices(ids: string[]): Promise<void> {
   try {
-    const response = await fetch("/api/resource/invoices/invoices", {
+    const response = await fetch("/api/resource/invoices", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),

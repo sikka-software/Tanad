@@ -38,13 +38,13 @@ export function CrudChart({
   footerPrimaryText,
   footerSecondaryText,
 }: CrudChartProps) {
-  const t = useTranslations("General");
+  const t = useTranslations();
 
   if (!chartData || chartData.length === 0) {
     return (
       <Card className="flex w-1/2 items-center justify-center" style={{ height: "350px" }}>
         <CardContent>
-          <p>{t("no_data_available")}</p>
+          <p>{t("Analytics.no_data_available")}</p>
         </CardContent>
       </Card>
     );
@@ -60,13 +60,8 @@ export function CrudChart({
         <ChartContainer config={chartConfig}>
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey={xAxisKey}
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-            />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dashed" />} />
+            <XAxis dataKey={xAxisKey} tickLine={false} tickMargin={10} axisLine={false} />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
             {Object.keys(chartConfig).map((key) => (
               <Bar key={key} dataKey={key} fill={`var(--color-${key})`} radius={4} />
             ))}

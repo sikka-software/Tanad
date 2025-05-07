@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Select } from "@radix-ui/react-select";
 import { CurrencyInput } from "@root/src/components/ui/currency-input";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -9,6 +8,7 @@ import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
@@ -30,7 +30,7 @@ export const createDomainSchema = (t: (key: string) => string) => {
     registrar: z.string().optional().or(z.literal("")),
     monthly_cost: z.number().optional().or(z.literal("")),
     annual_cost: z.number().optional().or(z.literal("")),
-    payment_cycle: z.string().optional().or(z.literal("")),
+    payment_cycle: z.string().min(1, t("Domains.form.payment_cycle.required")),
     notes: z.string().optional().or(z.literal("")),
   });
 
@@ -235,7 +235,15 @@ export function DomainForm({
               <FormItem>
                 <FormLabel>{t("Domains.form.payment_cycle.label")}</FormLabel>
                 <FormControl>
-                  <Select {...field} />
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("Domains.form.payment_cycle.placeholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="monthly">{t("Domains.form.payment_cycle.monthly")}</SelectItem>
+                      <SelectItem value="annual">{t("Domains.form.payment_cycle.annual")}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>

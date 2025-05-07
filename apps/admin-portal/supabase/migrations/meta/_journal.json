@@ -260,6 +260,27 @@
       "when": 1746517188680,
       "tag": "0036_tidy_wendigo",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1746600969631,
+      "tag": "0037_high_vermin",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1746601239503,
+      "tag": "0038_natural_deathstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1746601296442,
+      "tag": "0039_lame_mockingbird",
+      "breakpoints": true
     }
   ]
 }

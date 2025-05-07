@@ -130,6 +130,22 @@ export const MODULE_ANALYTICS = [
     update: "jobs_updated",
     delete: "jobs_removed",
   },
+  {
+    key: "server",
+    rpc: "get_module_analytics_server",
+    title: "Servers.title",
+    add: "servers_added",
+    update: "servers_updated",
+    delete: "servers_removed",
+  },
+  {
+    key: "domain",
+    rpc: "get_module_analytics_domain",
+    title: "Domains.title",
+    add: "domains_added",
+    update: "domains_updated",
+    delete: "domains_removed",
+  },
 ];
 export const fakeAnalyticsData = [
   {

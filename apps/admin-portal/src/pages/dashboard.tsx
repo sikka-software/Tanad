@@ -14,7 +14,7 @@ import ActivityCalendar from "@/components/ui/activity-calendar";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { ActivityService } from "@/modules/activity/activity.service";
+import { getActivityCountsByDate } from "@/modules/activity/activity.service";
 import useUserStore from "@/stores/use-user-store";
 
 // Interface for the data returned by the view
@@ -258,7 +258,7 @@ export default function Dashboard() {
           startDate.setFullYear(endDate.getFullYear() - 1);
           startDate.setDate(startDate.getDate() + 1); // Start from the day *after* one year ago
 
-          const counts = await ActivityService.getActivityCountsByDate(startDate, endDate);
+          const counts = await getActivityCountsByDate(startDate, endDate);
           if (isMounted) {
             setActivityCounts(counts);
           }

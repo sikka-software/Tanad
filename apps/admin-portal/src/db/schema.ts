@@ -75,6 +75,7 @@ export const activity_target_type = pgEnum("activity_target_type", [
   "EMPLOYEE",
   "DEPARTMENT",
   "SALARY",
+  "SERVER",
   "JOB_LISTING",
   "APPLICANT",
   "JOB",
@@ -83,6 +84,7 @@ export const activity_target_type = pgEnum("activity_target_type", [
   "ENTERPRISE_SETTINGS",
   "EMPLOYEE_REQUEST",
   "DOMAIN",
+  "WEBSITE",
 ]);
 export const app_permission = pgEnum("app_permission", [
   "users.create",
@@ -1846,6 +1848,47 @@ export const domains = pgTable(
       name: "domains_user_id_users_id_fk",
     }),
     unique("domains_enterprise_id_domain_name_unique").on(table.domain_name, table.enterprise_id),
+  ],
+);
+export const websites = pgTable(
+  "websites",
+  {
+    id: uuid()
+      .default(sql`uuid_generate_v4()`)
+      .primaryKey()
+      .notNull(),
+    domain_name: text().notNull(),
+    created_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+    notes: text(),
+  },
+  (table) => [
+    index("websites_domain_name_idx").using(
+      "btree",
+      table.domain_name.asc().nullsLast().op("text_ops"),
+    ),
+    index("websites_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("websites_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "websites_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "websites_user_id_users_id_fk",
+    }),
+    unique("websites_enterprise_id_domain_name_unique").on(table.domain_name, table.enterprise_id),
   ],
 );
 

@@ -26,7 +26,7 @@ export default function AddDomainPage() {
       form.setValue("registrar", dummyData.email);
       form.setValue("monthly_cost", dummyData.phone);
       form.setValue("annual_cost", dummyData.address);
-      form.setValue("payment_cycle", dummyData.city);
+      form.setValue("payment_cycle", dummyData.randomPicker(["monthly", "annual"]));
       form.setValue("notes", dummyData.state);
     }
   };

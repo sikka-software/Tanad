@@ -41,7 +41,7 @@ export default function Analytics() {
     delete: "branches_removed",
   });
 
-  const [branchAnalyticsData, setBranchAnalyticsData] = useState<{
+  const [analyticsData, setAnalyticsData] = useState<{
     chartData: any[];
     tableData: any[];
   }>({
@@ -65,8 +65,8 @@ export default function Analytics() {
     }
     // Default for SSR or if window is not defined (though localStorage check handles this)
     return {
-        from: startOfMonth(new Date()),
-        to: new Date(),
+      from: startOfMonth(new Date()),
+      to: new Date(),
     };
   });
 
@@ -82,10 +82,22 @@ export default function Analytics() {
     }
   }, [date]);
 
-  const branchChartConfig = {
-    added: { label: t("Analytics.add_actions"), color: "#3b82f6" },
-    updated: { label: t("Analytics.update_actions"), color: "#3b82f6" },
-    removed: { label: t("Analytics.delete_actions"), color: "#ef4444" },
+  const chartConfig = {
+    added: {
+      label: t("Analytics.add_actions"),
+      // color: "#27B376"
+      color: "var(--chart-green)",
+    },
+    updated: {
+      label: t("Analytics.update_actions"),
+      //  color: "#3b82f6"
+      color: "var(--chart-blue)",
+    },
+    removed: {
+      label: t("Analytics.delete_actions"),
+      // color: "#ef4444"
+      color: "var(--chart-red)",
+    },
   } satisfies ChartConfig;
 
   const fetchAnalytics = async (from: Date, to: Date) => {
@@ -113,18 +125,18 @@ export default function Analytics() {
 
     if (errorRpc) {
       console.error(`Error fetching ${selectedModule.key} analytics:`, errorRpc);
-      setBranchAnalyticsData({ chartData: [], tableData: [] }); // Clear data on error
+      setAnalyticsData({ chartData: [], tableData: [] }); // Clear data on error
       return;
     }
 
     if (dataRpc) {
-      const formattedBranchChartData = dataRpc.map((item: any) => ({
+      const formattedChartData = dataRpc.map((item: any) => ({
         label: format(new Date(item.period_start), "MM/dd"), // Format date for X-axis label
         added: item[selectedModule.add],
         updated: item[selectedModule.update],
         removed: item[selectedModule.delete],
       }));
-      setBranchAnalyticsData({ chartData: formattedBranchChartData, tableData: dataRpc });
+      setAnalyticsData({ chartData: formattedChartData, tableData: dataRpc });
     }
 
     // Add else if for other modules like 'jobs' here
@@ -240,7 +252,7 @@ export default function Analytics() {
         </div>
       </div>
 
-      <main className="flex flex-row items-center justify-start gap-4 p-4">
+      <main className="mx-auto flex max-w-2xl flex-row items-center justify-start gap-4 p-4">
         {/* <LinesChart
           title={t("Analytics.crud_analytics_title")}
           description={t("Analytics.crud_analytics_description")}
@@ -256,8 +268,8 @@ export default function Analytics() {
         <CrudChart
           title={t("Analytics.crud_analytics_title")}
           description={t("Analytics.crud_analytics_description")}
-          chartData={branchAnalyticsData.chartData}
-          chartConfig={branchChartConfig}
+          chartData={analyticsData.chartData}
+          chartConfig={chartConfig}
           xAxisKey="label"
         />
       </main>

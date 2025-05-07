@@ -1,0 +1,1 @@
+ALTER TYPE "public"."activity_target_type" ADD VALUE 'SERVER' BEFORE 'JOB_LISTING';
