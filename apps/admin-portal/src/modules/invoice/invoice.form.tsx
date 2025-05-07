@@ -49,7 +49,7 @@ const createInvoiceSchema = (t: (key: string) => string) =>
     due_date: z.date({
       required_error: t("Invoices.form.due_date.required"),
     }),
-    status: z.enum(["draft", "pending", "paid", "overdue", "cancelled"]),
+    status: z.enum(["draft", "sent", "paid", "partially_paid", "overdue", "void"]),
     subtotal: z.number().min(0, t("Invoices.form.subtotal.required")),
     tax_rate: z.number().min(0, t("Invoices.form.tax_rate.required")),
     notes: z.string().optional(),
@@ -455,12 +455,15 @@ export function InvoiceForm({
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="draft">{t("Invoices.form.status.draft")}</SelectItem>
-                      <SelectItem value="pending">{t("Invoices.form.status.pending")}</SelectItem>
+                      <SelectItem value="sent">{t("Invoices.form.status.pending")}</SelectItem>
                       <SelectItem value="paid">{t("Invoices.form.status.paid")}</SelectItem>
-                      <SelectItem value="overdue">{t("Invoices.form.status.overdue")}</SelectItem>
-                      <SelectItem value="cancelled">
-                        {t("Invoices.form.status.cancelled")}
+                      <SelectItem value="partially_paid">
+                        {t("Invoices.form.status.partially_paid", {
+                          defaultValue: "Partially Paid",
+                        })}
                       </SelectItem>
+                      <SelectItem value="overdue">{t("Invoices.form.status.overdue")}</SelectItem>
+                      <SelectItem value="void">{t("Invoices.form.status.cancelled")}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
