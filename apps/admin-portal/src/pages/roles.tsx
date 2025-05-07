@@ -26,8 +26,8 @@ import {
 } from "@/role/role.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/role/role.options";
 import useRoleStore from "@/role/role.store";
-import { RoleUpdateData, RoleWithPermissions } from "@/role/role.type";
 
+import { Role } from "@/modules/role/role.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function RolesPage() {
@@ -37,7 +37,7 @@ export default function RolesPage() {
   const canCreateRoles = useUserStore((state) => state.hasPermission("roles.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<RoleWithPermissions | null>(null);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
 
   const { enterprise, profile, membership } = useUserStore();
 
@@ -57,7 +57,7 @@ export default function RolesPage() {
   const { data: systemRoles, isLoading: loadingSystemRoles, error: systemError } = useSystemRoles();
 
   const allRoles = useMemo(() => {
-    const combined = new Map<string, RoleWithPermissions>();
+    const combined = new Map<string, Role>();
     (customRoles || []).forEach((role) => combined.set(role.id, role));
     (systemRoles || []).forEach((role) => combined.set(role.id, role));
     return Array.from(combined.values());
@@ -80,7 +80,7 @@ export default function RolesPage() {
     },
   });
 
-  const filteredRoles = getFilteredRoles(allRoles || []) as RoleWithPermissions[];
+  const filteredRoles = getFilteredRoles(allRoles || []) as Role[];
 
   const onActionClicked = async (action: string, rowId: string) => {
     if (action === "edit") {

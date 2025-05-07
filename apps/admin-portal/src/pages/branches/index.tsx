@@ -156,7 +156,7 @@ export default function BranchesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Branches.add_new")}
+          title={t("Branches.edit_branch")}
           formId="branch-form"
           loadingSave={loadingSaveBranch}
         >

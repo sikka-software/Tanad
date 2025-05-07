@@ -152,7 +152,7 @@ export default function JobListingsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("JobListings.add_new")}
+          title={t("JobListings.edit_listing")}
           formId="job-listing-form"
           loadingSave={loadingSaveJobListing}
         >

@@ -149,7 +149,7 @@ export default function DepartmentsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Departments.edit")}
+          title={t("Departments.edit_department")}
           formId="department-form"
           loadingSave={loadingSaveDepartment}
         >

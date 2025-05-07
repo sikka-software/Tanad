@@ -64,7 +64,7 @@ export function BranchForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Branch>) {
+}: ModuleFormProps<BranchUpdateData | BranchCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
 

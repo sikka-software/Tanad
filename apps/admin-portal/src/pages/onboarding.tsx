@@ -6,10 +6,10 @@ import { useState } from "react";
 import { useEffect } from "react";
 
 import { Card, CardContent } from "@/ui/card";
+import LanguageSwitcher from "@/ui/language-switcher";
+import ThemeSwitcher from "@/ui/theme-switcher";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import LanguageSwitcher from "@/components/ui/language-switcher";
-import ThemeSwitcher from "@/components/ui/theme-switcher";
 
 import { OnboardingForm } from "@/modules/onboarding/onboarding.form";
 

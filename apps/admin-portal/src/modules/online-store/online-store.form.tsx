@@ -15,7 +15,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateOnlineStore, useUpdateOnlineStore } from "./online-store.hooks";
 import useOnlineStoreStore from "./online-store.store";
-import { OnlineStore, OnlineStoreUpdateData } from "./online-store.type";
+import { OnlineStore, OnlineStoreUpdateData, OnlineStoreCreateData } from "./online-store.type";
 
 export const createOnlineStoreSchema = (t: (key: string) => string) => {
   const baseOnlineStoreSchema = z.object({
@@ -41,7 +41,7 @@ export function OnlineStoreForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<OnlineStore>) {
+}: ModuleFormProps<OnlineStoreUpdateData | OnlineStoreCreateData>) {
   const t = useTranslations();
 
   const user = useUserStore((state) => state.user);

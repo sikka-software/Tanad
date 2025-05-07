@@ -26,7 +26,7 @@ import type { Company } from "@/company/company.type";
 
 import { useCreateVendor, useUpdateVendor } from "@/vendor/vendor.hooks";
 import useVendorStore from "@/vendor/vendor.store";
-import type { Vendor, VendorUpdateData } from "@/vendor/vendor.type";
+import type { Vendor, VendorCreateData, VendorUpdateData } from "@/vendor/vendor.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -51,7 +51,7 @@ export function VendorForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<VendorUpdateData>) {
+}: ModuleFormProps<VendorUpdateData | VendorCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
 

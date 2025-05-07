@@ -19,7 +19,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateWarehouse, useUpdateWarehouse, useWarehouses } from "./warehouse.hooks";
 import useWarehouseStore from "./warehouse.store";
-import { Warehouse, WarehouseUpdateData } from "./warehouse.type";
+import { Warehouse, WarehouseCreateData, WarehouseUpdateData } from "./warehouse.type";
 
 export const createWarehouseFormSchema = (t: (key: string) => string) => {
   const baseWarehouseFormSchema = z.object({
@@ -43,7 +43,7 @@ export function WarehouseForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<WarehouseUpdateData>) {
+}: ModuleFormProps<WarehouseUpdateData | WarehouseCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const { profile, membership } = useUserStore();
@@ -98,7 +98,7 @@ export function WarehouseForm({
               name: data.name.trim(),
               code: data.code.trim(),
               capacity: data.capacity ? parseInt(data.capacity) : null,
-              status: data.status ?? "active",
+              status: data.status as "active" | "inactive" | "draft" | "archived" | null,
               notes: data.notes?.trim() || null,
               short_address: data.short_address?.trim() || undefined,
               building_number: data.building_number?.trim() || undefined,
@@ -126,7 +126,7 @@ export function WarehouseForm({
             code: data.code.trim(),
             capacity: data.capacity ? parseInt(data.capacity) : null,
             notes: data.notes?.trim() || null,
-            status: data.status ?? "active",
+            status: data.status as "active" | "inactive" | "draft" | "archived" | null,
             user_id: profile?.id || "",
             short_address: data.short_address?.trim() || undefined,
             building_number: data.building_number?.trim() || undefined,

@@ -24,7 +24,7 @@ import { usePermissions } from "../permission/permission.hooks";
 import type { Permission } from "../permission/permission.hooks";
 import { useCreateRole, useUpdateRole } from "./role.hooks";
 import useRoleStore from "./role.store";
-import { RoleUpdateData } from "./role.type";
+import { RoleCreateData, RoleUpdateData } from "./role.type";
 
 const createRoleSchema = (t: (key: string) => string) =>
   z.object({
@@ -57,7 +57,7 @@ export function RoleForm({
   defaultValues,
   onSuccess,
   editMode,
-}: ModuleFormProps<RoleUpdateData>) {
+}: ModuleFormProps<RoleUpdateData | RoleCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const enterprise = useUserStore((state) => state.enterprise);

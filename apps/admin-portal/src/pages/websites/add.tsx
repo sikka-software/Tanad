@@ -25,7 +25,10 @@ export default function AddWebsitePage() {
       const randomSuffix = Math.random().toString(36).substr(2, 6);
       form.setValue("domain_name", `example-${randomSuffix}.com`);
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
-      form.setValue("notes", "This is a test website generated on " + new Date().toLocaleDateString());
+      form.setValue(
+        "notes",
+        "This is a test website generated on " + new Date().toLocaleDateString(),
+      );
     }
   };
 

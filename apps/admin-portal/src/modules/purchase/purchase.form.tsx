@@ -82,7 +82,7 @@ export function PurchaseForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Purchase>) {
+}: ModuleFormProps<PurchaseUpdateData | PurchaseCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
 

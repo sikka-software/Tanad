@@ -1,3 +1,4 @@
+import settings from "@root/landing.config";
 import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
@@ -17,8 +18,6 @@ import { ContactForm } from "@/components/landing/ContactForm";
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import SocialIcons from "@/components/landing/SocialIcons";
-
-import settings from "../../landing.config";
 
 export default function ContactPage() {
   const t = useTranslations();

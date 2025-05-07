@@ -23,7 +23,7 @@ import { RoleForm } from "../role/role.form";
 import { useCustomRoles, useSystemRoles } from "../role/role.hooks";
 import { predefinedRoles } from "../role/role.options";
 import useRoleStore from "../role/role.store";
-import type { Role, RoleWithPermissions } from "../role/role.type";
+import type { Role } from "../role/role.type";
 // Import hooks for create/update
 import { useCreateUser, useUpdateUser } from "./user.hooks";
 import useEnterpriseUsersStore from "./user.store";
@@ -81,8 +81,8 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
 
   // Process roles, don't rely on initialData for role
   const allRoles = useMemo(() => {
-    const combined = new Map<string, RoleWithPermissions>();
-    const rolesArray: RoleWithPermissions[] = [];
+    const combined = new Map<string, Role>();
+    const rolesArray: Role[] = [];
 
     (customRoles ?? []).forEach((role) => {
       if (!combined.has(role.id)) {

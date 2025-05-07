@@ -30,7 +30,7 @@ import { Product } from "@/product/product.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { QuoteUpdateData } from "./quote.type";
+import { QuoteCreateData, QuoteUpdateData } from "./quote.type";
 
 export interface QuoteItem {
   product_id?: string;
@@ -56,13 +56,12 @@ export function QuoteForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<QuoteUpdateData>) {
+}: ModuleFormProps<QuoteUpdateData | QuoteCreateData>) {
   const supabase = createClient();
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
   const { user } = useUserStore();
-  const [isLoading, setIsLoading] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);

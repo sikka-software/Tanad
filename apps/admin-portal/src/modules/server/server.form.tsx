@@ -41,7 +41,7 @@ export function ServerForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<ServerUpdateData>) {
+}: ModuleFormProps<ServerUpdateData | ServerCreateData>) {
   const t = useTranslations();
   const lang = useLocale();
   const { user, enterprise } = useUserStore();
@@ -94,6 +94,7 @@ export function ServerForm({
       if (editMode) {
         const updateData: ServerUpdateData = {
           ...commonData,
+          status: commonData.status as "active" | "inactive" | "draft" | "archived" | null,
           enterprise_id: data.enterprise_id?.trim() || undefined,
           ip_address: commonData.ip_address as unknown | null,
         };
@@ -126,7 +127,7 @@ export function ServerForm({
           location: commonData.location,
           provider: commonData.provider,
           os: commonData.os,
-          status: commonData.status,
+          status: commonData.status as "active" | "inactive" | "draft" | "archived" | null,
           tags: commonData.tags,
           notes: commonData.notes,
           user_id: user.id,

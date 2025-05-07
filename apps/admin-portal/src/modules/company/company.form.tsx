@@ -21,7 +21,7 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import { useCreateCompany, useUpdateCompany } from "@/company/company.hooks";
 import useCompanyStore from "@/company/company.store";
-import { Company, CompanyUpdateData } from "@/company/company.type";
+import { Company, CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -52,7 +52,7 @@ export function CompanyForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<CompanyUpdateData>) {
+}: ModuleFormProps<CompanyUpdateData | CompanyCreateData>) {
   const t = useTranslations();
   const { profile, membership } = useUserStore();
   const { mutateAsync: createCompany, isPending: isCreating } = useCreateCompany();
@@ -144,7 +144,7 @@ export function CompanyForm({
               industry: data.industry?.trim() || undefined,
               size: data.size?.trim() || undefined,
               notes: data.notes?.trim() || undefined,
-              status: data.status ?? "active",
+              status: data.status as "active" | "inactive" | "draft" | "archived" | null,
               short_address: data.short_address?.trim() || undefined,
               building_number: data.building_number?.trim() || undefined,
               street_name: data.street_name?.trim() || undefined,
@@ -174,7 +174,7 @@ export function CompanyForm({
             industry: data.industry?.trim() || undefined,
             size: data.size?.trim() || undefined,
             notes: data.notes?.trim() || undefined,
-            status: data.status ?? "active",
+            status: data.status as "active" | "inactive" | "draft" | "archived" | null,
             user_id: profile?.id || "",
             short_address: data.short_address?.trim() || undefined,
             building_number: data.building_number?.trim() || undefined,

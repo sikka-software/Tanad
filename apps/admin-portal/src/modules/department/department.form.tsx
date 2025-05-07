@@ -168,7 +168,8 @@ export default function DepartmentForm({
             location_id: location.id,
             location_type: location.type,
             user_id: user.id,
-          }));
+            enterprise_id: enterprise?.id || "",
+          })) as DepartmentLocation[];
 
           const updatePayload: DepartmentUpdateData = {
             name: data.name,

@@ -148,7 +148,7 @@ export default function EmployeesPage() {
         <FormSheet
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Employees.update_employee")}
+          title={t("Employees.edit_employee")}
           formId="employee-form"
           loadingSave={loadingSaveEmployee}
         >

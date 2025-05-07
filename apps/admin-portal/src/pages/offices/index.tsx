@@ -140,7 +140,7 @@ export default function OfficesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Offices.add_new")}
+          title={t("Offices.edit_office")}
           formId="office-form"
           loadingSave={loadingSaveOffice}
         >

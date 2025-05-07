@@ -29,7 +29,7 @@ import { useCreateSalary, useUpdateSalary } from "@/salary/salary.hooks";
 import useSalaryStore from "@/salary/salary.store";
 
 import { DEDUCTION_TYPES } from "./salary.options";
-import { Salary, SalaryUpdateData } from "./salary.type";
+import { Salary, SalaryCreateData, SalaryUpdateData } from "./salary.type";
 
 const createDeductionSchema = (t: (key: string) => string) =>
   z
@@ -86,7 +86,7 @@ export function SalaryForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Salary>) {
+}: ModuleFormProps<SalaryUpdateData | SalaryCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const { data: employees = [], isLoading: employeesLoading } = useEmployees();

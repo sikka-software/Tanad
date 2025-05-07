@@ -22,7 +22,6 @@ import {
   useWebsites,
   useBulkDeleteWebsites,
   useDuplicateWebsite,
-  useUpdateWebsite,
 } from "@/modules/website/website.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/website/website.options";
 import useWebsiteStore from "@/modules/website/website.store";

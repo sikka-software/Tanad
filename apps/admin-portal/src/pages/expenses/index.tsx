@@ -141,7 +141,7 @@ export default function ExpensesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Expenses.add_new")}
+          title={t("Expenses.edit_expense")}
           formId="expense-form"
           loadingSave={loadingSaveExpense}
         >

@@ -1,3 +1,7 @@
+import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { BranchForm } from "@root/src/modules/branch/branch.form";
+import { Branch, BranchUpdateData } from "@root/src/modules/branch/branch.type";
+import { VendorForm } from "@root/src/modules/vendor/vendor.form";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -19,10 +23,10 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 import VendorCard from "@/vendor/vendor.card";
 import { useVendors, useBulkDeleteVendors, useDuplicateVendor } from "@/vendor/vendor.hooks";
 import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/vendor/vendor.options";
-import useVendorsStore from "@/vendor/vendor.store";
+import useVendorStore from "@/vendor/vendor.store";
 import VendorsTable from "@/vendor/vendor.table";
 
-import { Vendor } from "@/modules/vendor/vendor.type";
+import { Vendor, VendorUpdateData } from "@/modules/vendor/vendor.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function VendorsPage() {
@@ -33,22 +37,26 @@ export default function VendorsPage() {
   const canCreateVendors = useUserStore((state) => state.hasPermission("vendors.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableVendor, setActionableVendor] = useState<Vendor | null>(null);
+  const [actionableVendor, setActionableVendor] = useState<VendorUpdateData | null>(null);
+  const [displayData, setDisplayData] = useState<Vendor[]>([]);
 
-  const viewMode = useVendorsStore((state) => state.viewMode);
-  const isDeleteDialogOpen = useVendorsStore((state) => state.isDeleteDialogOpen);
-  const setIsDeleteDialogOpen = useVendorsStore((state) => state.setIsDeleteDialogOpen);
-  const selectedRows = useVendorsStore((state) => state.selectedRows);
-  const setSelectedRows = useVendorsStore((state) => state.setSelectedRows);
-  const clearSelection = useVendorsStore((state) => state.clearSelection);
-  const sortRules = useVendorsStore((state) => state.sortRules);
-  const sortCaseSensitive = useVendorsStore((state) => state.sortCaseSensitive);
-  const sortNullsFirst = useVendorsStore((state) => state.sortNullsFirst);
-  const searchQuery = useVendorsStore((state) => state.searchQuery);
-  const filterConditions = useVendorsStore((state) => state.filterConditions);
-  const filterCaseSensitive = useVendorsStore((state) => state.filterCaseSensitive);
-  const getFilteredVendors = useVendorsStore((state) => state.getFilteredData);
-  const getSortedVendors = useVendorsStore((state) => state.getSortedData);
+  const loadingSaveVendor = useVendorStore((state) => state.isLoading);
+  const setLoadingSaveVendor = useVendorStore((state) => state.setIsLoading);
+
+  const viewMode = useVendorStore((state) => state.viewMode);
+  const isDeleteDialogOpen = useVendorStore((state) => state.isDeleteDialogOpen);
+  const setIsDeleteDialogOpen = useVendorStore((state) => state.setIsDeleteDialogOpen);
+  const selectedRows = useVendorStore((state) => state.selectedRows);
+  const setSelectedRows = useVendorStore((state) => state.setSelectedRows);
+  const clearSelection = useVendorStore((state) => state.clearSelection);
+  const sortRules = useVendorStore((state) => state.sortRules);
+  const sortCaseSensitive = useVendorStore((state) => state.sortCaseSensitive);
+  const sortNullsFirst = useVendorStore((state) => state.sortNullsFirst);
+  const searchQuery = useVendorStore((state) => state.searchQuery);
+  const filterConditions = useVendorStore((state) => state.filterConditions);
+  const filterCaseSensitive = useVendorStore((state) => state.filterCaseSensitive);
+  const getFilteredVendors = useVendorStore((state) => state.getFilteredData);
+  const getSortedVendors = useVendorStore((state) => state.getSortedData);
 
   const { data: vendors, isLoading, error } = useVendors();
   const { mutateAsync: deleteVendors, isPending: isDeleting } = useBulkDeleteVendors();
@@ -101,7 +109,7 @@ export default function VendorsPage() {
           />
         ) : (
           <PageSearchAndFilter
-            store={useVendorsStore}
+            store={useVendorStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
             title={t("Vendors.title")}
@@ -133,6 +141,25 @@ export default function VendorsPage() {
             />
           </div>
         )}
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Vendors.edit_vendor")}
+          formId="vendor-form"
+          loadingSave={loadingSaveVendor}
+        >
+          <VendorForm
+            formHtmlId={"vendor-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableVendor(null);
+              setLoadingSaveVendor(false);
+            }}
+            defaultValues={actionableVendor as Vendor}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

@@ -36,7 +36,7 @@ export function WebsiteForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<Website>) {
+}: ModuleFormProps<WebsiteUpdateData | WebsiteCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
 
@@ -106,7 +106,7 @@ export function WebsiteForm({
             onError: (error: any) => {
               setIsLoading(false);
               toast.error(t("General.error_operation"), {
-                description: error.message || t("Websites.toast.update_error"),
+                description: error.message || t("Websites.error.update"),
               });
             },
           },
@@ -120,7 +120,7 @@ export function WebsiteForm({
           onError: (error: any) => {
             setIsLoading(false);
             toast.error(t("General.error_operation"), {
-              description: error.message || t("Websites.toast.create_error"),
+              description: error.message || t("Websites.error.create"),
             });
           },
         });

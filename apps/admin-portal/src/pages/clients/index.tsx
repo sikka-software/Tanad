@@ -141,7 +141,7 @@ export default function ClientsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Clients.add_new")}
+          title={t("Clients.edit_client")}
           formId="client-form"
           loadingSave={loadingSaveClient}
         >
