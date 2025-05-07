@@ -3859,10 +3859,7 @@
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {نطاق} =1 {هذا النطاق} other {# نطاقات}}",
     "manager": "المدير",
     "edit": "تعديل النطاق",
-    "status": {
-      "active": "نشط",
-      "inactive": "غير نشط"
-    },
+
     "form": {
       "domain_name": {
         "label": "الاسم",
@@ -3873,6 +3870,11 @@
         "label": "مزود التسجيل",
         "placeholder": "أدخل مزود التسجيل",
         "required": "مزود التسجيل مطلوب"
+      },
+      "status": {
+        "label": "الحالة",
+        "active": "نشط",
+        "inactive": "غير نشط"
       },
       "monthly_cost": {
         "label": "التكلفة الشهرية",

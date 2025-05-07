@@ -65,6 +65,16 @@ const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       header: t("Domains.form.payment_cycle.label"),
       validationSchema: z.string().min(1, "Required"),
     },
+    {
+      accessorKey: "status",
+      header: t("Domains.form.status.label"),
+      validationSchema: z.enum(["active", "inactive"]),
+      cellType: "status",
+      options: [
+        { label: t("Domains.form.status.active"), value: "active" },
+        { label: t("Domains.form.status.inactive"), value: "inactive" },
+      ],
+    },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {

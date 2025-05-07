@@ -35,11 +35,7 @@ const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       header: t("Websites.form.domain_name.label"),
       validationSchema: z.string().min(1, t("Websites.form.domain_name.required")),
     },
-    {
-      accessorKey: "status",
-      header: t("Websites.form.status.label"),
-      validationSchema: z.string().nullable(),
-    },
+
     {
       accessorKey: "notes",
       header: t("Websites.form.notes.label"),
@@ -62,6 +58,16 @@ const WebsitesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         const date = row.original.updated_at;
         return date ? new Date(date).toLocaleDateString(locale) : "-";
       },
+    },
+    {
+      accessorKey: "status",
+      header: t("Websites.form.status.label"),
+      validationSchema: z.enum(["active", "inactive"]),
+      cellType: "status",
+      options: [
+        { label: t("Websites.form.status.active"), value: "active" },
+        { label: t("Websites.form.status.inactive"), value: "inactive" },
+      ],
     },
   ];
 

@@ -32,6 +32,7 @@ export const createDomainSchema = (t: (key: string) => string) => {
     annual_cost: z.number().optional().or(z.literal("")),
     payment_cycle: z.string().min(1, t("Domains.form.payment_cycle.required")),
     notes: z.string().optional().or(z.literal("")),
+    status: z.string().min(1, t("Domains.form.status.required")),
   });
 
   return baseDomainSchema;
@@ -72,6 +73,7 @@ export function DomainForm({
       monthly_cost: defaultValues?.monthly_cost || 0,
       annual_cost: defaultValues?.annual_cost || 0,
       payment_cycle: defaultValues?.payment_cycle || "monthly",
+      status: defaultValues?.status || "active",
       notes: defaultValues?.notes || "",
     },
   });
@@ -96,6 +98,7 @@ export function DomainForm({
               monthly_cost: data.monthly_cost || 0,
               annual_cost: data.annual_cost || 0,
               payment_cycle: data.payment_cycle?.trim() as "monthly" | "annual" | null,
+              status: data.status?.trim() as "active" | "inactive" | null,
               notes: data.notes?.trim() || null,
             },
           },
@@ -115,6 +118,7 @@ export function DomainForm({
             monthly_cost: data.monthly_cost || 0,
             annual_cost: data.annual_cost || 0,
             payment_cycle: data.payment_cycle?.trim() as "monthly" | "annual" | null,
+            status: data.status?.trim() as "active" | "inactive" | null,
             notes: data.notes?.trim() || null,
             user_id: user?.id,
             updated_at: new Date().toISOString(),
@@ -228,27 +232,56 @@ export function DomainForm({
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="payment_cycle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Domains.form.payment_cycle.label")}</FormLabel>
-                <FormControl>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("Domains.form.payment_cycle.placeholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="monthly">{t("Domains.form.payment_cycle.monthly")}</SelectItem>
-                      <SelectItem value="annual">{t("Domains.form.payment_cycle.annual")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="payment_cycle"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Domains.form.payment_cycle.label")}</FormLabel>
+                  <FormControl>
+                    <Select>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("Domains.form.payment_cycle.placeholder")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="monthly">
+                          {t("Domains.form.payment_cycle.monthly")}
+                        </SelectItem>
+                        <SelectItem value="annual">
+                          {t("Domains.form.payment_cycle.annual")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Domains.form.status.label")}</FormLabel>
+                  <FormControl>
+                    <Select {...field} disabled={isLoading}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("Domains.form.status.placeholder")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">{t("Domains.form.status.active")}</SelectItem>
+                        <SelectItem value="inactive">
+                          {t("Domains.form.status.inactive")}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
             name="notes"

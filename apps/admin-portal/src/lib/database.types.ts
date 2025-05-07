@@ -385,6 +385,7 @@ export type Database = {
           notes: string | null
           payment_cycle: Database["public"]["Enums"]["payment_cycle"] | null
           registrar: string | null
+          status: Database["public"]["Enums"]["common_status"] | null
           updated_at: string
           user_id: string
         }
@@ -398,6 +399,7 @@ export type Database = {
           notes?: string | null
           payment_cycle?: Database["public"]["Enums"]["payment_cycle"] | null
           registrar?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string
           user_id: string
         }
@@ -411,6 +413,7 @@ export type Database = {
           notes?: string | null
           payment_cycle?: Database["public"]["Enums"]["payment_cycle"] | null
           registrar?: string | null
+          status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string
           user_id?: string
         }
@@ -2021,6 +2024,15 @@ export type Database = {
         }[]
       }
       get_module_analytics_website: {
+        Args: { start_date?: string; end_date?: string; time_interval?: string }
+        Returns: {
+          period_start: string
+          websites_added: number
+          websites_removed: number
+          websites_updated: number
+        }[]
+      }
+      get_module_analytics_websites: {
         Args: { start_date?: string; end_date?: string; time_interval?: string }
         Returns: {
           period_start: string

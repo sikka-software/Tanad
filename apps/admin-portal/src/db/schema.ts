@@ -1862,6 +1862,7 @@ export const domains = pgTable(
     monthly_cost: numeric({ precision: 10, scale: 2 }),
     annual_cost: numeric({ precision: 10, scale: 2 }),
     payment_cycle: payment_cycle(),
+    status: common_status().default("active"),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),

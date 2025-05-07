@@ -22,11 +22,12 @@ export default function AddDomainPage() {
     const dummyData = generateDummyData();
     const form = (window as any).domainForm;
     if (form) {
-      form.setValue("domain_name", dummyData.full_name);
+      form.setValue("domain_name", dummyData.first_name.toLowerCase() + ".com");
       form.setValue("registrar", dummyData.email);
-      form.setValue("monthly_cost", dummyData.phone);
-      form.setValue("annual_cost", dummyData.address);
+      form.setValue("monthly_cost", dummyData.randomNumber);
+      form.setValue("annual_cost", dummyData.randomNumber);
       form.setValue("payment_cycle", dummyData.randomPicker(["monthly", "annual"]));
+      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
       form.setValue("notes", dummyData.state);
     }
   };
