@@ -56,6 +56,8 @@ import { fakeAnalyticsData } from "@/lib/constants";
 
 import useUserStore from "@/stores/use-user-store";
 
+import LinesChart from "../components/analytics/lines-chart";
+
 // Actual Line Chart component for Branch Analytics
 function BranchLineChartComponent({ data, config }: { data: any[]; config: ChartConfig }) {
   const t = useTranslations();
@@ -321,22 +323,9 @@ export default function Analytics() {
         </div>
       </div>
 
-      <main className="flex flex-col items-center justify-between gap-4 p-4">
-        <div className="flex w-full flex-col gap-2">
-          <Card className="w-full">
-            <CardHeader className="flex flex-col justify-between gap-4 md:flex-row md:items-center"></CardHeader>
-            <CardContent className="">
-              {selectedModule === "branches" && (
-                <BranchLineChartComponent
-                  data={branchAnalyticsData.chartData}
-                  config={branchChartConfig}
-                />
-              )}
-              <CrudChart />
-              {/* Add other module charts here */}
-            </CardContent>
-          </Card>
-        </div>
+      <main className="flex flex-row items-center justify-start gap-4 p-4">
+        <LinesChart data={branchAnalyticsData.chartData} config={branchChartConfig} />
+        <CrudChart />
         {/* Other content like tables can be added here */}
       </main>
     </>
