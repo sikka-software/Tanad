@@ -7,9 +7,11 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
 import { useSubscription } from "@/hooks/use-subscription";
+import { useUsage } from "@/hooks/use-usage";
 
-import CurrentPlan, { SUBSCRIPTION_UPDATED_EVENT } from "@/components/billing/CurrentPlan";
+import CurrentPlan from "@/components/billing/CurrentPlan";
 import SubscriptionSelection from "@/components/billing/SubscriptionSelection";
+import UsageStats from "@/components/billing/UsageStats";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,14 +25,45 @@ export default function Billing() {
   const locale = useLocale();
   const { user, fetchUserAndProfile, profile } = useUserStore();
   const subscription = useSubscription();
+  const { usageData, refresh: refreshUsage } = useUsage();
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
-  const initialized = useRef(false);
-  const [isUpdatingSubscription, setIsUpdatingSubscription] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+  const initialLoadComplete = useRef(false);
+
+  // Pre-load all data before rendering any components
+  useEffect(() => {
+    if (!initialLoadComplete.current && user) {
+      // Mark as loading
+      setIsRefreshing(true);
+
+      // Load all data simultaneously
+      Promise.all([subscription.refetch(), fetchUserAndProfile(), refreshUsage()])
+        .then(() => {
+          // Set initialLoadComplete to prevent future initial loads
+          initialLoadComplete.current = true;
+          // Allow rendering
+          setShouldRender(true);
+        })
+        .catch((err) => {
+          console.error("Error during initial data load:", err);
+          // Still allow rendering even on error
+          setShouldRender(true);
+        })
+        .finally(() => {
+          setIsRefreshing(false);
+        });
+    } else if (user && !shouldRender) {
+      // If we already have user but render flag not set (e.g. on navigation)
+      setShouldRender(true);
+    }
+  }, [user, subscription, fetchUserAndProfile, refreshUsage]);
 
   // Force refresh when refresh query parameter is present
   useEffect(() => {
     if (router.query.refresh && user) {
-      setIsUpdatingSubscription(true);
+      setIsRefreshing(true);
+      setShouldRender(false);
 
       // Remove the refresh query parameter without page reload
       const { refresh, ...restQuery } = router.query;
@@ -43,137 +76,95 @@ export default function Billing() {
         { shallow: true },
       );
 
-      // Force a full data refresh with multiple retries
-      const refreshData = async () => {
-        console.log("Billing page: Forcing data refresh from query parameter");
-        for (let i = 0; i < 3; i++) {
-          try {
-            await subscription.refetch();
-            await fetchUserAndProfile();
-            console.log(`Query-triggered data refresh attempt ${i + 1} completed`);
-            break;
-          } catch (err) {
-            console.error(`Query-triggered data refresh attempt ${i + 1} failed:`, err);
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          }
-        }
-
-        // Reset loading state after a shorter delay
-        setTimeout(() => {
-          setIsUpdatingSubscription(false);
-        }, 300);
-      };
-
-      refreshData();
+      // Force a full data refresh
+      Promise.all([subscription.refetch(), fetchUserAndProfile(), refreshUsage()])
+        .then(() => {
+          setShouldRender(true);
+        })
+        .catch((err) => {
+          console.error("Data refresh failed:", err);
+          setShouldRender(true);
+        })
+        .finally(() => {
+          setIsRefreshing(false);
+        });
     }
-  }, [router.query.refresh, user, fetchUserAndProfile, subscription, router]);
+  }, [router.query.refresh, user, fetchUserAndProfile, subscription, refreshUsage, router]);
 
-  // Cleanup subscription on unmount
+  // Listen for subscription update events
   useEffect(() => {
-    // Keep track of component mount status
-    let mounted = true;
-
-    // Set initialization flag only once
-    if (!initialized.current) {
-      initialized.current = true;
-      console.log("Billing page: Initial mount");
-    }
-
-    // Listen for subscription update events
     const handleSubscriptionUpdated = () => {
-      console.log("Billing page: Subscription update detected");
-      setIsUpdatingSubscription(true);
+      setIsRefreshing(true);
+      setShouldRender(false);
 
-      // Force a full data refresh with multiple retries
-      const refreshData = async () => {
-        console.log("Billing page: Forcing full data refresh");
-        for (let i = 0; i < 3; i++) {
-          try {
-            await subscription.refetch();
-            await fetchUserAndProfile();
-            console.log(`Data refresh attempt ${i + 1} completed`);
-            break;
-          } catch (err) {
-            console.error(`Data refresh attempt ${i + 1} failed:`, err);
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          }
-        }
-
-        // If still mounted, reset loading state
-        if (mounted) {
-          setTimeout(() => {
-            setIsUpdatingSubscription(false);
-          }, 300);
-        }
-      };
-
-      refreshData();
-
-      // Last resort - force reload after a delay if UI still doesn't update
-      setTimeout(() => {
-        if (
-          mounted &&
-          (subscription.planLookupKey === "tanad_free" || !subscription.planLookupKey)
-        ) {
-          console.log("Forcing page reload to refresh subscription data");
-          // Use router.push with refresh parameter instead of window.location.reload
-          router.push({
-            pathname: router.pathname,
-            query: { refresh: Date.now() },
-          });
-        }
-      }, 3000);
+      Promise.all([subscription.refetch(), fetchUserAndProfile(), refreshUsage()])
+        .then(() => {
+          setShouldRender(true);
+        })
+        .catch((err) => {
+          console.error("Data refresh failed:", err);
+          setShouldRender(true);
+        })
+        .finally(() => {
+          setIsRefreshing(false);
+        });
     };
 
-    window.addEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
     window.addEventListener("subscription_updated", handleSubscriptionUpdated);
 
-    // Return cleanup function
     return () => {
-      mounted = false;
-      // Clear any refresh timers or flags
-      window.lastSubscriptionRefresh = undefined;
-      // Remove event listeners
-      window.removeEventListener(SUBSCRIPTION_UPDATED_EVENT, handleSubscriptionUpdated);
       window.removeEventListener("subscription_updated", handleSubscriptionUpdated);
     };
-  }, [subscription, fetchUserAndProfile, router]);
+  }, [subscription, fetchUserAndProfile, refreshUsage]);
 
-  // Improved condition to determine what counts as a free plan
+  // Determine if the user has a free plan
   const isFreePlan =
     !subscription.planLookupKey ||
     subscription.planLookupKey === "tanad_free" ||
     subscription.price === "0" ||
-    subscription.price === "0 SAR" ||
-    !subscription.price;
+    subscription.price === "0 SAR";
 
-  // If we know the user has a paid subscription, don't show selection
-  const hasActivePaidSubscription =
-    // Check subscription status from the subscription hook
-    (subscription.status === "active" &&
-      subscription.planLookupKey &&
-      subscription.planLookupKey !== "tanad_free" &&
-      !subscription.cancelAt) ||
-    // As a fallback, also check the profile data directly
-    (profile?.subscribed_to &&
-      profile.subscribed_to !== "tanad_free" &&
-      profile.subscribed_to !== null);
-
-  // Show subscription selection for new/free/expired users
+  // Determine if we should show subscription selection
   const showSubscriptionSelection =
     !subscription.loading &&
-    !isUpdatingSubscription &&
-    !hasActivePaidSubscription && // Check if user has an active paid subscription
-    (!subscription.status || // No subscription
-      subscription.status === "canceled" || // Canceled subscription
-      subscription.status === "incomplete_expired" || // Failed subscription
-      subscription.status === "unpaid" || // Unpaid subscription
-      (subscription.status === "active" && isFreePlan) || // Free plan
-      (subscription.cancelAt && new Date(Number(subscription.cancelAt) * 1000) < new Date())); // Expired subscription
+    !isRefreshing &&
+    (subscription.status !== "active" || (subscription.status === "active" && isFreePlan));
 
+  const handleSubscriptionUpdate = async () => {
+    setIsRefreshing(true);
+    setShouldRender(false);
+
+    try {
+      await Promise.all([subscription.refetch(), fetchUserAndProfile(), refreshUsage()]);
+    } catch (error) {
+      console.error("Error updating subscription data:", error);
+    } finally {
+      setShouldRender(true);
+      setIsRefreshing(false);
+    }
+  };
+
+  // Calculate the page loading state
+  const isPageLoading = isRefreshing || !user || !shouldRender;
+
+  // Return a skeleton version of the page layout for loading state
   if (!user) {
-    return <Skeleton className="h-[300px] w-full" />;
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-10 space-y-2">
+          <Skeleton className="h-10 w-1/4" />
+          <Skeleton className="h-5 w-3/4" />
+        </div>
+        <div className="mb-10">
+          <div className="flex flex-col gap-4 md:flex-row">
+            <Skeleton className="h-[180px] w-full flex-1 rounded-lg" />
+            <Skeleton className="h-[180px] w-full flex-1 rounded-lg" />
+          </div>
+        </div>
+      </div>
+    );
   }
+
   return (
     <>
       <CustomPageMeta title={t("Billing.title")} description={t("Billing.description")} />
@@ -190,66 +181,84 @@ export default function Billing() {
           </p>
         </div>
 
-        {/* Current Plan Card */}
+        {/* Current Plan and Usage Stats - both components share the same loading state */}
         <div className="mb-10">
-          {isUpdatingSubscription ? (
-            <Skeleton className="h-24 w-full rounded-lg" />
+          {isRefreshing || !shouldRender ? (
+            <div className="flex flex-col gap-4 md:flex-row">
+              <Skeleton className="h-[180px] w-full flex-1 rounded-lg" />
+              <Skeleton className="h-[180px] w-full flex-1 rounded-lg" />
+            </div>
           ) : (
-            <CurrentPlan />
+            <div className="flex flex-col gap-4 md:flex-row">
+              <CurrentPlan />
+              <UsageStats {...usageData} />
+            </div>
           )}
         </div>
 
-        {/* Subscription Selection Section - with Tabs */}
+        {/* Subscription Selection Section - show only for free users */}
         {showSubscriptionSelection && (
           <div className="w-full" id="plans">
-            <div className="mb-6">
-              <h2 className="mb-2 text-2xl font-bold">{t("Billing.available_plans")}</h2>
-              <p className="text-muted-foreground">
-                {t("Billing.choose_plan_description", {
-                  fallback: "Choose the plan that works best for you and your team",
-                })}
-              </p>
-            </div>
-            <Tabs
-              defaultValue="monthly"
-              value={billingPeriod}
-              onValueChange={(value) => setBillingPeriod(value as "monthly" | "yearly")}
-              className="mb-8"
-            >
-              <div className="mb-8 flex justify-center">
-                <TabsList>
-                  <TabsTrigger value="monthly">{t("Billing.monthly_billing")}</TabsTrigger>
-                  <TabsTrigger value="yearly">
-                    {t("Billing.yearly_billing", {
-                      discount: "20%",
-                      fallback: "Yearly Billing (Save 20%)",
+            {isRefreshing || !shouldRender ? (
+              <>
+                <div className="mb-6">
+                  <Skeleton className="mb-2 h-8 w-1/3" />
+                  <Skeleton className="h-5 w-2/3" />
+                </div>
+                <div className="mb-8 flex justify-center">
+                  <Skeleton className="h-10 w-64 rounded-full" />
+                </div>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <Skeleton className="h-[400px] rounded-lg" />
+                  <Skeleton className="h-[400px] rounded-lg" />
+                  <Skeleton className="h-[400px] rounded-lg" />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mb-6">
+                  <h2 className="mb-2 text-2xl font-bold">{t("Billing.available_plans")}</h2>
+                  <p className="text-muted-foreground">
+                    {t("Billing.choose_plan_description", {
+                      fallback: "Choose the plan that works best for you and your team",
                     })}
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-
-              <TabsContent value="monthly" className="mt-0">
-                <div id="monthlyPlans">
-                  <SubscriptionSelection />
+                  </p>
                 </div>
-              </TabsContent>
-
-              <TabsContent value="yearly" className="mt-0">
-                <div id="yearlyPlans">
-                  <Skeleton className="h-32 w-full" />
-                  <div className="text-muted-foreground mt-4 text-center">
-                    {t("Billing.yearly_plans_coming_soon")}
+                <Tabs
+                  defaultValue="monthly"
+                  value={billingPeriod}
+                  onValueChange={(value) => setBillingPeriod(value as "monthly" | "yearly")}
+                  className="mb-8"
+                >
+                  <div className="mb-8 flex justify-center">
+                    <TabsList>
+                      <TabsTrigger value="monthly">{t("Billing.monthly_billing")}</TabsTrigger>
+                      <TabsTrigger value="yearly">
+                        {t("Billing.yearly_billing", {
+                          discount: "20%",
+                          fallback: "Yearly Billing (Save 20%)",
+                        })}
+                      </TabsTrigger>
+                    </TabsList>
                   </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        )}
 
-        {/* Show loading skeleton when updating subscription */}
-        {isUpdatingSubscription && !showSubscriptionSelection && (
-          <div className="mb-8 w-full">
-            <Skeleton className="h-[400px] w-full" />
+                  <TabsContent value="monthly" className="mt-0">
+                    <div id="monthlyPlans">
+                      <SubscriptionSelection />
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="yearly" className="mt-0">
+                    <div id="yearlyPlans">
+                      <Skeleton className="h-32 w-full" />
+                      <div className="text-muted-foreground mt-4 text-center">
+                        {t("Billing.yearly_plans_coming_soon")}
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </>
+            )}
           </div>
         )}
 
@@ -272,13 +281,6 @@ export default function Billing() {
             >
               {t("Billing.contact_sales")}
             </Button>
-          </div>
-        </div>
-
-        {/* Hidden buttons for subscription management */}
-        <div className="hidden">
-          <div id="cancelSubscriptionBtn">
-            <CurrentPlan />
           </div>
         </div>
       </main>
