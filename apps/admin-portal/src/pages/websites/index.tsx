@@ -28,7 +28,6 @@ import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/website/website.o
 import useWebsiteStore from "@/modules/website/website.store";
 import WebsitesTable from "@/modules/website/website.table";
 import { Website, WebsiteUpdateData } from "@/modules/website/website.type";
-
 import useUserStore from "@/stores/use-user-store";
 
 export default function WebsitesPage() {
@@ -176,7 +175,7 @@ export default function WebsitesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Websites.confirm_delete")}
+          title={t("Websites.confirm_delete", { count: selectedRows.length })}
           description={t("Websites.delete_description", { count: selectedRows.length })}
         />
       </DataPageLayout>

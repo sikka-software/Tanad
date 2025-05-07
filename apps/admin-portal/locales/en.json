@@ -2571,7 +2571,8 @@
     "edit_salary": "Edit Salary",
     "delete_salary": "Delete Salary",
     "search_salaries": "Search salaries...",
-    "confirm_delete": "Are you sure you want to delete this salary?",
+    "confirm_delete": "Are you sure you want to delete {count, plural, =0 {salary} =1 {this salary} other {# salaries}}?",
+    "delete_description": "All data associated with {count, plural, =0 {salary} =1 {this salary} other {# salaries}} will be deleted",
     "no_salaries_found": "No salaries found",
     "salary_details": "Salary Details",
     "success": {
@@ -3179,6 +3180,8 @@
     "search_companies": "Search companies",
     "back_to_list": "Back to List",
     "no_companies_found": "No companies found",
+    "confirm_delete": "Are you sure you want to delete {count, plural, =0 {no company} =1 {this company} other {# companies}}?",
+    "delete_description": "All data associated with {count, plural, =0 {no company} =1 {this company} other {# companies}} will be deleted",
     "form": {
       "name": {
         "label": "Name",
@@ -3469,12 +3472,6 @@
       "delete": "Error deleting purchase",
       "duplicate": "Error duplicating purchase"
     }
-  },
-  "Employee_requests": {
-    "title": "Employee Requests"
-  },
-  "Job_listings": {
-    "title": "Job Listings"
   },
   "Roles": {
     "title": "Roles",

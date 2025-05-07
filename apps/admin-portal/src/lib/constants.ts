@@ -147,6 +147,14 @@ export const MODULE_ANALYTICS = [
     delete: "domains_removed",
   },
   {
+    key: "website",
+    rpc: "get_module_analytics_website",
+    title: "Websites.title",
+    add: "websites_added",
+    update: "websites_updated",
+    delete: "websites_removed",
+  },
+  {
     key: "client",
     rpc: "get_module_analytics_client",
     title: "Clients.title",

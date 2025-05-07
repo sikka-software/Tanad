@@ -691,8 +691,8 @@ function SheetTable<
           )}
           {/* Row actions */}
           {enableRowActions && (
-            <TableCell className="bg-background sticky start-8 z-2 min-w-4 border-y p-0">
-              <div className="bg-geen-400 flex h-auto min-h-9 items-center justify-center">
+            <TableCell className="bg-background sticky start-8 z-2 min-w-8  border-y p-0">
+              <div className="flex h-auto min-h-9 items-center justify-center">
                 <RowActionsPopover
                   texts={texts}
                   onEdit={props.canEditAction ? () => onActionClicked?.("edit", rowId) : undefined}
