@@ -14,7 +14,6 @@ import { ScrollArea } from "@/ui/scroll-area";
 import { Textarea } from "@/ui/textarea";
 
 import { ModuleFormProps } from "@/types/common.type";
-import { Role } from "@/types/rbac";
 
 import useUserStore from "@/stores/use-user-store";
 

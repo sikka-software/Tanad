@@ -1,6 +1,6 @@
 import { differenceInDays, endOfDay, endOfMonth, format, parseISO, startOfMonth } from "date-fns";
 import { ar } from "date-fns/locale";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, TrendingUp } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -9,7 +9,13 @@ import { DateRange } from "react-day-picker";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
-import { CardDescription } from "@/ui/card";
+import {
+  CardContent,
+  Card,
+  CardTitle,
+  CardDescription,
+  CardHeader,
+} from "@/ui/card";
 import { ChartConfig } from "@/ui/chart";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
@@ -17,7 +23,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { createClient } from "@/utils/supabase/component";
 
 import { CrudChart } from "@/components/analytics/crud-chart";
-import LinesChart from "@/components/analytics/lines-chart";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { MODULE_ANALYTICS } from "@/lib/constants";
@@ -201,36 +206,10 @@ export default function Analytics() {
       >
         <div className="flex flex-1 items-center gap-4">
           <h2 className="text-xl font-medium">{t("Analytics.analytics_overview")}</h2>
-          <CardDescription>{getDateRangeTitle()}</CardDescription>
+          {/* <CardDescription>{getDateRangeTitle()}</CardDescription> */}
         </div>
 
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-          <Select
-            value={selectedModule.key}
-            onValueChange={(value) => {
-              if (value) {
-                setSelectedModule({
-                  key: value,
-                  rpc: MODULE_ANALYTICS.find((m) => m.key === value)?.rpc || "",
-                  add: MODULE_ANALYTICS.find((m) => m.key === value)?.add || "",
-                  update: MODULE_ANALYTICS.find((m) => m.key === value)?.update || "",
-                  delete: MODULE_ANALYTICS.find((m) => m.key === value)?.delete || "",
-                });
-              }
-            }}
-          >
-            <SelectTrigger className="w-full md:w-[180px]">
-              <SelectValue placeholder={t("Analytics.select_module")} />
-            </SelectTrigger>
-            <SelectContent>
-              {MODULE_ANALYTICS.map((module) => (
-                <SelectItem key={module.key} value={module.key}>
-                  {t(module.title)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -282,14 +261,64 @@ export default function Analytics() {
               stroke: "var(--chart-blue)",
             },
           ]}
+
+          
         /> */}
-        <CrudChart
-          title={t("Analytics.crud_analytics_title")}
-          description={t("Analytics.crud_analytics_description")}
-          chartData={analyticsData.chartData}
-          chartConfig={chartConfig}
-          xAxisKey="label"
-        />
+
+        <Card className="w-full">
+          <CardHeader className="flex flex-row justify-between">
+            <div className="flex flex-col">
+              <CardTitle>{t("Analytics.crud_analytics_title")}</CardTitle>
+              <CardDescription>{t("Analytics.crud_analytics_description")}</CardDescription>
+            </div>
+            <Select
+              value={selectedModule.key}
+              onValueChange={(value) => {
+                if (value) {
+                  setSelectedModule({
+                    key: value,
+                    rpc: MODULE_ANALYTICS.find((m) => m.key === value)?.rpc || "",
+                    add: MODULE_ANALYTICS.find((m) => m.key === value)?.add || "",
+                    update: MODULE_ANALYTICS.find((m) => m.key === value)?.update || "",
+                    delete: MODULE_ANALYTICS.find((m) => m.key === value)?.delete || "",
+                  });
+                }
+              }}
+            >
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder={t("Analytics.select_module")} />
+              </SelectTrigger>
+              <SelectContent>
+                {MODULE_ANALYTICS.map((module) => (
+                  <SelectItem key={module.key} value={module.key}>
+                    {t(module.title)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardHeader>
+          <CardContent>
+            <CrudChart
+              title={t("Analytics.crud_analytics_title")}
+              description={t("Analytics.crud_analytics_description")}
+              chartData={analyticsData.chartData}
+              chartConfig={chartConfig}
+              xAxisKey="label"
+            />
+          </CardContent>
+          {/* {(footerPrimaryText || footerSecondaryText) && (
+            <CardFooter className="flex-col items-start gap-2 text-sm">
+              {footerPrimaryText && (
+                <div className="flex gap-2 leading-none font-medium">
+                  {footerPrimaryText} <TrendingUp className="h-4 w-4" />
+                </div>
+              )}
+              {footerSecondaryText && (
+                <div className="text-muted-foreground leading-none">{footerSecondaryText}</div>
+              )}
+            </CardFooter>
+          )} */}
+        </Card>
       </main>
     </>
   );

@@ -77,12 +77,12 @@ export async function createDepartmentWithLocations(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(
-      department.locations.map((location) => ({
+      department.locations?.map((location) => ({
         department_id: createdDept.id,
         location_id: location.location_id,
         type: location.location_type,
         user_id: department.user_id,
-      })),
+      })) || [],
     ),
   });
 

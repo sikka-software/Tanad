@@ -1,6 +1,8 @@
 import { Database } from "@/lib/database.types";
 
-export type Department = Database["public"]["Tables"]["departments"]["Row"];
+export type Department = Database["public"]["Tables"]["departments"]["Row"] & {
+  locations: DepartmentLocation[];
+};
 export type DepartmentCreateData = Database["public"]["Tables"]["departments"]["Insert"] & {
   locations?: DepartmentLocation[];
 };

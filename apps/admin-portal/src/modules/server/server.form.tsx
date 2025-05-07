@@ -213,6 +213,7 @@ export function ServerForm({
                       labelKey="label"
                       inputProps={{ disabled: isLoading }}
                       valueKey="value"
+                      value={field.value}
                       texts={{
                         placeholder: t("Servers.form.location.placeholder"),
                         searchPlaceholder: t("Servers.form.location.search_placeholder"),
@@ -250,6 +251,7 @@ export function ServerForm({
                         searchPlaceholder: t("Servers.form.provider.search_placeholder"),
                         noItems: t("Servers.form.provider.no_items"),
                       }}
+                      value={field.value}
                       renderOption={(item) => <div>{item.label}</div>}
                       renderSelected={(item) => <div>{item.label}</div>}
                       onChange={field.onChange}
@@ -278,6 +280,7 @@ export function ServerForm({
                         searchPlaceholder: t("Servers.form.os.search_placeholder"),
                         noItems: t("Servers.form.os.no_items"),
                       }}
+                      value={field.value}
                       renderOption={(item) => <div>{item.label}</div>}
                       renderSelected={(item) => <div>{item.label}</div>}
                       onChange={field.onChange}

@@ -47,7 +47,8 @@ type ComboboxTypes<T> = {
   labelProps?: LabelProps;
   /** If true, it will show a red asterisk next to the label*/
   isRequired?: boolean;
-  onChange?: (e: any) => void;
+  value?: string;
+  onChange?: (selectedValue: string) => void;
   renderOption?: (item: T) => React.ReactNode;
   renderSelected?: (item: T) => React.ReactNode;
   ariaInvalid?: boolean;
@@ -57,7 +58,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
     {
       labelKey = "label",
       valueKey = "value",
-      defaultValue = "",
+      defaultValue,
       popoverClassName,
       direction,
       labelProps,
@@ -66,27 +67,25 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
       ariaInvalid,
       renderOption,
       renderSelected,
+      value: controlledValue,
+      onChange: onValueChange,
       ...props
     },
     ref,
   ) => {
     const [open, setOpen] = React.useState(false);
-    const [value, setValue] = React.useState(defaultValue);
     const containerRef = React.useRef<HTMLDivElement>(null);
-    // function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
-    //   return key.split(".").reduce((o, k) => (o || {})[k], obj);
-    // }
 
     function getProperty<T>(obj: T, key: string): any {
       return key.split(".").reduce((o: any, k: string) => (o || {})[k], obj);
     }
 
-    const handleOpenChange = (open: boolean) => {
+    const handleOpenChange = (openState: boolean) => {
       if (!(props.isLoading || props.preview)) {
-        setOpen(open);
+        setOpen(openState);
       }
     };
-    const selectedItem = data.find((item) => getProperty(item, valueKey) === value);
+    const selectedItem = data.find((item) => getProperty(item, valueKey) === controlledValue);
 
     return (
       <div
@@ -199,9 +198,8 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                       key={i}
                       onSelect={() => {
                         const newValue = getProperty(item, valueKey);
-                        setValue(newValue === value ? "" : (newValue as string));
-                        if (props.onChange) {
-                          props.onChange(newValue === value ? "" : (newValue as string));
+                        if (onValueChange) {
+                          onValueChange(newValue === controlledValue ? "" : newValue);
                         }
                         setOpen(false);
                       }}
@@ -219,7 +217,9 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                         strokeLinejoin="round"
                         className={cn(
                           "icon",
-                          value === getProperty(item, valueKey) ? "opacity-100" : "opacity-0",
+                          controlledValue === getProperty(item, valueKey)
+                            ? "opacity-100"
+                            : "opacity-0",
                         )}
                         style={{ marginInlineEnd: "0.5rem" }}
                       >
@@ -237,3 +237,5 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
     );
   },
 );
+
+Combobox.displayName = "Combobox";

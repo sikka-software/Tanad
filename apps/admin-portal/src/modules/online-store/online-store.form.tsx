@@ -163,6 +163,7 @@ export function OnlineStoreForm({
                       labelKey="label"
                       valueKey="value"
                       defaultValue={field.value}
+                      value={field.value}
                       inputProps={{ disabled: isLoading }}
                       texts={{
                         placeholder: t("OnlineStores.form.platform.placeholder"),
