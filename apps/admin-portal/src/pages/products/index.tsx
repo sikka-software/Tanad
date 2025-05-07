@@ -2,9 +2,11 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
+import { FormDialog } from "@/ui/form-dialog";
 import NoPermission from "@/ui/no-permission";
 import PageSearchAndFilter from "@/ui/page-search-and-filter";
 import SelectionMode from "@/ui/selection-mode";
@@ -16,12 +18,13 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import ProductCard from "@/product/product.card";
+import { ProductForm } from "@/product/product.form";
 import { useProducts, useBulkDeleteProducts, useDuplicateProduct } from "@/product/product.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/product/product.options";
 import useProductStore from "@/product/product.store";
 import ProductsTable from "@/product/product.table";
+import { Product } from "@/product/product.type";
 
-import { Product } from "@/modules/product/product.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function ProductsPage() {
@@ -33,6 +36,9 @@ export default function ProductsPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableProduct, setActionableProduct] = useState<Product | null>(null);
+
+  const loadingSaveProduct = useProductStore((state) => state.isLoading);
+  const setLoadingSaveProduct = useProductStore((state) => state.setIsLoading);
 
   const viewMode = useProductStore((state) => state.viewMode);
   const isDeleteDialogOpen = useProductStore((state) => state.isDeleteDialogOpen);
@@ -71,6 +77,19 @@ export default function ProductsPage() {
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
+    },
+    onError: (error: Error) => {
+      console.log("error is ", error);
+      if (
+        error?.message?.includes("violates foreign key constraint") &&
+        error?.message?.includes("invoice_items_product_id_fkey")
+      ) {
+        toast.error(t("General.error_operation"), {
+          description: t("Products.error.delete_constraint_invoice"),
+        });
+        return true;
+      }
+      return false;
     },
   });
 
@@ -133,6 +152,25 @@ export default function ProductsPage() {
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Products.add_new")}
+          formId="product-form"
+          loadingSave={loadingSaveProduct}
+        >
+          <ProductForm
+            formHtmlId={"product-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableProduct(null);
+              setLoadingSaveProduct(false);
+            }}
+            defaultValues={actionableProduct as Product}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

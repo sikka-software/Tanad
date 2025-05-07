@@ -66,9 +66,18 @@ export async function deleteProduct(id: string): Promise<void> {
   const response = await fetch(`/api/resource/products/${id}`, {
     method: "DELETE",
   });
+
   if (!response.ok) {
-    throw new Error("Failed to delete product");
+    const errorData = await response.json().catch(() => null); // Try to parse JSON, fallback to null
+    // Throw an error object that useDeleteHandler can inspect
+    throw {
+      message: errorData?.message || response.statusText || "Failed to delete product",
+      details: errorData?.details,
+      status: response.status,
+      errorData: errorData, // include the full error data if needed
+    };
   }
+  // No return needed for a successful delete if the API returns 204 No Content or similar
 }
 
 export async function bulkDeleteProducts(ids: string[]): Promise<void> {
@@ -77,7 +86,22 @@ export async function bulkDeleteProducts(ids: string[]): Promise<void> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ids }),
   });
+
+  // Read the body once
+  // Check if response has content before trying to parse JSON
+  const responseBody =
+    response.headers.get("content-length") !== "0" && response.body
+      ? await response.json().catch(() => null)
+      : null;
+
   if (!response.ok) {
-    throw new Error("Failed to delete products");
+    // Throw an error object that useDeleteHandler can inspect
+    throw {
+      message: responseBody?.message || response.statusText || "Failed to bulk delete products",
+      details: responseBody?.details,
+      status: response.status,
+      errorData: responseBody, // include the full error data if needed
+    };
   }
+  // No return needed for a successful delete if the API returns 204 No Content or similar
 }

@@ -51,7 +51,7 @@ export default function TablePagination({
             aria-disabled={isFirstPage || totalPages === 0 ? true : undefined}
             onClick={!isFirstPage && totalPages > 0 ? (e) => handlePageLinkClick(1, e) : undefined}
           >
-            <ChevronFirstIcon size={16} aria-hidden="true" />
+            <ChevronFirstIcon className="rtl:rotate-180" size={16} aria-hidden="true" />
           </PaginationLink>
         </PaginationItem>
 
@@ -74,7 +74,7 @@ export default function TablePagination({
                 : undefined
             }
           >
-            <ChevronLeftIcon size={16} aria-hidden="true" />
+            <ChevronLeftIcon className="rtl:rotate-180" size={16} aria-hidden="true" />
           </PaginationLink>
         </PaginationItem>
 
@@ -125,7 +125,7 @@ export default function TablePagination({
                 : undefined
             }
           >
-            <ChevronRightIcon size={16} aria-hidden="true" />
+            <ChevronRightIcon className="rtl:rotate-180" size={16} aria-hidden="true" />
           </PaginationLink>
         </PaginationItem>
 
@@ -142,7 +142,7 @@ export default function TablePagination({
               !isLastPage && totalPages > 0 ? (e) => handlePageLinkClick(totalPages, e) : undefined
             }
           >
-            <ChevronLastIcon size={16} aria-hidden="true" />
+            <ChevronLastIcon className="rtl:rotate-180" size={16} aria-hidden="true" />
           </PaginationLink>
         </PaginationItem>
       </PaginationContent>

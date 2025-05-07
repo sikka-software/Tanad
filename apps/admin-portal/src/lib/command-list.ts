@@ -11,6 +11,18 @@ export const commandList = [
         href: ModulesOptions.dashboard.url,
       },
       {
+        icon: ModulesOptions.analytics.icon,
+        label: ModulesOptions.analytics.label,
+        shortcut: "⌘A",
+        href: ModulesOptions.analytics.url,
+      },
+      {
+        icon: ModulesOptions.activity_logs.icon,
+        label: ModulesOptions.activity_logs.label,
+        shortcut: "⌘L",
+        href: ModulesOptions.activity_logs.url,
+      },
+      {
         icon: ModulesOptions.companies.icon,
         label: ModulesOptions.companies.label,
         shortcut: "⌘C",

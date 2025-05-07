@@ -18,6 +18,8 @@ import {
   Globe,
   Server,
   Link,
+  TableOfContents,
+  BarChart,
 } from "lucide-react";
 
 const ModulesOptions = {
@@ -26,6 +28,18 @@ const ModulesOptions = {
     label: "Dashboard.title",
     translationKey: "Dashboard.title",
     url: "/dashboard",
+  },
+  analytics: {
+    icon: BarChart,
+    label: "Analytics.title",
+    translationKey: "Analytics.title",
+    url: "/analytics",
+  },
+  activity_logs: {
+    icon: TableOfContents,
+    label: "ActivityLogs.title",
+    translationKey: "ActivityLogs.title",
+    url: "/activity",
   },
   sales: {
     icon: SaudiRiyal,

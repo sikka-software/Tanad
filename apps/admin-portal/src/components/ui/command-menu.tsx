@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import {
   Command,
@@ -15,9 +14,9 @@ import {
 } from "@/ui/command";
 import { Dialog, DialogContent } from "@/ui/dialog";
 
-import { commandList } from "@/lib/command-list";
-
 import { useMainStore } from "@/hooks/main.store";
+
+import { commandList } from "@/lib/command-list";
 
 type ShortcutCommand = {
   key: string;
@@ -44,7 +43,8 @@ export function CommandMenu({ dir }: { dir: "ltr" | "rtl" }) {
     { key: "p", path: "/products", metaKey: true },
     { key: "i", path: "/invoices", metaKey: true },
     { key: "o", path: "/companies", metaKey: true },
-    { key: "l", path: "/calendar", metaKey: true },
+    { key: "l", path: "/activity", metaKey: true },
+    { key: "a", path: "/analytics", metaKey: true },
     { key: "s", path: "/settings", metaKey: true },
   ];
 
