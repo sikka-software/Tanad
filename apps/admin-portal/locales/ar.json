@@ -961,6 +961,12 @@
       "custom_design_and_colors": "تصميم خاص وألوان مخصصة",
       "advanced_analytics": "تحليلات متقدمة ودعم بالبريد الإلكتروني"
     },
+    "view_billing_history": "عرض سجل الفواتير",
+    "usage_title": "الاستخدام",
+    "usage_description": "تحديث الاشتراكات المستخدمة",
+    "used_of_total": "من المستخدمين المتاحين",
+    "available": "متاح",
+    "total": "مجموع",
     "choose_the_right_plan": "اختر الباقة التي تناسب احتياجاتك وفريقك",
     "manage_description": "إدارة اشتراكك ومعلومات الفواتير",
     "available_plans": "الباقات المتاحة",
