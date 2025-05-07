@@ -3,7 +3,7 @@
 import { useTheme } from "next-themes";
 import * as React from "react";
 
-import { CopyButton } from "@/components/animate-ui/buttons/copy";
+import { CopyButton } from "@root/src/components/ui/copy-button";
 import {
   Tabs,
   TabsContent,

@@ -416,7 +416,7 @@ export default function Dashboard() {
             />
           </div>
 
-          <div className="mt-8">
+          {/* <div className="mt-8">
             <h3 className="mb-4 text-lg font-semibold">{t("ActivityLogs.title")}</h3>
             {activityError && (
               <Alert variant="destructive" className="mb-4">
@@ -430,7 +430,7 @@ export default function Dashboard() {
             ) : (
               <ActivityCalendar data={activityCounts} />
             )}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
