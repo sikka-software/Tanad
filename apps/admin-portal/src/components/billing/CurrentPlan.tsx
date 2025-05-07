@@ -1,4 +1,4 @@
-import { RefreshCcw } from "lucide-react";
+import { ReceiptText, Undo2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -16,11 +16,16 @@ import { TANAD_PRODUCT_ID } from "@/lib/constants";
 import useUserStore from "@/stores/use-user-store";
 
 import { BillingHistoryDialog } from "./BillingHistoryDialog";
+import { ConfirmCancelSubscriptionDialog } from "./ConfirmCancelSubscription";
 
 // Create a pub/sub event for subscription updates
 export const SUBSCRIPTION_UPDATED_EVENT = "subscription_updated";
 
-export default function CurrentPlan() {
+interface CurrentPlanProps {
+  isPageLoading?: boolean;
+}
+
+export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
   const router = useRouter();
   const t = useTranslations();
   const locale = useLocale();
@@ -28,25 +33,10 @@ export default function CurrentPlan() {
   const { user, profile, fetchUserAndProfile } = useUserStore();
   const { getPlans } = usePricing(TANAD_PRODUCT_ID);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(Date.now());
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  console.log("CurrentPlan rendering with:", {
-    user: user?.id,
-    profile: profile
-      ? {
-          id: profile.id,
-          subscribed_to: profile.subscribed_to,
-          price_id: profile.price_id,
-          stripe_customer_id: profile.stripe_customer_id,
-        }
-      : null,
-    subscription: {
-      loading: subscription.loading,
-      plan: subscription.planLookupKey,
-      status: subscription.status,
-    },
-  });
+  const [isCanceling, setIsCanceling] = useState(false);
 
   // Add a function to handle forced refresh with router
   const forcePageRefresh = () => {
@@ -116,8 +106,58 @@ export default function CurrentPlan() {
     }
   }, [user, refreshData]);
 
-  if (subscription.loading || !user || isRefreshing) {
-    return <Skeleton className="h-24 w-full rounded-lg" />;
+  // Add handler for cancel subscription
+  const handleCancelSubscription = async () => {
+    if (!subscription.id) {
+      toast.error(
+        t("Billing.no_active_subscription", { fallback: "No active subscription to cancel" }),
+      );
+      return;
+    }
+
+    setIsCanceling(true);
+    try {
+      const response = await subscription.cancelSubscription();
+
+      if (response.success) {
+        toast.success(
+          t("Billing.cancel_subscription.cancel_success", {
+            fallback:
+              "Your subscription has been canceled and will end at the end of your billing period",
+          }),
+        );
+
+        // Refresh data to update UI
+        await refreshData();
+
+        // Close the dialog
+        setIsCancelDialogOpen(false);
+      } else {
+        toast.error(
+          response.error ||
+            t("Billing.error_canceling_subscription", {
+              fallback: "Error canceling subscription",
+            }),
+        );
+      }
+    } catch (error) {
+      console.error("Error canceling subscription:", error);
+      toast.error(
+        t("Billing.error_canceling_subscription", {
+          fallback: "Error canceling subscription",
+        }),
+      );
+    } finally {
+      setIsCanceling(false);
+    }
+  };
+
+  // Use the isPageLoading prop to determine loading state
+  // If isPageLoading is provided, use it; otherwise fall back to subscription.loading
+  const isLoading = isPageLoading !== undefined ? isPageLoading : subscription.loading || !user;
+
+  if (isLoading) {
+    return <Skeleton className="h-[180px] w-full flex-1 rounded-lg" />;
   }
 
   // Format the next billing date if available
@@ -163,145 +203,127 @@ export default function CurrentPlan() {
 
   return (
     <>
-      <div className="bg-background rounded-lg border p-6">
-        <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-          <div>
-            <h2 className="text-xl font-bold">{t("Billing.current_plan.title")}</h2>
-            <div className="mt-1 flex items-center gap-2">
-              <span className="text-lg font-medium">
-                {subscription.planLookupKey
-                  ? t(`Billing.${subscription.planLookupKey}`, {
-                      fallback: subscription.planLookupKey,
-                    })
-                  : t("Billing.tanad_free", { fallback: "Free Plan" })}
-              </span>
-              {subscription.status === "active" &&
-                !subscription.cancelAt &&
-                subscription.planLookupKey !== "tanad_free" && (
-                  <Badge variant="outline" className="border-green-500 bg-green-50 text-green-700">
-                    {t("Billing.subscription_status.active")}
+      <div className="bg-background relative flex-1 rounded-lg border p-6">
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-bold">
+                {t("Billing.current_plan.title", { fallback: "الباقة الحالية" })}
+              </h2>
+              <div className="mt-1 flex items-center gap-2">
+                <span className="text-lg font-medium">
+                  {subscription.planLookupKey
+                    ? t(`Billing.${subscription.planLookupKey}`, {
+                        fallback: `Billing.${subscription.planLookupKey}`,
+                      })
+                    : t("Billing.tanad_free", { fallback: "الباقة المجانية" })}
+                </span>
+                {subscription.status === "active" &&
+                  !subscription.cancelAt &&
+                  subscription.planLookupKey !== "tanad_free" && (
+                    <Badge
+                      variant="outline"
+                      className="border-green-500 bg-green-50 text-green-700"
+                    >
+                      {t("Billing.subscription_status.active", { fallback: "نشط" })}
+                    </Badge>
+                  )}
+                {subscription.planLookupKey === "tanad_free" && (
+                  <Badge variant="outline" className="border-blue-500 bg-blue-50 text-blue-700">
+                    {t("Billing.free_plan_badge", { fallback: "مجانية" })}
                   </Badge>
                 )}
-              {subscription.planLookupKey === "tanad_free" && (
-                <Badge variant="outline" className="border-blue-500 bg-blue-50 text-blue-700">
-                  {t("Billing.free_plan_badge", { fallback: "Free" })}
-                </Badge>
-              )}
-              {subscription.status === "trialing" && (
-                <Badge variant="outline" className="border-blue-500 bg-blue-50 text-blue-700">
-                  {t("Billing.subscription_status.trialing")}
-                </Badge>
-              )}
-              {subscription.cancelAt && (
-                <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
-                  {t("Billing.canceling")}
-                </Badge>
-              )}
-            </div>
+                {subscription.cancelAt && (
+                  <Badge
+                    variant="outline"
+                    className="border-orange-200 bg-orange-50 text-orange-700"
+                  >
+                    {t("Billing.canceling", { fallback: "قيد الإلغاء" })}
+                  </Badge>
+                )}
+              </div>
 
-            {/* Price and billing cycle */}
-            <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-4">
+              {/* Price and billing cycle */}
               {subscription.price && subscription.price !== "0 SAR" && (
-                <p className="text-foreground font-medium">
+                <p className="text-foreground mt-2 font-medium">
                   {locale === "ar"
-                    ? subscription.price.replace("SAR", "ريال سعودي")
-                    : subscription.price}
-                  {subscription.billingCycle && subscription.billingCycle !== "-" && (
-                    <span className="text-muted-foreground">
-                      {" "}
-                      {locale === "ar"
-                        ? subscription.billingCycle === "month"
-                          ? "شهرياً"
-                          : "سنوياً"
-                        : subscription.billingCycle === "month"
-                          ? "/month"
-                          : "/year"}
-                    </span>
-                  )}
+                    ? `${subscription.price.replace("SAR", "ريال سعودي")} ${
+                        subscription.billingCycle === "month" ? "شهرياً" : "سنوياً"
+                      }`
+                    : `${subscription.price} ${
+                        subscription.billingCycle === "month" ? "/month" : "/year"
+                      }`}
                 </p>
               )}
-
-              {/* Billing cycle badge */}
-              {subscription.billingCycle && subscription.billingCycle !== "-" && (
-                <Badge variant="outline" className="text-xs">
-                  {t(`Billing.${subscription.billingCycle}_billing`, {
-                    fallback:
-                      subscription.billingCycle === "month" ? "Monthly billing" : "Annual billing",
-                  })}
-                </Badge>
+              {/* Next billing date */}
+              {nextBillingDate && (
+                <p className="text-foreground mt-2 font-medium">
+                  {t("Billing.next_billing_date", { fallback: "التاريخ التالي للفوتر" })}:{" "}
+                  {nextBillingDate}
+                </p>
               )}
             </div>
 
-            {/* Format cancellation date if available */}
-            {subscription.cancelAt && (
-              <p className="mt-2 flex items-center text-sm text-orange-600">
-                <span className="mr-2 inline-block h-2 w-2 rounded-full bg-orange-500"></span>
-                {t("Billing.subscription_cancels_on", {
-                  date: new Date(Number(subscription.cancelAt) * 1000).toLocaleDateString(
-                    locale === "ar" ? "ar-SA" : "en-US",
-                    { year: "numeric", month: "long", day: "numeric" },
-                  ),
-                  fallback: `Your subscription will cancel on ${new Date(
-                    Number(subscription.cancelAt) * 1000,
-                  ).toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}`,
-                })}
-              </p>
-            )}
-
-            {/* Next billing date */}
-            {nextBillingDate && !subscription.cancelAt && (
-              <p className="text-muted-foreground mt-2 flex items-center">
-                <span className="mr-2 inline-block h-2 w-2 rounded-full bg-green-500"></span>
-                {locale === "ar"
-                  ? t("Billing.next_billing_date_is", {
-                      date: nextBillingDate,
-                      fallback: `تاريخ الفاتورة القادمة هو ${nextBillingDate}`,
-                    })
-                  : t("Billing.next_billing_date_is", {
-                      date: nextBillingDate,
-                      fallback: `Your subscription will automatically renew on ${nextBillingDate}`,
-                    })}
-              </p>
-            )}
-          </div>
-          <div>
+            {/* Billing history button */}
             <Button
               variant="outline"
-              className="bg-background hover:bg-accent"
-              onClick={async () => {
-                // Open the dialog without forcing a refresh
-                setIsHistoryDialogOpen(true);
-              }}
+              size="sm"
+              className="flex items-center gap-1"
+              onClick={() => setIsHistoryDialogOpen(true)}
             >
-              {t("Billing.history", { fallback: "Billing History" })}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => {
-                e.preventDefault();
-                refreshData();
-                toast.success(t("Billing.data_refreshed", { fallback: "Billing data refreshed" }));
-              }}
-              className="ml-2 h-9 w-9"
-              title={t("Billing.current_plan.refresh", { fallback: "Refresh" })}
-              disabled={isRefreshing}
-            >
-              <RefreshCcw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+              <ReceiptText className="h-4 w-4" />
+              {t("Billing.view_billing_history", { fallback: "سجل الفواتير" })}
             </Button>
           </div>
+
+          {/* Cancel subscription button - only shown for active paid plans */}
+          {subscription.status === "active" &&
+            subscription.planLookupKey !== "tanad_free" &&
+            !subscription.cancelAt && (
+              <div className="mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                  onClick={() => setIsCancelDialogOpen(true)}
+                >
+                  {t("Billing.cancel_subscription.button", { fallback: "إلغاء الاشتراك" })}
+                </Button>
+              </div>
+            )}
+
+          {/* Reactivate subscription button for canceled subscriptions */}
+          {subscription.cancelAt && (
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-primary border-primary/30 hover:bg-primary/10 flex items-center gap-1"
+                onClick={() => {
+                  // Add reactivation logic here if needed
+                }}
+              >
+                <Undo2 className="h-4 w-4" />
+                {t("Billing.reactivate_subscription", { fallback: "إعادة تفعيل الاشتراك" })}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Use the separate billing history dialog component */}
+      {/* Billing History Dialog */}
       <BillingHistoryDialog
         open={isHistoryDialogOpen}
         onOpenChange={setIsHistoryDialogOpen}
         user={user}
+      />
+
+      {/* Cancel Subscription Dialog */}
+      <ConfirmCancelSubscriptionDialog
+        open={isCancelDialogOpen}
+        onOpenChange={setIsCancelDialogOpen}
+        isCanceling={isCanceling}
+        onConfirm={handleCancelSubscription}
       />
     </>
   );
