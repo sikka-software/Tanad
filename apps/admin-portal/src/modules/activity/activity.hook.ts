@@ -29,10 +29,10 @@ export const activityLogKeys = {
 
 // Hook to fetch a paginated list of activity logs
 export function useActivityLogs(page: number, pageSize: number, filters?: ActivityFilters) {
-  return useQuery<ActivityLogListData[], Error>({
+  return useQuery<{ logs: ActivityLogListData[]; totalCount: number }, Error>({
     queryKey: activityLogKeys.list(filters, page, pageSize),
     queryFn: () => listActivities(page, pageSize, filters),
-    placeholderData: (previousData: ActivityLogListData[] | undefined) => previousData, // Keep previous data while new data loads
+    placeholderData: (previousData: { logs: ActivityLogListData[]; totalCount: number } | undefined) => previousData,
     // keepPreviousData: true, // TanStack Query v5 uses placeholderData
   });
 }

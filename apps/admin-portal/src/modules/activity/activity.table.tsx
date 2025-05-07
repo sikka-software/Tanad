@@ -33,8 +33,8 @@ export function ActivityLogTable() {
     error,
   } = useActivityLogs(page, itemsPerPage, debouncedFilters);
 
-  const activityLogs = activityLogResponse || [];
-  const totalLogs = activityLogResponse?.length || 0;
+  const activityLogs = activityLogResponse?.logs || [];
+  const totalLogs = activityLogResponse?.totalCount || 0;
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

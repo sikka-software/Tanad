@@ -32,7 +32,7 @@ export async function listActivities(
   page = 1,
   pageSize = 20,
   filters?: ActivityFilters, // Add filters parameter
-): Promise<ActivityLogListData[]> {
+): Promise<{ logs: ActivityLogListData[]; totalCount: number }> {
   const supabase = createClient();
 
   // 1. Get the current user's session
@@ -59,7 +59,7 @@ export async function listActivities(
   }
   if (!membership?.enterprise_id) {
     console.warn("listActivities: User is not associated with an enterprise.");
-    return []; // Or throw an error, depending on expected behavior
+    return { logs: [], totalCount: 0 }; // Or throw an error, depending on expected behavior
     // throw new Error("User is not associated with an enterprise.");
   }
   const enterprise_id = membership.enterprise_id;
@@ -150,10 +150,14 @@ export async function listActivities(
     });
   }
 
+  const totalCount = formattedData.length; // Get total count after filtering
+
   // 5. Apply client-side pagination to the filtered data
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
-  return formattedData.slice(start, end);
+  const paginatedLogs = formattedData.slice(start, end);
+
+  return { logs: paginatedLogs, totalCount }; // Return new structure
 }
 
 /**
