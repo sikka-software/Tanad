@@ -50,6 +50,7 @@ type ComboboxTypes<T> = {
   onChange?: (e: any) => void;
   renderOption?: (item: T) => React.ReactNode;
   renderSelected?: (item: T) => React.ReactNode;
+  ariaInvalid?: boolean;
 };
 export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
   (
@@ -62,6 +63,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
       labelProps,
       inputProps,
       data,
+      ariaInvalid,
       renderOption,
       renderSelected,
       ...props
@@ -118,11 +120,19 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                   disabled={inputProps?.disabled}
                   aria-expanded={open}
                   className={cn(
-                    "ring-offset-background focus-visible:ring-ring inline-flex w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-                    props.preview
-                      ? "cursor-default rounded-none border-transparent px-0"
-                      : "bg-background px-3",
+                    "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                    "bg-background px-3",
+                    ariaInvalid &&
+                      "ring-destructive/20 dark:ring-destructive/40 border-destructive",
+                    // inCell && "h-10 rounded-none border-none",
+                    // buttonClassName,
                   )}
+                  // className={cn(
+                  //   "ring-offset-background focus-visible:ring-ring inline-flex w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                  //   props.preview
+                  //     ? "cursor-default rounded-none border-transparent px-0"
+                  //     : "bg-background px-3",
+                  // )}
                 >
                   {selectedItem
                     ? renderSelected
@@ -160,7 +170,11 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
           <PopoverContent
             // sideOffset={0}
             align="start"
-            className={cn("w-[--radix-popover-trigger-width] p-0", props.helperText && "-mt-4")}
+            className={cn(
+              "w-[var(--radix-popover-trigger-width)] p-0",
+              props.helperText && "-mt-4",
+              popoverClassName,
+            )}
             dir={direction}
             // container={containerRef.current}
           >

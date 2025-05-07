@@ -4121,6 +4121,67 @@
     "title": "المتاجر الإلكترونية",
     "add_new": "متجر إلكتروني جديد",
     "edit_online_store": "تعديل المتجر الإلكتروني",
-    "update_online_store": "تحديث المتجر الإلكتروني"
+    "update_online_store": "تحديث المتجر الإلكتروني",
+    "singular": "متجر إلكتروني",
+    "online_store_details": "تفاصيل المتجر الإلكتروني",
+    "create_new": "إنشاء متجر إلكتروني جديد",
+    "no_online_stores_found": "لا توجد متاجر إلكترونية",
+    "search_online_stores": "بحث عن متاجر إلكترونية...",
+    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {متجر} =1 {هذا المتجر الإلكتروني} other {# متاجر إلكترونية}}؟",
+    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {متجر} =1 {هذا المتجر الإلكتروني} other {# متاجر إلكترونية}}",
+    "form": {
+      "domain_name": {
+        "label": "اسم النطاق",
+        "placeholder": "أدخل اسم النطاق",
+        "required": "اسم النطاق مطلوب"
+      },
+      "platform": {
+        "label": "المنصة",
+        "search_placeholder": "بحث عن منصة",
+        "placeholder": "اختر المنصة",
+        "required": "المنصة مطلوبة",
+        "salla": "سلة",
+        "zid": "زد",
+        "shopify": "شوبفاي (Shopify)",
+        "wix": "ويكس (Wix)",
+        "magento": "ماجنتو (Magento)",
+        "prestashop": "بريستاشوب (PrestaShop)",
+        "bigcommerce": "بيج كوميرس (BigCommerce)",
+        "woocommerce": "وو كوميرس (WooCommerce)",
+        "open_cart": "أوبن كارت (OpenCart)",
+        "other": "أخرى"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "required": "الحالة مطلوبة",
+        "active": "نشط",
+        "inactive": "غير نشط"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل الملاحظات"
+      },
+      "create_button": "إنشاء متجر إلكتروني",
+      "update_button": "تحديث المتجر الإلكتروني"
+    },
+    "success": {
+      "create": "تم إنشاء المتجر الإلكتروني بنجاح",
+      "update": "تم تحديث المتجر الإلكتروني بنجاح",
+      "delete": "تم حذف المتجر الإلكتروني بنجاح",
+      "duplicate": "تم تكرار المتجر الإلكتروني بنجاح"
+    },
+    "loading": {
+      "create": "جاري إنشاء المتجر الإلكتروني...",
+      "update": "جاري تحديث المتجر الإلكتروني...",
+      "delete": "جاري حذف المتجر الإلكتروني...",
+      "duplicate": "جاري تكرار المتجر الإلكتروني..."
+    },
+    "error": {
+      "create": "حدث خطأ أثناء إنشاء المتجر الإلكتروني",
+      "update": "حدث خطأ أثناء تحديث المتجر الإلكتروني",
+      "delete": "حدث خطأ أثناء حذف المتجر الإلكتروني",
+      "duplicate": "حدث خطأ أثناء تكرار المتجر الإلكتروني"
+    }
   }
 }

@@ -74,6 +74,49 @@ export const SERVER_OS = [
   },
 ];
 
+export const E_COMMERCE_PLATFORMS = [
+  {
+    label: "OnlineStores.form.platform.salla",
+    value: "salla",
+  },
+  {
+    label: "OnlineStores.form.platform.zid",
+    value: "zid",
+  },
+  {
+    label: "OnlineStores.form.platform.shopify",
+    value: "shopify",
+  },
+  {
+    label: "OnlineStores.form.platform.wix",
+    value: "wix",
+  },
+  {
+    label: "OnlineStores.form.platform.magento",
+    value: "magento",
+  },
+  {
+    label: "OnlineStores.form.platform.prestashop",
+    value: "prestashop",
+  },
+  {
+    label: "OnlineStores.form.platform.bigcommerce",
+    value: "bigcommerce",
+  },
+  {
+    label: "OnlineStores.form.platform.woocommerce",
+    value: "woocommerce",
+  },
+  {
+    label: "OnlineStores.form.platform.open_cart",
+    value: "opencart",
+  },
+  {
+    label: "OnlineStores.form.platform.other",
+    value: "other",
+  },
+];
+
 export const SERVER_PROVIDERS = [
   {
     label: "AWS",

@@ -1089,6 +1089,7 @@ export type Database = {
           enterprise_id: string
           id: string
           notes: string | null
+          platform: string | null
           status: Database["public"]["Enums"]["common_status"] | null
           updated_at: string
           user_id: string
@@ -1099,6 +1100,7 @@ export type Database = {
           enterprise_id: string
           id?: string
           notes?: string | null
+          platform?: string | null
           status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string
           user_id: string
@@ -1109,6 +1111,7 @@ export type Database = {
           enterprise_id?: string
           id?: string
           notes?: string | null
+          platform?: string | null
           status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string
           user_id?: string

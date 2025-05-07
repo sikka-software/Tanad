@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CurrencyInput } from "@root/src/components/ui/currency-input";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -54,13 +54,13 @@ export function DomainForm({
   editMode,
 }: ModuleFormProps<DomainUpdateData | DomainCreateData>) {
   const t = useTranslations();
+  const lang = useLocale();
 
   const user = useUserStore((state) => state.user);
   const membership = useUserStore((state) => state.membership);
 
   const { mutate: createDomain } = useCreateDomain();
   const { mutate: updateDomain } = useUpdateDomain();
-  const { data: domains } = useDomains();
 
   const isLoading = useDomainStore((state) => state.isLoading);
   const setIsLoading = useDomainStore((state) => state.setIsLoading);
@@ -240,7 +240,7 @@ export function DomainForm({
                 <FormItem>
                   <FormLabel>{t("Domains.form.payment_cycle.label")}</FormLabel>
                   <FormControl>
-                    <Select>
+                    <Select dir={lang === "ar" ? "rtl" : "ltr"}>
                       <SelectTrigger>
                         <SelectValue placeholder={t("Domains.form.payment_cycle.placeholder")} />
                       </SelectTrigger>
@@ -265,7 +265,7 @@ export function DomainForm({
                 <FormItem>
                   <FormLabel>{t("Domains.form.status.label")}</FormLabel>
                   <FormControl>
-                    <Select {...field} disabled={isLoading}>
+                    <Select dir={lang === "ar" ? "rtl" : "ltr"} {...field} disabled={isLoading}>
                       <SelectTrigger>
                         <SelectValue placeholder={t("Domains.form.status.placeholder")} />
                       </SelectTrigger>

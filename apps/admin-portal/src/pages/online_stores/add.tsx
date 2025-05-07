@@ -1,3 +1,4 @@
+import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -22,8 +23,11 @@ export default function AddOnlineStorePage() {
     const dummyData = generateDummyData();
     const form = (window as any).onlineStoreForm;
     if (form) {
+      let dd = dummyData.randomPicker(E_COMMERCE_PLATFORMS);
+      console.log(dd.value);
       form.setValue("domain_name", dummyData.first_name.toLowerCase() + ".com");
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
+      form.setValue("platform", dd.value);
       form.setValue("notes", dummyData.state);
     }
   };

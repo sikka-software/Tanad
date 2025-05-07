@@ -1,3 +1,4 @@
+import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
@@ -47,7 +48,18 @@ const OnlineStoresTable = ({
       header: t("OnlineStores.form.domain_name.label"),
       validationSchema: z.string().min(1, "Required"),
     },
-
+    {
+      accessorKey: "platform",
+      cellType: "select",
+      header: t("OnlineStores.form.platform.label"),
+      validationSchema: z.string().min(1, "Required"),
+      options: E_COMMERCE_PLATFORMS,
+    },
+    {
+      accessorKey: "notes",
+      header: t("OnlineStores.form.notes.label"),
+      validationSchema: z.string().min(1, "Required"),
+    },
     {
       accessorKey: "status",
       header: t("OnlineStores.form.status.label"),

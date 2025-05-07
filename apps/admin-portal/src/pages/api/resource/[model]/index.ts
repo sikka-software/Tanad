@@ -264,14 +264,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { model } = req.query;
 
   if (typeof model !== "string" || !(model in modelMap)) {
-    console.error(`>>> [${model}] Error: Model not found in modelMap <<<`);
-    return res.status(404).json({ message: "Model not found" });
+    return res.status(404).json({ message: "Module not found" });
   }
 
   const config = modelMap[model as keyof typeof modelMap];
 
   if (!config) {
-    console.error(`>>> [${model}] Error: No configuration found in modelMap <<<`);
     return res.status(500).json({ message: "Internal server configuration error" });
   }
 

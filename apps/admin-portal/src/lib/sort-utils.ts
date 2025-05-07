@@ -22,6 +22,7 @@ const models = [
   "domains",
   "servers",
   "websites",
+  "online_stores",
 ];
 
 interface SortOptions {

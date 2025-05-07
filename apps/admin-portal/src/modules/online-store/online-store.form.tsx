@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { Combobox } from "@root/src/components/ui/combobox";
+import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
+import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -15,11 +17,12 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateOnlineStore, useUpdateOnlineStore } from "./online-store.hooks";
 import useOnlineStoreStore from "./online-store.store";
-import { OnlineStore, OnlineStoreUpdateData, OnlineStoreCreateData } from "./online-store.type";
+import { OnlineStoreUpdateData, OnlineStoreCreateData } from "./online-store.type";
 
 export const createOnlineStoreSchema = (t: (key: string) => string) => {
   const baseOnlineStoreSchema = z.object({
     domain_name: z.string().min(1, t("OnlineStores.form.domain_name.required")),
+    platform: z.string().min(1, t("OnlineStores.form.platform.required")),
     notes: z.string().optional().or(z.literal("")),
     status: z.string().min(1, t("OnlineStores.form.status.required")),
   });
@@ -43,7 +46,7 @@ export function OnlineStoreForm({
   editMode,
 }: ModuleFormProps<OnlineStoreUpdateData | OnlineStoreCreateData>) {
   const t = useTranslations();
-
+  const lang = useLocale();
   const user = useUserStore((state) => state.user);
   const membership = useUserStore((state) => state.membership);
 
@@ -59,6 +62,7 @@ export function OnlineStoreForm({
       domain_name: defaultValues?.domain_name || "",
       status: defaultValues?.status || "active",
       notes: defaultValues?.notes || "",
+      platform: defaultValues?.platform || "",
     },
   });
 
@@ -148,30 +152,62 @@ export function OnlineStoreForm({
 
             <FormField
               control={form.control}
-              name="status"
+              name="platform"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("OnlineStores.form.status.label")}</FormLabel>
+                  <FormLabel>{t("OnlineStores.form.platform.label")}</FormLabel>
                   <FormControl>
-                    <Select {...field} disabled={isLoading}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("OnlineStores.form.status.placeholder")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="active">
-                          {t("OnlineStores.form.status.active")}
-                        </SelectItem>
-                        <SelectItem value="inactive">
-                          {t("OnlineStores.form.status.inactive")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Combobox
+                      direction={lang === "ar" ? "rtl" : "ltr"}
+                      data={E_COMMERCE_PLATFORMS || []}
+                      labelKey="label"
+                      valueKey="value"
+                      defaultValue={field.value}
+                      inputProps={{ disabled: isLoading }}
+                      texts={{
+                        placeholder: t("OnlineStores.form.platform.placeholder"),
+                        searchPlaceholder: t("OnlineStores.form.platform.search_placeholder"),
+                        noItems: t("OnlineStores.form.platform.no_items"),
+                      }}
+                      renderOption={(item) => <div>{t(item.label)}</div>}
+                      renderSelected={(item) => <div>{t(item.label)}</div>}
+                      onChange={field.onChange}
+                      ariaInvalid={!!form.formState.errors.platform}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("OnlineStores.form.status.label")}</FormLabel>
+                <FormControl>
+                  <Select
+                    dir={lang === "ar" ? "rtl" : "ltr"}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t("OnlineStores.form.status.placeholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">{t("OnlineStores.form.status.active")}</SelectItem>
+                      <SelectItem value="inactive">
+                        {t("OnlineStores.form.status.inactive")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="notes"

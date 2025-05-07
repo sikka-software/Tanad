@@ -1,31 +1,7 @@
-import DomainCard from "@root/src/modules/domain/domain.card";
-import { DomainForm } from "@root/src/modules/domain/domain.form";
-import {
-  useDomains,
-  useBulkDeleteDomains,
-  useDuplicateDomain,
-} from "@root/src/modules/domain/domain.hooks";
-import useDomainStore from "@root/src/modules/domain/domain.store";
-import DomainsTable from "@root/src/modules/domain/domain.table";
-import { DomainUpdateData } from "@root/src/modules/domain/domain.type";
-import OnlineStoreCard from "@root/src/modules/online-store/online-store.card";
-import { OnlineStoreForm } from "@root/src/modules/online-store/online-store.form";
-import {
-  useBulkDeleteOnlineStores,
-  useOnlineStores,
-} from "@root/src/modules/online-store/online-store.hooks";
-import { useDuplicateOnlineStore } from "@root/src/modules/online-store/online-store.hooks";
-import useOnlineStoreStore from "@root/src/modules/online-store/online-store.store";
-import OnlineStoresTable from "@root/src/modules/online-store/online-store.table";
-import {
-  OnlineStore,
-  OnlineStoreUpdateData,
-} from "@root/src/modules/online-store/online-store.type";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -40,7 +16,17 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
 
-import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/domain/domain.options";
+import OnlineStoreCard from "@/modules/online-store/online-store.card";
+import { OnlineStoreForm } from "@/modules/online-store/online-store.form";
+import {
+  useBulkDeleteOnlineStores,
+  useOnlineStores,
+  useDuplicateOnlineStore,
+} from "@/modules/online-store/online-store.hooks";
+import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/online-store/online-store.options";
+import useOnlineStoreStore from "@/modules/online-store/online-store.store";
+import OnlineStoresTable from "@/modules/online-store/online-store.table";
+import { OnlineStore, OnlineStoreUpdateData } from "@/modules/online-store/online-store.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function OnlineStoresPage() {

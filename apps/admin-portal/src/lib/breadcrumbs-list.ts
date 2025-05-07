@@ -292,4 +292,36 @@ export const dynamicRoutePatterns = [
       { path: "/activity", labelKey: "ActivityLogs.title" },
     ],
   },
+  // domains
+  {
+    pattern: /^\/domains\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/domains", labelKey: "Domains.title" },
+    ],
+  },
+  // servers
+  {
+    pattern: /^\/servers\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/servers", labelKey: "Servers.title" },
+    ],
+  },
+  // websites
+  {
+    pattern: /^\/websites\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/websites", labelKey: "Websites.title" },
+    ],
+  },
+  // online_stores
+  {
+    pattern: /^\/online_stores\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Dashboard.title" },
+      { path: "/online_stores", labelKey: "OnlineStores.title" },
+    ],
+  },
 ];

@@ -677,7 +677,7 @@ function SheetTable<
         >
           {/* Selection checkbox */}
           {enableRowSelection && (
-            <TableCell className="bg-background sticky start-0 z-2 border-y">
+            <TableCell className="bg-background sticky start-0 z-2 w-8 !max-w-8 min-w-8 border-y">
               <div className="flex h-auto items-center justify-center">
                 <input
                   type="checkbox"
@@ -691,7 +691,7 @@ function SheetTable<
           )}
           {/* Row actions */}
           {enableRowActions && (
-            <TableCell className="bg-background sticky start-8 z-2 min-w-8  border-y p-0">
+            <TableCell className="bg-background sticky start-8 z-2 w-8 !max-w-8 min-w-8 border-y p-0">
               <div className="flex h-auto min-h-9 items-center justify-center">
                 <RowActionsPopover
                   texts={texts}
@@ -900,82 +900,6 @@ function SheetTable<
     [renderRow],
   );
 
-  /**
-   * Renders optional footer (totals row + optional custom element) inside a <TableFooter>.
-   */
-  function renderFooter() {
-    if (!totalRowValues && !footerElement) return null;
-
-    return (
-      <TableFooter className="border-none">
-        {/* If there's a totalRowTitle, show it in a single row */}
-        {totalRowTitle && (
-          <TableRow className="border-none">
-            {/* If there's a totalRowTitle, show it in a single row */}
-            {enableRowSelection && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {removePos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            <TableCell colSpan={columns.length} className="border text-center font-semibold">
-              {totalRowTitle}
-            </TableCell>
-
-            {/* Left icon - empty cells  */}
-            {addPos === "right" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {removePos === "right" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-          </TableRow>
-        )}
-
-        {/* The totals row */}
-        {totalRowValues && (
-          <TableRow className="border-none">
-            {/*  Right icon - empty cells  */}
-            {addPos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {removePos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {columns.map((colDef, index) => {
-              const colKey = getColumnKey(colDef);
-              const cellValue = totalRowValues[colKey];
-
-              // Provide a default string if totalRowLabel is not passed and this is the first cell
-              const displayValue =
-                cellValue !== undefined ? cellValue : index === 0 ? totalRowLabel || "" : "";
-
-              // Always apply the border to the first cell or any cell that has a displayValue
-              const applyBorder = index === 0 || displayValue !== "";
-
-              return (
-                <TableCell
-                  key={`total-${colKey}`}
-                  className={`font-bold ${applyBorder ? "border" : ""}`}
-                >
-                  {displayValue}
-                </TableCell>
-              );
-            })}
-          </TableRow>
-        )}
-
-        {/* If a footerElement is provided, render it after the totals row */}
-        {footerElement}
-      </TableFooter>
-    );
-  }
-
   return (
     <div ref={parentRef} className="relative max-h-[calc(100vh-5rem)] overflow-auto p-0 pb-2">
       <Table id={id}>
@@ -986,7 +910,7 @@ function SheetTable<
             <TableRow className="border-none">
               {/* Selection checkbox header */}
               {enableRowSelection && (
-                <TableHead className="bg-muted sticky start-0 top-0 z-30 border-none text-start">
+                <TableHead className="bg-muted sticky start-0 top-0 z-30 w-8 !max-w-8 min-w-8 border-none text-start">
                   <div className="flex h-full items-center justify-center">
                     <input
                       type="checkbox"

@@ -1,16 +1,10 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { toast } from "sonner";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import PageTitle from "@/ui/page-title";
 
-import { JobListingForm, type JobListingFormValues } from "@/job-listing/job-listing.form";
-import { useCreateJobListing } from "@/job-listing/job-listing.hooks";
+import { JobListingForm } from "@/job-listing/job-listing.form";
 import useJobListingsStore from "@/job-listing/job-listing.store";
-
-import useUserStore from "@/stores/use-user-store";
 
 export default function AddJobListingPage() {
   const t = useTranslations();

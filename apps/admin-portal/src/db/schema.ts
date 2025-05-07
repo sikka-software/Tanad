@@ -1954,6 +1954,7 @@ export const online_stores = pgTable(
       .primaryKey()
       .notNull(),
     domain_name: text().notNull(),
+    platform: text(),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),
