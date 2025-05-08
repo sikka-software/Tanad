@@ -34,7 +34,7 @@ const FormSectionHeader = ({
         </div>
         {onCreate && (
           <Button type="button" size="sm" onClick={onCreate} disabled={onCreateDisabled}>
-            <PlusCircle className="mr-2 size-4" />
+            <PlusCircle className="me-2 size-4" />
             {onCreateText}
           </Button>
         )}

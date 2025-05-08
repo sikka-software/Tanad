@@ -91,7 +91,7 @@ const SortableItem = ({ item, title, enabled, onToggle }: SortableItemProps) => 
       <span className="h-4 w-4 flex-shrink-0" />
       <span className="flex-1">{title}</span>
       {item.is_active && (
-        <span className="text-primary bg-primary/10 mr-2 rounded-full px-2 py-1 text-xs font-medium">
+        <span className="text-primary bg-primary/10 me-2 rounded-full px-2 py-1 text-xs font-medium">
           Active
         </span>
       )}

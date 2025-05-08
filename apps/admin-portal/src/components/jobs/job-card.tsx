@@ -20,15 +20,15 @@ export default function JobCard({ job, onClick }: { job: Job; onClick: () => voi
       <CardContent className="flex-grow">
         <div className="space-y-3 text-sm text-gray-500">
           <div className="flex items-center">
-            <Briefcase className="mr-2 h-4 w-4 text-gray-400" />
+            <Briefcase className="me-2 h-4 w-4 text-gray-400" />
             <span>{job.department}</span>
           </div>
           <div className="flex items-center">
-            <MapPin className="mr-2 h-4 w-4 text-gray-400" />
+            <MapPin className="me-2 h-4 w-4 text-gray-400" />
             <span>{job.location}</span>
           </div>
           <div className="flex items-center">
-            <Calendar className="mr-2 h-4 w-4 text-gray-400" />
+            <Calendar className="me-2 h-4 w-4 text-gray-400" />
             <span>Posted {job.created_at}</span>
           </div>
         </div>

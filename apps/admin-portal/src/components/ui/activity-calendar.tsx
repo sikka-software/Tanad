@@ -160,7 +160,7 @@ export default function ActivityCalendar({ data }: ActivityCalendarProps) {
         </div>
         <div className="flex">
           {/* Day labels column */}
-          <div className="flex w-10 flex-shrink-0 flex-col justify-between pr-2 text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex w-10 flex-shrink-0 flex-col justify-between pe-2 text-xs text-gray-500 dark:text-gray-400">
             {/* Adjust spacing/alignment based on cell size */}
             <div className="h-[15px]"></div> {/* Top Spacer */}
             <div className="h-[15px]">{visibleDayLabels[1]}</div> {/* Mon */}

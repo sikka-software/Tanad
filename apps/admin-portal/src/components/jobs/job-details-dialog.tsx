@@ -39,17 +39,17 @@ export default function JobDetailsModal({
               <DialogTitle className="text-xl font-bold">{job.title}</DialogTitle>
               <DialogDescription className="mt-1 flex flex-wrap gap-2">
                 <span className="flex items-center text-sm text-gray-500">
-                  <Briefcase className="mr-1 h-4 w-4" /> {job.department}
+                  <Briefcase className="me-1 h-4 w-4" /> {job.department}
                 </span>
                 <span className="flex items-center text-sm text-gray-500">
-                  <MapPin className="mr-1 h-4 w-4" /> {job.location}
+                  <MapPin className="me-1 h-4 w-4" /> {job.location}
                 </span>
                 <span className="flex items-center text-sm text-gray-500">
-                  <Calendar className="mr-1 h-4 w-4" /> Posted {job.created_at}
+                  <Calendar className="me-1 h-4 w-4" /> Posted {job.created_at}
                 </span>
                 {job.salary && (
                   <span className="flex items-center text-sm text-gray-500">
-                    <DollarSign className="mr-1 h-4 w-4" /> {job.salary}
+                    <DollarSign className="me-1 h-4 w-4" /> {job.salary}
                   </span>
                 )}
               </DialogDescription>

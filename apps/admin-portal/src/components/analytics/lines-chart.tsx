@@ -78,7 +78,7 @@ function LinesChart({
                           return (
                             <div key={entry.name} className="flex items-center">
                               <span
-                                className="mr-2 h-2.5 w-2.5 shrink-0 rounded-full"
+                                className="me-2 h-2.5 w-2.5 shrink-0 rounded-full"
                                 style={{ backgroundColor: entry.color }}
                               />
                               <span className="flex-1 truncate">

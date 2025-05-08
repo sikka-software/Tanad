@@ -603,7 +603,7 @@ export function QuoteForm({
                   append({ product_id: "", description: "", quantity: "1", unit_price: "" })
                 }
               >
-                <PlusCircle className="mr-2 h-4 w-4" />
+                <PlusCircle className="me-2 h-4 w-4" />
                 {t("Quotes.products.add_product")}
               </Button>
             </div>

@@ -40,7 +40,7 @@ export function HeroSection() {
           <div className="relative pt-24">
             <div className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--background)_75%)]"></div>
             <div className="mx-auto max-w-5xl px-6">
-              <div className="sm:mx-auto lg:mr-auto">
+              <div className="sm:mx-auto lg:me-auto">
                 <AnimatedGroup
                   variants={{
                     container: {
@@ -97,7 +97,7 @@ export function HeroSection() {
                 ...transitionVariants,
               }}
             >
-              <div className="relative mt-8 -mr-56 overflow-hidden px-2 sm:mt-12 sm:mr-0 md:mt-20">
+              <div className="relative mt-8 -me-56 overflow-hidden px-2 sm:mt-12 sm:me-0 md:mt-20">
                 <div
                   aria-hidden
                   className="to-background absolute inset-0 z-10 bg-gradient-to-b from-transparent from-35%"

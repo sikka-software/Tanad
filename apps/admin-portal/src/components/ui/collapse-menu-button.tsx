@@ -71,7 +71,7 @@ export function CollapseMenuButton({
         >
           <div className="w-full items-center flex justify-between">
             <div className="flex items-center">
-              <span className="mr-4">
+              <span className="me-4">
                 <Icon size={18} />
               </span>
               <p
@@ -114,7 +114,7 @@ export function CollapseMenuButton({
             asChild
           >
             <Link href={href}>
-              <span className="mr-4 ml-2">
+              <span className="me-4 ms-2">
                 <Dot size={18} />
               </span>
               <p
@@ -144,7 +144,7 @@ export function CollapseMenuButton({
               >
                 <div className="w-full items-center flex justify-between">
                   <div className="flex items-center">
-                    <span className={cn(isOpen === false ? "" : "mr-4")}>
+                    <span className={cn(isOpen === false ? "" : "me-4")}>
                       <Icon size={18} />
                     </span>
                     <p

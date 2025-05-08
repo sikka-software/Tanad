@@ -140,7 +140,7 @@ export class PageBreakNode extends DecoratorNode<JSX.Element> {
     el.style.pageBreakAfter = 'always'
     el.className = `
       relative block w-[calc(100%+56px)] overflow-visible 
-      -ml-[28px] mt-7 mb-7
+      -ms-[28px] mt-7 mb-7
       border-0 border-t border-b border-dashed border-[var(--editor-color-secondary,#eee)]
       bg-[var(--editor-color-secondary,#eee)]
       before:content-[''] 

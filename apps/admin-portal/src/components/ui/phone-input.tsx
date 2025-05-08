@@ -144,7 +144,7 @@ export default function PhoneInput({
                           <img
                             src={`https://flagcdn.com/w20/${country.value}.png`}
                             alt={`${country.label} flag`}
-                            className="mr-2 h-fit w-6"
+                            className="me-2 h-fit w-6"
                           />
                           {/* Display translated name if different and locale is not English */}
                           <span>
@@ -157,7 +157,7 @@ export default function PhoneInput({
                       </div>
                       <Check
                         className={cn(
-                          "ml-auto h-4 w-4",
+                          "ms-auto h-4 w-4",
                           selectedCountry.value === country.value ? "opacity-100" : "opacity-0",
                         )}
                       />

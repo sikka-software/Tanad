@@ -138,7 +138,7 @@ const SettingsPage = () => {
                   className="h-auto justify-start rounded-none px-4 py-3"
                   onClick={() => handleTabChange("general")}
                 >
-                  <User className="mr-2 h-4 w-4" />
+                  <User className="me-2 h-4 w-4" />
                   {t("Settings.tabs.general")}
                 </Button>
                 <Button
@@ -146,7 +146,7 @@ const SettingsPage = () => {
                   className="h-auto justify-start rounded-none px-4 py-3"
                   onClick={() => handleTabChange("navigation")}
                 >
-                  <Sidebar className="mr-2 h-4 w-4" />
+                  <Sidebar className="me-2 h-4 w-4" />
                   {t("Settings.tabs.navigation")}
                 </Button>
                 <Button
@@ -154,7 +154,7 @@ const SettingsPage = () => {
                   className="h-auto justify-start rounded-none px-4 py-3"
                   onClick={() => handleTabChange("preferences")}
                 >
-                  <ChevronsUpDown className="mr-2 h-4 w-4" />
+                  <ChevronsUpDown className="me-2 h-4 w-4" />
                   {t("Settings.tabs.preferences")}
                 </Button>
                 <Button
@@ -162,7 +162,7 @@ const SettingsPage = () => {
                   className="h-auto justify-start rounded-none px-4 py-3"
                   onClick={() => handleTabChange("notifications")}
                 >
-                  <Mail className="mr-2 h-4 w-4" />
+                  <Mail className="me-2 h-4 w-4" />
                   {t("Settings.tabs.notifications")}
                 </Button>
               </div>

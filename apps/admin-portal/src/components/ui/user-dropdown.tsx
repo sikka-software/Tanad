@@ -55,13 +55,13 @@ export function UserDropdown() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => router.push("/account")}>
-            <User className="mr-2 h-4 w-4" />
+            <User className="me-2 h-4 w-4" />
             <span>{t("Account.title")}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
-          <LogOut className="mr-2 h-4 w-4" />
+          <LogOut className="me-2 h-4 w-4" />
           <span>{t("Auth.sign_out")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

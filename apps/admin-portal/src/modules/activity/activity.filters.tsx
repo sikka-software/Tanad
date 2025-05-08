@@ -169,7 +169,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
           <Input
             type="search"
             placeholder={t("ActivityLogs.filters.search")}
-            className="w-full pl-8"
+            className="w-full ps-8"
             value={filters.searchQuery}
             onChange={(e) => setFilters({ searchQuery: e.target.value })}
           />
@@ -253,7 +253,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                 </div>
                 <div className="flex justify-end">
                   <Button variant="ghost" size="sm" onClick={handleClearFilters}>
-                    <X className="mr-2 h-4 w-4" />
+                    <X className="me-2 h-4 w-4" />
                     {t("ActivityLogs.filters.clearFilters")}
                   </Button>
                 </div>

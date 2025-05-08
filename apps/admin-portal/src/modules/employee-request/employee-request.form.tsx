@@ -295,7 +295,7 @@ export function EmployeeRequestForm({
                             )}
                             disabled={isLoadingSave}
                           >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            <CalendarIcon className="me-2 h-4 w-4" />
                             {field.value ? format(field.value, "PPP") : t("General.pick_date")}
                           </Button>
                         </PopoverTrigger>
@@ -331,7 +331,7 @@ export function EmployeeRequestForm({
                             )}
                             disabled={isLoadingSave}
                           >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            <CalendarIcon className="me-2 h-4 w-4" />
                             {field.value ? format(field.value, "PPP") : t("General.pick_date")}
                           </Button>
                         </PopoverTrigger>

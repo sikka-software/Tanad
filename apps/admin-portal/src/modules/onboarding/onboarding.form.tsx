@@ -120,7 +120,7 @@ export function OnboardingForm() {
         />
 
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          {isPending ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
           {t("OnBoarding.form.create_enterprise")}
         </Button>
       </form>

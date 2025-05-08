@@ -173,7 +173,7 @@ const PricingCalculator: React.FC = () => {
                         mod.selectedIntegrations &&
                         mod.selectedIntegrations.length > 0 &&
                         fullModuleData?.integrations && (
-                          <div className="pl-8">
+                          <div className="ps-8">
                             {mod.selectedIntegrations.map((integrationId) => {
                               const integrationData = fullModuleData.integrations!.find(
                                 (int) => int.id === integrationId,

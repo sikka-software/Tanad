@@ -51,7 +51,7 @@ function PollOptionComponent({
   return (
     <div className="mb-2.5 flex flex-row items-center">
       <div
-        className={`relative mr-2.5 flex h-[22px] w-[22px] rounded-md border border-gray-400 ${
+        className={`relative me-2.5 flex h-[22px] w-[22px] rounded-md border border-gray-400 ${
           checked
             ? 'border-primary bg-primary after:pointer-events-none after:absolute after:top-1 after:left-2 after:m-0 after:block after:h-[9px] after:w-[5px] after:rotate-45 after:cursor-pointer after:border-r-2 after:border-b-2 after:border-solid after:border-white after:content-[""]'
             : ""

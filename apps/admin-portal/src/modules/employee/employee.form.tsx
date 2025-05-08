@@ -450,7 +450,7 @@ export function EmployeeForm({
               onClick={() => append({ type: "", amount: 0 })}
               disabled={isEmployeeSaving}
             >
-              <PlusCircle className="mr-2 size-4" />
+              <PlusCircle className="me-2 size-4" />
               {t("Employees.form.salary.add_component")}
             </Button>
           </div>
