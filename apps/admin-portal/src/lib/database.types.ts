@@ -60,7 +60,7 @@ export type Database = {
           id: string;
           manager: string | null;
           name: string;
-          notes: string | null;
+          notes: Json | null;
           phone: string | null;
           region: string | null;
           short_address: string | null;
@@ -81,7 +81,7 @@ export type Database = {
           id?: string;
           manager?: string | null;
           name: string;
-          notes?: string | null;
+          notes?: Json | null;
           phone?: string | null;
           region?: string | null;
           short_address?: string | null;
@@ -102,7 +102,7 @@ export type Database = {
           id?: string;
           manager?: string | null;
           name?: string;
-          notes?: string | null;
+          notes?: Json | null;
           phone?: string | null;
           region?: string | null;
           short_address?: string | null;

@@ -282,7 +282,7 @@ export const branches = pgTable(
     email: text(),
     manager: uuid(),
     status: common_status().default("active"),
-    notes: text(),
+    notes: jsonb(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
   },

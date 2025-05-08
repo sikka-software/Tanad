@@ -44,7 +44,11 @@ export const createBranchSchema = (t: (key: string) => string) => {
     status: z.enum(["active", "inactive"], {
       message: t("Branches.form.status.required"),
     }),
-    notes: z. string().optional().or(z.literal("")),
+    notes: z
+      .object({ root: z.any() })
+      .passthrough() // Allows any other properties on the object
+      .optional()
+      .nullable(), // Allows the value to be null
   });
 
   const addressSchema = createAddressSchema(t);

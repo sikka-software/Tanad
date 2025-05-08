@@ -1,0 +1,1 @@
+ALTER TABLE "branches" ALTER COLUMN "notes" TYPE JSONB USING notes::JSONB;
