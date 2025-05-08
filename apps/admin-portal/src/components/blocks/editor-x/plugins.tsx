@@ -200,7 +200,7 @@ export function Plugins({}) {
               <div className="" ref={onRef}>
                 <ContentEditable
                   placeholder={placeholder}
-                  className="ContentEditable__root relative block h-[830px] min-h-72 min-h-full overflow-auto px-8 py-4 focus:outline-none"
+                  className="ContentEditable__root relative block h-[330px] overflow-auto px-8 py-4 focus:outline-none"
                 />
               </div>
             </div>
@@ -311,9 +311,7 @@ export function Plugins({}) {
             <CounterCharacterPlugin charset="UTF-16" />
           </div>
           <div className="flex flex-1 justify-end">
-            <SpeechToTextPlugin />
-            <ShareContentPlugin />
-            <ImportExportPlugin />
+    
             <MarkdownTogglePlugin
               shouldPreserveNewLinesInMarkdown={true}
               transformers={[
@@ -335,7 +333,6 @@ export function Plugins({}) {
               <ClearEditorActionPlugin />
               <ClearEditorPlugin />
             </>
-            <TreeViewPlugin />
           </div>
         </div>
       </ActionsPlugin>

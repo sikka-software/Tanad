@@ -1,3 +1,4 @@
+import { FormSheet } from "@root/src/components/ui/form-sheet";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -153,7 +154,7 @@ export default function BranchesPage() {
           ) : null}
         </div>
 
-        <FormDialog
+        <FormSheet
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
           title={t("Branches.edit_branch")}
@@ -170,7 +171,7 @@ export default function BranchesPage() {
             defaultValues={actionableBranch as Branch}
             editMode={true}
           />
-        </FormDialog>
+        </FormSheet>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

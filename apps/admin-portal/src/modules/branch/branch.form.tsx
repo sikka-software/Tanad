@@ -44,11 +44,7 @@ export const createBranchSchema = (t: (key: string) => string) => {
     status: z.enum(["active", "inactive"], {
       message: t("Branches.form.status.required"),
     }),
-    notes: z
-      .object({ root: z.any() })
-      .passthrough() // Allows any other properties on the object
-      .optional()
-      .nullable(), // Allows the value to be null
+    notes: z.any().optional().nullable(),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -103,7 +99,12 @@ export function BranchForm({
       email: defaultValues?.email || "",
       manager: defaultValues?.manager || null,
       status: (defaultValues?.status as "active" | "inactive") || "active",
-      notes: defaultValues?.notes || "",
+      notes:
+        defaultValues?.notes &&
+        typeof defaultValues.notes === "object" &&
+        "root" in defaultValues.notes
+          ? defaultValues.notes
+          : null,
     },
   });
 
@@ -136,7 +137,7 @@ export function BranchForm({
       phone: optionalString(data.phone) ?? null,
       email: optionalString(data.email) ?? null,
       manager: data.manager && data.manager.trim() !== "" ? data.manager : null,
-      notes: optionalString(data.notes) ?? null,
+      notes: data.notes ?? null,
       status: data.status,
       short_address: optionalString(data.short_address) ?? null,
       building_number: optionalString(data.building_number) ?? null,

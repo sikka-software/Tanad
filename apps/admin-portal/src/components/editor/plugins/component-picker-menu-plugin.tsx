@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -7,72 +7,69 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import { useCallback, useMemo, useState, JSX } from 'react'
-import { createPortal } from 'react-dom'
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useBasicTypeaheadTriggerMatch } from "@lexical/react/LexicalTypeaheadMenuPlugin";
+import { cn } from "@root/src/lib/utils";
+import { TextNode } from "lexical";
+import dynamic from "next/dynamic";
+import { useCallback, useMemo, useState, JSX } from "react";
+import { createPortal } from "react-dom";
 
-import dynamic from 'next/dynamic'
-
-import { TextNode } from 'lexical'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { useBasicTypeaheadTriggerMatch } from '@lexical/react/LexicalTypeaheadMenuPlugin'
-
-import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command'
-
-import { useEditorModal } from '@/components/editor/editor-hooks/use-modal'
-import { ComponentPickerOption } from '@/components/editor/plugins/picker/component-picker-option'
+import { useEditorModal } from "@/components/editor/editor-hooks/use-modal";
+import { ComponentPickerOption } from "@/components/editor/plugins/picker/component-picker-option";
+import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
 const LexicalTypeaheadMenuPlugin = dynamic(
-  () => import('./default/lexical-typeahead-menu-plugin'),
-  { ssr: false }
-)
+  () => import("./default/lexical-typeahead-menu-plugin"),
+  { ssr: false },
+);
 
 export function ComponentPickerMenuPlugin({
   baseOptions = [],
   dynamicOptionsFn,
 }: {
-  baseOptions?: Array<ComponentPickerOption>
-  dynamicOptionsFn?: ({ queryString }: { queryString: string }) => Array<ComponentPickerOption>
+  baseOptions?: Array<ComponentPickerOption>;
+  dynamicOptionsFn?: ({ queryString }: { queryString: string }) => Array<ComponentPickerOption>;
 }): JSX.Element {
-  const [editor] = useLexicalComposerContext()
-  const [modal, showModal] = useEditorModal()
-  const [queryString, setQueryString] = useState<string | null>(null)
+  const [editor] = useLexicalComposerContext();
+  const [modal, showModal] = useEditorModal();
+  const [queryString, setQueryString] = useState<string | null>(null);
 
-  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
+  const checkForTriggerMatch = useBasicTypeaheadTriggerMatch("/", {
     minLength: 0,
-  })
+  });
 
   const options = useMemo(() => {
     if (!queryString) {
-      return baseOptions
+      return baseOptions;
     }
 
-    const regex = new RegExp(queryString, 'i')
+    const regex = new RegExp(queryString, "i");
 
     return [
-      ...dynamicOptionsFn?.({ queryString }) || [],
+      ...(dynamicOptionsFn?.({ queryString }) || []),
       ...baseOptions.filter(
         (option) =>
-          regex.test(option.title) ||
-          option.keywords.some((keyword) => regex.test(keyword))
+          regex.test(option.title) || option.keywords.some((keyword) => regex.test(keyword)),
       ),
-    ]
-  }, [editor, queryString, showModal])
+    ];
+  }, [editor, queryString, showModal]);
 
   const onSelectOption = useCallback(
     (
       selectedOption: ComponentPickerOption,
       nodeToRemove: TextNode | null,
       closeMenu: () => void,
-      matchingString: string
+      matchingString: string,
     ) => {
       editor.update(() => {
-        nodeToRemove?.remove()
-        selectedOption.onSelect(matchingString, editor, showModal)
-        closeMenu()
-      })
+        nodeToRemove?.remove();
+        selectedOption.onSelect(matchingString, editor, showModal);
+        closeMenu();
+      });
     },
-    [editor]
-  )
+    [editor],
+  );
 
   return (
     <>
@@ -85,58 +82,56 @@ export function ComponentPickerMenuPlugin({
         options={options}
         menuRenderFn={(
           anchorElementRef,
-          { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex }
+          { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
         ) => {
           return anchorElementRef.current && options.length
             ? createPortal(
-              <div className="fixed w-[250px] rounded-md shadow-md">
-                <Command
-                  onKeyDown={(e) => {
-                    if (e.key === 'ArrowUp') {
-                      e.preventDefault()
-                      setHighlightedIndex(
-                        selectedIndex !== null
-                          ? (selectedIndex - 1 + options.length) %
-                          options.length
-                          : options.length - 1
-                      )
-                    } else if (e.key === 'ArrowDown') {
-                      e.preventDefault()
-                      setHighlightedIndex(
-                        selectedIndex !== null
-                          ? (selectedIndex + 1) % options.length
-                          : 0
-                      )
-                    }
-                  }}
-                >
-                  <CommandList>
-                    <CommandGroup>
-                      {options.map((option, index) => (
-                        <CommandItem
-                          key={option.key}
-                          value={option.title}
-                          onSelect={() => {
-                            selectOptionAndCleanUp(option)
-                          }}
-                          className={`flex items-center gap-2 ${selectedIndex === index
-                              ? 'bg-accent'
-                              : '!bg-transparent'
-                            }`}
-                        >
-                          {option.icon}
-                          {option.title}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </div>,
-              anchorElementRef.current
-            )
-            : null
+                <div className="fixed z-[200] w-[250px] rounded-md shadow-md">
+                  <Command
+                    className="z-[199]"
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        setHighlightedIndex(
+                          selectedIndex !== null
+                            ? (selectedIndex - 1 + options.length) % options.length
+                            : options.length - 1,
+                        );
+                      } else if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        setHighlightedIndex(
+                          selectedIndex !== null ? (selectedIndex + 1) % options.length : 0,
+                        );
+                      }
+                    }}
+                  >
+                    <CommandList className="z-[199]">
+                      <CommandGroup className="z-[199]">
+                        {options.map((option, index) => (
+                          <CommandItem
+                            key={option.key}
+                            value={option.title}
+                            onSelect={() => {
+                              selectOptionAndCleanUp(option);
+                            }}
+                            className={cn(
+                              "z-[199] flex items-center gap-2",
+                              // selectedIndex === index ? "bg-accent" : "!bg-transparent",
+                            )}
+                          >
+                            {option.icon}
+                            {option.title}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </div>,
+                anchorElementRef.current,
+              )
+            : null;
         }}
       />
     </>
-  )
+  );
 }
