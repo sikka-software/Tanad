@@ -372,6 +372,13 @@
       "when": 1746712444802,
       "tag": "0052_curved_pandemic",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1746724650485,
+      "tag": "0053_slow_annihilus",
+      "breakpoints": true
     }
   ]
 }

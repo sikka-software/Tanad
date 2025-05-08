@@ -907,6 +907,7 @@ CASE
     ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
 END`),
     enterprise_id: uuid().notNull(),
+    created_by: uuid(),
   },
   (table) => [
     index("quotes_client_id_idx").using("btree", table.client_id.asc().nullsLast().op("uuid_ops")),
@@ -917,6 +918,11 @@ END`),
       foreignColumns: [clients.id],
       name: "quotes_client_id_fkey",
     }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.created_by],
+      foreignColumns: [profiles.id],
+      name: "quotes_created_by_fkey",
+    }),
     check(
       "quotes_status_check",
       sql`status = ANY (ARRAY['draft'::text, 'sent'::text, 'accepted'::text, 'rejected'::text, 'expired'::text])`,

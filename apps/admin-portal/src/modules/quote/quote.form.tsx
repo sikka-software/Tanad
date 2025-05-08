@@ -1,48 +1,44 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { ProductsFormSection } from "@root/src/components/forms/products-form-section";
-import { getNotesValue } from "@root/src/lib/utils";
-import { getCoreRowModel, useReactTable, ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { FieldError, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { Button } from "@/ui/button";
+import CodeInput from "@/ui/code-input";
 import { ComboboxAdd } from "@/ui/combobox-add";
-import { CurrencyInput } from "@/ui/currency-input";
 import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 
-import { createClient } from "@/utils/supabase/component";
+import NotesSection from "@/components/forms/notes-section";
+import { ProductsFormSection } from "@/components/forms/products-form-section";
+
+import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import { ClientForm, type ClientFormValues } from "@/client/client.form";
+import { ClientForm } from "@/client/client.form";
+import { useClients } from "@/client/client.hooks";
+import useClientStore from "@/client/client.store";
 import { Client } from "@/client/client.type";
 
 import { Product } from "@/product/product.type";
 
-import useUserStore from "@/stores/use-user-store";
-
-import { useClients } from "../client/client.hooks";
-import useClientStore from "../client/client.store";
-import { useCreateQuote, useUpdateQuote } from "./quote.hooks";
-import useQuoteStore from "./quote.store";
+import { useCreateQuote, useUpdateQuote } from "@/quote/quote.hooks";
+import { useQuotes } from "@/quote/quote.hooks";
+import useQuoteStore from "@/quote/quote.store";
 import {
   QuoteCreateData,
   QuoteUpdateData,
   QuoteItem as DbQuoteItem,
   QuoteItemClientData,
-  Quote as FetchedQuoteData,
-} from "./quote.type";
+} from "@/quote/quote.type";
+
+import useUserStore from "@/stores/use-user-store";
 
 const createQuoteFormSchema = (t: (key: string) => string) =>
   z.object({
@@ -57,7 +53,7 @@ const createQuoteFormSchema = (t: (key: string) => string) =>
       .array(
         z.object({
           product_id: z.string().optional(),
-          description: z.string().min(1, t("Quotes.validation.item_description_required")),
+          description: z.string().optional(),
           quantity: z
             .number({ invalid_type_error: t("Quotes.validation.item_quantity_invalid") })
             .min(1, t("Quotes.validation.item_quantity_positive")),
@@ -81,9 +77,8 @@ export function QuoteForm({
   const t = useTranslations();
   const locale = useLocale();
 
-  const supabase = createClient();
-
-  const { profile, membership, enterprise } = useUserStore();
+  const profile = useUserStore((state) => state.profile);
+  const membership = useUserStore((state) => state.membership);
 
   const { data: clients = [], isLoading: clientsLoading } = useClients();
 
@@ -92,6 +87,7 @@ export function QuoteForm({
 
   const { mutate: createQuote } = useCreateQuote();
   const { mutate: updateQuote } = useUpdateQuote();
+  const { data: quotes } = useQuotes();
 
   const setIsLoading = useQuoteStore((state) => state.setIsLoading);
   const isLoading = useQuoteStore((state) => state.isLoading);
@@ -167,7 +163,7 @@ export function QuoteForm({
 
     const itemsToSubmitForCreate: QuoteItemClientData[] = formData.items.map((item) => ({
       product_id: item.product_id || null,
-      description: item.description,
+      description: item.description || "",
       quantity: item.quantity,
       unit_price: item.unit_price,
     }));
@@ -175,7 +171,7 @@ export function QuoteForm({
     const itemsToSubmitForUpdate: (QuoteItemClientData & { id?: string })[] = formData.items.map(
       (item) => ({
         product_id: item.product_id || null,
-        description: item.description,
+        description: item.description || "",
         quantity: item.quantity,
         unit_price: item.unit_price,
         ...(item.id && { id: item.id }),
@@ -281,7 +277,29 @@ export function QuoteForm({
                   <FormItem>
                     <FormLabel>{t("Quotes.form.quote_number.label")} *</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("Quotes.form.quote_number.placeholder")} {...field} />
+                      <CodeInput
+                        onSerial={() => {
+                          const nextNumber = (quotes?.length || 0) + 1;
+                          const paddedNumber = String(nextNumber).padStart(4, "0");
+                          form.setValue("quote_number", `QT-${paddedNumber}`);
+                        }}
+                        onRandom={() => {
+                          const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                          let randomCode = "";
+                          for (let i = 0; i < 5; i++) {
+                            randomCode += randomChars.charAt(
+                              Math.floor(Math.random() * randomChars.length),
+                            );
+                          }
+                          form.setValue("quote_number", `QT-${randomCode}`);
+                        }}
+                      >
+                        <Input
+                          placeholder={t("Quotes.form.quote_number.placeholder")}
+                          {...field}
+                          disabled={isLoading}
+                        />
+                      </CodeInput>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
