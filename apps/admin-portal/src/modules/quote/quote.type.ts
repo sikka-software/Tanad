@@ -15,21 +15,48 @@ export type QuoteItemClientData = Omit<
   unit_price: number;
 };
 
-// Define the base type from the database row, augmented with its items
+// Represents the structure of the client data as expected by the QuoteCard.
+// This would typically be populated by resolving client_id and joining 'clients' with 'companies' table.
+export type ClientInfoForCard = Pick<
+  Database["public"]["Tables"]["clients"]["Row"],
+  "id" | "name" | "email"
+> & {
+  company?: string | null; // Company name, resolved from the related 'companies' table.
+};
+
+// Define the base type from the database row, augmented with its items and resolved client information
 export type Quote = Database["public"]["Tables"]["quotes"]["Row"] & {
-  items?: QuoteItem[]; // These are QuoteItem from DB
+  items?: QuoteItem[];
+  client?: ClientInfoForCard; // Populated client information for display in cards/views
 };
 
 // For creating a new quote
-export type QuoteCreateData = Omit<Database["public"]["Tables"]["quotes"]["Insert"], "notes" | "subtotal" | "tax_amount" | "total"> & {
+export type QuoteCreateData = Omit<
+  Database["public"]["Tables"]["quotes"]["Insert"],
+  "notes" | "subtotal" | "tax_amount" | "total"
+> & {
   items: QuoteItemClientData[];
   notes?: string | null; // Align notes with form usage (string) instead of Json
   // subtotal, tax_amount, total are usually calculated on backend or just before insert
 };
 
 // For updating an existing quote
-export type QuoteUpdateData = Omit<Database["public"]["Tables"]["quotes"]["Update"], "notes" | "subtotal" | "tax_amount" | "total"> & {
+export type QuoteUpdateData = Omit<
+  Database["public"]["Tables"]["quotes"]["Update"],
+  "notes" | "subtotal" | "tax_amount" | "total"
+> & {
   id: string; // Explicitly require id for update payloads
   items?: (QuoteItemClientData & { id?: string })[]; // Items can be new (no id) or existing (with id)
   notes?: string | null; // Align notes with form usage
+};
+
+// For creating a quote item via the service layer, expecting numeric quantity/price
+export type QuoteItemCreateServiceData = QuoteItemClientData & {
+  quote_id: string;
+};
+
+// For updating a quote item via the service layer, expecting numeric quantity/price
+export type QuoteItemUpdateServiceData = Partial<QuoteItemClientData> & {
+  quote_id?: string; // Allow updating the quote_id reference as well
+  // product_id is already optional in Partial<QuoteItemClientData>
 };

@@ -12,7 +12,7 @@ import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateQuote } from "@/quote/quote.hooks";
 import useQuotesStore from "@/quote/quote.store";
-import { Quote } from "@/quote/quote.type";
+import { Quote, QuoteUpdateData } from "@/quote/quote.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -85,7 +85,7 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "client_id") return;
-    await updateQuote({ id: rowId, data: { [columnId]: value } });
+    await updateQuote({ id: rowId, data: { [columnId]: value } as QuoteUpdateData });
   };
 
   const handleRowSelectionChange = (rows: Quote[]) => {

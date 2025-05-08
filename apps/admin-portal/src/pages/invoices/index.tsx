@@ -23,9 +23,8 @@ import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
 import useInvoiceStore from "@/invoice/invoice.store";
 import InvoicesTable from "@/invoice/invoice.table";
 
-import { CompanyForm } from "@/modules/company/company.form";
 import { InvoiceForm } from "@/modules/invoice/invoice.form";
-import { Invoice } from "@/modules/invoice/invoice.type";
+import { InvoiceUpdateData } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function InvoicesPage() {
@@ -36,7 +35,8 @@ export default function InvoicesPage() {
   const canCreateInvoices = useUserStore((state) => state.hasPermission("invoices.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableInvoice, setActionableInvoice] = useState<Invoice | null>(null);
+
+  const [actionableInvoice, setActionableInvoice] = useState<InvoiceUpdateData | null>(null);
 
   const loadingSaveInvoice = useInvoiceStore((state) => state.isLoading);
   const setLoadingSaveInvoice = useInvoiceStore((state) => state.setIsLoading);
@@ -61,11 +61,11 @@ export default function InvoicesPage() {
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: invoices,
+    data: invoices as InvoiceUpdateData[],
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableInvoice,
+    setActionableItem: setActionableInvoice as (item: InvoiceUpdateData | null) => void,
     duplicateMutation: duplicateInvoice,
     moduleName: "Invoices",
     previewAction: (id: string) => {

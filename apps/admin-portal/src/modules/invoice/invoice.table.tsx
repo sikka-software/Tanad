@@ -17,7 +17,7 @@ import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateInvoice } from "@/invoice/invoice.hooks";
 import useInvoiceStore from "@/invoice/invoice.store";
-import { Invoice } from "@/invoice/invoice.type";
+import { Invoice, InvoiceUpdateData } from "@/invoice/invoice.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -103,7 +103,6 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       header: t("Invoices.form.status.label"),
       validationSchema: z.string().min(1, t("Invoices.form.status.required")),
     },
- 
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
@@ -111,7 +110,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     if (columnId === "issue_date" || columnId === "due_date") {
       processedValue = new Date(value as string).toISOString();
     }
-    await updateInvoice({ id: rowId, data: { [columnId]: processedValue } });
+    await updateInvoice({ id: rowId, data: { [columnId]: processedValue } as InvoiceUpdateData });
   };
 
   const handleRowSelectionChange = (rows: Invoice[]) => {

@@ -1,9 +1,9 @@
 import {
   Quote,
   QuoteCreateData,
-  QuoteItemCreateData,
+  QuoteItemCreateServiceData,
   QuoteUpdateData,
-  QuoteItemUpdateData,
+  QuoteItemUpdateServiceData,
 } from "@/quote/quote.type";
 
 export async function fetchQuotes(): Promise<Quote[]> {
@@ -117,13 +117,14 @@ export async function bulkDeleteQuotes(ids: string[]): Promise<void> {
 }
 
 // Quote Items API endpoints
-export async function createQuoteItem(quoteItem: QuoteItemCreateData) {
+export async function createQuoteItem(quoteItem: QuoteItemCreateServiceData) {
   try {
     const dbQuoteItem = {
       quote_id: quoteItem.quote_id,
       description: quoteItem.description,
       quantity: quoteItem.quantity.toString(),
       unit_price: quoteItem.unit_price.toString(),
+      ...(quoteItem.product_id && { product_id: quoteItem.product_id }),
     };
 
     const response = await fetch("/api/resource/quote-items", {
@@ -145,13 +146,14 @@ export async function createQuoteItem(quoteItem: QuoteItemCreateData) {
   }
 }
 
-export async function updateQuoteItem(id: string, quoteItem: QuoteItemUpdateData) {
+export async function updateQuoteItem(id: string, quoteItem: QuoteItemUpdateServiceData) {
   try {
     const dbQuoteItem = {
       ...(quoteItem.quote_id && { quote_id: quoteItem.quote_id }),
       ...(quoteItem.description && { description: quoteItem.description }),
-      ...(quoteItem.quantity && { quantity: quoteItem.quantity.toString() }),
-      ...(quoteItem.unit_price && { unit_price: quoteItem.unit_price.toString() }),
+      ...(quoteItem.quantity !== undefined && { quantity: quoteItem.quantity.toString() }),
+      ...(quoteItem.unit_price !== undefined && { unit_price: quoteItem.unit_price.toString() }),
+      ...(quoteItem.product_id && { product_id: quoteItem.product_id }),
     };
 
     const response = await fetch(`/api/resource/quote-items/${id}`, {
