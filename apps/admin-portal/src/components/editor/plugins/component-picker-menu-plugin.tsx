@@ -116,38 +116,57 @@ export function ComponentPickerMenuPlugin({
                     className="w-[250px] p-0 shadow-md"
                     // onOpenAutoFocus={(e) => e.preventDefault()} // User commented this out, keeping it as is
                     onWheel={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        setHighlightedIndex(
+                          selectedIndex !== null
+                            ? (selectedIndex - 1 + options.length) % options.length
+                            : options.length - 1,
+                        );
+                      } else if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        setHighlightedIndex(
+                          selectedIndex !== null ? (selectedIndex + 1) % options.length : 0,
+                        );
+                      } else if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (selectedIndex !== null && options[selectedIndex]) {
+                          selectOptionAndCleanUp(options[selectedIndex]);
+                          setIsOpen(false);
+                        }
+                      }
+                      // We are not handling Enter here, relying on CommandItem's onSelect or Lexical's global Enter
+                    }}
                   >
                     <Command
-                      // Remove custom onKeyDown handler
+                      // Restore explicit onKeyDown handler for arrow keys
                       value={
+                        // This tells cmdk which item to visually mark as selected
                         selectedIndex !== null && options[selectedIndex]
                           ? options[selectedIndex].key
                           : undefined
                       }
-                      onValueChange={(currentValue) => {
-                        // Find the index of the item with the current value (key)
-                        const newIndex = options.findIndex((option) => option.key === currentValue);
-                        if (newIndex !== -1) {
-                          setHighlightedIndex(newIndex);
-                        }
-                      }}
+                      // Remove onValueChange, as we're driving selection with onKeyDown + setHighlightedIndex
+                      // onValueChange={(currentValue) => {
+                      //   const newIndex = options.findIndex((option) => option.key === currentValue);
+                      //   if (newIndex !== -1) {
+                      //     setHighlightedIndex(newIndex);
+                      //   }
+                      // }}
                     >
                       <CommandList>
                         <CommandGroup>
                           {options.map((option, index) => (
                             <CommandItem
                               key={option.key}
-                              value={option.key} // Set value for cmdk to track
+                              value={option.key} // cmdk needs this to match against Command.value
                               onSelect={() => {
+                                // For click or if cmdk processes Enter
                                 selectOptionAndCleanUp(option);
                                 setIsOpen(false); // Close popover on select
                               }}
-                              // Rely on cmdk's default hover/selection (aria-selected)
-                              // className={cn(
-                              //   "flex items-center gap-2",
-                              //   selectedIndex === index ? "bg-accent" : "!bg-transparent",
-                              // )}
-                              className="flex items-center gap-2" // Keep basic layout styles
+                              className="flex items-center gap-2" // Basic layout styles, cmdk handles selection style via data-selected
                             >
                               {option.icon}
                               {option.title}
