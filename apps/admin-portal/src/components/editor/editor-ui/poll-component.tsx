@@ -74,7 +74,7 @@ function PollOptionComponent({
           className="transition-width bg-accent absolute top-0 left-0 z-0 h-full duration-1000 ease-in-out"
           style={{ width: `${votes === 0 ? 0 : (votes / totalVotes) * 100}%` }}
         />
-        <span className="text-primary absolute top-1.5 right-4 text-xs">
+        <span className="text-primary absolute top-1.5 end-4 text-xs">
           {votes > 0 && (votes === 1 ? "1 vote" : `${votes} votes`)}
         </span>
         <Input

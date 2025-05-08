@@ -18,6 +18,7 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Separator } from "@/ui/separator";
@@ -121,10 +122,10 @@ import { IMAGE } from "@/components/editor/transformers/markdown-image-transform
 import { TABLE } from "@/components/editor/transformers/markdown-table-transformer";
 import { TWEET } from "@/components/editor/transformers/markdown-tweet-transformer";
 
-export const placeholder = "Press / for commands...";
 const maxLength = 500;
 
 export function Plugins({}) {
+  const t = useTranslations();
   const [floatingAnchorElem, setFloatingAnchorElem] = useState<HTMLDivElement | null>(null);
 
   const onRef = (_floatingAnchorElem: HTMLDivElement) => {
@@ -195,8 +196,8 @@ export function Plugins({}) {
             <div className="">
               <div className="" ref={onRef}>
                 <ContentEditable
-                  placeholder={placeholder}
-                  className="ContentEditable__root relative block h-[330px] overflow-auto px-8 py-4 focus:outline-none"
+                  placeholder={t("Forms.notes.placeholder")}
+                  className="ContentEditable__root relative block h-[330px] overflow-auto px-8 py-4 text-start focus:outline-none"
                 />
               </div>
             </div>

@@ -28,7 +28,7 @@ export function DraggableBlockPlugin({
       menuComponent={
         <div
           ref={menuRef}
-          className="draggable-block-menu absolute top-0 left-0 cursor-grab rounded-sm px-[1px] py-0.5 opacity-0 will-change-transform hover:bg-gray-100 active:cursor-grabbing"
+          className="draggable-block-menu absolute start-0 rtl:right-2 top-0 cursor-grab rounded-sm px-[1px] py-0.5 opacity-0 will-change-transform hover:bg-gray-100 active:cursor-grabbing"
         >
           <GripVerticalIcon className="size-4 opacity-30" />
         </div>
@@ -36,7 +36,7 @@ export function DraggableBlockPlugin({
       targetLineComponent={
         <div
           ref={targetLineRef}
-          className="bg-secondary-foreground pointer-events-none absolute top-0 left-0 h-1 opacity-0 will-change-transform"
+          className="bg-secondary-foreground pointer-events-none absolute start-0 rtl:right-12 top-0 h-1 opacity-0 will-change-transform"
         />
       }
       isOnMenu={isOnMenu}
