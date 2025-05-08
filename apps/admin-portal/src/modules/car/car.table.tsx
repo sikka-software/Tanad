@@ -68,10 +68,9 @@ const CarsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps
       header: t("Cars.form.vin.label"),
       validationSchema: z.string().min(1, "Required"),
     },
-
     {
-      accessorKey: "liscese_country",
-      header: t("Cars.form.liscese_country.label"),
+      accessorKey: "license_country",
+      header: t("Cars.form.license_country.label"),
       validationSchema: z.string().min(1, "Required"),
     },
     {

@@ -162,6 +162,24 @@ export const commandList = [
     ],
   },
   {
+    heading: "Fleet.title",
+    items: [
+      {
+        icon: ModulesOptions.cars.icon,
+        label: ModulesOptions.cars.label,
+        shortcut: "⌘D",
+        href: ModulesOptions.cars.url,
+      },
+
+      {
+        icon: ModulesOptions.trucks.icon,
+        label: ModulesOptions.trucks.label,
+        shortcut: "⌘T",
+        href: ModulesOptions.trucks.url,
+      },
+    ],
+  },
+  {
     heading: "Navigation.organization",
     items: [
       {

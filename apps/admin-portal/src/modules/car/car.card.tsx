@@ -3,26 +3,46 @@ import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader } from "@/ui/card";
 
-import { Domain } from "@/modules/domain/domain.type";
+import { Car } from "@/modules/car/car.type";
 
-const DomainCard = ({ domain }: { domain: Domain }) => {
-  const t = useTranslations("Domains");
+const CarCard = ({ car }: { car: Car }) => {
+  const t = useTranslations("Cars");
   return (
-    <Card key={domain.id} className="transition-shadow hover:shadow-lg">
+    <Card key={car.id} className="transition-shadow hover:shadow-lg">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold">{domain.domain_name}</h3>
-            <p className="text-sm text-gray-500">Registrar: {domain.registrar}</p>
+            <h3 className="text-lg font-semibold">{car.name}</h3>
+            {/* Updated to display make, model, and year based on the schema */}
+            <p className="text-sm text-gray-500">
+              {t("make")}: {car.make} | {t("model")}: {car.model} | {t("year")}: {car.year}
+            </p>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {domain.notes && (
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <User className="h-4 w-4" />
-              <span>{domain.notes}</span>
+          {/* Removed car.notes and car.registrar as they are not in the schema */}
+          {/* Added display for other schema properties */}
+          {car.color && (
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-semibold">{t("color")}:</span> {car.color}
+            </div>
+          )}
+          {car.vin && (
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-semibold">{t("vin")}:</span> {car.vin}
+            </div>
+          )}
+          {car.license_plate && (
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-semibold">{t("licensePlate")}:</span> {car.license_plate}
+              {car.license_country && ` (${car.license_country})`}
+            </div>
+          )}
+          {car.code && (
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-semibold">{t("code")}:</span> {car.code}
             </div>
           )}
         </div>
@@ -31,4 +51,4 @@ const DomainCard = ({ domain }: { domain: Domain }) => {
   );
 };
 
-export default DomainCard;
+export default CarCard;

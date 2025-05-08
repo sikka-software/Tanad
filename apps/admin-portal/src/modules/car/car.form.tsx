@@ -27,7 +27,7 @@ export const createCarSchema = (t: (key: string) => string) => {
     color: z.string().optional().or(z.literal("")),
     vin: z.string().optional().or(z.literal("")),
     code: z.string().optional().or(z.literal("")),
-    liscese_country: z.string().optional().or(z.literal("")),
+    license_country: z.string().optional().or(z.literal("")),
     license_plate: z.string().optional().or(z.literal("")),
   });
 
@@ -71,7 +71,7 @@ export function CarForm({
       color: defaultValues?.color || "",
       vin: defaultValues?.vin || "",
       code: defaultValues?.code || "",
-      liscese_country: defaultValues?.liscese_country || "",
+      license_country: defaultValues?.license_country || "",
       license_plate: defaultValues?.license_plate || "",
     },
   });
@@ -98,7 +98,7 @@ export function CarForm({
               color: data.color?.trim() || "",
               vin: data.vin?.trim() || "",
               code: data.code?.trim() || "",
-              liscese_country: data.liscese_country?.trim() || "",
+              license_country: data.license_country?.trim() || "",
               license_plate: data.license_plate?.trim() || "",
             },
           },
@@ -120,7 +120,7 @@ export function CarForm({
             color: data.color?.trim() || "",
             vin: data.vin?.trim() || "",
             code: data.code?.trim() || "",
-            liscese_country: data.liscese_country?.trim() || "",
+            license_country: data.license_country?.trim() || "",
             license_plate: data.license_plate?.trim() || "",
           },
           {
@@ -134,16 +134,16 @@ export function CarForm({
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Failed to save domain:", error);
+      console.error("Failed to save car:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Domains.error.create"),
+        description: t("Cars.error.create"),
       });
     }
   };
 
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
-    (window as any).domainForm = form;
+    (window as any).carForm = form;
   }
 
   return (
@@ -171,13 +171,13 @@ export function CarForm({
 
             <FormField
               control={form.control}
-              name="registrar"
+              name="make"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Domains.form.registrar.label")} *</FormLabel>
+                  <FormLabel>{t("Cars.form.make.label")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("Domains.form.registrar.placeholder")}
+                      placeholder={t("Cars.form.make.placeholder")}
                       {...field}
                       disabled={isLoading}
                     />
@@ -191,18 +191,15 @@ export function CarForm({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
-              name="monthly_cost"
+              name="model"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Domains.form.monthly_cost.label")}</FormLabel>
+                  <FormLabel>{t("Cars.form.model.label")}</FormLabel>
                   <FormControl>
-                    <CurrencyInput
-                      placeholder={t("Domains.form.monthly_cost.placeholder")}
+                    <Input
+                      placeholder={t("Cars.form.model.placeholder")}
                       disabled={isLoading}
                       {...field}
-                      showCommas={true}
-                      value={field.value ? parseFloat(String(field.value)) : undefined}
-                      onChange={(value) => field.onChange(value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -212,18 +209,15 @@ export function CarForm({
 
             <FormField
               control={form.control}
-              name="annual_cost"
+              name="year"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Domains.form.annual_cost.label")}</FormLabel>
+                  <FormLabel>{t("Cars.form.year.label")}</FormLabel>
                   <FormControl>
-                    <CurrencyInput
-                      placeholder={t("Domains.form.annual_cost.placeholder")}
+                    <Input
+                      placeholder={t("Cars.form.year.placeholder")}
                       disabled={isLoading}
                       {...field}
-                      showCommas={true}
-                      value={field.value ? parseFloat(String(field.value)) : undefined}
-                      onChange={(value) => field.onChange(value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -234,24 +228,16 @@ export function CarForm({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
-              name="payment_cycle"
+              name="color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Domains.form.payment_cycle.label")}</FormLabel>
+                  <FormLabel>{t("Cars.form.color.label")}</FormLabel>
                   <FormControl>
-                    <Select dir={lang === "ar" ? "rtl" : "ltr"}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Domains.form.payment_cycle.placeholder")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="monthly">
-                          {t("Domains.form.payment_cycle.monthly")}
-                        </SelectItem>
-                        <SelectItem value="annual">
-                          {t("Domains.form.payment_cycle.annual")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      placeholder={t("Cars.form.color.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -259,46 +245,78 @@ export function CarForm({
             />
             <FormField
               control={form.control}
-              name="status"
+              name="vin"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("Domains.form.status.label")}</FormLabel>
+                  <FormLabel>{t("Cars.form.vin.label")}</FormLabel>
                   <FormControl>
-                    <Select dir={lang === "ar" ? "rtl" : "ltr"} {...field} disabled={isLoading}>
-                      <SelectTrigger>
-                        <SelectValue placeholder={t("Domains.form.status.placeholder")} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="active">{t("Domains.form.status.active")}</SelectItem>
-                        <SelectItem value="inactive">
-                          {t("Domains.form.status.inactive")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Input
+                      placeholder={t("Cars.form.vin.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Domains.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Domains.form.notes.placeholder")}
-                    className="min-h-[120px]"
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.code.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Cars.form.code.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="license_country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.license_country.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Cars.form.license_country.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="license_plate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Cars.form.license_plate.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Cars.form.license_plate.placeholder")}
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Add a similar FormField here if there's another field, or leave as is for full width on smaller screens */}
+          </div>
         </div>
       </form>
     </Form>

@@ -20,6 +20,8 @@ import {
   Link,
   TableOfContents,
   BarChart,
+  Car,
+  Truck,
 } from "lucide-react";
 
 const ModulesOptions = {
@@ -201,6 +203,18 @@ const ModulesOptions = {
     label: "OnlineStores.title",
     translationKey: "OnlineStores.title",
     url: "/online_stores",
+  },
+  cars: {
+    icon: Car,
+    label: "Cars.title",
+    translationKey: "Cars.title",
+    url: "/cars",
+  },
+  trucks: {
+    icon: Truck,
+    label: "Trucks.title",
+    translationKey: "Trucks.title",
+    url: "/trucks",
   },
 };
 

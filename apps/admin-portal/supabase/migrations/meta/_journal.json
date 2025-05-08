@@ -344,6 +344,13 @@
       "when": 1746663881924,
       "tag": "0048_free_wong",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1746666719131,
+      "tag": "0049_bumpy_doorman",
+      "breakpoints": true
     }
   ]
 }

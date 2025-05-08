@@ -2071,7 +2071,7 @@ export const cars = pgTable("cars", {
   color: text(),
   vin: text(),
   code: text(),
-  liscese_country: text(),
+  license_country: text(),
   license_plate: text(),
   created_at: timestamp({ withTimezone: true, mode: "string" })
     .default(sql`timezone('utc'::text, now())`)
@@ -2087,7 +2087,7 @@ export const trucks = pgTable("trucks", {
   color: text(),
   vin: text(),
   code: text(),
-  liscese_country: text(),
+  license_country: text(),
   license_plate: text(),
   created_at: timestamp({ withTimezone: true, mode: "string" })
     .default(sql`timezone('utc'::text, now())`)

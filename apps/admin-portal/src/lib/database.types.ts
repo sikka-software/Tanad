@@ -133,8 +133,8 @@ export type Database = {
           color: string | null
           created_at: string
           id: string
+          license_country: string | null
           license_plate: string | null
-          liscese_country: string | null
           make: string
           model: string
           name: string
@@ -146,8 +146,8 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          license_country?: string | null
           license_plate?: string | null
-          liscese_country?: string | null
           make: string
           model: string
           name: string
@@ -159,8 +159,8 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          license_country?: string | null
           license_plate?: string | null
-          liscese_country?: string | null
           make?: string
           model?: string
           name?: string
@@ -1677,8 +1677,8 @@ export type Database = {
           color: string | null
           created_at: string
           id: string
+          license_country: string | null
           license_plate: string | null
-          liscese_country: string | null
           make: string
           model: string
           name: string
@@ -1690,8 +1690,8 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          license_country?: string | null
           license_plate?: string | null
-          liscese_country?: string | null
           make: string
           model: string
           name: string
@@ -1703,8 +1703,8 @@ export type Database = {
           color?: string | null
           created_at?: string
           id?: string
+          license_country?: string | null
           license_plate?: string | null
-          liscese_country?: string | null
           make?: string
           model?: string
           name?: string
