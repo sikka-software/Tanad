@@ -7,6 +7,7 @@ import {
   HelpCircle,
   LogOut,
   MessageSquareWarning,
+  Settings,
   User2,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
