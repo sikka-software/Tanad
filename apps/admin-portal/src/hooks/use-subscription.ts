@@ -207,7 +207,7 @@ export function useSubscription() {
       const supabase = createClient();
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("id, stripe_customer_id, subscribed_to, price_id")
+        .select("id, stripe_customer_id, subscribed_to, price_id, cancel_at_period_end, cancel_at")
         .eq("id", user.id)
         .single();
 
@@ -234,6 +234,8 @@ export function useSubscription() {
           subscribed_to: profile.subscribed_to,
           price_id: profile.price_id,
           stripe_customer_id: profile.stripe_customer_id,
+          cancel_at_period_end: profile.cancel_at_period_end,
+          cancel_at: profile.cancel_at,
         });
 
         // If profile shows a subscription but we don't see it in Stripe yet,
@@ -251,7 +253,9 @@ export function useSubscription() {
             planLookupKey: profile.subscribed_to,
             status: "active", // Assume active if in profile
             isExpired: false,
-            cancelAt: null,
+            cancelAt: profile.cancel_at_period_end
+              ? profile.cancel_at || Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
+              : null,
           });
           setLoading(false);
           return;

@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const supabase = createClient();
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("*")
+      .select("*, cancel_at_period_end, cancel_at")
       .eq("stripe_customer_id", customerId)
       .limit(1);
 
@@ -57,6 +57,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           lookup_key: subscription.items?.data[0]?.price?.lookup_key,
           price_id: subscription.items?.data[0]?.price?.id,
           subscribed_to: profile?.subscribed_to || null,
+          cancel_at_period_end: profile?.cancel_at_period_end || subscription.cancel_at_period_end,
+          cancel_at: profile?.cancel_at || subscription.cancel_at,
         },
       });
     }
@@ -72,6 +74,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           lookup_key: null,
           price_id: profile.price_id || null,
           subscribed_to: profile.subscribed_to || null,
+          cancel_at_period_end: profile.cancel_at_period_end || false,
+          cancel_at: profile.cancel_at || null,
         },
       });
     }
@@ -86,6 +90,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         lookup_key: null,
         price_id: null,
         subscribed_to: null,
+        cancel_at_period_end: false,
+        cancel_at: null,
       },
     });
   } catch (error) {
