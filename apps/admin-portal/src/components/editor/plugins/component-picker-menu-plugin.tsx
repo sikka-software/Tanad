@@ -106,11 +106,8 @@ export function ComponentPickerMenuPlugin({
                     ref={setMenuRef}
                     style={{
                       userSelect: "none",
-                      // Position the trigger to align with where Lexical expects the menu
-                      // This might need adjustment based on Lexical's internal positioning
-                      position: "absolute",
-                      left: anchorElementRef.current?.style.left,
-                      top: anchorElementRef.current?.style.top,
+                      // No longer using absolute positioning here, as the portal container (anchorElementRef.current)
+                      // is already positioned correctly by Lexical. The trigger will be at the top-left of this container.
                       width: "0px", // Make it invisible
                       height: "0px", // Make it invisible
                     }}
@@ -118,7 +115,7 @@ export function ComponentPickerMenuPlugin({
                   <PopoverContent
                     className="w-[250px] p-0 shadow-md"
                     // onOpenAutoFocus={(e) => e.preventDefault()} // Prevent focus stealing
-                    onWheel={(e) => e.preventDefault()}
+                    onWheel={(e) => e.stopPropagation()}
                   >
                     <Command
                       onKeyDown={(e) => {
