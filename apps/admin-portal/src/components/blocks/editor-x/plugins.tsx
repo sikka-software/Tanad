@@ -28,11 +28,9 @@ import { ActionsPlugin } from "@/components/editor/plugins/actions/actions-plugi
 import { CharacterLimitPlugin } from "@/components/editor/plugins/actions/character-limit-plugin";
 import { ClearEditorActionPlugin } from "@/components/editor/plugins/actions/clear-editor-plugin";
 import { CounterCharacterPlugin } from "@/components/editor/plugins/actions/counter-character-plugin";
-import { EditModeTogglePlugin } from "@/components/editor/plugins/actions/edit-mode-toggle-plugin";
 import { MarkdownTogglePlugin } from "@/components/editor/plugins/actions/markdown-toggle-plugin";
 import { MaxLengthPlugin } from "@/components/editor/plugins/actions/max-length-plugin";
 import { AutoLinkPlugin } from "@/components/editor/plugins/auto-link-plugin";
-import { AutocompletePlugin } from "@/components/editor/plugins/autocomplete-plugin";
 import { CodeActionMenuPlugin } from "@/components/editor/plugins/code-action-menu-plugin";
 import { CodeHighlightPlugin } from "@/components/editor/plugins/code-highlight-plugin";
 import { CollapsiblePlugin } from "@/components/editor/plugins/collapsible-plugin";
@@ -197,7 +195,7 @@ export function Plugins({}) {
               <div className="" ref={onRef}>
                 <ContentEditable
                   placeholder={t("Forms.notes.placeholder")}
-                  className="ContentEditable__root relative block h-[930px] overflow-auto px-8 py-4 text-start focus:outline-none"
+                  className="ContentEditable__root relative block h-[330px] overflow-auto px-8 py-4 text-start focus:outline-none"
                 />
               </div>
             </div>
@@ -254,7 +252,6 @@ export function Plugins({}) {
           ]}
         />
         <TabFocusPlugin />
-        <AutocompletePlugin />
         <AutoLinkPlugin />
         <LinkPlugin />
 
@@ -324,7 +321,6 @@ export function Plugins({}) {
                 ...TEXT_MATCH_TRANSFORMERS,
               ]}
             />
-            <EditModeTogglePlugin />
             <>
               <ClearEditorActionPlugin />
               <ClearEditorPlugin />

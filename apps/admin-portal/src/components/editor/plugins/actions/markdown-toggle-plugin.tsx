@@ -1,65 +1,66 @@
-import { useCallback } from 'react'
-
-import { $isCodeNode } from '@lexical/code'
-import { $createCodeNode } from '@lexical/code'
+import { $isCodeNode } from "@lexical/code";
+import { $createCodeNode } from "@lexical/code";
 import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
   Transformer,
-} from '@lexical/markdown'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $createTextNode } from 'lexical'
-import { $getRoot } from 'lexical'
-import { FileTextIcon } from 'lucide-react'
+} from "@lexical/markdown";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import IconButton from "@root/src/components/ui/icon-button";
+import { $createTextNode } from "lexical";
+import { $getRoot } from "lexical";
+import { FileTextIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useCallback } from "react";
 
-import { Button } from '@/components/ui/button'
 
 export function MarkdownTogglePlugin({
   shouldPreserveNewLinesInMarkdown,
   transformers,
 }: {
-  shouldPreserveNewLinesInMarkdown: boolean
-  transformers: Array<Transformer>
+  shouldPreserveNewLinesInMarkdown: boolean;
+  transformers: Array<Transformer>;
 }) {
-  const [editor] = useLexicalComposerContext()
+  const t = useTranslations();
+  const [editor] = useLexicalComposerContext();
 
   const handleMarkdownToggle = useCallback(() => {
     editor.update(() => {
-      const root = $getRoot()
-      const firstChild = root.getFirstChild()
-      if ($isCodeNode(firstChild) && firstChild.getLanguage() === 'markdown') {
+      const root = $getRoot();
+      const firstChild = root.getFirstChild();
+      if ($isCodeNode(firstChild) && firstChild.getLanguage() === "markdown") {
         $convertFromMarkdownString(
           firstChild.getTextContent(),
           transformers,
           undefined, // node
-          shouldPreserveNewLinesInMarkdown
-        )
+          shouldPreserveNewLinesInMarkdown,
+        );
       } else {
         const markdown = $convertToMarkdownString(
           transformers,
           undefined, //node
-          shouldPreserveNewLinesInMarkdown
-        )
-        const codeNode = $createCodeNode('markdown')
-        codeNode.append($createTextNode(markdown))
-        root.clear().append(codeNode)
+          shouldPreserveNewLinesInMarkdown,
+        );
+        const codeNode = $createCodeNode("markdown");
+        codeNode.append($createTextNode(markdown));
+        root.clear().append(codeNode);
         if (markdown.length === 0) {
-          codeNode.select()
+          codeNode.select();
         }
       }
-    })
-  }, [editor, shouldPreserveNewLinesInMarkdown])
+    });
+  }, [editor, shouldPreserveNewLinesInMarkdown]);
 
   return (
-    <Button
-      variant={'ghost'}
+    <IconButton
+      variant={"ghost"}
       onClick={handleMarkdownToggle}
-      title="Convert From Markdown"
+      label={t("General.convert_from_markdown")}
       aria-label="Convert from markdown"
-      size={'sm'}
+      size={"sm"}
       className="p-2"
-    >
-      <FileTextIcon className="size-4" />
-    </Button>
-  )
+      buttonType="button"
+      icon={<FileTextIcon className="size-4" />}
+    />
+  );
 }

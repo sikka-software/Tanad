@@ -1,8 +1,9 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from "react";
-import { $rootTextContent } from '@lexical/text';
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $rootTextContent } from "@lexical/text";
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 
 let textEncoderInstance: null | TextEncoder = null;
 
@@ -31,28 +32,29 @@ function utf8Length(text: string) {
 }
 
 interface CounterCharacterPluginProps {
-  charset?: 'UTF-8' | 'UTF-16'
+  charset?: "UTF-8" | "UTF-16";
 }
 
-const strlen = (text: string, charset: 'UTF-8' | 'UTF-16') => {
-  if (charset === 'UTF-8') {
+const strlen = (text: string, charset: "UTF-8" | "UTF-16") => {
+  if (charset === "UTF-8") {
     return utf8Length(text);
-  } else if (charset === 'UTF-16') {
+  } else if (charset === "UTF-16") {
     return text.length;
   }
-}
+};
 
 const countWords = (text: string) => {
-  return text.split(/\s+/).filter(word => word.length > 0).length;
-}
+  return text.split(/\s+/).filter((word) => word.length > 0).length;
+};
 
 export function CounterCharacterPlugin({ charset = "UTF-16" }: CounterCharacterPluginProps) {
+  const t = useTranslations();
   const [editor] = useLexicalComposerContext();
   const [stats, setStats] = useState(() => {
     const initialText = editor.getEditorState().read($rootTextContent);
     return {
       characters: strlen(initialText, charset),
-      words: countWords(initialText)
+      words: countWords(initialText),
     };
   });
 
@@ -60,16 +62,22 @@ export function CounterCharacterPlugin({ charset = "UTF-16" }: CounterCharacterP
     return editor.registerTextContentListener((currentText: string) => {
       setStats({
         characters: strlen(currentText, charset),
-        words: countWords(currentText)
+        words: countWords(currentText),
       });
     });
   }, [editor, charset]);
 
   return (
-    <div className="text-xs flex gap-2 text-gray-500 whitespace-nowrap">
-      <p>{stats.characters} characters</p>
+    <div className="flex gap-2 text-xs whitespace-nowrap text-gray-500">
+      <div className="flex flex-row gap-1 rtl:flex-row-reverse">
+        <span>{stats.characters}</span>
+        <span>{t("General.characters")}</span>
+      </div>
       |
-      <p>{stats.words} words</p>
+      <div className="flex flex-row gap-1 rtl:flex-row-reverse">
+        <span>{stats.words}</span>
+        <span>{t("General.words")}</span>
+      </div>
     </div>
   );
 }

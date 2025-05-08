@@ -9,20 +9,16 @@
  */
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { useBasicTypeaheadTriggerMatch } from "@lexical/react/LexicalTypeaheadMenuPlugin";
-import * as PopoverPrimitive from "@radix-ui/react-popover";
-import { PopoverPortal } from "@radix-ui/react-popover";
-import { cn } from "@root/src/lib/utils";
 import { TextNode } from "lexical";
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState, JSX, RefObject } from "react";
 import * as React from "react";
-import { createPortal } from "react-dom";
 
 import { useEditorModal } from "@/components/editor/editor-hooks/use-modal";
 import { ComponentPickerOption } from "@/components/editor/plugins/picker/component-picker-option";
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
-import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { PopoverContent, PopoverTrigger } from "../../ui/popover";
 
 const LexicalTypeaheadMenuPlugin = dynamic(
   () => import("./default/lexical-typeahead-menu-plugin"),
@@ -59,7 +55,7 @@ export function ComponentPickerMenuPlugin({
           regex.test(option.title) || option.keywords.some((keyword) => regex.test(keyword)),
       ),
     ];
-  }, [editor, queryString, showModal]);
+  }, [editor, queryString, showModal, baseOptions, dynamicOptionsFn]);
 
   const onSelectOption = useCallback(
     (
@@ -98,25 +94,20 @@ export function ComponentPickerMenuPlugin({
         ) => {
           const { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex } = itemProps;
           const { setMenuRef } = menuContext;
+
           return anchorElementRef.current && options.length ? (
             <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverPortal container={anchorElementRef.current}>
                 <div>
                   <PopoverTrigger
                     ref={setMenuRef}
-                    style={{
-                      userSelect: "none",
-                      // No longer using absolute positioning here, as the portal container (anchorElementRef.current)
-                      // is already positioned correctly by Lexical. The trigger will be at the top-left of this container.
-                      width: "0px", // Make it invisible
-                      height: "0px", // Make it invisible
-                    }}
+                    style={{ userSelect: "none", width: "0px", height: "0px" }}
                   />
                   <PopoverContent
                     align="start"
                     sideOffset={0}
                     className="w-[250px] p-0 shadow-md"
-                    // onOpenAutoFocus={(e) => e.preventDefault()} // User commented this out, keeping it as is
+                    onOpenAutoFocus={(e) => e.preventDefault()} // User commented this out, keeping it as is
                     onWheel={(e) => e.stopPropagation()}
                     onKeyDown={(e) => {
                       if (e.key === "ArrowUp") {
@@ -138,37 +129,26 @@ export function ComponentPickerMenuPlugin({
                           setIsOpen(false);
                         }
                       }
-                      // We are not handling Enter here, relying on CommandItem's onSelect or Lexical's global Enter
                     }}
                   >
                     <Command
-                      // Restore explicit onKeyDown handler for arrow keys
                       value={
-                        // This tells cmdk which item to visually mark as selected
                         selectedIndex !== null && options[selectedIndex]
                           ? options[selectedIndex].key
                           : undefined
                       }
-                      // Remove onValueChange, as we're driving selection with onKeyDown + setHighlightedIndex
-                      // onValueChange={(currentValue) => {
-                      //   const newIndex = options.findIndex((option) => option.key === currentValue);
-                      //   if (newIndex !== -1) {
-                      //     setHighlightedIndex(newIndex);
-                      //   }
-                      // }}
                     >
                       <CommandList>
                         <CommandGroup>
                           {options.map((option, index) => (
                             <CommandItem
                               key={option.key}
-                              value={option.key} // cmdk needs this to match against Command.value
+                              value={option.key}
+                              className="flex items-center gap-2"
                               onSelect={() => {
-                                // For click or if cmdk processes Enter
                                 selectOptionAndCleanUp(option);
-                                setIsOpen(false); // Close popover on select
+                                setIsOpen(false);
                               }}
-                              className="flex items-center gap-2" // Basic layout styles, cmdk handles selection style via data-selected
                             >
                               {option.icon}
                               {option.title}
