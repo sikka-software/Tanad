@@ -225,7 +225,6 @@ export function QuoteForm({
           onError: () => setIsLoading(false),
         });
       }
-      if (onSuccess) onSuccess();
     } catch (err) {
       console.error("Error saving quote:", err);
       toast.error(t("Quotes.error.save"));
