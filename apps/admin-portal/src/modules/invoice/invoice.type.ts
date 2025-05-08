@@ -3,21 +3,13 @@ import type { Database } from "@/lib/database.types";
 import type { Client } from "@/modules/client/client.type";
 
 export type Invoice = Database["public"]["Tables"]["invoices"]["Row"] & {
-  client: Client | null; // Assuming 'Client' type exists and client can be null
-  items?: InvoiceItem[]; // Assuming items might be included sometimes
+  client: Client | null;
+  items?: InvoiceItem[];
 };
 
 export type InvoiceItem = Database["public"]["Tables"]["invoice_items"]["Row"];
 
-// Extended types expected by the form/API handlers
-// Explicitly define the fields needed for creating an invoice item via the form/API
 export type InvoiceItemInput = Database["public"]["Tables"]["invoice_items"]["Insert"];
-// export type InvoiceItemInput = {
-//   product_id?: string | null; // Match backend expectation (null if not provided)
-//   description: string;
-//   quantity: number;
-//   unit_price: number;
-// };
 
 export type InvoiceCreateData = Database["public"]["Tables"]["invoices"]["Insert"] & {
   items: InvoiceItemInput[];
@@ -25,5 +17,3 @@ export type InvoiceCreateData = Database["public"]["Tables"]["invoices"]["Insert
 export type InvoiceUpdateData = Database["public"]["Tables"]["invoices"]["Update"] & {
   items?: InvoiceItemInput[];
 };
-
-export type InvoiceItemCreateData = Omit<InvoiceItem, "id">;
