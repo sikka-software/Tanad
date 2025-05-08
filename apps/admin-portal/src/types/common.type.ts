@@ -44,3 +44,21 @@ export interface ModuleTableProps<T> {
   error?: Error | null;
   onActionClicked: (action: string, rowId: string) => void;
 }
+
+export interface ModuleFormProps<T> {
+  formHtmlId?: string;
+  onSuccess?: () => void;
+  defaultValues?: T | null;
+  editMode?: boolean;
+}
+
+export interface AddressProps {
+  short_address?: string;
+  building_number?: string;
+  street_name?: string;
+  city?: string;
+  region?: string;
+  country?: string;
+  zip_code?: string;
+  additional_number?: string;
+}

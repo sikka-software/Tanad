@@ -26,8 +26,8 @@ import {
 } from "@/role/role.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/role/role.options";
 import useRoleStore from "@/role/role.store";
-import { RoleUpdateData, RoleWithPermissions } from "@/role/role.type";
 
+import { Role } from "@/modules/role/role.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function RolesPage() {
@@ -37,9 +37,8 @@ export default function RolesPage() {
   const canCreateRoles = useUserStore((state) => state.hasPermission("roles.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableRole, setActionableRole] = useState<(RoleUpdateData & { id?: string }) | null>(
-    null,
-  );
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
+
   const { enterprise, profile, membership } = useUserStore();
 
   const loadingSaveRole = useRoleStore((state) => state.isLoading);
@@ -58,7 +57,7 @@ export default function RolesPage() {
   const { data: systemRoles, isLoading: loadingSystemRoles, error: systemError } = useSystemRoles();
 
   const allRoles = useMemo(() => {
-    const combined = new Map<string, RoleWithPermissions>();
+    const combined = new Map<string, Role>();
     (customRoles || []).forEach((role) => combined.set(role.id, role));
     (systemRoles || []).forEach((role) => combined.set(role.id, role));
     return Array.from(combined.values());
@@ -72,27 +71,22 @@ export default function RolesPage() {
   const { createDeleteHandler } = useDeleteHandler();
 
   const handleConfirmDelete = createDeleteHandler(deleteRoles, {
-    loading: "Roles.loading.deleting",
-    success: "Roles.success.deleted",
-    error: "Roles.error.deleting",
+    loading: "Roles.loading.delete",
+    success: "Roles.success.delete",
+    error: "Roles.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
     },
   });
 
-  const filteredRoles = getFilteredRoles(allRoles || []) as RoleWithPermissions[];
+  const filteredRoles = getFilteredRoles(allRoles || []) as Role[];
 
   const onActionClicked = async (action: string, rowId: string) => {
     if (action === "edit") {
       const roleToEdit = allRoles.find((role) => role.id === rowId);
       if (roleToEdit) {
-        setActionableRole({
-          id: roleToEdit.id,
-          name: roleToEdit.name,
-          description: roleToEdit.description,
-          permissions: roleToEdit.permissions || [],
-        });
+        setEditingRole(roleToEdit);
         setIsFormDialogOpen(true);
       }
     }
@@ -111,14 +105,14 @@ export default function RolesPage() {
       const roleToDuplicate = allRoles.find((r) => r.id === rowId);
       if (roleToDuplicate && !roleToDuplicate.is_system) {
         const toastId = toast.loading(t("General.loading_operation"), {
-          description: t("Roles.loading.duplicating"),
+          description: t("Roles.loading.duplicate"),
         });
         await duplicateRole(
           { id: rowId, enterprise_id: enterprise?.id || "" },
           {
             onSuccess: () => {
               toast.success(t("General.successful_operation"), {
-                description: t("Roles.success.duplicated"),
+                description: t("Roles.success.duplicate"),
               });
               toast.dismiss(toastId);
             },
@@ -161,7 +155,7 @@ export default function RolesPage() {
             title={t("Roles.title")}
             onAddClick={() => {
               if (canCreateRoles) {
-                setActionableRole(null);
+                setEditingRole(null);
                 setIsFormDialogOpen(true);
               } else {
                 return undefined;
@@ -169,6 +163,8 @@ export default function RolesPage() {
             }}
             createLabel={t("Roles.create_role")}
             searchPlaceholder={t("Roles.search_roles")}
+            count={allRoles?.length}
+            hideOptions={allRoles?.length === 0}
           />
         )}
 
@@ -191,7 +187,7 @@ export default function RolesPage() {
                 key={role.id}
                 role={role}
                 onActionClick={onActionClicked}
-                disableActions={role.is_system}
+                disableActions={role.is_system || false}
               />
             )}
             gridCols="3"
@@ -201,33 +197,19 @@ export default function RolesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableRole?.id ? t("Roles.edit_role") : t("Roles.add_new")}
+          title={editingRole ? t("Roles.edit_role") : t("Roles.add_new")}
           formId="role-form"
           loadingSave={loadingSaveRole}
         >
           <RoleForm
-            formId={"role-form"}
+            formHtmlId={"role-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setLoadingSaveRole(false);
-              setActionableRole(null);
-              toast.success(t("General.successful_operation"), {
-                description: actionableRole?.id
-                  ? t("Roles.success.updated")
-                  : t("Roles.success.created"),
-              });
+              setEditingRole(null);
             }}
-            editMode={!!actionableRole?.id}
-            id={actionableRole?.id}
-            defaultValues={
-              actionableRole
-                ? {
-                    name: actionableRole.name || "",
-                    description: actionableRole.description || null,
-                    permissions: actionableRole.permissions || [],
-                  }
-                : undefined
-            }
+            editMode={!!editingRole}
+            defaultValues={editingRole as any}
           />
         </FormDialog>
 

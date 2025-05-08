@@ -1,4 +1,5 @@
-import { User } from "@supabase/supabase-js";
+import { currencies } from "@root/tanad.config";
+import { Session, User } from "@supabase/supabase-js";
 import { create } from "zustand";
 
 import { createClient } from "@/utils/supabase/component";
@@ -15,8 +16,8 @@ export interface ProfileType {
   price_id?: string;
   username: string | null;
   user_settings: {
-    currency: string;
-    calendar_type: string;
+    currency: (typeof currencies)[number];
+    calendar_type: "gregorian" | "hijri";
     timezone: string;
     notifications?: {
       email_updates: boolean;
@@ -32,7 +33,7 @@ export interface ProfileType {
         title: string;
         translationKey?: string;
         url?: string;
-        is_active?: boolean;
+        status?: string;
         action?: string;
       }>
     >;
@@ -102,7 +103,7 @@ const useUserStore = create<UserState>((set, get) => ({
 
   signOut: async () => {
     try {
-      set({ loading: true });
+      // Only call Supabase sign out, let the listener handle state changes
       await supabase.auth.signOut();
       set({
         user: null,
@@ -116,7 +117,9 @@ const useUserStore = create<UserState>((set, get) => ({
       });
       return Promise.resolve();
     } catch (error) {
+      // Log error, potentially set an error state if needed elsewhere
       console.error("Error signing out:", error);
+      // Optionally set error state: set({ error: (error as Error).message, loading: false });
       return Promise.reject(error);
     }
   },
@@ -206,14 +209,19 @@ const useUserStore = create<UserState>((set, get) => ({
           // Get user permissions from the view
           const { data: permissionsData } = await supabase
             .from("user_permissions_view")
-            .select("permission")
-            .eq("profile_id", session.user.id)
+            .select("permission_name")
+            .eq("user_id", session.user.id)
             .eq("enterprise_id", membershipData.enterprise_id);
 
           if (permissionsData) {
-            const permissions = permissionsData.map((p) => p.permission);
+            const permissions = permissionsData.map((p) => p.permission_name);
             set({ permissions });
           }
+          console.log("user", session.user);
+          console.log("profile", profileData);
+          console.log("permissions", permissionsData);
+          console.log("membership", membershipData);
+          console.log("enterprise", enterpriseData);
         }
       }
 
@@ -228,9 +236,17 @@ const useUserStore = create<UserState>((set, get) => ({
   },
 }));
 
+let session: Session | null = null;
+
+supabase.auth.getSession().then(async ({ data }) => {
+  if (data.session) {
+    session = data.session;
+  }
+});
+
 // Setup auth state change listener
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_IN") {
+supabase.auth.onAuthStateChange((event, _session) => {
+  if (event === "SIGNED_IN" && !session && _session) {
     useUserStore.getState().fetchUserAndProfile();
   } else if (event === "SIGNED_OUT") {
     useUserStore.setState({

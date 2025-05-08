@@ -10,7 +10,7 @@ interface DeleteHandlerOptions<TVariables> {
   success: string;
   error: string;
   onSuccess?: (data: any, variables: TVariables) => void;
-  onError?: (error: Error, variables: TVariables) => void;
+  onError?: (error: Error, variables: TVariables) => boolean | void;
 }
 
 export const useDeleteHandler = () => {
@@ -33,11 +33,29 @@ export const useDeleteHandler = () => {
         });
         options.onSuccess?.(data, variables);
       } catch (error) {
-        const err = error as Error;
-        toast.error(t("General.error_operation"), {
-          description: err.message || t(options.error),
-        });
-        options.onError?.(err, variables);
+        const err = error as any; // Treat as any to access potential JSON properties
+        console.log("error is ", err);
+        const errorHandled = options.onError?.(err, variables);
+
+        if (!errorHandled) {
+          let description = t(options.error); // Default to generic translation key
+
+          if (typeof err === "object" && err !== null) {
+            // Prefer 'details', then 'message' from the object itself (parsed JSON from service)
+            if (typeof err.details === "string" && err.details) {
+              description = err.details;
+            } else if (typeof err.message === "string" && err.message) {
+              description = err.message;
+            }
+          } else if (error instanceof Error && error.message) {
+            // Fallback to standard Error.message if 'err' wasn't a detailed object
+            description = error.message;
+          }
+
+          toast.error(t("General.error_operation"), {
+            description: description, // Use the determined description
+          });
+        }
       } finally {
         toast.dismiss(toastId);
       }

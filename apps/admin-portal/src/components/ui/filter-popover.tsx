@@ -388,7 +388,7 @@ export default function FilterPopover({
                 className="w-full justify-center text-sm"
                 onClick={addFilterCondition}
               >
-                <Plus className="mr-1 h-3.5 w-3.5" />
+                <Plus className="me-1 h-3.5 w-3.5" />
                 {t("General.add_filter_condition")}
               </Button>
 
@@ -415,7 +415,7 @@ export default function FilterPopover({
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="mr-2 h-4 w-4"
+                    className="me-2 h-4 w-4"
                   >
                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                     <path d="M3 3v5h5" />
@@ -437,7 +437,7 @@ export default function FilterPopover({
               <div className="flex items-center justify-between">
                 <h4 className="leading-none font-medium">{t("General.saved_filters")}</h4>
                 <Button variant="outline" size="sm" className="h-8">
-                  <Plus className="mr-1 h-3.5 w-3.5" />
+                  <Plus className="me-1 h-3.5 w-3.5" />
                   {t("General.save_current_filter")}
                 </Button>
               </div>
@@ -453,7 +453,7 @@ export default function FilterPopover({
                     }}
                   >
                     <div className="flex items-center">
-                      <Clock className="text-muted-foreground mr-2 h-4 w-4" />
+                      <Clock className="text-muted-foreground me-2 h-4 w-4" />
                       <span>{filter.name}</span>
                     </div>
                     <DropdownMenu>
@@ -478,7 +478,7 @@ export default function FilterPopover({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                          <Check className="mr-2 h-4 w-4" />
+                          <Check className="me-2 h-4 w-4" />
                           <span>{t("General.apply_filter")}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
@@ -492,7 +492,7 @@ export default function FilterPopover({
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="mr-2 h-4 w-4"
+                            className="me-2 h-4 w-4"
                           >
                             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
                             <path d="m15 5 4 4" />
@@ -500,7 +500,7 @@ export default function FilterPopover({
                           <span>{t("General.edit")}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" />
+                          <Trash2 className="me-2 h-4 w-4" />
                           <span>{t("General.delete")}</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>

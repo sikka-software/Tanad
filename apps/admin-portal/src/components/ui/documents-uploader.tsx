@@ -118,7 +118,7 @@ export function DocumentUploader({
             size="sm"
             disabled={disabled || documents.length >= maxFiles}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="me-2 h-4 w-4" />
             {t("Documents.add_document")}
           </Button>
         </div>

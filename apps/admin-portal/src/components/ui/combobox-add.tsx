@@ -50,13 +50,18 @@ type ComboboxAddTypes<T> = {
   renderSelected?: (item: T) => React.ReactNode;
   addText?: string;
   onAddClick?: () => void;
+  containerClassName?: string;
+  ariaInvalid?: boolean;
+  inCell?: boolean;
+  buttonClassName?: string;
 };
-export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any>>(
+export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<any>>(
   (
     {
       labelKey = "label",
       valueKey = "value",
       defaultValue = "",
+      containerClassName,
       popoverClassName,
       direction,
       labelProps,
@@ -65,13 +70,19 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
       renderOption,
       renderSelected,
       addText = "Add Category",
+      ariaInvalid,
+      inCell = false,
+      buttonClassName,
       ...props
     },
     ref,
   ) => {
     const [open, setOpen] = React.useState(false);
-    const [value, setValue] = React.useState(defaultValue);
-    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [selectedValue, setSelectedValue] = React.useState(defaultValue);
+
+    React.useEffect(() => {
+      setSelectedValue(defaultValue);
+    }, [defaultValue]);
 
     function getProperty<T>(obj: T, key: string): any {
       return key.split(".").reduce((o: any, k: string) => (o || {})[k], obj);
@@ -82,7 +93,8 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
         setOpen(open);
       }
     };
-    const selectedItem = data.find((item) => getProperty(item, valueKey) === value);
+
+    const selectedItem = data.find((item) => getProperty(item, valueKey) === selectedValue);
 
     return (
       <div
@@ -91,7 +103,6 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
           "relative flex h-fit flex-col gap-2",
           props.width === "fit" ? "w-fit" : "w-full",
         )}
-        ref={containerRef}
       >
         {props.label && <Label {...labelProps}>{props.label}</Label>}
 
@@ -101,9 +112,9 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
         >
           <PopoverTrigger disabled={props.disabled} asChild>
             {props.isLoading ? (
-              <Skeleton className="h-[40px] w-full" />
+              <Skeleton className={cn("h-9 w-full", inCell && "h-10 rounded-none")} />
             ) : (
-              <div className="flex flex-col items-start gap-2">
+              <div className={cn("flex flex-col items-start gap-2", containerClassName)}>
                 <div
                   className={cn(
                     "absolute top-[22px] h-[0.8px] w-full bg-gray-200 transition-all dark:bg-gray-800",
@@ -111,15 +122,18 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                   )}
                 ></div>
                 <button
+                  ref={ref}
                   disabled={props.disabled}
                   role="combobox"
                   type="button"
                   aria-expanded={open}
                   className={cn(
-                    "ring-offset-background focus-visible:ring-ring inline-flex h-10 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-                    props.preview
-                      ? "cursor-default rounded-none border-transparent px-0"
-                      : "bg-background px-3",
+                    "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                    "bg-background px-3",
+                    ariaInvalid &&
+                      "ring-destructive/20 dark:ring-destructive/40 border-destructive",
+                    inCell && "h-10 rounded-none border-none",
+                    buttonClassName,
                   )}
                 >
                   {selectedItem
@@ -127,22 +141,24 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                       ? renderSelected(selectedItem)
                       : getProperty(selectedItem, labelKey)
                     : props.texts?.placeholder || ". . ."}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className={cn(
-                      "size-4 transition-all",
-                      !props.preview ? "visible opacity-100" : "invisible opacity-0",
-                    )}
-                    aria-label="Chevron down icon"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
+                  {!inCell && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={cn(
+                        "size-4 transition-all",
+                        !props.preview ? "visible opacity-50" : "invisible opacity-0",
+                      )}
+                      aria-label="Chevron down icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  )}
                 </button>
               </div>
             )}
@@ -150,14 +166,21 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
           <PopoverContent
             sideOffset={0}
             className={cn(
-              "w-[var(--radix-popover-trigger-width)] p-0",
+              "p-0",
+              !inCell && "w-[var(--radix-popover-trigger-width)]",
               props.helperText && "-mt-4",
+              popoverClassName,
             )}
             dir={direction}
+            onOpenAutoFocus={(e) => e.preventDefault()}
           >
             <Command
               filter={(value, search) => {
-                if (value.toLowerCase().includes(search.toLowerCase())) return 1;
+                if (!search) return 1;
+                const item = data.find((i) => getProperty(i, valueKey) === value);
+                if (!item) return 0;
+                const label = String(getProperty(item, labelKey) ?? "");
+                if (label.toLowerCase().includes(search.toLowerCase())) return 1;
                 return 0;
               }}
             >
@@ -173,7 +196,10 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                 <Button
                   variant="outline"
                   className="w-full rounded-none !text-blue-500 dark:!text-blue-400"
-                  onClick={props.onAddClick}
+                  onClick={() => {
+                    setOpen(false);
+                    props.onAddClick?.();
+                  }}
                 >
                   {addText}
                   <Plus className="size-4" />
@@ -183,15 +209,17 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                 <CommandGroup className={cn("max-h-[200px]", data.length > 0 && "overflow-y-auto")}>
                   {data.map((item: any, i) => (
                     <CommandItem
-                      key={item[valueKey]}
-                      onSelect={() => {
-                        const newValue = getProperty(item, valueKey);
-                        setValue(newValue === value ? "" : (newValue as string));
+                      key={getProperty(item, valueKey)}
+                      value={getProperty(item, valueKey)}
+                      onSelect={(currentValue) => {
+                        const newValue = currentValue === selectedValue ? "" : currentValue;
+                        setSelectedValue(newValue as string);
                         if (props.onChange) {
-                          props.onChange(newValue === value ? "" : (newValue as string));
+                          props.onChange(newValue as string);
                         }
                         setOpen(false);
                       }}
+                      className="cursor-pointer"
                     >
                       <svg
                         aria-label="Check Icon"
@@ -205,14 +233,18 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         className={cn(
-                          "icon",
-                          value === getProperty(item, valueKey) ? "opacity-100" : "opacity-0",
+                          "icon shrink-0",
+                          selectedValue === getProperty(item, valueKey)
+                            ? "opacity-100"
+                            : "opacity-0",
                         )}
                         style={{ marginInlineEnd: "0.5rem" }}
                       >
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      {renderOption ? renderOption(item) : getProperty(item, labelKey)}
+                      <span className="truncate">
+                        {renderOption ? renderOption(item) : getProperty(item, labelKey)}
+                      </span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -224,3 +256,4 @@ export const ComboboxAdd = React.forwardRef<HTMLDivElement, ComboboxAddTypes<any
     );
   },
 );
+ComboboxAdd.displayName = "ComboboxAdd";

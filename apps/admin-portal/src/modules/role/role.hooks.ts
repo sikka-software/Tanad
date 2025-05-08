@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
+
+import useUserStore from "@/stores/use-user-store";
 
 // Import the user store
 
-import type { Role, RoleWithPermissions, RoleCreateData, RoleUpdateData } from "./role.type";
+import type { Role, RoleCreateData, RoleUpdateData } from "./role.type";
 
 const supabase = createClient();
 
@@ -26,7 +28,7 @@ export function useRoles() {
   const { enterprise } = useUserStore(); // Get current enterprise
   const enterpriseId = enterprise?.id;
 
-  return useQuery<RoleWithPermissions[], Error>({
+  return useQuery<Role[], Error>({
     // Update queryKey to include enterpriseId for caching and refetching
     queryKey: roleKeys.list(enterpriseId),
     queryFn: async () => {
@@ -96,7 +98,7 @@ export function useRoles() {
       );
 
       // 5. Combine roles and their permissions
-      const rolesWithPermissions: RoleWithPermissions[] = roles.map((role) => ({
+      const rolesWithPermissions: Role[] = roles.map((role) => ({
         ...role,
         permissions: rolePermissionsMap[role.id] || [],
       }));
@@ -110,6 +112,7 @@ export function useRoles() {
 // Create role hook - Uses RoleCreateData
 export function useCreateRole() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return useMutation<Role, Error, RoleCreateData & { enterprise_id: string }>({
     mutationFn: async (data: RoleCreateData & { enterprise_id: string }) => {
@@ -158,6 +161,9 @@ export function useCreateRole() {
       queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
       // Also invalidate the general custom roles list if used elsewhere
       queryClient.invalidateQueries({ queryKey: [...roleKeys.lists(), "custom"] });
+      toast.success(t("General.successful_operation"), {
+        description: t("Roles.success.create"),
+      });
     },
     onError: (error) => {
       console.error("Error creating role:", error);
@@ -169,6 +175,7 @@ export function useCreateRole() {
 // Update role hook - Uses RoleUpdateData
 export function useUpdateRole() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return useMutation<void, Error, { id: string; data: RoleUpdateData }>({
     mutationFn: async ({ id, data }: { id: string; data: RoleUpdateData }) => {
@@ -214,7 +221,10 @@ export function useUpdateRole() {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: roleKeys.lists() });
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) });
-      queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() }); // Also invalidate system roles
+      queryClient.invalidateQueries({ queryKey: roleKeys.systemRoles() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Roles.success.update"),
+      });
     },
     onError: (error) => {
       console.error("Error updating role:", error);
@@ -385,7 +395,7 @@ export function useDuplicateRole() {
 
 // Hook to fetch system roles (is_system = true)
 export function useSystemRoles() {
-  return useQuery<RoleWithPermissions[], Error>({
+  return useQuery<Role[], Error>({
     queryKey: roleKeys.systemRoles(), // Define a new query key
     queryFn: async () => {
       // 1. Fetch system roles
@@ -419,7 +429,7 @@ export function useSystemRoles() {
       );
 
       // 4. Combine roles and permissions
-      const rolesWithPermissions: RoleWithPermissions[] = roles.map((role) => ({
+      const rolesWithPermissions: Role[] = roles.map((role) => ({
         ...role,
         permissions: rolePermissionsMap[role.id] || [],
       }));
@@ -434,7 +444,7 @@ export function useCustomRoles() {
   const { enterprise } = useUserStore(); // Get current enterprise
   const enterpriseId = enterprise?.id;
 
-  return useQuery<RoleWithPermissions[], Error>({
+  return useQuery<Role[], Error>({
     queryKey: [...roleKeys.lists(), "custom", { enterpriseId }], // Key includes enterpriseId
     queryFn: async () => {
       if (!enterpriseId) {
@@ -473,7 +483,7 @@ export function useCustomRoles() {
       );
 
       // 3. Combine roles and their permissions
-      const rolesWithPermissions: RoleWithPermissions[] = roles.map((role) => ({
+      const rolesWithPermissions: Role[] = roles.map((role) => ({
         ...role,
         permissions: rolePermissionsMap[role.id] || [],
       }));

@@ -18,8 +18,8 @@ import IconButton from "./icon-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 interface SortPopoverProps {
-  sortRules: { field: string; direction: string }[];
-  onSortRulesChange: (sortRules: { field: string; direction: string }[]) => void;
+  sortRules: { field: string; direction: "asc" | "desc" }[];
+  onSortRulesChange: (sortRules: { field: string; direction: "asc" | "desc" }[]) => void;
   columns: SortableColumn[];
   caseSensitive?: boolean;
   onCaseSensitiveChange?: (value: boolean) => void;

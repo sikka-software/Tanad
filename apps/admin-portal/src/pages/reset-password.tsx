@@ -25,14 +25,11 @@ const ResetPassword = () => {
   const t = useTranslations("Auth");
   const lang = useLocale();
   const { resolvedTheme } = useTheme();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { token } = router.query;
-  const [error, setError] = useState<any>(null);
 
   const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

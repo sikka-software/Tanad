@@ -74,9 +74,9 @@ export default function DepartmentsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteDepartments, {
-    loading: "Departments.loading.deleting",
-    success: "Departments.success.deleted",
-    error: "Departments.error.deleting",
+    loading: "Departments.loading.delete",
+    success: "Departments.success.delete",
+    error: "Departments.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -117,6 +117,8 @@ export default function DepartmentsPage() {
             }
             createLabel={t("Departments.add_new")}
             searchPlaceholder={t("Departments.search_departments")}
+            count={departments?.length}
+            hideOptions={departments?.length === 0}
           />
         )}
 
@@ -147,18 +149,18 @@ export default function DepartmentsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Departments.edit")}
+          title={t("Departments.edit_department")}
           formId="department-form"
           loadingSave={loadingSaveDepartment}
         >
           <DepartmentForm
-            id="department-form"
+            formHtmlId="department-form"
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableDepartment(null);
               setLoadingSaveDepartment(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Departments.success.updated"),
+                description: t("Departments.success.update"),
               });
             }}
             defaultValues={actionableDepartment}

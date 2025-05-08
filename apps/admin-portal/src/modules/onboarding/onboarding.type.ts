@@ -3,18 +3,13 @@ import type { enterprises } from "@/db/schema";
 export type Enterprise = {
   id: string;
   name: string;
-  description: string;
-  logo: string;
   email: string;
   industry: string;
   size: string;
   created_at: string;
 };
 
-export type EnterpriseCreateData = Pick<
-  Enterprise,
-  "name" | "description" | "logo" | "email" | "industry" | "size"
->;
+export type EnterpriseCreateData = Pick<Enterprise, "name" | "email" | "industry" | "size">;
 
 export const INDUSTRY_OPTIONS = [
   { label: "Technology", value: "technology" },

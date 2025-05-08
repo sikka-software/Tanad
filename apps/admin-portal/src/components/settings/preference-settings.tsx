@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { currencies } from "@root/tanad.config";
 import { DollarSign, Euro, PoundSterling, SaudiRiyal, JapaneseYen, Flag } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useEffect } from "react";
@@ -13,18 +14,21 @@ import { Skeleton } from "@/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
+
 import useUserStore from "@/stores/use-user-store";
 
 import BetaFlag from "../ui/beta-flag";
 
 const formSchema = z.object({
   currency: z.string(),
-  calendar: z.string(),
+  calendar: z.enum(["gregorian", "hijri"]),
   dateFormat: z.string(),
   timeFormat: z.string(),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.input<typeof formSchema>;
 
 interface PreferenceSettingsProps {
   onDirtyChange?: (isDirty: boolean) => void;
@@ -45,8 +49,8 @@ const PreferenceSettings = ({
   const t = useTranslations();
 
   // Add state to track the selected values
-  const [selectedCurrency, setSelectedCurrency] = useState<string>("usd");
-  const [selectedCalendar, setSelectedCalendar] = useState<string>("month");
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("sar");
+  const [selectedCalendar, setSelectedCalendar] = useState<"gregorian" | "hijri">("gregorian");
   const [selectedDateFormat, setSelectedDateFormat] = useState<string>("mdy");
   const [selectedTimeFormat, setSelectedTimeFormat] = useState<string>("12h");
 
@@ -64,8 +68,8 @@ const PreferenceSettings = ({
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      currency: "usd",
-      calendar: "month",
+      currency: "sar",
+      calendar: "gregorian",
       dateFormat: "mdy",
       timeFormat: "12h",
     },
@@ -74,8 +78,8 @@ const PreferenceSettings = ({
   // Reset form when profile data is loaded
   useEffect(() => {
     if (profile) {
-      const currency = profile.user_settings?.currency || "usd";
-      const calendar = profile.user_settings?.calendar || "month";
+      const currency = profile.user_settings?.currency || "sar";
+      const calendar = profile.user_settings?.calendar || "gregorian";
       const dateFormat = profile.user_settings?.date_format || "mdy";
       const timeFormat = profile.user_settings?.time_format || "12h";
 
@@ -95,7 +99,6 @@ const PreferenceSettings = ({
       setTimeout(() => {
         form.reset(formValues);
 
-        // Force set the field values explicitly
         form.setValue("currency", currency);
         form.setValue("calendar", calendar);
         form.setValue("dateFormat", dateFormat);
@@ -160,25 +163,67 @@ const PreferenceSettings = ({
             onKeyDown={handleKeyDown}
             className="space-y-6"
           >
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium">{t("Settings.preferences.default.title")}</h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="currency"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("Settings.preferences.default.currency")}</FormLabel>
-                      {isLoadingProfile ? (
-                        <Skeleton className="h-10 w-full" />
-                      ) : (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="currency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Settings.preferences.default.currency")}</FormLabel>
+                    {isLoadingProfile ? (
+                      <Skeleton className="h-10 w-full" />
+                    ) : (
+                      <Select
+                        disabled={isSaving}
+                        dir={lang === "ar" ? "rtl" : "ltr"}
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          setSelectedCurrency(val);
+                        }}
+                        value={field.value || selectedCurrency}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("General.select")} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {currencies.map((currency) => (
+                            <SelectItem key={currency} value={currency}>
+                              <div className="flex flex-row items-center gap-2">
+                                <span>{t(`Settings.preferences.currency.${currency}`)}</span>
+                                {getCurrencySymbol(currency).symbol}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="calendar"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Settings.preferences.default.calendar")}</FormLabel>
+                    {isLoadingProfile ? (
+                      <Skeleton className="h-10 w-full" />
+                    ) : (
+                      <BetaFlag
+                        title={t("Flags.calendar_soon.title")}
+                        description={t("Flags.calendar_soon.description")}
+                      >
                         <Select
-                          disabled={isSaving}
+                          dir={lang === "ar" ? "rtl" : "ltr"}
+                          disabled
                           onValueChange={(val) => {
-                            field.onChange(val);
-                            setSelectedCurrency(val);
+                            field.onChange(val as "gregorian" | "hijri");
+                            setSelectedCalendar(val as "gregorian" | "hijri");
                           }}
-                          value={field.value || selectedCurrency}
+                          value={field.value || selectedCalendar}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -186,161 +231,92 @@ const PreferenceSettings = ({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="sar">
-                              <div className="flex flex-row items-center gap-2">
-                                <span>SAR</span>
-                                <SaudiRiyal className="size-3" />
-                              </div>
+                            <SelectItem value="gregorian">
+                              {t("General.calendars.gregorian")}
                             </SelectItem>
-                            <SelectItem value="usd">
-                              <div className="flex flex-row items-center gap-2">
-                                <span>USD</span>
-                                <DollarSign className="size-3" />
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="eur">
-                              <div className="flex flex-row items-center gap-2">
-                                <span>EUR</span>
-                                <Euro className="size-3" />
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="gbp">
-                              <div className="flex flex-row items-center gap-2">
-                                <span>GBP</span>
-                                <PoundSterling className="size-3" />
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="jpy">
-                              <div className="flex flex-row items-center gap-2">
-                                <span>JPY</span>
-                                <JapaneseYen className="size-3" />
-                              </div>
-                            </SelectItem>
+                            <SelectItem value="hijri">{t("General.calendars.hijri")}</SelectItem>
                           </SelectContent>
                         </Select>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="calendar"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("Settings.preferences.default.calendar")}</FormLabel>
-                      {isLoadingProfile ? (
-                        <Skeleton className="h-10 w-full" />
-                      ) : (
-                        <BetaFlag
-                          title={t("Flags.calendar_soon.title")}
-                          description={t("Flags.calendar_soon.description")}
-                        >
-                          <Select
-                            disabled
-                            // disabled={isSaving}
-                            onValueChange={(val) => {
-                              field.onChange(val);
-                              setSelectedCalendar(val);
-                            }}
-                            value={field.value || selectedCalendar}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder={t("General.select")} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="day">
-                                {t("General.calendars.gregorian")}
-                              </SelectItem>
-                              <SelectItem value="week">{t("General.calendars.hijri")}</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </BetaFlag>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                      </BetaFlag>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            <Separator />
-
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium">{t("Settings.preferences.datetime.title")}</h3>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="dateFormat"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("Settings.preferences.datetime.date_format")}</FormLabel>
-                      {isLoadingProfile ? (
-                        <Skeleton className="h-10 w-full" />
-                      ) : (
-                        <Select
-                          disabled={isSaving}
-                          onValueChange={(val) => {
-                            field.onChange(val);
-                            setSelectedDateFormat(val);
-                          }}
-                          value={field.value || selectedDateFormat}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t("General.select")} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
-                            <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
-                            <SelectItem value="ymd">YYYY/MM/DD</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="timeFormat"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t("Settings.preferences.datetime.time_format")}</FormLabel>
-                      {isLoadingProfile ? (
-                        <Skeleton className="h-10 w-full" />
-                      ) : (
-                        <Select
-                          disabled={isSaving}
-                          onValueChange={(val) => {
-                            field.onChange(val);
-                            setSelectedTimeFormat(val);
-                          }}
-                          value={field.value || selectedTimeFormat}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder={t("General.select")} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="12h">
-                              {t("Settings.preferences.datetime.12h")}
-                            </SelectItem>
-                            <SelectItem value="24h">
-                              {t("Settings.preferences.datetime.24h")}
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="dateFormat"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Settings.preferences.datetime.date_format")}</FormLabel>
+                    {isLoadingProfile ? (
+                      <Skeleton className="h-10 w-full" />
+                    ) : (
+                      <Select
+                        dir={lang === "ar" ? "rtl" : "ltr"}
+                        disabled={isSaving}
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          setSelectedDateFormat(val);
+                        }}
+                        value={field.value || selectedDateFormat}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("General.select")} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="mdy">MM/DD/YYYY</SelectItem>
+                          <SelectItem value="dmy">DD/MM/YYYY</SelectItem>
+                          <SelectItem value="ymd">YYYY/MM/DD</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="timeFormat"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Settings.preferences.datetime.time_format")}</FormLabel>
+                    {isLoadingProfile ? (
+                      <Skeleton className="h-10 w-full" />
+                    ) : (
+                      <Select
+                        dir={lang === "ar" ? "rtl" : "ltr"}
+                        disabled={isSaving}
+                        onValueChange={(val) => {
+                          field.onChange(val);
+                          setSelectedTimeFormat(val);
+                        }}
+                        value={field.value || selectedTimeFormat}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("General.select")} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="12h">
+                            {t("Settings.preferences.datetime.12h")}
+                          </SelectItem>
+                          <SelectItem value="24h">
+                            {t("Settings.preferences.datetime.24h")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </form>
         </Form>

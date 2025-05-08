@@ -1,0 +1,1 @@
+ALTER TYPE "public"."activity_target_type" ADD VALUE 'EMPLOYEE_REQUEST';

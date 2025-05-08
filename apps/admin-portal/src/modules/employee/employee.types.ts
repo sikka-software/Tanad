@@ -1,20 +1,5 @@
-export interface Employee {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone?: string;
-  position: string;
-  department?: string | null;
-  department_id?: string | null;
-  hire_date: string;
-  salary?: number;
-  status: "active" | "inactive" | "on_leave" | "terminated";
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-}
+import { Database } from "@/lib/database.types";
 
-export type EmployeeCreateData = Omit<Employee, "id" | "created_at" | "updated_at"> & {
-  user_id?: string;
-};
+export type Employee = Database["public"]["Tables"]["employees"]["Row"];
+export type EmployeeCreateData = Database["public"]["Tables"]["employees"]["Insert"];
+export type EmployeeUpdateData = Database["public"]["Tables"]["employees"]["Update"];

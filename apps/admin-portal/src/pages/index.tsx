@@ -4,15 +4,16 @@ import { useTranslations } from "next-intl";
 import CustomersSection from "@/ui/customers-section";
 import { HeroSection as HeroSection2 } from "@/ui/hero-section-2";
 
-import BottomCTA from "@/components/landing/BottomCTA";
+// import BottomCTA from "@/components/landing/BottomCTA";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
-import Features from "@/components/landing/Features";
-import FloatingPuklas from "@/components/landing/FloatingPuklas";
-import HeroSection from "@/components/landing/HeroSection";
+// import Features from "@/components/landing/Features";
+// import FloatingPuklas from "@/components/landing/FloatingPuklas";
+// import HeroSection from "@/components/landing/HeroSection";
 import { DepartmentsFeatures } from "@/components/landing/departments-features";
 import { FeaturesSection } from "@/components/landing/features-section";
 import { Pricing } from "@/components/landing/pricing-with-comparison";
-import WaitlistSection from "@/components/landing/waitlist-section";
+
+// import WaitlistSection from "@/components/landing/waitlist-section";
 
 export default function LandingPage() {
   const t = useTranslations();

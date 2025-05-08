@@ -1,16 +1,18 @@
 import { Loader2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/ui/dialog";
+
+import { Button } from "./button";
+import { Input } from "./input";
 
 interface ConfirmDeleteProps {
   isDeleteDialogOpen: boolean;
@@ -19,6 +21,7 @@ interface ConfirmDeleteProps {
   handleConfirmDelete: () => void;
   title: string;
   description: string;
+  extraConfirm?: boolean;
 }
 const ConfirmDelete = ({
   isDeleteDialogOpen,
@@ -27,11 +30,16 @@ const ConfirmDelete = ({
   handleConfirmDelete,
   title,
   description,
+  extraConfirm,
 }: ConfirmDeleteProps) => {
   const t = useTranslations();
   const locale = useLocale();
+  const [confirmText, setConfirmText] = useState("");
+
+  const confirmString = locale === "ar" ? "نعم" : "confirm";
+
   return (
-    <AlertDialog
+    <Dialog
       open={isDeleteDialogOpen}
       onOpenChange={(open) => {
         if (!isDeleting) {
@@ -39,30 +47,43 @@ const ConfirmDelete = ({
         }
       }}
     >
-      <AlertDialogContent dir={locale === "ar" ? "rtl" : "ltr"}>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>{t("General.cancel")}</AlertDialogCancel>
-          <AlertDialogAction
+      <DialogContent dir={locale === "ar" ? "rtl" : "ltr"}>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        {extraConfirm && (
+          <>
+            <DialogDescription>
+              {t("General.extra_confirm_typed", { confirmString: confirmString })}
+            </DialogDescription>
+            <Input
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder={t("General.yes")}
+            />
+          </>
+        )}
+        <DialogFooter>
+          <Button onClick={() => setIsDeleteDialogOpen(false)} disabled={isDeleting}>
+            {t("General.cancel")}
+          </Button>
+          <Button
             onClick={handleConfirmDelete}
-            disabled={isDeleting}
-            className="bg-destructive hover:bg-destructive/90 text-white"
+            disabled={isDeleting || (extraConfirm && confirmText !== confirmString)}
+            className="bg-destructive hover:bg-destructive/90 min-w-24 text-white"
           >
             {isDeleting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("General.deleting")}
+                <Loader2 className="h-4 w-4 animate-spin" />
               </>
             ) : (
               t("General.delete")
             )}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

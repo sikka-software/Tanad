@@ -1,77 +1,78 @@
 {
   "General": {
     "sikka": "Sikka",
-    "language": "Language",
-    "delete": "Delete",
-    "edit": "Edit",
-    "share": "Share",
-    "save": "Save",
-    "add": "Add",
-    "unauthorized": "Unauthorized",
-    "must_be_logged_in": "You must be logged in to perform this action",
-    "sidebar_search": "Search for a page",
-    "saving": "Saving...",
-    "saved": "Saved",
-    "invalid_date": "Invalid Date",
-    "update": "Update",
-    "updating": "Updating...",
-    "updated": "Updated",
-    "select": "Select",
-    "search": "Search",
-    "filter_options": "Filter Options",
-
-    "filter": {
-      "title": "Filter",
-      "value": {
-        "placeholder": "Value"
-      }
-    },
-    "apply_filters": "Apply Filter",
-    "save_current_filter": "Save Current Filter",
-    "apply_filter": "Apply Filter",
-
-    "saved_filters": "Saved Filters",
-    "field": "Field",
-    "operator": "Operator",
-    "add_filter_condition": "Add filter condition",
-    "operators": {
-      "equals": "Equals",
-      "contains": "Contains",
-      "startsWith": "Starts with",
-      "endsWith": "Ends with",
-      "isEmpty": "Is empty",
-      "isNotEmpty": "Is not empty",
-      "greaterThan": "Greater than",
-      "lessThan": "Less than",
-      "between": "Between",
-      "before": "Before",
-      "after": "After"
-    },
-    "reset": "Reset",
-    "reload": "Reload",
-    "more": "More",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
     "tanad": "Tanad",
     "dark": "Dark",
+    "ready": "Ready",
     "light": "Light",
-    "soon": "Coming Soon",
+    "language": "Language",
+    "theme": "Theme",
+    "next_number": "Next Number",
+    "export": "Export",
+    "filters": "Filters",
+    "random": "Random",
+    "soon": "Soon",
     "active": "Active",
+    "characters": "Characters",
+    "words": "Words",
     "inactive": "Inactive",
+    "clear_editor_description": "Are you sure you want to clear the editor?",
+    "convert_from_markdown": "Convert from Markdown",
+    "archive": "Archive",
+    "enterprises": "Enterprises",
+    "invalid_date": "Invalid Date",
+    "add_enterprise": "Add Enterprise",
+    "created_at": "Created At",
+    "updated_at": "Updated At",
+    "created": "Created",
+    "updated": "Updated",
+    "deleted": "Deleted",
+    "duplicated": "Duplicated",
+    "unknown": "Unknown",
+    "employee": "Employee",
+    "employee_request": "Employee Request",
+    "invoice": "Invoice",
+    "customer": "Customer",
+    "client": "Client",
+    "product": "Product",
+    "expense": "Expense",
+    "salary": "Salary",
+    "vendor": "Vendor",
+    "company": "Company",
+    "department": "Department",
+    "office": "Office",
+    "user": "User",
+    "branch": "Branch",
+    "warehouse": "Warehouse",
+    "role": "Role",
+    "view": "View",
+    "actions": "Actions",
+    "yes": "confirm",
+    "extra_confirm_typed": "Type \"{confirmString}\" to confirm the deletion",
+    "duplicate": "Duplicate",
     "successful_operation": "Successful Operation",
     "error_operation": "Error Operation",
+    "loading_operation": "Loading Operation...",
+    "unauthorized": "Unauthorized",
+    "must_be_logged_in": "You must be logged in to perform this operation",
     "clear": "Clear",
     "close": "Close",
-    "no_results_found": "No results found",
+    "switch_to_ltr": "Switch to LTR",
+    "switch_to_rtl": "Switch to RTL",
+    "search_country": "Search Country",
+    "no_country_found": "No Country Found",
+    "no_permission": "You don't have permission to perform this operation",
+    "no_permission_description": "Please contact the administrator to get the necessary permission",
+    "no_results_found": "No Results Found",
     "quick_access": "Quick Access",
-    "select_all": "Select All",
-    "deselect_all": "Deselect All",
     "items_selected": "Items Selected",
     "delete_selected": "Delete Selected",
     "delete_all": "Delete All",
     "edit_selected": "Edit Selected",
     "view_selected": "View Selected",
-    "view_all": "View All",
+    "select_all": "Select All",
+    "deselect_all": "Deselect All",
+    "pick_date": "Pick Date",
     "cards_view": "Cards View",
     "table_view": "Table View",
     "sort": "Sort",
@@ -88,47 +89,81 @@
     "primary_sort": "Primary Sort",
     "secondary_sort": "Secondary Sort",
     "tertiary_sort": "Tertiary Sort",
-    "sort_priority_hint": "Higher rules take priority",
+    "sort_priority_hint": "Rules with higher priority are applied first",
     "remove_sort_rule": "Remove Sort Rule",
-    "case_sensitive_hint": "Match exact letter case when sorting",
-    "empty_values_hint": "Show null and empty values at the beginning",
+    "case_sensitive_hint": "Case Sensitive",
+    "empty_values_hint": "Show Empty Values First",
+    "sort_by": "Sort By",
     "calendars": {
-      "gregorian": "Gregorian",
-      "hijri": "Hijri"
+      "gregorian": "Gregorian Calendar",
+      "hijri": "Hijri Calendar"
     },
     "languages": {
       "label": "Change Language",
       "ar": "العربية",
       "en": "English"
     },
+    "filter": {
+      "title": "Filter",
+      "value": {
+        "placeholder": "Value"
+      }
+    },
+    "add_filter_condition": "Add Filter Condition",
+    "apply_filters": "Apply Filters",
+    "saved_filters": "Saved Filters",
+    "save_current_filter": "Save Current Filter",
+    "apply_filter": "Apply Filter",
+    "field": "Field",
+    "operator": "Operator",
+    "operators": {
+      "equals": "Equals",
+      "not_equals": "Not Equals",
+      "contains": "Contains",
+      "not_contains": "Not Contains",
+      "starts_with": "Starts With",
+      "ends_with": "Ends With",
+      "is_empty": "Is Empty",
+      "is_not_empty": "Is Not Empty"
+    },
+    "sidebar_search": "Search for a page",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "preview": "Preview",
+    "share": "Share",
     "copy": "Copy",
     "copied": "Copied",
+    "edit": "Edit",
+    "delete": "Delete",
     "send": "Send",
+    "search": "Search",
     "enable": "Enable",
     "disable": "Disable",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "favorite": "Favorite",
     "get_started": "Get Started",
+    "learn_more": "Learn More",
     "last-updated": "Last Updated",
     "privacy": "Privacy Policy",
     "tos": "Terms of Service",
     "upgrade": "Upgrade",
     "generate_qr_code": "Generate QR Code",
     "download": "Download",
-    "report": "Report Pukla",
+    "report": "Report an Issue",
     "country": "Country",
     "city": "City",
     "mobile": "Mobile",
     "desktop": "Desktop",
     "total": "Total",
     "no_results": "No results",
-    "lock": "Lock Link",
+    "lock": "Protect Link",
     "layout": "Link Layout",
     "thumbnail": "Link Thumbnail",
     "highlight": "Highlight Link",
     "submit": "Submit",
-    "coming_soon": "Coming soon...",
+    "coming_soon": "Coming Soon",
     "rows_per_page": "Rows per page",
     "select_number_of_results": "Select number of results",
     "go_to_first_page": "Go to first page",
@@ -151,123 +186,133 @@
       "november": "November",
       "december": "December"
     },
-    "changes_saved": "Changes saved",
-    "error_occurred": "Error occurred",
-    "error_updating_avatar": "Error while updating avatar",
+    "changes_saved": "Changes Saved",
+    "error_occurred": "An error occurred",
+    "error_updating_avatar": "Error updating avatar",
     "next": "Next",
     "previous": "Previous",
     "done": "Done",
+    "saved": "Saved",
+    "update": "Update",
+    "updating": "Updating...",
+    "select": "Select",
+    "filter_options": "Filter Options",
+    "reset": "Reset",
+    "reload": "Reload",
+    "more": "More",
+    "add": "Add",
     "loading": "Loading...",
     "success": "Success",
     "create": "Create",
-    "submit_report": "Submit report",
+    "submit_report": "Submit Report",
     "error": {
       "title": "Error",
-      "error_detected": "Error Detected",
+      "error_detected": "An error was detected",
       "error_message": "Error Message",
       "error_code": "Error Code",
       "error_details": "Error Details",
       "error_details_question": "What were you trying to do when this error occurred?",
       "submitting": "Submitting...",
-      "submit_report": "Submit report"
+      "submit_report": "Submit Report"
     },
     "report_issue": "Report Issue",
-    "report_issue_title": "Report Issue",
-    "report_issue_description": "Help us improve by providing additional details about what happened.",
+    "report_issue_title": "Report an Issue",
+    "report_issue_description": "Help us by providing additional details about what happened.",
     "report_issue_thank_you": "Thank you for your report",
-    "report_issue_description_thank_you": "Our team has been notified and will investigate this issue promptly."
+    "report_issue_description_thank_you": "Our team has been notified and will investigate this issue soon."
   },
   "Flags": {
     "timezone_soon": {
-      "title": "Coming Soon",
-      "description": "We are working on connecting all timestamps to other timezones"
+      "title": "Soon",
+      "description": "We are working on linking all timestamps to other timezones"
     },
     "calendar_soon": {
-      "title": "Coming Soon",
-      "description": "We are working on connecting all timestamps to other calendars"
+      "title": "Soon",
+      "description": "We are working on linking all times to the Hijri calendar"
     }
   },
   "SEO": {
     "landing": {
       "title": "The backbone of your business",
-      "description": "One link that includes all your other links from social media platforms, delivery apps, and even communication methods like WhatsApp or direct calls!",
-      "author": "Sikka Software",
-      "keywords": "pukla, one link, links, communication, app, apps, delivery app, whatsapp, direct call, social media, social media platforms, delivery apps, communication methods, whatsapp, direct call, social media, social media platforms"
+      "description": "One link that includes all your other links from social media platforms, delivery applications, and even communication methods like WhatsApp or direct calls!",
+      "author": "Sikka Information Technology",
+      "keywords": "Pukla, one link, links, communication, application, applications, delivery application, WhatsApp, direct call, social communication, social media platforms, delivery applications, communication methods, WhatsApp, direct call, social communication, social media platforms"
     },
     "directory": {
       "title": "Discover Puklas",
-      "description": "Explore and discover public Pukla pages from our community"
+      "description": "Browse and discover public Pukla pages from our community"
     },
     "my_puklas": {
       "title": "My Puklas",
       "description": "Manage all your other links"
     },
     "auth": {
-      "title": "Sign in to Pukla",
-      "description": "Sign in to Pukla to manage all your other links"
+      "title": "Login to Pukla",
+      "description": "Login to Pukla to manage all your other links"
     },
     "billing": "Subscription",
     "slogan": "The backbone of your business",
     "index": {
       "title": "The backbone of your business",
-      "description": "Pukla is a website that allows you to create one link containing all your other links. You can use it in your resume, social media, or anywhere else."
+      "description": "Pukla is a site that allows you to create one link containing all your other links. You can use it in your bio, social media, or anywhere else."
     },
     "features": {
       "title": "Pukla Features",
-      "description": "Pukla allows you to create one link containing all your other links. You can use it in your resume, social media, or anywhere else."
+      "description": "Pukla allows you to create one link containing all your other links. You can use it in your bio, social media, or anywhere else."
     },
     "pricing": {
       "title": "Subscription",
-      "description": "Pukla allows you to create one link containing all your other links. You can use it in your resume, social media, or anywhere else."
+      "description": "Pukla allows you to create one link containing all your other links. You can use it in your bio, social media, or anywhere else."
     },
     "appeal": {
       "title": "Appeal Decision",
-      "description": "Pukla allows you to create one link containing all your other links. You can use it in your resume, social media, or anywhere else."
+      "description": "Pukla allows you to create one link containing all your other links. You can use it in your bio, social media, or anywhere else."
     },
     "contact": {
       "title": "Contact Us",
-      "description": "Pukla allows you to create one link containing all your other links. You can use it in your resume, social media, or anywhere else."
+      "description": "Pukla allows you to create one link containing all your other links. You can use it in your bio, social media, or anywhere else."
     },
     "help": {
       "title": "Help",
-      "description": "Pukla allows you to create one link containing all your other links. You can use it in your resume, social media, or anywhere else."
+      "description": "Pukla allows you to create one link containing all your other links. You can use it in your bio, social media, or anywhere else."
     },
     "report": {
-      "title": "Report Pukla",
-      "description": "Pukla allows you to create one link containing all your other links. You can use it in your resume, social media, or anywhere else."
+      "title": "Report a Pukla",
+      "description": "Pukla allows you to create one link containing all your other links. You can use it in your bio, social media, or anywhere else."
     },
     "report-ip": {
-      "title": "Report Pukla",
-      "description": "Pukla allows you to create one link containing all your other links. You can use it in your resume, social media, or anywhere else."
+      "title": "Report a Pukla",
+      "description": "Pukla allows you to create one link containing all your other links. You can use it in your bio, social media, or anywhere else."
     },
     "theme": {
-      "title": "Pukla Theme",
+      "title": "Pukla Design",
       "description": "Design your Pukla to reflect your personal style or brand."
     },
     "analytics": {
       "title": "Pukla Analytics",
-      "description": "Analytics for your Pukla to reflect your personal style or brand."
+      "description": "Analyze your Pukla's performance to understand your audience."
     },
-    "editor": "Links {puklaName}",
-    "settings": "Settings {puklaName}",
-    "appearence": "Design {puklaName}"
+    "editor": "{puklaName} Links",
+    "settings": "{puklaName} Settings",
+    "appearence": "{puklaName} Appearance"
   },
   "Landing": {
     "directory": "Directory",
     "hero": {
       "title": "The backbone of your business",
-      "subtitle": "One link that includes all your other links from social media platforms, delivery apps, and even communication methods like WhatsApp or direct calls!",
+      "subtitle": "One link that includes all your other links from social media platforms, delivery applications, and even communication methods like WhatsApp or direct calls!",
       "primary-action": "Get Started"
     },
     "not-found": {
       "title": "Page Not Found",
-      "subtitle": "Looks like you went to a non-existent link. Please check the link"
+      "subtitle": "It seems you went to a link that doesn't exist. Please check the link."
     },
     "dashboard": "Dashboard",
-    "used-by": "Our Clients",
+    "used-by": "Some of our clients",
     "get-started": "Get Started",
     "home": "Home",
     "pricing": "Pricing",
+    "solution": "Solutions",
     "features": "Features",
     "legal": "Legal",
     "company": "Company",
@@ -280,9 +325,9 @@
     "tos": "Terms of Service",
     "resources": "Resources",
     "cta": {
-      "subtitle": "Gather all your links in one link now",
+      "subtitle": "Gather all your links in one place now",
       "title": "Ready to create your personal link?",
-      "action-1-text": "Let's Start"
+      "action-1-text": "Let's get started"
     },
     "footer": {
       "tagline": "The backbone of your business"
@@ -293,7 +338,7 @@
       "tiny-3": "Button Order",
       "tiny-4": "Background Image",
       "tiny-5": "Button Corners",
-      "tiny-6": "And More"
+      "tiny-6": "And more"
     },
     "feature-platforms": {
       "tiny-1": "Social Media",
@@ -301,53 +346,29 @@
       "tiny-3": "Delivery Apps",
       "tiny-4": "Professional Apps",
       "tiny-5": "Websites",
-      "tiny-6": "And More"
+      "tiny-6": "And more"
     },
     "feature-highlight-1": {
-      "title": "Design Your Page Your Way",
-      "subtitle": "Take full control of your page design in the way you like with the shapes and colors you love! Or you can use ready-made templates"
+      "title": "Design your page your way",
+      "subtitle": "Control your page design completely the way you like it, with the shapes and colors you love! Or you can use ready-made templates."
     },
     "feature-highlight-2": {
-      "title": "All Your Favorite Platforms",
-      "subtitle": "From social media platforms to delivery apps and even communication methods like WhatsApp or direct calls!"
+      "title": "All the platforms you love",
+      "subtitle": "From social media platforms, delivery applications, and even communication methods like WhatsApp or direct calls!"
     },
     "waitlist": {
-      "title": "Join Our Product Launch Waitlist",
-      "subtitle": "Be part of something truly extraordinary. Join thousands of others already gaining early access to our revolutionary new product.",
+      "title": "Join the Waitlist",
+      "subtitle": "Be part of the first platform to manage bio links",
       "placeholder": "Enter your email",
-      "button": "Get Notified"
+      "button": "Join the List"
     }
-  },
-
-  "Dashboard": {
-    "title": "Dashboard",
-    "meta_description": "Administrative dashboard showing key business metrics and statistics",
-    "meta_title": "Dashboard | Admin Portal",
-    "create_product": "Add Product",
-    "total_invoices": "Total Invoices",
-    "pending": "Pending",
-    "total_products": "Total Products",
-    "total_revenue": "Total Revenue",
-    "pending_invoices": "Pending Invoices",
-    "of_total": "% of Total",
-    "recent_invoices": "Recent Invoices",
-    "recent_invoices_list": "Coming Soon: Recent Invoices List",
-    "popular_products": "Popular Products",
-    "popular_products_list": "Coming Soon: Popular Products List",
-    "create": "Create",
-    "select_create_option": "Select an Option",
-    "add_product": "Add Product",
-    "add_invoice": "Add Invoice",
-    "add_client": "Add Client",
-    "add_employee": "Add Employee",
-    "add_warehouse": "Add Warehouse"
   },
   "Features": {
     "title": "Pukla Features",
     "subtitle": "Discover a world of possibilities",
     "hero": {
       "title": "Pukla Features",
-      "subtitle": "Discover a world of possibilities - from seamless link management to interactive content - all in one versatile platform."
+      "subtitle": "Discover a world of possibilities – from seamless link management to interactive content – all in one versatile platform."
     },
     "feature-1": {
       "title": "Customizable Design",
@@ -355,11 +376,11 @@
     },
     "feature-2": {
       "title": "Social Media Integration",
-      "description": "Connect your Pukla page with all social media platforms. One link to unify your online presence and boost your reach."
+      "description": "Connect your Pukla page with all your social media platforms. One link to unify your online presence and enhance your reach."
     },
     "feature-3": {
       "title": "Search Engine Optimization (SEO)",
-      "description": "Boost your page visibility with SEO-friendly features. Improve your search rankings and attract more organic visits."
+      "description": "Boost your page's visibility with SEO-friendly features. Improve your search engine rankings and attract more organic traffic."
     },
     "feature-4": {
       "title": "Security and Privacy",
@@ -371,11 +392,11 @@
     },
     "feature-6": {
       "title": "Mobile Responsiveness",
-      "description": "Your Pukla page looks great on any device. Enjoy a responsive design that ensures a seamless experience for your audience, regardless of how they access your page."
+      "description": "Your Pukla page looks great on any device. Enjoy a responsive design that ensures a seamless experience for your audience, no matter how they access your page."
     },
     "feature-7": {
       "title": "Real-time Analytics",
-      "description": "Track your success with real-time analytics. Better understand your audience through insights on page views, link clicks, and engagement metrics."
+      "description": "Track your success with real-time analytics. Understand your audience better with insights into page views, link clicks, and engagement metrics."
     },
     "feature-8": {
       "title": "QR Code Generation",
@@ -383,16 +404,16 @@
     },
     "feature-9": {
       "title": "E-commerce Integration",
-      "description": "Sell your products or services directly through your Pukla page with seamless e-commerce platform integration."
+      "description": "Sell your products or services directly through your Pukla page with seamless integration with e-commerce platforms."
     }
   },
   "Pricing": {
-    "contact-sales": "Contact Us",
-    "not-sure": "Not sure which plan to choose? <contactSales>Contact us</contactSales>",
+    "contact-sales": "Contact Sales",
+    "not-sure": "Not sure which plan to choose? <contactSales>Contact Sales</contactSales>",
     "free": "Free",
     "hero": {
       "title": "Ready to Subscribe?",
-      "subtitle": "Choose the right plan to take advantage of the features offered in each package"
+      "subtitle": "Choose the right plan to benefit from the features offered in each package"
     },
     "billing-currency": {
       "sar": "SAR",
@@ -405,33 +426,33 @@
     "faq": {
       "header": {
         "title": "Frequently Asked Questions",
-        "subtitle": "You have all the questions, we have the answers"
+        "subtitle": "You have the questions, we have the answers"
       }
     },
     "plan-1": {
-      "button-text": "Start Free",
+      "button-text": "Start for Free",
       "title": "Bronze Plan",
       "subtitle": "",
       "features": {
         "feature-1": "Your own Pukla page",
         "feature-2": "Unlimited links",
-        "feature-3": "10 colors to design your page",
+        "feature-3": "10 colors for your page design",
         "feature-4": ""
       }
     },
     "plan-2": {
-      "button-text": "Start Now",
+      "button-text": "Get Started Now",
       "title": "Silver Plan",
       "subtitle": "",
       "features": {
         "feature-1": "Your own Pukla page",
         "feature-2": "Unlimited links",
         "feature-3": "Unlimited open design",
-        "feature-4": "One month of visit statistics"
+        "feature-4": "Visit statistics for one month"
       }
     },
     "plan-3": {
-      "button-text": "Start Now",
+      "button-text": "Get Started Now",
       "title": "Gold Plan",
       "subtitle": "",
       "features": {
@@ -442,23 +463,153 @@
       }
     },
     "plan-4": {
-      "button-text": "Start Now",
+      "button-text": "Get Started Now",
       "title": "Diamond Plan",
       "subtitle": ""
+    },
+    "custom_pricing": {
+      "title": "Custom Pricing",
+      "description": "Choose the features you need and we will provide a custom quote for you",
+      "your_custom_solution": "Your Custom Solution",
+      "plan": "The Plan",
+      "modules": "The Modules",
+      "estimated_price": "Estimated Price",
+      "click_on_modules_to_add_or_remove_them_from_your_solution": "Click on the modules to add or remove them from your solution",
+      "unlimited_modules": "Unlimited",
+      "up_to_modules": "Up to",
+      "price_breakdown": "Price Breakdown",
+      "see_how_your_selected_modules_affect_your_price": "See how your selected modules affect your price",
+      "base_price": "Base Price",
+      "need_to_start_over": "Need to start over?",
+      "reset_selections": "Reset Selections",
+      "discount": "Discount",
+      "total_monthly_price": "Total Monthly Price",
+      "billing_cycle": {
+        "monthly": "Monthly",
+        "annually": "Annually"
+      },
+      "offices": {
+        "title": "Offices",
+        "description": "Oversee all aspects of company office locations, including employee and department assignments, rent contract management, cost tracking, and seamless integration with expense and purchasing systems for comprehensive facility oversight."
+      },
+      "branches": {
+        "title": "Branches",
+        "description": "Control operations for distinct company branches. Handle staff and department allocation, lease agreements, financial outlays, link with procurement and expense records, and manage branch-specific inventory levels."
+      },
+      "warehouses": {
+        "title": "Warehouses",
+        "description": "Direct warehouse operations efficiently. Assign personnel, oversee lease details and costs, integrate with purchasing and expense data, maintain accurate inventory counts, and connect warehouse activities directly to sales fulfillment and logistics coordination."
+      },
+      "clients": {
+        "title": "Clients",
+        "description": "Utilize a comprehensive Customer Relationship Management (CRM) system to nurture client relationships, track interactions, generate and dispatch professional quotes and invoices, and streamline the entire client lifecycle."
+      },
+      "vendors": {
+        "title": "Vendors",
+        "description": "Implement a robust Vendor Relationship Management system. Organize vendor information, issue purchase orders, process vendor invoices efficiently, and maintain strong supplier partnerships."
+      },
+      "invoices": {
+        "title": "Invoices",
+        "description": "Streamline the entire invoicing process. Create, customize, and send professional invoices to clients, track payment statuses, link invoices to corresponding quotes, and manage accounts receivable effectively."
+      },
+      "products": {
+        "title": "Products",
+        "description": "Maintain a detailed catalog of company products or services. Easily incorporate items into sales quotes and invoices, track product inventory across different warehouses, and manage product details and pricing."
+      },
+      "quotes": {
+        "title": "Quotes",
+        "description": "Generate accurate and professional sales quotations for clients. Track quote status from creation to conversion, easily transform accepted quotes into invoices, and manage the sales pipeline efficiently."
+      },
+      "expenses": {
+        "title": "Expenses",
+        "description": "Gain complete control over company expenditures. Track and categorize all business expenses, linking them to specific purchases, operational costs like rent, employee compensation, and other financial outflows for detailed analysis."
+      },
+      "purchases": {
+        "title": "Purchases",
+        "description": "Oversee the entire procurement lifecycle. Create purchase orders, track supplier deliveries, manage vendor invoices related to purchases, and integrate purchasing data with inventory and expense management."
+      },
+      "employees": {
+        "title": "Employees",
+        "description": "Centralize all employee information and HR processes. Maintain detailed employee records, manage contracts, track time off, oversee performance reviews, and handle payroll data within a unified system."
+      },
+      "jobs": {
+        "title": "Jobs",
+        "description": "Define and manage job roles and positions within the organization. Outline responsibilities, required skills, salary ranges, and reporting structures for each distinct job title."
+      },
+      "departments": {
+        "title": "Departments",
+        "description": "Structure your organization by creating and managing distinct departments. Assign employees, allocate resources, define departmental goals, and track performance at the department level."
+      },
+      "job_listings": {
+        "title": "Job Listings",
+        "description": "Create, publish, and manage job openings across various platforms. Track the status of listings, define application requirements, and attract potential candidates for open positions."
+      },
+      "applicants": {
+        "title": "Applicants",
+        "description": "Streamline the recruitment process by managing candidate applications. Track applicant progress through hiring stages, store resumes and documents, schedule interviews, and collaborate on hiring decisions."
+      },
+      "servers": {
+        "title": "Servers",
+        "description": "Monitor and maintain the company's server infrastructure. Track server specifications, manage configurations, monitor performance and uptime, and schedule maintenance tasks for physical or virtual servers."
+      },
+      "domains": {
+        "title": "Domains",
+        "description": "Keep track of all registered domain names owned by the company. Manage registration details, renewal dates, DNS settings, and associated services for each domain."
+      },
+      "websites": {
+        "title": "Websites",
+        "description": "Oversee the company's online presence by managing website details. Track hosting information, content management systems, development status, analytics integration, and maintenance schedules for corporate websites."
+      },
+      "ecommerce": {
+        "title": "E-commerce",
+        "description": "Control all aspects of the company's online sales operations. Manage product listings, process orders, handle customer data, integrate payment gateways, and track sales performance for e-commerce platforms."
+      },
+      "infrastructure": {
+        "title": "Infrastructure",
+        "description": "Gain a holistic view of the company's core operational infrastructure, encompassing IT assets, physical facilities, network components, and essential systems required for business continuity."
+      },
+      "business": {
+        "title": "Business",
+        "description": "Oversee strategic business operations, including planning, performance monitoring, market analysis, and key decision-making processes to drive overall company growth and success."
+      },
+      "finance": {
+        "title": "Finance",
+        "description": "Handle all financial aspects of the company, including accounting, budgeting, financial reporting, cash flow management, tax compliance, and investment tracking for sound fiscal health."
+      },
+      "hr": {
+        "title": "Human Resources",
+        "description": "Direct the full spectrum of Human Resources functions, from recruitment and onboarding to employee relations, benefits administration, compliance, training, and talent management."
+      },
+      "it": {
+        "title": "Technology",
+        "description": "Supervise the company's technology landscape, including hardware, software, network administration, cybersecurity, technical support, and IT project management to ensure efficient and secure operations."
+      },
+      "starter": {
+        "title": "Starter",
+        "description": "Start using Pukla"
+      },
+      "professional": {
+        "title": "Professional",
+        "description": "Professional level for companies"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "description": "Enterprise level for companies"
+      }
     }
   },
   "FAQ": {
     "faq-1": {
       "question": "What is Pukla?",
-      "answer": "Pukla is a link management tool that helps you connect your audience with all your online content through one simple link."
+      "answer": "Pukla is a link management tool that helps you connect your audience to all your online content through one simple link."
     },
     "faq-2": {
-      "question": "How can I set up my Pukla page?",
+      "question": "How do I set up my Pukla page?",
       "answer": "Sign up, add the links you want, customize your page to match your style, and you're ready to go!"
     },
     "faq-3": {
       "question": "Is Pukla free to use?",
-      "answer": "Yes, Pukla offers a free plan for everyone and also a basic plan with additional features for advanced users."
+      "answer": "Yes, Pukla offers a free plan for everyone, as well as a basic plan with additional features for advanced users."
     },
     "faq-4": {
       "question": "Can I customize the design of my Pukla page?",
@@ -470,22 +621,11 @@
     },
     "faq-contact": {
       "question": "How can I contact support?",
-      "answer": "You can contact us via <email>email</email>, <twitter>Twitter</twitter>, <whatsapp>WhatsApp</whatsapp>, or <phone>phone</phone>"
-    }
-  },
-  "Help": {
-    "hero": {
-      "title": "Help Page",
-      "subtitle": "We will be adding educational content soon",
-      "in-the-meantime": "In the meantime, feel free to contact us if you need help"
-    },
-    "contact": {
-      "title": "Contact Us",
-      "subtitle": "Have something in mind? Send us a message"
+      "answer": "You can contact us via <email>email</email>, <twitter>Twitter</twitter>, <whatsapp>WhatsApp</whatsapp>, or <phone>phone</phone>."
     }
   },
   "ReportPage": {
-    "page-title": "Report a Violation",
+    "page-title": "Report Violation",
     "page-subtitle": "Have you discovered an illegal or unethical issue in one of the Puklas? Please fill out the following form to report it.",
     "first-name": "First Name",
     "last-name": "Last Name",
@@ -499,7 +639,7 @@
       "required": "Link is required"
     },
     "additional-comments": {
-      "label": "Additional comments to help us identify the report",
+      "label": "Additional comments that help us identify the report",
       "required": "Comment is required",
       "too-short": "Comment is too short"
     },
@@ -509,14 +649,14 @@
       "required": "Copyright owner name is required"
     },
     "relationship-copyright-owner": {
-      "label": "My relationship to the copyright owner",
-      "hint": "For example: I am the copyright owner / I am an employee of the copyright owner / I am legal counsel / I am an authorized agent",
-      "required": "Your relationship to the copyright owner is required"
+      "label": "My relationship with the copyright owner",
+      "hint": "e.g., I am the copyright owner / I am an employee of the copyright owner / I am a legal advisor / I am an authorized agent",
+      "required": "Your relationship with the copyright owner is required"
     },
     "copyright-infringment": "Copyright Infringement",
     "trademark-infringment": "Trademark Infringement",
     "reason": {
-      "label": "Reason for Report",
+      "label": "Reason for report",
       "required": "This option is required"
     },
     "reporter-role": {
@@ -526,13 +666,13 @@
     "reporter-role-options": {
       "pukla_user": "Pukla platform user",
       "non_pukla_user": "Visitor and not a Pukla platform user",
-      "law_enforcement": "Government entity",
+      "law_enforcement": "Government agency",
       "regulatory_body": "Regulatory body"
     },
     "reporter-reason-options": {
       "spam": "Spam",
       "gambling": "Gambling",
-      "adultContent": "Adult Content",
+      "adultContent": "Pornographic Content",
       "misinformation": "Misinformation",
       "electoralFraud": "Electoral Fraud",
       "illegalGoodsAndServices": "Illegal Goods and Services",
@@ -546,13 +686,13 @@
     },
     "report-form": {
       "submitted": {
-        "title": "Your report has been submitted successfully",
-        "subtitle": "Thank you for helping us maintain a safe environment for all Pukla users. We will review your report and take necessary action if required"
+        "title": "Your report has been successfully submitted",
+        "subtitle": "Thank you for helping us maintain a safe environment for all Pukla users. We will review your report and take necessary action if required."
       }
     },
     "report-ip": {
       "title": "Report Intellectual Property Violations",
-      "subtitle": "Is there a Pukla that violates your intellectual property or trademark? Please fill out the following form"
+      "subtitle": "Is there a Pukla violating your intellectual property rights or trademark? Please fill out the following form."
     },
     "required-field": "This field is required",
     "clear": "Clear",
@@ -563,23 +703,23 @@
     },
     "statement": {
       "good-faith": {
-        "label": "I have a good faith belief that use of the copyrighted content I am reporting is not authorized by the copyright owner, their agent, or the law.",
+        "label": "I declare in good faith that the use of the copyrighted content I am reporting is not authorized by the copyright owner, their representative, or the law.",
         "required": "This declaration is required"
       },
       "trademark-good-faith": {
-        "label": "I have a good faith belief that use of the trademark content I am reporting is not authorized by the trademark owner, their agent, or the law.",
+        "label": "I declare in good faith that the use of the trademark-protected content I am reporting is not authorized by the trademark owner, their representative, or the law.",
         "required": "This declaration is required"
       },
       "trademark-authorized": {
-        "label": "I swear under penalty of perjury that I am the trademark owner, or authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.",
+        "label": "I declare and swear under penalty of perjury that I am the trademark owner, or authorized to act on behalf of the owner of the exclusive copyright allegedly infringed.",
         "required": "This declaration is required"
       },
       "trademark-no-lie": {
-        "label": "I acknowledge that knowingly submitting a false trademark infringement claim may result in liability under the Digital Millennium Copyright Act.",
+        "label": "I am aware that knowingly submitting a false claim of trademark infringement may result in legal liability under the Digital Millennium Copyright Act.",
         "required": "This declaration is required"
       },
       "authorized": {
-        "label": "I swear under penalty of perjury that I am the copyright owner, or authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.",
+        "label": "I declare and swear under penalty of perjury that I am the copyright owner, or authorized to act on behalf of the owner of the exclusive copyright allegedly infringed.",
         "required": "This declaration is required"
       },
       "correct-info": {
@@ -591,7 +731,7 @@
         "required": "This declaration is required"
       },
       "no-lie": {
-        "label": "I acknowledge that knowingly submitting a false copyright infringement claim may result in liability under the Digital Millennium Copyright Act.",
+        "label": "I am aware that knowingly submitting a false claim of copyright infringement may result in legal liability under the Digital Millennium Copyright Act.",
         "required": "This declaration is required"
       }
     },
@@ -601,9 +741,9 @@
       "required": "Trademark owner name is required"
     },
     "relationship-trademark-owner": {
-      "label": "My relationship to the trademark owner",
-      "hint": "For example: I am the trademark owner / I am an employee of the trademark owner / I am legal counsel / I am an authorized agent",
-      "required": "Your relationship to the trademark owner is required"
+      "label": "My relationship with the trademark owner",
+      "hint": "e.g., I am the trademark owner / I am an employee of the trademark owner / I am a legal advisor / I am an authorized agent",
+      "required": "Your relationship with the trademark owner is required"
     },
     "trademark-name": {
       "label": "Trademark Name",
@@ -611,10 +751,10 @@
     },
     "trademark-industry": {
       "label": "Trademark Industry",
-      "required": "Trademark industry is required (e.g.: Media, E-commerce, etc)"
+      "required": "Trademark industry is required (e.g., Media, E-commerce, etc.)"
     },
     "trademark-country": {
-      "label": "Country of Trademark Registration",
+      "label": "Trademark Registration Country",
       "required": "Country name is required"
     },
     "trademark-registration": {
@@ -635,20 +775,20 @@
       "required": "City name is required"
     },
     "state": {
-      "label": "State",
-      "required": "State name is required"
+      "label": "Region",
+      "required": "Region name is required"
     },
     "zip": {
-      "label": "ZIP Code",
-      "required": "ZIP code is required"
+      "label": "Postal Code",
+      "required": "Postal code is required"
     },
     "country": {
       "label": "Country",
       "required": "Country name is required"
     },
     "phone": {
-      "label": "Phone Number",
-      "required": "Phone number is required"
+      "label": "Mobile Number",
+      "required": "Mobile number is required"
     },
     "infringment-content": {
       "label": "Content you want to report",
@@ -657,7 +797,7 @@
   },
   "AppealPage": {
     "page-title": "Appeal Decision",
-    "page-subtitle": "Has your account been blocked and you want to appeal the decision? Please fill out the following form for the decision to be reconsidered.",
+    "page-subtitle": "Has your account been blocked and you want to appeal the decision? Please fill out the following form for reconsideration.",
     "first-name": "First Name",
     "last-name": "Last Name",
     "email": {
@@ -670,20 +810,20 @@
       "required": "Link is required"
     },
     "additional-comments": {
-      "label": "Additional comments to help us identify the report",
+      "label": "Additional comments that help us identify the report",
       "required": "Comment is required",
       "too-short": "Comment is too short"
     },
     "report-form": {
       "submitted": {
         "title": "Appeal request submitted successfully",
-        "subtitle": "Thank you for submitting the request. The appeal request will be sent to management for review"
+        "subtitle": "Thank you for submitting the request. The appeal request will be sent to management for reconsideration."
       }
     },
     "appeal-form": {
       "submitted": {
         "title": "Appeal request submitted successfully",
-        "subtitle": "Thank you for submitting the request. The appeal request will be sent to management for review"
+        "subtitle": "Thank you for submitting the request. The appeal request will be sent to management for reconsideration."
       }
     }
   },
@@ -692,7 +832,7 @@
     "twitter": "Twitter",
     "instagram": "Instagram",
     "phone": "Phone",
-    "mail": "Mail",
+    "mail": "Email",
     "email": "Email",
     "the-whatsapp": "WhatsApp",
     "contact-page": "Contact Page"
@@ -700,22 +840,22 @@
   "ContactPage": {
     "hero": {
       "title": "Contact Us",
-      "subtitle": "Have something in mind? Send us a message"
+      "subtitle": "Have something on your mind? Feel free to send us a message."
     },
     "contact-form": {
       "submitted": {
         "title": "Your message has been sent successfully 👍",
         "subtitle": "We will get back to you soon!",
-        "contact-methods": "In the meantime, feel free to contact us through other channels"
+        "contact-methods": "In the meantime, feel free to contact us through other channels."
       },
       "name": {
         "invalid": "Name is too short",
         "label": "Your Name",
-        "placeholder": "Enter your name here",
+        "placeholder": "Write your name here",
         "required": "Name is required"
       },
       "email": {
-        "invalid": "Invalid email",
+        "invalid": "Invalid email address",
         "label": "Email",
         "placeholder": "example@sikka.io",
         "required": "Email is required"
@@ -731,15 +871,15 @@
   "Auth": {
     "user_already_exists": "User already exists",
     "forgot_password": "Forgot password?",
-    "password_reset_email_sent": "Password reset email has been sent",
-    "password_reset_successfully": "Password has been reset successfully",
-    "passwords_do_not_match": "Passwords do not match",
+    "password_reset_email_sent": "Password reset email sent",
+    "password_reset_successfully": "Password reset successfully",
+    "passwords_do_not_match": "Password and confirmation password do not match",
     "email_address_invalid": "Invalid email address",
     "user_not_found": "User not found",
-    "email_exists": "Email address already exists",
-    "email_address_not_authorized": "Email address not authorized",
+    "email_exists": "Email address is already in use",
+    "email_address_not_authorized": "Email address is not authorized",
     "reset_password": "Reset Password",
-    "go_back_to_sign_in": "Back to Sign In",
+    "go_back_to_sign_in": "Go back to sign in",
     "account_created_successfully": "Your account has been created successfully",
     "failed_to_sign_in_with_google": "Failed to sign in with Google",
     "sign_in": "Sign In",
@@ -747,7 +887,7 @@
     "sign_out": "Sign Out",
     "email_address": "Email Address",
     "password": "Password",
-    "password_placeholder": "Enter your password",
+    "password_placeholder": "Enter password",
     "confirm_password": "Confirm Password",
     "already_have_an_account": "Already have an account?",
     "dont_have_an_account": "Don't have an account?",
@@ -756,99 +896,24 @@
     "create_your_account": "Create your account",
     "sign_in_to_your_account": "Sign in to your account",
     "welcome_back": "Welcome back",
-    "over_email_send_rate_limit": "You have sent too many password reset requests. Please try again later.",
+    "over_email_send_rate_limit": "You have requested a password reset too frequently. Please try again later.",
     "invalid_credentials": "Invalid email or password"
   },
-  "MyPuklas": {
-    "links": "Links",
-    "items": "Items",
-    "copy_link": "Copy Link",
-    "edit_links": "Edit Links",
-    "edit_pukla": "Edit Pukla",
-    "pukla_link": "Pukla Link",
-    "created": "Created Date",
-    "pukla_title_required": "Title is required",
-    "pukla_title_too_short": "Title is too short",
-    "pukla_title_too_long": "Title is too long",
-    "pukla_slug_required": "Custom link is required",
-    "pukla_slug_too_short": "Custom link is too short",
-    "pukla_slug_too_long": "Custom link is too long",
-    "pukla_slug_invalid": "Invalid custom link",
-    "title": "Puklas",
-    "create_pukla": "Create Pukla",
-    "pukla_title": "Pukla Title",
-    "pukla_title_placeholder": "Enter your pukla title",
-    "pukla_bio": "Pukla Bio",
-    "pukla_bio_placeholder": "Enter your pukla bio",
-    "pukla_description": "Description",
-    "pukla_description_placeholder": "Enter description",
-    "success_creating_pukla": "Pukla created successfully",
-    "success_deleting_pukla": "Pukla deleted successfully",
-    "success_fetching_puklas": "Puklas fetched successfully",
-    "error_fetching_puklas": "Failed to fetch Puklas",
-    "error_deleting_pukla": "Failed to delete Pukla",
-    "error_creating_pukla": "Failed to create Pukla",
-    "error_generating_slug": "Failed to generate custom link",
-    "error_checking_slug": "Failed to check custom link",
-    "this_custom_slug_is_already_taken": "This custom link is already taken",
-    "create": "Create",
-    "pukla_description_required": "Description is required",
-    "pukla_deleted": "Pukla deleted successfully",
-    "update_avatar": "Update Avatar",
-    "avatar_updated": "Avatar updated successfully",
-    "error_uploading_avatar": "Failed to upload avatar",
-    "error_updating_avatar": "Failed to update avatar",
-    "uploading": "Uploading...",
-    "choose_file": "Choose File",
-    "delete_pukla": "Delete Pukla",
-    "delete_pukla_description": "This action cannot be undone. To confirm, please enter the Pukla name. {pukla_name}",
-    "delete_pukla_project_name": "Pukla",
-    "delete_pukla_label": "Enter Pukla name",
-    "delete_pukla_placeholder": "Enter Pukla name",
-    "no_puklas_found": "No Puklas found",
-    "start_creating_a_pukla": "Start creating Puklas for your own page and more.",
-    "start_creating_short_links": "Start creating short links for your marketing campaigns, referral programs and more.",
-    "this_custom_slug_is_not_allowed": "This custom link is not allowed",
-    "custom_slug_optional": "Custom Slug (Optional)",
-    "custom_slug_placeholder": "Enter your custom slug",
-    "custom_slug_can_only_contain_letters_numbers_and_hyphens": "Custom link can only contain letters, numbers and hyphens",
-    "validation": {
-      "title_required": "Title is required",
-      "slug_required": "Custom link is required"
-    },
-    "pukla_created_successfully": "Pukla created successfully",
-    "short_slug_pro_feature": "Short links (less than 5 characters) are a pro feature",
-    "short_slug_pro_feature_description": "Upgrade to Pro to create shorter custom links (1-4 characters). Free users must use at least 5 characters.",
-    "short_slug_pro_feature_description_5_characters": "Upgrade to Pro to create shorter custom links (1-4 characters). Free users must use at least 5 characters.",
-    "is_discoverable": "Make this Pukla discoverable",
-    "is_discoverable_description": "Allow your Pukla to be listed in the public directory"
-  },
-  "PuklaNotFound": {
-    "oops_this_pukla_doesnt_exist_yet": "Oops! This Pukla doesn't exist yet",
-    "but_dont_worry_you_can_create_your_own_pukla_right_now": "Don't worry! You can create your own Pukla right now!",
-    "enter_your_long_url": "Enter a long URL you want to shorten",
-    "sign_up_for_free": "Sign up for free",
-    "want_more_features": "Want more features?",
-    "terms_of_service": "Terms of Service",
-    "privacy_policy": "Privacy Policy",
-    "by_using_our_service_you_agree_to_our": "By using our service, you agree to our <terms>Terms of Service</terms> and <privacy_policy>Privacy Policy</privacy_policy>"
-  },
   "Editor": {
-    "remove_thumbnail": "Remove Thumbnail",
-    "failed_to_update_link": "Failed to update link",
+    "change_thumbnail": "Change Link Icon",
     "link_title_required": "Link title is required",
     "link_url_required": "Link URL is required",
-    "link_url_invalid": "Please enter a valid URL",
+    "link_url_invalid": "Link URL is invalid",
     "lock_link": {
       "password_protected": {
         "title": "Password Protected",
-        "description": "You can add a password to the link to prevent access until the correct password is entered",
-        "invalid_password": "Invalid password",
+        "description": "You can add a password to the link to prevent access unless the correct password is entered",
+        "invalid_password": "Incorrect password",
         "password_required": "Password is required"
       },
       "requires_date_of_birth": {
-        "title": "Link requires date of birth",
-        "description": "You can add a date of birth requirement to prevent access until the correct date of birth is entered",
+        "title": "Link Requires Date of Birth",
+        "description": "You can require a date of birth for the link to prevent access unless the correct date of birth is entered",
         "too_young": "You are younger than the minimum required age",
         "day_required": "Day is required",
         "month_required": "Month is required",
@@ -860,12 +925,12 @@
       }
     },
     "try_lazim": {
-      "title": "Long URL?",
-      "description": "Try Lazim platform to shorten long URLs",
-      "go_to_lazim": "Let's Start"
+      "title": "Long link?",
+      "description": "Try Lazim platform to shorten long links",
+      "go_to_lazim": "Let's get started"
     },
     "delivery_apps": {
-      "hungerstation": "Hungerstation",
+      "hungerstation": "HungerStation",
       "jahez": "Jahez",
       "keeta": "Keeta",
       "toyou": "ToYou",
@@ -887,6 +952,8 @@
       "position_start": "Start of Text",
       "position_end": "End of Text"
     },
+    "remove_thumbnail": "Remove Image",
+    "failed_to_update_thumbnail": "Failed to update thumbnail",
     "header-added-successfully": "Header added successfully",
     "failed-to-add-header": "Failed to add header",
     "header-updated-successfully": "Header updated successfully",
@@ -900,17 +967,17 @@
     "link-failed-to-update-status": "Failed to update link status",
     "header-status-updated-successfully": "Header status updated successfully",
     "header-failed-to-update-status": "Failed to update header status",
-    "confirm-delete-link": "Confirm delete link",
-    "confirm-delete-header": "Confirm delete header",
-    "single_link_title": "Link title",
-    "single_link_url": "Link",
+    "confirm-delete-link": "Confirm Delete Link",
+    "confirm-delete-header": "Confirm Delete Header",
+    "single_link_title": "Link Title",
+    "single_link_url": "Link URL",
     "change-pukla": "Change Pukla",
     "select_a_pukla": "Select a Pukla",
     "success_deleting_link": "Link deleted successfully",
     "error_deleting_link": "Failed to delete link",
     "error_deleting_header": "Failed to delete header",
     "success_deleting_header": "Header deleted successfully",
-    "order-updated-successfully": "Links ordered successfully",
+    "order-updated-successfully": "Links order updated successfully",
     "select_pukla": "Select Pukla",
     "description": "Manage all your other links",
     "add-header": "New Header",
@@ -920,7 +987,7 @@
     "add-button": "New Button",
     "select_pukla_to_start_editing": "Select a Pukla to start editing",
     "link": "Link",
-    "embed-video": "Video",
+    "embed-video": "Embed Video",
     "document": "Document",
     "form": "Form",
     "delivery-apps": "Delivery Apps",
@@ -935,35 +1002,34 @@
       "placeholder": "Link title"
     },
     "link-url": {
-      "label": "Link",
+      "label": "URL",
       "placeholder": "https://example.com"
     },
     "no_items_found": "No items found",
     "change_layout": "Change Layout",
-    "change_thumbnail": "Change Thumbnail",
+    "default_layout": "Default",
+    "double_height_layout": "Double Height",
+    "half_width_layout": "Half Width",
     "save": "Save",
     "edit_pukla": "Edit Pukla",
     "slug": "Short Link",
     "slug_already_taken": "This short link is already taken",
     "pukla_updated_successfully": "Pukla updated successfully",
-    "default_layout": "Default",
-    "double_height_layout": "Double Height",
-    "half_width_layout": "Half Width",
     "square_layout": "Square",
     "layout_updated_successfully": "Layout updated successfully",
     "failed_to_update_layout": "Failed to update layout",
-    "search_icons": "Search icons..."
+    "search_icons": "Search Icons..."
   },
   "Theme": {
-    "title": "Design",
+    "title": "Theme",
     "predefined_themes": "Predefined Themes",
-    "choose_theme": "Choose a theme for your Pukla",
+    "choose_theme": "Choose a predefined theme for your Pukla",
     "update_theme": "Update Theme",
     "updating": "Updating...",
     "success_update": "Theme updated successfully",
     "error_update": "Failed to update theme",
     "custom_theme": "Custom Theme",
-    "customize_colors": "Choose colors and design that suit you",
+    "customize_colors": "Choose the colors and design that suit you",
     "preview": "Preview",
     "background_color": "Background Color",
     "text_color": "Text Color",
@@ -972,19 +1038,19 @@
     "button_hover_color": "Button Hover Color",
     "button_border_color": "Button Border Color",
     "layouts": "Layouts",
-    "choose_layout": "Choose how many columns you want to display your links in",
+    "choose_layout": "Choose the number of columns to display your links in",
     "column": "Column",
     "columns": "Columns",
     "appearance_settings": "Appearance Settings",
-    "choose_appearance_settings": "Choose appearance settings for your Pukla",
-    "border_color": "Border Color",
+    "choose_appearance_settings": "Choose the appearance settings for the Pukla",
+    "border_color": "Button Border Color",
     "border_radius": "Border Radius",
     "square": "Square",
     "slightly_rounded": "Slightly Rounded",
     "rounded": "Rounded",
     "very_rounded": "Very Rounded",
     "pill": "Pill",
-    "choose_animation": "Choose animation style",
+    "choose_animation": "Choose Animation Style",
     "slide_up": "Slide Up",
     "slide_down": "Slide Down",
     "slide_left": "Slide Left",
@@ -992,11 +1058,11 @@
     "fade": "Fade",
     "scale": "Scale",
     "animation_settings": "Animation Settings",
-    "choose_animation_settings": "Choose animation settings for your buttons",
+    "choose_animation_settings": "Choose the button appearance animation settings you want",
     "none": "None",
     "background_image": "Background Image",
-    "upload_background": "Upload Background",
-    "image_too_large": "Image must be less than 5MB",
+    "upload_background": "Upload Background Image",
+    "image_too_large": "Image size must be less than 5MB",
     "invalid_file_type": "Invalid file type. Please upload an image",
     "background_image_uploaded": "Background image uploaded successfully",
     "error_uploading_image": "Error uploading image. Please try again",
@@ -1009,9 +1075,9 @@
     "border": "Border",
     "platform": "Platform",
     "url": "URL",
-    "select_platform": "Select platform",
-    "add_social_link": "Add Social Link",
-    "save_social_links": "Save Social Links",
+    "select_platform": "Select Platform",
+    "add_social_link": "Add Link",
+    "save_social_links": "Save Links",
     "social_media_settings": "Social Media Settings",
     "choose_social_media_settings": "Add and manage your social media links",
     "update_settings": "Update Settings"
@@ -1019,22 +1085,22 @@
   "Analytics": {
     "title": "Analytics",
     "description": "Manage all your other analytics",
-    "select_pukla": "Select a Pukla",
+    "select_pukla": "Select Pukla",
     "select_pukla_to_view_analytics": "Select a Pukla to view analytics",
     "coming_soon": "Analytics coming soon",
     "analytics_overview": "Analytics Overview",
     "analytics_overview_description": "View general analytics for your Pukla",
-    "select_date_range": "Pick a date range"
+    "select_date_range": "Select Date Range"
   },
   "Billing": {
     "pro_plan": "Pro Plan",
-    "only_for_enterprise_users": "For Enterprise Users Only",
-    "upgrade_to_enterprise_for_advanced_analytics": "Upgrade to Enterprise plan to access advanced analytics",
+    "only_for_enterprise_users": "For Enterprise Plan users only",
+    "upgrade_to_enterprise_for_advanced_analytics": "Upgrade to the Enterprise plan for advanced analytics",
     "enterprise_plan": "Enterprise Plan",
     "title": "Billing",
     "description": "Manage all your payment methods",
     "upgrade_dialog": {
-      "title": "Upgrade to Next Level",
+      "title": "Upgrade to the Next Level",
       "description": "Upgrade your plan to create more Puklas",
       "unlimited_puklas": "Create unlimited Puklas",
       "custom_design_and_colors": "Custom design and colors",
@@ -1055,7 +1121,7 @@
     "facebook": "Share on Facebook",
     "mail": "Share via Email",
     "more-options": "More Options",
-    "shared_content": "Found a Pukla I wanted to share, check it out here https://puk.la/{puklaName}"
+    "shared_content": "Found a Pukla and wanted to share it, check it out here https://puk.la/{puklaName}"
   },
   "Blog": {
     "title": "Blog",
@@ -1069,7 +1135,7 @@
     "title": "Settings",
     "description": "Manage your account settings",
     "saved_successfully": "Settings saved successfully",
-    "error_saving": "Failed to save settings",
+    "error_saving": "Failed to update settings",
     "tabs": {
       "general": "General",
       "appearance": "Appearance",
@@ -1094,7 +1160,7 @@
     },
     "appearance": {
       "title": "Appearance",
-      "description": "Customize how the application looks",
+      "description": "Customize the appearance of the application",
       "theme": {
         "title": "Theme",
         "dark_mode": "Dark Mode"
@@ -1108,13 +1174,13 @@
     },
     "navigation": {
       "title": "Navigation",
-      "description": "Customize your navigation menu"
+      "description": "Customize the navigation menu"
     },
     "preferences": {
       "title": "Preferences",
-      "description": "Set your default preferences",
+      "description": "Set default preferences",
       "default": {
-        "title": "Default Settings",
+        "title": "Defaults",
         "currency": "Default Currency",
         "calendar": "Default Calendar"
       },
@@ -1124,27 +1190,41 @@
         "time_format": "Time Format",
         "12h": "12-hour (AM/PM)",
         "24h": "24-hour"
+      },
+      "currency": {
+        "sar": "Saudi Riyal",
+        "bhd": "Bahraini Dinar",
+        "kwd": "Kuwaiti Dinar",
+        "qar": "Qatari Riyal",
+        "aed": "UAE Dirham",
+        "omr": "Omani Rial",
+        "try": "Turkish Lira",
+        "iqd": "Iraqi Dinar",
+        "usd": "US Dollar",
+        "eur": "Euro",
+        "gbp": "British Pound",
+        "jpy": "Japanese Yen"
       }
     },
     "notifications": {
       "title": "Notifications",
-      "description": "Manage your notification preferences",
+      "description": "Manage notification preferences",
       "email": {
         "title": "Email Notifications",
-        "updates": "Product updates",
-        "marketing": "Marketing emails",
-        "security": "Security alerts"
+        "updates": "Product Updates",
+        "marketing": "Marketing Messages",
+        "security": "Security Alerts"
       },
       "in_app": {
         "title": "In-App Notifications",
         "mentions": "Mentions",
         "comments": "Comments",
-        "tasks": "Task assignments"
+        "tasks": "Task Assignments"
       }
     },
     "billing": {
       "title": "Billing",
-      "description": "Manage your billing information and subscription",
+      "description": "Manage billing information and subscription",
       "current_plan": {
         "title": "Current Plan",
         "change_plan": "Change Plan"
@@ -1163,19 +1243,47 @@
     }
   },
   "Feedback": {
-    "give_feedback": "Got feedback?",
+    "give_feedback": "Have feedback?",
     "feedback_placeholder": "Write your feedback here",
-    "feedback_dialog_description": "If you have any suggestions, complaints or feedback about the service, you can send them here",
-    "submit_feedback": "Submit feedback",
+    "feedback_dialog_description": "If you have a suggestion, complaint, or any feedback about the service, you can send it here",
+    "submit_feedback": "Submit Feedback",
     "submitting": "Submitting...",
     "feedback_submitted": "Feedback submitted successfully",
     "thank_you_feedback": "Thank you for helping us improve our service",
     "error_submitting_feedback": "Failed to submit feedback. Please try again."
   },
+  "Profile": {
+    "general": "General",
+    "security": "Security",
+    "profile_updated_successfully": "Profile updated successfully",
+    "incorrect_current_password": "Incorrect current password",
+    "password_updated_successfully": "Password updated successfully",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "confirm_new_password": "Confirm New Password",
+    "updating_password": "Updating password...",
+    "change_password": "Change Password",
+    "saving_changes": "Saving changes...",
+    "save_changes": "Save Changes",
+    "name_required": "Name is required",
+    "email_required": "Email is required",
+    "phone_required": "Phone is required",
+    "name_min_length": "Name must be longer than 2 characters",
+    "email_invalid": "Invalid email",
+    "password_min_length": "Password must be longer than 6 characters",
+    "current_password_required": "Current password is required",
+    "confirm_new_password_required": "Confirm new password is required",
+    "new_password_required": "New password is required",
+    "passwords_do_not_match": "Password and confirmation password do not match"
+  },
   "Country": {
     "afghanistan": "Afghanistan",
     "albania": "Albania",
     "algeria": "Algeria",
+    "hong_kong": "Hong Kong",
     "andorra": "Andorra",
     "angola": "Angola",
     "antigua_and_barbuda": "Antigua and Barbuda",
@@ -1373,18 +1481,32 @@
     "description": "Create your enterprise to get started",
     "welcome_message": "Set up your enterprise and start managing your organization efficiently.",
     "form": {
-      "enterprise_name": "Enterprise Name",
-      "enterprise_name_placeholder": "Enter your enterprise name",
-      "description": "Description",
-      "description_placeholder": "Tell us about your enterprise",
-      "logo": "Logo URL",
-      "logo_placeholder": "Enter your logo URL",
-      "email": "Enterprise Email",
-      "email_placeholder": "Enter your enterprise email",
-      "industry": "Industry",
-      "industry_placeholder": "Select your industry",
-      "size": "Company Size",
-      "size_placeholder": "Select your company size",
+      "enterprise_name": {
+        "label": "Enterprise Name",
+        "placeholder": "Enter your enterprise name",
+        "required": "Enterprise name is required"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Tell us about your enterprise"
+      },
+      "logo": {
+        "label": "Logo URL",
+        "placeholder": "Enter your enterprise logo URL"
+      },
+      "email": {
+        "label": "Enterprise Email",
+        "placeholder": "Enter the enterprise email",
+        "invalid": "Invalid email"
+      },
+      "industry": {
+        "label": "Industry",
+        "placeholder": "Select your enterprise industry"
+      },
+      "size": {
+        "label": "Enterprise Size",
+        "placeholder": "Select your enterprise size"
+      },
       "create_enterprise": "Create Enterprise"
     },
     "industry_options": {
@@ -1409,27 +1531,51 @@
     "username": "Username",
     "title": "Title",
     "description": "Description",
-    "avatar": "Profile Picture",
+    "avatar": "Avatar",
     "create": "Create Pukla",
     "link_title": "Link Title",
     "link_url": "Link URL",
-    "add_more_links": "Add Another Link",
+    "add_more_links": "Add More Links",
     "save_links": "Save Links",
     "upload_image": "Upload Image"
   },
-  "Directory": {
-    "title": "Discover Puklas",
-    "subtitle": "Explore and discover public Pukla pages from our community",
-    "search_placeholder": "Search by title, bio, or username...",
-    "no_puklas_found": "No Puklas found",
-    "no_puklas_found_description": "Try adjusting your search or check back later for new Puklas",
-    "total_puklas": "{count} Puklas found",
-    "loading": "Loading Puklas..."
+  "Dashboard": {
+    "title": "Dashboard",
+    "create_product": "Add Product",
+    "total_invoices": "Total Invoices",
+    "pending": "Pending",
+    "total_products": "Total Products",
+    "total_revenue": "Total Revenue",
+    "pending_invoices": "Pending Invoices",
+    "of_total": "% of Total",
+    "recent_invoices": "Recent Invoices",
+    "recent_invoices_list": "Soon: List of recent invoices",
+    "popular_products": "Popular Products",
+    "popular_products_list": "Soon: List of popular products",
+    "create": "Create",
+    "select_create_option": "Select an option",
+    "add_product": "Add Product",
+    "add_invoice": "Add Invoice",
+    "add_client": "Add Client",
+    "add_employee": "Add Employee",
+    "add_warehouse": "Add Warehouse"
+  },
+  "Help": {
+    "title": "Help",
+    "hero": {
+      "title": "Help Page",
+      "subtitle": "We will add educational content soon, God willing",
+      "in-the-meantime": "In the meantime, feel free to contact us if you need help"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "subtitle": "Have something on your mind? Feel free to send us a message"
+    }
   },
   "Products": {
     "title": "Products",
-    "add_new": "Add New Product",
-    "search_products": "Search Products",
+    "add_new": "New Product",
+    "search_products": "Search products",
     "product_details": "Product Details",
     "product_name": "Product Name",
     "product_name_required": "Product name is required",
@@ -1444,7 +1590,7 @@
     "enter_sku": "Enter SKU (optional)",
     "no_description": "No description",
     "sku_label": "SKU: {value}",
-    "stock_label": "Available: {value}",
+    "stock_label": "Stock: {value}",
     "create_product": "Create Product",
     "creating_product": "Creating...",
     "no_products": "No products",
@@ -1476,20 +1622,50 @@
         "placeholder": "Enter stock quantity"
       }
     },
+    "products": {
+      "title": "Products",
+      "add_product": "Add Product",
+      "no_products": "No products",
+      "product": "Product",
+      "quantity": "Quantity",
+      "unit_price": "Unit Price",
+      "subtotal": "Subtotal",
+      "select_product": "Select Product",
+      "search_products": "Search products",
+      "no_products_found": "No products found",
+      "add_new_product": "New Product",
+      "product_description": "Product Description",
+      "name": "Name",
+      "save_product": "Save Product"
+    },
+    "success": {
+      "create": "Product created successfully",
+      "update": "Product updated successfully",
+      "delete": "Product deleted successfully",
+      "duplicate": "Product duplicated successfully"
+    },
+    "loading": {
+      "create": "Creating product...",
+      "update": "Updating product...",
+      "delete": "Deleting product...",
+      "duplicate": "Duplicating product..."
+    },
     "error": {
-      "delete_referenced": "Cannot delete products",
-      "delete_referenced_description": "The following products cannot be deleted because they are used in quotes: {products}. Please remove them from quotes before deleting.",
-      "delete": "Error deleting products"
+      "create": "Error creating product",
+      "update": "Error updating product",
+      "delete": "Error deleting product",
+      "duplicate": "Error duplicating product"
     }
   },
   "Invoices": {
     "title": "Invoices",
-    "add_new": "Add New Invoice",
+    "add_new": "New Invoice",
     "invoice_details": "Invoice Details",
     "invoice_number": "Invoice #{number}",
     "enter_invoice_number": "Enter invoice number",
     "description": "Description",
     "enter_description": "Enter invoice description",
+    "search_invoices": "Search invoices",
     "price": "Price",
     "price_required": "Price is required",
     "stock_quantity": "Stock Quantity",
@@ -1498,19 +1674,37 @@
     "enter_sku": "Enter SKU (optional)",
     "no_description": "No description",
     "sku_label": "SKU: {value}",
-    "stock_label": "In Stock: {value}",
-    "create_invoice": "Create Invoice",
+    "stock_label": "Stock: {value}",
+    "create_new": "Create Invoice",
     "creating": "Creating...",
     "no_invoices_found": "No invoices found",
     "add_first_invoice": "Add your first invoice",
     "client": "Client",
-    "select_client": "Select a client",
+    "select_client": "Select client",
     "search_clients": "Search clients...",
     "no_clients": "No clients found",
-    "add_new_client": "Add New Client",
+    "add_new_client": "New Client",
     "amount": "Amount",
     "due_date": "Due Date",
-    "select_status": "Select a status",
+    "select_status": "Select status",
+    "success": {
+      "create": "Invoice created successfully",
+      "update": "Invoice updated successfully",
+      "delete": "Invoice deleted successfully",
+      "duplicate": "Invoice duplicated successfully"
+    },
+    "loading": {
+      "create": "Creating invoice...",
+      "update": "Updating invoice...",
+      "delete": "Deleting invoice...",
+      "duplicate": "Duplicating invoice..."
+    },
+    "error": {
+      "create": "Error creating invoice",
+      "update": "Error updating invoice",
+      "delete": "Error deleting invoice",
+      "duplicate": "Error duplicating invoice"
+    },
     "status": {
       "title": "Status",
       "draft": "Draft",
@@ -1522,37 +1716,59 @@
     "notes": "Notes",
     "enter_notes": "Enter any additional notes",
     "client_added": "Client added successfully",
-    "error": {
-      "load_clients": "Failed to load clients",
-      "create": "Failed to create invoice",
-      "fetch": "Failed to fetch invoices",
-      "title": "Error"
-    },
-    "success": {
-      "title": "Success",
-      "created": "Invoice created successfully"
-    },
     "submitting": "Submitting...",
     "invoice_hash": "Invoice #{number}",
     "issue_date": "Issue Date",
     "form": {
       "invoice_number": {
-        "label": "Invoice #"
+        "label": "Invoice Number",
+        "placeholder": "Enter invoice number",
+        "required": "Invoice number is required"
       },
       "client": {
-        "label": "Client"
+        "label": "Client",
+        "select_client": "Select client",
+        "search_clients": "Search clients...",
+        "no_clients": "No clients found",
+        "add_new_client": "New Client",
+        "required": "Client is required"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter invoice description",
+        "required": "Description is required"
       },
       "issue_date": {
-        "label": "Issue Date"
+        "label": "Issue Date",
+        "placeholder": "Select issue date",
+        "required": "Issue date is required"
       },
       "due_date": {
-        "label": "Due Date"
+        "label": "Due Date",
+        "placeholder": "Select due date",
+        "required": "Due date is required"
       },
       "total": {
         "label": "Total"
       },
       "status": {
-        "label": "Status"
+        "label": "Status",
+        "placeholder": "Select status",
+        "draft": "Draft",
+        "pending": "Pending",
+        "paid": "Paid",
+        "overdue": "Overdue",
+        "cancelled": "Cancelled"
+      },
+      "subtotal": {
+        "label": "Subtotal"
+      },
+      "tax_rate": {
+        "label": "Tax Rate"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter your notes"
       }
     },
     "actions": {
@@ -1566,171 +1782,74 @@
       "quantity": "Quantity",
       "unit_price": "Unit Price",
       "subtotal": "Subtotal",
-      "select_product": "Select product",
+      "select_product": "Select Product",
       "search_products": "Search products",
       "no_products_found": "No products found",
-      "add_new_product": "Add new product",
-      "product_description": "Product description"
-    }
-  },
-  "Clients": {
-    "title": "Clients",
-    "add_new": "Add New Client",
-    "add_client": "Add Client",
-    "back_to_list": "Back to List",
-    "client_details": "Client Details",
-    "form": {
-      "validation": {
-        "name_required": "Name is required",
-        "email_required": "Email is required",
-        "email_invalid": "Invalid email address",
-        "phone_required": "Phone number is required",
-        "address_required": "Address is required",
-        "city_required": "City is required",
-        "state_required": "State is required",
-        "zip_code_required": "ZIP code is required"
-      },
-      "name": {
-        "label": "Name",
-        "placeholder": "Enter client name"
-      },
-      "email": {
-        "label": "Email",
-        "placeholder": "Enter client email"
-      },
-      "phone": {
-        "label": "Phone",
-        "placeholder": "Enter phone number"
-      },
-      "company": {
-        "label": "Company",
-        "placeholder": "Select or add a company",
-        "search_placeholder": "Search companies...",
-        "no_companies": "No companies found"
-      },
-      "address": {
-        "label": "Address",
-        "placeholder": "Enter address"
-      },
-      "city": {
-        "label": "City",
-        "placeholder": "Enter city"
-      },
-      "state": {
-        "label": "State",
-        "placeholder": "Enter state"
-      },
-      "zip_code": {
-        "label": "ZIP Code",
-        "placeholder": "Enter ZIP code"
-      },
-      "notes": {
-        "label": "Notes",
-        "placeholder": "Enter any additional notes"
-      }
-    },
-    "messages": {
-      "creating": "Creating client...",
-      "create": "Create Client"
-    },
-    "success": {
-      "title": "Success",
-      "created": "Client created successfully"
-    },
-    "error": {
-      "title": "Error",
-      "create": "An error occurred while creating the client",
-      "not_authenticated": "You must be logged in to create a client"
-    }
-  },
-  "Vendors": {
-    "title": "Vendors",
-    "add_new": "Add New Vendor",
-    "search_vendors": "Search vendors",
-    "no_vendors": "No vendors found",
-    "error": {
-      "loading": "Failed to load vendors",
-      "create": "Failed to create vendor",
-      "update": "Failed to update vendor",
-      "delete": "Failed to delete vendor"
-    },
-    "form": {
-      "name": {
-        "label": "Name",
-        "placeholder": "Enter vendor name",
-        "validation": {
-          "required": "Name is required"
-        }
-      },
-      "company": {
-        "label": "Company",
-        "placeholder": "Enter company name"
-      },
-      "email": {
-        "label": "Email",
-        "placeholder": "Enter email address",
-        "validation": {
-          "required": "Email is required",
-          "invalid": "Invalid email address"
-        }
-      },
-      "phone": {
-        "label": "Phone",
-        "placeholder": "Enter phone number",
-        "validation": {
-          "required": "Phone number is required"
-        }
-      },
-      "address": {
-        "label": "Address",
-        "placeholder": "Enter street address",
-        "validation": {
-          "required": "Address is required"
-        }
-      },
-      "city": {
-        "label": "City",
-        "placeholder": "Enter city",
-        "validation": {
-          "required": "City is required"
-        }
-      },
-      "state": {
-        "label": "State",
-        "placeholder": "Enter state",
-        "validation": {
-          "required": "State is required"
-        }
-      },
-      "zip_code": {
-        "label": "ZIP Code",
-        "placeholder": "Enter ZIP code",
-        "validation": {
-          "required": "ZIP code is required"
-        }
-      },
-      "products": {
-        "label": "Products",
-        "placeholder": "Enter products/services"
-      },
-      "notes": {
-        "label": "Notes",
-        "placeholder": "Enter any additional notes"
-      }
-    },
-    "messages": {
-      "creating": "Creating vendor...",
-      "create": "Create Vendor",
-      "success_created": "Vendor created successfully"
+      "add_new_product": "New Product",
+      "product_description": "Product Description"
     }
   },
   "Sales": {
-    "title": "Sales"
+    "title": "Sales",
+    "add_new": "New Sale",
+    "sale_details": "Sale Details",
+    "description": "Description",
+    "description_required": "Description is required",
+    "enter_description": "Enter sale description",
+    "amount": "Amount",
+    "amount_required": "Amount is required",
+    "date": "Date",
+    "date_required": "Date is required",
+    "status": {
+      "title": "Status",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "select_status": "Select status",
+    "status_required": "Status is required",
+    "notes": "Notes",
+    "enter_notes": "Enter any additional notes",
+    "create_sale": "Create Sale",
+    "creating": "Creating...",
+    "no_sales": "No sales",
+    "add_first_sale": "Add your first sale",
+    "client": "Client",
+    "select_client": "Select client",
+    "search_clients": "Search clients...",
+    "no_clients": "No clients found",
+    "add_new_client": "New Client",
+    "client_added": "Client added successfully",
+    "products": {
+      "title": "Products",
+      "add_product": "Add Product",
+      "no_products": "No products added",
+      "product": "Product",
+      "quantity": "Quantity",
+      "unit_price": "Unit Price",
+      "subtotal": "Subtotal",
+      "select_product": "Select Product",
+      "search_products": "Search products",
+      "no_products_found": "No products found",
+      "add_new_product": "New Product",
+      "product_description": "Product Description"
+    },
+    "error": {
+      "load_clients": "Failed to load clients",
+      "create": "Failed to create sale",
+      "fetch": "Failed to fetch sales",
+      "title": "Error"
+    },
+    "success": {
+      "title": "Success",
+      "created": "Sale created successfully"
+    },
+    "submitting": "Submitting..."
   },
   "Quotes": {
     "title": "Quotes",
     "create_quote": "Create Quote",
-    "add_new": "Add New Quote",
+    "add_new": "New Quote",
     "back_to_list": "Back to Quotes",
     "quote_details": "Quote Details",
     "submitting": "Submitting...",
@@ -1740,7 +1859,7 @@
     "select_client": "Select client",
     "search_clients": "Search clients",
     "no_clients": "No clients found",
-    "add_new_client": "Add new client",
+    "add_new_client": "New Client",
     "quote_number": "Quote Number",
     "enter_quote_number": "Enter quote number",
     "subtotal": "Subtotal",
@@ -1795,8 +1914,8 @@
       "select_product": "Select product",
       "search_products": "Search products",
       "no_products_found": "No products found",
-      "add_new_product": "Add new product",
-      "add_product": "Add product",
+      "add_new_product": "New Product",
+      "add_product": "Add Product",
       "quantity": "Quantity",
       "unit_price": "Unit Price",
       "subtotal": "Subtotal",
@@ -1824,296 +1943,26 @@
       "status_required": "Status is required",
       "subtotal_positive": "Subtotal must be a positive number",
       "tax_rate_positive": "Tax rate must be a positive number",
-      "items_required": "At least one product must be added",
+      "items_required": "At least one item must be added",
       "item_description_required": "Description is required",
       "item_quantity_required": "Quantity is required",
       "item_quantity_positive": "Quantity must be a positive number",
       "item_price_required": "Price is required",
       "item_price_positive": "Price must be a positive number",
-      "item_description_or_product": "Either a product or description must be selected for each item"
+      "item_description_or_product": "Either select a product or enter a description for each item"
     }
-  },
-  "Salaries": {
-    "title": "Salaries",
-    "create_salary": "Create Salary",
-    "add_new": "Add New Salary",
-    "edit_salary": "Edit Salary",
-    "delete_salary": "Delete Salary",
-    "search_salaries": "Search salaries...",
-    "confirm_delete": "Are you sure you want to delete this salary?",
-    "no_salaries_found": "No salaries found",
-    "salary_details": "Salary Details",
-    "success": {
-      "title": "Success",
-      "deleted": "Salary deleted successfully"
-    },
-    "error": {
-      "title": "Error",
-      "delete": "Failed to delete salary",
-      "error_not_authenticated": "You must be logged in to create a salary"
-    },
-    "messages": {
-      "success_deleted": "Salary deleted successfully",
-      "error_delete": "Failed to delete salary",
-      "success_created": "Salary created successfully"
-    },
-    "table": {
-      "employee_name": "Employee Name",
-      "gross_amount": "Gross Amount",
-      "net_amount": "Net Amount",
-      "payment_date": "Payment Date",
-      "pay_period_start": "Pay Period Start",
-      "pay_period_end": "Pay Period End",
-      "actions": "Actions"
-    },
-    "form": {
-      "employee_name": {
-        "label": "Employee Name",
-        "placeholder": "Enter employee name",
-        "required": "Employee name is required"
-      },
-      "gross_amount": {
-        "label": "Gross Amount",
-        "placeholder": "Enter gross amount",
-        "required": "Gross amount is required"
-      },
-      "net_amount": {
-        "label": "Net Amount",
-        "placeholder": "Enter net amount",
-        "required": "Net amount is required"
-      },
-      "payment_date": {
-        "label": "Payment Date",
-        "required": "Payment date is required",
-        "placeholder": "Select payment date"
-      },
-      "pay_period_start": {
-        "label": "Pay Period Start",
-        "required": "Pay period start date is required",
-        "placeholder": "Select pay period start date"
-      },
-      "pay_period_end": {
-        "label": "Pay Period End",
-        "required": "Pay period end date is required",
-        "placeholder": "Select pay period end date"
-      },
-      "notes": {
-        "label": "Notes",
-        "placeholder": "Enter any additional notes"
-      }
-    }
-  },
-  "HumanResources": {
-    "title": "Human Resources"
-  },
-  "Administration": {
-    "title": "Administration"
-  },
-  "Accounting": {
-    "title": "Accounting"
-  },
-  "Jobs": {
-    "title": "Jobs",
-    "create_job": "Create Job",
-    "add_job": "Add Job",
-    "edit_job": "Edit Job",
-    "job_details": "Job Details",
-    "add_new": "Add New Job",
-    "add_new_listing": "Add New Job Listing",
-    "listing_details": "Job Listing Details",
-    "back_to_list": "Back to List",
-    "no_jobs_found": "No jobs found",
-    "failed_to_fetch_jobs": "Failed to fetch jobs",
-    "search_jobs": "Search jobs...",
-    "messages": {
-      "creating_job": "Creating job...",
-      "create_job": "Create Job",
-      "created": "Job created successfully",
-      "updated": "Job updated successfully",
-      "deleted": "Job deleted successfully",
-      "error": "An error occurred while processing your request",
-      "job_created": "Job created successfully"
-    },
-    "form": {
-      "title": {
-        "label": "Job Title",
-        "placeholder": "Enter job title",
-        "required": "Job title is required"
-      },
-      "description": {
-        "label": "Description",
-        "placeholder": "Enter job description"
-      },
-      "requirements": {
-        "label": "Requirements",
-        "placeholder": "Enter job requirements"
-      },
-      "location": {
-        "label": "Location",
-        "placeholder": "Enter job location"
-      },
-      "department": {
-        "label": "Department",
-        "placeholder": "Enter department"
-      },
-      "type": {
-        "label": "Job Type",
-        "placeholder": "Select job type",
-        "full_time": "Full-time",
-        "part_time": "Part-time",
-        "contract": "Contract",
-        "internship": "Internship",
-        "temporary": "Temporary"
-      },
-      "salary": {
-        "label": "Salary",
-        "placeholder": "Enter salary"
-      },
-      "position": {
-        "label": "Position",
-        "placeholder": "Enter position"
-      },
-      "status": {
-        "label": "Status",
-        "placeholder": "Select status"
-      },
-      "start_date": {
-        "label": "Start Date"
-      },
-      "end_date": {
-        "label": "End Date"
-      },
-      "is_active": {
-        "label": "Is this job active?"
-      },
-      "created_at": {
-        "label": "Created Date"
-      },
-      "updated_at": {
-        "label": "Updated Date"
-      }
-    }
-  },
-  "JobListings": {
-    "title": "Job Listings",
-    "create_listing": "Create Listing",
-    "add_new_listing": "Add New Listing",
-    "search_listings": "Search listings...",
-    "listing_details": "Listing Details",
-    "messages": {
-      "auth_required": "You must be logged in to create a job listing",
-      "listing_created": "Job listing created successfully",
-      "error": "An error occurred while creating the job listing",
-      "items_deleted": "Job listings deleted successfully",
-      "delete_error": "An error occurred while deleting job listings"
-    },
-    "status": {
-      "title": "Status",
-      "active": "Active",
-      "inactive": "Inactive"
-    },
-    "form": {
-      "title": {
-        "label": "Listing Title",
-        "placeholder": "Enter listing title"
-      },
-      "description": {
-        "label": "Description",
-        "placeholder": "Enter listing description"
-      },
-      "jobs": {
-        "label": "Jobs",
-        "placeholder": "Select jobs"
-      },
-      "is_active": {
-        "label": "Is this listing active?",
-        "placeholder": "Enter whether the listing is active or not"
-      },
-      "status": {
-        "label": "Status",
-        "placeholder": "Select status"
-      },
-      "created_at": {
-        "label": "Created Date"
-      }
-    }
-  },
-  "Expenses": {
-    "title": "Expenses",
-    "description": "Manage and track expenses",
-    "add_new": "Add New Expense",
-    "search_expenses": "Search expenses",
-    "no_expenses_found": "No expenses found",
-    "confirm_delete_title": "Confirm Delete Expenses",
-    "confirm_delete": "Are you sure you want to delete {count} expense(s)?",
-    "success": {
-      "created": "Expense created successfully"
-    },
-    "error": {
-      "creating": "Error creating expense",
-      "bulk_delete": "Error deleting expenses"
-    },
-    "form": {
-      "expense_number": {
-        "label": "Expense Number",
-        "placeholder": "Enter expense number",
-        "required": "Expense number is required"
-      },
-      "issue_date": {
-        "label": "Issue Date",
-        "placeholder": "Select issue date",
-        "required": "Issue date is required"
-      },
-      "due_date": {
-        "label": "Due Date",
-        "placeholder": "Select due date",
-        "required": "Due date is required"
-      },
-      "amount": {
-        "label": "Amount",
-        "placeholder": "Enter amount",
-        "required": "Amount is required"
-      },
-      "category": {
-        "label": "Category",
-        "placeholder": "Select category",
-        "required": "Category is required"
-      },
-      "client": {
-        "label": "Client",
-        "placeholder": "Select client"
-      },
-      "status": {
-        "label": "Status",
-        "placeholder": "Select status",
-        "pending": "Pending",
-        "paid": "Paid",
-        "overdue": "Overdue"
-      },
-      "notes": {
-        "label": "Notes",
-        "placeholder": "Enter additional notes"
-      }
-    }
-  },
-  "Leave": {
-    "title": "Leave"
-  },
-  "Holidays": {
-    "title": "Holidays"
-  },
-  "Reports": {
-    "title": "Reports"
-  },
-  "Requests": {
-    "title": "Requests"
   },
   "EmployeeRequests": {
     "title": "Employee Requests",
     "description": "Employee Requests",
-    "add_new": "Add New Employee Request",
+    "add_new": "New Employee Request",
     "no_employee_requests_found": "No employee requests found",
     "search_requests": "Search employee requests...",
+    "update_employee_request": "Update Employee Request",
+    "delete": {
+      "title": "Delete Employee Request",
+      "description": "Are you sure you want to delete this request?"
+    },
     "form": {
       "validation": {
         "title_required": "Title is required",
@@ -2126,7 +1975,7 @@
         "amount_positive": "Amount must be a positive number"
       },
       "title": {
-        "label": "Title",
+        "label": "Request Title",
         "placeholder": "Enter request title",
         "required": "Title is required"
       },
@@ -2175,11 +2024,921 @@
         "approved": "Approved",
         "rejected": "Rejected"
       }
+    },
+    "success": {
+      "title": "Success",
+      "create": "Request created successfully",
+      "update": "Request updated successfully",
+      "delete": "Request deleted successfully",
+      "duplicate": "Request duplicated successfully"
+    },
+    "error": {
+      "create": "Failed to create request",
+      "update": "Failed to update request",
+      "delete": "Failed to delete request",
+      "duplicate": "Failed to duplicate request"
+    },
+    "loading": {
+      "create": "Creating request...",
+      "update": "Updating request...",
+      "delete": "Deleting request...",
+      "duplicate": "Duplicating request..."
+    }
+  },
+  "Clients": {
+    "title": "Clients",
+    "add_new": "New Client",
+    "create_client": "Add Client",
+    "back_to_list": "Back to List",
+    "client_details": "Client Details",
+    "search_clients": "Search clients...",
+    "no_clients_found": "No clients found",
+    "form": {
+      "validation": {
+        "name_required": "Name is required",
+        "email_required": "Email is required",
+        "email_invalid": "Invalid email",
+        "phone_required": "Phone number is required",
+        "address_required": "Address is required",
+        "city_required": "City is required",
+        "state_required": "State/Region is required",
+        "zip_code_required": "ZIP/Postal code is required"
+      },
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter client name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter client email"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Enter phone number"
+      },
+      "company": {
+        "label": "Company",
+        "placeholder": "Select or add a company",
+        "search_placeholder": "Search companies...",
+        "no_companies": "No companies found"
+      },
+      "address": {
+        "label": "Client Address",
+        "placeholder": "Enter client address"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city"
+      },
+      "state": {
+        "label": "State/Region",
+        "placeholder": "Enter state/region"
+      },
+      "zip_code": {
+        "label": "ZIP/Postal Code",
+        "placeholder": "Enter ZIP/Postal code"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter any additional notes"
+      }
+    },
+    "success": {
+      "title": "Success",
+      "create": "Client created successfully",
+      "update": "Client updated successfully",
+      "delete": "Client deleted successfully",
+      "duplicate": "Client duplicated successfully"
+    },
+    "error": {
+      "create": "Failed to create client",
+      "load_clients": "Failed to load clients",
+      "update": "Failed to update client",
+      "delete": "Failed to delete client",
+      "duplicate": "Failed to duplicate client"
+    },
+    "loading": {
+      "create": "Creating client...",
+      "update": "Updating client...",
+      "delete": "Deleting client...",
+      "duplicate": "Duplicating client..."
+    }
+  },
+  "Warehouses": {
+    "title": "Warehouses",
+    "singular": "Warehouse",
+    "add_new": "New Warehouse",
+    "warehouse_details": "Warehouse Details",
+    "search_warehouses": "Search warehouses...",
+    "name": "Name",
+    "name_required": "Warehouse name is required",
+    "enter_name": "Enter warehouse name",
+    "code": "Code",
+    "code_required": "Warehouse code is required",
+    "enter_code": "Enter warehouse code",
+    "address": "Address",
+    "enter_address": "Enter warehouse address",
+    "city": "City",
+    "enter_city": "Enter city",
+    "state": "State/Region",
+    "enter_state": "Enter state/region",
+    "zip": "ZIP/Postal Code",
+    "enter_zip": "Enter ZIP/Postal code",
+    "status": {
+      "title": "Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "select_status": "Select status",
+    "status_required": "Status is required",
+    "notes": "Notes",
+    "enter_notes": "Enter any additional notes",
+    "create_warehouse": "Create Warehouse",
+    "creating": "Creating...",
+    "no_warehouses": "No warehouses",
+    "add_first_warehouse": "Add your first warehouse",
+
+    "submitting": "Submitting...",
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter warehouse name",
+        "required": "Name is required"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Enter phone number"
+      },
+      "code": {
+        "label": "Code",
+        "placeholder": "Enter warehouse code",
+        "required": "Code is required"
+      },
+      "address": {
+        "label": "Warehouse Address",
+        "placeholder": "Enter warehouse address",
+        "required": "Warehouse address is required"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city",
+        "required": "City is required"
+      },
+      "state": {
+        "label": "State/Region",
+        "placeholder": "Enter state/region",
+        "required": "State/Region is required"
+      },
+      "zip": "ZIP/Postal Code",
+      "enter_zip": "Enter ZIP/Postal code",
+      "capacity": {
+        "label": "Capacity",
+        "placeholder": "Enter warehouse capacity"
+      },
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      },
+      "create_button": "Create Warehouse",
+      "update_button": "Update Warehouse"
+    },
+    "success": {
+      "create": "Warehouse created successfully",
+      "update": "Warehouse updated successfully",
+      "delete": "Warehouse deleted successfully",
+      "duplicate": "Warehouse duplicated successfully"
+    },
+    "loading": {
+      "create": "Creating warehouse...",
+      "update": "Updating warehouse...",
+      "delete": "Deleting warehouse...",
+      "duplicate": "Duplicating warehouse..."
+    },
+    "error": {
+      "create": "Error creating warehouse",
+      "update": "Error updating warehouse",
+      "delete": "Error deleting warehouse",
+      "duplicate": "Error duplicating warehouse"
+    }
+  },
+  "Branches": {
+    "title": "Branches",
+    "singular": "Branch",
+    "add_new": "New Branch",
+    "branch_details": "Branch Details",
+    "create_new": "Create Branch",
+    "no_branches_found": "No branches found",
+    "search_branches": "Search branches...",
+    "manager": "Manager",
+    "edit": "Edit Branch",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter branch name",
+        "required": "Name is required"
+      },
+      "code": {
+        "label": "Code",
+        "placeholder": "Enter branch code",
+        "required": "Code is required"
+      },
+      "address": {
+        "label": "Branch Address",
+        "placeholder": "Enter branch address",
+        "required": "Branch address is required"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city",
+        "required": "City is required"
+      },
+      "state": {
+        "label": "State/Region",
+        "placeholder": "Enter state/region",
+        "required": "State/Region is required"
+      },
+      "zip_code": {
+        "label": "ZIP/Postal Code",
+        "placeholder": "Enter ZIP/Postal code",
+        "required": "ZIP/Postal code is required"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Enter phone number"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter email address",
+        "invalid": "Invalid email format"
+      },
+      "manager": {
+        "label": "Manager",
+        "placeholder": "Enter manager name"
+      },
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      },
+      "update_button": "Update Branch",
+      "create_button": "Create Branch"
+    },
+    "success": {
+      "create": "Branch created successfully",
+      "update": "Branch updated successfully",
+      "delete": "Branch deleted successfully",
+      "duplicate": "Branch duplicated successfully"
+    },
+    "loading": {
+      "create": "Creating branch...",
+      "update": "Updating branch...",
+      "delete": "Deleting branch...",
+      "duplicate": "Duplicating branch..."
+    },
+    "error": {
+      "create": "Error creating branch",
+      "update": "Error updating branch",
+      "delete": "Error deleting branch",
+      "duplicate": "Error duplicating branch"
+    }
+  },
+  "Vendors": {
+    "title": "Vendors",
+    "singular": "Vendor",
+    "add_new": "New Vendor",
+    "back_to_list": "Back to List",
+    "vendor_details": "Vendor Details",
+    "no_vendors": "No vendors found",
+    "search_vendors": "Search vendors...",
+    "add_first_vendor": "Add your first vendor",
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter name",
+        "required": "Name is required"
+      },
+      "company": {
+        "label": "Company",
+        "placeholder": "Enter company name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter email address",
+        "required": "Email is required",
+        "invalid": "Invalid email format"
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Enter phone number",
+        "required": "Phone number is required"
+      },
+      "address": {
+        "label": "Vendor Address",
+        "placeholder": "Enter vendor address",
+        "required": "Vendor address is required"
+      },
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city",
+        "required": "City is required"
+      },
+      "state": {
+        "label": "State/Region",
+        "placeholder": "Enter state/region",
+        "required": "State/Region is required"
+      },
+      "zip_code": {
+        "label": "ZIP/Postal Code",
+        "placeholder": "Enter ZIP/Postal code",
+        "required": "ZIP/Postal code is required"
+      },
+      "products": {
+        "label": "Products/Services",
+        "placeholder": "Enter products or services"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      }
+    },
+    "success": {
+      "create": "Vendor created successfully",
+      "update": "Vendor updated successfully",
+      "delete": "Vendor deleted successfully",
+      "duplicate": "Vendor duplicated successfully"
+    },
+    "loading": {
+      "create": "Creating vendor...",
+      "update": "Updating vendor...",
+      "delete": "Deleting vendor...",
+      "duplicate": "Duplicating vendor..."
+    },
+    "error": {
+      "create": "Error creating vendor",
+      "update": "Error updating vendor",
+      "delete": "Error deleting vendor",
+      "duplicate": "Error duplicating vendor"
+    }
+  },
+  "Attendance": {
+    "title": "Attendance",
+    "today": "Today's Attendance",
+    "check_in": "Check In",
+    "check_out": "Check Out",
+    "total_hours": "Total Hours",
+    "history": "Attendance History",
+    "date": "Date",
+    "employee": "Employee",
+    "status": {
+      "present": "Present",
+      "absent": "Absent",
+      "late": "Late",
+      "half_day": "Half Day",
+      "on_leave": "On Leave"
+    },
+    "report": {
+      "title": "Attendance Report",
+      "generate": "Generate Report",
+      "daily": "Daily Report",
+      "weekly": "Weekly Report",
+      "monthly": "Monthly Report"
+    },
+    "filter": {
+      "all": "All Employees",
+      "department": "Filter by Department",
+      "date_range": "Date Range"
+    },
+    "no_records": "No attendance records found",
+    "messages": {
+      "check_in_success": "Checked in successfully",
+      "check_out_success": "Checked out successfully",
+      "already_checked_in": "Already checked in for today",
+      "not_checked_in": "Not checked in yet",
+      "error": "An error occurred while processing your request"
+    }
+  },
+  "Users": {
+    "title": "Users",
+    "add_new": "New User",
+    "user_details": "User Details",
+    "login_details": "Login Details",
+    "personal_info": "Personal Information",
+    "permissions": "Permissions",
+    "no_users": "No users found",
+    "active_users": "Active Users",
+    "inactive_users": "Inactive Users",
+    "search_placeholder": "Search users...",
+    "add_dialog": {
+      "title": "New User",
+      "description": "Fill in the details to create a new user. They will belong to the same enterprise."
+    },
+    "permissions_popover": "Permissions",
+    "created_at_never": "Never",
+    "actions": {
+      "open_menu": "Open menu",
+      "edit": "Edit User",
+      "delete": "Delete User",
+      "activate": "Activate User",
+      "deactivate": "Deactivate User",
+      "reset_password": "Reset Password"
+    },
+    "edit_dialog": {
+      "title": "Edit User",
+      "description": "Make changes to the user profile here.",
+      "email_label": "Email",
+      "role_label": "Role",
+      "select_role_placeholder": "Select Role",
+      "save_button": "Save Changes"
+    },
+    "delete_dialog": {
+      "title": "Delete User",
+      "description": "Are you sure you want to delete this user? This action cannot be undone.",
+      "user_prefix": "User: ",
+      "no_email": "No email",
+      "delete_button": "Delete"
+    },
+
+    "form": {
+      "first_name": {
+        "label": "First Name",
+        "placeholder": "Enter first name",
+        "required": "First name is required"
+      },
+      "last_name": {
+        "label": "Last Name",
+        "placeholder": "Enter last name",
+        "required": "Last name is required"
+      },
+      "name": {
+        "label": "Full Name",
+        "placeholder": "Enter full name",
+        "required": "Full name is required"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter email address",
+        "required": "Email is required",
+        "invalid": "Invalid email format"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Enter password",
+        "required": "Password is required",
+        "min_length": "Password must be at least 8 characters long",
+        "confirm": "Confirm Password",
+        "confirm_placeholder": "Confirm password",
+        "mismatch": "Passwords do not match"
+      },
+      "role": {
+        "label": "Role",
+        "placeholder": "Select a role",
+        "required": "Role is required",
+        "admin": "System Administrator",
+        "manager": "Manager",
+        "employee": "Employee",
+        "user": "Regular User",
+        "search_placeholder": "Search for role..."
+      },
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "suspended": "Suspended"
+      },
+      "phone": {
+        "label": "Phone Number",
+        "placeholder": "Enter phone number"
+      },
+      "department": {
+        "label": "Department",
+        "placeholder": "Select department"
+      },
+      "avatar": {
+        "label": "Avatar",
+        "upload": "Upload Image",
+        "remove": "Remove Image"
+      },
+      "permissions": {
+        "label": "Permissions",
+        "placeholder": "Select permissions"
+      },
+      "created_at": {
+        "label": "Created At"
+      },
+      "updated_at": {
+        "label": "Updated At"
+      }
+    },
+    "messages": {
+      "create": "User created successfully",
+      "update": "User updated successfully",
+      "delete": "User deleted successfully",
+      "error": "An error occurred while processing your request"
+    },
+    "success": {
+      "create": "User created successfully",
+      "update": "User updated successfully",
+      "delete": "User deleted successfully"
+    },
+    "error": {
+      "create": "Error creating user",
+      "update": "Error updating user",
+      "delete": "Error deleting user"
+    }
+  },
+  "Locations": {
+    "title": "Locations",
+    "add_new": "New Location",
+    "search_locations": "Search locations...",
+    "no_locations": "No locations found",
+    "types": {
+      "office": "Office",
+      "branch": "Branch",
+      "warehouse": "Warehouse"
+    }
+  },
+  "Salaries": {
+    "title": "Salaries",
+    "add_new": "New Salary",
+    "create_salary": "Add Salary",
+    "edit_salary": "Edit Salary",
+    "delete_salary": "Delete Salary",
+    "search_salaries": "Search salaries...",
+    "confirm_delete": "Are you sure you want to delete {count, plural, =0 {salary} =1 {this salary} other {# salaries}}?",
+    "delete_description": "All data associated with {count, plural, =0 {salary} =1 {this salary} other {# salaries}} will be deleted",
+    "no_salaries_found": "No salaries found",
+    "salary_details": "Salary Details",
+    "success": {
+      "title": "Success",
+      "deleted": "Salary deleted successfully"
+    },
+    "error": {
+      "title": "Error",
+      "delete": "Failed to delete salary"
+    },
+    "messages": {
+      "success_deleted": "Salary deleted successfully",
+      "error_delete": "Failed to delete salary",
+      "error_not_authenticated": "You must be logged in to create a salary",
+      "success_created": "Salary created successfully"
+    },
+    "table": {
+      "employee_name": "Employee Name",
+      "gross_amount": "Gross Amount",
+      "net_amount": "Net Amount",
+      "payment_date": "Payment Date",
+      "pay_period_start": "Pay Period Start",
+      "pay_period_end": "Pay Period End",
+      "actions": "Actions"
+    },
+    "form": {
+      "employee_name": {
+        "label": "Employee Name",
+        "placeholder": "Enter employee name",
+        "required": "Employee name is required"
+      },
+      "gross_amount": {
+        "label": "Gross Amount",
+        "placeholder": "Enter gross amount",
+        "required": "Gross amount is required"
+      },
+      "net_amount": {
+        "label": "Net Amount",
+        "placeholder": "Enter net amount",
+        "required": "Net amount is required"
+      },
+      "payment_date": {
+        "label": "Payment Date",
+        "required": "Payment date is required",
+        "placeholder": "Select payment date"
+      },
+      "pay_period_start": {
+        "label": "Pay Period Start",
+        "required": "Pay period start date is required",
+        "placeholder": "Select pay period start date"
+      },
+      "pay_period_end": {
+        "label": "Pay Period End",
+        "required": "Pay period end date is required",
+        "placeholder": "Select pay period end date"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter any additional notes"
+      },
+      "deductions": {
+        "label": "Deductions",
+        "placeholder": "Enter deductions",
+        "required": "Deductions are required",
+        "add": "Add Deduction",
+        "remove": "Remove Deduction",
+        "invalid_json": "Deductions are invalid"
+      },
+      "deduction_type": {
+        "label": "Deduction Type",
+        "placeholder": "Select deduction type",
+        "required": "Deduction type is required"
+      },
+      "deduction_type_options": {
+        "tax": "Tax",
+        "insurance": "Insurance",
+        "loan_payment": "Loan Payment",
+        "advance_repayment": "Advance Repayment",
+        "other": "Other",
+        "absences": "Absences"
+      },
+      "deduction_amount": {
+        "label": "Deduction Amount",
+        "placeholder": "Enter deduction amount",
+        "required": "Deduction amount is required"
+      }
+    }
+  },
+  "Administration": {
+    "title": "Administration"
+  },
+  "Accounting": {
+    "title": "Accounting"
+  },
+  "HumanResources": {
+    "title": "Human Resources"
+  },
+  "Jobs": {
+    "title": "Jobs",
+    "create_job": "Create Job",
+    "add_job": "Add Job",
+    "edit_job": "Edit Job",
+    "job_details": "Job Details",
+    "add_new": "New Job",
+    "back_to_list": "Back to List",
+    "no_jobs_found": "No jobs found",
+    "failed_to_fetch_jobs": "Failed to fetch jobs",
+    "search_jobs": "Search jobs...",
+
+    "form": {
+      "title": {
+        "label": "Job Title",
+        "placeholder": "Enter job title",
+        "required": "Job title is required"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter job description"
+      },
+      "requirements": {
+        "label": "Requirements",
+        "placeholder": "Enter job requirements"
+      },
+      "location": {
+        "label": "Location",
+        "placeholder": "Enter job location"
+      },
+      "department": {
+        "label": "Department",
+        "placeholder": "Enter department",
+        "required": "Department is required"
+      },
+      "type": {
+        "label": "Job Type",
+        "placeholder": "Select job type",
+        "full_time": "Full-time",
+        "part_time": "Part-time",
+        "contract": "Contract",
+        "internship": "Internship",
+        "temporary": "Temporary",
+        "required": "Job type is required"
+      },
+      "salary": {
+        "label": "Salary",
+        "placeholder": "Enter salary",
+        "required": "Salary is required"
+      },
+
+      "start_date": {
+        "label": "Start Date",
+        "placeholder": "Enter start date"
+      },
+      "end_date": {
+        "label": "End Date",
+        "placeholder": "Enter end date"
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Select status",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "created_at": {
+        "label": "Created At"
+      },
+      "updated_at": {
+        "label": "Updated At"
+      }
+    },
+    "success": {
+      "create": "Job created successfully",
+      "update": "Job updated successfully",
+      "delete": "Job deleted successfully",
+      "duplicate": "Job duplicated successfully"
+    },
+    "loading": {
+      "create": "Creating job...",
+      "update": "Updating job...",
+      "delete": "Deleting job...",
+      "duplicate": "Duplicating job..."
+    },
+    "error": {
+      "create": "Error creating job",
+      "update": "Error updating job",
+      "delete": "Error deleting job",
+      "duplicate": "Error duplicating job"
+    }
+  },
+  "SystemAdmin": {
+    "title": "System Administration"
+  },
+  "JobListings": {
+    "title": "Job Listings",
+    "create_listing": "Create Job Listing",
+    "add_new": "New Job Listing",
+    "search_listings": "Search job listings...",
+    "listing_details": "Job Listing Details",
+    "jobs_section": {
+      "title": "Jobs",
+      "subtitle": "Select the jobs you want to publish on this listing",
+      "add_new": "New Job"
+    },
+    "jobs_count": {
+      "label": "Number of Jobs"
+    },
+    "options": {
+      "title": "Job Listing Settings",
+      "currencyLabel": "Salary Currency",
+      "currencyPlaceholder": "Select salary currency",
+      "searchFilteringLabel": "Search & Filtering",
+      "locationsLabel": "Locations",
+      "locationsPlaceholder": "Select locations",
+      "departmentsLabel": "Departments",
+      "departmentsPlaceholder": "Select departments",
+      "enableSearchFilteringLabel": "Enable Search & Filtering",
+      "enableSearchFilteringPlaceholder": "Enable search and filtering",
+      "searchFilteringDescription": "You can enable search and filtering for users to find the jobs they need"
+    },
+
+    "status": {
+      "title": "Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "form": {
+      "title": {
+        "label": "Listing Title",
+        "placeholder": "Enter listing title",
+        "required": "Listing title is required"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter listing description"
+      },
+      "jobs": {
+        "label": "Jobs",
+        "placeholder": "Select jobs",
+        "required": "At least one job must be selected"
+      },
+
+      "status": {
+        "label": "Status",
+        "placeholder": "Select status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "published": "Published",
+        "unpublished": "Unpublished"
+      },
+      "created_at": {
+        "label": "Created At"
+      },
+      "slug": {
+        "label": "Unique Link Identifier",
+        "placeholder": "Enter unique link identifier (used in URL)"
+      }
+    },
+    "not_found": {
+      "title": "Job Listing Not Found",
+      "desc": "We could not find the job listing. The listing may not exist or the code may be invalid",
+      "create_new": "Create New Job Listing",
+      "looking_to_hire": "Looking to hire?",
+      "our_platform": "Our platform helps you create job listings, manage applicants, and organize your hiring process.",
+      "companies_using_platform": "Companies using our platform",
+      "faster_hiring_process": "Faster hiring process"
+    },
+    "success": {
+      "title": "Success",
+      "create": "Listing created successfully",
+      "update": "Listing updated successfully",
+      "delete": "Listing deleted successfully",
+      "duplicate": "Listing duplicated successfully"
+    },
+    "error": {
+      "create": "Failed to create listing",
+      "load": "Failed to load listings",
+      "update": "Failed to update listing",
+      "delete": "Failed to delete listing",
+      "duplicate": "Failed to duplicate listing"
+    },
+    "loading": {
+      "create": "Creating listing...",
+      "update": "Updating listing...",
+      "delete": "Deleting listing...",
+      "duplicate": "Duplicating listing..."
+    }
+  },
+  "Expenses": {
+    "title": "Expenses",
+    "description": "Manage and track expenses",
+    "add_new": "New Expense",
+    "search_expenses": "Search expenses",
+    "no_expenses_found": "No expenses found",
+    "confirm_delete_title": "Confirm Expense Deletion",
+    "confirm_delete": "Are you sure you want to delete {count} expense(s)?",
+    "success": {
+      "title": "Success",
+      "create": "Expense created successfully",
+      "update": "Expense updated successfully",
+      "delete": "Expense deleted successfully",
+      "duplicate": "Expense duplicated successfully"
+    },
+    "error": {
+      "create": "Failed to create expense",
+      "load": "Failed to load expenses",
+      "update": "Failed to update expense",
+      "delete": "Failed to delete expense",
+      "duplicate": "Failed to duplicate expense"
+    },
+    "loading": {
+      "create": "Creating expense...",
+      "update": "Updating expense...",
+      "delete": "Deleting expense...",
+      "duplicate": "Duplicating expense..."
+    },
+    "form": {
+      "expense_number": {
+        "label": "Expense Number",
+        "placeholder": "Enter expense number",
+        "required": "Expense number is required"
+      },
+      "issue_date": {
+        "label": "Issue Date",
+        "placeholder": "Select issue date",
+        "required": "Issue date is required"
+      },
+      "due_date": {
+        "label": "Due Date",
+        "placeholder": "Select due date",
+        "required": "Due date is required"
+      },
+      "amount": {
+        "label": "Amount",
+        "placeholder": "Enter amount",
+        "required": "Amount is required"
+      },
+      "category": {
+        "label": "Category",
+        "placeholder": "Select category",
+        "required": "Category is required"
+      },
+      "client": {
+        "label": "Client",
+        "placeholder": "Select client"
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Select status",
+        "pending": "Pending",
+        "paid": "Paid",
+        "overdue": "Overdue"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter additional notes"
+      }
     }
   },
   "Applicants": {
     "title": "Applicants",
-    "add_new": "Add New Applicant",
+    "add_new": "New Applicant",
     "applicant_details": "Applicant Details",
     "back_to_list": "Back to List",
     "no_applicants": "No applicants found",
@@ -2201,14 +2960,14 @@
         "required": "Phone number is required"
       },
       "position": {
-        "label": "Position Applied For",
+        "label": "Applied Position",
         "placeholder": "Enter position",
         "required": "Position is required"
       },
       "resume": {
-        "label": "Resume/CV",
-        "placeholder": "Upload resume/CV",
-        "required": "Resume/CV is required"
+        "label": "Resume",
+        "placeholder": "Upload resume",
+        "required": "Resume is required"
       },
       "cover_letter": {
         "label": "Cover Letter",
@@ -2253,322 +3012,74 @@
       "delete": "Delete",
       "change_status": "Change Status"
     },
-    "messages": {
-      "creating": "Creating applicant...",
-      "create": "Create Applicant",
-      "created": "Applicant created successfully",
-      "updated": "Applicant updated successfully",
-      "deleted": "Applicant deleted successfully",
-      "error": "An error occurred while processing your request"
-    }
-  },
-  "Attendance": {
-    "title": "Attendance",
-    "today": "Today's Attendance",
-    "check_in": "Check In",
-    "check_out": "Check Out",
-    "total_hours": "Total Hours",
-    "history": "Attendance History",
-    "date": "Date",
-    "employee": "Employee",
-    "status": {
-      "present": "Present",
-      "absent": "Absent",
-      "late": "Late",
-      "half_day": "Half Day",
-      "on_leave": "On Leave"
+    "success": {
+      "create": "Applicant created successfully",
+      "update": "Applicant updated successfully",
+      "delete": "Applicant deleted successfully",
+      "duplicate": "Applicant duplicated successfully"
     },
-    "report": {
-      "title": "Attendance Report",
-      "generate": "Generate Report",
-      "daily": "Daily Report",
-      "weekly": "Weekly Report",
-      "monthly": "Monthly Report"
+    "error": {
+      "create": "Failed to create applicant",
+      "load": "Failed to load applicants",
+      "update": "Failed to update applicant",
+      "delete": "Failed to delete applicant",
+      "duplicate": "Failed to duplicate applicant"
     },
-    "filter": {
-      "all": "All Employees",
-      "department": "Filter by Department",
-      "date_range": "Date Range"
-    },
-    "no_records": "No attendance records found",
-    "messages": {
-      "check_in_success": "Checked in successfully",
-      "check_out_success": "Checked out successfully",
-      "already_checked_in": "Already checked in today",
-      "not_checked_in": "Not checked in yet",
-      "error": "An error occurred while processing your request"
-    }
-  },
-  "Users": {
-    "title": "Users",
-    "add_new": "Add New User",
-    "user_details": "User Details",
-    "login_details": "Login Details",
-    "personal_info": "Personal Information",
-    "permissions": "Permissions & Roles",
-    "no_users": "No users found",
-    "active_users": "Active Users",
-    "inactive_users": "Inactive Users",
-    "search_placeholder": "Search users...",
-    "add_dialog": {
-      "title": "Add New User",
-      "description": "Fill in the details to create a new user. They will belong to the same enterprise."
-    },
-    "table": {
-      "head": {
-        "email": "Email",
-        "role": "Role",
-        "permissions": "Permissions",
-        "created_at": "Created At",
-        "actions": "Actions"
-      },
-      "no_users": "No users found.",
-      "permissions_popover": "Permissions",
-      "created_at_never": "Never"
-    },
-    "actions": {
-      "open_menu": "Open menu",
-      "edit": "Edit User",
-      "delete": "Delete User",
-      "activate": "Activate User",
-      "deactivate": "Deactivate User",
-      "reset_password": "Reset Password"
-    },
-    "edit_dialog": {
-      "title": "Edit User",
-      "description": "Make changes to the user's profile here.",
-      "email_label": "Email",
-      "role_label": "Role",
-      "select_role_placeholder": "Select role",
-      "save_button": "Save changes"
-    },
-    "delete_dialog": {
-      "title": "Delete User",
-      "description": "Are you sure you want to delete this user? This action cannot be undone.",
-      "user_prefix": "User: ",
-      "no_email": "No email",
-      "delete_button": "Delete"
-    },
-    "toast": {
-      "success": {
-        "updated": "User updated",
-        "updated_description": "User information has been updated successfully.",
-        "deleted": "User deleted",
-        "deleted_description": "User has been deleted successfully."
-      },
-      "error": {
-        "update_failed": "Failed to update user information.",
-        "update_failed_description": "Failed to update user information.",
-        "delete_failed": "Failed to delete user.",
-        "delete_failed_description": "Failed to delete user."
-      }
-    },
-    "form": {
-      "name": {
-        "label": "Full Name",
-        "placeholder": "Enter full name",
-        "required": "Full name is required"
-      },
-      "email": {
-        "label": "Email",
-        "placeholder": "Enter email address",
-        "required": "Email is required"
-      },
-      "password": {
-        "label": "Password",
-        "placeholder": "Enter password",
-        "required": "Password is required"
-      },
-      "role": {
-        "label": "Role",
-        "placeholder": "Select a role",
-        "required": "Role is required"
-      },
-      "status": {
-        "label": "Status",
-        "placeholder": "Select status"
-      },
-      "phone": {
-        "label": "Phone",
-        "placeholder": "Enter phone number"
-      },
-      "department": {
-        "label": "Department",
-        "placeholder": "Select department"
-      },
-      "avatar": {
-        "label": "Profile Picture",
-        "upload": "Upload Image",
-        "remove": "Remove Image"
-      }
-    }
-  },
-  "Warehouses": {
-    "title": "Warehouses",
-    "add_new": "Add New Warehouse",
-    "warehouse_details": "Warehouse Details",
-    "create_warehouse": "Create Warehouse",
-    "no_warehouses_found": "No warehouses found",
-    "search_warehouses": "Search warehouses...",
-    "capacity": "Capacity",
-    "manager": "Manager",
-    "edit": "Edit Warehouse",
-    "status": {
-      "active": "Active",
-      "inactive": "Inactive"
-    },
-    "form": {
-      "name": {
-        "label": "Name",
-        "placeholder": "Enter warehouse name",
-        "required": "Name is required"
-      },
-      "code": {
-        "label": "Code",
-        "placeholder": "Enter warehouse code",
-        "required": "Code is required"
-      },
-      "address": {
-        "label": "Address",
-        "placeholder": "Enter address",
-        "required": "Address is required"
-      },
-      "city": {
-        "label": "City",
-        "placeholder": "Enter city",
-        "required": "City is required"
-      },
-      "state": {
-        "label": "State",
-        "placeholder": "Enter state",
-        "required": "State is required"
-      },
-      "zip_code": {
-        "label": "ZIP Code",
-        "placeholder": "Enter ZIP code",
-        "required": "ZIP code is required"
-      },
-      "capacity": {
-        "label": "Capacity",
-        "placeholder": "Enter warehouse capacity"
-      },
-      "is_active": {
-        "label": "Active"
-      },
-      "notes": {
-        "label": "Notes",
-        "placeholder": "Enter notes"
-      },
-      "create_button": "Create Warehouse",
-      "update_button": "Update Warehouse"
-    },
-    "messages": {
-      "error_fetch": "Failed to fetch warehouse",
-      "error_save": "Failed to save warehouse",
-      "success_updated": "Warehouse updated successfully",
-      "success_created": "Warehouse created successfully"
-    },
-    "errorLoadingWarehouses": "Error loading warehouses"
-  },
-  "Branches": {
-    "title": "Branches",
-    "add_new": "Add New Branch",
-    "branch_details": "Branch Details",
-    "create_branch": "Create Branch",
-    "no_branches_found": "No branches found",
-    "search_branches": "Search branches...",
-    "manager": "Manager",
-    "edit": "Edit Branch",
-    "status": {
-      "active": "Active",
-      "inactive": "Inactive"
-    },
-    "form": {
-      "name": {
-        "label": "Name",
-        "placeholder": "Enter branch name",
-        "required": "Name is required"
-      },
-      "code": {
-        "label": "Code",
-        "placeholder": "Enter branch code",
-        "required": "Code is required"
-      },
-      "address": {
-        "label": "Address",
-        "placeholder": "Enter address",
-        "required": "Address is required"
-      },
-      "city": {
-        "label": "City",
-        "placeholder": "Enter city",
-        "required": "City is required"
-      },
-      "state": {
-        "label": "State",
-        "placeholder": "Enter state",
-        "required": "State is required"
-      },
-      "zip_code": {
-        "label": "ZIP Code",
-        "placeholder": "Enter ZIP code",
-        "required": "ZIP code is required"
-      },
-      "phone": {
-        "label": "Phone",
-        "placeholder": "Enter phone number"
-      },
-      "email": {
-        "label": "Email",
-        "placeholder": "Enter email address",
-        "invalid": "Invalid email format"
-      },
-      "manager": {
-        "label": "Manager",
-        "placeholder": "Enter manager name"
-      },
-      "is_active": {
-        "label": "Active Status"
-      },
-      "notes": {
-        "label": "Notes",
-        "placeholder": "Enter notes"
-      },
-      "update_button": "Update Branch",
-      "create_button": "Create Branch"
-    },
-    "messages": {
-      "error_fetch": "Failed to fetch branch",
-      "error_save": "Failed to save branch",
-      "success_updated": "Branch updated successfully",
-      "success_created": "Branch created successfully"
-    }
-  },
-  "Locations": {
-    "title": "Locations",
-    "types": {
-      "office": "Office",
-      "branch": "Branch",
-      "warehouse": "Warehouse"
+    "loading": {
+      "create": "Creating applicant...",
+      "update": "Updating applicant...",
+      "delete": "Deleting applicant...",
+      "duplicate": "Duplicating applicant..."
     }
   },
   "Recruitment": {
     "title": "Recruitment"
   },
+  "Leave": {
+    "title": "Leave"
+  },
   "Employees": {
     "title": "Employees",
-    "add_new": "Add New Employee",
+    "add_new": "New Employee",
     "add_employee": "Add Employee",
+    "update_employee": "Update Employee",
+    "search_employees": "Search employees",
+    "cancel": "Cancel",
     "employee_details": "Employee Details",
     "edit": "Edit Employee",
     "back_to_list": "Back to List",
     "allEmployees": "All Employees",
-    "search_employees": "Search employees...",
-    "no_employees": "No employees found",
-    "add_first_employee": "Add your first employee",
-    "email_label": "Email: {value}",
-    "phone_label": "Phone: {value}",
-    "department_label": "Department: {value}",
+    "salary_section_title": "Salary Information",
+    "success": {
+      "create": "Employee created successfully",
+      "update": "Employee updated successfully",
+      "delete": "Employee deleted successfully",
+      "duplicate": "Employee duplicated successfully"
+    },
+    "loading": {
+      "create": "Creating employee...",
+      "update": "Updating employee...",
+      "delete": "Deleting employee...",
+      "duplicate": "Duplicating employee..."
+    },
+    "error": {
+      "create": "Error creating employee",
+      "update": "Error updating employee",
+      "delete": "Error deleting employee",
+      "duplicate": "Error duplicating employee"
+    },
+    "salary_types": {
+      "base": "Base Salary",
+      "bonus": "Bonuses",
+      "allowance": "Allowances",
+      "deduction": "Deductions",
+      "commission": "Commissions",
+      "overtime": "Overtime",
+      "health_insurance": "Health Insurance",
+      "housing": "Housing Allowance",
+      "transportation": "Transportation Allowance",
+      "other": "Other"
+    },
     "form": {
       "first_name": {
         "label": "First Name",
@@ -2581,16 +3092,16 @@
         "required": "Last name is required"
       },
       "name": {
-        "label": "Full Name",
-        "placeholder": "Enter full name",
-        "required": "Full name is required"
+        "label": "Name",
+        "placeholder": "Enter name",
+        "required": "Name is required"
       },
       "email": {
         "label": "Email",
-        "placeholder": "Enter email address",
+        "placeholder": "Enter email",
         "required": "Email is required",
-        "invalid": "Invalid email address",
-        "duplicate": "Email address is already in use"
+        "invalid": "Invalid email format",
+        "duplicate": "Email is already used by another employee"
       },
       "phone": {
         "label": "Phone Number",
@@ -2612,13 +3123,19 @@
         "placeholder": "Enter hire date",
         "required": "Hire date is required"
       },
+
       "salary": {
         "label": "Salary",
         "placeholder": "Enter salary",
-        "required": "Salary is required"
-      },
-      "is_active": {
-        "label": "Active Status"
+        "required": "Salary is required",
+        "amount_label": "Amount",
+        "amount_placeholder": "Enter amount",
+        "type_label": "Salary Type",
+        "type_placeholder": "Enter salary type",
+        "add_component": "Add Component",
+        "total": "Total",
+        "total_label": "Total",
+        "total_placeholder": "Enter total"
       },
       "status": {
         "label": "Status",
@@ -2634,103 +3151,153 @@
         "label": "Notes",
         "placeholder": "Enter notes"
       }
-    },
-    "messages": {
-      "creating": "Creating employee...",
-      "create": "Create Employee",
-      "create_employee": "Create Employee",
-      "created": "Employee created successfully",
-      "updated": "Employee updated successfully",
-      "deleted": "Employee deleted successfully",
-      "error": "An error occurred while processing your request"
-    },
-    "success": {
-      "created": "Employee created successfully"
-    },
-    "error": {
-      "create": "Failed to create employee"
     }
   },
   "Contacts": {
     "title": "Contacts",
     "all": "All Contacts",
-    "add_new": "Add New Contact",
+    "add_new": "New Contact",
     "name": "Name",
     "email": "Email",
     "phone": "Phone",
     "address": "Address"
   },
+  "Forms": {
+    "description": {
+      "label": "Description",
+      "placeholder": "Enter description"
+    },
+    "created_at": {
+      "label": "Created At",
+      "placeholder": "Enter creation date"
+    },
+    "updated_at": {
+      "label": "Updated At",
+      "placeholder": "Enter update date"
+    }
+  },
   "Companies": {
     "title": "Companies",
-    "add_new": "Add New Company",
-    "search_companies": "Search companies",
-    "no_companies_found": "No companies found",
-    "edit_company": "Edit Company",
+    "add_new": "Add Company",
     "company_details": "Company Details",
     "create_company": "Create Company",
     "creating_company": "Creating company...",
-    "error_loading_companies": "Error loading companies",
+    "edit_company": "Edit Company",
+    "search_companies": "Search companies",
+    "back_to_list": "Back to List",
+    "no_companies_found": "No companies found",
+    "confirm_delete": "Are you sure you want to delete {count, plural, =0 {no company} =1 {this company} other {# companies}}?",
+    "delete_description": "All data associated with {count, plural, =0 {no company} =1 {this company} other {# companies}} will be deleted",
     "form": {
       "name": {
         "label": "Name",
-        "required": "Name is required"
-      },
-      "industry": {
-        "label": "Industry"
+        "placeholder": "Enter company name"
       },
       "email": {
         "label": "Email",
-        "required": "Email is required",
-        "invalid": "Invalid email"
+        "placeholder": "fulan@example.com"
       },
       "phone": {
-        "label": "Phone"
+        "label": "Phone",
+        "placeholder": "Enter company phone number"
       },
       "website": {
         "label": "Website",
-        "invalid": "Invalid URL"
+        "placeholder": "https://www.example.com"
       },
       "address": {
-        "label": "Address"
+        "label": "Company Address",
+        "placeholder": "Enter company address"
       },
-      "city": {
-        "label": "City"
+      "short_address": {
+        "label": "Short National Address",
+        "placeholder": "4 letters and 4 numbers code",
+        "explainer": {
+          "title": "Fetch Address",
+          "description": "Use Saudi Post database to fetch address details"
+        }
       },
-      "state": {
-        "label": "State"
+      "building_number": {
+        "label": "Building Number",
+        "placeholder": "Enter building number"
       },
-      "zip_code": {
-        "label": "Zip Code",
-        "required": "Zip code is required"
+      "street_name": {
+        "label": "Street Name",
+        "placeholder": "Enter street name"
       },
-      "is_active": {
-        "label": "Status"
+      "additional_number": {
+        "label": "Additional Number",
+        "placeholder": "Enter additional number"
       },
-      "size": {
-        "label": "Size"
+      "region": {
+        "label": "Region",
+        "placeholder": "Enter region"
       },
 
+      "city": {
+        "label": "City",
+        "placeholder": "Enter city"
+      },
+      "country": {
+        "label": "Country",
+        "placeholder": "Enter country"
+      },
+      "state": {
+        "label": "State/Region",
+        "placeholder": "Enter state/region"
+      },
+      "zip_code": {
+        "label": "ZIP/Postal Code",
+        "placeholder": "Enter ZIP/Postal code"
+      },
+      "industry": {
+        "label": "Industry",
+        "placeholder": "Enter company industry"
+      },
+      "size": {
+        "label": "Company Size",
+        "placeholder": "Enter company size"
+      },
       "notes": {
-        "label": "Notes"
+        "label": "Notes",
+        "placeholder": "Enter notes"
+      },
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "published": "Published",
+        "unpublished": "Unpublished"
+      },
+      "validation": {
+        "name_required": "Company name is required",
+        "email_required": "Email is required",
+        "email_invalid": "Invalid email format"
+      },
+      "created_at": {
+        "label": "Created At"
+      },
+      "updated_at": {
+        "label": "Updated At"
       }
     },
-    "messages": {
-      "creating": "Creating company...",
-      "create": "Create Company",
-      "created": "Company created successfully",
-      "updated": "Company updated successfully",
-      "deleted": "Company deleted successfully",
-      "error": "An error occurred while processing your request"
-    },
     "success": {
-      "created": "Company created successfully",
-      "updated": "Company updated successfully",
-      "deleted": "Company deleted successfully"
+      "create": "Company created successfully",
+      "update": "Company updated successfully",
+      "delete": "Company deleted successfully",
+      "duplicate": "Company duplicated successfully"
+    },
+    "loading": {
+      "create": "Creating company...",
+      "update": "Updating company...",
+      "delete": "Deleting company...",
+      "duplicate": "Duplicating company..."
     },
     "error": {
-      "creating": "An error occurred while creating the company",
-      "updating": "An error occurred while updating the company",
-      "deleting": "An error occurred while deleting the company"
+      "create": "Error creating company",
+      "update": "Error updating company",
+      "delete": "Error deleting company",
+      "duplicate": "Error duplicating company"
     }
   },
   "Navigation": {
@@ -2740,27 +3307,28 @@
   },
   "Offices": {
     "title": "Offices",
-    "add_new": "Add New Office",
+    "add_new": "New Office",
+    "singular": "Office",
     "office_details": "Office Details",
     "back_to_list": "Back to List",
     "no_offices": "No offices found",
-    "table": {
-      "name": "Name",
-      "address": "Address",
-      "phone": "Phone",
-      "email": "Email",
-      "status": "Status"
-    },
+    "search_offices": "Search offices",
+
     "form": {
       "name": {
         "label": "Name",
         "placeholder": "Enter office name",
         "required": "Name is required"
       },
+      "code": {
+        "label": "Code",
+        "placeholder": "Enter code",
+        "required": "Code is required"
+      },
       "address": {
-        "label": "Address",
-        "placeholder": "Enter address",
-        "required": "Address is required"
+        "label": "Office Address",
+        "placeholder": "Enter office address",
+        "required": "Office address is required"
       },
       "city": {
         "label": "City",
@@ -2768,14 +3336,14 @@
         "required": "City is required"
       },
       "state": {
-        "label": "State",
-        "placeholder": "Enter state",
-        "required": "State is required"
+        "label": "State/Region",
+        "placeholder": "Enter state/region",
+        "required": "State/Region is required"
       },
       "zip_code": {
-        "label": "Zip Code",
-        "placeholder": "Enter zip code",
-        "required": "Zip code is required"
+        "label": "ZIP/Postal Code",
+        "placeholder": "Enter ZIP/Postal code",
+        "required": "ZIP/Postal code is required"
       },
       "phone": {
         "label": "Phone",
@@ -2783,74 +3351,342 @@
       },
       "email": {
         "label": "Email",
-        "placeholder": "Enter email address",
+        "placeholder": "Enter email",
         "invalid": "Invalid email format"
       },
-      "is_active": {
-        "label": "Status"
+      "status": {
+        "label": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "published": "Published",
+        "unpublished": "Unpublished"
+      },
+      "notes": {
+        "label": "Notes",
+        "placeholder": "Enter notes"
       }
     },
     "messages": {
-      "creating": "Creating office...",
       "create": "Create Office",
       "created": "Office created successfully",
-      "updated": "Office updated successfully",
-      "deleted": "Office deleted successfully",
-      "error": "An error occurred while processing your request"
+      "update": "Office updated successfully",
+      "delete": "Office deleted successfully",
+      "duplicate": "Office duplicated successfully"
     },
     "success": {
       "created": "Office created successfully",
-      "updated": "Office updated successfully",
-      "deleted": "Office deleted successfully"
+      "update": "Office updated successfully",
+      "delete": "Office deleted successfully",
+      "duplicate": "Office duplicated successfully"
+    },
+    "loading": {
+      "duplicating": "Duplicating office...",
+      "deleting": "Deleting office..."
     },
     "error": {
-      "creating": "An error occurred while creating the office",
-      "updating": "An error occurred while updating the office",
-      "deleting": "An error occurred while deleting the office"
+      "creating": "Error creating office",
+      "updating": "Error updating office",
+      "deleting": "Error deleting office"
     }
   },
   "Departments": {
     "title": "Departments",
-    "add_new": "Add New Department",
+    "add_new": "New Department",
     "search_departments": "Search departments",
     "department_details": "Department Details",
     "form": {
       "name": {
         "label": "Name",
-        "placeholder": "Enter name",
+        "placeholder": "Enter department name",
         "required": "Name is required"
       },
       "description": {
         "label": "Description",
-        "placeholder": "Enter description"
+        "placeholder": "Enter department description"
+      },
+      "locations": {
+        "label": "Locations",
+        "placeholder": "Enter locations",
+        "required": "Locations are required",
+        "noLocations": "No locations",
+        "multipleLocations": "{count, plural, =0 {No Location} =1 {1 Location} other {# Locations}}"
       },
       "validation": {
         "name_required": "Name is required",
-        "locations_required": "At least one location is required"
+        "description_required": "Description is required",
+        "locations_required": "At least one location must be selected"
       },
       "updated_at": {
         "label": "Updated At",
-        "placeholder": "Enter updated at"
+        "placeholder": "Enter update date"
       },
       "created_at": {
         "label": "Created At",
-        "placeholder": "Enter created at"
+        "placeholder": "Enter creation date"
       }
     },
-    "table": {
-      "name": "Name",
-      "description": "Description",
-      "locations": "Locations",
-      "created_at": "Created At",
-      "updated_at": "Updated At"
+    "messages": {
+      "create": "Create Department",
+      "created": "Department created successfully",
+      "update": "Department updated successfully",
+      "delete": "Department deleted successfully",
+      "duplicate": "Department duplicated successfully"
     },
     "success": {
-      "created": "Department created successfully",
-      "updated": "Department updated successfully"
+      "create": "Department created successfully",
+      "update": "Department updated successfully",
+      "delete": "Department deleted successfully",
+      "duplicate": "Department duplicated successfully"
+    },
+    "loading": {
+      "duplicate": "Duplicating department...",
+      "delete": "Deleting department...",
+      "create": "Creating department...",
+      "update": "Updating department..."
     },
     "error": {
-      "creating": "An error occurred while creating the department",
-      "updating": "An error occurred while updating the department"
+      "create": "Error creating department",
+      "update": "Error updating department",
+      "delete": "Error deleting department",
+      "duplicate": "Error duplicating department"
     }
+  },
+  "Storage": {
+    "title": "Storage"
+  },
+  "Purchases": {
+    "title": "Purchases",
+    "add_new": "New Purchase",
+    "search_purchases": "Search purchases",
+    "purchase_details": "Purchase Details",
+    "form": {},
+    "success": {
+      "create": "Purchase created successfully",
+      "update": "Purchase updated successfully",
+      "delete": "Purchase deleted successfully",
+      "duplicate": "Purchase duplicated successfully"
+    },
+    "loading": {
+      "duplicate": "Duplicating purchase...",
+      "delete": "Deleting purchase...",
+      "create": "Creating purchase...",
+      "update": "Updating purchase..."
+    },
+    "error": {
+      "create": "Error creating purchase",
+      "update": "Error updating purchase",
+      "delete": "Error deleting purchase",
+      "duplicate": "Error duplicating purchase"
+    }
+  },
+  "Roles": {
+    "title": "Roles",
+    "your_role": "Your Role",
+    "create_role": "Create New Role",
+    "add_new": "New Role",
+    "search_roles": "Search Roles",
+    "role_details": "Role Details",
+    "no_permissions": "No Permissions",
+    "permissions": {
+      "title": "Permissions",
+      "description": "Available permissions for the role",
+      "read": "Read",
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "view": "View",
+      "manage": "Manage",
+      "approve": "Approve",
+      "process": "Process",
+      "report": "Report",
+      "configure": "Configure",
+      "manage_users": "Manage Users",
+      "invite": "Invite",
+      "export": "Export",
+      "import": "Import",
+      "print": "Print",
+      "send": "Send",
+      "receive": "Receive",
+      "assign": "Assign",
+      "unassign": "Unassign",
+      "edit": "Edit"
+    },
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter role name",
+        "required": "Name is required",
+        "format": "Role name must contain only lowercase letters, numbers and underscores"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Enter role description",
+        "required": "Description is required"
+      },
+      "permissions": {
+        "label": "Permissions"
+      }
+    },
+    "predefined": {
+      "system": "System",
+      "superadmin": {
+        "title": "System Administrator",
+        "description": "System administrator has all permissions to control the system and users"
+      },
+      "admin": {
+        "title": "Enterprise Administrator",
+        "description": "Enterprise administrator has all permissions to control the enterprise and users"
+      },
+      "employee": {
+        "title": "Employee",
+        "description": "Employee has permissions to access their own data"
+      },
+      "human_resources": {
+        "title": "HR Manager",
+        "description": "HR employee has permissions to access human resources data"
+      },
+      "accounting": {
+        "title": "Accounting Manager",
+        "description": "Accounting employee has permissions to access accounting data"
+      }
+    },
+    "roles": {
+      "superadmin": "System Administrator",
+      "admin": "Enterprise Administrator",
+      "employee": "Employee",
+      "hr": "HR Employee",
+      "accounting": "Accounting Employee"
+    },
+    "success": {
+      "create": "Role created successfully",
+      "update": "Role updated successfully",
+      "delete": "Role deleted successfully",
+      "duplicate": "Role duplicated successfully"
+    },
+    "loading": {
+      "create": "Creating role...",
+      "update": "Updating role...",
+      "delete": "Deleting role...",
+      "duplicate": "Duplicating role..."
+    },
+    "error": {
+      "create": "Error creating role",
+      "update": "Error updating role",
+      "delete": "Error deleting role",
+      "duplicate": "Error duplicating role"
+    }
+  },
+  "OnlineShops": {
+    "title": "Online Shops",
+    "singular": "Online Shop"
+  },
+  "ActivityLogs": {
+    "title": "Activity Logs",
+    "description": "Activity logs for the organization during a specific period",
+    "dialog": {
+      "title": "Activity Details"
+    },
+    "error_fetching": "Error fetching activities",
+    "no_activity_logs_found": "No activity logs found",
+    "export": {
+      "exportAs": "{fileType} Export as file",
+      "generatingPDF": "Generating PDF file...",
+      "downloadPDF": "{fileType} Download file",
+      "preparingPDF": "Preparing PDF file...",
+      "preparingPDFShort": "Preparing PDF file...",
+      "readyPDF": "PDF file ready",
+      "noData": "No data to export",
+      "errorPDF": "Error creating PDF file",
+      "errorCSV": "Error creating CSV file",
+      "successPDF": "PDF file created successfully",
+      "successCSV": "CSV file created successfully"
+    },
+    "filters": {
+      "date_range": "Date Range",
+      "select_date_range": "Select date range",
+      "event_type": "Event Type",
+      "select_event_type": "Select event type",
+      "all_events": "All events",
+      "login": "Login",
+      "logout": "Logout",
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "view": "View",
+      "manage": "Manage",
+      "approve": "Approve",
+      "process": "Process",
+      "report": "Report",
+      "configure": "Configure",
+      "manage_users": "Manage Users",
+      "invite": "Invite",
+      "export": "Export",
+      "import": "Import",
+      "print": "Print",
+      "send": "Send",
+      "receive": "Receive",
+      "assign": "Assign",
+      "unassign": "Unassign",
+      "edit": "Edit",
+      "clearFilters": "Clear Filters",
+      "selectUser": "Select User",
+      "selectTimeRange": "Select Time Range",
+      "lastHour": "Last Hour",
+      "last24Hours": "Last 24 Hours",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "last90Days": "Last 90 Days",
+      "customRange": "Custom Range",
+      "allUsers": "All Users",
+      "administrators": "Administrators",
+      "developers": "Developers",
+      "viewers": "Viewers",
+      "user": "User",
+      "timeRange": "Time Range",
+      "pickDate": "Pick Date",
+      "filter": "Filters",
+      "search": "Search"
+    },
+
+    "fields": {
+      "id": "ID",
+      "user_full_name": "User Full Name",
+      "user_email": "User Email",
+      "action_type": "Action Type",
+      "target_type": "Target Type",
+      "target_name": "Target Name",
+      "target_id": "Target ID",
+      "details": "Details",
+      "created_at": "Created At",
+      "enterprise_id": "Enterprise ID",
+      "user_id": "User ID"
+    },
+    "action_description": {
+      "created": "Created {target} with name {name}",
+      "updated": "Updated {target} with name {name}",
+      "deleted": "Deleted {target} with name {name}",
+      "unknown": "Executed {action} on {target}"
+    }
+  },
+  "Internet": {
+    "title": "Internet"
+  },
+  "Domains": {
+    "title": "Domains",
+    "add_new": "New Domain"
+  },
+  "Websites": {
+    "title": "Websites",
+    "add_new": "New Website"
+  },
+  "Servers": {
+    "title": "Servers",
+    "add_new": "New Server"
+  },
+  "OnlineStores": {
+    "title": "Online Stores",
+    "add_new": "New Online Store"
   }
 }

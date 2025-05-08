@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { toast } from "sonner";
 
 import useUserStore from "@/stores/use-user-store";

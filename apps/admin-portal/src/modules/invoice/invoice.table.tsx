@@ -9,11 +9,15 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { MoneyFormatter } from "@/components/ui/currency-input";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateInvoice } from "@/invoice/invoice.hooks";
 import useInvoiceStore from "@/invoice/invoice.store";
-import { Invoice } from "@/invoice/invoice.type";
+import { Invoice, InvoiceUpdateData } from "@/invoice/invoice.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -29,7 +33,8 @@ const formatDate = (dateStr: string) => {
 };
 
 const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Invoice>) => {
-  const t = useTranslations("Invoices");
+  const t = useTranslations();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
   const { mutateAsync: updateInvoice } = useUpdateInvoice();
   const selectedRows = useInvoiceStore((state) => state.selectedRows);
   const setSelectedRows = useInvoiceStore((state) => state.setSelectedRows);
@@ -39,63 +44,64 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canViewInvoice = useUserStore((state) => state.hasPermission("invoices.view"));
   const canArchiveInvoice = useUserStore((state) => state.hasPermission("invoices.archive"));
   const canDeleteInvoice = useUserStore((state) => state.hasPermission("invoices.delete"));
+  // const canPreviewInvoice = useUserStore((state) => state.hasPermission("invoices.preview"));
+  const canPreviewInvoice = true;
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-
+  console.log("data is ", data);
   const columns: ExtendedColumnDef<Invoice>[] = [
     {
       accessorKey: "invoice_number",
-      header: t("form.invoice_number.label"),
+      header: t("Invoices.form.invoice_number.label"),
       validationSchema: z.string().min(1, t("Invoices.form.invoice_number.required")),
     },
     {
-      accessorKey: "client.company",
-      header: t("form.client.label"),
-      cell: ({ row }) => row.original.client?.company || "N/A",
+      enableEditing: false,
+      accessorKey: "client.name",
+      header: t("Invoices.form.client.label"),
+      cell: ({ row }) => {
+        const client = row.original.client;
+        if (!client) return "N/A";
+        // Display name and email if available
+        return (
+          <div>
+            <div className="text-sm font-medium">{client.name || "-"}</div>
+            {/* {client.email && <div className="text-muted-foreground text-xs">{client.email}</div>} */}
+          </div>
+        );
+      },
     },
     {
+      enableEditing: false,
       accessorKey: "issue_date",
-      header: t("form.issue_date.label"),
+      header: t("Invoices.form.issue_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.issue_date.required")),
-      cell: ({ row }) => formatDate(row.original.issue_date),
+      cell: ({ row }) => row.original.issue_date,
     },
     {
       accessorKey: "due_date",
-      header: t("form.due_date.label"),
+      header: t("Invoices.form.due_date.label"),
       validationSchema: z.string().min(1, t("Invoices.form.due_date.required")),
-      cell: ({ row }) => formatDate(row.original.due_date),
+      cell: ({ row }) => row.original.due_date,
     },
     {
+      enableEditing: false,
       accessorKey: "total",
-      header: t("form.total.label"),
+      header: t("Invoices.form.total.label"),
       validationSchema: z.number().min(0, t("Invoices.form.total.required")),
       cell: ({ row }) => {
-        const total =
-          typeof row.original.total === "string"
-            ? parseFloat(row.original.total)
-            : row.original.total;
-        return `$${Number(total).toFixed(2)}`;
+        return (
+          <span className="flex flex-row items-center gap-1 text-sm font-medium">
+            {MoneyFormatter(row.getValue("total"))}
+            {getCurrencySymbol(currency || "sar").symbol}
+          </span>
+        );
       },
     },
     {
       accessorKey: "status",
-      header: t("form.status.label"),
+      header: t("Invoices.form.status.label"),
       validationSchema: z.string().min(1, t("Invoices.form.status.required")),
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => {
-        const invoice = row.original;
-        return (
-          <div className="flex space-x-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/pay/${invoice.id}`} target="_blank">
-                {t("actions.preview")}
-              </Link>
-            </Button>
-          </div>
-        );
-      },
     },
   ];
 
@@ -104,7 +110,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     if (columnId === "issue_date" || columnId === "due_date") {
       processedValue = new Date(value as string).toISOString();
     }
-    await updateInvoice({ id: rowId, data: { [columnId]: processedValue } });
+    await updateInvoice({ id: rowId, data: { [columnId]: processedValue } as InvoiceUpdateData });
   };
 
   const handleRowSelectionChange = (rows: Invoice[]) => {
@@ -158,6 +164,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       canViewAction={canViewInvoice}
       canArchiveAction={canArchiveInvoice}
       canDeleteAction={canDeleteInvoice}
+      canPreviewAction={canPreviewInvoice}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={invoiceTableOptions}
       onActionClicked={onActionClicked}
@@ -168,6 +175,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
         view: t("General.view"),
         archive: t("General.archive"),
         delete: t("General.delete"),
+        preview: t("General.preview"),
       }}
     />
   );

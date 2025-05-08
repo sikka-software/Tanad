@@ -7,15 +7,14 @@ import * as z from "zod";
 import { Button } from "@/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import { Textarea } from "@/ui/textarea";
+
+import { FlippableInput } from "@/components/ui/flippable-input";
 
 import { useCreateEnterprise } from "./onboarding.hooks";
 
 export const createEnterpriseSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(1, t("OnBoarding.form.enterprise_name.required")),
-    description: z.string(),
-    logo: z.string(),
     email: z.string().email(t("OnBoarding.form.email.invalid")),
     industry: z.string(),
     size: z.string(),
@@ -31,8 +30,6 @@ export function OnboardingForm() {
     resolver: zodResolver(createEnterpriseSchema(t)),
     defaultValues: {
       name: "",
-      description: "",
-      logo: "",
       email: "",
       industry: "",
       size: "",
@@ -49,7 +46,7 @@ export function OnboardingForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -57,7 +54,7 @@ export function OnboardingForm() {
             <FormItem>
               <FormLabel>{t("OnBoarding.form.enterprise_name.label")}</FormLabel>
               <FormControl>
-                <Input
+                <FlippableInput
                   {...field}
                   placeholder={t("OnBoarding.form.enterprise_name.placeholder")}
                   disabled={isPending}
@@ -70,40 +67,6 @@ export function OnboardingForm() {
 
         <FormField
           control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("OnBoarding.form.description.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  placeholder={t("OnBoarding.form.description.placeholder")}
-                  disabled={isPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="logo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("OnBoarding.form.logo.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder={t("OnBoarding.form.logo.placeholder")}
-                  disabled={isPending}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
@@ -111,6 +74,7 @@ export function OnboardingForm() {
               <FormControl>
                 <Input
                   type="email"
+                  dir="ltr"
                   {...field}
                   placeholder={t("OnBoarding.form.email.placeholder")}
                   disabled={isPending}
@@ -156,7 +120,7 @@ export function OnboardingForm() {
         />
 
         <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+          {isPending ? <Loader2 className="me-2 h-4 w-4 animate-spin" /> : null}
           {t("OnBoarding.form.create_enterprise")}
         </Button>
       </form>

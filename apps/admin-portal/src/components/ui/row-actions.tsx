@@ -13,12 +13,14 @@ interface RowActionsProps {
   onView?: () => void;
   onArchive?: () => void;
   onDelete?: () => void;
+  onPreview?: () => void;
   texts?: {
     edit?: string;
     duplicate?: string;
     view?: string;
     archive?: string;
     delete?: string;
+    preview?: string;
   };
 }
 const RowActions = ({
@@ -27,11 +29,12 @@ const RowActions = ({
   onView,
   onArchive,
   onDelete,
+  onPreview,
   texts,
 }: RowActionsProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const actions = [onDelete, onEdit, onDuplicate, onView, onArchive];
+  const actions = [onDelete, onEdit, onDuplicate, onView, onArchive, onPreview];
   const availableActionsCount = actions.filter(Boolean).length; // Count how many actions are defined
   const collapsedWidth = 32; // Default width when collapsed or no actions
   // Calculate expanded width based on the number of actions:
@@ -93,6 +96,14 @@ const RowActions = ({
                 onClick={onArchive}
               />
             )} */}
+            {onPreview && (
+              <IconButton
+                icon={<Eye className="size-4" />}
+                label={texts?.preview || "preview"}
+                className="h-7 w-7"
+                onClick={onPreview}
+              />
+            )}
           </motion.div>
         ) : (
           <motion.div

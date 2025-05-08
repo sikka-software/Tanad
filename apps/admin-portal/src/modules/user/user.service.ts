@@ -29,19 +29,40 @@ export async function fetchUserById(id: string): Promise<UserType> {
 
 export async function createUser(user: UserCreateData): Promise<UserType> {
   try {
+    // Cast user to any to access the 'role' name field added by the form
+    const userDataWithRoleName = user as any;
+
+    // Extract only the fields the API expects
+    const apiPayload = {
+      email: userDataWithRoleName.email,
+      password: userDataWithRoleName.password, // Assume password is required
+      role: userDataWithRoleName.role, // Role name (present at runtime)
+      full_name: userDataWithRoleName.full_name,
+    };
+
     const response = await fetch("/api/resource/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(user),
+      body: JSON.stringify(apiPayload),
     });
+
     if (!response.ok) {
-      throw new Error("Failed to create user");
+      let errorDetails = "Failed to create user";
+      try {
+        const errorData = await response.json();
+        errorDetails = errorData.details || errorData.error || errorDetails;
+      } catch (parseError) {
+        console.error("Failed to parse error response from API");
+      }
+      console.error("Create User API Error Response:", response.status, errorDetails);
+      throw new Error(errorDetails);
     }
+
     return response.json();
   } catch (error) {
-    console.error("Error creating user:", error);
+    console.error("Error creating user (service level):", error);
     throw error;
   }
 }

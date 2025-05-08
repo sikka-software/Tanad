@@ -11,6 +11,24 @@ export const commandList = [
         href: ModulesOptions.dashboard.url,
       },
       {
+        icon: ModulesOptions.analytics.icon,
+        label: ModulesOptions.analytics.label,
+        shortcut: "⌘A",
+        href: ModulesOptions.analytics.url,
+      },
+      {
+        icon: ModulesOptions.activity_logs.icon,
+        label: ModulesOptions.activity_logs.label,
+        shortcut: "⌘L",
+        href: ModulesOptions.activity_logs.url,
+      },
+      {
+        icon: ModulesOptions.companies.icon,
+        label: ModulesOptions.companies.label,
+        shortcut: "⌘C",
+        href: ModulesOptions.companies.url,
+      },
+      {
         icon: ModulesOptions.clients.icon,
         label: ModulesOptions.clients.label,
         shortcut: "⌘C",
@@ -81,10 +99,10 @@ export const commandList = [
         href: ModulesOptions.employees.url,
       },
       {
-        icon: ModulesOptions.employeeRequests.icon,
-        label: ModulesOptions.employeeRequests.label,
+        icon: ModulesOptions.employee_requests.icon,
+        label: ModulesOptions.employee_requests.label,
         shortcut: "⌘R",
-        href: ModulesOptions.employeeRequests.url,
+        href: ModulesOptions.employee_requests.url,
       },
       {
         icon: ModulesOptions.jobs.icon,
@@ -110,6 +128,54 @@ export const commandList = [
         label: ModulesOptions.salaries.label,
         shortcut: "⌘S",
         href: ModulesOptions.salaries.url,
+      },
+    ],
+  },
+  {
+    heading: "Internet.title",
+    items: [
+      {
+        icon: ModulesOptions.domains.icon,
+        label: ModulesOptions.domains.label,
+        shortcut: "⌘D",
+        href: ModulesOptions.domains.url,
+      },
+
+      {
+        icon: ModulesOptions.websites.icon,
+        label: ModulesOptions.websites.label,
+        shortcut: "⌘W",
+        href: ModulesOptions.websites.url,
+      },
+      {
+        icon: ModulesOptions.online_stores.icon,
+        label: ModulesOptions.online_stores.label,
+        shortcut: "⌘O",
+        href: ModulesOptions.online_stores.url,
+      },
+      {
+        icon: ModulesOptions.servers.icon,
+        label: ModulesOptions.servers.label,
+        shortcut: "⌘S",
+        href: ModulesOptions.servers.url,
+      },
+    ],
+  },
+  {
+    heading: "Fleet.title",
+    items: [
+      {
+        icon: ModulesOptions.cars.icon,
+        label: ModulesOptions.cars.label,
+        shortcut: "⌘D",
+        href: ModulesOptions.cars.url,
+      },
+
+      {
+        icon: ModulesOptions.trucks.icon,
+        label: ModulesOptions.trucks.label,
+        shortcut: "⌘T",
+        href: ModulesOptions.trucks.url,
       },
     ],
   },

@@ -69,9 +69,9 @@ export default function OfficesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteOffices, {
-    loading: "Offices.loading.deleting",
-    success: "Offices.success.deleted",
-    error: "Offices.error.deleting",
+    loading: "Offices.loading.delete",
+    success: "Offices.success.delete",
+    error: "Offices.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -110,6 +110,8 @@ export default function OfficesPage() {
             onAddClick={canCreateOffices ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Offices.add_new")}
             searchPlaceholder={t("Offices.search_offices")}
+            count={offices?.length}
+            hideOptions={offices?.length === 0}
           />
         )}
 
@@ -138,18 +140,18 @@ export default function OfficesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Offices.add_new")}
+          title={t("Offices.edit_office")}
           formId="office-form"
           loadingSave={loadingSaveOffice}
         >
           <OfficeForm
-            id={"office-form"}
+            formHtmlId={"office-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableOffice(null);
               setLoadingSaveOffice(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Offices.success.updated"),
+                description: t("Offices.success.update"),
               });
             }}
             defaultValues={actionableOffice}

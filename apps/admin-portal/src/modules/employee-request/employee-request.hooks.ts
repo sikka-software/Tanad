@@ -1,6 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
+import { departmentKeys } from "../department/department.hooks";
 import {
   createEmployeeRequest,
   deleteEmployeeRequest,
@@ -10,10 +13,14 @@ import {
   bulkDeleteEmployeeRequests,
   duplicateEmployeeRequest,
 } from "./employee-request.service";
-import { EmployeeRequest } from "./employee-request.type";
+import {
+  EmployeeRequest,
+  EmployeeRequestCreateData,
+  EmployeeRequestUpdateData,
+} from "./employee-request.type";
 
 export const employeeRequestKeys = {
-  all: ["employeeRequests"] as const,
+  all: ["employee_requests"] as const,
   lists: () => [...employeeRequestKeys.all, "list"] as const,
   list: (filters: any) => [...employeeRequestKeys.lists(), { filters }] as const,
   details: () => [...employeeRequestKeys.all, "detail"] as const,
@@ -35,18 +42,32 @@ export function useEmployeeRequest(id: string) {
   });
 }
 
-export function useCreateEmployeeRequest() {
+export const useCreateEmployeeRequest = () => {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (employeeRequest: EmployeeRequest) => createEmployeeRequest(employeeRequest),
-    onSuccess: () => {
+    mutationFn: (employeeRequest: EmployeeRequestCreateData) =>
+      createEmployeeRequest(employeeRequest),
+    onSuccess: (newEmployeeRequest) => {
+      const previousEmployeeRequests = queryClient.getQueryData(employeeRequestKeys.lists()) || [];
+      queryClient.setQueryData(employeeRequestKeys.lists(), [
+        ...(Array.isArray(previousEmployeeRequests) ? previousEmployeeRequests : []),
+        newEmployeeRequest,
+      ]);
+
       queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
+
+      toast.success(t("General.successful_operation"), {
+        description: t("EmployeeRequests.success.create"),
+      });
     },
   });
-}
+};
 
 export function useDuplicateEmployeeRequest() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
+
   return useMutation({
     mutationFn: (id: string) => duplicateEmployeeRequest(id),
   });
@@ -54,12 +75,96 @@ export function useDuplicateEmployeeRequest() {
 
 export function useUpdateEmployeeRequest() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
+
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<EmployeeRequest> }) =>
-      updateEmployeeRequest(id, data),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: employeeRequestKeys.detail(data.id) });
-      queryClient.invalidateQueries({ queryKey: employeeRequestKeys.lists() });
+    mutationFn: ({ id, updates }: { id: string; updates: EmployeeRequestUpdateData }) =>
+      updateEmployeeRequest(id, updates),
+    onMutate: async ({ id, updates }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: employeeRequestKeys.lists() });
+      await queryClient.cancelQueries({ queryKey: employeeRequestKeys.detail(id) });
+
+      // Snapshot the previous values
+      const previousEmployeeRequests = queryClient.getQueryData(employeeRequestKeys.lists());
+      const previousEmployeeRequest = queryClient.getQueryData(employeeRequestKeys.detail(id));
+
+      // Prepare updates to apply optimistically
+      const optimisticUpdates = { ...updates };
+
+      // Handle department_id changes to also update the department name for UI
+      if (updates.employee_id !== undefined) {
+        try {
+          // Get the current departments from the cache
+          const employees: any = queryClient.getQueryData(employeeRequestKeys.lists());
+
+          if (employees && Array.isArray(employees)) {
+            // Find the department with the matching ID
+            const employee = employees.find((e: any) => e.id === updates.employee_id);
+
+            if (employee) {
+              optimisticUpdates.employee_id = employee.id;
+            }
+          }
+        } catch (error) {
+          console.error("Error getting department name for optimistic update:", error);
+        }
+      }
+
+      // Optimistically update the cache
+      queryClient.setQueryData(
+        employeeRequestKeys.lists(),
+        (old: EmployeeRequest[] | undefined) => {
+          if (!old) return old;
+
+          return old.map((employeeRequest) => {
+            if (employeeRequest.id === id) {
+              return { ...employeeRequest, ...optimisticUpdates };
+            }
+            return employeeRequest;
+          });
+        },
+      );
+
+      if (previousEmployeeRequest) {
+        queryClient.setQueryData(
+          employeeRequestKeys.detail(id),
+          (old: EmployeeRequest | undefined) => {
+            if (!old) return old;
+            return { ...old, ...optimisticUpdates };
+          },
+        );
+      }
+
+      return { previousEmployeeRequests, previousEmployeeRequest };
+    },
+    onSuccess: (updatedEmployee, { id }) => {
+      // Manually update the cache with the new data instead of invalidating
+      queryClient.setQueryData(
+        employeeRequestKeys.lists(),
+        (old: EmployeeRequest[] | undefined) => {
+          if (!old) return [updatedEmployee];
+
+          return old.map((employeeRequest) =>
+            employeeRequest.id === id ? updatedEmployee : employeeRequest,
+          );
+        },
+      );
+
+      // Also update the individual employee query data if it exists
+      queryClient.setQueryData(employeeRequestKeys.detail(id), updatedEmployee);
+      toast.success(t("General.successful_operation"), {
+        description: t("EmployeeRequests.success.update"),
+      });
+    },
+    onError: (err, { id }, context) => {
+      // Roll back to the previous values if mutation fails
+      if (context?.previousEmployeeRequests) {
+        queryClient.setQueryData(employeeRequestKeys.lists(), context.previousEmployeeRequests);
+      }
+      if (context?.previousEmployeeRequest) {
+        queryClient.setQueryData(employeeRequestKeys.detail(id), context.previousEmployeeRequest);
+      }
     },
   });
 }

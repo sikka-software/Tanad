@@ -65,9 +65,9 @@ export default function SalariesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteSalaries, {
-    loading: "Salaries.loading.deleting",
-    success: "Salaries.success.deleted",
-    error: "Salaries.error.deleting",
+    loading: "Salaries.loading.delete",
+    success: "Salaries.success.delete",
+    error: "Salaries.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -106,6 +106,8 @@ export default function SalariesPage() {
             onAddClick={canCreateSalaries ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Salaries.create_salary")}
             searchPlaceholder={t("Salaries.search_salaries")}
+            count={salaries?.length}
+            hideOptions={salaries?.length === 0}
           />
         )}
         <div>

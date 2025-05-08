@@ -1,12 +1,10 @@
-import { Mail, Phone, MapPin, NotebookText } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 import { Card, CardContent, CardHeader } from "@/ui/card";
 
 import { Vendor } from "@/vendor/vendor.type";
 
 const VendorCard = ({ vendor }: { vendor: Vendor }) => {
-  const t = useTranslations("Vendors");
   return (
     <Card key={vendor.id} className="transition-shadow hover:shadow-lg">
       <CardHeader>
@@ -34,20 +32,16 @@ const VendorCard = ({ vendor }: { vendor: Vendor }) => {
           <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
             <MapPin className="mt-1 h-4 w-4 flex-shrink-0" />
             <div>
-              <p>{vendor.address}</p>
-              <p>{`${vendor.city}, ${vendor.state} ${vendor.zip_code}`}</p>
+              <p>
+                {vendor.building_number} {vendor.street_name}
+              </p>
+              <p>
+                {vendor.city} {vendor.region} {vendor.zip_code}
+              </p>
             </div>
           </div>
-          {/* Notes */}
-          {vendor.notes && (
-            <div className="flex items-start gap-2 border-t pt-3 text-sm text-gray-500 dark:text-gray-400">
-              <NotebookText className="mt-1 h-4 w-4 flex-shrink-0" />
-              <p className="whitespace-pre-wrap">{vendor.notes}</p>
-            </div>
-          )}
         </div>
       </CardContent>
-      {/* Consider adding Edit/Delete actions here if DataModelList doesn't handle it */}
     </Card>
   );
 };

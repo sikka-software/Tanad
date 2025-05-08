@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import {
   createWarehouse,
@@ -7,8 +9,13 @@ import {
   fetchWarehouses,
   updateWarehouse,
   duplicateWarehouse,
+  bulkDeleteWarehouses,
 } from "@/warehouse/warehouse.service";
-import type { Warehouse, WarehouseCreateData } from "@/warehouse/warehouse.type";
+import type {
+  Warehouse,
+  WarehouseCreateData,
+  WarehouseUpdateData,
+} from "@/warehouse/warehouse.type";
 
 // Query keys for warehouses
 export const warehouseKeys = {
@@ -41,16 +48,13 @@ export function useCreateWarehouse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newWarehouse: Omit<Warehouse, "id" | "created_at"> & { user_id: string }) => {
-      const { user_id, ...rest } = newWarehouse;
-      const warehouseData: WarehouseCreateData = {
-        ...rest,
-        user_id: user_id,
-      };
-      return createWarehouse(warehouseData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
+    mutationFn: (newWarehouse: WarehouseCreateData) => createWarehouse(newWarehouse),
+    onSuccess: (newWarehouse: Warehouse) => {
+      const previousWarehouses = queryClient.getQueryData(warehouseKeys.lists()) || [];
+      queryClient.setQueryData(warehouseKeys.lists(), [
+        ...(Array.isArray(previousWarehouses) ? previousWarehouses : []),
+        newWarehouse,
+      ]);
     },
   });
 }
@@ -59,25 +63,83 @@ export function useDuplicateWarehouse() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => duplicateWarehouse(id),
+    onSuccess: (newWarehouse: Warehouse) => {
+      const previousWarehouses = queryClient.getQueryData(warehouseKeys.lists()) || [];
+      queryClient.setQueryData(warehouseKeys.lists(), [
+        ...(Array.isArray(previousWarehouses) ? previousWarehouses : []),
+        newWarehouse,
+      ]);
+      queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(newWarehouse.id) });
+    },
   });
 }
 
 // Hook for updating an existing warehouse
 export function useUpdateWarehouse() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: string;
-      data: Partial<Omit<Warehouse, "id" | "created_at">>;
-    }) => updateWarehouse(id, data),
-    onSuccess: (data) => {
-      // Invalidate both the specific detail and the list queries
-      queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(data.id) });
+    mutationFn: ({ id, data }: { id: string; data: WarehouseUpdateData }) =>
+      updateWarehouse(id, data),
+    onMutate: async ({ id, data }) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: warehouseKeys.detail(id) });
+      await queryClient.cancelQueries({ queryKey: warehouseKeys.lists() });
+
+      // Snapshot the previous value
+      const previousWarehouse = queryClient.getQueryData<Warehouse>(warehouseKeys.detail(id));
+      const previousWarehouses = queryClient.getQueryData<Warehouse[]>(warehouseKeys.lists());
+
+      // Optimistically update to the new value
+      // Update detail cache
+      if (previousWarehouse) {
+        queryClient.setQueryData<Warehouse>(warehouseKeys.detail(id), {
+          ...previousWarehouse,
+          ...data,
+          // Ensure created_at is preserved if not part of the update
+          created_at: previousWarehouse.created_at,
+        });
+      }
+
+      // Update list cache
+      if (previousWarehouses) {
+        queryClient.setQueryData<Warehouse[]>(
+          warehouseKeys.lists(),
+          previousWarehouses.map((warehouse) =>
+            warehouse.id === id
+              ? { ...warehouse, ...data, created_at: warehouse.created_at } // Preserve created_at here too
+              : warehouse,
+          ),
+        );
+      }
+
+      // Return a context object with the snapshotted value
+      return { previousWarehouse, previousWarehouses };
+    },
+    onError: (err, { id }, context) => {
+      console.error("Update failed:", err);
+      if (context?.previousWarehouse) {
+        queryClient.setQueryData(warehouseKeys.detail(id), context.previousWarehouse);
+      }
+      if (context?.previousWarehouses) {
+        queryClient.setQueryData(warehouseKeys.lists(), context.previousWarehouses);
+      }
+      toast.error(t("General.error_operation"), {
+        description: t("Warehouses.error.update"),
+      });
+    },
+    onSettled: (data, error, { id }) => {
+      // Invalidate queries to ensure eventual consistency
+      queryClient.invalidateQueries({ queryKey: warehouseKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
+
+      // Show success toast only if the mutation succeeded
+      if (!error && data) {
+        toast.success(t("General.successful_operation"), {
+          description: t("Warehouses.success.update"),
+        });
+      }
     },
   });
 }
@@ -99,18 +161,7 @@ export function useDeleteWarehouse() {
 export function useBulkDeleteWarehouses() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (ids: string[]) => {
-      const response = await fetch("/api/warehouses/bulk-delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete warehouses");
-      }
-    },
+    mutationFn: (ids: string[]) => bulkDeleteWarehouses(ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: warehouseKeys.lists() });
     },

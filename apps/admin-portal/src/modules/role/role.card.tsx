@@ -1,3 +1,4 @@
+import { convertToPascalCase } from "@root/src/lib/utils";
 import { MoreHorizontal } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -17,10 +18,10 @@ import { app_permission } from "@/db/schema";
 import useUserStore from "@/stores/use-user-store";
 
 import { predefinedRoles } from "./role.options";
-import type { Role, RoleWithPermissions } from "./role.type";
+import type { Role } from "./role.type";
 
 interface RoleCardProps {
-  role: RoleWithPermissions;
+  role: Role;
   onActionClick?: (action: string, id: string) => void;
   disableActions?: boolean;
 }
@@ -48,7 +49,7 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
   const canDeleteRoles = useUserStore((state) => state.hasPermission("roles.delete"));
 
   const assignedPermissionsByCategory = (role.permissions || []).reduce(
-    (acc, perm) => {
+    (acc: Record<string, string[]>, perm: string) => {
       const [category] = perm.split(".");
       if (!acc[category]) {
         acc[category] = [];
@@ -121,8 +122,7 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
                     const assignedPerms = assignedPermissionsByCategory[category] || [];
                     const assignedCount = assignedPerms.length;
 
-                    const displayCategory = category.charAt(0).toUpperCase() + category.slice(1);
-
+                    const displayCategory = convertToPascalCase(category);
                     return (
                       <Popover key={category}>
                         <PopoverTrigger asChild>

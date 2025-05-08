@@ -1,6 +1,5 @@
 "use client";
 
-import type { LucideIcon } from "lucide-react";
 import { Asterisk, Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -23,21 +22,6 @@ import useUserStore, { ProfileType } from "@/stores/use-user-store";
 import { EnterpriseSwitcher } from "./enterprise-switcher";
 import { NavMain } from "./sidebar-menu";
 import { SidebarUserFooter } from "./sidebar-user-footer";
-
-type Menu = {
-  href: string;
-  label: string;
-  translationKey: string;
-  active?: boolean;
-  icon: LucideIcon;
-  submenus?: {
-    href: string;
-    label: string;
-    translationKey: string;
-    active?: boolean;
-    plusAction?: string;
-  }[];
-};
 
 export function AppSidebar() {
   const t = useTranslations();
@@ -259,14 +243,25 @@ export function AppSidebar() {
         {searchableMenuGroups.Administration && searchableMenuGroups.Administration.length > 0 && (
           <NavMain title={t("Administration.title")} items={searchableMenuGroups.Administration} />
         )}
+
         {searchableMenuGroups.Accounting && searchableMenuGroups.Accounting.length > 0 && (
           <NavMain title={t("Accounting.title")} items={searchableMenuGroups.Accounting} />
         )}
+
         {searchableMenuGroups.HumanResources && searchableMenuGroups.HumanResources.length > 0 && (
           <NavMain title={t("HumanResources.title")} items={searchableMenuGroups.HumanResources} />
         )}
-        {searchableMenuGroups.Settings && searchableMenuGroups.Settings.length > 0 && (
-          <NavMain title={t("Settings.title")} items={searchableMenuGroups.Settings} />
+
+        {searchableMenuGroups.Internet && searchableMenuGroups.Internet.length > 0 && (
+          <NavMain title={t("Internet.title")} items={searchableMenuGroups.Internet} />
+        )}
+
+        {searchableMenuGroups.Fleet && searchableMenuGroups.Fleet.length > 0 && (
+          <NavMain title={t("Fleet.title")} items={searchableMenuGroups.Fleet} />
+        )}
+
+        {searchableMenuGroups.SystemAdmin && searchableMenuGroups.SystemAdmin.length > 0 && (
+          <NavMain title={t("SystemAdmin.title")} items={searchableMenuGroups.SystemAdmin} />
         )}
       </SidebarContent>
       <SidebarFooter className="border-t">

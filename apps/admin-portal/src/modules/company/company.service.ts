@@ -1,4 +1,4 @@
-import { Company } from "@/company/company.type";
+import { Company, CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
 
 export async function fetchCompanies(): Promise<Company[]> {
   const response = await fetch("/api/resource/companies");
@@ -16,7 +16,7 @@ export async function fetchCompanyById(id: string): Promise<Company> {
   return response.json();
 }
 
-export async function createCompany(company: Omit<Company, "id" | "created_at">): Promise<Company> {
+export async function createCompany(company: CompanyCreateData): Promise<Company> {
   const response = await fetch("/api/resource/companies", {
     method: "POST",
     headers: {
@@ -30,7 +30,7 @@ export async function createCompany(company: Omit<Company, "id" | "created_at">)
   return response.json();
 }
 
-export async function updateCompany(id: string, updates: Partial<Company>): Promise<Company> {
+export async function updateCompany(id: string, updates: CompanyUpdateData): Promise<Company> {
   const response = await fetch(`/api/resource/companies/${id}`, {
     method: "PUT",
     headers: {

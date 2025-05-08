@@ -1,3 +1,4 @@
+import { ModulesOptions } from "@root/tanad.config";
 import {
   Users,
   Settings,
@@ -11,9 +12,8 @@ import {
   SaudiRiyal,
   ShieldPlus,
   FileUser,
+  TableOfContents,
 } from "lucide-react";
-
-import { ModulesOptions } from "../../tanad.config";
 
 export type SidebarMenuGroupProps = {
   title: string;
@@ -70,39 +70,6 @@ type SimplifiedMenu = {
   items: SimplifiedMenuItem[];
 };
 
-let simplifiedMenu: SimplifiedMenu = {
-  group: "Administration",
-  items: [
-    { title: "Dashboard" },
-    { title: "Analytics" },
-    {
-      title: "Contacts",
-      items: [
-        { title: "All Contacts" },
-        { title: "Companies" },
-        { title: "Clients" },
-        { title: "Vendors" },
-      ],
-    },
-    {
-      title: "Locations",
-      items: [{ title: "Offices" }, { title: "Warehouses" }, { title: "Branches" }],
-    },
-    {
-      title: "Sales",
-      items: [{ title: "Products" }, { title: "Invoices" }, { title: "Quotes" }],
-    },
-    {
-      title: "Human Resources",
-      items: [{ title: "Employees" }, { title: "Departments" }, { title: "Salaries" }],
-    },
-    {
-      title: "Settings",
-      items: [{ title: "Users" }, { title: "Billing" }, { title: "Settings" }],
-    },
-  ],
-};
-
 // Main menu items
 function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
@@ -120,6 +87,14 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       icon: BarChart,
       is_active: pathname.startsWith("/analytics"),
       requiredPermission: "analytics.read",
+    },
+    {
+      title: "Activity Logs",
+      translationKey: "ActivityLogs.title",
+      url: "/activity",
+      icon: TableOfContents,
+      is_active: pathname.startsWith("/activity"),
+      requiredPermission: "activity_logs.read",
     },
 
     {
@@ -327,11 +302,11 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
         //   is_active: pathname === "/reports",
         // },
         {
-          title: ModulesOptions.employeeRequests.label,
-          translationKey: ModulesOptions.employeeRequests.label,
-          url: ModulesOptions.employeeRequests.url,
-          action: ModulesOptions.employeeRequests.url + "/add",
-          is_active: pathname.startsWith(ModulesOptions.employeeRequests.url),
+          title: ModulesOptions.employee_requests.label,
+          translationKey: ModulesOptions.employee_requests.label,
+          url: ModulesOptions.employee_requests.url,
+          action: ModulesOptions.employee_requests.url + "/add",
+          is_active: pathname.startsWith(ModulesOptions.employee_requests.url),
           requiredPermission: "employee_requests.read",
         },
       ],
@@ -380,8 +355,48 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
     // },
   ];
 }
-// Settings menu items
-function getSettingsMenus(pathname: string): SidebarMenuGroupProps["items"] {
+// Internet menu items
+function getInternetMenus(pathname: string): SidebarMenuGroupProps["items"] {
+  return [
+    {
+      title: ModulesOptions.domains.label,
+      translationKey: ModulesOptions.domains.label,
+      url: ModulesOptions.domains.url,
+      icon: ModulesOptions.domains.icon,
+      action: ModulesOptions.domains.url + "/add",
+      is_active: pathname.startsWith(ModulesOptions.domains.url),
+      requiredPermission: "domains.read",
+    },
+    {
+      title: ModulesOptions.servers.label,
+      translationKey: ModulesOptions.servers.label,
+      url: ModulesOptions.servers.url,
+      icon: ModulesOptions.servers.icon,
+      action: ModulesOptions.servers.url + "/add",
+      is_active: pathname.startsWith(ModulesOptions.servers.url),
+    },
+    {
+      title: ModulesOptions.websites.label,
+      translationKey: ModulesOptions.websites.label,
+      url: ModulesOptions.websites.url,
+      icon: ModulesOptions.websites.icon,
+      action: ModulesOptions.websites.url + "/add",
+      is_active: pathname.startsWith(ModulesOptions.websites.url),
+      requiredPermission: "websites.read",
+    },
+    {
+      title: ModulesOptions.online_stores.label,
+      translationKey: ModulesOptions.online_stores.label,
+      url: ModulesOptions.online_stores.url,
+      icon: ModulesOptions.online_stores.icon,
+      action: ModulesOptions.online_stores.url + "/add",
+      is_active: pathname.startsWith(ModulesOptions.online_stores.url),
+      requiredPermission: "online_stores.read",
+    },
+  ];
+}
+// System admin menu items
+function getSystemAdminMenus(pathname: string): SidebarMenuGroupProps["items"] {
   return [
     {
       title: ModulesOptions.users.label,
@@ -397,20 +412,25 @@ function getSettingsMenus(pathname: string): SidebarMenuGroupProps["items"] {
       url: ModulesOptions.roles.url,
       is_active: pathname === ModulesOptions.roles.url,
     },
-    // {
-    //   title: "Billing",
-    //   translationKey: "Billing.title",
-    //   icon: CreditCard,
-    //   url: "/billing",
-    //   is_active: pathname === "/billing",
-    // },
-    // {
-    //   title: "Settings",
-    //   translationKey: "Settings.title",
-    //   icon: Settings,
-    //   url: "/settings",
-    //   is_active: pathname === "/settings",
-    // },
+  ];
+}
+
+function getFleetMenus(pathname: string): SidebarMenuGroupProps["items"] {
+  return [
+    {
+      title: ModulesOptions.cars.label,
+      translationKey: ModulesOptions.cars.label,
+      icon: ModulesOptions.cars.icon,
+      url: ModulesOptions.cars.url,
+      is_active: pathname === ModulesOptions.cars.url,
+    },
+    {
+      title: ModulesOptions.trucks.label,
+      translationKey: ModulesOptions.trucks.label,
+      icon: ModulesOptions.trucks.icon,
+      url: ModulesOptions.trucks.url,
+      is_active: pathname === ModulesOptions.trucks.url,
+    },
   ];
 }
 
@@ -419,7 +439,9 @@ export function getMenuList(pathname?: string): Record<string, SidebarMenuGroupP
     Administration: getAdministrationMenus(pathname || ""),
     Accounting: getAccountingMenus(pathname || ""),
     HumanResources: getHrMenus(pathname || ""),
-    Settings: getSettingsMenus(pathname || ""),
+    Internet: getInternetMenus(pathname || ""),
+    Fleet: getFleetMenus(pathname || ""),
+    SystemAdmin: getSystemAdminMenus(pathname || ""),
   };
 }
 
@@ -465,63 +487,3 @@ export function applyCustomMenuOrder(
 
   return resultMenu;
 }
-
-// Mapper function to convert simplified menu to the existing format
-function mapSimplifiedMenuToSidebarMenu(
-  menu: SimplifiedMenu,
-  pathname: string = "",
-): Record<string, SidebarMenuGroupProps["items"]> {
-  const getIcon = (title: string): LucideIcon => {
-    const iconMap: Record<string, LucideIcon> = {
-      Dashboard: LayoutDashboard,
-      Analytics: BarChart,
-      Contacts: Users,
-      Locations: MapPin,
-      Sales: Package,
-      "Human Resources": Users,
-      Settings: Settings,
-      Billing: CreditCard,
-    };
-    return iconMap[title] || Users; // Default to Users icon if not found
-  };
-
-  const mapMenuItem = (
-    item: SimplifiedMenuItem,
-    parentUrl: string = "",
-  ): SidebarMenuGroupProps["items"][0] => {
-    const baseUrl = parentUrl || `/${item.title.toLowerCase().replace(/\s+/g, "-")}`;
-    const mappedItem = {
-      title: item.title,
-      translationKey: `${item.title.replace(/\s+/g, "")}.title`,
-      url: baseUrl,
-      icon: getIcon(item.title),
-      is_active: pathname.startsWith(baseUrl),
-    };
-
-    if (item.items) {
-      return {
-        ...mappedItem,
-        items: item.items.map((subItem) => ({
-          title: subItem.title,
-          translationKey: `${subItem.title.replace(/\s+/g, "")}.title`,
-          url: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`,
-          action: `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}/add`,
-          is_active: pathname.startsWith(
-            `${baseUrl}${subItem.title === "All " + item.title ? "" : "/" + subItem.title.toLowerCase().replace(/\s+/g, "-")}`,
-          ),
-        })),
-      };
-    }
-
-    return mappedItem;
-  };
-
-  const result: Record<string, SidebarMenuGroupProps["items"]> = {
-    [menu.group]: menu.items.map((item) => mapMenuItem(item)),
-  };
-
-  return result;
-}
-
-// Example usage:
-// const mappedMenu = mapSimplifiedMenuToSidebarMenu(simplifiedMenu);

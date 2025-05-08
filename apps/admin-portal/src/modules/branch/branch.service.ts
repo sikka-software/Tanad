@@ -1,4 +1,4 @@
-import { Branch, BranchCreateData } from "@/branch/branch.type";
+import { Branch, BranchCreateData, BranchUpdateData } from "@/branch/branch.type";
 
 export async function fetchBranches(): Promise<Branch[]> {
   try {
@@ -38,10 +38,7 @@ export async function createBranch(branch: BranchCreateData): Promise<Branch> {
   return response.json();
 }
 
-export async function updateBranch(
-  id: string,
-  branch: Partial<Omit<Branch, "id" | "created_at">>,
-): Promise<Branch> {
+export async function updateBranch(id: string, branch: BranchUpdateData): Promise<Branch> {
   const response = await fetch(`/api/resource/branches/${id}`, {
     method: "PUT",
     headers: {
@@ -85,9 +82,7 @@ export async function deleteBranch(id: string): Promise<void> {
 export async function bulkDeleteBranches(ids: string[]): Promise<void> {
   const response = await fetch("/api/resource/branches", {
     method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ids }),
   });
 

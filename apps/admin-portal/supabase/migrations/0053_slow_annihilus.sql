@@ -1,0 +1,2 @@
+ALTER TABLE "quotes" ADD COLUMN "created_by" uuid;--> statement-breakpoint
+ALTER TABLE "quotes" ADD CONSTRAINT "quotes_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "public"."profiles"("id") ON DELETE no action ON UPDATE no action;

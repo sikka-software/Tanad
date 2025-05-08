@@ -1,3 +1,4 @@
+import { CellContext } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
@@ -5,6 +6,10 @@ import { z } from "zod";
 import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
+
+import { MoneyFormatter } from "@/components/ui/currency-input";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
 
 import { ModuleTableProps } from "@/types/common.type";
 
@@ -20,6 +25,7 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const setSelectedRows = useProductStore((state) => state.setSelectedRows);
   const { mutateAsync: updateProduct } = useUpdateProduct();
 
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
   const canEditProduct = useUserStore((state) => state.hasPermission("products.update"));
   const canDuplicateProduct = useUserStore((state) => state.hasPermission("products.duplicate"));
   const canViewProduct = useUserStore((state) => state.hasPermission("products.view"));
@@ -43,6 +49,12 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       accessorKey: "price",
       header: t("Products.form.price.label"),
       validationSchema: z.number().min(0, t("Products.form.price.required")),
+      cell: (props: CellContext<Product, unknown>) => (
+        <span className="flex flex-row items-center gap-1 text-sm font-medium">
+          {MoneyFormatter(props.row.original.price)}
+          {getCurrencySymbol(currency || "sar").symbol}
+        </span>
+      ),
     },
     {
       accessorKey: "sku",
@@ -52,6 +64,11 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     {
       accessorKey: "stock_quantity",
       header: t("Products.form.stock_quantity.label"),
+      cell: (props: CellContext<Product, unknown>) => (
+        <span className="flex flex-row items-center gap-1 text-sm font-medium">
+          {props.row.original.stock_quantity?.toLocaleString()}
+        </span>
+      ),
       validationSchema: z.number().min(0, t("Products.form.stock_quantity.required")),
     },
   ];

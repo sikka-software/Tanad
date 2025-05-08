@@ -26,13 +26,20 @@ export default function AddCompanyPage() {
       form.setValue("name", dummyData.full_name);
       form.setValue("email", dummyData.email);
       form.setValue("phone", dummyData.phone);
-      form.setValue("address", dummyData.address);
+      form.setValue("street_name", dummyData.address);
+      form.setValue("city", dummyData.city);
+      form.setValue("region", "Eastern");
+      form.setValue("zip_code", String(dummyData.zip_code));
+      form.setValue("building_number", String(dummyData.randomNumber));
+      form.setValue("additional_number", String(dummyData.randomNumber));
+      form.setValue("industry", dummyData.randomString);
+      form.setValue("size", String(dummyData.randomNumber));
     }
   };
 
   const onAddSuccess = () => {
     toast.success(t("General.successful_operation"), {
-      description: t("Companies.success.created"),
+      description: t("Companies.success.create"),
     });
     router.push("/companies");
     setIsLoading(false);
@@ -53,9 +60,7 @@ export default function AddCompanyPage() {
           cancel: t("General.cancel"),
         }}
       />
-      <div className="mx-auto max-w-2xl p-4">
-        <CompanyForm id="company-form" onSuccess={onAddSuccess} />
-      </div>
+      <CompanyForm formHtmlId="company-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

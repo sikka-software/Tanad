@@ -14,6 +14,47 @@ export const navigationMenuTriggerStyle = cva(
   "group inline-flex h-10 w-max items-center gap-1 justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 ",
 );
 
+export const getNotesValue = (defaultValues: any) =>
+  defaultValues?.notes && typeof defaultValues.notes === "object" && "root" in defaultValues.notes
+    ? defaultValues.notes
+    : null;
+
+export function convertToPascalCase(inputString: string) {
+  // Return an empty string if the input is null, undefined, or an empty/whitespace string
+  if (inputString === null || inputString === undefined) {
+    return "";
+  }
+
+  const str = String(inputString); // Ensure the input is treated as a string
+
+  if (str.trim() === "") {
+    return "";
+  }
+
+  return (
+    str
+      .replace(/_/g, " ") // Replace all underscores with spaces.
+      // e.g., "job_listings" becomes "job listings"
+      // e.g., "online_stores" becomes "online stores"
+      // Handles cases like "branches" or "jobs" gracefully (no change).
+      .split(" ") // Split the string into an array of words using space as a delimiter.
+      // e.g., "job listings" becomes ["job", "listings"]
+      // e.g., "branches" becomes ["branches"]
+      .map((word) => {
+        // For each word in the array:
+        if (word.length === 0) {
+          return ""; // Handle potential empty strings if there were multiple spaces
+        }
+        // Capitalize the first letter and make the rest of the word lowercase.
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        // e.g., "job" -> "Job", "listings" -> "Listings"
+        // e.g., "ONLINE" -> "Online"
+      })
+      .join("")
+  ); // Join the processed words back into a single string without spaces.
+  // e.g., ["Job", "Listings"] becomes "JobListings"
+}
+
 export const thumbnails: string[] = [
   "/assets/thumbnails/pukla-design-1.png",
   "/assets/thumbnails/pukla-design-2.png",

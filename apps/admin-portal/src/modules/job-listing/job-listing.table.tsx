@@ -1,7 +1,9 @@
+import { cn } from "@root/src/lib/utils";
 import { useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
 
+import { Badge } from "@/ui/badge";
 import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
@@ -12,31 +14,31 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateJobListing } from "./job-listing.hooks";
 import useJobListingsStore from "./job-listing.store";
-import { JobListing } from "./job-listing.type";
+import { JobListingWithJobs } from "./job-listing.type";
 
 const JobListingsTable = ({
   data,
   isLoading,
   error,
   onActionClicked,
-}: ModuleTableProps<JobListing>) => {
+}: ModuleTableProps<JobListingWithJobs>) => {
   const t = useTranslations();
   const { mutate: updateJobListing } = useUpdateJobListing();
   const selectedRows = useJobListingsStore((state) => state.selectedRows);
   const setSelectedRows = useJobListingsStore((state) => state.setSelectedRows);
 
-  const canEditJobListing = useUserStore((state) => state.hasPermission("job-listings.update"));
+  const canEditJobListing = useUserStore((state) => state.hasPermission("job_listings.update"));
   const canDuplicateJobListing = useUserStore((state) =>
-    state.hasPermission("job-listings.duplicate"),
+    state.hasPermission("job_listings.duplicate"),
   );
-  const canViewJobListing = useUserStore((state) => state.hasPermission("job-listings.view"));
-  const canArchiveJobListing = useUserStore((state) => state.hasPermission("job-listings.archive"));
-  const canDeleteJobListing = useUserStore((state) => state.hasPermission("job-listings.delete"));
+  const canViewJobListing = useUserStore((state) => state.hasPermission("job_listings.view"));
+  const canArchiveJobListing = useUserStore((state) => state.hasPermission("job_listings.archive"));
+  const canDeleteJobListing = useUserStore((state) => state.hasPermission("job_listings.delete"));
 
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
-  const columns: ExtendedColumnDef<JobListing>[] = [
+  const columns: ExtendedColumnDef<JobListingWithJobs>[] = [
     {
       accessorKey: "title",
       header: t("JobListings.form.title.label"),
@@ -47,15 +49,27 @@ const JobListingsTable = ({
       header: t("JobListings.form.description.label"),
       validationSchema: z.string().min(1, t("JobListings.form.description.required")),
     },
-    {
-      accessorKey: "is_active",
-      header: t("JobListings.form.is_active.label"),
-      validationSchema: z.boolean(),
-    },
+
     {
       accessorKey: "slug",
       header: t("JobListings.form.slug.label"),
       validationSchema: z.string().min(1, t("JobListings.form.slug.required")),
+    },
+    {
+      accessorKey: "jobs_count",
+      header: t("JobListings.jobs_count.label", { defaultMessage: "Jobs" }),
+      enableEditing: false,
+      cell: ({ row }) => row.original.jobs_count,
+    },
+    {
+      accessorKey: "status",
+      header: t("JobListings.form.status.label"),
+      validationSchema: z.boolean(),
+      cellType: "status",
+      options: [
+        { value: "active", label: t("JobListings.form.status.active") },
+        { value: "inactive", label: t("JobListings.form.status.inactive") },
+      ],
     },
   ];
 
@@ -65,7 +79,7 @@ const JobListingsTable = ({
   };
 
   const handleRowSelectionChange = useCallback(
-    (rows: JobListing[]) => {
+    (rows: JobListingWithJobs[]) => {
       const newSelectedIds = rows.map((row) => row.id!);
       // Only update if the selection has actually changed
       if (JSON.stringify(newSelectedIds) !== JSON.stringify(selectedRows)) {
@@ -91,7 +105,7 @@ const JobListingsTable = ({
     },
     enableRowSelection: true,
     enableMultiRowSelection: true,
-    getRowId: (row: JobListing) => row.id!,
+    getRowId: (row: JobListingWithJobs) => row.id!,
     onRowSelectionChange: (updater: any) => {
       const newSelection = typeof updater === "function" ? updater(rowSelection) : updater;
       const selectedRows = data.filter((row) => newSelection[row.id!]);
@@ -112,6 +126,7 @@ const JobListingsTable = ({
       canViewAction={canViewJobListing}
       canArchiveAction={canArchiveJobListing}
       canDeleteAction={canDeleteJobListing}
+      canPreviewAction={true}
       onRowSelectionChange={handleRowSelectionChange}
       tableOptions={jobListingTableOptions}
       onActionClicked={onActionClicked}
@@ -122,6 +137,7 @@ const JobListingsTable = ({
         view: t("General.view"),
         archive: t("General.archive"),
         delete: t("General.delete"),
+        preview: t("General.preview"),
       }}
     />
   );

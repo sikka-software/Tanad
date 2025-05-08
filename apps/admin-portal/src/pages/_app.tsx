@@ -1,6 +1,6 @@
 "use client";
 
-import { NextIntlClientProvider } from "next-intl";
+import { NextIntlClientProvider, useLocale } from "next-intl";
 import { ThemeProvider } from "next-themes";
 import type { AppProps } from "next/app";
 import { IBM_Plex_Sans_Arabic } from "next/font/google";
@@ -16,9 +16,12 @@ import LandingLayout from "@/components/layouts/landing-layout";
 import { QueryProvider } from "@/providers/QueryProvider";
 import "@/styles/globals.css";
 
+import TopBar from "../components/jobs/top-bar";
+
 const arabicFont = IBM_Plex_Sans_Arabic({
   weight: ["100", "200", "300", "400", "500", "600", "700"],
-  subsets: ["arabic"],
+  subsets: ["arabic", "latin"],
+  variable: "--font-arabic",
 });
 
 const authPages = ["/auth", "/reset-password", "/onboarding"];
@@ -37,6 +40,7 @@ const landingPages = [
   "/appeal",
   "/404",
   "/directory",
+  "/custom-pricing",
 ];
 
 function AppContent({ Component, pageProps, router }: AppProps) {
@@ -44,6 +48,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
 
   useEffect(() => {
     setMounted(true);
+    document.documentElement.classList.add(arabicFont.className);
   }, []);
 
   // Prevent beforeunload confirmation dialog for programmatic navigation
@@ -75,7 +80,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   // Auth Pages
   if (authPages.includes(router.pathname)) {
     return (
-      <div className={`${arabicFont.className}`}>
+      <div>
         <NextIntlClientProvider
           messages={pageProps.messages}
           locale={router.locale}
@@ -91,7 +96,7 @@ function AppContent({ Component, pageProps, router }: AppProps) {
   // Landing Page
   if (landingPages.includes(router.pathname)) {
     return (
-      <div className={`${arabicFont.className}`}>
+      <div>
         <NextIntlClientProvider
           messages={pageProps.messages}
           locale={router.locale}
@@ -104,10 +109,25 @@ function AppContent({ Component, pageProps, router }: AppProps) {
     );
   }
 
-  // Invoice pages
-  if (router.pathname === "/invoices/[code]") {
+  // job listing page
+  if (router.pathname === "/job_listings/preview/[id]") {
     return (
-      <div className={`${arabicFont.className}`}>
+      <div>
+        <NextIntlClientProvider
+          messages={pageProps.messages}
+          locale={router.locale}
+          timeZone="Asia/Riyadh"
+          now={new Date()}
+        >
+          <JobListingPage>{<Component {...pageProps} />}</JobListingPage>
+        </NextIntlClientProvider>
+      </div>
+    );
+  }
+  // Invoice pages
+  if (router.pathname === "/pay/[id]") {
+    return (
+      <div>
         <NextIntlClientProvider
           messages={pageProps.messages}
           locale={router.locale}
@@ -120,9 +140,8 @@ function AppContent({ Component, pageProps, router }: AppProps) {
     );
   }
 
-  // App Pages
   return (
-    <div className={`${arabicFont.className}`}>
+    <div>
       <NextIntlClientProvider
         messages={pageProps.messages}
         locale={router.locale}
@@ -153,6 +172,17 @@ const InvoicePages = ({ children }: { children: React.ReactNode }) => {
     <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
       <LoadingBar />
       {children}
+    </ThemeProvider>
+  );
+};
+
+const JobListingPage = ({ children }: { children: React.ReactNode }) => {
+  const locale = useLocale();
+  return (
+    <ThemeProvider attribute="class" disableTransitionOnChange enableSystem defaultTheme="dark">
+      <LoadingBar />
+      <TopBar />
+      <div dir={locale === "ar" ? "rtl" : "ltr"}>{children}</div>
     </ThemeProvider>
   );
 };

@@ -7,6 +7,279 @@ export const MAX_SLUG_LENGTH = 32;
 export const CACHE_KEY = (user_id: string) => `user_cache_${user_id}`;
 export const FREE_PLAN_ID = "price_1QfPy8CVtUnAWEKBdr1JAb5w";
 export const TANAD_PRODUCT_ID = process.env.NEXT_PUBLIC_STRIPE_PRODUCT_ID;
+
+export const SERVER_OS = [
+  {
+    label: "Windows",
+    value: "windows",
+  },
+  {
+    label: "Linux",
+    value: "linux",
+  },
+  {
+    label: "MacOS",
+    value: "macos",
+  },
+  {
+    label: "Ubuntu",
+    value: "ubuntu",
+  },
+  {
+    label: "Debian",
+    value: "debian",
+  },
+  {
+    label: "CentOS",
+    value: "centos",
+  },
+  {
+    label: "Fedora",
+    value: "fedora",
+  },
+  {
+    label: "Arch Linux",
+    value: "archlinux",
+  },
+  {
+    label: "OpenBSD",
+    value: "openbsd",
+  },
+  {
+    label: "FreeBSD",
+    value: "freebsd",
+  },
+  {
+    label: "Alpine Linux",
+    value: "alpine",
+  },
+  {
+    label: "Red Hat (RHEL)",
+    value: "rhel",
+  },
+  {
+    label: "Solaris",
+    value: "solaris",
+  },
+  {
+    label: "AIX",
+    value: "aix",
+  },
+  {
+    label: "HP-UX",
+    value: "hp-ux",
+  },
+  {
+    label: "Other",
+    value: "other",
+  },
+];
+
+export const E_COMMERCE_PLATFORMS = [
+  {
+    label: "OnlineStores.form.platform.salla",
+    value: "salla",
+  },
+  {
+    label: "OnlineStores.form.platform.zid",
+    value: "zid",
+  },
+  {
+    label: "OnlineStores.form.platform.shopify",
+    value: "shopify",
+  },
+  {
+    label: "OnlineStores.form.platform.wix",
+    value: "wix",
+  },
+  {
+    label: "OnlineStores.form.platform.magento",
+    value: "magento",
+  },
+  {
+    label: "OnlineStores.form.platform.prestashop",
+    value: "prestashop",
+  },
+  {
+    label: "OnlineStores.form.platform.bigcommerce",
+    value: "bigcommerce",
+  },
+  {
+    label: "OnlineStores.form.platform.woocommerce",
+    value: "woocommerce",
+  },
+  {
+    label: "OnlineStores.form.platform.open_cart",
+    value: "opencart",
+  },
+  {
+    label: "OnlineStores.form.platform.other",
+    value: "other",
+  },
+];
+
+export const SERVER_PROVIDERS = [
+  {
+    label: "AWS",
+    value: "aws",
+  },
+  {
+    label: "Azure",
+    value: "azure",
+  },
+  {
+    label: "Google Cloud",
+    value: "google",
+  },
+  {
+    label: "DigitalOcean",
+    value: "digitalocean",
+  },
+  {
+    label: "Linode",
+    value: "linode",
+  },
+  {
+    label: "Vultr",
+    value: "vultr",
+  },
+  {
+    label: "Hawsabah",
+    value: "hawsabah",
+  },
+  {
+    label: "GoDaddy",
+    value: "godaddy",
+  },
+  {
+    label: "Other",
+    value: "other",
+  },
+];
+
+export const MODULE_ANALYTICS = [
+  {
+    key: "branch",
+    rpc: "get_module_analytics_branch",
+    title: "Branches.title",
+    add: "branches_added",
+    update: "branches_updated",
+    delete: "branches_removed",
+  },
+  {
+    key: "job",
+    rpc: "get_module_analytics_job",
+    title: "Jobs.title",
+    add: "jobs_added",
+    update: "jobs_updated",
+    delete: "jobs_removed",
+  },
+  {
+    key: "server",
+    rpc: "get_module_analytics_server",
+    title: "Servers.title",
+    add: "servers_added",
+    update: "servers_updated",
+    delete: "servers_removed",
+  },
+  {
+    key: "domain",
+    rpc: "get_module_analytics_domain",
+    title: "Domains.title",
+    add: "domains_added",
+    update: "domains_updated",
+    delete: "domains_removed",
+  },
+  {
+    key: "website",
+    rpc: "get_module_analytics_website",
+    title: "Websites.title",
+    add: "websites_added",
+    update: "websites_updated",
+    delete: "websites_removed",
+  },
+  {
+    key: "client",
+    rpc: "get_module_analytics_client",
+    title: "Clients.title",
+    add: "clients_added",
+    update: "clients_updated",
+    delete: "clients_removed",
+  },
+  {
+    key: "office",
+    rpc: "get_module_analytics_office",
+    title: "Offices.title",
+    add: "offices_added",
+    update: "offices_updated",
+    delete: "offices_removed",
+  },
+  {
+    key: "warehouse",
+    rpc: "get_module_analytics_warehouse",
+    title: "Warehouses.title",
+    add: "warehouses_added",
+    update: "warehouses_updated",
+    delete: "warehouses_removed",
+  },
+  {
+    key: "product",
+    rpc: "get_module_analytics_product",
+    title: "Products.title",
+    add: "products_added",
+    update: "products_updated",
+    delete: "products_removed",
+  },
+  {
+    key: "invoice",
+    rpc: "get_module_analytics_invoice",
+    title: "Invoices.title",
+    add: "invoices_added",
+    update: "invoices_updated",
+    delete: "invoices_removed",
+  },
+
+  {
+    key: "employee",
+    rpc: "get_module_analytics_employee",
+    title: "Employees.title",
+    add: "employees_added",
+    update: "employees_updated",
+    delete: "employees_removed",
+  },
+  {
+    key: "expense",
+    rpc: "get_module_analytics_expense",
+    title: "Expenses.title",
+    add: "expenses_added",
+    update: "expenses_updated",
+    delete: "expenses_removed",
+  },
+  {
+    key: "purchase",
+    rpc: "get_module_analytics_purchases",
+    title: "Purchases.title",
+    add: "purchases_added",
+    update: "purchases_updated",
+    delete: "purchases_removed",
+  },
+  {
+    key: "employee_request",
+    rpc: "get_module_analytics_employee_request",
+    title: "EmployeeRequests.title",
+    add: "employee_requests_added",
+    update: "employee_requests_updated",
+    delete: "employee_requests_removed",
+  },
+  {
+    key: "job_listing",
+    rpc: "get_module_analytics_job_listing",
+    title: "JobListings.title",
+    add: "job_listings_added",
+    update: "job_listings_updated",
+    delete: "job_listings_removed",
+  },
+];
 export const fakeAnalyticsData = [
   {
     country: "Saudi Arabia",

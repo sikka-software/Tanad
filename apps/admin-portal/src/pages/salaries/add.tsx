@@ -29,25 +29,17 @@ export default function AddSalaryPage() {
           submit_form: t("Salaries.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={generateDummySalary}>
-              Dummy Data
-            </Button>
-          )
-        }
+        dummyButton={generateDummySalary}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <SalaryForm
-          id="salary-form"
-          onSuccess={() =>
-            router.push("/salaries").then(() => {
-              setLoading(false);
-            })
-          }
-        />
-      </div>
+      <SalaryForm
+        formHtmlId="salary-form"
+        onSuccess={() =>
+          router.push("/salaries").then(() => {
+            setLoading(false);
+          })
+        }
+      />
     </div>
   );
 }

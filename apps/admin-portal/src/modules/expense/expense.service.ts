@@ -1,4 +1,4 @@
-import { Expense } from "./expense.type";
+import { Expense, ExpenseCreateData, ExpenseUpdateData } from "./expense.type";
 
 export async function fetchExpenses(): Promise<Expense[]> {
   const response = await fetch("/api/resource/expenses");
@@ -16,7 +16,7 @@ export async function fetchExpenseById(id: string): Promise<Expense> {
   return response.json();
 }
 
-export async function createExpense(expense: Omit<Expense, "id" | "created_at">): Promise<Expense> {
+export async function createExpense(expense: ExpenseCreateData): Promise<Expense> {
   const response = await fetch("/api/resource/expenses", {
     method: "POST",
     headers: {
@@ -30,7 +30,7 @@ export async function createExpense(expense: Omit<Expense, "id" | "created_at">)
   return response.json();
 }
 
-export async function updateExpense(id: string, updates: Partial<Expense>): Promise<Expense> {
+export async function updateExpense(id: string, updates: ExpenseUpdateData): Promise<Expense> {
   const response = await fetch(`/api/resource/expenses/${id}`, {
     method: "PUT",
     headers: {

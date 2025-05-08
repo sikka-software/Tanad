@@ -1,4 +1,6 @@
-import { useTranslations } from "next-intl";
+import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import { CommandSelect } from "@root/src/components/ui/command-select";
+import { useLocale, useTranslations } from "next-intl";
 import React from "react";
 import { z } from "zod";
 
@@ -14,6 +16,8 @@ import { Warehouse } from "@/warehouse/warehouse.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { useEmployees } from "../employee/employee.hooks";
+
 const WarehouseTable = ({
   data,
   isLoading,
@@ -21,6 +25,7 @@ const WarehouseTable = ({
   onActionClicked,
 }: ModuleTableProps<Warehouse>) => {
   const t = useTranslations();
+  const locale = useLocale();
   const { mutateAsync: updateWarehouse } = useUpdateWarehouse();
   const selectedRows = useWarehouseStore((state) => state.selectedRows);
   const setSelectedRows = useWarehouseStore((state) => state.setSelectedRows);
@@ -32,6 +37,12 @@ const WarehouseTable = ({
   const canViewWarehouse = useUserStore((state) => state.hasPermission("warehouses.view"));
   const canArchiveWarehouse = useUserStore((state) => state.hasPermission("warehouses.archive"));
   const canDeleteWarehouse = useUserStore((state) => state.hasPermission("warehouses.delete"));
+
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const employeeOptions = employees.map((emp) => ({
+    label: `${emp.first_name} ${emp.last_name}`,
+    value: emp.id,
+  }));
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
@@ -47,10 +58,56 @@ const WarehouseTable = ({
       validationSchema: z.string().min(1, t("Warehouses.form.code.required")),
     },
     {
-      accessorKey: "address",
-      header: t("Warehouses.form.address.label"),
-      validationSchema: z.string().min(1, t("Warehouses.form.address.required")),
+      accessorKey: "email",
+      header: t("Warehouses.form.email.label"),
+      validationSchema: z.string().email(t("Warehouses.form.email.invalid")),
     },
+    {
+      accessorKey: "phone",
+      header: t("Warehouses.form.phone.label"),
+      validationSchema: z.string().nullable(),
+    },
+    {
+      accessorKey: "capacity",
+      header: t("Warehouses.form.capacity.label"),
+      validationSchema: z.number().min(0, t("Warehouses.form.capacity.invalid")),
+    },
+
+    {
+      accessorKey: "manager",
+      header: t("Warehouses.form.manager.label"),
+      noPadding: true,
+      validationSchema: z.string().nullable(),
+      cell: ({ row }) => {
+        const warehouse = row.original;
+        return (
+          <ComboboxAdd
+            direction={locale === "ar" ? "rtl" : "ltr"}
+            inCell
+            data={employeeOptions}
+            isLoading={employeesLoading}
+            buttonClassName="bg-transparent"
+            defaultValue={warehouse.manager || ""}
+            onChange={async (value) => {
+              await updateWarehouse({
+                id: warehouse.id,
+                data: {
+                  manager: value || null,
+                },
+              });
+            }}
+            texts={{
+              placeholder: ". . .",
+              searchPlaceholder: t("Employees.search_employees"),
+              noItems: t("Warehouses.form.manager.no_employees"),
+            }}
+            addText={t("Employees.add_new")}
+            ariaInvalid={false}
+          />
+        );
+      },
+    },
+
     {
       accessorKey: "city",
       header: t("Warehouses.form.city.label"),
@@ -67,14 +124,19 @@ const WarehouseTable = ({
       validationSchema: z.string().min(1, t("Warehouses.form.zip_code.required")),
     },
     {
-      accessorKey: "capacity",
-      header: t("Warehouses.form.capacity.label"),
-      validationSchema: z.number().min(0, t("Warehouses.form.capacity.invalid")),
-    },
-    {
       accessorKey: "notes",
       header: t("Warehouses.form.notes.label"),
       validationSchema: z.string().optional(),
+    },
+    {
+      accessorKey: "status",
+      header: t("Warehouses.form.status.label"),
+      validationSchema: z.enum(["active", "inactive"]),
+      cellType: "status",
+      options: [
+        { label: t("Warehouses.form.status.active"), value: "active" },
+        { label: t("Warehouses.form.status.inactive"), value: "inactive" },
+      ],
     },
   ];
 

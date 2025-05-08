@@ -1,0 +1,1 @@
+-- Removed ALTER TYPE statement that conflicts with existing type

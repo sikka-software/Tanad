@@ -10,6 +10,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 
+import PasswordInput from "@/components/ui/password-input";
+
+import { ModuleFormProps } from "@/types/common.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { RoleForm } from "../role/role.form";
@@ -18,7 +22,7 @@ import { RoleForm } from "../role/role.form";
 import { useCustomRoles, useSystemRoles } from "../role/role.hooks";
 import { predefinedRoles } from "../role/role.options";
 import useRoleStore from "../role/role.store";
-import type { Role, RoleWithPermissions } from "../role/role.type";
+import type { Role } from "../role/role.type";
 // Import hooks for create/update
 import { useCreateUser, useUpdateUser } from "./user.hooks";
 import useEnterpriseUsersStore from "./user.store";
@@ -51,14 +55,7 @@ const updateUserFormSchema = baseUserFormSchema.extend({
 // Infer the type from the base schema, specific validation handled conditionally
 type UserFormData = z.infer<typeof baseUserFormSchema> & { password?: string };
 
-interface UserFormProps {
-  onSuccess: () => void;
-  id?: string;
-  // Revert to User type, assuming it has first_name, last_name, and role (ID/key)
-  initialData?: UserType | null;
-}
-
-export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
+export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormProps<UserType>) {
   const t = useTranslations();
   const locale = useLocale();
   const enterprise = useUserStore((state) => state.enterprise);
@@ -83,8 +80,8 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
 
   // Process roles, don't rely on initialData for role
   const allRoles = useMemo(() => {
-    const combined = new Map<string, RoleWithPermissions>();
-    const rolesArray: RoleWithPermissions[] = [];
+    const combined = new Map<string, Role>();
+    const rolesArray: Role[] = [];
 
     (customRoles ?? []).forEach((role) => {
       if (!combined.has(role.id)) {
@@ -112,42 +109,42 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
   const rolesLoading = customRolesLoading || systemRolesLoading;
   const rolesError = customRolesError || systemRolesError;
 
-  const isEditing = !!initialData;
+  const isEditing = !!defaultValues;
   const currentSchema = isEditing ? updateUserFormSchema : createUserFormSchema;
 
   const form = useForm<UserFormData>({
     resolver: zodResolver(currentSchema),
     defaultValues: useMemo(() => {
       // Revert to splitting full_name
-      const [firstName = "", lastName = ""] = (initialData?.full_name || "").split(" ", 2);
+      const [firstName = "", lastName = ""] = (defaultValues?.full_name || "").split(" ", 2);
       // Cannot reliably determine initial role name from initialData type
       return {
         first_name: firstName,
         last_name: lastName,
-        email: initialData?.email || "",
+        email: defaultValues?.email || "",
         password: "",
         role: "", // Default role to empty string
       };
-    }, [initialData?.id, initialData?.full_name, initialData?.email]), // Revert dependencies
+    }, [defaultValues?.id, defaultValues?.full_name, defaultValues?.email]), // Revert dependencies
   });
 
   // Reset form
   useEffect(() => {
     // Revert to splitting full_name
-    const [firstName = "", lastName = ""] = (initialData?.full_name || "").split(" ", 2);
+    const [firstName = "", lastName = ""] = (defaultValues?.full_name || "").split(" ", 2);
 
     form.reset({
       first_name: firstName,
       last_name: lastName,
-      email: initialData?.email || "",
+      email: defaultValues?.email || "",
       password: "",
       role: "", // Default role to empty string
     });
     // Update dependencies to match defaultValues
   }, [
-    initialData?.id,
-    initialData?.full_name, // Revert dependencies
-    initialData?.email,
+    defaultValues?.id,
+    defaultValues?.full_name, // Revert dependencies
+    defaultValues?.email,
     form.reset,
   ]);
 
@@ -160,7 +157,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
       setIsRoleDialogOpen(false);
       // Refetch roles - React Query handles this via hook re-render if keys are correct
       toast.success(t("General.successful_operation"), {
-        description: t("Roles.success.created"), // Use Role success message
+        description: t("Roles.success.create"), // Use Role success message
       });
       // Cannot reliably set value without knowing the new role name from RoleForm onSuccess
       // if (newRole?.name) {
@@ -184,12 +181,16 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
     const roleId = selectedRole?.id;
 
     // Construct mutation data based on form values
+    // ** Combine first and last name into full_name **
+    const fullName = `${values.first_name} ${values.last_name}`.trim();
+
     const mutationDataBase = {
-      first_name: values.first_name,
-      last_name: values.last_name,
+      // Remove first_name and last_name
+      full_name: fullName, // Add full_name
       email: values.email.toLowerCase(), // Ensure email is lowercase
-      role: values.role,
-      enterprise_id: enterprise.id,
+      role: values.role, // Keep role name for API check
+      enterprise_id: enterprise.id, // Keep for potential use (though API doesn't destructure it)
+      role_id: roleId, // Keep role_id for potential use (though API doesn't destructure it)
     };
 
     // Add password conditionally
@@ -198,13 +199,13 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
       : mutationDataBase;
 
     try {
-      if (isEditing && initialData) {
+      if (isEditing && defaultValues) {
         await updateUser({
-          id: initialData.id,
+          id: defaultValues.id,
           data: { ...mutationData, role_id: roleId } as UserUpdateData,
         });
         toast.success(t("General.successful_operation"), {
-          description: t("Users.success.updated"),
+          description: t("Users.success.update"),
         });
       } else {
         // Ensure password exists for creation, handled by schema but double-check
@@ -215,7 +216,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
         }
         await createUser({ ...mutationData, role_id: roleId } as UserCreateData);
         toast.success(t("General.successful_operation"), {
-          description: t("Users.success.created"),
+          description: t("Users.success.create"),
         });
       }
       // Reset form fields explicitly
@@ -226,13 +227,30 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
         password: "",
         role: "", // Reset role to empty
       });
-      onSuccess();
+      onSuccess?.();
     } catch (error: any) {
       console.error("Submit Error in UserForm:", error);
-      toast.error(t("General.error_occurred"), {
-        description:
-          error?.message || t(isEditing ? "Users.error.updating" : "Users.error.creating"),
-      });
+
+      // Check for the specific 409 conflict error
+      if (
+        error?.response?.status === 409 &&
+        error?.response?.data?.code === "USER_MEMBERSHIP_EXISTS"
+      ) {
+        // Set a specific error message on the email field
+        form.setError("email", {
+          type: "manual",
+          message: t("Users.error.already_exists_in_enterprise"), // Add this translation key
+        });
+        toast.error(t("Validation.error"), {
+          // More generic toast title
+          description: t("Users.error.already_exists_in_enterprise"),
+        });
+      } else {
+        // Handle other errors generally
+        toast.error(t("General.error_occurred"), {
+          description: error?.message || t(isEditing ? "Users.error.update" : "Users.error.create"),
+        });
+      }
       setIsLoading(false);
     }
   };
@@ -243,17 +261,56 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
   return (
     <Form {...form}>
       {/* Use the correct form ID */}
-      <form id={id} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+      <form id={formHtmlId} onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="form-container">
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="first_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Users.form.first_name.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Users.form.first_name.placeholder")}
+                      {...field}
+                      disabled={isFormSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="last_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Users.form.last_name.label")}</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder={t("Users.form.last_name.placeholder")}
+                      {...field}
+                      disabled={isFormSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
           <FormField
             control={form.control}
-            name="first_name"
+            name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Users.form.first_name.label")}</FormLabel>
+                <FormLabel>{t("Users.form.email.label")}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={t("Users.form.first_name.placeholder")}
+                    dir="ltr"
+                    className="text-start"
+                    type="email"
+                    placeholder={t("Users.form.email.placeholder")}
                     {...field}
                     disabled={isFormSubmitting}
                   />
@@ -264,14 +321,53 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
           />
           <FormField
             control={form.control}
-            name="last_name"
+            name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Users.form.last_name.label")}</FormLabel>
+                <FormLabel>
+                  {t("Users.form.password.label")}{" "}
+                  {isEditing && (
+                    <span className="text-muted-foreground text-xs">
+                      {" "}
+                      ({t("Users.password_optional")})
+                    </span>
+                  )}
+                </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder={t("Users.form.last_name.placeholder")}
+                  <PasswordInput
+                    placeholder={t("Users.form.password.placeholder")}
                     {...field}
+                    disabled={isFormSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>{t("Users.form.role.label")}</FormLabel>
+                <FormControl>
+                  <ComboboxAdd
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    // Use role name as value, consistent with previous Select
+                    data={allRoles.roles.map((role) => ({
+                      label: predefinedRoles(t, role.name)?.name || role.name, // Pass role.name to predefinedRoles
+                      value: role.name, // Form value
+                    }))}
+                    isLoading={rolesLoading}
+                    defaultValue={field.value} // Current form value (role name)
+                    onChange={(value) => field.onChange(value || null)} // Update form value
+                    texts={{
+                      placeholder: t("Users.form.role.placeholder"),
+                      searchPlaceholder: t("Users.form.role.search_placeholder"),
+                      noItems: t("Roles.no_roles_available"),
+                    }}
+                    addText={t("Roles.add_new")} // Use Role translation
+                    onAddClick={() => setIsRoleDialogOpen(true)} // Open dialog
                     disabled={isFormSubmitting}
                   />
                 </FormControl>
@@ -280,83 +376,6 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Users.form.email.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  dir="ltr"
-                  className="text-start"
-                  type="email"
-                  placeholder={t("Users.form.email.placeholder")}
-                  {...field}
-                  disabled={isFormSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                {t("Users.form.password.label")}{" "}
-                {isEditing && (
-                  <span className="text-muted-foreground text-xs">
-                    {" "}
-                    ({t("Users.password_optional")})
-                  </span>
-                )}
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder={t("Users.form.password.placeholder")}
-                  {...field}
-                  disabled={isFormSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>{t("Users.form.role.label")}</FormLabel>
-              <FormControl>
-                <ComboboxAdd
-                  direction={locale === "ar" ? "rtl" : "ltr"}
-                  // Use role name as value, consistent with previous Select
-                  data={allRoles.roles.map((role) => ({
-                    label: predefinedRoles(t, role.name)?.name || role.name, // Pass role.name to predefinedRoles
-                    value: role.name, // Form value
-                  }))}
-                  isLoading={rolesLoading}
-                  defaultValue={field.value} // Current form value (role name)
-                  onChange={(value) => field.onChange(value || null)} // Update form value
-                  texts={{
-                    placeholder: t("Users.form.role.placeholder"),
-                    searchPlaceholder: t("Users.form.role.search_placeholder"),
-                    noItems: t("Roles.no_roles_available"),
-                  }}
-                  addText={t("Roles.add_new")} // Use Role translation
-                  onAddClick={() => setIsRoleDialogOpen(true)} // Open dialog
-                  disabled={isFormSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </form>
 
       {/* Role Creation Dialog */}
@@ -370,7 +389,7 @@ export function UserForm({ onSuccess, id, initialData }: UserFormProps) {
         loadingSave={isSavingRole}
       >
         <RoleForm
-          formId="role-form" // Match the FormDialog's formId
+          formHtmlId="role-form" // Match the FormDialog's formId
           onSuccess={handleRoleCreated} // Callback on successful creation
         />
       </FormDialog>

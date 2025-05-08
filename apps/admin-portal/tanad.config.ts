@@ -15,6 +15,13 @@ import {
   Settings,
   ShoppingCart,
   BriefcaseBusiness,
+  Globe,
+  Server,
+  Link,
+  TableOfContents,
+  BarChart,
+  Car,
+  Truck,
 } from "lucide-react";
 
 const ModulesOptions = {
@@ -23,6 +30,18 @@ const ModulesOptions = {
     label: "Dashboard.title",
     translationKey: "Dashboard.title",
     url: "/dashboard",
+  },
+  analytics: {
+    icon: BarChart,
+    label: "Analytics.title",
+    translationKey: "Analytics.title",
+    url: "/analytics",
+  },
+  activity_logs: {
+    icon: TableOfContents,
+    label: "ActivityLogs.title",
+    translationKey: "ActivityLogs.title",
+    url: "/activity",
   },
   sales: {
     icon: SaudiRiyal,
@@ -34,7 +53,7 @@ const ModulesOptions = {
     icon: Briefcase,
     label: "JobListings.title",
     translationKey: "JobListings.title",
-    url: "/jobs/listings",
+    url: "/job_listings",
   },
   companies: {
     icon: Building2,
@@ -120,11 +139,11 @@ const ModulesOptions = {
     translationKey: "Departments.title",
     url: "/departments",
   },
-  employeeRequests: {
+  employee_requests: {
     icon: Briefcase,
     label: "EmployeeRequests.title",
     translationKey: "EmployeeRequests.title",
-    url: "/employee-requests",
+    url: "/employee_requests",
   },
   jobs: {
     icon: Briefcase,
@@ -156,6 +175,62 @@ const ModulesOptions = {
     translationKey: "Settings.title",
     url: "/settings",
   },
+  internet: {
+    label: "Internet.title",
+    translationKey: "Internet.title",
+    url: "/internet",
+  },
+  websites: {
+    icon: Globe,
+    label: "Websites.title",
+    translationKey: "Websites.title",
+    url: "/websites",
+  },
+  servers: {
+    icon: Server,
+    label: "Servers.title",
+    translationKey: "Servers.title",
+    url: "/servers",
+  },
+  domains: {
+    icon: Link,
+    label: "Domains.title",
+    translationKey: "Domains.title",
+    url: "/domains",
+  },
+  online_stores: {
+    icon: Store,
+    label: "OnlineStores.title",
+    translationKey: "OnlineStores.title",
+    url: "/online_stores",
+  },
+  cars: {
+    icon: Car,
+    label: "Cars.title",
+    translationKey: "Cars.title",
+    url: "/cars",
+  },
+  trucks: {
+    icon: Truck,
+    label: "Trucks.title",
+    translationKey: "Trucks.title",
+    url: "/trucks",
+  },
 };
 
-export { ModulesOptions };
+const currencies = [
+  "sar",
+  "usd",
+  "bhd",
+  "kwd",
+  "qar",
+  "aed",
+  "omr",
+  "try",
+  "iqd",
+  "eur",
+  "gbp",
+  "jpy",
+] as const;
+
+export { ModulesOptions, currencies };

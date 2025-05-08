@@ -16,8 +16,8 @@ const CompanyCard = ({ company }: { company: Company }) => {
             <h3 className="text-lg font-semibold">{company.name}</h3>
             {company.industry && <p className="text-sm text-gray-500">{company.industry}</p>}
           </div>
-          <Badge variant={company.is_active ? "default" : "secondary"}>
-            {company.is_active ? t("Companies.active") : t("Companies.inactive")}
+          <Badge variant={company.status === "active" ? "default" : "secondary"}>
+            {company.status === "active" ? t("Companies.active") : t("Companies.inactive")}
           </Badge>
         </div>
       </CardHeader>
@@ -54,11 +54,13 @@ const CompanyCard = ({ company }: { company: Company }) => {
               </a>
             </div>
           )}
-          {(company.address || company.city || company.state) && (
+          {(company.building_number || company.street_name || company.city || company.region) && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <MapPin className="h-4 w-4" />
               <span>
-                {[company.address, company.city, company.state].filter(Boolean).join(", ")}
+                {[company.building_number, company.street_name, company.city, company.region]
+                  .filter(Boolean)
+                  .join(", ")}
                 {company.zip_code && ` ${company.zip_code}`}
               </span>
             </div>
@@ -68,9 +70,6 @@ const CompanyCard = ({ company }: { company: Company }) => {
               <Building2 className="h-4 w-4" />
               <span>{company.size} employees</span>
             </div>
-          )}
-          {company.notes && (
-            <p className="mt-2 border-t pt-2 text-sm text-gray-500">{company.notes}</p>
           )}
         </div>
       </CardContent>

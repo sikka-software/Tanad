@@ -70,9 +70,9 @@ export default function ClientsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteClients, {
-    loading: "Clients.loading.deleting",
-    success: "Clients.success.deleted",
-    error: "Clients.error.deleting",
+    loading: "Clients.loading.delete",
+    success: "Clients.success.delete",
+    error: "Clients.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -111,6 +111,8 @@ export default function ClientsPage() {
             onAddClick={canCreateClients ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Clients.add_new")}
             searchPlaceholder={t("Clients.search_clients")}
+            count={clients?.length}
+            hideOptions={clients?.length === 0}
           />
         )}
         <div>
@@ -139,18 +141,18 @@ export default function ClientsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Clients.add_new")}
+          title={t("Clients.edit_client")}
           formId="client-form"
           loadingSave={loadingSaveClient}
         >
           <ClientForm
-            id={"client-form"}
+            formHtmlId={"client-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableClient(null);
               setLoadingSaveClient(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Clients.success.updated"),
+                description: t("Clients.success.update"),
               });
             }}
             defaultValues={actionableClient}

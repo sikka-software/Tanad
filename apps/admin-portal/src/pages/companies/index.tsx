@@ -23,7 +23,7 @@ import { useCompanies, useBulkDeleteCompanies, useDuplicateCompany } from "@/com
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/company/company.options";
 import useCompanyStore from "@/company/company.store";
 import CompaniesTable from "@/company/company.table";
-import { CompanyUpdateData } from "@/company/company.type";
+import { Company, CompanyUpdateData } from "@/company/company.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -35,7 +35,7 @@ export default function CompaniesPage() {
   const canCreateCompanies = useUserStore((state) => state.hasPermission("companies.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableCompany, setActionableCompany] = useState<CompanyUpdateData | null>(null);
+  const [actionableCompany, setActionableCompany] = useState<Company | null>(null);
 
   const loadingSaveCompany = useCompanyStore((state) => state.isLoading);
   const setLoadingSaveCompany = useCompanyStore((state) => state.setIsLoading);
@@ -70,9 +70,9 @@ export default function CompaniesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteCompanies, {
-    loading: "Companies.loading.deleting",
-    success: "Companies.success.deleted",
-    error: "Companies.error.deleting",
+    loading: "Companies.loading.delete",
+    success: "Companies.success.delete",
+    error: "Companies.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -112,6 +112,8 @@ export default function CompaniesPage() {
             }
             createLabel={t("Companies.create_company")}
             searchPlaceholder={t("Companies.search_companies")}
+            count={companies?.length}
+            hideOptions={companies?.length === 0}
           />
         )}
 
@@ -140,18 +142,18 @@ export default function CompaniesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Companies.add_new")}
+          title={t("Companies.edit_company")}
           formId="company-form"
           loadingSave={loadingSaveCompany}
         >
           <CompanyForm
-            id={"company-form"}
+            formHtmlId={"company-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableCompany(null);
               setLoadingSaveCompany(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Companies.success.updated"),
+                description: t("Companies.success.update"),
               });
             }}
             defaultValues={actionableCompany}
@@ -164,8 +166,9 @@ export default function CompaniesPage() {
           setIsDeleteDialogOpen={setIsDeleteDialogOpen}
           isDeleting={isDeleting}
           handleConfirmDelete={() => handleConfirmDelete(selectedRows)}
-          title={t("Companies.confirm_delete")}
+          title={t("Companies.confirm_delete", { count: selectedRows.length })}
           description={t("Companies.delete_description", { count: selectedRows.length })}
+          extraConfirm={selectedRows.length > 4}
         />
       </DataPageLayout>
     </div>

@@ -1,4 +1,4 @@
-import { Job, JobCreateData } from "@/job/job.type";
+import { Job, JobCreateData, JobUpdateData } from "@/job/job.type";
 
 export async function fetchJobs(): Promise<Job[]> {
   try {
@@ -44,7 +44,7 @@ export async function createJob(job: JobCreateData): Promise<Job> {
   }
 }
 
-export async function updateJob(id: string, updates: Partial<Job>): Promise<Job> {
+export async function updateJob(id: string, updates: JobUpdateData): Promise<Job> {
   try {
     const response = await fetch(`/api/resource/jobs/${id}`, {
       method: "PUT",

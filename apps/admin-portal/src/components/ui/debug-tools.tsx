@@ -24,8 +24,8 @@ const DebugTools = () => {
         <PopoverContent align="end" side="left" className="w-[300px]">
           <ScrollArea className="h-[400px]">
             <div className="flex flex-col gap-4">
-            <div>
-              <div className="text-xs font-bold">User ID</div>
+              <div>
+                <div className="text-xs font-bold">User ID</div>
                 <div className="text-xs break-all">{user?.id}</div>
               </div>
               <div>
@@ -37,16 +37,26 @@ const DebugTools = () => {
               <div>
                 <div className="text-xs font-bold">Role ID</div>
                 <div className="text-xs break-all">{membership?.role_id}</div>
-            </div>
-            <div>
-                <div className="text-xs font-bold">Permissions</div>
+              </div>
+              <div>
+                <div className="text-xs font-bold">User Settings</div>
                 <div className="flex flex-col gap-1">
-                  {permissions.map((permission) => (
-                    <div key={permission} className="text-xs">
-                      {permission}
+                  {Object.entries(profile?.user_settings || {}).map(([key, value]) => (
+                    <div key={key} className="text-xs">
+                      {key}: {JSON.stringify(value)}
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+            <div>
+              <div className="text-xs font-bold">Permissions</div>
+              <div className="flex flex-col gap-1">
+                {permissions.map((permission) => (
+                  <div key={permission} className="text-xs">
+                    {permission}
+                  </div>
+                ))}
               </div>
             </div>
           </ScrollArea>

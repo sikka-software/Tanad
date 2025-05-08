@@ -1,9 +1,10 @@
 import { eq } from "drizzle-orm";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { createClient } from "@/utils/supabase/server-props";
+
 import { db } from "@/db/drizzle";
 import * as schema from "@/db/schema";
-import { createClient } from "@/utils/supabase/server-props";
 
 type ModelConfig = {
   table: any;
@@ -21,24 +22,46 @@ const modelMap: Record<string, ModelConfig> = {
     idField: "id",
     excludeFromDuplicate: ["code"],
   },
-  companies: { table: schema.companies, query: db.query.companies, idField: "id" },
+  companies: {
+    table: schema.companies,
+    query: db.query.companies,
+    idField: "id",
+    excludeFromDuplicate: ["user_id"],
+  },
   jobs: { table: schema.jobs, query: db.query.jobs, idField: "id" },
   clients: { table: schema.clients, query: db.query.clients, idField: "id" },
   expenses: { table: schema.expenses, query: db.query.expenses, idField: "id" },
   departments: { table: schema.departments, query: db.query.departments, idField: "id" },
-  departmentLocations: {
+  department_locations: {
     table: schema.department_locations,
     query: db.query.department_locations,
+    idField: "id",
+    excludeFromDuplicate: ["department_id"],
+  },
+  online_stores: {
+    table: schema.online_stores,
+    query: db.query.online_stores,
     idField: "id",
   },
   salaries: { table: schema.salaries, query: db.query.salaries, idField: "id" },
   offices: { table: schema.offices, query: db.query.offices, idField: "id" },
-  warehouses: { table: schema.warehouses, query: db.query.warehouses, idField: "id" },
+  warehouses: {
+    table: schema.warehouses,
+    query: db.query.warehouses,
+    idField: "id",
+    excludeFromDuplicate: ["code"],
+  },
   employees: { table: schema.employees, query: db.query.employees, idField: "id" },
   products: { table: schema.products, query: db.query.products, idField: "id" },
   invoices: { table: schema.invoices, query: db.query.invoices, idField: "id" },
   quotes: { table: schema.quotes, query: db.query.quotes, idField: "id" },
   vendors: { table: schema.vendors, query: db.query.vendors, idField: "id" },
+  job_listings: {
+    table: schema.job_listings,
+    query: db.query.job_listings,
+    idField: "id",
+    excludeFromDuplicate: ["slug"],
+  },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -82,9 +105,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ message: `${model} not found` });
     }
 
-    if ("user_id" in record && record.user_id !== user.id) {
-      return res.status(403).json({ error: `Not authorized to duplicate this ${model}` });
-    }
+    // if ("user_id" in record && record.user_id !== user.id) {
+    //   console.log("record is ", record);
+    //   console.log("user is ", user);
+    //   return res.status(403).json({ error: `Not authorized to duplicate this ${model}` });
+    // }
 
     // Create a copy of the record without the excluded fields
     const dataToDuplicate = Object.keys(record).reduce(
@@ -99,7 +124,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const [duplicated] = (await db
       .insert(table)
-      .values(dataToDuplicate)
+      .values({ ...dataToDuplicate, user_id: user.id })
       .returning()) as unknown as any[];
 
     return res.status(201).json(duplicated);

@@ -30,7 +30,7 @@ const InvoiceCard = ({ invoice }: { invoice: Invoice }) => {
           <h3 className="text-lg font-semibold">
             {t("invoice_number", { number: invoice.invoice_number })}
           </h3>
-          <p className="text-sm text-gray-500">{invoice.client?.company}</p>
+          <p className="text-sm text-gray-500">{invoice.client?.company ?? "N/A"}</p>
         </div>
         <Badge className={getInvoiceStatusColor(invoice.status)}>
           {t(`status.${invoice.status.toLowerCase()}`)}
@@ -40,19 +40,23 @@ const InvoiceCard = ({ invoice }: { invoice: Invoice }) => {
         <div className="space-y-2">
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">{t("issue_date")}</span>
-            <span className="text-sm">{format(new Date(invoice.issue_date), "MMM dd, yyyy")}</span>
+            <span className="text-sm">
+              {invoice.issue_date ? format(new Date(invoice.issue_date), "MMM dd, yyyy") : "N/A"}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">{t("due_date")}</span>
-            <span className="text-sm">{format(new Date(invoice.due_date), "MMM dd, yyyy")}</span>
+            <span className="text-sm">
+              {invoice.due_date ? format(new Date(invoice.due_date), "MMM dd, yyyy") : "N/A"}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className="text-sm text-gray-500">{t("amount")}</span>
-            <span className="text-lg font-bold">${invoice.total.toFixed(2)}</span>
+            <span className="text-lg font-bold">${invoice.total?.toFixed(2) ?? "0.00"}</span>
           </div>
           <div className="border-t pt-2">
             <p className="text-sm text-gray-500">
-              {invoice.client?.name} • {invoice.client?.email}
+              {invoice.client?.name ?? "N/A"} • {invoice.client?.email ?? "N/A"}
             </p>
           </div>
         </div>

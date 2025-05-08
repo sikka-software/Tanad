@@ -9,7 +9,7 @@ import {
   updateExpense,
   duplicateExpense,
 } from "@/expense/expense.service";
-import type { Expense, ExpenseCreateData } from "@/expense/expense.type";
+import type { Expense, ExpenseCreateData, ExpenseUpdateData } from "@/expense/expense.type";
 
 // Query keys for expenses
 export const expenseKeys = {
@@ -56,7 +56,7 @@ export function useCreateExpense() {
 export function useUpdateExpense() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Expense> }) => updateExpense(id, data),
+    mutationFn: ({ id, data }: { id: string; data: ExpenseUpdateData }) => updateExpense(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });

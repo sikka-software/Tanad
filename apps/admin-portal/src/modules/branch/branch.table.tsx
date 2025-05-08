@@ -1,33 +1,26 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useCallback } from "react";
 import { z } from "zod";
 
+import { ComboboxAdd } from "@/ui/combobox-add";
+import { CommandSelect } from "@/ui/command-select";
 import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import useBranchStore from "@/branch/branch.store";
-import { Branch } from "@/branch/branch.type";
+import { useEmployees } from "@/employee/employee.hooks";
 
 import useUserStore from "@/stores/use-user-store";
 
 import { useUpdateBranch } from "./branch.hooks";
-
-const nameSchema = z.string().min(1, "Required");
-const codeSchema = z.string().min(1, "Required");
-const addressSchema = z.string().min(1, "Required");
-const citySchema = z.string().min(1, "Required");
-const stateSchema = z.string().min(1, "Required");
-const zipCodeSchema = z.string().min(1, "Required");
-const phoneSchema = z.string().nullable();
-const emailSchema = z.string().email().nullable();
-const managerSchema = z.string().nullable();
-const isActiveSchema = z.boolean();
+import useBranchStore from "./branch.store";
+import { Branch } from "./branch.type";
 
 const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Branch>) => {
   const t = useTranslations();
+  const locale = useLocale();
   const { mutate: updateBranch } = useUpdateBranch();
   const selectedRows = useBranchStore((state) => state.selectedRows);
   const setSelectedRows = useBranchStore((state) => state.setSelectedRows);
@@ -38,42 +31,120 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canArchiveBranch = useUserStore((state) => state.hasPermission("branches.archive"));
   const canDeleteBranch = useUserStore((state) => state.hasPermission("branches.delete"));
 
+  // Employees for manager combobox
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const employeeOptions = employees.map((emp) => ({
+    label: `${emp.first_name} ${emp.last_name}`,
+    value: emp.id,
+  }));
+
   // Create a selection state object for the table
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
 
   const columns: ExtendedColumnDef<Branch>[] = [
-    { accessorKey: "name", header: t("Branches.form.name.label"), validationSchema: nameSchema },
-    { accessorKey: "code", header: t("Branches.form.code.label"), validationSchema: codeSchema },
     {
-      accessorKey: "address",
-      header: t("Branches.form.address.label"),
-      validationSchema: addressSchema,
+      accessorKey: "name",
+      header: t("Branches.form.name.label"),
+      validationSchema: z.string().min(1, t("Branches.form.name.required")),
     },
-    { accessorKey: "city", header: t("Branches.form.city.label"), validationSchema: citySchema },
-    { accessorKey: "state", header: t("Branches.form.state.label"), validationSchema: stateSchema },
     {
-      accessorKey: "zip_code",
-      header: t("Branches.form.zip_code.label"),
-      validationSchema: zipCodeSchema,
+      accessorKey: "code",
+      header: t("Branches.form.code.label"),
+      validationSchema: z.string().min(1, t("Branches.form.code.required")),
     },
-    { accessorKey: "phone", header: t("Branches.form.phone.label"), validationSchema: phoneSchema },
-    { accessorKey: "email", header: t("Branches.form.email.label"), validationSchema: emailSchema },
+    {
+      accessorKey: "email",
+      header: t("Branches.form.email.label"),
+      validationSchema: z.string().email(t("Branches.form.email.invalid")),
+    },
+    {
+      accessorKey: "phone",
+      header: t("Branches.form.phone.label"),
+      validationSchema: z.string().nullable(),
+    },
     {
       accessorKey: "manager",
       header: t("Branches.form.manager.label"),
-      validationSchema: managerSchema,
+      noPadding: true,
+      validationSchema: z.string().nullable(),
+      cell: ({ row }) => {
+        const branch = row.original;
+        return (
+          <ComboboxAdd
+            direction={locale === "ar" ? "rtl" : "ltr"}
+            inCell
+            data={employeeOptions}
+            isLoading={employeesLoading}
+            buttonClassName="bg-transparent"
+            defaultValue={branch.manager || ""}
+            onChange={async (value) => {
+              await updateBranch({
+                id: branch.id,
+                data: {
+                  id: branch.id,
+                  name: branch.name,
+                  status: branch.status,
+                  manager: value || null,
+                },
+              });
+            }}
+            texts={{
+              placeholder: ". . .",
+              searchPlaceholder: t("Employees.search_employees"),
+              noItems: t("Branches.form.manager.no_employees"),
+            }}
+            addText={t("Employees.add_new")}
+            ariaInvalid={false}
+          />
+        );
+      },
+    },
+
+    {
+      accessorKey: "address",
+      header: t("Branches.form.address.label"),
+      validationSchema: z.string().min(1, t("Branches.form.address.required")),
     },
     {
-      accessorKey: "is_active",
-      header: t("Branches.form.is_active.label"),
-      cell: ({ row }) => (row.getValue("is_active") ? t("active") : t("inactive")),
-      validationSchema: isActiveSchema,
+      accessorKey: "city",
+      header: t("Branches.form.city.label"),
+      validationSchema: z.string().min(1, t("Branches.form.city.required")),
+    },
+    {
+      accessorKey: "state",
+      header: t("Branches.form.state.label"),
+      validationSchema: z.string().min(1, t("Branches.form.state.required")),
+    },
+    {
+      accessorKey: "zip_code",
+      header: t("Branches.form.zip_code.label"),
+      validationSchema: z.string().min(1, t("Branches.form.zip_code.required")),
+    },
+    {
+      accessorKey: "status",
+      header: t("Branches.form.status.label"),
+      validationSchema: z.enum(["active", "inactive"]),
+      cellType: "status",
+      options: [
+        { label: t("Branches.form.status.active"), value: "active" },
+        { label: t("Branches.form.status.inactive"), value: "inactive" },
+      ],
     },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "branch_id") return;
-    await updateBranch({ id: rowId, data: { [columnId]: value } });
+    const branch = data.find((b) => b.id === rowId);
+    if (!branch) return;
+    await updateBranch({
+      id: branch.id,
+      data: {
+        id: branch.id,
+        name: branch.name,
+        status: branch.status,
+        [columnId]: value,
+      },
+    });
   };
 
   const handleRowSelectionChange = useCallback(

@@ -1,8 +1,8 @@
+import { FormSheet } from "@root/src/components/ui/form-sheet";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useMemo, useState } from "react";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -19,11 +19,16 @@ import DataPageLayout from "@/components/layouts/data-page-layout";
 
 import BranchCard from "@/branch/branch.card";
 import { BranchForm } from "@/branch/branch.form";
-import { useBranches, useBulkDeleteBranches, useDuplicateBranch } from "@/branch/branch.hooks";
+import {
+  useBranches,
+  useBulkDeleteBranches,
+  useDuplicateBranch,
+  useUpdateBranch,
+} from "@/branch/branch.hooks";
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/branch/branch.options";
 import useBranchStore from "@/branch/branch.store";
 import BranchesTable from "@/branch/branch.table";
-import { BranchUpdateData } from "@/branch/branch.type";
+import { Branch, BranchUpdateData } from "@/branch/branch.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -36,6 +41,7 @@ export default function BranchesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
+  const [displayData, setDisplayData] = useState<Branch[]>([]);
 
   const loadingSaveBranch = useBranchStore((state) => state.isLoading);
   const setLoadingSaveBranch = useBranchStore((state) => state.setIsLoading);
@@ -53,14 +59,24 @@ export default function BranchesPage() {
   const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
   const getFilteredBranches = useBranchStore((state) => state.getFilteredData);
   const getSortedBranches = useBranchStore((state) => state.getSortedData);
+  const setViewMode = useBranchStore((state) => state.setViewMode);
 
   const { data: branches, isLoading: loadingFetchBranches, error } = useBranches();
   const { mutate: duplicateBranch } = useDuplicateBranch();
   const { mutateAsync: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
+  const { mutate: updateBranch } = useUpdateBranch();
   const { createDeleteHandler } = useDeleteHandler();
 
+  useEffect(() => {
+    if (branches) {
+      setDisplayData(branches);
+    } else {
+      setDisplayData([]);
+    }
+  }, [branches]);
+
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: branches,
+    data: displayData,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
@@ -70,18 +86,19 @@ export default function BranchesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteBranches, {
-    loading: "Branches.loading.deleting",
-    success: "Branches.success.deleted",
-    error: "Branches.error.deleting",
+    loading: "Branches.loading.delete",
+    success: "Branches.success.delete",
+    error: "Branches.error.delete",
     onSuccess: () => {
+      setDisplayData((current) => current.filter((row) => !selectedRows.includes(row.id)));
       clearSelection();
       setIsDeleteDialogOpen(false);
     },
   });
 
   const filteredBranches = useMemo(() => {
-    return getFilteredBranches(branches || []);
-  }, [branches, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredBranches(displayData);
+  }, [displayData, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedBranches = useMemo(() => {
     return getSortedBranches(filteredBranches);
@@ -108,8 +125,10 @@ export default function BranchesPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Branches.title")}
             onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Branches.create_branch")}
+            createLabel={t("Branches.create_new")}
             searchPlaceholder={t("Branches.search_branches")}
+            count={displayData?.length}
+            hideOptions={displayData?.length === 0}
           />
         )}
 
@@ -118,10 +137,10 @@ export default function BranchesPage() {
             <BranchesTable
               data={sortedBranches}
               isLoading={loadingFetchBranches}
-              error={error as Error | null}
+              error={error instanceof Error ? error : null}
               onActionClicked={onActionClicked}
             />
-          ) : (
+          ) : viewMode === "cards" ? (
             <div className="p-4">
               <DataModelList
                 data={sortedBranches}
@@ -132,30 +151,27 @@ export default function BranchesPage() {
                 gridCols="3"
               />
             </div>
-          )}
+          ) : null}
         </div>
 
-        <FormDialog
+        <FormSheet
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Branches.add_new")}
+          title={t("Branches.edit_branch")}
           formId="branch-form"
           loadingSave={loadingSaveBranch}
         >
           <BranchForm
-            id={"branch-form"}
+            formHtmlId={"branch-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableBranch(null);
               setLoadingSaveBranch(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Branches.success.updated"),
-              });
             }}
-            defaultValues={actionableBranch}
+            defaultValues={actionableBranch as Branch}
             editMode={true}
           />
-        </FormDialog>
+        </FormSheet>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

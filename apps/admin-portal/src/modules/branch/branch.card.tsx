@@ -16,8 +16,8 @@ const BranchCard = ({ branch }: { branch: Branch }) => {
             <h3 className="text-lg font-semibold">{branch.name}</h3>
             <p className="text-sm text-gray-500">Code: {branch.code}</p>
           </div>
-          <Badge variant={branch.is_active ? "default" : "secondary"}>
-            {branch.is_active ? t("status.active") : t("status.inactive")}
+          <Badge variant={branch.status ? "default" : "secondary"}>
+            {t(`status.${branch.status}`)}
           </Badge>
         </div>
       </CardHeader>
@@ -48,15 +48,10 @@ const BranchCard = ({ branch }: { branch: Branch }) => {
           <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
             <MapPin className="mt-1 h-4 w-4" />
             <div>
-              <p>{branch.address}</p>
-              <p>{`${branch.city}, ${branch.state} ${branch.zip_code}`}</p>
+              <p>{branch.short_address}</p>
+              <p>{`${branch.city}, ${branch.region} ${branch.zip_code}`}</p>
             </div>
           </div>
-          {branch.notes && (
-            <p className="mt-2 border-t pt-2 text-sm text-gray-500 dark:text-gray-400">
-              {branch.notes}
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>

@@ -1,18 +1,5 @@
-export interface EmployeeRequest {
-  id: string;
-  employee_id: string;
-  type: "leave" | "expense" | "document" | "other";
-  status: "pending" | "approved" | "rejected";
-  title: string;
-  description?: string;
-  start_date?: string;
-  end_date?: string;
-  amount?: number;
-  attachments?: string[];
-  notes?: string;
-  created_at: string;
-  updated_at: string;
-}
+import { Database } from "@/lib/database.types";
 
-export type EmployeeRequestCreateData = Omit<EmployeeRequest, "id" | "created_at" | "updated_at">;
-export type EmployeeRequestUpdateData = Partial<EmployeeRequestCreateData>;
+export type EmployeeRequest = Database["public"]["Tables"]["employee_requests"]["Row"];
+export type EmployeeRequestCreateData = Database["public"]["Tables"]["employee_requests"]["Insert"];
+export type EmployeeRequestUpdateData = Database["public"]["Tables"]["employee_requests"]["Update"];

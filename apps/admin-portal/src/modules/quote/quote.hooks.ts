@@ -9,7 +9,7 @@ import {
   bulkDeleteQuotes,
   duplicateQuote,
 } from "@/quote/quote.service";
-import { Quote } from "@/quote/quote.type";
+import { Quote, QuoteCreateData, QuoteUpdateData } from "@/quote/quote.type";
 
 export const quoteKeys = {
   all: ["quotes"] as const,
@@ -41,7 +41,7 @@ export function useCreateQuote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newQuote: Omit<Quote, "id" | "created_at">) => createQuote(newQuote),
+    mutationFn: (newQuote: QuoteCreateData) => createQuote(newQuote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });
     },
@@ -65,7 +65,7 @@ export function useUpdateQuote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Quote> }) => updateQuote(id, data),
+    mutationFn: ({ id, data }: { id: string; data: QuoteUpdateData }) => updateQuote(id, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: quoteKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: quoteKeys.lists() });

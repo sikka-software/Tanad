@@ -13,8 +13,8 @@ const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
       <CardHeader>
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">{warehouse.name}</h3>
-          <Badge variant={warehouse.is_active ? "default" : "secondary"}>
-            {warehouse.is_active ? t("status.active") : t("status.inactive")}
+          <Badge variant={warehouse.status === "active" ? "default" : "secondary"}>
+            {warehouse.status === "active" ? t("status.active") : t("status.inactive")}
           </Badge>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -28,8 +28,12 @@ const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
           <div className="flex items-start gap-2 text-sm text-gray-600">
             <MapPin className="mt-1 h-4 w-4 flex-shrink-0" />
             <div>
-              <p>{warehouse.address}</p>
-              <p>{`${warehouse.city}, ${warehouse.state} ${warehouse.zip_code}`}</p>
+              <p>
+                {warehouse.building_number} {warehouse.street_name}
+              </p>
+              <p>
+                {warehouse.city} {warehouse.region} {warehouse.zip_code}
+              </p>
             </div>
           </div>
           {/* Capacity */}
@@ -37,13 +41,6 @@ const WarehouseCard = ({ warehouse }: { warehouse: Warehouse }) => {
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <LayoutGrid className="h-4 w-4" />
               <span>{`${t("capacity")}: ${warehouse.capacity}`}</span>
-            </div>
-          )}
-          {/* Notes */}
-          {warehouse.notes && (
-            <div className="flex items-start gap-2 border-t pt-3 text-sm text-gray-500">
-              <NotebookText className="mt-1 h-4 w-4 flex-shrink-0" />
-              <p className="whitespace-pre-wrap">{warehouse.notes}</p>
             </div>
           )}
         </div>

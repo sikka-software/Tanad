@@ -1,14 +1,11 @@
+import settings from "@root/landing.config";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
-// Components
 import BottomCTA from "@/components/landing/BottomCTA";
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import FeatureCard from "@/components/landing/FeatureCard";
-
-// Constants
-import settings from "../../landing.config";
 
 export default function FeaturesPage() {
   const t = useTranslations();

@@ -7,18 +7,24 @@ const models = [
   "invoices",
   "products",
   "employees",
-  "employee-requests",
+  "employee_requests",
   "salaries",
   "jobs",
 
   "companies",
   "departments",
-  "job-listings",
+  "job_listings",
   "expenses",
   "purchases",
   "quotes",
   "roles",
   "users",
+  "domains",
+  "servers",
+  "websites",
+  "online_stores",
+  "cars",
+  "trucks",
 ];
 
 interface SortOptions {
@@ -32,35 +38,41 @@ function sortData<T>(
   sortRules: { field: string; direction: string }[],
   options: SortOptions = {},
 ): T[] {
-  if (!sortRules.length) return items;
+  if (!sortRules.length) {
+    return items;
+  }
 
   const { caseSensitive = false, nullsFirst = false } = options;
 
   return [...items].sort((a, b) => {
     for (const rule of sortRules) {
-      // Handle nested fields like company_details.name
       const getNestedValue = (obj: T, path: string) => {
         return path.split(".").reduce((o: any, p) => o?.[p] ?? null, obj);
       };
 
       const aRawValue = getNestedValue(a, rule.field);
       const bRawValue = getNestedValue(b, rule.field);
-
-      // Handle null/undefined values
-      if (aRawValue === null || aRawValue === undefined || aRawValue === "") {
-        if (bRawValue === null || bRawValue === undefined || bRawValue === "") {
-          continue; // Both are null/empty, try next rule
-        }
-        return nullsFirst ? -1 : 1;
-      }
-      if (bRawValue === null || bRawValue === undefined || bRawValue === "") {
-        return nullsFirst ? 1 : -1;
-      }
-
-      // Determine the type of the values and compare accordingly
       const aType = typeof aRawValue;
       const bType = typeof bRawValue;
+      // Handle null/undefined/empty values
+      const isANullish = aRawValue === null || aRawValue === undefined || aRawValue === "";
+      const isBNullish = bRawValue === null || bRawValue === undefined || bRawValue === "";
 
+      if (isANullish) {
+        if (isBNullish) {
+          continue; // Both are null/empty, try next rule
+        }
+        const result = nullsFirst ? -1 : 1;
+        return result;
+      }
+      if (isBNullish) {
+        const result = nullsFirst ? 1 : -1;
+        return result;
+      }
+
+      let comparisonResult = 0;
+
+      // Determine the type of the values and compare accordingly
       // If types don't match, convert both to strings
       if (aType !== bType) {
         const aStr = String(aRawValue);
@@ -68,21 +80,28 @@ function sortData<T>(
         const aCompare = caseSensitive ? aStr : aStr.toLowerCase();
         const bCompare = caseSensitive ? bStr : bStr.toLowerCase();
 
-        if (aCompare < bCompare) return rule.direction === "asc" ? -1 : 1;
-        if (aCompare > bCompare) return rule.direction === "asc" ? 1 : -1;
-        continue;
+        if (aCompare < bCompare) comparisonResult = -1;
+        if (aCompare > bCompare) comparisonResult = 1;
+
+        if (comparisonResult !== 0) {
+          comparisonResult = rule.direction === "asc" ? comparisonResult : -comparisonResult;
+          return comparisonResult;
+        }
+        continue; // Types were different but string comparison was equal, try next rule
       }
 
       // Handle different types
       switch (aType) {
         case "number":
           const aDiff = (aRawValue as number) - (bRawValue as number);
-          if (aDiff !== 0) return rule.direction === "asc" ? aDiff : -aDiff;
+          if (aDiff !== 0) {
+            comparisonResult = rule.direction === "asc" ? aDiff : -aDiff;
+          }
           break;
 
         case "boolean":
           if (aRawValue !== bRawValue) {
-            return rule.direction === "asc" ? (aRawValue ? 1 : -1) : aRawValue ? -1 : 1;
+            comparisonResult = rule.direction === "asc" ? (aRawValue ? 1 : -1) : aRawValue ? -1 : 1;
           }
           break;
 
@@ -92,20 +111,23 @@ function sortData<T>(
           const aCompare = caseSensitive ? aStr : aStr.toLowerCase();
           const bCompare = caseSensitive ? bStr : bStr.toLowerCase();
 
-          if (aCompare < bCompare) return rule.direction === "asc" ? -1 : 1;
-          if (aCompare > bCompare) return rule.direction === "asc" ? 1 : -1;
+          if (aCompare < bCompare) comparisonResult = rule.direction === "asc" ? -1 : 1;
+          if (aCompare > bCompare) comparisonResult = rule.direction === "asc" ? 1 : -1;
           break;
 
         default:
-          // For dates or other types, convert to string
           const aVal = String(aRawValue);
           const bVal = String(bRawValue);
-          if (aVal < bVal) return rule.direction === "asc" ? -1 : 1;
-          if (aVal > bVal) return rule.direction === "asc" ? 1 : -1;
+          if (aVal < bVal) comparisonResult = rule.direction === "asc" ? -1 : 1;
+          if (aVal > bVal) comparisonResult = rule.direction === "asc" ? 1 : -1;
           break;
       }
+
+      if (comparisonResult !== 0) {
+        return comparisonResult; // Return immediately if a difference is found
+      }
     }
-    return 0;
+    return 0; // Return 0 if all rules resulted in equality
   });
 }
 
@@ -134,7 +156,6 @@ function sortData<T>(
  * ];
  *
  * const sortedItems = applySort('userModel', items, sortRules);
- * console.log(sortedItems);
  * // Output: [
  * //   { name: 'Bob', age: 25 },
  * //   { name: 'Alice', age: 30 },

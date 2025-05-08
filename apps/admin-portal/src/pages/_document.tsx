@@ -27,12 +27,6 @@ export default function Document() {
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="msapplication-TileImage" content="../icons/ms-icon-144x144.png" />
         <meta name="theme-color" content="#ffffff" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        ></link>
 
         <meta property="og:url" content="https://puk.la" />
         <meta property="og:type" content="website" />

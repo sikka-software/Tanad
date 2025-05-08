@@ -1,3 +1,4 @@
+import settings from "@root/landing.config";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -7,9 +8,6 @@ import { Card, CardContent, CardDescription, CardTitle } from "@/ui/card";
 import CustomMotionDiv from "@/components/landing/CustomMotionDiv";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import SocialIcons from "@/components/landing/SocialIcons";
-
-// Constants
-import settings from "../../landing.config";
 
 export default function HelpPage() {
   const t = useTranslations();

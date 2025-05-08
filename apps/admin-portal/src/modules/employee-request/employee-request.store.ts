@@ -6,8 +6,11 @@ const searchEmployeeRequestFn = (employeeRequest: EmployeeRequest, searchQuery: 
   employeeRequest.title.toLowerCase().includes(searchQuery.toLowerCase());
 
 const useEmployeeRequestStore = createGenericStore<EmployeeRequest>(
-  "employee-requests",
+  "employee_requests",
   searchEmployeeRequestFn,
+  {
+    sortRules: [{ field: "created_at", direction: "asc" }],
+  },
 );
 
 export default useEmployeeRequestStore;

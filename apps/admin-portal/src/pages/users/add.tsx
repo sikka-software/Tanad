@@ -32,7 +32,7 @@ export default function AddUserPage() {
 
   const onAddSuccess = () => {
     toast.success(t("General.successful_operation"), {
-      description: t("Users.success.created"),
+      description: t("Users.success.create"),
     });
     router.push("/users");
   };
@@ -52,9 +52,7 @@ export default function AddUserPage() {
           cancel: t("General.cancel"),
         }}
       />
-      <div className="mx-auto max-w-2xl p-4">
-        <UserForm id="user-form" onSuccess={onAddSuccess} />
-      </div>
+      <UserForm formHtmlId="user-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

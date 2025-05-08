@@ -1,8 +1,22 @@
+import { DollarSign, Euro, PoundSterling, JapaneseYen } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
 import { Input } from "@/ui/input";
 
+import { currencyInputClassName, getCurrencySymbol } from "@/lib/currency-utils";
+import { cn } from "@/lib/utils";
+
+import useUserStore from "@/stores/use-user-store";
+
 import { SARSymbol } from "./sar-symbol";
+
+export const MoneyFormatter = (value: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "decimal",
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  }).format(value);
+};
 
 // Helper function to convert Arabic numerals to English numerals
 const convertArabicToEnglishNumerals = (value: string): string => {
@@ -23,6 +37,7 @@ interface CurrencyInputProps
   onChange?: (value: number | undefined) => void;
   showCommas?: boolean;
   showCurrencySymbol?: boolean;
+  containerClassName?: string;
 }
 
 export function CurrencyInput({
@@ -34,6 +49,9 @@ export function CurrencyInput({
 }: CurrencyInputProps) {
   const [inputText, setInputText] = useState(value?.toFixed(2) || "");
   const isUserInput = useRef(false);
+  const profile = useUserStore((state) => state.profile);
+  const currency = profile?.user_settings?.currency || "sar";
+  const [currencySymbol, setCurrencySymbol] = useState(getCurrencySymbol(currency));
 
   // Update input text when value prop changes, but only if it's not from user input
   useEffect(() => {
@@ -112,21 +130,31 @@ export function CurrencyInput({
     }
   };
 
+  useEffect(() => {
+    setCurrencySymbol(getCurrencySymbol(currency));
+  }, [profile]);
+
+  // let currencySymbol = getCurrencySymbol(currency);
+
   return (
-    <div className="relative">
+    <div className={cn("relative", props.containerClassName)}>
       <Input
         type="text"
         inputMode="decimal"
         placeholder="0.00"
-        className="currency-input"
+        className={cn("currency-input rtl:text-end", currencyInputClassName(currency))}
         value={inputText}
         onChange={handleChange}
         onBlur={handleBlur}
         {...props}
       />
       {showCurrencySymbol && (
-        <span className="text-muted-foreground absolute end-2 top-1/2 -translate-y-1/2">
-          <SARSymbol className="size-4" />
+        <span
+          className={
+            "text-muted-foreground absolute top-1/2 -translate-y-1/2 ltr:start-2 rtl:left-2"
+          }
+        >
+          {currencySymbol.symbol}
         </span>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { Client, ClientCreateData } from "@/client/client.type";
+import { Client, ClientCreateData, ClientUpdateData } from "@/client/client.type";
 
 export async function fetchClients(): Promise<Client[]> {
   try {
@@ -38,7 +38,7 @@ export async function createClient(client: ClientCreateData): Promise<Client> {
   return response.json();
 }
 
-export async function updateClient(id: string, client: Partial<Client>): Promise<Client> {
+export async function updateClient(id: string, client: ClientUpdateData): Promise<Client> {
   const response = await fetch(`/api/resource/clients/${id}`, {
     method: "PUT",
     headers: {

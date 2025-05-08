@@ -4,7 +4,7 @@ export const SORTABLE_COLUMNS: SortableColumn[] = [
   { value: "name", translationKey: "Companies.form.name.label" },
   { value: "created_at", translationKey: "Companies.form.created_at.label" },
   { value: "updated_at", translationKey: "Companies.form.updated_at.label" },
-  { value: "is_active", translationKey: "Companies.form.is_active.label" },
+  { value: "status", translationKey: "Companies.form.status.label" },
   { value: "industry", translationKey: "Companies.form.industry.label" },
   { value: "size", translationKey: "Companies.form.size.label" },
   { value: "notes", translationKey: "Companies.form.notes.label" },

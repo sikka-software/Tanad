@@ -67,9 +67,9 @@ export default function QuotesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteQuotes, {
-    loading: "Quotes.loading.deleting",
-    success: "Quotes.success.deleted",
-    error: "Quotes.error.deleting",
+    loading: "Quotes.loading.delete",
+    success: "Quotes.success.delete",
+    error: "Quotes.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -108,6 +108,8 @@ export default function QuotesPage() {
             onAddClick={canCreateQuotes ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Quotes.add_new")}
             searchPlaceholder={t("Quotes.search_quotes")}
+            count={quotes?.length}
+            hideOptions={quotes?.length === 0}
           />
         )}
 

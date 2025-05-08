@@ -60,7 +60,7 @@ const Navigation = () => {
               <button
                 onClick={() => setMenuState(!menuState)}
                 aria-label={menuState == true ? "Close Menu" : "Open Menu"}
-                className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden"
+                className="relative z-20 -m-2.5 -me-4 block cursor-pointer p-2.5 lg:hidden"
               >
                 <Menu className="m-auto size-6 duration-200 group-data-[state=active]:scale-0 group-data-[state=active]:rotate-180 group-data-[state=active]:opacity-0" />
                 <X className="absolute inset-0 m-auto size-6 scale-0 -rotate-180 opacity-0 duration-200 group-data-[state=active]:scale-100 group-data-[state=active]:rotate-0 group-data-[state=active]:opacity-100" />

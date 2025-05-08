@@ -1,62 +1,108 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import NotesSection from "@root/src/components/forms/notes-section";
+import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
+import { CommandSelect } from "@root/src/components/ui/command-select";
+import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { getNotesValue } from "@root/src/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Combobox } from "@/ui/combobox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
+import { AddressFormSection } from "@/components/forms/address-form-section";
+import { createAddressSchema } from "@/components/forms/address-schema";
+import CodeInput from "@/components/ui/code-input";
+import PhoneInput from "@/components/ui/phone-input";
+
+import { ModuleFormProps } from "@/types/common.type";
+
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreateOffice, useUpdateOffice } from "./office.hooks";
+import { EmployeeForm } from "../employee/employee.form";
+import { useEmployees } from "../employee/employee.hooks";
+import useEmployeeStore from "../employee/employee.store";
+import { useCreateOffice, useOffices, useUpdateOffice } from "./office.hooks";
 import useOfficeStore from "./office.store";
-import { OfficeUpdateData } from "./office.type";
+import { OfficeCreateData, OfficeUpdateData } from "./office.type";
 
-const createOfficeSchema = (t: (key: string) => string) =>
-  z.object({
+const createOfficeSchema = (t: (key: string) => string) => {
+  const baseOfficeSchema = z.object({
     name: z.string().min(1, t("Offices.form.name.required")),
+    code: z.string().optional().or(z.literal("")),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional().or(z.literal("")),
-    address: z.string().min(1, t("Offices.form.address.required")),
-    city: z.string().min(1, t("Offices.form.city.required")),
-    state: z.string().min(1, t("Offices.form.state.required")),
-    zip_code: z.string().min(1, t("Offices.form.zip_code.required")),
+    manager: z
+      .string({ invalid_type_error: t("Offices.form.manager.invalid_uuid") })
+      .uuid({ message: t("Offices.form.manager.invalid_uuid") })
+      .optional()
+      .nullable(),
+    status: z.enum(["active", "inactive"], {
+      message: t("Offices.form.status.required"),
+    }),
+    notes: z.any().optional().nullable(),
   });
+
+  const addressSchema = createAddressSchema(t);
+
+  return baseOfficeSchema.merge(addressSchema);
+};
 
 export type OfficeFormValues = z.input<ReturnType<typeof createOfficeSchema>>;
 
-interface OfficeFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: OfficeUpdateData | null;
-  editMode?: boolean;
-}
-
-export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFormProps) {
+export function OfficeForm({
+  formHtmlId,
+  onSuccess,
+  defaultValues,
+  editMode,
+}: ModuleFormProps<OfficeCreateData | OfficeUpdateData>) {
   const t = useTranslations();
+  const locale = useLocale();
+  const { data: offices } = useOffices();
   const { mutateAsync: createOffice, isPending: isCreating } = useCreateOffice();
   const { mutateAsync: updateOffice, isPending: isUpdating } = useUpdateOffice();
-  const { profile, membership } = useUserStore();
+  const user = useUserStore((state) => state.user);
+  const membership = useUserStore((state) => state.membership);
   const isLoading = useOfficeStore((state) => state.isLoading);
   const setIsLoading = useOfficeStore((state) => state.setIsLoading);
+
+  const { data: employees = [], isLoading: employeesLoading } = useEmployees();
+  const setIsEmployeeSaving = useEmployeeStore((state) => state.setIsLoading);
+  const isEmployeeSaving = useEmployeeStore((state) => state.isLoading);
+  const isEmployeeFormDialogOpen = useEmployeeStore((state) => state.isFormDialogOpen);
+  const setIsEmployeeFormDialogOpen = useEmployeeStore((state) => state.setIsFormDialogOpen);
 
   const form = useForm<OfficeFormValues>({
     resolver: zodResolver(createOfficeSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
+      code: defaultValues?.code || "",
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
-      address: defaultValues?.address || "",
+      short_address: defaultValues?.short_address || "",
+      building_number: defaultValues?.building_number || "",
+      street_name: defaultValues?.street_name || "",
       city: defaultValues?.city || "",
-      state: defaultValues?.state || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
+      manager: defaultValues?.manager || "",
+      status: (defaultValues?.status as "active" | "inactive") || "active",
+      notes: getNotesValue(defaultValues),
     },
   });
 
   const handleSubmit = async (data: OfficeFormValues) => {
     setIsLoading(true);
+    if (!user?.id) {
+      toast.error(t("General.unauthorized"), {
+        description: t("General.must_be_logged_in"),
+      });
+      return;
+    }
     try {
       if (editMode && defaultValues) {
         if (!defaultValues.id) {
@@ -70,10 +116,15 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
             id: defaultValues.id,
             office: {
               name: data.name.trim(),
-              address: data.address?.trim() || undefined,
+              code: data.code?.trim() || undefined,
+              short_address: data.short_address?.trim() || undefined,
+              building_number: data.building_number?.trim() || undefined,
+              street_name: data.street_name?.trim() || undefined,
               city: data.city?.trim() || undefined,
-              state: data.state?.trim() || undefined,
+              region: data.region?.trim() || undefined,
+              country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
+              notes: data.notes?.trim() || undefined,
             },
           },
           {
@@ -94,12 +145,18 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
         await createOffice(
           {
             name: data.name.trim(),
-            address: data.address?.trim() || undefined,
+            code: data.code?.trim() || undefined,
+            short_address: data.short_address?.trim() || undefined,
+            building_number: data.building_number?.trim() || undefined,
+            street_name: data.street_name?.trim() || undefined,
             city: data.city?.trim() || undefined,
-            state: data.state?.trim() || undefined,
+            region: data.region?.trim() || undefined,
+            country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
             enterprise_id: membership.enterprise_id,
-            is_active: true,
+            status: "active",
+            user_id: user.id,
+            notes: data.notes?.trim() || undefined,
           },
           {
             onSuccess: async (response) => {
@@ -111,124 +168,208 @@ export function OfficeForm({ id, onSuccess, defaultValues, editMode }: OfficeFor
     } catch (error) {
       console.error("Error in office form:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Offices.error.creating"),
+        description: t("Offices.error.create"),
       });
       setIsLoading(false);
     }
   };
 
+  const employeeOptions = employees.map((emp) => ({
+    label: `${emp.first_name} ${emp.last_name}`,
+    value: emp.id,
+  }));
   // Expose form methods for external use (like dummy data)
   if (typeof window !== "undefined") {
     (window as any).officeForm = form;
   }
 
   return (
-    <Form {...form}>
-      <form
-        id={id || "office-form"}
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-4"
+    <div>
+      <Form {...form}>
+        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.name.label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        disabled={isLoading}
+                        placeholder={t("Offices.form.name.placeholder")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.code.label")}</FormLabel>
+                    <FormControl>
+                      <CodeInput
+                        onSerial={() => {
+                          const nextNumber = (offices?.length || 0) + 1;
+                          const paddedNumber = String(nextNumber).padStart(4, "0");
+                          form.setValue("code", `OF-${paddedNumber}`);
+                        }}
+                        onRandom={() => {
+                          const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                          let randomCode = "";
+                          for (let i = 0; i < 5; i++) {
+                            randomCode += randomChars.charAt(
+                              Math.floor(Math.random() * randomChars.length),
+                            );
+                          }
+                          form.setValue("code", `OF-${randomCode}`);
+                        }}
+                      >
+                        <Input
+                          {...field}
+                          disabled={isLoading}
+                          placeholder={t("Offices.form.code.placeholder")}
+                        />
+                      </CodeInput>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.email.label")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        dir="ltr"
+                        {...field}
+                        type="email"
+                        disabled={isLoading}
+                        placeholder={t("Offices.form.email.placeholder")}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
+                    <FormControl>
+                      <PhoneInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        ariaInvalid={form.formState.errors.phone !== undefined}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="manager"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.manager.label")}</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        data={employeeOptions}
+                        isLoading={employeesLoading}
+                        defaultValue={field.value || ""}
+                        onChange={(value) => {
+                          field.onChange(value || null);
+                        }}
+                        texts={{
+                          placeholder: t("Offices.form.manager.placeholder"),
+                          searchPlaceholder: t("Employees.search_employees"),
+                          noItems: t("Offices.form.manager.no_employees"),
+                        }}
+                        addText={t("Employees.add_new")}
+                        onAddClick={() => setIsEmployeeFormDialogOpen(true)}
+                        ariaInvalid={!!form.formState.errors.manager}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Offices.form.status.label")}</FormLabel>
+                    <FormControl>
+                      <CommandSelect
+                        direction={locale === "ar" ? "rtl" : "ltr"}
+                        data={[
+                          { label: t("Offices.form.status.active"), value: "active" },
+                          { label: t("Offices.form.status.inactive"), value: "inactive" },
+                        ]}
+                        isLoading={false}
+                        defaultValue={field.value || ""}
+                        onChange={(value) => {
+                          field.onChange(value || null);
+                        }}
+                        texts={{
+                          placeholder: t("Offices.form.status.placeholder"),
+                        }}
+                        renderOption={(item) => {
+                          return <div>{item.label}</div>;
+                        }}
+                        ariaInvalid={!!form.formState.errors.status}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+          <AddressFormSection
+            title={t("Offices.form.address.label")}
+            control={form.control}
+            isLoading={isLoading}
+          />
+          <NotesSection control={form.control} title={t("Offices.form.notes.label")} />
+        </form>
+      </Form>
+      <FormDialog
+        open={isEmployeeFormDialogOpen}
+        onOpenChange={setIsEmployeeFormDialogOpen}
+        title={t("Employees.add_new")}
+        formId="employee-form"
+        loadingSave={isEmployeeSaving}
       >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Offices.form.name.label")}</FormLabel>
-              <FormControl>
-                <Input {...field} disabled={isLoading} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+        <EmployeeForm
+          formHtmlId="employee-form"
+          onSuccess={() => {
+            setIsEmployeeSaving(false);
+            setIsEmployeeFormDialogOpen(false);
+          }}
         />
-
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Offices.form.email.label")}</FormLabel>
-              <FormControl>
-                <Input {...field} type="email" disabled={isLoading} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Offices.form.phone.label")}</FormLabel>
-              <FormControl>
-                <Input {...field} type="tel" disabled={isLoading} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Offices.form.address.label")}</FormLabel>
-              <FormControl>
-                <Input {...field} disabled={isLoading} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-3 gap-4">
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.city.label")}</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled={isLoading} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.state.label")}</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled={isLoading} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="zip_code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Offices.form.zip_code.label")}</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled={isLoading} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-      </form>
-    </Form>
+      </FormDialog>
+    </div>
   );
 }

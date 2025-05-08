@@ -6,6 +6,10 @@ import ErrorComponent from "@/ui/error-component";
 import SheetTable, { ExtendedColumnDef } from "@/ui/sheet-table";
 import TableSkeleton from "@/ui/table-skeleton";
 
+import { MoneyFormatter } from "@/components/ui/currency-input";
+
+import { getCurrencySymbol } from "@/lib/currency-utils";
+
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateExpense } from "@/expense/expense.hooks";
@@ -16,6 +20,7 @@ import useUserStore from "@/stores/use-user-store";
 
 const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<Expense>) => {
   const t = useTranslations();
+  const currency = useUserStore((state) => state.profile?.user_settings?.currency);
   const { mutate: updateExpense } = useUpdateExpense();
   const selectedRows = useExpenseStore((state) => state.selectedRows);
   const setSelectedRows = useExpenseStore((state) => state.setSelectedRows);
@@ -45,22 +50,18 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       header: t("Expenses.form.due_date.label"),
       validationSchema: z.string().min(1, t("Expenses.form.due_date.required")),
     },
-    {
-      accessorKey: "status",
-      header: t("Expenses.form.status.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.status.required")),
-      cell: ({ row }) => t(`Expenses.form.status.${row.getValue("status")}`),
-    },
+
     {
       accessorKey: "amount",
       header: t("Expenses.form.amount.label"),
       validationSchema: z.number().min(0, t("Expenses.form.amount.required")),
       cell: ({ row }) => {
-        const amount = row.getValue("amount");
-        return new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        }).format(amount as number);
+        return (
+          <span className="flex flex-row items-center gap-1 text-sm font-medium">
+            {MoneyFormatter(row.getValue("amount"))}
+            {getCurrencySymbol(currency || "sar").symbol}
+          </span>
+        );
       },
     },
     {
@@ -74,9 +75,16 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       validationSchema: z.string().nullable(),
     },
     {
-      accessorKey: "client_id",
-      header: t("Expenses.form.client_id.label"),
-      validationSchema: z.string().min(1, t("Expenses.form.client_id.required")),
+      accessorKey: "status",
+      header: t("Expenses.form.status.label"),
+      validationSchema: z.enum(["paid", "pending", "rejected", "overdue"]),
+      cellType: "select",
+      options: [
+        { label: t("Expenses.form.status.paid"), value: "paid" },
+        { label: t("Expenses.form.status.pending"), value: "pending" },
+        { label: t("Expenses.form.status.rejected"), value: "rejected" },
+        { label: t("Expenses.form.status.overdue"), value: "overdue" },
+      ],
     },
   ];
 

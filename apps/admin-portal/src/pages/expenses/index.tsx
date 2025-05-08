@@ -70,9 +70,9 @@ export default function ExpensesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteExpenses, {
-    loading: "Expenses.loading.deleting",
-    success: "Expenses.success.deleted",
-    error: "Expenses.error.deleting",
+    loading: "Expenses.loading.delete",
+    success: "Expenses.success.delete",
+    error: "Expenses.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -111,6 +111,8 @@ export default function ExpensesPage() {
             onAddClick={canCreateExpenses ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Expenses.add_new")}
             searchPlaceholder={t("Expenses.search_expenses")}
+            count={expenses?.length}
+            hideOptions={expenses?.length === 0}
           />
         )}
 
@@ -139,18 +141,18 @@ export default function ExpensesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Expenses.add_new")}
+          title={t("Expenses.edit_expense")}
           formId="expense-form"
           loadingSave={loadingSaveExpense}
         >
           <ExpenseForm
-            id={"expense-form"}
+            formHtmlId={"expense-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableExpense(null);
               setLoadingSaveExpense(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Expenses.success.updated"),
+                description: t("Expenses.success.update"),
               });
             }}
             defaultValues={actionableExpense}

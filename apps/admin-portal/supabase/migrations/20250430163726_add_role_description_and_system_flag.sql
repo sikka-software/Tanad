@@ -1,10 +1,10 @@
 -- Add description column
 ALTER TABLE public.roles
-ADD COLUMN description text;
+ADD COLUMN IF NOT EXISTS description text;
 
 -- Add is_system column
 ALTER TABLE public.roles
-ADD COLUMN is_system boolean DEFAULT false NOT NULL;
+ADD COLUMN IF NOT EXISTS is_system boolean DEFAULT false NOT NULL;
 
 -- Update existing system roles to set is_system = true
 UPDATE public.roles

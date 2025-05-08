@@ -8,7 +8,7 @@ import {
   duplicateJobListing,
   fetchJobListingById,
 } from "@/job-listing/job-listing.service";
-import { JobListing } from "@/job-listing/job-listing.type";
+import { JobListingCreateData, JobListingUpdateData } from "@/job-listing/job-listing.type";
 
 export const jobListingKeys = {
   all: ["jobListings"] as const,
@@ -38,7 +38,7 @@ export function useCreateJobListing() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: JobListing) => createJobListing(data),
+    mutationFn: (data: JobListingCreateData) => createJobListing(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() });
     },
@@ -70,13 +70,8 @@ export function useUpdateJobListing() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      jobListing,
-    }: {
-      id: string;
-      jobListing: Partial<Omit<JobListing, "id" | "created_at">>;
-    }) => updateJobListing(id, jobListing),
+    mutationFn: ({ id, jobListing }: { id: string; jobListing: JobListingUpdateData }) =>
+      updateJobListing(id, jobListing),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: jobListingKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: jobListingKeys.lists() });

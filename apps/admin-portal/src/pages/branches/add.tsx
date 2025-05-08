@@ -1,31 +1,19 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
-
-import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
 import { BranchForm } from "@/branch/branch.form";
-import { branchKeys } from "@/branch/branch.hooks";
 import useBranchStore from "@/branch/branch.store";
 
-import useUserStore from "@/stores/use-user-store";
-
 export default function AddBranchPage() {
-  const supabase = createClient();
   const router = useRouter();
   const t = useTranslations();
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
 
   const setIsLoading = useBranchStore((state) => state.setIsLoading);
   const isLoading = useBranchStore((state) => state.isLoading);
@@ -42,18 +30,9 @@ export default function AddBranchPage() {
       form.setValue("city", dummyData.city);
       form.setValue("state", dummyData.state);
       form.setValue("zip_code", dummyData.zip_code);
-      form.setValue("manager", dummyData.full_name);
-      form.setValue("is_active", true);
+      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
       form.setValue("notes", "Test branch notes");
     }
-  };
-
-  const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Branches.success.created"),
-    });
-    router.push("/branches");
-    setIsLoading(false);
   };
 
   return (
@@ -72,9 +51,13 @@ export default function AddBranchPage() {
         dummyButton={handleDummyData}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <BranchForm id="branch-form" onSuccess={onAddSuccess} />
-      </div>
+      <BranchForm
+        formHtmlId="branch-form"
+        onSuccess={() => {
+          router.push("/branches");
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

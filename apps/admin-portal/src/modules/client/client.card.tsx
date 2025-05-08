@@ -9,7 +9,7 @@ const ClientCard = ({ client }: { client: Client }) => {
     <Card key={client.id} className="transition-shadow hover:shadow-lg">
       <CardHeader>
         <h3 className="text-lg font-semibold">{client.name}</h3>
-        <p className="text-sm text-gray-500">{client.company_details?.name || "Unknown Company"}</p>
+        <p className="text-sm text-gray-500">{client.company || "Unknown Company"}</p>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
@@ -27,20 +27,19 @@ const ClientCard = ({ client }: { client: Client }) => {
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Building2 className="h-4 w-4" />
-            <span>{client.company_details?.name || "Unknown Company"}</span>
+            <span>{client.company || "Unknown Company"}</span>
           </div>
           <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
             <MapPin className="mt-1 h-4 w-4" />
             <div>
-              <p>{client.address}</p>
-              <p>{`${client.city}, ${client.state} ${client.zip_code}`}</p>
+              <p>
+                {client.building_number} {client.street_name}
+              </p>
+              <p>
+                {client.city} {client.region} {client.zip_code}
+              </p>
             </div>
           </div>
-          {client.notes && (
-            <p className="mt-2 border-t pt-2 text-sm text-gray-500 dark:text-gray-400">
-              {client.notes}
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>

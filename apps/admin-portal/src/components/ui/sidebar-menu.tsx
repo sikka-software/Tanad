@@ -54,7 +54,7 @@ export function NavMain({ title, items }: SidebarMenuGroupProps) {
           </motion.div>
         )}
       </AnimatePresence>
-      <SidebarSeparator className="mb-2" />
+      <SidebarSeparator className="mx-0 mb-2" />
       <SidebarMenu>
         {items.map((item, i) =>
           item.items ? (
@@ -198,16 +198,24 @@ const NonCollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][numb
   return (
     <SidebarMenuItem>
       <Link href={item.url}>
-        <SidebarMenuButton tooltip={t(item.translationKey)}>
+        <SidebarMenuButton
+          tooltip={t(item.translationKey)}
+          className={cn(
+            item.is_active &&
+              "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+          )}
+        >
           {item.icon && <item.icon />}
           <span>{t(item.translationKey)}</span>
         </SidebarMenuButton>
       </Link>
       {item.action && (
-        <SidebarMenuAction className="absolute !end-1 top-1/2 -translate-y-1/2">
-          <Plus className="!size-3" />
-          <span className="sr-only">More</span>
-        </SidebarMenuAction>
+        <Link href={item.action}>
+          <SidebarMenuAction className="absolute !end-1 top-1/2 -translate-y-1/2">
+            <Plus className="!size-3" />
+            <span className="sr-only">More</span>
+          </SidebarMenuAction>
+        </Link>
       )}
     </SidebarMenuItem>
   );

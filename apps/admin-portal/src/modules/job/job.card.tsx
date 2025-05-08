@@ -17,8 +17,8 @@ const JobCard = ({ job }: { job: Job }) => {
             <h3 className="text-lg font-semibold">{job.title}</h3>
             <p className="text-sm text-gray-500">{job.type}</p>
           </div>
-          <Badge variant={job.is_active ? "default" : "secondary"}>
-            {job.is_active ? "Active" : "Inactive"}
+          <Badge variant={job.status === "active" ? "default" : "secondary"}>
+            {job.status === "active" ? "Active" : "Inactive"}
           </Badge>
         </div>
       </CardHeader>

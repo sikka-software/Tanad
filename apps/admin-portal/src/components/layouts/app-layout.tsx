@@ -4,9 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { ThemeProvider, useTheme } from "next-themes";
 import { Toaster } from "sonner";
 
-import ProtectedRoute from "@/components/app/ProtectedRoute";
 import { AppSidebar } from "@/ui/app-sidebar";
-import { Breadcrumb } from "@/ui/breadcrumb";
 import { Button } from "@/ui/button";
 import { CommandMenu } from "@/ui/command-menu";
 import LanguageSwitcher from "@/ui/language-switcher";
@@ -16,6 +14,10 @@ import ThemeSwitcher from "@/ui/theme-switcher";
 import { UserDropdown } from "@/ui/user-dropdown";
 
 import { useMainStore } from "@/hooks/main.store";
+
+import ProtectedRoute from "@/components/app/ProtectedRoute";
+import { AppBreadcrumb } from "@/components/ui/app-breadcrumb";
+
 import useUserStore from "@/stores/use-user-store";
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
@@ -46,13 +48,15 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
             richColors
             position={lang === "ar" ? "bottom-left" : "bottom-right"}
             dir={lang === "ar" ? "rtl" : "ltr"}
-            style={{ fontFamily: "var(--font-family)" }}
+            style={{ fontFamily: "var(--font-arabic)" }}
           />
           <div className="w-full">
             <div className="flex w-full flex-row justify-between border-b p-2">
               <div className="flex flex-row items-center gap-0 p-0">
                 <SidebarTrigger />
-                <Breadcrumb />
+                <div className="hidden md:block">
+                  <AppBreadcrumb />
+                </div>
               </div>
               <div className="flex flex-row gap-2">
                 <Button
@@ -71,7 +75,12 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                 <UserDropdown />
               </div>
             </div>
-            <div className="relative mx-auto">{children}</div>
+            <div className="relative mx-auto">
+              <div className="block md:hidden p-2 border-b">
+                <AppBreadcrumb />
+              </div>
+              {children}
+            </div>
           </div>
         </SidebarProvider>
       </ThemeProvider>

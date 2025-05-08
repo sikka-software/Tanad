@@ -13,8 +13,6 @@ import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import { generateDummyData } from "@/lib/dummy-generator";
 
 import { JobForm } from "@/job/job.form";
-import { jobKeys } from "@/job/job.hooks";
-import { createJob } from "@/job/job.service";
 import useJobStore from "@/job/job.store";
 
 export default function AddJobPage() {
@@ -33,9 +31,12 @@ export default function AddJobPage() {
       form.setValue("requirements", dummyData.requirements);
       form.setValue("location", dummyData.job_location);
       form.setValue("department", dummyData.job_department);
-      form.setValue("type", dummyData.job_type);
+      form.setValue(
+        "type",
+        dummyData.randomPicker(["full-time", "part-time", "contract", "internship", "temporary"]),
+      );
       form.setValue("salary", dummyData.job_salary);
-      form.setValue("is_active", dummyData.job_is_active);
+      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
       form.setValue("start_date", dummyData.job_start_date);
       form.setValue("end_date", dummyData.job_end_date);
     }
@@ -57,18 +58,13 @@ export default function AddJobPage() {
         dummyButton={handleDummyData}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <JobForm
-          id="job-form"
-          onSuccess={() => {
-            setIsLoading(false);
-            router.push("/jobs");
-            toast.success(t("General.successful_operation"), {
-              description: t("Jobs.success.created"),
-            });
-          }}
-        />
-      </div>
+      <JobForm
+        formHtmlId="job-form"
+        onSuccess={() => {
+          setIsLoading(false);
+          router.push("/jobs");
+        }}
+      />
     </div>
   );
 }

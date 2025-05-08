@@ -38,7 +38,7 @@ type ComboboxTypes<T> = {
   preview?: boolean;
   hideInput?: boolean;
   direction?: "rtl" | "ltr";
-  inputProps?: any;
+  inputProps?: React.ComponentPropsWithoutRef<typeof CommandInput>;
   //   TODO: fix this
   //   inputProps?: CommandInputProps;
   id?: string;
@@ -47,49 +47,50 @@ type ComboboxTypes<T> = {
   labelProps?: LabelProps;
   /** If true, it will show a red asterisk next to the label*/
   isRequired?: boolean;
-  onChange?: (e: any) => void;
+  value?: string;
+  onChange?: (selectedValue: string) => void;
   renderOption?: (item: T) => React.ReactNode;
   renderSelected?: (item: T) => React.ReactNode;
+  ariaInvalid?: boolean;
 };
 export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
   (
     {
       labelKey = "label",
       valueKey = "value",
-      defaultValue = "",
+      defaultValue,
       popoverClassName,
       direction,
       labelProps,
       inputProps,
       data,
+      ariaInvalid,
       renderOption,
       renderSelected,
+      value: controlledValue,
+      onChange: onValueChange,
       ...props
     },
     ref,
   ) => {
     const [open, setOpen] = React.useState(false);
-    const [value, setValue] = React.useState(defaultValue);
     const containerRef = React.useRef<HTMLDivElement>(null);
-    // function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
-    //   return key.split(".").reduce((o, k) => (o || {})[k], obj);
-    // }
 
     function getProperty<T>(obj: T, key: string): any {
       return key.split(".").reduce((o: any, k: string) => (o || {})[k], obj);
     }
 
-    const handleOpenChange = (open: boolean) => {
+    const handleOpenChange = (openState: boolean) => {
       if (!(props.isLoading || props.preview)) {
-        setOpen(open);
+        setOpen(openState);
       }
     };
-    const selectedItem = data.find((item) => getProperty(item, valueKey) === value);
+    const selectedItem = data.find((item) => getProperty(item, valueKey) === controlledValue);
 
     return (
       <div
         className={cn(
-          "relative flex h-fit flex-col gap-2",
+          "relative flex h-9 flex-col gap-2",
           props.width === "fit" ? "w-fit" : "w-full",
         )}
         ref={containerRef}
@@ -97,10 +98,10 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
         {props.label && <Label {...labelProps}>{props.label}</Label>}
 
         <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
-          <PopoverTrigger asChild>
+          <PopoverTrigger asChild className="h-9">
             {props.isLoading ? (
-              <div className="pb-2">
-                <Skeleton className="h-[40px] min-h-[40px] w-full" />
+              <div className="">
+                <Skeleton className="h-9 w-full" />
               </div>
             ) : (
               <div className="flex flex-col items-start gap-2">
@@ -114,14 +115,23 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                   role="combobox"
                   type="button"
                   variant="outline"
-                  size="sm"
+                  // size="sm"
+                  disabled={inputProps?.disabled}
                   aria-expanded={open}
                   className={cn(
-                    "ring-offset-background focus-visible:ring-ring inline-flex w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-                    props.preview
-                      ? "cursor-default rounded-none border-transparent px-0"
-                      : "bg-background px-3",
+                    "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                    "bg-background px-3",
+                    ariaInvalid &&
+                      "ring-destructive/20 dark:ring-destructive/40 border-destructive",
+                    // inCell && "h-10 rounded-none border-none",
+                    // buttonClassName,
                   )}
+                  // className={cn(
+                  //   "ring-offset-background focus-visible:ring-ring inline-flex w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                  //   props.preview
+                  //     ? "cursor-default rounded-none border-transparent px-0"
+                  //     : "bg-background px-3",
+                  // )}
                 >
                   {selectedItem
                     ? renderSelected
@@ -159,7 +169,11 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
           <PopoverContent
             // sideOffset={0}
             align="start"
-            className={cn("w-[--radix-popover-trigger-width] p-0", props.helperText && "-mt-4")}
+            className={cn(
+              "w-[var(--radix-popover-trigger-width)] p-0",
+              props.helperText && "-mt-4",
+              popoverClassName,
+            )}
             dir={direction}
             // container={containerRef.current}
           >
@@ -184,9 +198,8 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                       key={i}
                       onSelect={() => {
                         const newValue = getProperty(item, valueKey);
-                        setValue(newValue === value ? "" : (newValue as string));
-                        if (props.onChange) {
-                          props.onChange(newValue === value ? "" : (newValue as string));
+                        if (onValueChange) {
+                          onValueChange(newValue === controlledValue ? "" : newValue);
                         }
                         setOpen(false);
                       }}
@@ -204,7 +217,9 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
                         strokeLinejoin="round"
                         className={cn(
                           "icon",
-                          value === getProperty(item, valueKey) ? "opacity-100" : "opacity-0",
+                          controlledValue === getProperty(item, valueKey)
+                            ? "opacity-100"
+                            : "opacity-0",
                         )}
                         style={{ marginInlineEnd: "0.5rem" }}
                       >
@@ -222,3 +237,5 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxTypes<any>>(
     );
   },
 );
+
+Combobox.displayName = "Combobox";

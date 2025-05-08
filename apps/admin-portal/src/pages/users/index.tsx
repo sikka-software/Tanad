@@ -70,9 +70,9 @@ export default function UsersPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteUsers, {
-    loading: "Users.loading.deleting",
-    success: "Users.success.deleted",
-    error: "Users.error.deleting",
+    loading: "Users.loading.delete",
+    success: "Users.success.delete",
+    error: "Users.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -123,6 +123,8 @@ export default function UsersPage() {
             onAddClick={handleAddClick}
             createLabel={t("Users.add_new")}
             searchPlaceholder={t("Users.search_placeholder")}
+            count={users?.length}
+            hideOptions={users?.length === 0}
           />
         )}
 
@@ -156,8 +158,8 @@ export default function UsersPage() {
           loadingSave={loadingSaveUser}
         >
           <UserForm
-            id="user-form"
-            initialData={actionableUser}
+            formHtmlId="user-form"
+            defaultValues={actionableUser}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableUser(null);

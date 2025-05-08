@@ -26,7 +26,7 @@ ADD COLUMN role_id UUID REFERENCES roles(id);
 UPDATE user_roles ur
 SET role_id = r.id
 FROM roles r
-WHERE r.name = ur.role 
+WHERE r.name = ur.role::text
 AND r.enterprise_id = ur.enterprise_id;
 
 -- Make role_id NOT NULL after populating data

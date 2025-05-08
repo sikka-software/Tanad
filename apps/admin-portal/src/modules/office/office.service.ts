@@ -1,4 +1,4 @@
-import { Office, OfficeCreateData } from "@/office/office.type";
+import { Office, OfficeCreateData, OfficeUpdateData } from "@/office/office.type";
 
 export async function fetchOffices(): Promise<Office[]> {
   try {
@@ -46,7 +46,7 @@ export async function createOffice(office: OfficeCreateData): Promise<Office> {
   }
 }
 
-export async function updateOffice(id: string, updates: Partial<Office>): Promise<Office> {
+export async function updateOffice(id: string, updates: OfficeUpdateData): Promise<Office> {
   const response = await fetch(`/api/resource/offices/${id}`, {
     method: "PUT",
     headers: {

@@ -1,4 +1,4 @@
-import { Vendor } from "@/vendor/vendor.type";
+import { Vendor, VendorCreateData, VendorUpdateData } from "@/vendor/vendor.type";
 
 export async function fetchVendors(): Promise<Vendor[]> {
   try {
@@ -22,7 +22,7 @@ export async function fetchVendorById(id: string): Promise<Vendor> {
   return response.json();
 }
 
-export async function createVendor(vendor: Omit<Vendor, "id" | "created_at">): Promise<Vendor> {
+export async function createVendor(vendor: VendorCreateData): Promise<Vendor> {
   const response = await fetch("/api/resource/vendors", {
     method: "POST",
     headers: {
@@ -36,7 +36,7 @@ export async function createVendor(vendor: Omit<Vendor, "id" | "created_at">): P
   return response.json();
 }
 
-export async function updateVendor(id: string, updates: Partial<Vendor>): Promise<Vendor> {
+export async function updateVendor(id: string, updates: VendorUpdateData): Promise<Vendor> {
   const response = await fetch(`/api/resource/vendors/${id}`, {
     method: "PUT",
     headers: {

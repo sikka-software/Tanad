@@ -1,4 +1,4 @@
-import { Invoice } from "@/invoice/invoice.type";
+import { Invoice, InvoiceCreateData, InvoiceUpdateData } from "@/invoice/invoice.type";
 
 export async function fetchInvoices(): Promise<Invoice[]> {
   const response = await fetch("/api/resource/invoices");
@@ -16,7 +16,7 @@ export async function fetchInvoiceById(id: string): Promise<Invoice> {
   return response.json();
 }
 
-export async function createInvoice(invoice: Omit<Invoice, "id" | "created_at">): Promise<Invoice> {
+export async function createInvoice(invoice: InvoiceCreateData): Promise<Invoice> {
   const response = await fetch("/api/resource/invoices", {
     method: "POST",
     headers: {
@@ -25,7 +25,9 @@ export async function createInvoice(invoice: Omit<Invoice, "id" | "created_at">)
     body: JSON.stringify(invoice),
   });
   if (!response.ok) {
-    throw new Error("Failed to create invoice");
+    const errorBody = await response.text();
+    console.error("API Error Response:", errorBody);
+    throw new Error(`Failed to create invoice: ${response.statusText}`);
   }
   return response.json();
 }
@@ -40,7 +42,7 @@ export async function duplicateInvoice(id: string): Promise<Invoice> {
   return response.json();
 }
 
-export async function updateInvoice(id: string, invoice: Partial<Invoice>): Promise<Invoice> {
+export async function updateInvoice(id: string, invoice: InvoiceUpdateData): Promise<Invoice> {
   const response = await fetch(`/api/resource/invoices/${id}`, {
     method: "PUT",
     headers: {
@@ -49,7 +51,9 @@ export async function updateInvoice(id: string, invoice: Partial<Invoice>): Prom
     body: JSON.stringify(invoice),
   });
   if (!response.ok) {
-    throw new Error("Failed to update invoice");
+    const errorBody = await response.text();
+    console.error("API Error Response:", errorBody);
+    throw new Error(`Failed to update invoice: ${response.statusText}`);
   }
   return response.json();
 }
@@ -65,8 +69,8 @@ export async function deleteInvoice(id: string): Promise<void> {
 
 export async function bulkDeleteInvoices(ids: string[]): Promise<void> {
   try {
-    const response = await fetch("/api/resource/invoices/bulk-delete", {
-      method: "POST",
+    const response = await fetch("/api/resource/invoices", {
+      method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),
     });

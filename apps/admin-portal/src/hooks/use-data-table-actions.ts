@@ -9,6 +9,7 @@ interface UseDataTableActionsProps<T extends { id: string }> {
   setActionableItem: (item: T | null) => void;
   duplicateMutation: (id: string, options?: any) => void;
   moduleName: string;
+  previewAction?: (id: string) => void;
 }
 
 export function useDataTableActions<T extends { id: string }>({
@@ -19,6 +20,7 @@ export function useDataTableActions<T extends { id: string }>({
   setActionableItem,
   duplicateMutation,
   moduleName,
+  previewAction,
 }: UseDataTableActionsProps<T>) {
   const t = useTranslations();
 
@@ -33,21 +35,25 @@ export function useDataTableActions<T extends { id: string }>({
       setIsDeleteDialogOpen(true);
     }
 
+    if (action === "preview") {
+      previewAction?.(rowId);
+    }
+
     if (action === "duplicate") {
       const toastId = toast.loading(t("General.loading_operation"), {
-        description: t(`${moduleName}.loading.duplicating`),
+        description: t(`${moduleName}.loading.duplicate`),
       });
 
       await duplicateMutation(rowId, {
         onSuccess: () => {
           toast.success(t("General.successful_operation"), {
-            description: t(`${moduleName}.success.duplicated`),
+            description: t(`${moduleName}.success.duplicate`),
           });
           toast.dismiss(toastId);
         },
         onError: () => {
           toast.error(t("General.error_operation"), {
-            description: t(`${moduleName}.error.duplicating`),
+            description: t(`${moduleName}.error.duplicate`),
           });
           toast.dismiss(toastId);
         },

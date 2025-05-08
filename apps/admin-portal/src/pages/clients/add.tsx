@@ -1,7 +1,6 @@
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { toast } from "sonner";
 
 import PageTitle from "@/ui/page-title";
 
@@ -32,14 +31,6 @@ export default function AddClientPage() {
     }
   };
 
-  const onAddSuccess = () => {
-    toast.success(t("General.successful_operation"), {
-      description: t("Clients.success.created"),
-    });
-    router.push("/clients");
-    setIsLoading(false);
-  };
-
   return (
     <div>
       <CustomPageMeta title={t("Clients.add_new")} />
@@ -56,9 +47,13 @@ export default function AddClientPage() {
         }}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <ClientForm id="client-form" loading={isLoading} onSuccess={onAddSuccess} />
-      </div>
+      <ClientForm
+        formHtmlId="client-form"
+        onSuccess={() => {
+          router.push("/clients");
+          setIsLoading(false);
+        }}
+      />
     </div>
   );
 }

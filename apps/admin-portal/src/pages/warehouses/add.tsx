@@ -1,70 +1,20 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
-import PageTitle from "@/ui/page-title";
-
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
+import PageTitle from "@/components/ui/page-title";
 
-import { WarehouseForm, type WarehouseFormValues } from "@/warehouse/warehouse.form";
-import { warehouseKeys } from "@/warehouse/warehouse.hooks";
-import { createWarehouse } from "@/warehouse/warehouse.service";
-import type { Warehouse, WarehouseCreateData } from "@/warehouse/warehouse.type";
-import useUserStore from "@/stores/use-user-store";
+import { WarehouseForm } from "@/modules/warehouse/warehouse.form";
+import useWarehouseStore from "@/modules/warehouse/warehouse.store";
 
 export default function AddWarehousePage() {
   const t = useTranslations();
   const router = useRouter();
-  const queryClient = useQueryClient();
-  const { user } = useUserStore();
 
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (data: WarehouseFormValues) => {
-    setLoading(true);
-    try {
-      const warehouseData = {
-        name: data.name.trim(),
-        code: data.code.trim(),
-        address: data.address.trim(),
-        city: data.city.trim(),
-        state: data.state.trim(),
-        zip_code: data.zip_code.trim(),
-        capacity: data.capacity ? parseFloat(data.capacity) : null,
-        is_active: data.is_active,
-        notes: data.notes?.trim() || null,
-      };
-
-      let result: Warehouse;
-
-      const warehouseCreateData = {
-        ...warehouseData,
-        user_id: user?.id,
-      };
-      result = await createWarehouse(warehouseCreateData as WarehouseCreateData);
-      toast.success(t("General.successful_operation"), {
-        description: t("Warehouses.messages.success_created"),
-      });
-
-      const previousWarehouses = queryClient.getQueryData(warehouseKeys.lists()) || [];
-      queryClient.setQueryData(warehouseKeys.lists(), [
-        ...(Array.isArray(previousWarehouses) ? previousWarehouses : []),
-        result,
-      ]);
-
-      router.push("/warehouses");
-    } catch (error) {
-      console.error("Failed to save warehouse:", error);
-      toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Warehouses.messages.error_save"),
-      });
-      setLoading(false);
-    }
-  };
+  const setIsLoading = useWarehouseStore((state) => state.setIsLoading);
+  const isLoading = useWarehouseStore((state) => state.isLoading);
 
   const handleDummyData = () => {
     const form = (window as any).warehouseForm;
@@ -82,31 +32,31 @@ export default function AddWarehousePage() {
     }
   };
 
+  const onAddSuccess = () => {
+    toast.success(t("General.successful_operation"), {
+      description: t("Warehouses.success.create"),
+    });
+    router.push("/warehouses");
+    setIsLoading(false);
+  };
+
   return (
     <div>
       <CustomPageMeta title={t("Warehouses.add_new")} />
       <PageTitle
         formButtons
         formId="warehouse-form"
-        loading={loading}
+        loading={isLoading}
         onCancel={() => router.push("/warehouses")}
         texts={{
           title: t("Warehouses.add_new"),
           submit_form: t("Warehouses.add_new"),
           cancel: t("General.cancel"),
         }}
-        customButton={
-          process.env.NODE_ENV === "development" && (
-            <Button variant="outline" size="sm" onClick={handleDummyData}>
-              Dummy Data
-            </Button>
-          )
-        }
+        dummyButton={handleDummyData}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <WarehouseForm id="warehouse-form" onSubmit={handleSubmit} />
-      </div>
+      <WarehouseForm formHtmlId="warehouse-form" onSuccess={onAddSuccess} />
     </div>
   );
 }

@@ -12,7 +12,7 @@ import { ModuleTableProps } from "@/types/common.type";
 
 import { useUpdateQuote } from "@/quote/quote.hooks";
 import useQuotesStore from "@/quote/quote.store";
-import { Quote } from "@/quote/quote.type";
+import { Quote, QuoteUpdateData } from "@/quote/quote.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -33,17 +33,17 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
   const columns: ExtendedColumnDef<Quote>[] = [
     {
       accessorKey: "quote_number",
-      header: t("Quotes.quote_number"),
-      validationSchema: z.string().min(1, t("Quotes.quote_number.required")),
+      header: t("Quotes.form.quote_number"),
+      validationSchema: z.string().min(1, t("Quotes.form.quote_number.required")),
     },
     {
       accessorKey: "client_id",
       header: t("Companies.title"),
-      cell: (props: CellContext<Quote, unknown>) => props.row.original.clients?.company || "N/A",
+      cell: (props: CellContext<Quote, unknown>) => props.row.original.client?.company || "N/A",
     },
     {
       accessorKey: "issue_date",
-      header: t("Quotes.issue_date"),
+      header: t("Quotes.form.issue_date"),
       cell: (props: CellContext<Quote, unknown>) => {
         try {
           return format(new Date(props.row.original.issue_date), "MMM dd, yyyy");
@@ -54,7 +54,7 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
     },
     {
       accessorKey: "expiry_date",
-      header: t("Quotes.expiry_date"),
+      header: t("Quotes.form.expiry_date"),
       cell: (props: CellContext<Quote, unknown>) => {
         try {
           return format(new Date(props.row.original.expiry_date), "MMM dd, yyyy");
@@ -64,28 +64,28 @@ const QuotesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
       },
     },
     {
-      accessorKey: "status",
-      header: t("Quotes.status.title"),
-      validationSchema: z.enum(["draft", "sent", "accepted", "rejected", "expired"]),
-    },
-    {
       accessorKey: "subtotal",
-      header: t("Quotes.subtotal"),
-      validationSchema: z.number().min(0, t("Quotes.subtotal.required")),
+      header: t("Quotes.form.subtotal"),
+      validationSchema: z.number().min(0, t("Quotes.form.subtotal.required")),
       cell: (props: CellContext<Quote, unknown>) =>
         `$${Number(props.row.original.subtotal || 0).toFixed(2)}`,
     },
     {
       accessorKey: "tax_rate",
-      header: t("Quotes.tax_rate"),
-      validationSchema: z.number().min(0, t("Quotes.tax_rate.required")),
+      header: t("Quotes.form.tax_rate"),
+      validationSchema: z.number().min(0, t("Quotes.form.tax_rate.required")),
       cell: (props: CellContext<Quote, unknown>) => `${props.row.original.tax_rate || 0}%`,
+    },
+    {
+      accessorKey: "status",
+      header: t("Quotes.form.status.title"),
+      validationSchema: z.enum(["draft", "sent", "accepted", "rejected", "expired"]),
     },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
     if (columnId === "client_id") return;
-    await updateQuote({ id: rowId, data: { [columnId]: value } });
+    await updateQuote({ id: rowId, data: { [columnId]: value } as QuoteUpdateData });
   };
 
   const handleRowSelectionChange = (rows: Quote[]) => {

@@ -1,8 +1,14 @@
-import { Quote, QuoteItem, QuoteCreateData, QuoteItemCreateData } from "@/quote/quote.type";
+import {
+  Quote,
+  QuoteCreateData,
+  QuoteItemCreateServiceData,
+  QuoteUpdateData,
+  QuoteItemUpdateServiceData,
+} from "@/quote/quote.type";
 
 export async function fetchQuotes(): Promise<Quote[]> {
   try {
-    const response = await fetch("/api/resources/quotes");
+    const response = await fetch("/api/resource/quotes");
     if (!response.ok) {
       throw new Error("Failed to fetch quotes");
     }
@@ -15,7 +21,7 @@ export async function fetchQuotes(): Promise<Quote[]> {
 
 export async function fetchQuoteById(id: string): Promise<Quote> {
   try {
-    const response = await fetch(`/api/resources/quotes/${id}`);
+    const response = await fetch(`/api/resource/quotes/${id}`);
     if (!response.ok) {
       throw new Error("Failed to fetch quote");
     }
@@ -28,7 +34,7 @@ export async function fetchQuoteById(id: string): Promise<Quote> {
 
 export async function createQuote(newQuote: QuoteCreateData): Promise<Quote> {
   try {
-    const response = await fetch("/api/resources/quotes", {
+    const response = await fetch("/api/resource/quotes", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +53,7 @@ export async function createQuote(newQuote: QuoteCreateData): Promise<Quote> {
 
 export async function duplicateQuote(id: string): Promise<Quote> {
   try {
-    const response = await fetch(`/api/resources/quotes/${id}/duplicate`, {
+    const response = await fetch(`/api/resource/quotes/${id}/duplicate`, {
       method: "POST",
     });
     if (!response.ok) {
@@ -59,9 +65,9 @@ export async function duplicateQuote(id: string): Promise<Quote> {
     throw new Error("Failed to duplicate quote");
   }
 }
-export async function updateQuote(id: string, updates: Partial<Quote>): Promise<Quote> {
+export async function updateQuote(id: string, updates: QuoteUpdateData): Promise<Quote> {
   try {
-    const response = await fetch(`/api/resources/quotes/${id}`, {
+    const response = await fetch(`/api/resource/quotes/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +86,7 @@ export async function updateQuote(id: string, updates: Partial<Quote>): Promise<
 
 export async function deleteQuote(id: string): Promise<void> {
   try {
-    const response = await fetch(`/api/resources/quotes/${id}`, {
+    const response = await fetch(`/api/resource/quotes/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -94,7 +100,7 @@ export async function deleteQuote(id: string): Promise<void> {
 
 export async function bulkDeleteQuotes(ids: string[]): Promise<void> {
   try {
-    const response = await fetch("/api/resources/quotes/bulk-delete", {
+    const response = await fetch("/api/resource/quotes/bulk-delete", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -111,16 +117,17 @@ export async function bulkDeleteQuotes(ids: string[]): Promise<void> {
 }
 
 // Quote Items API endpoints
-export async function createQuoteItem(quoteItem: QuoteItemCreateData) {
+export async function createQuoteItem(quoteItem: QuoteItemCreateServiceData) {
   try {
     const dbQuoteItem = {
       quote_id: quoteItem.quote_id,
       description: quoteItem.description,
       quantity: quoteItem.quantity.toString(),
       unit_price: quoteItem.unit_price.toString(),
+      ...(quoteItem.product_id && { product_id: quoteItem.product_id }),
     };
 
-    const response = await fetch("/api/resources/quote-items", {
+    const response = await fetch("/api/resource/quote-items", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -139,16 +146,17 @@ export async function createQuoteItem(quoteItem: QuoteItemCreateData) {
   }
 }
 
-export async function updateQuoteItem(id: string, quoteItem: Partial<QuoteItem>) {
+export async function updateQuoteItem(id: string, quoteItem: QuoteItemUpdateServiceData) {
   try {
     const dbQuoteItem = {
       ...(quoteItem.quote_id && { quote_id: quoteItem.quote_id }),
       ...(quoteItem.description && { description: quoteItem.description }),
-      ...(quoteItem.quantity && { quantity: quoteItem.quantity.toString() }),
-      ...(quoteItem.unit_price && { unit_price: quoteItem.unit_price.toString() }),
+      ...(quoteItem.quantity !== undefined && { quantity: quoteItem.quantity.toString() }),
+      ...(quoteItem.unit_price !== undefined && { unit_price: quoteItem.unit_price.toString() }),
+      ...(quoteItem.product_id && { product_id: quoteItem.product_id }),
     };
 
-    const response = await fetch(`/api/resources/quote-items/${id}`, {
+    const response = await fetch(`/api/resource/quote-items/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -169,7 +177,7 @@ export async function updateQuoteItem(id: string, quoteItem: Partial<QuoteItem>)
 
 export async function deleteQuoteItem(id: string) {
   try {
-    const response = await fetch(`/api/resources/quote-items/${id}`, {
+    const response = await fetch(`/api/resource/quote-items/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

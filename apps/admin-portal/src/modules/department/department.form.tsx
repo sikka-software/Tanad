@@ -11,16 +11,19 @@ import { Input } from "@/ui/input";
 import { MultiSelect, MultiSelectOption } from "@/ui/multi-select";
 import { Textarea } from "@/ui/textarea";
 
-import { useOffices } from "@/office/office.hooks";
+import { ModuleFormProps } from "@/types/common.type";
 
-import { useBranches } from "@/branch/branch.hooks";
-
-import { useCreateDepartment, useUpdateDepartment } from "@/department/department.hooks";
-import useDepartmentStore from "@/department/department.store";
-import { DepartmentCreateData, DepartmentUpdateData } from "@/department/department.type";
-
-import { useWarehouses } from "@/warehouse/warehouse.hooks";
-
+import { useBranches } from "@/modules/branch/branch.hooks";
+import { useCreateDepartment, useUpdateDepartment } from "@/modules/department/department.hooks";
+import useDepartmentStore from "@/modules/department/department.store";
+import {
+  Department,
+  DepartmentCreateData,
+  DepartmentUpdateData,
+  DepartmentLocation,
+} from "@/modules/department/department.type";
+import { useOffices } from "@/modules/office/office.hooks";
+import { useWarehouses } from "@/modules/warehouse/warehouse.hooks";
 import useUserStore from "@/stores/use-user-store";
 
 type LocationValue = {
@@ -30,6 +33,12 @@ type LocationValue = {
 
 type LocationOption = MultiSelectOption<LocationValue> & {
   metadata: { type: LocationValue["type"] };
+};
+
+type FormLocationData = {
+  location_id: string;
+  location_type: "office" | "branch" | "warehouse";
+  user_id: string;
 };
 
 export const createDepartmentSchema = (t: (key: string) => string) =>
@@ -48,23 +57,18 @@ export const createDepartmentSchema = (t: (key: string) => string) =>
 
 export type DepartmentFormValues = z.infer<ReturnType<typeof createDepartmentSchema>>;
 
-interface DepartmentFormProps {
-  id?: string;
-  onSuccess?: () => void;
-  defaultValues?: DepartmentUpdateData | null;
-  editMode?: boolean;
-}
-
 export default function DepartmentForm({
-  id,
+  formHtmlId,
   onSuccess,
   defaultValues,
   editMode = false,
-}: DepartmentFormProps) {
+}: ModuleFormProps<DepartmentUpdateData | DepartmentCreateData>) {
   const t = useTranslations();
   const user = useUserStore((state) => state.user);
+  const enterprise = useUserStore((state) => state.enterprise);
   const { mutateAsync: createDepartment } = useCreateDepartment();
   const { mutate: updateDepartment } = useUpdateDepartment();
+
   const setIsLoading = useDepartmentStore((state) => state.setIsLoading);
 
   const { data: offices, isLoading: isOfficesLoading } = useOffices();
@@ -73,16 +77,18 @@ export default function DepartmentForm({
   const locale = useLocale();
   const [locationOptions, setLocationOptions] = useState<LocationOption[]>([]);
 
+  const initialFormLocations =
+    defaultValues?.locations?.map((loc) => ({
+      id: loc.location_id,
+      type: loc.location_type as "office" | "branch" | "warehouse",
+    })) || [];
+
   const form = useForm<DepartmentFormValues>({
     resolver: zodResolver(createDepartmentSchema(t)),
     defaultValues: {
       name: defaultValues?.name || "",
       description: defaultValues?.description || "",
-      locations:
-        defaultValues?.locations?.map((loc) => ({
-          id: loc.location_id,
-          type: loc.location_type,
-        })) || [],
+      locations: initialFormLocations,
     },
   });
 
@@ -142,31 +148,44 @@ export default function DepartmentForm({
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
+      setIsLoading(false);
       return;
     }
+
     try {
       if (editMode) {
+        if (!defaultValues?.id) {
+          toast.error(t("General.error_occurred"), {
+            description: t("Departments.error.update_missing_id"),
+          });
+          setIsLoading(false);
+          return;
+        }
+        const departmentId = defaultValues.id;
         try {
-          const locations = data.locations.map((location) => ({
-            department_id: id!,
+          const locationsForUpdate: DepartmentLocation[] = data.locations.map((location) => ({
+            department_id: departmentId,
             location_id: location.id,
             location_type: location.type,
             user_id: user.id,
-          }));
+            enterprise_id: enterprise?.id || "",
+          })) as DepartmentLocation[];
+
+          const updatePayload: DepartmentUpdateData = {
+            name: data.name,
+            description: data.description || null,
+            user_id: user.id,
+            status: defaultValues.status,
+            locations: locationsForUpdate,
+          };
 
           await updateDepartment({
-            id: id!,
-            data: {
-              name: data.name,
-              description: data.description || null,
-              user_id: user.id,
-              is_active: true,
-              locations,
-            },
+            id: departmentId,
+            data: updatePayload as Partial<Department>,
           });
 
           toast.success(t("General.successful_operation"), {
-            description: t("Departments.success.updated"),
+            description: t("Departments.success.update"),
           });
           if (onSuccess) {
             onSuccess();
@@ -174,28 +193,32 @@ export default function DepartmentForm({
         } catch (error) {
           console.error("Error updating department:", error);
           toast.error(t("General.error_occurred"), {
-            description: t("Departments.error.updating"),
+            description: t("Departments.error.update"),
           });
+        } finally {
+          setIsLoading(false);
         }
       } else {
         try {
+          const locationsForCreate = data.locations.map((location) => ({
+            location_id: location.id,
+            location_type: location.type,
+            user_id: user.id,
+          }));
+
           const createData: DepartmentCreateData = {
             name: data.name,
             description: data.description || null,
             user_id: user.id,
-            is_active: true,
-            locations: data.locations.map((location) => ({
-              department_id: id!,
-              location_id: location.id,
-              location_type: location.type,
-              user_id: user.id,
-            })),
+            status: "active",
+            enterprise_id: enterprise?.id || "",
+            locations: locationsForCreate as DepartmentLocation[],
           };
 
           await createDepartment(createData);
 
           toast.success(t("General.successful_operation"), {
-            description: t("Departments.success.created"),
+            description: t("Departments.success.create"),
           });
           if (onSuccess) {
             onSuccess();
@@ -203,15 +226,17 @@ export default function DepartmentForm({
         } catch (error) {
           console.error("Error creating department:", error);
           toast.error(t("General.error_occurred"), {
-            description: t("Departments.error.creating"),
+            description: t("Departments.error.create"),
           });
+        } finally {
+          setIsLoading(false);
         }
       }
     } catch (error) {
       setIsLoading(false);
       console.error("Failed to save department:", error);
       toast.error(t("General.error_operation"), {
-        description: error instanceof Error ? error.message : t("Departments.error.create"),
+        description: editMode ? t("Departments.error.update") : t("Departments.error.create"),
       });
     }
   };
@@ -222,63 +247,65 @@ export default function DepartmentForm({
 
   return (
     <Form {...form}>
-      <form id={id} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Departments.form.name.label")}</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form id={formHtmlId || "department-form"} onSubmit={form.handleSubmit(handleSubmit)}>
+        <div className="form-container">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Departments.form.name.label")}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Departments.form.description.label")}</FormLabel>
-              <FormControl>
-                <Textarea {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Departments.form.description.label")}</FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="locations"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Departments.form.locations.label")}</FormLabel>
-              <FormControl>
-                <MultiSelect<LocationValue>
-                  loading={isOfficesLoading || isBranchesLoading || isWarehousesLoading}
-                  dir={locale === "ar" ? "rtl" : "ltr"}
-                  options={locationOptions}
-                  onValueChange={(values) => {
-                    field.onChange(values);
-                  }}
-                  defaultValue={field.value}
-                  placeholder={t("Departments.form.locations.placeholder")}
-                  variant="inverted"
-                  animation={2}
-                  maxCount={3}
-                  renderOption={renderLocationOption}
-                  getValueKey={(value) => value.id}
-                  isValueEqual={(a, b) => a.id === b.id && a.type === b.type}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="locations"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Departments.form.locations.label")}</FormLabel>
+                <FormControl>
+                  <MultiSelect<LocationValue>
+                    loading={isOfficesLoading || isBranchesLoading || isWarehousesLoading}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                    options={locationOptions}
+                    onValueChange={(values) => {
+                      field.onChange(values);
+                    }}
+                    value={field.value}
+                    placeholder={t("Departments.form.locations.placeholder")}
+                    variant="inverted"
+                    animation={2}
+                    maxCount={3}
+                    renderOption={renderLocationOption}
+                    getValueKey={(value) => value.id}
+                    isValueEqual={(a, b) => a.id === b.id && a.type === b.type}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </form>
     </Form>
   );

@@ -1,26 +1,25 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Shield } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/ui/accordion";
-import { Button } from "@/ui/button";
 import { Checkbox } from "@/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { ScrollArea } from "@/ui/scroll-area";
 import { Textarea } from "@/ui/textarea";
 
+import { ModuleFormProps } from "@/types/common.type";
+
 import useUserStore from "@/stores/use-user-store";
 
 import { usePermissions } from "../permission/permission.hooks";
-// Assuming Permission type looks like { id: string; name: string }
-// import type { Permission } from "../permission/permission.type";
 import type { Permission } from "../permission/permission.hooks";
 import { useCreateRole, useUpdateRole } from "./role.hooks";
 import useRoleStore from "./role.store";
+import { RoleCreateData, RoleUpdateData } from "./role.type";
 
 const createRoleSchema = (t: (key: string) => string) =>
   z.object({
@@ -36,19 +35,12 @@ const createRoleSchema = (t: (key: string) => string) =>
 
 type FormData = z.infer<ReturnType<typeof createRoleSchema>>;
 
-interface RoleFormProps {
-  id?: string;
-  defaultValues?: {
-    name: string;
-    description: string | null;
-    permissions: string[];
-  };
-  onSuccess?: () => void;
-  editMode?: boolean;
-  formId?: string;
-}
-
-export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: RoleFormProps) {
+export function RoleForm({
+  formHtmlId,
+  defaultValues,
+  onSuccess,
+  editMode,
+}: ModuleFormProps<RoleUpdateData | RoleCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
   const enterprise = useUserStore((state) => state.enterprise);
@@ -121,10 +113,10 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
 
     try {
       setIsLoading(true);
-      if (editMode && id) {
+      if (editMode && defaultValues?.id) {
         // Ensure id exists for edit mode
         await updateRole({
-          id: id,
+          id: defaultValues?.id,
           data: {
             name: formData.name,
             description: formData.description,
@@ -155,108 +147,110 @@ export function RoleForm({ id, defaultValues, onSuccess, editMode, formId }: Rol
 
   return (
     <Form {...form}>
-      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t("Roles.form.name.label")}</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder={t("Roles.form.name.placeholder")}
-                  disabled={editMode}
-                />
-              </FormControl>
-              {field.value && !/^[a-z0-9_]+$/.test(field.value) && (
-                <p className="text-destructive mt-1 text-xs">{t("Roles.form.name.format")}</p>
-              )}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <form id={formHtmlId} onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="form-container">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Roles.form.name.label")}</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder={t("Roles.form.name.placeholder")}
+                    disabled={editMode}
+                  />
+                </FormControl>
+                {field.value && !/^[a-z0-9_]+$/.test(field.value) && (
+                  <p className="text-destructive mt-1 text-xs">{t("Roles.form.name.format")}</p>
+                )}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field: { value, ...field } }) => (
-            <FormItem>
-              <FormLabel>{t("Roles.form.description.label")}</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  value={value || ""}
-                  placeholder={t("Roles.form.description.placeholder")}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field: { value, ...field } }) => (
+              <FormItem>
+                <FormLabel>{t("Roles.form.description.label")}</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    value={value || ""}
+                    placeholder={t("Roles.form.description.placeholder")}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="space-y-4">
-          <FormLabel>{t("Roles.form.permissions.label")}</FormLabel>
-          <ScrollArea className="h-[300px] pe-4" dir={locale === "ar" ? "rtl" : "ltr"}>
-            <Accordion type="multiple" className="w-full">
-              {Object.entries(permissionsByCategory).map(([category, perms]) => (
-                <AccordionItem key={category} value={category}>
-                  <AccordionTrigger className="py-2">
-                    <div className="flex w-full items-center justify-between pe-4">
-                      {/* Display the capitalized category name */}
-                      <span>{t(`${category}.title`)}</span>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          // Check if all permissions in this category are selected by permission.id
-                          checked={perms.every((p) => selectedPermissions.includes(p.id))}
-                          // Pass the display category name (e.g., "Companies")
-                          onCheckedChange={() => toggleCategoryPermissions(category)}
-                          onClick={(e) => e.stopPropagation()}
-                          // Add an id for accessibility if needed, e.g., `category-${category}-select-all`
-                        />
-                        <span className="text-muted-foreground text-xs">
-                          {/* Count selected permissions in this category by permission.id */}
-                          {perms.filter((p) => selectedPermissions.includes(p.id)).length}/
-                          {perms.length}
-                        </span>
+          <div className="space-y-4">
+            <FormLabel>{t("Roles.form.permissions.label")}</FormLabel>
+            <ScrollArea className="h-[300px] pe-4" dir={locale === "ar" ? "rtl" : "ltr"}>
+              <Accordion type="multiple" className="w-full">
+                {Object.entries(permissionsByCategory).map(([category, perms]) => (
+                  <AccordionItem key={category} value={category}>
+                    <AccordionTrigger className="py-2">
+                      <div className="flex w-full items-center justify-between pe-4">
+                        {/* Display the capitalized category name */}
+                        <span>{t(`${category}.title`)}</span>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            // Check if all permissions in this category are selected by permission.id
+                            checked={perms.every((p) => selectedPermissions.includes(p.id))}
+                            // Pass the display category name (e.g., "Companies")
+                            onCheckedChange={() => toggleCategoryPermissions(category)}
+                            onClick={(e) => e.stopPropagation()}
+                            // Add an id for accessibility if needed, e.g., `category-${category}-select-all`
+                          />
+                          <span className="text-muted-foreground text-xs">
+                            {/* Count selected permissions in this category by permission.id */}
+                            {perms.filter((p) => selectedPermissions.includes(p.id)).length}/
+                            {perms.length}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 ps-4 pt-2">
-                      {perms.map((permission) => {
-                        // Extract action part (e.g., "create" from "companies.create")
-                        const nameParts = permission.id.split("."); // Split permission.id
-                        const actionName = nameParts.length > 1 ? nameParts[1] : permission.id;
-                        // Capitalize action for display
-                        const displayActionName =
-                          actionName.charAt(0).toUpperCase() + actionName.slice(1);
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2 ps-4 pt-2">
+                        {perms.map((permission) => {
+                          // Extract action part (e.g., "create" from "companies.create")
+                          const nameParts = permission.id.split("."); // Split permission.id
+                          const actionName = nameParts.length > 1 ? nameParts[1] : permission.id;
+                          // Capitalize action for display
+                          const displayActionName =
+                            actionName.charAt(0).toUpperCase() + actionName.slice(1);
 
-                        return (
-                          <div key={permission.id} className="flex items-start space-x-2">
-                            <Checkbox
-                              // Check based on resource.action string (permission.id)
-                              checked={selectedPermissions.includes(permission.id)}
-                              // Pass resource.action string (permission.id)
-                              onCheckedChange={() => togglePermission(permission.id)}
-                              id={`permission-${permission.id}`} // Unique ID for the checkbox using the action string
-                            />
-                            <label
-                              htmlFor={`permission-${permission.id}`} // Associate label with checkbox
-                              className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                              {/* Display the capitalized action name (e.g., Create, Read) */}
-                              {t(`Roles.permissions.${displayActionName.toLowerCase()}`)}
-                            </label>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </ScrollArea>
+                          return (
+                            <div key={permission.id} className="flex items-start space-x-2">
+                              <Checkbox
+                                // Check based on resource.action string (permission.id)
+                                checked={selectedPermissions.includes(permission.id)}
+                                // Pass resource.action string (permission.id)
+                                onCheckedChange={() => togglePermission(permission.id)}
+                                id={`permission-${permission.id}`} // Unique ID for the checkbox using the action string
+                              />
+                              <label
+                                htmlFor={`permission-${permission.id}`} // Associate label with checkbox
+                                className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                {/* Display the capitalized action name (e.g., Create, Read) */}
+                                {t(`Roles.permissions.${displayActionName.toLowerCase()}`)}
+                              </label>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </ScrollArea>
+          </div>
         </div>
       </form>
     </Form>

@@ -49,49 +49,22 @@ interface AnalyticsData {
   total: number;
 }
 
-export default function AnalyticsTable({
+export default function AnalyticsTable<TData>({
   data = [],
+  columns: propColumns,
   className,
   hidePagination = false,
   fake = false,
 }: {
-  data: AnalyticsData[];
+  data: TData[];
+  columns: ColumnDef<TData>[];
   className?: string;
   hidePagination?: boolean;
   fake?: boolean;
 }) {
   const t = useTranslations();
-  const columns: ColumnDef<AnalyticsData>[] = [
-    {
-      header: t("General.country"),
-      accessorKey: "country",
-      cell: ({ row }) => <div className="font-medium">{row.getValue("country")}</div>,
-      size: 180,
-    },
-    {
-      header: t("General.city"),
-      accessorKey: "city",
-      size: 200,
-    },
-    {
-      header: t("General.mobile"),
-      accessorKey: "mobile",
-      cell: ({ row }) => <div className="text-right">{row.getValue("mobile")}</div>,
-      size: 120,
-    },
-    {
-      header: t("General.desktop"),
-      accessorKey: "desktop",
-      cell: ({ row }) => <div className="text-right">{row.getValue("desktop")}</div>,
-      size: 120,
-    },
-    {
-      header: t("General.total"),
-      accessorKey: "total",
-      cell: ({ row }) => <div className="text-right">{row.getValue("total")}</div>,
-      size: 120,
-    },
-  ];
+  const columns = propColumns || [];
+
   const id = useId();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,

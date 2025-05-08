@@ -25,30 +25,14 @@ import {
   Row as TanStackRow,
   ColumnSizingState,
 } from "@tanstack/react-table";
-// ** import icons
-import {
-  ChevronDown,
-  ChevronRight,
-  MoreHorizontal,
-  Plus,
-  Trash2,
-  Edit,
-  Copy,
-  Eye,
-  Archive,
-} from "lucide-react";
-import { EllipsisVertical } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
-import { useTranslations } from "next-intl";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useLocale, useTranslations } from "next-intl";
 import React, { useState, useCallback, useEffect } from "react";
 import type { ZodType, ZodTypeDef } from "zod";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-// ** import ui components
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -59,9 +43,8 @@ import {
 // ** import lib
 import { cn } from "@/lib/utils";
 
-import { Button } from "./button";
-import IconButton from "./icon-button";
-import RowActions from "./row-actions";
+import { CommandSelect } from "./command-select";
+import RowActionsPopover from "./row-actions-popover";
 
 export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   ColumnDef<TData, TValue>,
@@ -69,11 +52,13 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
 > & {
   id?: string;
   accessorKey?: string;
-  cellType?: "text" | "select";
-  options?: Array<{ label: string; value: string | number }>;
+  cellType?: "text" | "select" | "status";
+  options?: Array<{ label: string; value: string | number | boolean }>;
   validationSchema?: ZodType<any, ZodTypeDef, any>;
   className?: string | ((row: TData) => string); // Allows static or dynamic class names
   style?: React.CSSProperties; // style for inline styles
+  enableEditing?: boolean;
+  noPadding?: boolean;
 };
 
 /**
@@ -218,6 +203,7 @@ export interface SheetTableProps<T extends object> extends FooterProps {
     view?: string;
     archive?: string;
     delete?: string;
+    preview?: string;
   };
 
   onActionClicked?: (action: string, rowId: string) => void;
@@ -226,6 +212,7 @@ export interface SheetTableProps<T extends object> extends FooterProps {
   canViewAction?: boolean;
   canArchiveAction?: boolean;
   canDeleteAction?: boolean;
+  canPreviewAction?: boolean;
 }
 
 /**
@@ -383,6 +370,7 @@ function SheetTable<
   } = props;
 
   const t = useTranslations();
+  const locale = useLocale();
 
   /**
    * If column sizing is enabled, we track sizes in state.
@@ -526,6 +514,8 @@ function SheetTable<
       const rowIndex = tanStackRow.index;
       const colKey = getColumnKey(colDef);
 
+      console.log("eddiging?");
+
       if (isRowDisabled(disabledRows, groupKey, rowIndex) || disabledColumns.includes(colKey)) {
         return;
       }
@@ -583,7 +573,7 @@ function SheetTable<
         };
         return { ...prev, [groupKey]: { ...groupErrors, [rowId]: rowErrors } };
       });
-
+      console.log("eddiging?");
       if (errorMessage) {
         console.error(`Row "${rowId}", Col "${colKey}" error: ${errorMessage}`);
       } else if (onEdit) {
@@ -608,30 +598,28 @@ function SheetTable<
     return out;
   }, [data]);
 
-  /**
-   * Attempt removing the row with the given rowId via handleRemoveRowFunction.
-   * You can also do the "recursive removal" in your parent with a similar approach to `updateNestedRow`.
-   */
-  const removeRow = useCallback(
-    (rowId: string) => {
-      if (handleRemoveRowFunction) {
-        handleRemoveRowFunction(rowId);
-      }
-    },
-    [handleRemoveRowFunction],
-  );
+  // Flatten all rows for virtualization (no sub-rows)
+  const flatRows = React.useMemo(() => {
+    const result: { row: TanStackRow<T>; groupKey: string; level: number }[] = [];
+    Object.entries(groupedData).forEach(([groupKey, topRows]) => {
+      topRows.forEach((rowData) => {
+        const row = table.getRowModel().flatRows.find((r) => r.original === rowData);
+        if (row) {
+          result.push({ row, groupKey, level: 0 });
+        }
+      });
+    });
+    return result;
+  }, [groupedData, table]);
 
-  /**
-   * Attempt adding a sub-row to the row with given rowId (the "parentRowId").
-   */
-  const addSubRow = useCallback(
-    (parentRowId: string) => {
-      if (handleAddRowFunction) {
-        handleAddRowFunction(parentRowId);
-      }
-    },
-    [handleAddRowFunction],
-  );
+  // Virtualizer setup
+  const parentRef = React.useRef<HTMLDivElement>(null);
+  const rowVirtualizer = useVirtualizer({
+    count: flatRows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 48, // Adjust to your row height
+    overscan: 10,
+  });
 
   // rowActions config
   const addPos = rowActions?.add ?? null; // "left" | "right" | null
@@ -689,7 +677,7 @@ function SheetTable<
         >
           {/* Selection checkbox */}
           {enableRowSelection && (
-            <TableCell className="bg-background sticky start-0 z-2 border-y">
+            <TableCell className="bg-background sticky start-0 z-2 w-8 !max-w-8 min-w-8 border-y">
               <div className="flex h-auto items-center justify-center">
                 <input
                   type="checkbox"
@@ -701,30 +689,31 @@ function SheetTable<
               <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
             </TableCell>
           )}
-
-          {/* Left icon cells */}
-          {addPos === "left" && handleAddRowFunction && (
-            <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle}>
-              {showRowActions && (
-                <button
-                  className="flex w-full items-center justify-center"
-                  onClick={() => addSubRow(rowId)}
-                >
-                  <Plus size={16} />
-                </button>
-              )}
-            </TableCell>
-          )}
-          {removePos === "left" && handleRemoveRowFunction && (
-            <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle}>
-              {showRowActions && (
-                <button
-                  className="flex w-full items-center justify-center"
-                  onClick={() => removeRow(rowId)}
-                >
-                  <Trash2 size={16} />
-                </button>
-              )}
+          {/* Row actions */}
+          {enableRowActions && (
+            <TableCell className="bg-background sticky start-8 z-2 w-8 !max-w-8 min-w-8 border-y p-0">
+              <div className="flex h-auto min-h-9 items-center justify-center">
+                <RowActionsPopover
+                  texts={texts}
+                  onEdit={props.canEditAction ? () => onActionClicked?.("edit", rowId) : undefined}
+                  onDelete={
+                    props.canDeleteAction ? () => onActionClicked?.("delete", rowId) : undefined
+                  }
+                  onDuplicate={
+                    props.canDuplicateAction
+                      ? () => onActionClicked?.("duplicate", rowId)
+                      : undefined
+                  }
+                  onView={props.canViewAction ? () => onActionClicked?.("view", rowId) : undefined}
+                  onArchive={
+                    props.canArchiveAction ? () => onActionClicked?.("archive", rowId) : undefined
+                  }
+                  onPreview={
+                    props.canPreviewAction ? () => onActionClicked?.("preview", rowId) : undefined
+                  }
+                />
+              </div>
+              <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
             </TableCell>
           )}
 
@@ -748,61 +737,14 @@ function SheetTable<
               if (colDef.minSize) style.minWidth = `${colDef.minSize}px`;
               if (colDef.maxSize) style.maxWidth = `${colDef.maxSize}px`;
             }
-            // if (cellIndex === 0) {
-            //   style.paddingLeft = `${level * 20}px`;
-            // }
 
             // Render cell content with customizations for the first cell
             const rawCellContent = flexRender(cell.column.columnDef.cell, cell.getContext());
 
             let cellContent: React.ReactNode = rawCellContent;
 
-            // If first cell, show expand arrow if subRows exist
-            if (cellIndex === 0) {
-              cellContent = (
-                <div
-                  className="flex h-full w-full items-center gap-2"
-                  style={{ outline: "none" }} // Hide the focus outline
-                >
-                  {hasSubRows && (
-                    <button
-                      type="button"
-                      className={cn("flex-shrink-0", {
-                        "cursor-not-allowed opacity-50": !hasSubRows,
-                      })}
-                      onClick={() => row.toggleExpanded()}
-                      disabled={!hasSubRows}
-                    >
-                      {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    </button>
-                  )}
-                  <div
-                    className="flex-grow"
-                    contentEditable={!isDisabled}
-                    suppressContentEditableWarning
-                    style={{ outline: "none" }} // Hide the outline for editing
-                    onFocus={(e) => handleCellFocus(e, groupKey, rowData, colDef)}
-                    onKeyDown={(e) => {
-                      if (
-                        (e.ctrlKey || e.metaKey) &&
-                        ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
-                      ) {
-                        return;
-                      }
-                      handleKeyDown(e, colDef);
-                    }}
-                    onPaste={(e) => handlePaste(e, colDef)}
-                    onInput={(e) => handleCellInput(e, groupKey, rowData, colDef)}
-                    onBlur={(e) => handleCellBlur(e, groupKey, rowData, colDef)}
-                  >
-                    {rawCellContent}
-                  </div>
-                </div>
-              );
-            }
-
-            // if cell type is select, show a select element
-            if (colDef.cellType === "select" && colDef.options) {
+            // if cell type is status, show a status element
+            if (colDef.cellType === "status" && colDef.options) {
               const cellValue = cell.getValue() as string | number;
               const selectedOption = colDef.options.find((opt) => opt.value === cellValue);
 
@@ -820,88 +762,126 @@ function SheetTable<
                       : colDef.className,
                   )}
                 >
-                  <Select
-                    value={String(cellValue)}
-                    onValueChange={(value) => {
+                  <CommandSelect
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    data={colDef.options}
+                    inCell
+                    isLoading={false}
+                    defaultValue={String(selectedOption?.value)}
+                    popoverClassName="w-fit"
+                    buttonClassName="bg-transparent p-0"
+                    valueKey="value"
+                    labelKey="label"
+                    onChange={async (value) => {
                       if (onEdit) {
                         onEdit(rowId, colKey as keyof T, value as T[keyof T]);
                       }
                     }}
-                  >
-                    <SelectTrigger
-                      defaultStyles={false}
-                      className={cn(
-                        "focus:ring-none blur:outline-none relative border-none ring-0 outline-0 focus:ring-offset-0 focus:outline-none",
-                        {
-                          "bg-muted": isDisabled,
-                          "bg-destructive/25": errorMsg,
-                        },
-                        typeof colDef.className === "function"
-                          ? colDef.className(rowData)
-                          : colDef.className,
-                      )}
-                      hideIcon={true}
-                    >
-                      <SelectValue>{selectedOption?.label ?? cellValue}</SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {colDef.options.map((option) => (
-                        <SelectItem key={option.value} value={String(option.value)}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    texts={{
+                      placeholder: ". . .",
+                    }}
+                    renderSelected={(item) => {
+                      return (
+                        <div
+                          className={cn(
+                            "flex h-full w-full items-center justify-center bg-green-500 px-2 text-center text-xs font-bold",
+                            item.value === "active" &&
+                              "text-primary bg-green-200 hover:bg-green-200",
+                            item.value === "inactive" && "text-primary bg-red-200 hover:bg-red-200",
+                          )}
+                        >
+                          {item.label}
+                        </div>
+                      );
+                    }}
+                    ariaInvalid={false}
+                  />
                 </TableCell>
               );
             }
+            // if cell type is select, show a select element
+            if (colDef.cellType === "select" && colDef.options) {
+              const cellValue = cell.getValue() as string | number;
+
+              return (
+                <TableCell
+                  key={cell.id}
+                  className={cn(
+                    "relative border p-0",
+                    {
+                      "bg-muted": isDisabled,
+                      "bg-destructive/25": errorMsg,
+                    },
+                    typeof colDef.className === "function"
+                      ? colDef.className(rowData)
+                      : colDef.className,
+                  )}
+                >
+                  <CommandSelect
+                    direction={locale === "ar" ? "rtl" : "ltr"}
+                    data={colDef.options}
+                    inCell
+                    isLoading={false}
+                    defaultValue={String(cellValue)}
+                    popoverClassName="w-fit"
+                    buttonClassName="bg-transparent"
+                    valueKey="value"
+                    labelKey="label"
+                    onChange={async (value) => {
+                      if (onEdit) {
+                        onEdit(rowId, colKey as keyof T, value as T[keyof T]);
+                      }
+                    }}
+                    texts={{
+                      placeholder: ". . .",
+                    }}
+                    renderOption={(item) => {
+                      return <div>{item.label}</div>;
+                    }}
+                    ariaInvalid={false}
+                  />
+                </TableCell>
+              );
+            }
+
             return (
               <TableCell
-                key={cell.id}
+                key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
                   "relative border", // 'relative' for absolute icons if you prefer
                   {
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,
                   },
+                  colDef.noPadding ? "p-0" : "",
                   typeof colDef.className === "function"
                     ? colDef.className(rowData)
                     : colDef.className,
                 )}
                 style={style}
-                contentEditable={cellIndex === 0 ? false : !isDisabled}
+                contentEditable={colDef.enableEditing !== false ? !isDisabled : false}
                 suppressContentEditableWarning
                 onFocus={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    handleCellFocus(e, groupKey, rowData, colDef);
-                  }
+                  handleCellFocus(e, groupKey, rowData, colDef);
                 }}
                 onKeyDown={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    if (
-                      (e.ctrlKey || e.metaKey) &&
-                      // Let user do Ctrl+A, C, X, Z, V, etc.
-                      ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
-                    ) {
-                      return; // do not block copy/paste
-                    }
-                    handleKeyDown(e, colDef);
+                  if (
+                    (e.ctrlKey || e.metaKey) &&
+                    // Let user do Ctrl+A, C, X, Z, V, etc.
+                    ["a", "c", "x", "z", "v"].includes(e.key.toLowerCase())
+                  ) {
+                    return; // do not block copy/paste
                   }
+                  handleKeyDown(e, colDef);
                 }}
                 onPaste={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    handlePaste(e, colDef);
-                  }
+                  handlePaste(e, colDef);
                 }}
                 onInput={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    handleCellInput(e, groupKey, rowData, colDef);
-                  }
+                  handleCellInput(e, groupKey, rowData, colDef);
                 }}
                 onBlur={(e) => {
-                  if (cellIndex > 0 && !isDisabled) {
-                    handleCellBlur(e, groupKey, rowData, colDef);
-                  }
+                  handleCellBlur(e, groupKey, rowData, colDef);
                 }}
               >
                 {/** The actual content */}
@@ -909,139 +889,19 @@ function SheetTable<
               </TableCell>
             );
           })}
-
-          {/* Right icon cells */}
-          {addPos === "right" && handleAddRowFunction && (
-            <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle}>
-              {showRowActions && (
-                <button
-                  className="flex w-full items-center justify-center"
-                  onClick={() => addSubRow(rowId)}
-                >
-                  <Plus size={16} />
-                </button>
-              )}
-            </TableCell>
-          )}
-
-          {removePos === "right" && handleRemoveRowFunction && (
-            <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle}>
-              {showRowActions && (
-                <button
-                  className="flex w-full items-center justify-center"
-                  onClick={() => removeRow(rowId)}
-                >
-                  <Trash2 size={16} />
-                </button>
-              )}
-            </TableCell>
-          )}
-
-          {/* Selection checkbox */}
-          {enableRowActions && (
-            <div className="sticky end-0 z-2">
-              <RowActions
-                texts={texts}
-                onEdit={props.canEditAction ? () => onActionClicked?.("edit", rowId) : undefined}
-                onDuplicate={
-                  props.canDuplicateAction ? () => onActionClicked?.("duplicate", rowId) : undefined
-                }
-                onView={props.canViewAction ? () => onActionClicked?.("view", rowId) : undefined}
-                onArchive={
-                  props.canArchiveAction ? () => onActionClicked?.("archive", rowId) : undefined
-                }
-                onDelete={
-                  props.canDeleteAction ? () => onActionClicked?.("delete", rowId) : undefined
-                }
-              />
-            </div>
-          )}
         </TableRow>
-
-        {/* If expanded, render each subRows recursively */}
-        {isExpanded && row.subRows.map((subRow) => renderRow(subRow, groupKey, level + 1))}
       </React.Fragment>
     );
   };
 
-  /**
-   * Renders optional footer (totals row + optional custom element) inside a <TableFooter>.
-   */
-  function renderFooter() {
-    if (!totalRowValues && !footerElement) return null;
-
-    return (
-      <TableFooter className="border-none">
-        {/* If there's a totalRowTitle, show it in a single row */}
-        {totalRowTitle && (
-          <TableRow className="border-none">
-            {/* If there's a totalRowTitle, show it in a single row */}
-            {enableRowSelection && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {removePos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            <TableCell colSpan={columns.length} className="border text-center font-semibold">
-              {totalRowTitle}
-            </TableCell>
-
-            {/* Left icon - empty cells  */}
-            {addPos === "right" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {removePos === "right" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-          </TableRow>
-        )}
-
-        {/* The totals row */}
-        {totalRowValues && (
-          <TableRow className="border-none">
-            {/*  Right icon - empty cells  */}
-            {addPos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {removePos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {columns.map((colDef, index) => {
-              const colKey = getColumnKey(colDef);
-              const cellValue = totalRowValues[colKey];
-
-              // Provide a default string if totalRowLabel is not passed and this is the first cell
-              const displayValue =
-                cellValue !== undefined ? cellValue : index === 0 ? totalRowLabel || "" : "";
-
-              // Always apply the border to the first cell or any cell that has a displayValue
-              const applyBorder = index === 0 || displayValue !== "";
-
-              return (
-                <TableCell
-                  key={`total-${colKey}`}
-                  className={`font-bold ${applyBorder ? "border" : ""}`}
-                >
-                  {displayValue}
-                </TableCell>
-              );
-            })}
-          </TableRow>
-        )}
-
-        {/* If a footerElement is provided, render it after the totals row */}
-        {footerElement}
-      </TableFooter>
-    );
-  }
+  // Memoize renderRow
+  const memoizedRenderRow = React.useCallback(
+    (row: TanStackRow<T>, groupKey: string, level = 0) => renderRow(row, groupKey, level),
+    [renderRow],
+  );
 
   return (
-    <div className="overflow-x-auto p-0 pb-2">
+    <div ref={parentRef} className="relative max-h-[calc(100vh-5rem)] overflow-auto p-0 pb-2">
       <Table id={id}>
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         {/* Primary header */}
@@ -1050,7 +910,7 @@ function SheetTable<
             <TableRow className="border-none">
               {/* Selection checkbox header */}
               {enableRowSelection && (
-                <TableHead className="bg-muted sticky start-0 z-2 w-[30px] border-y p-0">
+                <TableHead className="bg-muted sticky start-0 top-0 z-30 w-8 !max-w-8 min-w-8 border-none text-start">
                   <div className="flex h-full items-center justify-center">
                     <input
                       type="checkbox"
@@ -1063,14 +923,8 @@ function SheetTable<
                   <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
                 </TableHead>
               )}
-
-              {/* Right icon cells empty headers */}
-              {addPos === "left" && (
-                <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-              )}
-
-              {removePos === "left" && (
-                <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
+              {enableRowActions && (
+                <TableHead className="bg-muted sticky start-8 top-0 !z-20 border-e border-none text-start" />
               )}
 
               {table.getHeaderGroups().map((headerGroup) =>
@@ -1085,99 +939,44 @@ function SheetTable<
                   }
 
                   return (
-                    <TableHead key={header.id} className="border text-start" style={style}>
+                    <TableHead
+                      key={header.id}
+                      className="bg-muted sticky top-0 !z-20 border-x text-start"
+                      style={style}
+                    >
                       {flexRender(header.column.columnDef.header, header.getContext()) as string}
                     </TableHead>
                   );
                 }),
               )}
-
-              {/* Left icon cells empty headers */}
-              {addPos === "right" && (
-                <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-              )}
-
-              {removePos === "right" && (
-                <TableHead className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-              )}
-
-              {enableRowActions && (
-                <TableHead className="border">{props.texts?.actions || "Actions"}</TableHead>
-              )}
+              {/* Action column */}
             </TableRow>
           </TableHeader>
         )}
-        {/* Optional second header */}
-        {showSecondHeader && secondHeaderTitle && (
-          <TableRow>
-            {/* Right icon cells empty headers */}
-            {addPos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
 
-            {removePos === "left" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            <TableHead colSpan={columns.length} className="border text-center">
-              {secondHeaderTitle}
-            </TableHead>
-
-            {/* Left icon cells empty headers */}
-            {addPos === "right" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-
-            {removePos === "right" && (
-              <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-            )}
-          </TableRow>
-        )}
         <TableBody>
-          {Object.entries(groupedData).map(([groupKey, topRows]) => (
-            <React.Fragment key={groupKey}>
-              {/* Group label row (if not ungrouped) */}
-              {groupKey !== "ungrouped" && (
-                <TableRow className="border-none">
-                  {/* Right icon cells empty headers */}
-                  {addPos === "left" && (
-                    <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-                  )}
-
-                  {removePos === "left" && (
-                    <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-                  )}
-
-                  <TableCell
-                    colSpan={columns.length}
-                    className="bg-muted-foreground/10 border font-bold"
-                  >
-                    {groupKey}
-                  </TableCell>
-
-                  {/* Left icon cells empty headers */}
-                  {addPos === "right" && (
-                    <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-                  )}
-
-                  {removePos === "right" && (
-                    <TableCell className={cn(rowActionCellClassName)} style={rowActionCellStyle} />
-                  )}
-                </TableRow>
-              )}
-              {/* For each top-level row in this group, find the actual row in table.
-                  Then recursively render it with renderRow() */}
-              {topRows.map((rowData) => {
-                const row = table.getRowModel().flatRows.find((r) => r.original === rowData);
-                if (!row) return null;
-
-                return renderRow(row, groupKey, 0);
-              })}
-            </React.Fragment>
-          ))}
+          {/* Top spacer */}
+          {rowVirtualizer.getVirtualItems().length > 0 && (
+            <tr style={{ height: `${rowVirtualizer.getVirtualItems()[0].start}px` }} />
+          )}
+          {/* Virtualized rows */}
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const { row, groupKey, level } = flatRows[virtualRow.index];
+            // Render as TableRow, not div
+            return React.cloneElement(
+              memoizedRenderRow(row, groupKey, level) as React.ReactElement,
+              { key: row.id },
+            );
+          })}
+          {/* Bottom spacer */}
+          {rowVirtualizer.getVirtualItems().length > 0 && (
+            <tr
+              style={{
+                height: `${rowVirtualizer.getTotalSize() - (rowVirtualizer.getVirtualItems().at(-1)?.end ?? 0)}px`,
+              }}
+            />
+          )}
         </TableBody>
-        {/* Render footer (totals row + custom footer) */}
-        {renderFooter()}
       </Table>
     </div>
   );

@@ -1,2 +1,2 @@
 ALTER TABLE public.profiles
-ADD COLUMN user_settings jsonb;
+ADD COLUMN IF NOT EXISTS user_settings jsonb;

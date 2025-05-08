@@ -1,5 +1,5 @@
-import React from "react";
 import type { User } from "@supabase/supabase-js";
+import React from "react";
 
 export type ThemeType = "light" | "dark";
 export type LangType = "ar" | "en";
@@ -69,11 +69,7 @@ export type IconComponents = {
   [key in keyof ContactSettings]: React.JSX.Element;
 };
 
-export type LinkLayoutType =
-  | "default"
-  | "double-height"
-  | "half-width"
-  | "square";
+export type LinkLayoutType = "default" | "double-height" | "half-width" | "square";
 
 export type IconPosition = "start" | "end";
 
@@ -177,11 +173,7 @@ export type PuklaSettings = {
   hide_watermark?: boolean;
   hide_title?: boolean;
   hide_bio?: boolean;
-  avatar_shape?:
-    | "circle"
-    | "square"
-    | "horizontal_rectangle"
-    | "vertical_rectangle";
+  avatar_shape?: "circle" | "square" | "horizontal_rectangle" | "vertical_rectangle";
   animation?: AnimationType;
   social_links?: { platform: string; url: string }[];
   socials_position?: "top" | "bottom";

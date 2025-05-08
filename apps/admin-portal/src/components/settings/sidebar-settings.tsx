@@ -26,9 +26,10 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
 import { Switch } from "@/ui/switch";
 
+import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
+
 import { getMenuList, applyCustomMenuOrder, type SidebarMenuGroupProps } from "@/lib/sidebar-list";
 
-import { useProfile, useUpdateProfile } from "@/hooks/use-profile";
 import useUserStore from "@/stores/use-user-store";
 
 interface SortableItemProps {
@@ -90,7 +91,7 @@ const SortableItem = ({ item, title, enabled, onToggle }: SortableItemProps) => 
       <span className="h-4 w-4 flex-shrink-0" />
       <span className="flex-1">{title}</span>
       {item.is_active && (
-        <span className="text-primary bg-primary/10 mr-2 rounded-full px-2 py-1 text-xs font-medium">
+        <span className="text-primary bg-primary/10 me-2 rounded-full px-2 py-1 text-xs font-medium">
           Active
         </span>
       )}
@@ -354,7 +355,7 @@ const SidebarSettings = ({
                         <SortableItem
                           key={item.title}
                           item={item}
-                          title={t(`${item.title}.title`)}
+                          title={t(item.translationKey)}
                           enabled={isEnabled}
                           onToggle={(enabled) => handleToggleItem(groupName, item.title, enabled)}
                         />

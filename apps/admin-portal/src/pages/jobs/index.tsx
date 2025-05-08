@@ -74,9 +74,9 @@ export default function JobsPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteJobs, {
-    loading: "Jobs.loading.deleting",
-    success: "Jobs.success.deleted",
-    error: "Jobs.error.deleting",
+    loading: "Jobs.loading.delete",
+    success: "Jobs.success.delete",
+    error: "Jobs.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -114,6 +114,8 @@ export default function JobsPage() {
             onAddClick={canCreateJobs ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Jobs.create_job")}
             searchPlaceholder={t("Jobs.search_jobs")}
+            count={jobs?.length}
+            hideOptions={jobs?.length === 0}
           />
         )}
 
@@ -142,18 +144,18 @@ export default function JobsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Jobs.add_new")}
+          title={t("Jobs.edit_job")}
           formId="job-form"
           loadingSave={isLoading}
         >
           <JobForm
-            id={"job-form"}
+            formHtmlId={"job-form"}
             onSuccess={() => {
               setIsFormDialogOpen(false);
               setActionableItem(null);
               setIsLoading(false);
               toast.success(t("General.successful_operation"), {
-                description: t("Jobs.success.updated"),
+                description: t("Jobs.success.update"),
               });
             }}
             defaultValues={actionableItem}

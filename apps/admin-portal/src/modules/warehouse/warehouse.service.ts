@@ -1,8 +1,8 @@
-import { Warehouse, WarehouseCreateData } from "@/warehouse/warehouse.type";
+import { Warehouse, WarehouseCreateData, WarehouseUpdateData } from "@/warehouse/warehouse.type";
 
 export async function fetchWarehouses(): Promise<Warehouse[]> {
   try {
-    const response = await fetch("/api/warehouses");
+    const response = await fetch("/api/resource/warehouses");
     if (!response.ok) {
       console.error("Failed to fetch warehouses:", response.statusText);
       return [];
@@ -16,7 +16,7 @@ export async function fetchWarehouses(): Promise<Warehouse[]> {
 
 export async function fetchWarehouseById(id: string): Promise<Warehouse> {
   try {
-    const response = await fetch(`/api/warehouses/${id}`);
+    const response = await fetch(`/api/resource/warehouses/${id}`);
     if (!response.ok) {
       throw new Error(`Warehouse with id ${id} not found`);
     }
@@ -30,7 +30,7 @@ export async function fetchWarehouseById(id: string): Promise<Warehouse> {
 // Create operation
 export async function createWarehouse(warehouse: WarehouseCreateData): Promise<Warehouse> {
   try {
-    const response = await fetch("/api/warehouses", {
+    const response = await fetch("/api/resource/warehouses", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,7 +51,7 @@ export async function createWarehouse(warehouse: WarehouseCreateData): Promise<W
 
 export async function duplicateWarehouse(id: string): Promise<Warehouse> {
   try {
-    const response = await fetch(`/api/warehouses/${id}/duplicate`, {
+    const response = await fetch(`/api/resource/warehouses/${id}/duplicate`, {
       method: "POST",
     });
 
@@ -67,9 +67,12 @@ export async function duplicateWarehouse(id: string): Promise<Warehouse> {
 }
 
 // Update operation
-export async function updateWarehouse(id: string, updates: Partial<Warehouse>): Promise<Warehouse> {
+export async function updateWarehouse(
+  id: string,
+  updates: WarehouseUpdateData,
+): Promise<Warehouse> {
   try {
-    const response = await fetch(`/api/warehouses/${id}`, {
+    const response = await fetch(`/api/resource/warehouses/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -90,35 +93,21 @@ export async function updateWarehouse(id: string, updates: Partial<Warehouse>): 
 
 // Delete operations
 export async function deleteWarehouse(id: string): Promise<void> {
-  try {
-    const response = await fetch(`/api/warehouses/${id}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to delete warehouse with id ${id}`);
-    }
-  } catch (error) {
-    console.error(`Error deleting warehouse ${id}:`, error);
-    throw error;
+  const response = await fetch(`/api/resource/warehouses/${id}`, {
+    method: "DELETE",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to delete warehouse with id ${id}`);
   }
 }
 
 export async function bulkDeleteWarehouses(ids: string[]): Promise<void> {
-  try {
-    const response = await fetch("/api/warehouses/bulk-delete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ids }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to delete warehouses");
-    }
-  } catch (error) {
-    console.error("Error bulk deleting warehouses:", error);
-    throw error;
+  const response = await fetch("/api/resource/warehouses", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete warehouses");
   }
 }

@@ -1,3 +1,4 @@
+import { Terminal } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -9,10 +10,31 @@ import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import ActivityCalendar from "@/components/ui/activity-calendar";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 
-import { useEmployees } from "@/modules/employee/employee.hooks";
+import { getActivityCountsByDate } from "@/modules/activity/activity.service";
 import useUserStore from "@/stores/use-user-store";
 
+// Interface for the data returned by the view
+interface DashboardStatsViewData {
+  total_invoices: number;
+  total_products: number;
+  total_revenue: number;
+  pending_invoices: number;
+  total_employees: number;
+  total_departments: number;
+  total_jobs: number;
+  total_clients: number;
+  total_companies: number;
+  total_vendors: number;
+  total_offices: number;
+  total_warehouses: number;
+  total_branches: number;
+}
+
+// Update state interface to match view column names (or map later)
 interface DashboardStats {
   totalInvoices: number;
   totalProducts: number;
@@ -27,6 +49,12 @@ interface DashboardStats {
   totalOffices: number;
   totalWarehouses: number;
   totalBranches: number;
+}
+
+// New interface for activity count data
+interface ActivityCountData {
+  date: string; // YYYY-MM-DD
+  count: number;
 }
 
 export default function Dashboard() {
@@ -46,33 +74,17 @@ export default function Dashboard() {
     totalWarehouses: 0,
     totalBranches: 0,
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
+
+  // State for activity calendar
+  const [activityCounts, setActivityCounts] = useState<ActivityCountData[]>([]);
+  const [loadingActivity, setLoadingActivity] = useState(true);
+  const [activityError, setActivityError] = useState<string | null>(null);
+
   const t = useTranslations();
   const router = useRouter();
-  const { user, profile, enterprise, error: userError } = useUserStore();
-
-  // Comment out hooks that are causing infinite loops
-  // Keep the ones that are working correctly
-  const { data: employees } = useEmployees();
-  // const { data: departments } = useDepartments();
-  // const { data: jobs } = useJobs();
-  // const { data: clients } = useClients();
-  // const { data: companies } = useCompanies();
-  // const { data: vendors } = useVendors();
-  // const { data: offices } = useOffices();
-  // const { data: warehouses } = useWarehouses();
-  // const { data: branches } = useBranches();
-
-  // Use placeholders for commented-out hooks
-  const departments = [];
-  const jobs = [];
-  const clients = [];
-  const companies = [];
-  const vendors = [];
-  const offices = [];
-  const warehouses = [];
-  const branches = [];
+  const { user, profile, enterprise } = useUserStore();
 
   const createOptions = [
     {
@@ -105,106 +117,185 @@ export default function Dashboard() {
     }
   };
 
-  // Fetch dashboard stats
+  // Fetch dashboard stats and activity data
   useEffect(() => {
     let isMounted = true;
 
-    async function fetchDashboardStats() {
-      if (!isMounted || !user?.id) {
+    async function fetchData() {
+      if (!isMounted || !user?.id || !enterprise?.id) {
+        if (isMounted) {
+          setLoadingStats(false);
+          setLoadingActivity(false);
+        }
         return;
       }
 
-      try {
-        // If no enterprise is found, set loading to false but don't attempt to fetch enterprise-dependent data
-        if (!enterprise?.id) {
+      const enterpriseId = enterprise.id; // Cache enterprise ID
+
+      // Reset states on new fetch
+      setLoadingStats(true);
+      setLoadingActivity(true);
+      setStatsError(null);
+      setActivityError(null);
+
+      // --- Fetch Stats --- (extracted logic)
+      const fetchStats = async () => {
+        try {
+          const fetchCount = async (
+            tableName: string,
+            additionalFilter?: object,
+          ): Promise<number> => {
+            const query = supabase
+              .from(tableName)
+              .select("id", { count: "exact", head: true })
+              .eq("enterprise_id", enterpriseId);
+
+            if (additionalFilter) {
+              Object.entries(additionalFilter).forEach(([key, value]) => {
+                query.eq(key, value);
+              });
+            }
+
+            const { count, error } = await query;
+            if (error) throw error;
+            return count ?? 0;
+          };
+
+          const fetchSum = async (tableName: string, columnName: string): Promise<number> => {
+            const { data, error } = await supabase
+              .from(tableName)
+              .select(columnName)
+              .eq("enterprise_id", enterpriseId);
+
+            if (error) throw error;
+            return data?.reduce((sum, row) => sum + ((row as any)[columnName] || 0), 0) ?? 0;
+          };
+
+          const [
+            totalInvoices,
+            pendingInvoicesCount,
+            totalRevenue,
+            totalProducts,
+            totalEmployees,
+            totalDepartments,
+            totalJobs,
+            totalClients,
+            totalCompanies,
+            totalVendors,
+            totalOffices,
+            totalWarehouses,
+            totalBranches,
+          ] = await Promise.all([
+            fetchCount("invoices"),
+            fetchCount("invoices", { status: "pending" }),
+            fetchSum("invoices", "total"),
+            fetchCount("products"),
+            fetchCount("employees"),
+            fetchCount("departments"),
+            fetchCount("jobs"),
+            fetchCount("clients"),
+            fetchCount("companies"),
+            fetchCount("vendors"),
+            fetchCount("offices"),
+            fetchCount("warehouses"),
+            fetchCount("branches"),
+          ]);
+
           if (isMounted) {
-            setLoading(false);
+            setStats({
+              totalInvoices,
+              pendingInvoices: pendingInvoicesCount,
+              totalRevenue,
+              totalProducts,
+              totalEmployees,
+              totalDepartments,
+              totalJobs,
+              totalClients,
+              totalCompanies,
+              totalVendors,
+              totalOffices,
+              totalWarehouses,
+              totalBranches,
+            });
           }
-          return;
+        } catch (err) {
+          console.error("Error fetching dashboard stats:", err);
+          if (isMounted) {
+            setStatsError(
+              err instanceof Error
+                ? err.message
+                : "An error occurred while fetching dashboard stats",
+            );
+            // Reset stats on error
+            setStats({
+              totalInvoices: 0,
+              totalProducts: 0,
+              totalRevenue: 0,
+              pendingInvoices: 0,
+              totalEmployees: 0,
+              totalDepartments: 0,
+              totalJobs: 0,
+              totalClients: 0,
+              totalCompanies: 0,
+              totalVendors: 0,
+              totalOffices: 0,
+              totalWarehouses: 0,
+              totalBranches: 0,
+            });
+          }
+        } finally {
+          if (isMounted) {
+            setLoadingStats(false);
+          }
         }
+      };
 
-        // Fetch total invoices and revenue
-        const { data: invoiceStats, error: invoiceError } = await supabase
-          .from("invoices")
-          .select("id, total, status")
-          .eq("enterprise_id", enterprise.id);
+      // --- Fetch Activity Counts ---
+      const fetchActivity = async () => {
+        try {
+          const endDate = new Date(); // Today
+          const startDate = new Date();
+          startDate.setFullYear(endDate.getFullYear() - 1);
+          startDate.setDate(startDate.getDate() + 1); // Start from the day *after* one year ago
 
-        if (invoiceError) throw invoiceError;
-
-        // Fetch total products
-        const { count: productCount, error: productError } = await supabase
-          .from("products")
-          .select("id", { count: "exact" })
-          .eq("enterprise_id", enterprise.id);
-
-        if (productError) throw productError;
-
-        if (!isMounted) return;
-
-        const totalRevenue =
-          invoiceStats?.reduce((sum, invoice) => sum + (invoice.total || 0), 0) || 0;
-        const pendingInvoices =
-          invoiceStats?.filter((invoice) => invoice.status.toLowerCase() === "pending").length || 0;
-
-        setStats({
-          totalInvoices: invoiceStats?.length || 0,
-          totalProducts: productCount || 0,
-          totalRevenue,
-          pendingInvoices,
-          totalEmployees: employees?.length || 0,
-          totalDepartments: departments?.length || 0,
-          totalJobs: jobs?.length || 0,
-          totalClients: clients?.length || 0,
-          totalCompanies: companies?.length || 0,
-          totalVendors: vendors?.length || 0,
-          totalOffices: offices?.length || 0,
-          totalWarehouses: warehouses?.length || 0,
-          totalBranches: branches?.length || 0,
-        });
-      } catch (err) {
-        console.error("Error fetching stats:", err);
-        if (isMounted) {
-          setError(
-            err instanceof Error ? err.message : "An error occurred while fetching dashboard stats",
-          );
+          const counts = await getActivityCountsByDate(startDate, endDate);
+          if (isMounted) {
+            setActivityCounts(counts);
+          }
+        } catch (err) {
+          console.error("Error fetching activity counts:", err);
+          if (isMounted) {
+            setActivityError(
+              err instanceof Error ? err.message : "An error occurred while fetching activity data",
+            );
+            setActivityCounts([]); // Clear data on error
+          }
+        } finally {
+          if (isMounted) {
+            setLoadingActivity(false);
+          }
         }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
+      };
+
+      // Run fetches concurrently
+      await Promise.all([fetchStats(), fetchActivity()]);
     }
 
-    if (user?.id) {
-      fetchDashboardStats();
-    }
+    fetchData();
 
     return () => {
       isMounted = false;
     };
-  }, [
-    user?.id,
-    enterprise?.id,
-    employees,
-    // Remove these dependencies since we've commented out the hooks
-    // departments,
-    // jobs,
-    // clients,
-    // companies,
-    // vendors,
-    // offices,
-    // warehouses,
-    // branches,
-  ]);
+  }, [user?.id, enterprise?.id, supabase]); // Add supabase as dependency
 
-  // Show error state
-  if (error) {
+  // Show error state for stats (kept separate for now)
+  if (statsError) {
     return (
       <DataPageLayout>
         <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
         <div className="flex flex-col items-center justify-center gap-4 p-8">
           <h2 className="text-xl font-semibold">{t("Dashboard.error_loading")}</h2>
-          <p className="text-muted-foreground">{error}</p>
+          <p className="text-muted-foreground">{statsError}</p>
         </div>
       </DataPageLayout>
     );
@@ -218,13 +309,6 @@ export default function Dashboard() {
           ✓ Premium Account
         </div>
       )}
-      {/* <PageTitle
-        texts={{
-          title: t("Dashboard.title"),
-          submit_form: t("Dashboard.title"),
-          cancel: t("General.cancel"),
-        }}
-      /> */}
       <div className="space-y-8 p-4">
         {/* Contacts Section */}
         <div>
@@ -233,19 +317,19 @@ export default function Dashboard() {
             <StatCard
               title={t("Clients.title")}
               value={stats.totalClients}
-              loading={loading}
+              loading={loadingStats}
               link="/clients"
             />
             <StatCard
               title={t("Companies.title")}
               value={stats.totalCompanies}
-              loading={loading}
+              loading={loadingStats}
               link="/companies"
             />
             <StatCard
               title={t("Vendors.title")}
               value={stats.totalVendors}
-              loading={loading}
+              loading={loadingStats}
               link="/vendors"
             />
           </div>
@@ -258,19 +342,19 @@ export default function Dashboard() {
             <StatCard
               title={t("Offices.title")}
               value={stats.totalOffices}
-              loading={loading}
+              loading={loadingStats}
               link="/offices"
             />
             <StatCard
               title={t("Warehouses.title")}
               value={stats.totalWarehouses}
-              loading={loading}
+              loading={loadingStats}
               link="/warehouses"
             />
             <StatCard
               title={t("Branches.title")}
               value={stats.totalBranches}
-              loading={loading}
+              loading={loadingStats}
               link="/branches"
             />
           </div>
@@ -279,32 +363,31 @@ export default function Dashboard() {
         {/* Sales & Revenue Section */}
         <div>
           <h2 className="mb-4 text-lg font-semibold">{t("Sales.title")}</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <StatCard
               title={t("Invoices.title")}
               value={stats.totalInvoices}
-              loading={loading}
+              loading={loadingStats}
               link="/invoices"
               additionalText={`${stats.pendingInvoices} ${t("Dashboard.pending")}`}
             />
             <StatCard
               title={t("Products.title")}
               value={stats.totalProducts}
-              loading={loading}
+              loading={loadingStats}
               link="/products"
             />
             <StatCard
-              title={t("Revenue.title")}
-              value={`$${stats.totalRevenue.toFixed(2)}`}
-              loading={loading}
-            />
-            <StatCard
-              title={t("Invoices.title")}
+              title={`${t("Invoices.pending")} ${t("Invoices.title").toLowerCase()}`}
               value={stats.pendingInvoices}
-              loading={loading}
-              additionalText={`${((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}% ${t(
-                "Dashboard.of_total",
-              )}`}
+              loading={loadingStats}
+              additionalText={
+                stats.totalInvoices > 0
+                  ? `${((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}% ${t(
+                      "Dashboard.of_total",
+                    )}`
+                  : `0% ${t("Dashboard.of_total")}`
+              }
             />
           </div>
         </div>
@@ -316,22 +399,38 @@ export default function Dashboard() {
             <StatCard
               title={t("Employees.title")}
               value={stats.totalEmployees}
-              loading={loading}
+              loading={loadingStats}
               link="/employees"
             />
             <StatCard
               title={t("Departments.title")}
               value={stats.totalDepartments}
-              loading={loading}
+              loading={loadingStats}
               link="/departments"
             />
             <StatCard
               title={t("Jobs.title")}
               value={stats.totalJobs}
-              loading={loading}
+              loading={loadingStats}
               link="/jobs"
             />
           </div>
+
+          {/* <div className="mt-8">
+            <h3 className="mb-4 text-lg font-semibold">{t("ActivityLogs.title")}</h3>
+            {activityError && (
+              <Alert variant="destructive" className="mb-4">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Error Loading Activity</AlertTitle>
+                <AlertDescription>{activityError}</AlertDescription>
+              </Alert>
+            )}
+            {loadingActivity ? (
+              <Skeleton className="h-[180px] w-full rounded-md" />
+            ) : (
+              <ActivityCalendar data={activityCounts} />
+            )}
+          </div> */}
         </div>
       </div>
     </div>

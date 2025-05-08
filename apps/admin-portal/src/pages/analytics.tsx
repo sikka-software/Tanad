@@ -1,111 +1,63 @@
-import {
-  differenceInDays,
-  eachDayOfInterval,
-  eachMonthOfInterval,
-  eachWeekOfInterval,
-  endOfMonth,
-  endOfWeek,
-  format,
-  parseISO,
-  startOfMonth,
-  startOfWeek,
-} from "date-fns";
+import { differenceInDays, endOfDay, endOfMonth, format, parseISO, startOfMonth } from "date-fns";
 import { ar } from "date-fns/locale";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, TrendingUp } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/ui/chart";
+import {
+  CardContent,
+  Card,
+  CardTitle,
+  CardDescription,
+  CardHeader,
+} from "@/ui/card";
+import { ChartConfig } from "@/ui/chart";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-// UI Components
-import { Skeleton } from "@/ui/skeleton";
 
 import { createClient } from "@/utils/supabase/component";
 
-// Store
-import { useMainStore } from "@/hooks/main.store";
-
-import AnalyticsTable from "@/components/app/AnalyticsTable";
-import NoPuklas from "@/components/app/NoPuklas";
+import { CrudChart } from "@/components/analytics/crud-chart";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
-import { fakeAnalyticsData } from "@/lib/constants";
-// Utils
-import { fetchPukla, fetchPuklasWithLinkCount } from "@/lib/operations";
+import { MODULE_ANALYTICS } from "@/lib/constants";
 
-import useUserStore from "@/stores/use-user-store";
+import useUserStore from "../stores/use-user-store";
 
 export default function Analytics() {
   const supabase = createClient();
   const t = useTranslations();
   const router = useRouter();
-  const { profile } = useUserStore();
-  const { puklas, setPuklas, selectedPukla, setSelectedPukla } = useMainStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const puklaId = (router.query.id || selectedPukla?.id) as string;
   const { locale } = router;
+  const profile = useUserStore((state) => state.profile);
 
-  useEffect(() => {
-    const initializePuklas = async () => {
-      if (!profile?.id) return;
+  const [selectedModule, setSelectedModule] = useState<{
+    key: string;
+    rpc: string;
+    add: string;
+    update: string;
+    delete: string;
+  }>({
+    key: "branch",
+    rpc: "get_module_analytics_branch",
+    add: "branches_added",
+    update: "branches_updated",
+    delete: "branches_removed",
+  });
 
-      try {
-        // Fetch all puklas with link count
-        const fetchedPuklas = await fetchPuklasWithLinkCount(profile?.id, {
-          toasts: {
-            error: t("MyPuklas.error_fetching_puklas"),
-            success: t("MyPuklas.success_fetching_puklas"),
-          },
-        });
-        setPuklas(fetchedPuklas);
-
-        // If we have a puklaId, fetch that specific pukla
-        if (puklaId) {
-          const currentPukla = await fetchPukla(puklaId, {
-            toasts: {
-              error: t("MyPuklas.error_fetching_puklas"),
-              success: t("MyPuklas.success_fetching_puklas"),
-            },
-          });
-          if (currentPukla) {
-            setSelectedPukla(currentPukla);
-          }
-        } else if (selectedPukla) {
-          router.push(`/analytics?id=${selectedPukla.id}`);
-        } else if (fetchedPuklas.length > 0) {
-          setSelectedPukla(fetchedPuklas[0]);
-          router.push(`/analytics?id=${fetchedPuklas[0].id}`);
-        }
-      } catch (error) {
-        console.error("Error initializing puklas:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializePuklas();
-  }, [profile?.id, puklaId]);
-
-  let chartConfig = {
-    desktop: { label: t("General.desktop"), color: "#2563eb" },
-    mobile: { label: t("General.mobile"), color: "#60a5fa" },
-  } satisfies ChartConfig;
-
-  const [data, setData] = useState<{ chartData: any[]; tableData: any[] }>({
+  const [analyticsData, setAnalyticsData] = useState<{
+    chartData: any[];
+    tableData: any[];
+  }>({
     chartData: [],
     tableData: [],
   });
   const [date, setDate] = useState<DateRange | undefined>(() => {
-    // Try to load saved date range during initialization
     if (typeof window !== "undefined") {
       const savedDateRange = localStorage.getItem("analytics_date_range");
       if (savedDateRange) {
@@ -115,15 +67,18 @@ export default function Analytics() {
           to: parseISO(parsed.to),
         };
       }
-      // Fall back to default values if nothing is saved
       return {
         from: startOfMonth(new Date()),
-        to: endOfMonth(new Date()),
+        to: new Date(),
       };
     }
+    // Default for SSR or if window is not defined (though localStorage check handles this)
+    return {
+      from: startOfMonth(new Date()),
+      to: new Date(),
+    };
   });
 
-  // Save date range to localStorage when it changes
   useEffect(() => {
     if (date?.from && date?.to) {
       localStorage.setItem(
@@ -136,203 +91,107 @@ export default function Analytics() {
     }
   }, [date]);
 
+  const chartConfig = {
+    added: {
+      label: t("Analytics.add_actions"),
+      color: "var(--chart-green)",
+    },
+    updated: {
+      label: t("Analytics.update_actions"),
+      color: "var(--chart-blue)",
+    },
+    removed: {
+      label: t("Analytics.delete_actions"),
+      color: "var(--chart-red)",
+    },
+  } satisfies ChartConfig;
+
+  const fetchAnalytics = async (from: Date, to: Date) => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const adjustedTo = endOfDay(to);
+
+    const daysDifference = differenceInDays(adjustedTo, from);
+
+    const { data: dataRpc, error: errorRpc } = await supabase.rpc(selectedModule.rpc, {
+      start_date: from.toISOString(),
+      end_date: adjustedTo.toISOString(),
+      time_interval:
+        daysDifference <= 1
+          ? "hour"
+          : daysDifference <= 7
+            ? "day"
+            : daysDifference <= 31
+              ? "week"
+              : "month",
+    });
+
+    if (errorRpc) {
+      console.error(`Error fetching ${selectedModule.key} analytics:`, errorRpc);
+      setAnalyticsData({ chartData: [], tableData: [] }); // Clear data on error
+      return;
+    }
+
+    let calType = profile?.user_settings.calendar_type;
+    if (dataRpc) {
+      const formattedChartData = dataRpc.map((item: any) => ({
+        label: new Date(item.period_start).toLocaleString(calType === "hijri" ? "ar-SA" : "en-US", {
+          day: "2-digit",
+          month: "2-digit",
+          // year: "numeric",
+        }), // Format date for X-axis label
+        tooltipLabel: new Date(item.period_start).toLocaleString(
+          calType === "hijri" ? "ar-SA" : "en-US",
+          {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          },
+        ), // Format date for X-axis label
+        added: item[selectedModule.add],
+        updated: item[selectedModule.update],
+        removed: item[selectedModule.delete],
+      }));
+      setAnalyticsData({ chartData: formattedChartData, tableData: dataRpc });
+    }
+
+    // Add else if for other modules like 'jobs' here
+  };
+
   useEffect(() => {
-    if (date?.from && date?.to && selectedPukla) {
+    if (date?.from && date?.to && selectedModule) {
+      // Fetch when module or date changes
       fetchAnalytics(date.from, date.to);
     }
-  }, [date, selectedPukla]);
+  }, [date, selectedModule]); // Added selectedModule to dependency array
 
-  const getShortFormattedDate = (date: Date) => {
-    const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
-    const day = locale === "ar" ? date.getDate().toLocaleString("ar-SA") : format(date, "d");
+  const getShortFormattedDate = (dateToFormat: Date) => {
+    const month = dateToFormat.toLocaleString("en-US", { month: "long" }).toLowerCase();
+    const day =
+      locale === "ar" ? dateToFormat.getDate().toLocaleString("ar-SA") : format(dateToFormat, "d");
     const translatedMonth = t(`General.months.${month}`);
-    // Keep full month name for Arabic, shortened for English
     const displayMonth = locale === "ar" ? translatedMonth : translatedMonth.slice(0, 3);
     return `${displayMonth} ${day}`;
   };
 
-  const getFormattedDate = (date: Date) => {
-    const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
-    const day = locale === "ar" ? date.getDate().toLocaleString("ar-SA") : format(date, "dd");
-    const year = locale === "ar" ? date.getFullYear().toLocaleString("ar-SA") : format(date, "y");
+  const getFormattedDate = (dateToFormat: Date) => {
+    const month = dateToFormat.toLocaleString("en-US", { month: "long" }).toLowerCase();
+    const day =
+      locale === "ar" ? dateToFormat.getDate().toLocaleString("ar-SA") : format(dateToFormat, "dd");
+    const year =
+      locale === "ar"
+        ? dateToFormat.getFullYear().toLocaleString("ar-SA")
+        : format(dateToFormat, "y");
     return `${t(`General.months.${month}`)} ${day}, ${year}`;
   };
 
   const getDateRangeTitle = () => {
-    if (!date?.from || !date?.to) return t("analytics");
+    if (!date?.from || !date?.to) return t("Analytics.select_date_range_first");
     return `${getFormattedDate(date.from)} - ${getFormattedDate(date.to)}`;
   };
-
-  const fetchAnalytics = async (from: Date, to: Date) => {
-    // Get current user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user || !selectedPukla) return;
-
-    // Fetch clicks for the selected date range and selected pukla only
-    const { data: clicks, error: clicksError } = await supabase
-      .from("clicks_log")
-      .select("clicked_at, is_mobile, country, city")
-      .eq("pukla_id", selectedPukla.id)
-      .gte("clicked_at", from.toISOString())
-      .lte("clicked_at", to.toISOString())
-      .order("clicked_at", { ascending: true });
-
-    if (clicksError) {
-      console.error("Error fetching clicks:", clicksError);
-      return;
-    }
-
-    // Calculate the difference in days between the start and end dates
-    const daysDifference = differenceInDays(to, from);
-    let chartData;
-
-    // If range is 1 day or less, show hourly data
-    if (daysDifference <= 1) {
-      const hours = Array.from({ length: 24 }, (_, i) => i);
-      const grouped = clicks?.reduce((acc: any, click) => {
-        const date = new Date(click.clicked_at);
-        const hour = date.getHours();
-        const device = click.is_mobile ? "mobile" : "desktop";
-        acc[hour] = acc[hour] || { desktop: 0, mobile: 0 };
-        acc[hour][device]++;
-        return acc;
-      }, {});
-
-      chartData = hours.map((hour) => ({
-        label: `${hour}:00`,
-        desktop: grouped[hour]?.desktop || 0,
-        mobile: grouped[hour]?.mobile || 0,
-      }));
-    }
-    // If range is 7 days or less, show daily data
-    else if (daysDifference <= 7) {
-      const days = eachDayOfInterval({ start: from, end: to });
-      const grouped = clicks?.reduce((acc: any, click) => {
-        const date = new Date(click.clicked_at);
-        const day = format(date, "yyyy-MM-dd");
-        const device = click.is_mobile ? "mobile" : "desktop";
-        acc[day] = acc[day] || { desktop: 0, mobile: 0 };
-        acc[day][device]++;
-        return acc;
-      }, {});
-
-      chartData = days.map((day) => ({
-        label: format(day, "EEE"),
-        desktop: grouped[format(day, "yyyy-MM-dd")]?.desktop || 0,
-        mobile: grouped[format(day, "yyyy-MM-dd")]?.mobile || 0,
-      }));
-    }
-    // If range is 31 days or less, show weekly data
-    else if (daysDifference <= 31) {
-      const weeks = eachWeekOfInterval({ start: from, end: to });
-      const grouped = clicks?.reduce((acc: any, click) => {
-        const date = new Date(click.clicked_at);
-        const weekStart = startOfWeek(date);
-        const weekKey = format(weekStart, "yyyy-MM-dd");
-        const device = click.is_mobile ? "mobile" : "desktop";
-        acc[weekKey] = acc[weekKey] || { desktop: 0, mobile: 0 };
-        acc[weekKey][device]++;
-        return acc;
-      }, {});
-
-      chartData = weeks.map((weekStart) => {
-        const weekEnd = endOfWeek(weekStart);
-        return {
-          label: `${getShortFormattedDate(weekStart)} - ${getShortFormattedDate(weekEnd)}`,
-          desktop: grouped[format(weekStart, "yyyy-MM-dd")]?.desktop || 0,
-          mobile: grouped[format(weekStart, "yyyy-MM-dd")]?.mobile || 0,
-        };
-      });
-    }
-    // If range is more than 31 days, show monthly data
-    else {
-      const months = eachMonthOfInterval({ start: from, end: to });
-      const grouped = clicks?.reduce((acc: any, click) => {
-        const date = new Date(click.clicked_at);
-        const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
-        const device = click.is_mobile ? "mobile" : "desktop";
-        acc[month] = acc[month] || { desktop: 0, mobile: 0 };
-        acc[month][device]++;
-        return acc;
-      }, {});
-
-      chartData = months.map((date) => {
-        const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
-        return {
-          label: t(`General.months.${month}`),
-          desktop: grouped[month]?.desktop || 0,
-          mobile: grouped[month]?.mobile || 0,
-        };
-      });
-    }
-
-    // Process data for the table
-    const tableData = clicks?.reduce((acc: any, click) => {
-      const locationKey = `${click.country || "Unknown"}-${click.city || "Unknown"}`;
-
-      if (!acc[locationKey]) {
-        acc[locationKey] = {
-          country: click.country
-            ? t(`Country.${click.country.toLowerCase().replace(" ", "_")}`)
-            : "Unknown",
-          city: click.city || "Unknown",
-          mobile: 0,
-          desktop: 0,
-          total: 0,
-        };
-      }
-
-      if (click.is_mobile) {
-        acc[locationKey].mobile++;
-      } else {
-        acc[locationKey].desktop++;
-      }
-      acc[locationKey].total++;
-
-      return acc;
-    }, {});
-
-    const processedTableData = Object.values(tableData);
-
-    // Update state with both chart and table data
-    setData({ chartData: chartData, tableData: processedTableData });
-  };
-
-  if (!puklaId) {
-    return (
-      <div className="flex w-full flex-col items-center justify-center">
-        {isLoading ? (
-          <Skeleton className="h-[100px] w-full" />
-        ) : puklas.length > 0 ? (
-          <Card className="flex w-full flex-col items-center justify-center">
-            <CardContent headless className="w-full">
-              <div className="flex w-full flex-col items-center justify-between gap-4 md:flex-row">
-                <span className="text-2xl font-bold">
-                  {t("Analytics.select_pukla_to_view_analytics")}
-                </span>
-                <Select onValueChange={(value: any) => router.push(`/analytics?id=${value}`)}>
-                  <SelectTrigger className="w-full max-w-[200px]">
-                    <SelectValue placeholder={t("Analytics.select_pukla")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {puklas.map((pukla) => (
-                      <SelectItem key={pukla.id} value={pukla.id}>
-                        {pukla.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <NoPuklas onCreate={() => router.push("/dashboard")} />
-        )}
-      </div>
-    );
-  }
 
   return (
     <>
@@ -340,101 +199,128 @@ export default function Analytics() {
         title={t("SEO.analytics.title")}
         description={t("SEO.analytics.description")}
       />
-      <main className="flex flex-col items-center justify-between gap-4">
-        <div className="flex w-full flex-col gap-2">
-          <Card className="w-full">
-            <CardHeader className="flex flex-col justify-between md:flex-row">
-              <div className="flex flex-col gap-2">
-                <CardTitle>{t("Analytics.analytics_overview")}</CardTitle>
-                <CardDescription>{getDateRangeTitle()}</CardDescription>
-              </div>
-
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={"w-[300px] justify-start text-start font-normal"}
-                  >
-                    <CalendarIcon className="me-2 h-4 w-4" />
-                    {date?.from ? (
-                      date.to ? (
-                        <>
-                          {getFormattedDate(date.from)} - {getFormattedDate(date.to)}
-                        </>
-                      ) : (
-                        getFormattedDate(date.from)
-                      )
-                    ) : (
-                      <span>{t("Analytics.select_date_range")}</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    initialFocus
-                    mode="range"
-                    defaultMonth={date?.from}
-                    selected={date}
-                    onSelect={setDate}
-                    numberOfMonths={2}
-                    locale={locale === "ar" ? ar : undefined}
-                  />
-                </PopoverContent>
-              </Popover>
-            </CardHeader>
-            <CardContent className="">
-              <ChartComponent data={data?.chartData || []} config={chartConfig} />
-            </CardContent>
-          </Card>
+      <div
+        className={
+          "bg-background sticky top-0 z-10 flex !min-h-12 items-center justify-between gap-4 border-b px-2"
+        }
+      >
+        <div className="flex flex-1 items-center gap-4">
+          <h2 className="text-xl font-medium">{t("Analytics.analytics_overview")}</h2>
+          {/* <CardDescription>{getDateRangeTitle()}</CardDescription> */}
         </div>
 
-        {profile?.subscribed_to === "pukla_enterprise" ? (
-          <div className="flex w-full flex-col gap-2">
-            <AnalyticsTable data={data?.tableData || []} />
-          </div>
-        ) : (
-          <div className="relative min-h-[300px] w-full">
-            <Card className="relative z-[11] flex min-h-[300px] flex-col items-center justify-center bg-transparent">
-              <CardHeader className="flex flex-col items-center justify-center gap-2">
-                <CardTitle className="text-center">
-                  {t("Billing.only_for_enterprise_users")}
-                </CardTitle>
-                <CardDescription className="text-center">
-                  {t("Billing.upgrade_to_enterprise_for_advanced_analytics")}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex justify-center">
-                <Link href="/billing">
-                  <Button>{t("General.upgrade")}</Button>
-                </Link>
-              </CardContent>
-            </Card>
-            <div className="bg-background absolute top-0 z-[10] h-full w-full [mask-image:linear-gradient(to_top,white,70%,transparent)]"></div>
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={"w-full justify-start text-left font-normal md:w-[300px]"}
+              >
+                <CalendarIcon className="me-2 h-4 w-4" />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {getFormattedDate(date.from)} - {getFormattedDate(date.to)}
+                    </>
+                  ) : (
+                    getFormattedDate(date.from)
+                  )
+                ) : (
+                  <span>{t("Analytics.select_date_range")}</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+                locale={locale === "ar" ? ar : undefined}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
 
-            <AnalyticsTable
-              className="absolute top-0 h-full !min-h-full w-full opacity-30"
-              hidePagination
-              fake
-              data={fakeAnalyticsData}
+      <main className="mx-auto flex max-w-2xl flex-row items-center justify-start gap-4 p-4">
+        {/* <LinesChart
+          title={t("Analytics.crud_analytics_title")}
+          description={t("Analytics.crud_analytics_description")}
+          data={analyticsData.chartData}
+          config={chartConfig}
+          xAxisKey="label"
+          lines={[
+            { dataKey: "added", name: t("Analytics.add_actions"), stroke: "var(--chart-green)" },
+            { dataKey: "removed", name: t("Analytics.delete_actions"), stroke: "var(--chart-red)" },
+            {
+              dataKey: "updated",
+              name: t("Analytics.update_actions"),
+              stroke: "var(--chart-blue)",
+            },
+          ]}
+
+          
+        /> */}
+
+        <Card className="w-full">
+          <CardHeader className="flex flex-row justify-between">
+            <div className="flex flex-col">
+              <CardTitle>{t("Analytics.crud_analytics_title")}</CardTitle>
+              <CardDescription>{t("Analytics.crud_analytics_description")}</CardDescription>
+            </div>
+            <Select
+              value={selectedModule.key}
+              onValueChange={(value) => {
+                if (value) {
+                  setSelectedModule({
+                    key: value,
+                    rpc: MODULE_ANALYTICS.find((m) => m.key === value)?.rpc || "",
+                    add: MODULE_ANALYTICS.find((m) => m.key === value)?.add || "",
+                    update: MODULE_ANALYTICS.find((m) => m.key === value)?.update || "",
+                    delete: MODULE_ANALYTICS.find((m) => m.key === value)?.delete || "",
+                  });
+                }
+              }}
+            >
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder={t("Analytics.select_module")} />
+              </SelectTrigger>
+              <SelectContent>
+                {MODULE_ANALYTICS.map((module) => (
+                  <SelectItem key={module.key} value={module.key}>
+                    {t(module.title)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardHeader>
+          <CardContent>
+            <CrudChart
+              title={t("Analytics.crud_analytics_title")}
+              description={t("Analytics.crud_analytics_description")}
+              chartData={analyticsData.chartData}
+              chartConfig={chartConfig}
+              xAxisKey="label"
             />
-          </div>
-        )}
+          </CardContent>
+          {/* {(footerPrimaryText || footerSecondaryText) && (
+            <CardFooter className="flex-col items-start gap-2 text-sm">
+              {footerPrimaryText && (
+                <div className="flex gap-2 leading-none font-medium">
+                  {footerPrimaryText} <TrendingUp className="h-4 w-4" />
+                </div>
+              )}
+              {footerSecondaryText && (
+                <div className="text-muted-foreground leading-none">{footerSecondaryText}</div>
+              )}
+            </CardFooter>
+          )} */}
+        </Card>
       </main>
     </>
-  );
-}
-
-export function ChartComponent({ data, config }: { data: any[]; config: ChartConfig }) {
-  return (
-    <ChartContainer config={config} className="max-h-[300px] w-full">
-      <BarChart accessibilityLayer data={data} margin={{ left: 12, right: 12 }}>
-        <CartesianGrid vertical={false} />
-        <XAxis dataKey="label" tickLine={false} axisLine={false} tickMargin={8} />
-        <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-        <Bar dataKey="desktop" fill={config.desktop.color} radius={4} />
-        <Bar dataKey="mobile" fill={config.mobile.color} radius={4} />
-      </BarChart>
-    </ChartContainer>
   );
 }
 

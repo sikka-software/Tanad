@@ -2,7 +2,6 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -15,6 +14,7 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormSheet } from "@/components/ui/form-sheet";
 
 import EmployeeCard from "@/employee/employee.card";
 import {
@@ -26,6 +26,7 @@ import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/employee/employee.options
 import useEmployeesStore from "@/employee/employee.store";
 import EmployeesTable from "@/employee/employee.table";
 
+import { EmployeeForm } from "@/modules/employee/employee.form";
 import { Employee } from "@/modules/employee/employee.types";
 import useUserStore from "@/stores/use-user-store";
 
@@ -36,8 +37,13 @@ export default function EmployeesPage() {
   const canReadEmployees = useUserStore((state) => state.hasPermission("employees.read"));
   const canCreateEmployees = useUserStore((state) => state.hasPermission("employees.create"));
 
-  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableEmployee, setActionableEmployee] = useState<Employee | null>(null);
+
+  const isFormDialogOpen = useEmployeesStore((state) => state.isFormDialogOpen);
+  const setIsFormDialogOpen = useEmployeesStore((state) => state.setIsFormDialogOpen);
+
+  const loadingSaveEmployee = useEmployeesStore((state) => state.isLoading);
+  const setLoadingSaveEmployee = useEmployeesStore((state) => state.setIsLoading);
 
   const viewMode = useEmployeesStore((state) => state.viewMode);
   const isDeleteDialogOpen = useEmployeesStore((state) => state.isDeleteDialogOpen);
@@ -58,6 +64,7 @@ export default function EmployeesPage() {
   const { mutateAsync: deleteEmployees, isPending: isDeleting } = useBulkDeleteEmployees();
   const { mutate: duplicateEmployee } = useDuplicateEmployee();
   const { createDeleteHandler } = useDeleteHandler();
+
   const { handleAction: onActionClicked } = useDataTableActions({
     data: employees,
     setSelectedRows,
@@ -69,9 +76,9 @@ export default function EmployeesPage() {
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteEmployees, {
-    loading: "Employees.loading.deleting",
-    success: "Employees.success.deleted",
-    error: "Employees.error.deleting",
+    loading: "Employees.loading.delete",
+    success: "Employees.success.delete",
+    error: "Employees.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -112,12 +119,14 @@ export default function EmployeesPage() {
             }
             createLabel={t("Employees.add_new")}
             searchPlaceholder={t("Employees.search_employees")}
+            count={employees?.length}
+            hideOptions={employees?.length === 0}
           />
         )}
         <div>
           {viewMode === "table" ? (
             <EmployeesTable
-              data={filteredEmployees || []}
+              data={sortedEmployees}
               isLoading={isLoading}
               error={error instanceof Error ? error : null}
               onActionClicked={onActionClicked}
@@ -125,7 +134,7 @@ export default function EmployeesPage() {
           ) : (
             <div className="p-4">
               <DataModelList
-                data={filteredEmployees || []}
+                data={sortedEmployees}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
                 emptyMessage={t("Employees.no_employees_found")}
@@ -135,6 +144,24 @@ export default function EmployeesPage() {
             </div>
           )}
         </div>
+
+        <FormSheet
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Employees.edit_employee")}
+          formId="employee-form"
+          loadingSave={loadingSaveEmployee}
+        >
+          <EmployeeForm
+            formHtmlId={"employee-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableEmployee(null);
+            }}
+            defaultValues={actionableEmployee}
+            editMode={true}
+          />
+        </FormSheet>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

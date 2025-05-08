@@ -31,20 +31,10 @@ export type ChipTypes = React.HTMLAttributes<HTMLSpanElement> & {
 
 export const Chip = React.forwardRef<HTMLSpanElement, ChipTypes>(
   (
-    {
-      label,
-      size = "normal",
-      icon,
-      color,
-      radius = "inherit",
-      dot,
-      dotStatus = "none",
-      ...rest
-    },
+    { label, size = "normal", icon, color, radius = "inherit", dot, dotStatus = "none", ...rest },
     ref,
   ) => {
-    let defaultStyles =
-      "flex flex-row w-fit gap-1 items-center  px-2.5 py-1  font-bold ";
+    let defaultStyles = "flex flex-row w-fit gap-1 items-center  px-2.5 py-1  font-bold ";
     let radiusStyles = {
       inherit: " rounded",
       full: "rounded-full",
@@ -66,16 +56,12 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipTypes>(
       unavailable: "bg-red-500",
     };
     let colorStyles: any = {
-      green:
-        "bg-green-200 text-green-700 dark:bg-green-700 dark:text-green-200",
+      green: "bg-green-200 text-green-700 dark:bg-green-700 dark:text-green-200",
       blue: "bg-blue-200 text-blue-700 dark:bg-blue-700 dark:text-blue-100",
       red: "bg-red-200 text-red-700 dark:bg-red-700 dark:text-red-100",
-      yellow:
-        "bg-yellow-200 text-yellow-700 dark:bg-yellow-600 dark:text-black",
-      orange:
-        "bg-orange-200 text-orange-700 dark:bg-orange-700 dark:text-orange-100",
-      purple:
-        "bg-purple-200 text-purple-700 dark:bg-purple-700 dark:text-purple-100",
+      yellow: "bg-yellow-200 text-yellow-700 dark:bg-yellow-600 dark:text-black",
+      orange: "bg-orange-200 text-orange-700 dark:bg-orange-700 dark:text-orange-100",
+      purple: "bg-purple-200 text-purple-700 dark:bg-purple-700 dark:text-purple-100",
       cyan: "bg-cyan-200 text-cyan-700 dark:bg-cyan-700 dark:text-cyan-100",
       hyper:
         "text-white dark:text-black bg-gradient-to-tl from-pink-500 via-red-500 to-yellow-500 ",
@@ -93,14 +79,10 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipTypes>(
             radiusStyles[radius],
             color ? colorStyles[color] : "border bg-none",
             rest.className,
-            "p-2"
+            "p-2",
           )}
         >
-          {dot && (
-            <span
-              className={cn(dotStyles[size], dotStatusStyles[dotStatus])}
-            ></span>
-          )}
+          {dot && <span className={cn(dotStyles[size], dotStatusStyles[dotStatus])}></span>}
           {icon && icon}
           {label}
         </span>
@@ -110,10 +92,7 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipTypes>(
         <span
           {...rest}
           ref={ref}
-          className={cn(
-            "h-2 w-2 rounded-full",
-            color ? colorStyles[color] : "border bg-none",
-          )}
+          className={cn("h-2 w-2 rounded-full", color ? colorStyles[color] : "border bg-none")}
         ></span>
       );
     }

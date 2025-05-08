@@ -27,13 +27,14 @@ const OfficeCard = ({ office }: { office: Office }) => {
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Building2 className="h-4 w-4" />
-            <span>{office.address}</span>
+            <span>
+              {office.street_name} {office.building_number} {office.additional_number}
+            </span>
           </div>
           <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
             <MapPin className="mt-1 h-4 w-4" />
             <div>
-              <p>{office.address}</p>
-              <p>{`${office.city}, ${office.state} ${office.zip_code}`}</p>
+              <p>{`${office.city}, ${office.country} ${office.zip_code}`}</p>
             </div>
           </div>
         </div>

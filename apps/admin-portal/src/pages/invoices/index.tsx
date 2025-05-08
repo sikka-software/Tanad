@@ -2,6 +2,7 @@ import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import ConfirmDelete from "@/ui/confirm-delete";
 import DataModelList from "@/ui/data-model-list";
@@ -14,6 +15,7 @@ import { useDeleteHandler } from "@/hooks/use-delete-handler";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
+import { FormDialog } from "@/components/ui/form-dialog";
 
 import InvoiceCard from "@/invoice/invoice.card";
 import { useInvoices, useBulkDeleteInvoices, useDuplicateInvoice } from "@/invoice/invoice.hooks";
@@ -21,7 +23,8 @@ import { SORTABLE_COLUMNS, FILTERABLE_FIELDS } from "@/invoice/invoice.options";
 import useInvoiceStore from "@/invoice/invoice.store";
 import InvoicesTable from "@/invoice/invoice.table";
 
-import { Invoice } from "@/modules/invoice/invoice.type";
+import { InvoiceForm } from "@/modules/invoice/invoice.form";
+import { InvoiceUpdateData } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function InvoicesPage() {
@@ -32,8 +35,11 @@ export default function InvoicesPage() {
   const canCreateInvoices = useUserStore((state) => state.hasPermission("invoices.create"));
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [actionableInvoice, setActionableInvoice] = useState<Invoice | null>(null);
 
+  const [actionableInvoice, setActionableInvoice] = useState<InvoiceUpdateData | null>(null);
+
+  const loadingSaveInvoice = useInvoiceStore((state) => state.isLoading);
+  const setLoadingSaveInvoice = useInvoiceStore((state) => state.setIsLoading);
   const viewMode = useInvoiceStore((state) => state.viewMode);
   const isDeleteDialogOpen = useInvoiceStore((state) => state.isDeleteDialogOpen);
   const setIsDeleteDialogOpen = useInvoiceStore((state) => state.setIsDeleteDialogOpen);
@@ -55,19 +61,22 @@ export default function InvoicesPage() {
   const { createDeleteHandler } = useDeleteHandler();
 
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: invoices,
+    data: invoices as InvoiceUpdateData[],
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
-    setActionableItem: setActionableInvoice,
+    setActionableItem: setActionableInvoice as (item: InvoiceUpdateData | null) => void,
     duplicateMutation: duplicateInvoice,
     moduleName: "Invoices",
+    previewAction: (id: string) => {
+      window.open(`/pay/${id}`, "_blank");
+    },
   });
 
   const handleConfirmDelete = createDeleteHandler(deleteInvoices, {
-    loading: "Invoices.loading.deleting",
-    success: "Invoices.success.deleted",
-    error: "Invoices.error.deleting",
+    loading: "Invoices.loading.delete",
+    success: "Invoices.success.delete",
+    error: "Invoices.error.delete",
     onSuccess: () => {
       clearSelection();
       setIsDeleteDialogOpen(false);
@@ -103,8 +112,10 @@ export default function InvoicesPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Invoices.title")}
             onAddClick={canCreateInvoices ? () => router.push("/invoices/add") : undefined}
-            createLabel={t("Invoices.create_invoice")}
+            createLabel={t("Invoices.create_new")}
             searchPlaceholder={t("Invoices.search_invoices")}
+            count={invoices?.length}
+            hideOptions={invoices?.length === 0}
           />
         )}
 
@@ -130,6 +141,28 @@ export default function InvoicesPage() {
             </div>
           )}
         </div>
+
+        <FormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          title={t("Invoices.edit_invoice")}
+          formId="invoice-form"
+          loadingSave={loadingSaveInvoice}
+        >
+          <InvoiceForm
+            formHtmlId={"invoice-form"}
+            onSuccess={() => {
+              setIsFormDialogOpen(false);
+              setActionableInvoice(null);
+              setLoadingSaveInvoice(false);
+              toast.success(t("General.successful_operation"), {
+                description: t("Invoices.success.update"),
+              });
+            }}
+            defaultValues={actionableInvoice}
+            editMode={true}
+          />
+        </FormDialog>
 
         <ConfirmDelete
           isDeleteDialogOpen={isDeleteDialogOpen}

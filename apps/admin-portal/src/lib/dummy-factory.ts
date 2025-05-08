@@ -10,15 +10,6 @@ export const generateDummySalary = () => {
     form.setValue("payment_date", "2021-01-31");
     form.setValue("gross_amount", 100000);
     form.setValue("net_amount", 10000);
-
-    form.setValue(
-      "deductions",
-      JSON.stringify({
-        tax: 10000,
-        insurance: 20000,
-        retirement: 30000,
-      }),
-    );
   }
 };
 

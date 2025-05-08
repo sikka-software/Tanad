@@ -1,21 +1,5 @@
-export interface Company {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  website?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zip_code?: string;
-  industry?: string;
-  size?: string;
-  notes?: string;
-  is_active: boolean;
-  enterprise_id: string;
-  created_at: string;
-  user_id: string;
-}
+import { Database } from "@/lib/database.types";
 
-export type CompanyCreateData = Omit<Company, "id" | "created_at"> & { user_id: string };
-export type CompanyUpdateData = Partial<Company>;
+export type Company = Database["public"]["Tables"]["companies"]["Row"];
+export type CompanyCreateData = Database["public"]["Tables"]["companies"]["Insert"];
+export type CompanyUpdateData = Database["public"]["Tables"]["companies"]["Update"];
