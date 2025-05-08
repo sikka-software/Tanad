@@ -48,7 +48,7 @@ const createRequestSchema = (t: (key: string) => string) =>
     start_date: z.date().optional(),
     end_date: z.date().optional(),
     amount: z.number().optional(),
-    notes:z.any().optional().nullable(),
+    notes: z.any().optional().nullable(),
   });
 
 // Infer the type from the Zod schema for form values

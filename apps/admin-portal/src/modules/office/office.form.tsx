@@ -43,7 +43,7 @@ const createOfficeSchema = (t: (key: string) => string) => {
     status: z.enum(["active", "inactive"], {
       message: t("Offices.form.status.required"),
     }),
-    notes:z.any().optional().nullable(),
+    notes: z.any().optional().nullable(),
   });
 
   const addressSchema = createAddressSchema(t);

@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import NotesSection from "@root/src/components/forms/notes-section";
+import { ProductsFormSection } from "@root/src/components/forms/products-form-section";
 import { getNotesValue } from "@root/src/lib/utils";
-import { flexRender, getCoreRowModel, useReactTable, ColumnDef } from "@tanstack/react-table";
+import { getCoreRowModel, useReactTable, ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
@@ -20,7 +20,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
 
 import { createClient } from "@/utils/supabase/component";
 
@@ -33,6 +32,10 @@ import { Product } from "@/product/product.type";
 
 import useUserStore from "@/stores/use-user-store";
 
+import { useClients } from "../client/client.hooks";
+import useClientStore from "../client/client.store";
+import { useCreateQuote, useUpdateQuote } from "./quote.hooks";
+import useQuoteStore from "./quote.store";
 import {
   QuoteCreateData,
   QuoteUpdateData,
@@ -40,7 +43,6 @@ import {
   QuoteItemClientData,
   Quote as FetchedQuoteData,
 } from "./quote.type";
-import { ProductsFormSection } from "@root/src/components/forms/products-form-section";
 
 const createQuoteFormSchema = (t: (key: string) => string) =>
   z.object({
@@ -50,7 +52,7 @@ const createQuoteFormSchema = (t: (key: string) => string) =>
     expiry_date: z.string().min(1, t("Quotes.validation.expiry_date_required")),
     status: z.string().min(1, t("Quotes.validation.status_required")),
     tax_rate: z.number().min(0, t("Quotes.validation.tax_rate_positive")),
-    notes: z.string().optional().nullable(),
+    notes: z.any().optional().nullable(),
     items: z
       .array(
         z.object({
@@ -75,17 +77,29 @@ export function QuoteForm({
   onSuccess,
   defaultValues,
   editMode,
-}: ModuleFormProps<FetchedQuoteData | QuoteCreateData | QuoteUpdateData>) {
-  const supabase = createClient();
+}: ModuleFormProps<QuoteCreateData | QuoteUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
-  const router = useRouter();
+
+  const supabase = createClient();
+
   const { profile, membership, enterprise } = useUserStore();
-  const [clients, setClients] = useState<Client[]>([]);
+
+  const { data: clients = [], isLoading: clientsLoading } = useClients();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const { mutate: createQuote } = useCreateQuote();
+  const { mutate: updateQuote } = useUpdateQuote();
+
+  const setIsLoading = useQuoteStore((state) => state.setIsLoading);
+  const isLoading = useQuoteStore((state) => state.isLoading);
+  const setIsClientSaving = useClientStore((state) => state.setIsLoading);
+  const isClientSaving = useClientStore((state) => state.isLoading);
+  const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
+
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
-  const [clientsLoading, setClientsLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
 
   const form = useForm<QuoteFormValues>({
@@ -120,7 +134,6 @@ export function QuoteForm({
   });
 
   const watchedItems = form.watch("items") || [];
-  const watchedTaxRate = form.watch("tax_rate") || 0;
 
   const subtotal = useMemo(() => {
     return watchedItems.reduce((acc: number, item: QuoteFormValues["items"][number]) => {
@@ -130,82 +143,10 @@ export function QuoteForm({
     }, 0);
   }, [watchedItems]);
 
-  const tax = (subtotal * watchedTaxRate) / 100;
-  const total = subtotal + tax;
-
-  useEffect(() => {
-    const getClients = async () => {
-      setClientsLoading(true);
-      try {
-        const { data, error } = await supabase.from("clients").select("*").order("name");
-        if (error) throw error;
-        setClients((data as Client[]) || []);
-      } catch (error) {
-        console.error("Error fetching clients:", error);
-        toast.error(t("Quotes.error.load_clients"));
-      } finally {
-        setClientsLoading(false);
-      }
-    };
-    getClients();
-  }, [supabase, t]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setProductsLoading(true);
-      try {
-        const { data, error } = await supabase.from("products").select("*").order("name");
-        if (error) throw error;
-        setProducts(data || []);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        toast.error(t("Quotes.error.load_products"));
-      } finally {
-        setProductsLoading(false);
-      }
-    };
-    fetchProducts();
-  }, [supabase, t]);
-
-  const clientOptions = useMemo(
-    () =>
-      clients.map((client) => ({
-        value: client.id,
-        label: `${client.name}${client.company ? ` (${client.company})` : ""}`,
-      })),
-    [clients],
-  );
-
-  const productOptions = useMemo(
-    () =>
-      products.map((product) => ({
-        value: product.id,
-        label: product.name,
-        description: product.description,
-        price: product.price,
-      })),
-    [products],
-  );
-
-  const handleClientAdded = async (data: ClientFormValues) => {
-    if (!profile?.id) return toast.error(t("Authentication.login_required"));
-    try {
-      const { data: newClient, error } = await supabase
-        .from("clients")
-        .insert([{ ...data, user_id: profile.id }])
-        .select("*")
-        .single();
-      if (error) throw error;
-      if (newClient) {
-        setClients((prev) => [...prev, newClient as Client]);
-        form.setValue("client_id", newClient.id);
-      }
-      setIsDialogOpen(false);
-    } catch (error) {
-      console.error("Error creating client:", error);
-      toast.error(t("Quotes.error.create_client"));
-    }
-  };
+  const clientOptions = clients.map((client) => ({
+    value: client.id,
+    label: `${client.name}${client.company ? ` (${client.company})` : ""}`,
+  }));
 
   const handleProductSelection = (index: number, product_id: string | undefined) => {
     if (!product_id) return;
@@ -216,182 +157,11 @@ export function QuoteForm({
     }
   };
 
-  const columns = useMemo<ColumnDef<QuoteFormValues["items"][number] & { index: number }>[]>(
-    () => [
-      {
-        accessorKey: "product_id",
-        header: t("Quotes.products.product"),
-        cell: ({ row }) => {
-          const index = row.original.index;
-          return (
-            <FormField
-              control={form.control}
-              name={`items.${index}.product_id`}
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  <FormControl>
-                    <ComboboxAdd
-                      data={productOptions}
-                      isLoading={productsLoading}
-                      defaultValue={field.value}
-                      onChange={(value) => {
-                        field.onChange(value);
-                        handleProductSelection(index, value as string | undefined);
-                      }}
-                      texts={{
-                        placeholder: t("Quotes.products.select_product"),
-                        searchPlaceholder: t("Quotes.products.search_products"),
-                        noItems: t("Quotes.products.no_products_found"),
-                      }}
-                      addText={t("Quotes.products.add_new_product")}
-                      onAddClick={() => setIsNewProductDialogOpen(true)}
-                      containerClassName="w-full min-w-[150px]"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        },
-      },
-      {
-        accessorKey: "quantity",
-        header: t("Quotes.products.quantity"),
-        cell: ({ row }) => {
-          const index = row.original.index;
-          return (
-            <FormField
-              control={form.control}
-              name={`items.${index}.quantity`}
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={1}
-                      step={1}
-                      {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                      className="w-24"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        },
-      },
-      {
-        accessorKey: "unit_price",
-        header: t("Quotes.products.unit_price"),
-        cell: ({ row }) => {
-          const index = row.original.index;
-          return (
-            <FormField
-              control={form.control}
-              name={`items.${index}.unit_price`}
-              render={({ field }) => (
-                <FormItem className="max-w-[150px] space-y-0">
-                  <FormControl>
-                    <CurrencyInput
-                      value={field.value}
-                      onChange={(inputValue) => {
-                        let numericValue: number | undefined;
-                        if (typeof inputValue === "string") {
-                          numericValue = parseFloat(inputValue);
-                        } else if (typeof inputValue === "number") {
-                          numericValue = inputValue;
-                        } else {
-                          numericValue = undefined;
-                        }
-                        field.onChange(isNaN(numericValue as number) ? undefined : numericValue);
-                      }}
-                      placeholder="0.00"
-                      className="w-32"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        },
-      },
-      {
-        accessorKey: "description",
-        header: t("Quotes.products.description"),
-        cell: ({ row }) => {
-          const index = row.original.index;
-          return (
-            <FormField
-              control={form.control}
-              name={`items.${index}.description`}
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  <FormControl>
-                    <Input placeholder={t("Quotes.products.product_description")} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          );
-        },
-      },
-      {
-        id: "subtotal",
-        header: t("Quotes.products.subtotal"),
-        cell: ({ row }) => {
-          const item = row.original;
-          const itemSubtotal = (item.quantity || 0) * (item.unit_price || 0);
-          return <div className="text-right">{itemSubtotal.toFixed(2)}</div>;
-        },
-      },
-      {
-        id: "actions",
-        header: "",
-        cell: ({ row }) => {
-          const index = row.original.index;
-          return (
-            fields.length > 1 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => remove(index)}
-                className="h-8 w-8 p-0"
-              >
-                <Trash2 className="h-4 w-4 text-red-500" />
-              </Button>
-            )
-          );
-        },
-      },
-    ],
-    [
-      form.control,
-      productOptions,
-      productsLoading,
-      handleProductSelection,
-      remove,
-      t,
-      fields.length,
-    ],
-  );
-
-  const tableData = useMemo(() => fields.map((field, index) => ({ ...field, index })), [fields]);
-
-  const table = useReactTable({
-    data: tableData,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   const handleSubmit = async (formData: QuoteFormValues) => {
+    setIsLoading(true);
     if (!profile?.id || !membership?.enterprise_id) {
       toast.error(t("Authentication.login_required_enterprise"));
+      setIsLoading(false);
       return;
     }
 
@@ -427,10 +197,17 @@ export function QuoteForm({
           enterprise_id: membership.enterprise_id,
           items: itemsToSubmitForUpdate,
         };
-        // TODO: Implement actual API call
-        // await updateQuoteMutation.mutateAsync(updatePayload);
-        console.log("Update Payload:", updatePayload);
-        toast.success(t("Quotes.success.updated"));
+
+        await updateQuote(
+          { id: defaultValues.id, data: updatePayload },
+          {
+            onSuccess: () => {
+              setIsLoading(false);
+              if (onSuccess) onSuccess();
+            },
+            onError: () => setIsLoading(false),
+          },
+        );
       } else {
         const createPayload: QuoteCreateData = {
           client_id: formData.client_id,
@@ -444,18 +221,26 @@ export function QuoteForm({
           enterprise_id: membership.enterprise_id,
           items: itemsToSubmitForCreate,
         };
-        // TODO: Implement actual API call
-        // await createQuoteMutation.mutateAsync(createPayload);
-        console.log("Create Payload:", createPayload);
-        toast.success(t("Quotes.success.created"));
+        await createQuote(createPayload, {
+          onSuccess: () => {
+            setIsLoading(false);
+            if (onSuccess) onSuccess();
+          },
+          onError: () => setIsLoading(false),
+        });
       }
       if (onSuccess) onSuccess();
     } catch (err) {
       console.error("Error saving quote:", err);
       toast.error(t("Quotes.error.save"));
+      setIsLoading(false);
     }
     console.log("Form Data:", formData);
   };
+
+  if (typeof window !== "undefined") {
+    (window as any).quoteForm = form;
+  }
 
   return (
     <>
@@ -614,7 +399,6 @@ export function QuoteForm({
             onAddNewProduct={() => setIsNewProductDialogOpen(true)}
             handleProductSelection={handleProductSelection}
             title={t("Quotes.products.title")}
-            isLoading={productsLoading}
             isError={form.formState.errors.items as FieldError}
           />
           {/* <FormSectionHeader
@@ -694,15 +478,8 @@ export function QuoteForm({
         <ClientForm
           formHtmlId="client-form-quote"
           onSuccess={(newClientData?: Client) => {
-            if (newClientData && newClientData.id) {
-              setClients((prevClients) => [...prevClients, newClientData]);
-              form.setValue("client_id", newClientData.id);
-              setIsDialogOpen(false);
-              toast.success(t("Quotes.success.client_added"));
-            } else {
-              setIsDialogOpen(false);
-              toast.info(t("Quotes.info.client_added_refresh_manually"));
-            }
+            setIsClientSaving(false);
+            setIsClientDialogOpen(false);
           }}
         />
       </FormDialog>

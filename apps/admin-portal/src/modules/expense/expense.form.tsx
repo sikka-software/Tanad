@@ -31,7 +31,7 @@ export const createExpenseSchema = (t: (key: string) => string) =>
     status: z.enum(["pending", "paid", "overdue"]).default("pending"),
     amount: z.number().min(0, t("Expenses.form.amount.required")),
     category: z.string().min(1, t("Expenses.form.category.required")),
-    notes:z.any().optional().nullable(),
+    notes: z.any().optional().nullable(),
     client_id: z.string().optional(),
   });
 

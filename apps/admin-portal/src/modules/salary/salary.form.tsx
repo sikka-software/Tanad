@@ -74,7 +74,7 @@ const createSalarySchema: (t: (key: string) => string) => z.ZodObject<any> = (t)
       .array(createDeductionSchema(t))
       .transform((arr) => arr.filter((item) => item.type.trim() !== "" || item.amount !== 0))
       .default([]),
-    notes:z.any().optional().nullable(),
+    notes: z.any().optional().nullable(),
   });
 
 // This type will have numbers for amounts due to the .transform()

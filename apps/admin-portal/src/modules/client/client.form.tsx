@@ -36,7 +36,7 @@ export const createClientSchema = (t: (key: string) => string) => {
       .email(t("Clients.form.validation.email_invalid")),
     phone: z.string().min(1, t("Clients.form.validation.phone_required")),
     company: z.string().nullish(),
-    notes:z.any().optional().nullable(),
+    notes: z.any().optional().nullable(),
   });
 
   const addressSchema = createAddressSchema(t);

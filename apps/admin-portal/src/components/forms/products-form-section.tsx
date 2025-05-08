@@ -288,7 +288,7 @@ export function ProductsFormSection({
     <div>
       <FormSectionHeader
         title={title}
-        onCreate={() => append({ product_id: "", description: "", quantity: "1", unit_price: "0" })}
+        onCreate={() => append({ product_id: undefined, description: "", quantity: 1, unit_price: 0 })}
         onCreateText={t("Invoices.products.add_product")}
         onCreateDisabled={isLoading}
         isError={isError}

@@ -27,7 +27,7 @@ export const createCarSchema = (t: (key: string) => string) => {
     code: z.string().optional().or(z.literal("")),
     license_country: z.string().optional().or(z.literal("")),
     license_plate: z.string().optional().or(z.literal("")),
-    notes:z.any().optional().nullable(),
+    notes: z.any().optional().nullable(),
   });
 
   return baseCarSchema;

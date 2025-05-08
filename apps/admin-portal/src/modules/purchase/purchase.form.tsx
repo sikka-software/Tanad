@@ -66,7 +66,7 @@ export const createPurchaseSchema = (t: (key: string) => string) => {
       })
       .transform((val) => val || new Date().toISOString().split("T")[0]) // Default to today if empty, then format
       .default(new Date().toISOString().split("T")[0]),
-    notes:z.any().optional().nullable(),
+    notes: z.any().optional().nullable(),
   });
 };
 

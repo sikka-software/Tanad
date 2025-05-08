@@ -22,7 +22,7 @@ import { WebsiteUpdateData, WebsiteCreateData } from "./website.type";
 export const createWebsiteSchema = (t: (key: string) => string) => {
   return z.object({
     domain_name: z.string().min(1, t("Websites.form.domain_name.required")),
-    notes:z.any().optional().nullable(),
+    notes: z.any().optional().nullable(),
     status: z
       .enum(["active", "inactive"], {
         required_error: t("Websites.form.status.required"),

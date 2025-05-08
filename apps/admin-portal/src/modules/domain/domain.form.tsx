@@ -28,7 +28,7 @@ export const createDomainSchema = (t: (key: string) => string) => {
     annual_cost: z.number().optional().or(z.literal("")),
     payment_cycle: z.string().min(1, t("Domains.form.payment_cycle.required")),
     status: z.string().min(1, t("Domains.form.status.required")),
-    notes:z.any().optional().nullable(),
+    notes: z.any().optional().nullable(),
   });
 
   return baseDomainSchema;
