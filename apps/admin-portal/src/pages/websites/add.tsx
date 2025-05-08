@@ -35,15 +35,15 @@ export default function AddWebsitePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Websites.add_new")} />
+      <CustomPageMeta title={t("Pages.Websites.add")} />
       <PageTitle
         formButtons
         formId="website-form"
         loading={isLoading}
         onCancel={() => router.push("/websites")}
         texts={{
-          title: t("Websites.add_new"),
-          submit_form: t("Websites.add_new"),
+          title: t("Pages.Websites.add"),
+          submit_form: t("Pages.Websites.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

@@ -302,10 +302,10 @@ export function OfficeForm({
                         }}
                         texts={{
                           placeholder: t("Offices.form.manager.placeholder"),
-                          searchPlaceholder: t("Employees.search_employees"),
+                          searchPlaceholder: t("Pages.Employees.search"),
                           noItems: t("Offices.form.manager.no_employees"),
                         }}
-                        addText={t("Employees.add_new")}
+                        addText={t("Pages.Employees.add")}
                         onAddClick={() => setIsEmployeeFormDialogOpen(true)}
                         ariaInvalid={!!form.formState.errors.manager}
                       />
@@ -363,7 +363,7 @@ export function OfficeForm({
       <FormDialog
         open={isEmployeeFormDialogOpen}
         onOpenChange={setIsEmployeeFormDialogOpen}
-        title={t("Employees.add_new")}
+        title={t("Pages.Employees.add")}
         formId="employee-form"
         loadingSave={isEmployeeSaving}
       >

@@ -107,8 +107,8 @@ export default function EmployeeRequestsPage() {
   return (
     <div>
       <CustomPageMeta
-        title={t("EmployeeRequests.title")}
-        description={t("EmployeeRequests.description")}
+        title={t("Pages.EmployeeRequests.title")}
+        description={t("Pages.EmployeeRequests.description")}
       />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
@@ -123,12 +123,12 @@ export default function EmployeeRequestsPage() {
             store={useEmployeeRequestsStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("EmployeeRequests.title")}
+            title={t("Pages.EmployeeRequests.title")}
             onAddClick={
               canCreateEmployeeRequests ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("EmployeeRequests.add_new")}
-            searchPlaceholder={t("EmployeeRequests.search_requests")}
+            createLabel={t("Pages.EmployeeRequests.add")}
+            searchPlaceholder={t("Pages.EmployeeRequests.search")}
             count={requests?.length}
             hideOptions={requests?.length === 0}
           />

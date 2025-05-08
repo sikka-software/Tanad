@@ -75,16 +75,12 @@ export function WebsiteForm({
       return;
     }
 
-    const optionalString = (val: string | null | undefined): string | null => {
-      return val && val.trim() !== "" ? val.trim() : null;
-    };
-
     const payload: Omit<
       WebsiteCreateData,
       "user_id" | "enterprise_id" | "id" | "created_at" | "updated_at"
     > & { user_id: string; enterprise_id: string } = {
       domain_name: data.domain_name.trim(),
-      notes: optionalString(data.notes),
+      notes: data.notes,
       status: data.status,
       user_id: user.id,
       enterprise_id: enterprise.id,

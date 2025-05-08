@@ -108,10 +108,10 @@ export default function ExpensesPage() {
             store={useExpenseStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Expenses.title")}
+            title={t("Pages.Expenses.title")}
             onAddClick={canCreateExpenses ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Expenses.add_new")}
-            searchPlaceholder={t("Expenses.search_expenses")}
+            createLabel={t("Pages.Expenses.add")}
+            searchPlaceholder={t("Pages.Expenses.search")}
             count={expenses?.length}
             hideOptions={expenses?.length === 0}
           />
@@ -131,7 +131,7 @@ export default function ExpensesPage() {
                 data={sortedExpenses}
                 isLoading={loadingFetchExpenses}
                 error={error instanceof Error ? error : null}
-                emptyMessage={t("Expenses.no_expenses_found")}
+                emptyMessage={t("Pages.Expenses.no_expenses_found")}
                 renderItem={(expense) => <ExpenseCard expense={expense} />}
                 gridCols="3"
               />
@@ -142,7 +142,7 @@ export default function ExpensesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Expenses.edit_expense")}
+          title={t("Pages.Expenses.edit")}
           formId="expense-form"
           loadingSave={loadingSaveExpense}
         >

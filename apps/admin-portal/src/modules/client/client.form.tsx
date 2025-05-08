@@ -205,10 +205,10 @@ export function ClientForm({
                         onChange={(value) => field.onChange(value || null)}
                         texts={{
                           placeholder: t("Clients.form.company.placeholder"),
-                          searchPlaceholder: t("Clients.form.company.search_placeholder"),
+                          searchPlaceholder: t("Pages.Companies.search"),
                           noItems: t("Clients.form.company.no_companies"),
                         }}
-                        addText={t("Companies.add_new")}
+                        addText={t("Pages.Companies.add")}
                         onAddClick={() => setIsCompanyDialogOpen(true)}
                       />
                     </FormControl>
@@ -275,7 +275,7 @@ export function ClientForm({
       <FormDialog
         open={isCompanyDialogOpen}
         onOpenChange={setIsCompanyDialogOpen}
-        title={t("Companies.add_new")}
+        title={t("Pages.Companies.add")}
         formId="company-form"
       >
         <CompanyForm formHtmlId="company-form" onSuccess={() => setIsCompanyDialogOpen(false)} />

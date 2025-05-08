@@ -38,15 +38,15 @@ export default function AddCarPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Cars.add_new")} />
+      <CustomPageMeta title={t("Pages.Cars.add")} />
       <PageTitle
         formButtons
         formId="car-form"
         loading={isLoading}
         onCancel={() => router.push("/cars")}
         texts={{
-          title: t("Cars.add_new"),
-          submit_form: t("Cars.add_new"),
+          title: t("Pages.Cars.add"),
+          submit_form: t("Pages.Cars.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

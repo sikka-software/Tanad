@@ -108,7 +108,10 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Products.title")} description={t("Products.description")} />
+      <CustomPageMeta
+        title={t("Pages.Products.title")}
+        description={t("Pages.Products.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -122,10 +125,10 @@ export default function ProductsPage() {
             store={useProductStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Products.title")}
+            title={t("Pages.Products.title")}
             onAddClick={canCreateProducts ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Products.add_new")}
-            searchPlaceholder={t("Products.search_products")}
+            createLabel={t("Pages.Products.add")}
+            searchPlaceholder={t("Pages.Products.search")}
             count={products?.length}
             hideOptions={products?.length === 0}
           />
@@ -157,7 +160,7 @@ export default function ProductsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Products.add_new")}
+          title={t("Pages.Products.add")}
           formId="product-form"
           loadingSave={loadingSaveProduct}
         >
@@ -186,7 +189,7 @@ export default function ProductsPage() {
   );
 }
 
-ProductsPage.messages = ["Pages", "Products", "General"];
+ProductsPage.messages = ["Pages", "Products", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

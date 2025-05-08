@@ -32,7 +32,7 @@ export default function AddDepartmentPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Departments.add_new")} />
+      <CustomPageMeta title={t("Pages.Departments.add")} />
       <PageTitle
         formButtons
         formId="department-form"
@@ -40,8 +40,8 @@ export default function AddDepartmentPage() {
         onCancel={() => router.push("/departments")}
         dummyButton={handleDummyData}
         texts={{
-          title: t("Departments.add_new"),
-          submit_form: t("Departments.add_new"),
+          title: t("Pages.Departments.add"),
+          submit_form: t("Pages.Departments.add"),
           cancel: t("General.cancel"),
         }}
       />

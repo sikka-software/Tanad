@@ -113,10 +113,10 @@ export default function VendorsPage() {
             store={useVendorStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Vendors.title")}
+            title={t("Pages.Vendors.title")}
             onAddClick={canCreateVendors ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Vendors.add_new")}
-            searchPlaceholder={t("Vendors.search_vendors")}
+            createLabel={t("Pages.Vendors.add")}
+            searchPlaceholder={t("Pages.Vendors.search")}
             count={vendors?.length}
             hideOptions={vendors?.length === 0}
           />
@@ -146,7 +146,7 @@ export default function VendorsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Vendors.edit_vendor")}
+          title={t("Pages.Vendors.edit")}
           formId="vendor-form"
           loadingSave={loadingSaveVendor}
         >

@@ -1,5 +1,4 @@
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
-import { CommandSelect } from "@root/src/components/ui/command-select";
 import { useLocale, useTranslations } from "next-intl";
 import React from "react";
 import { z } from "zod";
@@ -98,10 +97,10 @@ const WarehouseTable = ({
             }}
             texts={{
               placeholder: ". . .",
-              searchPlaceholder: t("Employees.search_employees"),
+              searchPlaceholder: t("Pages.Employees.search"),
               noItems: t("Warehouses.form.manager.no_employees"),
             }}
-            addText={t("Employees.add_new")}
+            addText={t("Pages.Employees.add")}
             ariaInvalid={false}
           />
         );

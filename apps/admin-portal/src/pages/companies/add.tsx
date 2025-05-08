@@ -48,7 +48,7 @@ export default function AddCompanyPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Companies.add_new")} />
+      <CustomPageMeta title={t("Pages.Companies.add")} />
       <PageTitle
         formButtons
         formId="company-form"
@@ -56,8 +56,8 @@ export default function AddCompanyPage() {
         onCancel={() => router.push("/companies")}
         dummyButton={handleDummyData}
         texts={{
-          title: t("Companies.add_new"),
-          submit_form: t("Companies.add_new"),
+          title: t("Pages.Companies.add"),
+          submit_form: t("Pages.Companies.add"),
           cancel: t("General.cancel"),
         }}
       />

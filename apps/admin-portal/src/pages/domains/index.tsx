@@ -110,10 +110,10 @@ export default function DomainsPage() {
             store={useDomainStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Domains.title")}
+            title={t("Pages.Domains.title")}
             onAddClick={canCreateDomains ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Domains.add_new")}
-            searchPlaceholder={t("Domains.search_domains")}
+            createLabel={t("Pages.Domains.add")}
+            searchPlaceholder={t("Pages.Domains.search")}
             count={domains?.length}
             hideOptions={domains?.length === 0}
           />

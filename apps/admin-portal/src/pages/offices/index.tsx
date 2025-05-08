@@ -112,8 +112,8 @@ export default function OfficesPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Pages.Offices.title")}
             onAddClick={canCreateOffices ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Pages.Offices.add_new")}
-            searchPlaceholder={t("Offices.search_offices")}
+            createLabel={t("Pages.Offices.add")}
+            searchPlaceholder={t("Pages.Offices.search")}
             count={offices?.length}
             hideOptions={offices?.length === 0}
           />
@@ -133,7 +133,7 @@ export default function OfficesPage() {
                 data={sortedOffices}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
-                emptyMessage={t("Offices.no_offices_found")}
+                emptyMessage={t("Pages.Offices.no_offices_found")}
                 renderItem={(office) => <OfficeCard office={office} />}
                 gridCols="3"
               />
@@ -144,7 +144,7 @@ export default function OfficesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Offices.edit_office")}
+          title={t("Pages.Offices.edit")}
           formId="office-form"
           loadingSave={loadingSaveOffice}
         >

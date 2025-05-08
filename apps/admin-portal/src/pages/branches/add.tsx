@@ -38,15 +38,15 @@ export default function AddBranchPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Branches.add_new")} />
+      <CustomPageMeta title={t("Pages.Branches.add")} />
       <PageTitle
         formButtons
         formId="branch-form"
         loading={isLoading}
         onCancel={() => router.push("/branches")}
         texts={{
-          title: t("Branches.add_new"),
-          submit_form: t("Branches.add_new"),
+          title: t("Pages.Branches.add"),
+          submit_form: t("Pages.Branches.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

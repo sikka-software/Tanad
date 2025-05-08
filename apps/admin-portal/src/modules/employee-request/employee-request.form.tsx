@@ -203,7 +203,7 @@ export function EmployeeRequestForm({
                         searchPlaceholder: t("Employees.search_employees"),
                         noItems: t("EmployeeRequests.form.employee.no_employees"),
                       }}
-                      addText={t("Employees.add_new")}
+                      addText={t("Employees.add")}
                       onAddClick={() => setIsEmployeeDialogOpen(true)}
                     />
                   </FormControl>
@@ -384,7 +384,7 @@ export function EmployeeRequestForm({
       <FormDialog
         open={isEmployeeDialogOpen}
         onOpenChange={setIsEmployeeDialogOpen}
-        title={t("Employees.add_new")}
+        title={t("Pages.Employees.add")}
         formId="employee-form"
         loadingSave={isLoadingCreateEmployee}
       >

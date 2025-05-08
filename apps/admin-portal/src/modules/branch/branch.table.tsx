@@ -90,10 +90,10 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
             }}
             texts={{
               placeholder: ". . .",
-              searchPlaceholder: t("Employees.search_employees"),
+              searchPlaceholder: t("Pages.Employees.search"),
               noItems: t("Branches.form.manager.no_employees"),
             }}
-            addText={t("Employees.add_new")}
+            addText={t("Pages.Employees.add")}
             ariaInvalid={false}
           />
         );

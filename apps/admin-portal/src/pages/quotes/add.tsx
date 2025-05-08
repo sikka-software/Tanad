@@ -20,15 +20,15 @@ export default function AddQuotePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Quotes.add_new")} />
+      <CustomPageMeta title={t("Pages.Quotes.add")} />
       <PageTitle
         formButtons
         formId="quote-form"
         loading={isLoading}
         onCancel={() => router.push("/quotes")}
         texts={{
-          title: t("Quotes.add_new"),
-          submit_form: t("Quotes.add_new"),
+          title: t("Pages.Quotes.add"),
+          submit_form: t("Pages.Quotes.add"),
           cancel: t("General.cancel"),
         }}
       />

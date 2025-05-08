@@ -36,15 +36,15 @@ export default function AddVendorPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Vendors.add_new")} />
+      <CustomPageMeta title={t("Pages.Vendors.add")} />
       <PageTitle
         formButtons
         formId="vendor-form"
         loading={isLoading}
         onCancel={() => router.push("/vendors")}
         texts={{
-          title: t("Vendors.add_new"),
-          submit_form: t("Vendors.add_new"),
+          title: t("Pages.Vendors.add"),
+          submit_form: t("Pages.Vendors.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

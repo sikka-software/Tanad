@@ -35,15 +35,15 @@ export default function AddOnlineStorePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("OnlineStores.add_new")} />
+      <CustomPageMeta title={t("Pages.OnlineStores.add")} />
       <PageTitle
         formButtons
         formId="online-store-form"
         loading={isLoading}
         onCancel={() => router.push("/online_stores")}
         texts={{
-          title: t("OnlineStores.add_new"),
-          submit_form: t("OnlineStores.add_new"),
+          title: t("Pages.OnlineStores.add"),
+          submit_form: t("Pages.OnlineStores.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

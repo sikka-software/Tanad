@@ -105,10 +105,10 @@ export default function CarsPage() {
             store={useCarStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Cars.title")}
+            title={t("Pages.Cars.title")}
             onAddClick={canCreateCars ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Cars.add_new")}
-            searchPlaceholder={t("Cars.search_cars")}
+            createLabel={t("Pages.Cars.add")}
+            searchPlaceholder={t("Pages.Cars.search")}
             count={cars?.length}
             hideOptions={cars?.length === 0}
           />

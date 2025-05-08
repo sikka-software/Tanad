@@ -361,7 +361,7 @@ export function EmployeeForm({
                           searchPlaceholder: t("Employees.form.department.searchPlaceholder"),
                           noItems: t("Employees.form.department.no_departments"),
                         }}
-                        addText={t("Departments.add_new")}
+                        addText={t("Pages.Departments.add")}
                         onAddClick={() => setIsDepartmentDialogOpen(true)}
                       />
                     </FormControl>
@@ -528,7 +528,7 @@ export function EmployeeForm({
       <FormDialog
         open={isDepartmentDialogOpen}
         onOpenChange={setIsDepartmentDialogOpen}
-        title={t("Departments.add_new")}
+        title={t("Pages.Departments.add")}
         formId="department-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}

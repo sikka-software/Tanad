@@ -43,15 +43,15 @@ export default function AddWarehousePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Warehouses.add_new")} />
+      <CustomPageMeta title={t("Pages.Warehouses.add")} />
       <PageTitle
         formButtons
         formId="warehouse-form"
         loading={isLoading}
         onCancel={() => router.push("/warehouses")}
         texts={{
-          title: t("Warehouses.add_new"),
-          submit_form: t("Warehouses.add_new"),
+          title: t("Pages.Warehouses.add"),
+          submit_form: t("Pages.Warehouses.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

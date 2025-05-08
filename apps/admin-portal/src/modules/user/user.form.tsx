@@ -366,7 +366,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
                       searchPlaceholder: t("Users.form.role.search_placeholder"),
                       noItems: t("Roles.no_roles_available"),
                     }}
-                    addText={t("Roles.add_new")} // Use Role translation
+                    addText={t("Pages.Roles.add")} // Use Role translation
                     onAddClick={() => setIsRoleDialogOpen(true)} // Open dialog
                     disabled={isFormSubmitting}
                   />
@@ -382,7 +382,7 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
       <FormDialog
         open={isRoleDialogOpen}
         onOpenChange={setIsRoleDialogOpen}
-        title={t("Roles.add_new")} // Use Role translation
+        title={t("Pages.Roles.add")} // Use Role translation
         formId="role-form" // ID for the RoleForm inside
         cancelText={t("General.cancel")}
         submitText={t("General.save")}

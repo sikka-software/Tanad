@@ -106,7 +106,10 @@ export default function WebsitesPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Websites.title")} description={t("Websites.description")} />
+      <CustomPageMeta
+        title={t("Pages.Websites.title")}
+        description={t("Pages.Websites.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -120,10 +123,10 @@ export default function WebsitesPage() {
             store={useWebsiteStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Websites.title")}
+            title={t("Pages.Websites.title")}
             onAddClick={canCreateWebsites ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Websites.add_new")}
-            searchPlaceholder={t("Websites.search_websites")}
+            createLabel={t("Pages.Websites.add")}
+            searchPlaceholder={t("Pages.Websites.search")}
             count={displayData?.length}
             hideOptions={displayData?.length === 0}
           />
@@ -154,7 +157,7 @@ export default function WebsitesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={actionableWebsite?.id ? t("Websites.edit_title") : t("Websites.add_new")}
+          title={actionableWebsite?.id ? t("Pages.Websites.edit") : t("Pages.Websites.add")}
           formId="website-form"
           loadingSave={loadingSaveWebsite}
         >

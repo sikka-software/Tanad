@@ -71,10 +71,10 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
             }}
             texts={{
               placeholder: ". . .",
-              searchPlaceholder: t("Employees.search_employees"),
+              searchPlaceholder: t("Pages.Employees.search"),
               noItems: t("Salaries.form.employee_name.no_employees"),
             }}
-            addText={t("Employees.add_new")}
+            addText={t("Pages.Employees.add")}
             ariaInvalid={false}
           />
         );

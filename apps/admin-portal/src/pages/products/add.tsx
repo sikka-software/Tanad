@@ -43,15 +43,15 @@ export default function AddProductPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Products.add_new")} />
+      <CustomPageMeta title={t("Pages.Products.add")} />
       <PageTitle
         formButtons
         formId="product-form"
         loading={isLoading}
         onCancel={() => router.push("/products")}
         texts={{
-          title: t("Products.add_new"),
-          submit_form: t("Products.add_new"),
+          title: t("Pages.Products.add"),
+          submit_form: t("Pages.Products.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -62,7 +62,7 @@ export default function AddProductPage() {
   );
 }
 
-AddProductPage.messages = ["Pages", "Products", "General"];
+AddProductPage.messages = ["Pages", "Products", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

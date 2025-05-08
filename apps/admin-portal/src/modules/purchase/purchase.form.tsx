@@ -133,13 +133,9 @@ export function PurchaseForm({
       return;
     }
 
-    const optionalString = (val: string | null | undefined): string | null => {
-      return val && val.trim() !== "" ? val.trim() : null;
-    };
-
     const payload: PurchaseCreateData = {
       purchase_number: data.purchase_number.trim(),
-      description: optionalString(data.description),
+      description: data.description,
       amount: Number(data.amount),
       category: data.category.trim(),
       status: data.status,
@@ -150,7 +146,7 @@ export function PurchaseForm({
       incurred_at: data.incurred_at
         ? new Date(data.incurred_at).toISOString()
         : new Date().toISOString(),
-      notes: optionalString(data.notes),
+      notes: data.notes,
       user_id: user.id,
       enterprise_id: enterprise.id,
       created_by: user.id,

@@ -114,12 +114,12 @@ export default function EmployeesPage() {
             store={useEmployeesStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Employees.title")}
+            title={t("Pages.Employees.title")}
             onAddClick={
               canCreateEmployees ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Employees.add_new")}
-            searchPlaceholder={t("Employees.search_employees")}
+            createLabel={t("Pages.Employees.add")}
+            searchPlaceholder={t("Pages.Employees.search")}
             count={employees?.length}
             hideOptions={employees?.length === 0}
           />
@@ -138,7 +138,7 @@ export default function EmployeesPage() {
                 data={sortedEmployees}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
-                emptyMessage={t("Employees.no_employees_found")}
+                emptyMessage={t("Pages.Employees.no_employees_found")}
                 renderItem={(employee) => <EmployeeCard employee={employee} />}
                 gridCols="3"
               />
@@ -149,7 +149,7 @@ export default function EmployeesPage() {
         <FormSheet
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Employees.edit_employee")}
+          title={t("Pages.Employees.edit")}
           formId="employee-form"
           loadingSave={loadingSaveEmployee}
         >

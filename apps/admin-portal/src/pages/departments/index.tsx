@@ -98,7 +98,10 @@ export default function DepartmentsPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Departments.title")} description={t("Departments.description")} />
+      <CustomPageMeta
+        title={t("Pages.Departments.title")}
+        description={t("Pages.Departments.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -112,12 +115,12 @@ export default function DepartmentsPage() {
             store={useDepartmentsStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Departments.title")}
+            title={t("Pages.Departments.title")}
             onAddClick={
               canCreateDepartments ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Departments.add_new")}
-            searchPlaceholder={t("Departments.search_departments")}
+            createLabel={t("Pages.Departments.add")}
+            searchPlaceholder={t("Pages.Departments.search")}
             count={departments?.length}
             hideOptions={departments?.length === 0}
           />

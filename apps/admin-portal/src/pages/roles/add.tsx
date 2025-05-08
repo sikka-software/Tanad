@@ -22,15 +22,15 @@ export default function AddRolePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Roles.add_new")} />
+      <CustomPageMeta title={t("Pages.Roles.add")} />
       <PageTitle
         formButtons
         formId="role-form"
         loading={isLoading}
         onCancel={() => router.push("/roles")}
         texts={{
-          title: t("Roles.add_new"),
-          submit_form: t("Roles.add_new"),
+          title: t("Pages.Roles.add"),
+          submit_form: t("Pages.Roles.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

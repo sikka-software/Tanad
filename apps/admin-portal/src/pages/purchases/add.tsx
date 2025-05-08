@@ -36,15 +36,15 @@ export default function AddPurchasePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Purchases.add_new")} />
+      <CustomPageMeta title={t("Pages.Purchases.add")} />
       <PageTitle
         formButtons
         formId="purchase-form"
         loading={isLoading}
         onCancel={() => router.push("/purchases")}
         texts={{
-          title: t("Purchases.add_new"),
-          submit_form: t("Purchases.add_new"),
+          title: t("Pages.Purchases.add"),
+          submit_form: t("Pages.Purchases.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

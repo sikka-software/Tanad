@@ -31,15 +31,15 @@ export default function AddInvoicePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Invoices.add_new")} />
+      <CustomPageMeta title={t("Pages.Invoices.add")} />
       <PageTitle
         formButtons
         formId="invoice-form"
         loading={isLoading}
         onCancel={() => router.push("/invoices")}
         texts={{
-          title: t("Invoices.add_new"),
-          submit_form: t("Invoices.add_new"),
+          title: t("Pages.Invoices.add"),
+          submit_form: t("Pages.Invoices.add"),
           cancel: t("General.cancel"),
         }}
       />

@@ -128,27 +128,24 @@ export function BranchForm({
     }
 
     // Helper to convert empty string/null to null
-    const optionalString = (val: string | null | undefined): string | null => {
-      return val && val.trim() !== "" ? val.trim() : null;
-    };
 
     // Prepare payload - ensure optional fields are null if empty and required fields are present
     const payload: BranchCreateData = {
       name: data.name.trim(),
       code: data.code?.trim() || null,
-      phone: optionalString(data.phone) ?? null,
-      email: optionalString(data.email) ?? null,
+      phone: data.phone,
+      email: data.email,
       manager: data.manager && data.manager.trim() !== "" ? data.manager : null,
       notes: data.notes ?? null,
       status: data.status,
-      short_address: optionalString(data.short_address) ?? null,
-      building_number: optionalString(data.building_number) ?? null,
-      street_name: optionalString(data.street_name) ?? null,
-      city: optionalString(data.city) ?? null,
-      region: optionalString(data.region) ?? null,
-      country: optionalString(data.country) ?? null,
-      zip_code: optionalString(data.zip_code) ?? null,
-      additional_number: optionalString((data as any).additional_number) ?? null,
+      short_address: data.short_address,
+      building_number: data.building_number,
+      street_name: data.street_name,
+      city: data.city,
+      region: data.region,
+      country: data.country,
+      zip_code: data.zip_code,
+      additional_number: data.additional_number,
       user_id: user.id,
       enterprise_id: enterprise.id,
     };
@@ -319,7 +316,7 @@ export function BranchForm({
                           searchPlaceholder: t("Employees.search_employees"),
                           noItems: t("Branches.form.manager.no_employees"),
                         }}
-                        addText={t("Employees.add_new")}
+                        addText={t("Pages.Employees.add")}
                         onAddClick={() => setIsEmployeeDialogOpen(true)}
                         ariaInvalid={!!form.formState.errors.manager}
                       />
@@ -379,7 +376,7 @@ export function BranchForm({
       <FormDialog
         open={isEmployeeDialogOpen}
         onOpenChange={setIsEmployeeDialogOpen}
-        title={t("Employees.add_new")}
+        title={t("Pages.Employees.add")}
         formId="employee-form"
         loadingSave={isEmployeeSaving}
       >

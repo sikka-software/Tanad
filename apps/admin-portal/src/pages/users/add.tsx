@@ -40,7 +40,7 @@ export default function AddUserPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Users.add_new")} />
+      <CustomPageMeta title={t("Pages.Users.add")} />
       <PageTitle
         formButtons
         formId="user-form"
@@ -48,8 +48,8 @@ export default function AddUserPage() {
         onCancel={() => router.push("/users")}
         dummyButton={handleDummyData}
         texts={{
-          title: t("Users.add_new"),
-          submit_form: t("Users.add_new"),
+          title: t("Pages.Users.add"),
+          submit_form: t("Pages.Users.add"),
           cancel: t("General.cancel"),
         }}
       />

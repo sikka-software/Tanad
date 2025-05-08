@@ -109,7 +109,10 @@ export default function PurchasesPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Purchases.title")} description={t("Purchases.description")} />
+      <CustomPageMeta
+        title={t("Pages.Purchases.title")}
+        description={t("Pages.Purchases.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -123,12 +126,12 @@ export default function PurchasesPage() {
             store={usePurchaseStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Purchases.title")}
+            title={t("Pages.Purchases.title")}
             onAddClick={
               canCreatePurchases ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Purchases.add_new")}
-            searchPlaceholder={t("Purchases.search_purchases")}
+            createLabel={t("Pages.Purchases.add")}
+            searchPlaceholder={t("Pages.Purchases.search")}
             count={displayData?.length}
             hideOptions={displayData?.length === 0}
           />
@@ -159,7 +162,7 @@ export default function PurchasesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Purchases.add_new")}
+          title={t("Pages.Purchases.add")}
           formId="purchase-form"
           loadingSave={loadingSavePurchase}
         >

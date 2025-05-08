@@ -19,15 +19,15 @@ export default function AddEmployeeRequestPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("EmployeeRequests.add_new")} />
+      <CustomPageMeta title={t("Pages.EmployeeRequests.add")} />
       <PageTitle
         formButtons
         formId="employee-request-form"
         loading={loadingSave}
         onCancel={() => router.push("/employee_requests")}
         texts={{
-          title: t("EmployeeRequests.add_new"),
-          submit_form: t("EmployeeRequests.add_new"),
+          title: t("Pages.EmployeeRequests.add"),
+          submit_form: t("Pages.EmployeeRequests.add"),
           cancel: t("General.cancel"),
         }}
       />

@@ -94,7 +94,10 @@ export default function ClientsPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Clients.title")} description={t("Clients.description")} />
+      <CustomPageMeta
+        title={t("Pages.Clients.title")}
+        description={t("Pages.Clients.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -108,10 +111,10 @@ export default function ClientsPage() {
             store={useClientStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Clients.title")}
+            title={t("Pages.Clients.title")}
             onAddClick={canCreateClients ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Clients.add_new")}
-            searchPlaceholder={t("Clients.search_clients")}
+            createLabel={t("Pages.Clients.add")}
+            searchPlaceholder={t("Pages.Clients.search")}
             count={clients?.length}
             hideOptions={clients?.length === 0}
           />
@@ -142,7 +145,7 @@ export default function ClientsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Clients.edit_client")}
+          title={t("Pages.Clients.edit")}
           formId="client-form"
           loadingSave={loadingSaveClient}
         >

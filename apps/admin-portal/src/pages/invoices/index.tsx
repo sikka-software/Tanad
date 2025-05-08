@@ -111,10 +111,10 @@ export default function InvoicesPage() {
             store={useInvoiceStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Invoices.title")}
+            title={t("Pages.Invoices.title")}
             onAddClick={canCreateInvoices ? () => router.push("/invoices/add") : undefined}
-            createLabel={t("Invoices.add_new")}
-            searchPlaceholder={t("Invoices.search_invoices")}
+            createLabel={t("Pages.Invoices.add")}
+            searchPlaceholder={t("Pages.Invoices.search")}
             count={invoices?.length}
             hideOptions={invoices?.length === 0}
           />

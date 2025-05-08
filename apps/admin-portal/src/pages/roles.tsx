@@ -198,7 +198,7 @@ export default function RolesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={editingRole ? t("Roles.edit_role") : t("Roles.add_new")}
+          title={editingRole ? t("Pages.Roles.edit") : t("Pages.Roles.add")}
           formId="role-form"
           loadingSave={loadingSaveRole}
         >

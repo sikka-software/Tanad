@@ -102,11 +102,11 @@ export default function UsersPage() {
     return <NoPermission />;
   }
 
-  const formDialogTitle = actionableUser ? t("Users.edit_user") : t("Users.add_new");
+  const formDialogTitle = actionableUser ? t("Pages.Users.edit") : t("Pages.Users.add");
 
   return (
     <div>
-      <CustomPageMeta title={t("Users.title")} description={t("Users.description")} />
+      <CustomPageMeta title={t("Pages.Users.title")} description={t("Pages.Users.description")} />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -120,10 +120,10 @@ export default function UsersPage() {
             store={useEnterpriseUsersStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Users.title")}
+            title={t("Pages.Users.title")}
             onAddClick={handleAddClick}
-            createLabel={t("Users.add_new")}
-            searchPlaceholder={t("Users.search_placeholder")}
+            createLabel={t("Pages.Users.add")}
+            searchPlaceholder={t("Pages.Users.search")}
             count={users?.length}
             hideOptions={users?.length === 0}
           />
@@ -143,7 +143,7 @@ export default function UsersPage() {
                 data={sortedUsers}
                 isLoading={isLoading}
                 error={error as Error | null}
-                emptyMessage={t("Users.no_users_found")}
+                emptyMessage={t("Pages.Users.no_users_found")}
                 renderItem={(user) => <UserCard key={user.id} user={user} />}
                 gridCols="3"
               />

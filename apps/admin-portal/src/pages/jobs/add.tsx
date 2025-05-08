@@ -45,15 +45,15 @@ export default function AddJobPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Jobs.add_new")} />
+      <CustomPageMeta title={t("Pages.Jobs.add")} />
       <PageTitle
         formButtons
         formId="job-form"
         loading={isLoading}
         onCancel={() => router.push("/jobs")}
         texts={{
-          title: t("Jobs.add_new"),
-          submit_form: t("Jobs.add_new"),
+          title: t("Pages.Jobs.add"),
+          submit_form: t("Pages.Jobs.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

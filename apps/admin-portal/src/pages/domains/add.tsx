@@ -35,15 +35,15 @@ export default function AddDomainPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Domains.add_new")} />
+      <CustomPageMeta title={t("Pages.Domains.add")} />
       <PageTitle
         formButtons
         formId="domain-form"
         loading={isLoading}
         onCancel={() => router.push("/domains")}
         texts={{
-          title: t("Domains.add_new"),
-          submit_form: t("Domains.add_new"),
+          title: t("Pages.Domains.add"),
+          submit_form: t("Pages.Domains.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

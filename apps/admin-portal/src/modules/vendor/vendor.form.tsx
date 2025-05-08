@@ -206,10 +206,10 @@ export function VendorForm({
                         onChange={(value) => field.onChange(value || null)}
                         texts={{
                           placeholder: t("Vendors.form.company.placeholder"),
-                          searchPlaceholder: t("Companies.search_companies"),
-                          noItems: t("Companies.no_companies_found"),
+                          searchPlaceholder: t("Pages.Companies.search"),
+                          noItems: t("Pages.Companies.no_companies_found"),
                         }}
-                        addText={t("Companies.add_new")}
+                        addText={t("Pages.Companies.add")}
                         onAddClick={() => setIsCompanyDialogOpen(true)}
                       />
                     </FormControl>
@@ -278,7 +278,7 @@ export function VendorForm({
       <FormDialog
         open={isCompanyDialogOpen}
         onOpenChange={setIsCompanyDialogOpen}
-        title={t("Companies.add_new")}
+        title={t("Pages.Companies.add")}
         formId="company-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}

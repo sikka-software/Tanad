@@ -34,15 +34,15 @@ export default function AddOfficePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Pages.Offices.add_new")} />
+      <CustomPageMeta title={t("Pages.Offices.add")} />
       <PageTitle
         formButtons
         formId="office-form"
         loading={isLoading}
         onCancel={() => router.push("/offices")}
         texts={{
-          title: t("Pages.Offices.add_new"),
-          submit_form: t("Pages.Offices.add_new"),
+          title: t("Pages.Offices.add"),
+          submit_form: t("Pages.Offices.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

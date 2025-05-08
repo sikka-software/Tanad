@@ -38,15 +38,15 @@ export default function AddServerPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Servers.add_new")} />
+      <CustomPageMeta title={t("Pages.Servers.add")} />
       <PageTitle
         formButtons
         formId="server-form"
         loading={isLoading}
         onCancel={() => router.push("/servers")}
         texts={{
-          title: t("Servers.add_new"),
-          submit_form: t("Servers.add_new"),
+          title: t("Pages.Servers.add"),
+          submit_form: t("Pages.Servers.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

@@ -34,7 +34,7 @@ export default function AddClientPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Clients.add_new")} />
+      <CustomPageMeta title={t("Pages.Clients.add")} />
       <PageTitle
         formButtons
         formId="client-form"
@@ -42,8 +42,8 @@ export default function AddClientPage() {
         onCancel={() => router.push("/clients")}
         dummyButton={handleDummyData}
         texts={{
-          title: t("Clients.add_new"),
-          submit_form: t("Clients.add_new"),
+          title: t("Pages.Clients.add"),
+          submit_form: t("Pages.Clients.add"),
           cancel: t("General.cancel"),
         }}
       />

@@ -110,7 +110,10 @@ export default function BranchesPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Branches.title")} description={t("Branches.description")} />
+      <CustomPageMeta
+        title={t("Pages.Branches.title")}
+        description={t("Pages.Branches.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -124,10 +127,10 @@ export default function BranchesPage() {
             store={useBranchStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Branches.title")}
+            title={t("Pages.Branches.title")}
             onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Branches.add_new")}
-            searchPlaceholder={t("Branches.search_branches")}
+            createLabel={t("Pages.Branches.add")}
+            searchPlaceholder={t("Pages.Branches.search")}
             count={displayData?.length}
             hideOptions={displayData?.length === 0}
           />
@@ -147,7 +150,7 @@ export default function BranchesPage() {
                 data={sortedBranches}
                 isLoading={loadingFetchBranches}
                 error={error as Error | null}
-                emptyMessage={t("Branches.no_branches_found")}
+                emptyMessage={t("Pages.Branches.no_branches_found")}
                 renderItem={(branch) => <BranchCard key={branch.id} branch={branch} />}
                 gridCols="3"
               />
@@ -158,7 +161,7 @@ export default function BranchesPage() {
         <FormSheet
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Branches.edit_branch")}
+          title={t("Pages.Branches.edit")}
           formId="branch-form"
           loadingSave={loadingSaveBranch}
         >

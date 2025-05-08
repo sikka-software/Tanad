@@ -117,8 +117,8 @@ export default function OnlineStoresPage() {
             onAddClick={
               canCreateOnlineStores ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("OnlineStores.add_new")}
-            searchPlaceholder={t("OnlineStores.search_online_stores")}
+            createLabel={t("Pages.OnlineStores.add")}
+            searchPlaceholder={t("Pages.OnlineStores.search")}
             count={onlineStores?.length}
             hideOptions={onlineStores?.length === 0}
           />
@@ -138,7 +138,7 @@ export default function OnlineStoresPage() {
                 data={sortedOnlineStores}
                 isLoading={loadingFetchOnlineStores}
                 error={error as Error | null}
-                emptyMessage={t("OnlineStores.no_online_stores_found")}
+                emptyMessage={t("Pages.OnlineStores.no_online_stores_found")}
                 renderItem={(onlineStore) => (
                   <OnlineStoreCard key={onlineStore.id} onlineStore={onlineStore} />
                 )}
@@ -151,7 +151,7 @@ export default function OnlineStoresPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("OnlineStores.add_new")}
+          title={t("Pages.OnlineStores.add")}
           formId="online-store-form"
           loadingSave={loadingSaveOnlineStore}
         >

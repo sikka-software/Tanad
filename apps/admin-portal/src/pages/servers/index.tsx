@@ -96,7 +96,10 @@ export default function ServersPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Servers.title")} description={t("Servers.description")} />
+      <CustomPageMeta
+        title={t("Pages.Servers.title")}
+        description={t("Pages.Servers.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -110,10 +113,10 @@ export default function ServersPage() {
             store={useServerStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Servers.title")}
+            title={t("Pages.Servers.title")}
             onAddClick={canCreateServers ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Servers.add_new")}
-            searchPlaceholder={t("Servers.search_servers")}
+            createLabel={t("Pages.Servers.add")}
+            searchPlaceholder={t("Pages.Servers.search")}
             count={servers?.length}
             hideOptions={servers?.length === 0}
           />
@@ -133,7 +136,7 @@ export default function ServersPage() {
                 data={sortedServers}
                 isLoading={loadingFetchServers}
                 error={error as Error | null}
-                emptyMessage={t("Servers.no_servers_found")}
+                emptyMessage={t("Pages.Servers.no_servers_found")}
                 renderItem={(server) => <ServerCard key={server.id} server={server} />}
                 gridCols="3"
               />
@@ -144,7 +147,7 @@ export default function ServersPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Servers.add_new")}
+          title={t("Pages.Servers.add")}
           formId="server-form"
           loadingSave={loadingSaveServer}
         >

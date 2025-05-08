@@ -321,7 +321,7 @@ export function JobListingForm({
           <FormSectionHeader
             title={t("JobListings.jobs_section.title")}
             subtitle={t("JobListings.jobs_section.subtitle")}
-            onCreateText={t("Jobs.add_new")}
+            onCreateText={t("Pages.Jobs.add")}
             onCreate={() => setIsJobDialogOpen(true)}
             isError={form.formState.errors.jobs as FieldError}
             onErrorText={t("JobListings.form.jobs.required")}
@@ -371,7 +371,7 @@ export function JobListingForm({
       <FormDialog
         open={isJobDialogOpen}
         onOpenChange={setIsJobDialogOpen}
-        title={t("Jobs.add_new")}
+        title={t("Pages.Jobs.add")}
         formId="job-form"
         loadingSave={isJobSaving}
       >

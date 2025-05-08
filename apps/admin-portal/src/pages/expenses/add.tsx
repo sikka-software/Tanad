@@ -43,15 +43,15 @@ export default function AddExpensePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Expenses.add_new")} />
+      <CustomPageMeta title={t("Pages.Expenses.add")} />
       <PageTitle
         formButtons
         formId="expense-form"
         loading={isLoading}
         onCancel={() => router.push("/expenses")}
         texts={{
-          title: t("Expenses.add_new"),
-          submit_form: t("Expenses.add_new"),
+          title: t("Pages.Expenses.add"),
+          submit_form: t("Pages.Expenses.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}

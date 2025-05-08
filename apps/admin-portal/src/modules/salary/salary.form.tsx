@@ -240,10 +240,10 @@ export function SalaryForm({
                       }}
                       texts={{
                         placeholder: t("Salaries.form.employee_name.placeholder"),
-                        searchPlaceholder: t("Employees.search_employees"),
+                        searchPlaceholder: t("Pages.Employees.search"),
                         noItems: t("Salaries.form.employee_name.no_employees"),
                       }}
-                      addText={t("Employees.add_new")}
+                      addText={t("Pages.Employees.add")}
                       onAddClick={() => setIsEmployeeDialogOpen(true)}
                     />
                   </FormControl>
@@ -492,7 +492,7 @@ export function SalaryForm({
       <FormDialog
         open={isEmployeeDialogOpen}
         onOpenChange={setIsEmployeeDialogOpen}
-        title={t("Employees.add_new")}
+        title={t("Pages.Employees.add")}
         formId="employee-form"
         loadingSave={isEmployeeSaving}
         dummyData={() => process.env.NODE_ENV === "development" && generateDummyEmployee()}

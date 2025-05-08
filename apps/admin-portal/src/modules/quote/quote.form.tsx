@@ -260,7 +260,7 @@ export function QuoteForm({
                           searchPlaceholder: t("Quotes.clients.search_clients"),
                           noItems: t("Quotes.clients.no_clients"),
                         }}
-                        addText={t("Clients.add_new")}
+                        addText={t("Pages.Clients.add")}
                         onAddClick={() => setIsDialogOpen(true)}
                       />
                     </FormControl>
@@ -487,7 +487,7 @@ export function QuoteForm({
       <FormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        title={t("Clients.add_new")}
+        title={t("Pages.Clients.add")}
         formId="client-form-quote"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}

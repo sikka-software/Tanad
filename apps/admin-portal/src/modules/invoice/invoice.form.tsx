@@ -486,7 +486,7 @@ export function InvoiceForm({
       <FormDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        title={t("Clients.add_new")}
+        title={t("Pages.Clients.add")}
         formId="client-form"
         cancelText={t("cancel")}
         submitText={t("save")}
@@ -496,7 +496,7 @@ export function InvoiceForm({
       <FormDialog
         open={isNewProductDialogOpen}
         onOpenChange={setIsNewProductDialogOpen}
-        title={t("Products.add_new")}
+        title={t("Pages.Products.add")}
         formId="product-form"
         cancelText={t("cancel")}
         submitText={t("save")}

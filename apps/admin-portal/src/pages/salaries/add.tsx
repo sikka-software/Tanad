@@ -26,8 +26,8 @@ export default function AddSalaryPage() {
         loading={loading}
         onCancel={() => router.push("/salaries")}
         texts={{
-          title: t("Salaries.add_new"),
-          submit_form: t("Salaries.add_new"),
+          title: t("Pages.Salaries.add"),
+          submit_form: t("Pages.Salaries.add"),
           cancel: t("General.cancel"),
         }}
         dummyButton={generateDummySalary}

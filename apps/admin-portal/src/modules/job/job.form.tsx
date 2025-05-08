@@ -260,7 +260,7 @@ export function JobForm({
                         searchPlaceholder: t("Departments.search_departments"),
                         noItems: t("Departments.no_departments"),
                       }}
-                      addText={t("Departments.add_new")}
+                      addText={t("Pages.Departments.add")}
                       onAddClick={() => {
                         setChosenForm("Departments");
                         setIsDepartmentDialogOpen(true);
@@ -287,10 +287,10 @@ export function JobForm({
                       onChange={(value) => field.onChange(value || null)}
                       texts={{
                         placeholder: t("Jobs.form.location.placeholder"),
-                        searchPlaceholder: t("Locations.search_locations"),
-                        noItems: t("Locations.no_locations"),
+                        searchPlaceholder: t("Pages.Locations.search"),
+                        noItems: t("Pages.Locations.no_locations"),
                       }}
-                      addText={t("Locations.add_new")}
+                      addText={t("Pages.Locations.add")}
                       onAddClick={() => setIsChooseLocationDialogOpen(true)}
                     />
                     {/* <Input placeholder={t("Jobs.form.location.placeholder")} {...field} /> */}
