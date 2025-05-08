@@ -1,4 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
+import { getNotesValue } from "@root/src/lib/utils";
 import { PlusCircle, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -13,7 +15,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Textarea } from "@/ui/textarea";
 
 import { createClient } from "@/utils/supabase/component";
 
@@ -28,7 +29,7 @@ import useDepartmentStore from "@/department/department.store";
 
 import { SALARY_COMPONENT_TYPES } from "@/employee/employee.options";
 import useEmployeeStore from "@/employee/employee.store";
-import type { Employee, EmployeeCreateData, EmployeeUpdateData } from "@/employee/employee.types";
+import type { EmployeeCreateData, EmployeeUpdateData } from "@/employee/employee.types";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -115,7 +116,7 @@ export function EmployeeForm({
       }),
       salary: z.array(salaryComponentSchema).optional(),
       status: z.enum(["active", "inactive", "on_leave", "terminated"]),
-      notes: z.string().optional(),
+      notes: z.string().optional().nullable(),
     });
   };
 
@@ -135,7 +136,7 @@ export function EmployeeForm({
       )
         ? defaultValues?.status
         : "active") as "active" | "inactive" | "on_leave" | "terminated",
-      notes: defaultValues?.notes ?? "",
+      notes: getNotesValue(defaultValues) || "",
     },
   });
 
@@ -155,7 +156,7 @@ export function EmployeeForm({
         phone: defaultValues.phone || "",
         salary:
           (defaultValues.salary as { type: string; amount: number }[] | undefined) || undefined,
-        notes: defaultValues.notes ?? "",
+        notes: getNotesValue(defaultValues) || "",
       });
     } else {
       // Optionally reset to empty if defaultValues becomes null (e.g., switching modes)
@@ -420,26 +421,6 @@ export function EmployeeForm({
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Employees.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("Employees.form.notes.placeholder")}
-                      className="min-h-[100px]"
-                      disabled={isEmployeeSaving}
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           <div className="bg-muted sticky top-12 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
@@ -535,6 +516,8 @@ export function EmployeeForm({
               {t("Employees.form.salary.total")}: {MoneyFormatter(totalSalary)}
             </div>
           </div>
+
+          <NotesSection control={form.control} title={t("Employees.form.notes.label")} />
         </form>
       </Form>
 

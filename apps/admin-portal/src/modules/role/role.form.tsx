@@ -1,12 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Shield } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/ui/accordion";
-import { Button } from "@/ui/button";
 import { Checkbox } from "@/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
@@ -18,8 +16,6 @@ import { ModuleFormProps } from "@/types/common.type";
 import useUserStore from "@/stores/use-user-store";
 
 import { usePermissions } from "../permission/permission.hooks";
-// Assuming Permission type looks like { id: string; name: string }
-// import type { Permission } from "../permission/permission.type";
 import type { Permission } from "../permission/permission.hooks";
 import { useCreateRole, useUpdateRole } from "./role.hooks";
 import useRoleStore from "./role.store";
@@ -38,18 +34,6 @@ const createRoleSchema = (t: (key: string) => string) =>
   });
 
 type FormData = z.infer<ReturnType<typeof createRoleSchema>>;
-
-interface RoleFormProps {
-  id?: string;
-  defaultValues?: {
-    name: string;
-    description: string | null;
-    permissions: string[];
-  };
-  onSuccess?: () => void;
-  editMode?: boolean;
-  formId?: string;
-}
 
 export function RoleForm({
   formHtmlId,

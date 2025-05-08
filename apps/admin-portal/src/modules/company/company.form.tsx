@@ -1,10 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { NotesEditor } from "@root/src/components/blocks/editor-x/notes-editor";
-import FormSectionHeader from "@root/src/components/forms/form-section-header";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { getNotesValue } from "@root/src/lib/utils";
-import { SerializedEditorState } from "lexical";
 import { useTranslations } from "next-intl";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -13,7 +10,6 @@ import * as z from "zod";
 import { DocumentFile } from "@/ui/documents-uploader";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
@@ -25,7 +21,7 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import { useCreateCompany, useUpdateCompany } from "@/company/company.hooks";
 import useCompanyStore from "@/company/company.store";
-import { Company, CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
+import { CompanyCreateData, CompanyUpdateData } from "@/company/company.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -75,7 +71,6 @@ export function CompanyForm({
       website: defaultValues?.website || "",
       industry: defaultValues?.industry || "",
       size: defaultValues?.size || "",
-      notes: getNotesValue(defaultValues) || "",
       status: defaultValues?.status || "active",
       short_address: defaultValues?.short_address || "",
       additional_number: defaultValues?.additional_number || "",
@@ -85,6 +80,7 @@ export function CompanyForm({
       region: defaultValues?.region || "",
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
+      notes: getNotesValue(defaultValues) || "",
     },
   });
 
@@ -335,24 +331,7 @@ export function CompanyForm({
           isLoading={isLoading}
         />
 
-        <FormSectionHeader inDialog={editMode} title={t("Companies.form.notes.label")} />
-        <div className="form-container">
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <NotesEditor
-                    editorSerializedState={field.value as unknown as SerializedEditorState}
-                    onSerializedChange={(value) => field.onChange(value)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <NotesSection control={form.control} title={t("Companies.form.notes.label")} />
       </form>
     </Form>
   );

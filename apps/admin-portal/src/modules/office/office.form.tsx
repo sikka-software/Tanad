@@ -1,7 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,7 +17,6 @@ import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
 import CodeInput from "@/components/ui/code-input";
 import PhoneInput from "@/components/ui/phone-input";
-import { Textarea } from "@/components/ui/textarea";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -26,7 +27,7 @@ import { useEmployees } from "../employee/employee.hooks";
 import useEmployeeStore from "../employee/employee.store";
 import { useCreateOffice, useOffices, useUpdateOffice } from "./office.hooks";
 import useOfficeStore from "./office.store";
-import { Office, OfficeCreateData, OfficeUpdateData } from "./office.type";
+import { OfficeCreateData, OfficeUpdateData } from "./office.type";
 
 const createOfficeSchema = (t: (key: string) => string) => {
   const baseOfficeSchema = z.object({
@@ -42,7 +43,7 @@ const createOfficeSchema = (t: (key: string) => string) => {
     status: z.enum(["active", "inactive"], {
       message: t("Offices.form.status.required"),
     }),
-    notes: z.string().optional().or(z.literal("")),
+    notes: z.string().optional().nullable(),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -90,6 +91,7 @@ export function OfficeForm({
       zip_code: defaultValues?.zip_code || "",
       manager: defaultValues?.manager || "",
       status: (defaultValues?.status as "active" | "inactive") || "active",
+      notes: getNotesValue(defaultValues),
     },
   });
 
@@ -122,6 +124,7 @@ export function OfficeForm({
               region: data.region?.trim() || undefined,
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
+              notes: data.notes?.trim() || undefined,
             },
           },
           {
@@ -153,6 +156,7 @@ export function OfficeForm({
             enterprise_id: membership.enterprise_id,
             status: "active",
             user_id: user.id,
+            notes: data.notes?.trim() || undefined,
           },
           {
             onSuccess: async (response) => {
@@ -342,30 +346,13 @@ export function OfficeForm({
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vendors.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("Vendors.form.notes.placeholder")}
-                      {...field}
-                      value={field.value ?? ""}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
           <AddressFormSection
             title={t("Offices.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
+          <NotesSection control={form.control} title={t("Offices.form.notes.label")} />
         </form>
       </Form>
       <FormDialog

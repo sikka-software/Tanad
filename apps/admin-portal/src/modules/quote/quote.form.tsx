@@ -1,10 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import FormSectionHeader from "@root/src/components/forms/form-section-header";
+import NotesSection from "@root/src/components/forms/notes-section";
+import { getNotesValue } from "@root/src/lib/utils";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState, RefObject } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -17,7 +20,6 @@ import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table";
-import { Textarea } from "@/ui/textarea";
 
 import { createClient } from "@/utils/supabase/component";
 
@@ -47,7 +49,7 @@ export interface QuoteFormValues {
   status: string;
   tax_rate: number;
   subtotal?: number;
-  notes?: string;
+  notes?: string | null;
   items: QuoteItem[];
 }
 
@@ -76,7 +78,7 @@ export function QuoteForm({
     expiry_date: z.string().min(1, t("Quotes.validation.expiry_date_required")),
     status: z.string().min(1, t("Quotes.validation.status_required")),
     tax_rate: z.number().min(0, t("Quotes.validation.tax_rate_positive")),
-    notes: z.string().optional(),
+    notes: z.string().optional().nullable(),
     items: z
       .array(
         z.object({
@@ -108,14 +110,14 @@ export function QuoteForm({
   const form = useForm<z.input<typeof quoteSchema>>({
     resolver: zodResolver(quoteSchema),
     defaultValues: {
-      client_id: "",
-      quote_number: "",
-      issue_date: "",
-      expiry_date: "",
-      status: "draft",
-      tax_rate: 0,
-      notes: "",
-      items: [],
+      client_id: defaultValues?.client_id || "",
+      quote_number: defaultValues?.quote_number || "",
+      issue_date: defaultValues?.issue_date || "",
+      expiry_date: defaultValues?.expiry_date || "",
+      status: defaultValues?.status || "draft",
+      tax_rate: defaultValues?.tax_rate || 0,
+      notes: getNotesValue(defaultValues),
+      items: defaultValues?.items || [],
     },
   });
 
@@ -443,235 +445,224 @@ export function QuoteForm({
   return (
     <>
       <Form {...form}>
-        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="client_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Quotes.form.client.label")} *</FormLabel>
-                  <FormControl>
-                    <ComboboxAdd
-                      data={clientOptions}
-                      isLoading={clientsLoading}
-                      defaultValue={field.value}
-                      onChange={(value) => field.onChange(value || null)}
-                      renderOption={(option) => {
-                        return (
-                          <div className="flex items-center gap-2">
-                            <span>{option.label}</span>
-                            <span className="text-sm text-gray-500">{option.description}</span>
-                          </div>
-                        );
-                      }}
-                      texts={{
-                        placeholder: t("Quotes.form.client.placeholder"),
-                        searchPlaceholder: t("Quotes.clients.search_clients"),
-                        noItems: t("Quotes.clients.no_clients"),
-                      }}
-                      addText={t("Clients.add_new")}
-                      onAddClick={() => setIsDialogOpen(true)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="form-container">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="client_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Quotes.form.client.label")} *</FormLabel>
+                    <FormControl>
+                      <ComboboxAdd
+                        data={clientOptions}
+                        isLoading={clientsLoading}
+                        defaultValue={field.value}
+                        onChange={(value) => field.onChange(value || null)}
+                        renderOption={(option) => {
+                          return (
+                            <div className="flex items-center gap-2">
+                              <span>{option.label}</span>
+                              <span className="text-sm text-gray-500">{option.description}</span>
+                            </div>
+                          );
+                        }}
+                        texts={{
+                          placeholder: t("Quotes.form.client.placeholder"),
+                          searchPlaceholder: t("Quotes.clients.search_clients"),
+                          noItems: t("Quotes.clients.no_clients"),
+                        }}
+                        addText={t("Clients.add_new")}
+                        onAddClick={() => setIsDialogOpen(true)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="quote_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Quotes.form.quote_number.label")} *</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t("Quotes.form.quote_number.placeholder")} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <SubtotalDisplay />
-
-            <FormField
-              control={form.control}
-              name="tax_rate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Quotes.tax_rate")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max="100"
-                      {...field}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        field.onChange(isNaN(value) ? 0 : value);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="issue_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Quotes.form.issue_date.label")} *</FormLabel>
-                  <DatePicker
-                    date={field.value ? new Date(field.value) : undefined}
-                    onSelect={(date) =>
-                      field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")
-                    }
-                    placeholder={t("Quotes.form.issue_date.placeholder")}
-                    ariaInvalid={form.formState.errors.issue_date !== undefined}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="expiry_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Quotes.form.expiry_date.label")} *</FormLabel>
-                  <DatePicker
-                    date={field.value ? new Date(field.value) : undefined}
-                    onSelect={(date) =>
-                      field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")
-                    }
-                    placeholder={t("Quotes.form.expiry_date.placeholder")}
-                    ariaInvalid={form.formState.errors.expiry_date !== undefined}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Quotes.form.status.title")} *</FormLabel>
-                <Select
-                  defaultValue={field.value}
-                  onValueChange={field.onChange}
-                  dir={locale === "ar" ? "rtl" : "ltr"}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("Quotes.form.status.placeholder")} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="draft">{t("Quotes.form.status.draft")}</SelectItem>
-                    <SelectItem value="sent">{t("Quotes.form.status.sent")}</SelectItem>
-                    <SelectItem value="accepted">{t("Quotes.form.status.accepted")}</SelectItem>
-                    <SelectItem value="rejected">{t("Quotes.form.status.rejected")}</SelectItem>
-                    <SelectItem value="expired">{t("Quotes.form.status.expired")}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Products Section with Table */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium">{t("Quotes.products.title")}</h3>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  append({ product_id: "", description: "", quantity: "1", unit_price: "" })
-                }
-              >
-                <PlusCircle className="me-2 h-4 w-4" />
-                {t("Quotes.products.add_product")}
-              </Button>
+              <FormField
+                control={form.control}
+                name="quote_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Quotes.form.quote_number.label")} *</FormLabel>
+                    <FormControl>
+                      <Input placeholder={t("Quotes.form.quote_number.placeholder")} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <SubtotalDisplay />
 
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <TableHead key={header.id}>
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows.length ? (
-                    table.getRowModel().rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
+              <FormField
+                control={form.control}
+                name="tax_rate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Quotes.tax_rate")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        max="100"
+                        {...field}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          field.onChange(isNaN(value) ? 0 : value);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="issue_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Quotes.form.issue_date.label")} *</FormLabel>
+                    <DatePicker
+                      date={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) =>
+                        field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")
+                      }
+                      placeholder={t("Quotes.form.issue_date.placeholder")}
+                      ariaInvalid={form.formState.errors.issue_date !== undefined}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="expiry_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("Quotes.form.expiry_date.label")} *</FormLabel>
+                    <DatePicker
+                      date={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) =>
+                        field.onChange(date ? format(date as Date, "yyyy-MM-dd") : "")
+                      }
+                      placeholder={t("Quotes.form.expiry_date.placeholder")}
+                      ariaInvalid={form.formState.errors.expiry_date !== undefined}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("Quotes.form.status.title")} *</FormLabel>
+                  <Select
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("Quotes.form.status.placeholder")} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="draft">{t("Quotes.form.status.draft")}</SelectItem>
+                      <SelectItem value="sent">{t("Quotes.form.status.sent")}</SelectItem>
+                      <SelectItem value="accepted">{t("Quotes.form.status.accepted")}</SelectItem>
+                      <SelectItem value="rejected">{t("Quotes.form.status.rejected")}</SelectItem>
+                      <SelectItem value="expired">{t("Quotes.form.status.expired")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormSectionHeader title={t("Quotes.form.header")} />
+          <div className="form-container">
+            {/* Products Section with Table */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">{t("Quotes.products.title")}</h3>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    append({ product_id: "", description: "", quantity: "1", unit_price: "" })
+                  }
+                >
+                  <PlusCircle className="me-2 h-4 w-4" />
+                  {t("Quotes.products.add_product")}
+                </Button>
+              </div>
+
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <TableRow key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => (
+                          <TableHead key={header.id}>
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableHead>
                         ))}
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={columns.length} className="h-24 text-center">
-                        {t("Quotes.products.no_products")}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                    ))}
+                  </TableHeader>
+                  <TableBody>
+                    {table.getRowModel().rows.length ? (
+                      table.getRowModel().rows.map((row) => (
+                        <TableRow key={row.id}>
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={columns.length} className="h-24 text-center">
+                          {t("Quotes.products.no_products")}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="flex items-center justify-between md:col-start-2">
+                <span className="text-sm font-medium">{t("Quotes.subtotal")}</span>
+                <span className="text-sm">${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center justify-between md:col-start-2">
+                <span className="text-sm font-medium">{t("Quotes.tax")}</span>
+                <span className="text-sm">${tax.toFixed(2)}</span>
+              </div>
+              <div className="flex items-center justify-between md:col-start-2">
+                <span className="text-sm font-medium">{t("Quotes.total")}</span>
+                <span className="text-sm font-bold">${total.toFixed(2)}</span>
+              </div>
             </div>
           </div>
-
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Quotes.notes")}</FormLabel>
-                <FormControl>
-                  <Textarea placeholder={t("Quotes.enter_notes")} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="flex items-center justify-between md:col-start-2">
-              <span className="text-sm font-medium">{t("Quotes.subtotal")}</span>
-              <span className="text-sm">${subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex items-center justify-between md:col-start-2">
-              <span className="text-sm font-medium">{t("Quotes.tax")}</span>
-              <span className="text-sm">${tax.toFixed(2)}</span>
-            </div>
-            <div className="flex items-center justify-between md:col-start-2">
-              <span className="text-sm font-medium">{t("Quotes.total")}</span>
-              <span className="text-sm font-bold">${total.toFixed(2)}</span>
-            </div>
-          </div>
+          <NotesSection control={form.control} title={t("Quotes.notes")} />
         </form>
       </Form>
 

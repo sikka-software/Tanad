@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -31,7 +32,7 @@ export const createProductSchema = (t: (key: string) => string) =>
         t("Products.form.price.invalid"),
       ),
     sku: z.string().optional(),
-    notes: z.string().optional(),
+    notes: z.string().optional().nullable(),
     stock_quantity: z
       .string()
       .min(1, t("Products.form.stock_quantity.required"))
@@ -267,24 +268,8 @@ export function ProductForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Companies.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.notes.placeholder")}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
+        <NotesSection control={form.control} title={t("Products.form.notes.label")} />
       </form>
     </Form>
   );

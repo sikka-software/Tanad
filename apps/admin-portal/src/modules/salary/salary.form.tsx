@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -14,7 +14,6 @@ import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Textarea } from "@/ui/textarea";
 
 import { generateDummyEmployee } from "@/lib/dummy-factory";
 
@@ -29,7 +28,7 @@ import { useCreateSalary, useUpdateSalary } from "@/salary/salary.hooks";
 import useSalaryStore from "@/salary/salary.store";
 
 import { DEDUCTION_TYPES } from "./salary.options";
-import { Salary, SalaryCreateData, SalaryUpdateData } from "./salary.type";
+import { SalaryCreateData, SalaryUpdateData } from "./salary.type";
 
 const createDeductionSchema = (t: (key: string) => string) =>
   z
@@ -75,7 +74,7 @@ const createSalarySchema: (t: (key: string) => string) => z.ZodObject<any> = (t)
       .array(createDeductionSchema(t))
       .transform((arr) => arr.filter((item) => item.type.trim() !== "" || item.amount !== 0))
       .default([]),
-    notes: z.string().optional(),
+    notes: z.string().optional().nullable(),
   });
 
 // This type will have numbers for amounts due to the .transform()
@@ -481,27 +480,8 @@ export function SalaryForm({
                 </Button>
               </div>
             </div>
-
-            {/* Notes */}
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Salaries.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("Salaries.form.notes.placeholder")}
-                      {...field}
-                      value={field.value ?? ""}
-                      disabled={loading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
+          <NotesSection control={form.control} title={t("Salaries.form.notes.label")} />
         </form>
       </Form>
 

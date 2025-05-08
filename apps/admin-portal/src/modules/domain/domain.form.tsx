@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CurrencyInput } from "@root/src/components/ui/currency-input";
+import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -9,20 +9,16 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Textarea } from "@/ui/textarea";
 
-import { AddressFormSection } from "@/components/forms/address-form-section";
-import { createAddressSchema } from "@/components/forms/address-schema";
-import CodeInput from "@/components/ui/code-input";
-import PhoneInput from "@/components/ui/phone-input";
+import NotesSection from "@/components/forms/notes-section";
 
 import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useDomains, useCreateDomain, useUpdateDomain } from "./domain.hooks";
+import { useCreateDomain, useUpdateDomain } from "./domain.hooks";
 import useDomainStore from "./domain.store";
-import { Domain, DomainUpdateData, DomainCreateData } from "./domain.type";
+import { DomainUpdateData, DomainCreateData } from "./domain.type";
 
 export const createDomainSchema = (t: (key: string) => string) => {
   const baseDomainSchema = z.object({
@@ -31,8 +27,8 @@ export const createDomainSchema = (t: (key: string) => string) => {
     monthly_cost: z.number().optional().or(z.literal("")),
     annual_cost: z.number().optional().or(z.literal("")),
     payment_cycle: z.string().min(1, t("Domains.form.payment_cycle.required")),
-    notes: z.string().optional().or(z.literal("")),
     status: z.string().min(1, t("Domains.form.status.required")),
+    notes: z.string().optional().nullable(),
   });
 
   return baseDomainSchema;
@@ -74,7 +70,7 @@ export function DomainForm({
       annual_cost: defaultValues?.annual_cost || 0,
       payment_cycle: defaultValues?.payment_cycle || "monthly",
       status: defaultValues?.status || "active",
-      notes: defaultValues?.notes || "",
+      notes: getNotesValue(defaultValues) || "",
     },
   });
 
@@ -282,25 +278,8 @@ export function DomainForm({
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Domains.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Domains.form.notes.placeholder")}
-                    className="min-h-[120px]"
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
+        <NotesSection control={form.control} title={t("Domains.form.notes.label")} />
       </form>
     </Form>
   );

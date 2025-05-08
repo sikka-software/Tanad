@@ -97,9 +97,7 @@ export default function AddQuotePage() {
         }}
       />
 
-      <div className="mx-auto max-w-2xl p-4">
-        <QuoteForm formHtmlId="quote-form" onSuccess={() => router.push("/quotes")} />
-      </div>
+      <QuoteForm formHtmlId="quote-form" onSuccess={() => router.push("/quotes")} />
     </div>
   );
 }

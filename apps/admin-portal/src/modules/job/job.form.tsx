@@ -3,7 +3,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -28,13 +27,11 @@ import { ModuleFormProps } from "@/types/common.type";
 
 import { useCreateJob, useUpdateJob } from "@/job/job.hooks";
 import useJobStore from "@/job/job.store";
-import { Job, JobUpdateData, JobCreateData } from "@/job/job.type";
+import { JobUpdateData, JobCreateData } from "@/job/job.type";
 
 import DepartmentForm from "@/department/department.form";
 import { useDepartments } from "@/department/department.hooks";
 import useDepartmentStore from "@/department/department.store";
-
-// import { generateDummyDepartment } from "@/lib/dummy-factory"; // Commented out for now
 
 import useUserStore from "@/stores/use-user-store";
 

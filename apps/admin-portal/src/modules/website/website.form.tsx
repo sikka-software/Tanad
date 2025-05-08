@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -7,7 +8,8 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Textarea } from "@/ui/textarea";
+
+import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -15,12 +17,12 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateWebsite, useUpdateWebsite } from "./website.hooks";
 import useWebsiteStore from "./website.store";
-import { WebsiteUpdateData, WebsiteCreateData, Website } from "./website.type";
+import { WebsiteUpdateData, WebsiteCreateData } from "./website.type";
 
 export const createWebsiteSchema = (t: (key: string) => string) => {
   return z.object({
     domain_name: z.string().min(1, t("Websites.form.domain_name.required")),
-    notes: z.string().optional().or(z.literal("")),
+    notes: z.string().optional().nullable(),
     status: z
       .enum(["active", "inactive"], {
         required_error: t("Websites.form.status.required"),
@@ -51,7 +53,7 @@ export function WebsiteForm({
     resolver: zodResolver(createWebsiteSchema(t)),
     defaultValues: {
       domain_name: defaultValues?.domain_name || "",
-      notes: defaultValues?.notes || "",
+      notes: getNotesValue(defaultValues),
       status: (defaultValues?.status as "active" | "inactive") || "active",
     },
   });
@@ -187,26 +189,8 @@ export function WebsiteForm({
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Websites.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("Websites.form.notes.placeholder")}
-                      className="min-h-[100px]"
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
+          <NotesSection control={form.control} title={t("Websites.form.notes.label")} />
         </form>
       </Form>
     </div>

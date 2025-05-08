@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { Combobox } from "@root/src/components/ui/combobox";
 import { countries } from "@root/src/lib/constants/countries";
+import { getNotesValue } from "@root/src/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -8,7 +10,6 @@ import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import { Textarea } from "@/ui/textarea";
 
 import { SERVER_OS, SERVER_PROVIDERS } from "@/lib/constants";
 
@@ -18,7 +19,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateServer, useUpdateServer } from "./server.hooks";
 import useServerStore from "./server.store";
-import { Server, ServerCreateData, ServerUpdateData } from "./server.type";
+import { ServerCreateData, ServerUpdateData } from "./server.type";
 
 export const createServerSchema = (t: (key: string) => string) =>
   z.object({
@@ -29,9 +30,9 @@ export const createServerSchema = (t: (key: string) => string) =>
     os: z.string().optional().or(z.literal("")),
     status: z.string().optional().or(z.literal("")),
     tags: z.array(z.string()).optional().or(z.literal("")),
-    notes: z.string().optional().or(z.literal("")),
     user_id: z.string().optional().or(z.literal("")),
     enterprise_id: z.string().optional().or(z.literal("")),
+    notes: z.string().optional().nullable(),
   });
 
 export type ServerFormValues = z.input<ReturnType<typeof createServerSchema>>;
@@ -63,7 +64,7 @@ export function ServerForm({
       tags: Array.isArray(defaultValues?.tags)
         ? defaultValues.tags.filter((tag): tag is string => typeof tag === "string")
         : [],
-      notes: defaultValues?.notes || "",
+      notes: getNotesValue(defaultValues),
       user_id: defaultValues?.user_id || "",
       enterprise_id: defaultValues?.enterprise_id || "",
     },
@@ -160,7 +161,7 @@ export function ServerForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+        <div className="form-container">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -291,25 +292,8 @@ export function ServerForm({
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Servers.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Servers.form.notes.placeholder")}
-                    className="min-h-[120px]"
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
+        <NotesSection control={form.control} title={t("Servers.form.notes.label")} />
       </form>
     </Form>
   );

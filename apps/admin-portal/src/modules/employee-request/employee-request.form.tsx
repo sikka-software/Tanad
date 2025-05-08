@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -17,7 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
 
-import { cn } from "@/lib/utils";
+import { cn, getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -47,7 +48,7 @@ const createRequestSchema = (t: (key: string) => string) =>
     start_date: z.date().optional(),
     end_date: z.date().optional(),
     amount: z.number().optional(),
-    notes: z.string().optional(),
+    notes: z.string().optional().nullable(),
   });
 
 // Infer the type from the Zod schema for form values
@@ -95,7 +96,7 @@ export function EmployeeRequestForm({
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
       amount: defaultValues?.amount || undefined,
-      notes: defaultValues?.notes || "",
+      notes: getNotesValue(defaultValues),
     },
   });
 
@@ -371,25 +372,8 @@ export function EmployeeRequestForm({
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("EmployeeRequests.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder={t("EmployeeRequests.form.notes.placeholder")}
-                      disabled={isLoadingSave}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
+          <NotesSection control={form.control} title={t("EmployeeRequests.form.notes.label")} />
         </form>
       </Form>
 

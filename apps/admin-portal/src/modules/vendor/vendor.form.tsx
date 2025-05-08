@@ -1,4 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
+import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,7 +11,6 @@ import { ComboboxAdd } from "@/ui/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
-import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
@@ -17,16 +18,13 @@ import PhoneInput from "@/components/ui/phone-input";
 
 import { ModuleFormProps } from "@/types/common.type";
 
-import {
-  CompanyForm,
-  type CompanyFormValues as CompanyFormValuesType,
-} from "@/company/company.form";
+import { CompanyForm } from "@/company/company.form";
 import { useCompanies } from "@/company/company.hooks";
 import type { Company } from "@/company/company.type";
 
 import { useCreateVendor, useUpdateVendor } from "@/vendor/vendor.hooks";
 import useVendorStore from "@/vendor/vendor.store";
-import type { Vendor, VendorCreateData, VendorUpdateData } from "@/vendor/vendor.type";
+import type { VendorCreateData, VendorUpdateData } from "@/vendor/vendor.type";
 
 import useUserStore from "@/stores/use-user-store";
 
@@ -36,7 +34,7 @@ export const createVendorSchema = (t: (key: string) => string) => {
     email: z.string().email(t("Vendors.form.email.invalid")),
     phone: z.string().min(1, t("Vendors.form.phone.required")),
     company: z.string().optional(),
-    notes: z.string().nullable(),
+    notes: z.string().optional().nullable(),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -67,18 +65,18 @@ export function VendorForm({
   const form = useForm<VendorFormValues>({
     resolver: zodResolver(createVendorSchema(t)),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      short_address: "",
-      building_number: "",
-      street_name: "",
-      city: "",
-      region: "",
-      country: "",
-      zip_code: "",
-      notes: "",
+      name: defaultValues?.name || "",
+      email: defaultValues?.email || "",
+      phone: defaultValues?.phone || "",
+      company: defaultValues?.company || "",
+      short_address: defaultValues?.short_address || "",
+      building_number: defaultValues?.building_number || "",
+      street_name: defaultValues?.street_name || "",
+      city: defaultValues?.city || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
+      zip_code: defaultValues?.zip_code || "",
+      notes: getNotesValue(defaultValues),
     },
   });
 
@@ -146,10 +144,10 @@ export function VendorForm({
             region: data.region?.trim() || undefined,
             country: data.country?.trim() || undefined,
             zip_code: data.zip_code?.trim() || undefined,
-            notes: data.notes?.trim() || null,
             enterprise_id: membership?.enterprise_id || "",
             user_id: profile?.id || "",
             updated_at: new Date().toISOString(),
+            notes: data.notes?.trim() || null,
           },
           {
             onSuccess: async () => {
@@ -260,25 +258,6 @@ export function VendorForm({
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Vendors.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("Vendors.form.notes.placeholder")}
-                      {...field}
-                      value={field.value ?? ""}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           <AddressFormSection
@@ -286,6 +265,8 @@ export function VendorForm({
             control={form.control}
             isLoading={isLoading}
           />
+
+          <NotesSection control={form.control} title={t("Vendors.form.notes.label")} />
         </form>
       </Form>
 

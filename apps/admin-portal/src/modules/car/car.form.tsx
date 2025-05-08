@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CurrencyInput } from "@root/src/components/ui/currency-input";
+import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -7,16 +7,14 @@ import * as z from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Textarea } from "@/ui/textarea";
 
 import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useCars, useCreateCar, useUpdateCar } from "./car.hooks";
+import { useCreateCar, useUpdateCar } from "./car.hooks";
 import useCarStore from "./car.store";
-import { Car, CarUpdateData, CarCreateData } from "./car.type";
+import { CarUpdateData, CarCreateData } from "./car.type";
 
 export const createCarSchema = (t: (key: string) => string) => {
   const baseCarSchema = z.object({
@@ -29,6 +27,7 @@ export const createCarSchema = (t: (key: string) => string) => {
     code: z.string().optional().or(z.literal("")),
     license_country: z.string().optional().or(z.literal("")),
     license_plate: z.string().optional().or(z.literal("")),
+    notes: z.string().optional().nullable(),
   });
 
   return baseCarSchema;
@@ -53,7 +52,7 @@ export function CarForm({
   const lang = useLocale();
 
   const user = useUserStore((state) => state.user);
-  const membership = useUserStore((state) => state.membership);
+  const enterprise = useUserStore((state) => state.enterprise);
 
   const { mutate: createCar } = useCreateCar();
   const { mutate: updateCar } = useUpdateCar();
@@ -73,6 +72,7 @@ export function CarForm({
       code: defaultValues?.code || "",
       license_country: defaultValues?.license_country || "",
       license_plate: defaultValues?.license_plate || "",
+      notes: getNotesValue(defaultValues),
     },
   });
 
@@ -98,6 +98,7 @@ export function CarForm({
               color: data.color?.trim() || "",
               vin: data.vin?.trim() || "",
               code: data.code?.trim() || "",
+              notes: data.notes || "",
               license_country: data.license_country?.trim() || "",
               license_plate: data.license_plate?.trim() || "",
             },
@@ -122,7 +123,11 @@ export function CarForm({
             code: data.code?.trim() || "",
             license_country: data.license_country?.trim() || "",
             license_plate: data.license_plate?.trim() || "",
+            notes: data.notes || "",
+            user_id: user?.id || "",
+            enterprise_id: enterprise?.id || "",
           },
+
           {
             onSuccess: async (response) => {
               if (onSuccess) {

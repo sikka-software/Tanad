@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,10 +10,10 @@ import { ComboboxAdd } from "@/ui/combobox-add";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
-import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
+import NotesSection from "@/components/forms/notes-section";
 import PhoneInput from "@/components/ui/phone-input";
 
 import { ModuleFormProps } from "@/types/common.type";
@@ -35,7 +36,7 @@ export const createClientSchema = (t: (key: string) => string) => {
       .email(t("Clients.form.validation.email_invalid")),
     phone: z.string().min(1, t("Clients.form.validation.phone_required")),
     company: z.string().nullish(),
-    notes: z.string().optional(),
+    notes: z.string().optional().nullable(),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -76,7 +77,7 @@ export function ClientForm({
       region: defaultValues?.region || "",
       country: defaultValues?.country || "",
       zip_code: defaultValues?.zip_code || "",
-      notes: defaultValues?.notes || "",
+      notes: getNotesValue(defaultValues) || "",
     },
   });
 
@@ -255,23 +256,6 @@ export function ClientForm({
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Clients.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t("Clients.form.notes.placeholder")}
-                      rows={4}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           <AddressFormSection
@@ -279,6 +263,7 @@ export function ClientForm({
             control={form.control}
             isLoading={isLoading}
           />
+          <NotesSection control={form.control} title={t("Clients.form.notes.label")} />
         </form>
       </Form>
 

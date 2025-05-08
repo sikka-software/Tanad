@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { Combobox } from "@root/src/components/ui/combobox";
 import { E_COMMERCE_PLATFORMS } from "@root/src/lib/constants";
+import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -9,7 +11,6 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Textarea } from "@/ui/textarea";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -23,7 +24,7 @@ export const createOnlineStoreSchema = (t: (key: string) => string) => {
   const baseOnlineStoreSchema = z.object({
     domain_name: z.string().min(1, t("OnlineStores.form.domain_name.required")),
     platform: z.string().min(1, t("OnlineStores.form.platform.required")),
-    notes: z.string().optional().or(z.literal("")),
+    notes: z.string().optional().nullable(),
     status: z.string().min(1, t("OnlineStores.form.status.required")),
   });
 
@@ -61,8 +62,8 @@ export function OnlineStoreForm({
     defaultValues: {
       domain_name: defaultValues?.domain_name || "",
       status: defaultValues?.status || "active",
-      notes: defaultValues?.notes || "",
       platform: defaultValues?.platform || "",
+      notes: getNotesValue(defaultValues),
     },
   });
 
@@ -130,7 +131,7 @@ export function OnlineStoreForm({
   return (
     <Form {...form}>
       <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+        <div className="form-container">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
@@ -209,25 +210,8 @@ export function OnlineStoreForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("OnlineStores.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("OnlineStores.form.notes.placeholder")}
-                    className="min-h-[120px]"
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
+        <NotesSection control={form.control} title={t("OnlineStores.form.notes.label")} />
       </form>
     </Form>
   );

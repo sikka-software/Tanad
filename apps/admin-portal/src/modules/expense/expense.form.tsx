@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -9,9 +10,10 @@ import { DatePicker } from "@/ui/date-picker";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Textarea } from "@/ui/textarea";
 
 import CodeInput from "@/components/ui/code-input";
+
+import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
@@ -19,7 +21,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateExpense, useUpdateExpense, useExpenses } from "./expense.hooks";
 import useExpenseStore from "./expense.store";
-import { Expense, ExpenseCreateData, ExpenseUpdateData } from "./expense.type";
+import { ExpenseCreateData, ExpenseUpdateData } from "./expense.type";
 
 export const createExpenseSchema = (t: (key: string) => string) =>
   z.object({
@@ -29,7 +31,7 @@ export const createExpenseSchema = (t: (key: string) => string) =>
     status: z.enum(["pending", "paid", "overdue"]).default("pending"),
     amount: z.number().min(0, t("Expenses.form.amount.required")),
     category: z.string().min(1, t("Expenses.form.category.required")),
-    notes: z.string().optional().or(z.literal("")),
+    notes: z.string().optional().nullable(),
     client_id: z.string().optional(),
   });
 
@@ -61,7 +63,7 @@ export function ExpenseForm({
       status: (defaultValues?.status || "pending") as "pending" | "paid" | "overdue",
       amount: defaultValues?.amount || 0,
       category: defaultValues?.category || "",
-      notes: defaultValues?.notes || "",
+      notes: getNotesValue(defaultValues),
       // client_id: defaultValues?.client_id || "",
     },
   });
@@ -287,25 +289,9 @@ export function ExpenseForm({
             </FormItem>
           )}
         /> */}
-
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Expenses.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Expenses.form.notes.placeholder")}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
+
+        <NotesSection control={form.control} title={t("Expenses.form.notes.label")} />
       </form>
     </Form>
   );

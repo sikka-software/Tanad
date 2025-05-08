@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NotesEditor } from "@root/src/components/blocks/editor-x/notes-editor";
 import FormSectionHeader from "@root/src/components/forms/form-section-header";
+import NotesSection from "@root/src/components/forms/notes-section";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
@@ -367,25 +368,7 @@ export function BranchForm({
             control={form.control}
             isLoading={isLoading}
           />
-
-          <FormSectionHeader title={t("Branches.form.notes.label")} />
-          <div className="form-container">
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <NotesEditor
-                      editorSerializedState={field.value as unknown as SerializedEditorState}
-                      onSerializedChange={(value) => field.onChange(value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <NotesSection control={form.control} title={t("Branches.form.notes.label")} />
         </form>
       </Form>
 

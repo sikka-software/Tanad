@@ -1,22 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { PlusCircle, Trash2 } from "lucide-react";
+import NotesSection from "@root/src/components/forms/notes-section";
+import { getNotesValue } from "@root/src/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/router";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-import { Button } from "@/ui/button";
 import { ComboboxAdd } from "@/ui/combobox-add";
 import { DatePicker } from "@/ui/date-picker";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { FormDialog } from "@/ui/form-dialog";
 import { Input } from "@/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Textarea } from "@/ui/textarea";
 
 import { createClient } from "@/utils/supabase/component";
 
@@ -28,18 +25,9 @@ import { ModuleFormProps } from "@/types/common.type";
 import { ClientForm } from "@/client/client.form";
 
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
-import {
-  Invoice,
-  InvoiceItem,
-  InvoiceUpdateData,
-  InvoiceCreateData,
-} from "@/modules/invoice/invoice.type";
+import { InvoiceUpdateData, InvoiceCreateData } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
-import { CompanyFormValues } from "../company/company.form";
-import { useUpdateCompany } from "../company/company.hooks";
-import { createCompany, updateCompany } from "../company/company.service";
-import useCompanyStore from "../company/company.store";
 import { useCreateInvoice, useUpdateInvoice } from "../invoice/invoice.hooks";
 import useInvoiceStore from "../invoice/invoice.store";
 import { ProductForm } from "../product/product.form";
@@ -57,21 +45,21 @@ const createInvoiceSchema = (t: (key: string) => string) =>
     status: z.enum(["draft", "sent", "paid", "partially_paid", "overdue", "void"]),
     subtotal: z.number().min(0, t("Invoices.form.subtotal.required")),
     tax_rate: z.number().min(0, t("Invoices.form.tax_rate.required")),
-    notes: z.string().optional(),
+    notes: z.string().optional().nullable(),
     items: z
       .array(
         z.object({
           product_id: z.string().optional(),
           description: z.string(),
           quantity: z
-            .string()
+            .number()
             .min(1, t("Invoices.form.quantity.required"))
             .refine(
               (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
               t("Invoices.form.quantity.required"),
             ),
           unit_price: z
-            .string()
+            .number()
             .min(1, t("Invoices.form.price.required"))
             .refine(
               (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
@@ -116,15 +104,24 @@ export function InvoiceForm({
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(createInvoiceSchema(t)),
     defaultValues: {
-      client_id: "",
-      invoice_number: "",
-      issue_date: new Date(),
-      due_date: undefined,
-      status: "draft",
-      subtotal: 0,
-      tax_rate: 0,
-      notes: "",
-      items: [{ product_id: "", description: "", quantity: "1", unit_price: "0" }],
+      client_id: defaultValues?.client_id || "",
+      invoice_number: defaultValues?.invoice_number || "",
+      issue_date: defaultValues?.issue_date || new Date(),
+      due_date: defaultValues?.due_date,
+      status:
+        (defaultValues?.status as
+          | "draft"
+          | "sent"
+          | "paid"
+          | "partially_paid"
+          | "overdue"
+          | "void") || "draft",
+      subtotal: defaultValues?.subtotal || 0,
+      tax_rate: defaultValues?.tax_rate || 0,
+      notes: getNotesValue(defaultValues),
+      items: defaultValues?.items || [
+        { product_id: "", description: "", quantity: 1, unit_price: "0" },
+      ],
     },
   });
 
@@ -467,20 +464,6 @@ export function InvoiceForm({
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Invoices.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder={t("Invoices.form.notes.placeholder")} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           {/* Use the new ProductFormSection component */}
@@ -494,18 +477,7 @@ export function InvoiceForm({
             title={t("Invoices.products.title")}
             isLoading={loading}
           />
-          {/* <div className="mt-4 text-right">
-            <div className="text-sm text-gray-600">
-              Tax Amount: ${((form.watch("subtotal") * form.watch("tax_rate")) / 100).toFixed(2)}
-            </div>
-            <div className="text-lg font-semibold">
-              Total: $
-              {(
-                form.watch("subtotal") +
-                (form.watch("subtotal") * form.watch("tax_rate")) / 100
-              ).toFixed(2)}
-            </div>
-          </div> */}
+          <NotesSection control={form.control} title={t("Invoices.form.notes.label")} />
         </form>
       </Form>
 

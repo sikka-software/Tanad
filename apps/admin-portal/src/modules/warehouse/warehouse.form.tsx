@@ -1,4 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NotesSection from "@root/src/components/forms/notes-section";
+import { getNotesValue } from "@root/src/lib/utils";
 import { useLocale, useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -6,7 +8,6 @@ import { z } from "zod";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
-import { Textarea } from "@/ui/textarea";
 
 import { AddressFormSection } from "@/components/forms/address-form-section";
 import { createAddressSchema } from "@/components/forms/address-schema";
@@ -19,7 +20,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { useCreateWarehouse, useUpdateWarehouse, useWarehouses } from "./warehouse.hooks";
 import useWarehouseStore from "./warehouse.store";
-import { Warehouse, WarehouseCreateData, WarehouseUpdateData } from "./warehouse.type";
+import { WarehouseCreateData, WarehouseUpdateData } from "./warehouse.type";
 
 export const createWarehouseFormSchema = (t: (key: string) => string) => {
   const baseWarehouseFormSchema = z.object({
@@ -28,7 +29,7 @@ export const createWarehouseFormSchema = (t: (key: string) => string) => {
     phone: z.string().optional(),
     capacity: z.string().optional(),
     status: z.string().default("active"),
-    notes: z.string().optional(),
+    notes: z.string().optional().nullable(),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -59,18 +60,18 @@ export function WarehouseForm({
   const form = useForm<WarehouseFormValues>({
     resolver: zodResolver(createWarehouseFormSchema(t)),
     defaultValues: {
-      name: "",
-      code: "",
-      short_address: "",
-      building_number: "",
-      street_name: "",
-      city: "",
-      region: "",
-      country: "",
-      zip_code: "",
-      capacity: "",
-      status: "active",
-      notes: "",
+      name: defaultValues?.name || "",
+      code: defaultValues?.code || "",
+      short_address: defaultValues?.short_address || "",
+      building_number: defaultValues?.building_number || "",
+      street_name: defaultValues?.street_name || "",
+      city: defaultValues?.city || "",
+      region: defaultValues?.region || "",
+      country: defaultValues?.country || "",
+      zip_code: defaultValues?.zip_code || "",
+      capacity: defaultValues?.capacity ? String(defaultValues.capacity) : "",
+      status: defaultValues?.status || "active",
+      notes: getNotesValue(defaultValues),
     },
   });
 
@@ -258,30 +259,14 @@ export function WarehouseForm({
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="notes"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("Warehouses.form.notes.label")}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder={t("Warehouses.form.notes.placeholder")}
-                    className="min-h-[120px]"
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
         <AddressFormSection
           title={t("Warehouses.form.address.label")}
           control={form.control}
           isLoading={isLoading}
         />
+
+        <NotesSection control={form.control} title={t("Warehouses.form.notes.label")} />
       </form>
     </Form>
   );

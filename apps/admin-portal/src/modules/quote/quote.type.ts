@@ -1,29 +1,10 @@
 import type { Database } from "@/lib/database.types";
 
-import { Client } from "@/client/client.type";
+export type QuoteItem = Database["public"]["Tables"]["quote_items"]["Row"];
 
 // Define the base type from the database row
-type QuoteRow = Database["public"]["Tables"]["quotes"]["Row"];
-type QuoteItemRow = Database["public"]["Tables"]["quote_items"]["Row"];
-
-// Extend the base type to include the related Client object
-export type Quote = QuoteRow & {
-  client?: Client; // Making it optional in case the join is sometimes omitted
+export type Quote = Database["public"]["Tables"]["quotes"]["Row"] & {
+  items?: QuoteItem[];
 };
-
-export interface QuoteItem {
-  id: string;
-  quote_id: string;
-  product_id?: string;
-  description: string;
-  quantity: number;
-  unit_price: number;
-}
-
-export type QuoteCreateData = Omit<Quote, "id" | "created_at" | "client"> & {
-  user_id?: string;
-};
-
-export type QuoteUpdateData = Partial<Quote>;
-export type QuoteItemCreateData = Omit<QuoteItem, "id">;
-export type QuoteItemUpdateData = Database["public"]["Tables"]["quote_items"]["Update"];
+export type QuoteCreateData = Database["public"]["Tables"]["quotes"]["Insert"];
+export type QuoteUpdateData = Database["public"]["Tables"]["quotes"]["Update"];
