@@ -455,15 +455,11 @@ export function PaymentDialog({
         }),
       );
 
-      // Use router.push to refresh the page with minimal delay
-      router.push({
-        pathname: "/billing",
-        query: { refresh: Date.now() }, // Add timestamp to force full refresh
-      });
+      // Remove both router.push calls - no need to refresh the page
     } catch (error) {
       console.error("Error in data refresh:", error);
 
-      // Even if refresh fails, still show success and refresh the page
+      // Even if refresh fails, still show success
       toast.dismiss(loadingToast);
       toast.success(
         t("Billing.payment.success", {
@@ -471,11 +467,7 @@ export function PaymentDialog({
         }),
       );
 
-      // Force page refresh as fallback
-      router.push({
-        pathname: "/billing",
-        query: { refresh: Date.now() },
-      });
+      // Remove the router.push fallback - no page refresh needed
     }
   };
 

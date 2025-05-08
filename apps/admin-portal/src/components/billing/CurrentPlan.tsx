@@ -17,6 +17,7 @@ import useUserStore from "@/stores/use-user-store";
 
 import { BillingHistoryDialog } from "./BillingHistoryDialog";
 import { ConfirmCancelSubscriptionDialog } from "./ConfirmCancelSubscription";
+import { ConfirmReactivateSubscriptionDialog } from "./ConfirmReactivateSubscription";
 
 // Create a pub/sub event for subscription updates
 export const SUBSCRIPTION_UPDATED_EVENT = "subscription_updated";
@@ -34,9 +35,11 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
   const { getPlans } = usePricing(TANAD_PRODUCT_ID);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isReactivateDialogOpen, setIsReactivateDialogOpen] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState<number>(Date.now());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
+  const [isReactivating, setIsReactivating] = useState(false);
 
   // Add a function to handle forced refresh with router
   const forcePageRefresh = () => {
@@ -152,6 +155,64 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
     }
   };
 
+  // Add handler for reactivating subscription
+  const handleReactivateSubscription = async () => {
+    if (!subscription.id || !subscription.cancelAt) {
+      toast.error(
+        t("Billing.no_subscription_to_reactivate", {
+          fallback: "No subscription available to reactivate",
+        }),
+      );
+      return;
+    }
+
+    // Check for profile-based subscription
+    if (subscription.id === "profile-based") {
+      toast.error(
+        t("Billing.profile_based_reactivation_error", {
+          fallback:
+            "Cannot reactivate a subscription that's only in your profile. Please contact support.",
+        }),
+      );
+      return;
+    }
+
+    setIsReactivating(true);
+    try {
+      const response = await subscription.reactivateSubscription();
+
+      if (response.success) {
+        toast.success(
+          t("Billing.reactivate_subscription.success", {
+            fallback: "Your subscription has been reactivated successfully",
+          }),
+        );
+
+        // Refresh data to update UI
+        await refreshData();
+
+        // Close the dialog
+        setIsReactivateDialogOpen(false);
+      } else {
+        toast.error(
+          response.error ||
+            t("Billing.error_reactivating_subscription", {
+              fallback: "Error reactivating subscription",
+            }),
+        );
+      }
+    } catch (error) {
+      console.error("Error reactivating subscription:", error);
+      toast.error(
+        t("Billing.error_reactivating_subscription", {
+          fallback: "Error reactivating subscription",
+        }),
+      );
+    } finally {
+      setIsReactivating(false);
+    }
+  };
+
   // Use the isPageLoading prop to determine loading state
   // If isPageLoading is provided, use it; otherwise fall back to subscription.loading
   const isLoading = isPageLoading !== undefined ? isPageLoading : subscription.loading || !user;
@@ -200,6 +261,13 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
   };
 
   const nextBillingDate = formatNextBillingDate();
+
+  // Get plan name for display
+  const planName = subscription.planLookupKey
+    ? t(`Billing.${subscription.planLookupKey}`, {
+        fallback: subscription.name || "Subscription Plan",
+      })
+    : t("Billing.tanad_free", { fallback: "Free Plan" });
 
   return (
     <>
@@ -293,15 +361,13 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
             )}
 
           {/* Reactivate subscription button for canceled subscriptions */}
-          {subscription.cancelAt && (
+          {subscription.cancelAt && subscription.id !== "profile-based" && (
             <div className="mt-4">
               <Button
                 variant="outline"
                 size="sm"
                 className="text-primary border-primary/30 hover:bg-primary/10 flex items-center gap-1"
-                onClick={() => {
-                  // Add reactivation logic here if needed
-                }}
+                onClick={() => setIsReactivateDialogOpen(true)}
               >
                 <Undo2 className="h-4 w-4" />
                 {t("Billing.reactivate_subscription", { fallback: "إعادة تفعيل الاشتراك" })}
@@ -324,6 +390,15 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
         onOpenChange={setIsCancelDialogOpen}
         isCanceling={isCanceling}
         onConfirm={handleCancelSubscription}
+      />
+
+      {/* Reactivate Subscription Dialog */}
+      <ConfirmReactivateSubscriptionDialog
+        open={isReactivateDialogOpen}
+        onOpenChange={setIsReactivateDialogOpen}
+        isReactivating={isReactivating}
+        onConfirm={handleReactivateSubscription}
+        planName={planName}
       />
     </>
   );
