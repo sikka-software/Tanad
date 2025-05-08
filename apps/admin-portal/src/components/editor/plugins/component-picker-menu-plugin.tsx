@@ -116,7 +116,7 @@ export function ComponentPickerMenuPlugin({
                             }}
                             className={cn(
                               "z-[199] flex items-center gap-2",
-                              // selectedIndex === index ? "bg-accent" : "!bg-transparent",
+                              selectedIndex === index ? "bg-accent" : "!bg-transparent",
                             )}
                           >
                             {option.icon}

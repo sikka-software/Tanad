@@ -1,3 +1,4 @@
+import { cn } from "@root/src/lib/utils";
 import { PlusCircle } from "lucide-react";
 import { FieldError } from "react-hook-form";
 
@@ -13,6 +14,7 @@ const FormSectionHeader = ({
   onError,
   isError,
   onErrorText,
+  inDialog,
 }: {
   title: string;
   subtitle?: string;
@@ -22,9 +24,15 @@ const FormSectionHeader = ({
   onError?: any;
   isError?: FieldError | boolean;
   onErrorText?: string;
+  inDialog?: boolean;
 }) => {
   return (
-    <div className="sticky top-12 z-10 flex !min-h-12 w-full flex-col items-center justify-between">
+    <div
+      className={cn(
+        inDialog ? "top-0" : "top-12",
+        "sticky z-10 flex !min-h-12 w-full flex-col items-center justify-between",
+      )}
+    >
       <div className="bg-muted sticky top-12 z-10 flex !min-h-12 w-full items-center justify-between gap-4 border-y px-2">
         <div className="flex flex-col">
           <div className="flex flex-row items-center gap-2">

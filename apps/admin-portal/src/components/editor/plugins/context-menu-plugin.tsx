@@ -14,6 +14,7 @@ import {
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, JSX } from "react";
 import * as React from "react";
+import { toast } from "sonner";
 
 import { Command, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -66,7 +67,7 @@ export function ContextMenuPlugin(): JSX.Element {
               name: "clipboard-read",
             });
             if (permission.state === "denied") {
-              alert("Not allowed to paste from clipboard.");
+              toast.warning("Not allowed to paste from clipboard.");
               return;
             }
 
@@ -92,7 +93,7 @@ export function ContextMenuPlugin(): JSX.Element {
             });
 
             if (permission.state === "denied") {
-              alert("Not allowed to paste from clipboard.");
+              toast.warning("Not allowed to paste from clipboard.");
               return;
             }
 

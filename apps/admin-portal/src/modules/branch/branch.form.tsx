@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Editor } from "@root/src/components/blocks/editor-x/editor";
+import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
@@ -200,7 +201,8 @@ export function BranchForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-          <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4">
+          {/* <FormSectionHeader inDialog title={t("Branches.form.details.label")} /> */}
+          <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
@@ -358,35 +360,6 @@ export function BranchForm({
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("Branches.form.notes.label")}</FormLabel>
-                  <FormControl>
-                    <Editor
-                      editorSerializedState={field.value as unknown as SerializedEditorState}
-                      onSerializedChange={(value) => field.onChange(value)}
-                    />
-                    {/* <RichNotes
-                      placeholder={t("Branches.form.notes.placeholder")}
-                      className="min-h-[120px]"
-                      {...field}
-                      disabled={isLoading}
-                    /> */}
-                    {/* <Textarea
-                      placeholder={t("Branches.form.notes.placeholder")}
-                      className="min-h-[120px]"
-                      {...field}
-                      disabled={isLoading}
-                    /> */}
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           <AddressFormSection
@@ -394,6 +367,25 @@ export function BranchForm({
             control={form.control}
             isLoading={isLoading}
           />
+
+          <FormSectionHeader title={t("Branches.form.notes.label")} />
+          <div className="form-container">
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Editor
+                      editorSerializedState={field.value as unknown as SerializedEditorState}
+                      onSerializedChange={(value) => field.onChange(value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </form>
       </Form>
 
