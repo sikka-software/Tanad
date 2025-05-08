@@ -23,7 +23,14 @@ export default function AddPurchasePage() {
     const dummyData = generateDummyData();
     const form = (window as any).purchaseForm;
     if (form) {
-      form.setValue("purchase_number", dummyData.randomNumber);
+      form.setValue("purchase_number", dummyData.randomString);
+      form.setValue("description", dummyData.randomString);
+      form.setValue("amount", dummyData.randomNumber);
+      form.setValue("category", dummyData.randomString);
+      form.setValue("status", dummyData.randomPicker(["pending", "paid", "overdue", "cancelled"]));
+      form.setValue("issue_date", String(dummyData.randomDate));
+      form.setValue("due_date", String(dummyData.randomDate));
+      form.setValue("incurred_at", String(dummyData.randomDate));
     }
   };
 
@@ -54,7 +61,7 @@ export default function AddPurchasePage() {
   );
 }
 
-AddPurchasePage.messages = ["Pages", "Purchases", "General"];
+AddPurchasePage.messages = ["Pages", "Purchases", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

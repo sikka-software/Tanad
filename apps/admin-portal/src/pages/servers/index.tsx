@@ -112,7 +112,7 @@ export default function ServersPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Servers.title")}
             onAddClick={canCreateServers ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Servers.create_new")}
+            createLabel={t("Servers.add_new")}
             searchPlaceholder={t("Servers.search_servers")}
             count={servers?.length}
             hideOptions={servers?.length === 0}

@@ -117,7 +117,7 @@ export default function OnlineStoresPage() {
             onAddClick={
               canCreateOnlineStores ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("OnlineStores.create_new")}
+            createLabel={t("OnlineStores.add_new")}
             searchPlaceholder={t("OnlineStores.search_online_stores")}
             count={onlineStores?.length}
             hideOptions={onlineStores?.length === 0}

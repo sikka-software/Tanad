@@ -126,7 +126,7 @@ export default function BranchesPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Branches.title")}
             onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Branches.create_new")}
+            createLabel={t("Branches.add_new")}
             searchPlaceholder={t("Branches.search_branches")}
             count={displayData?.length}
             hideOptions={displayData?.length === 0}

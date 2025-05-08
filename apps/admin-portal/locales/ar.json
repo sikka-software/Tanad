@@ -1889,7 +1889,6 @@
     "no_description": "لا يوجد وصف",
     "sku_label": "رمز المنتج: {value}",
     "stock_label": "المخزون: {value}",
-    "create_new": "إنشاء فاتورة",
     "creating": "جاري الإنشاء...",
     "no_invoices_found": "لم يتم العثور على فواتير",
     "add_first_invoice": "أضف أول فاتورة",
@@ -2464,7 +2463,6 @@
     "edit_branch": "تعديل الفرع",
     "update_branch": "تحديث الفرع",
     "branch_details": "تفاصيل الفرع",
-    "create_new": "إنشاء فرع",
     "no_branches_found": "لا توجد فروع",
     "search_branches": "بحث عن فروع...",
     "description": "الوصف",
@@ -3826,10 +3824,60 @@
     "update_purchase": "تحديث المشترية",
     "search_purchases": "بحث عن المشتريات",
     "purchase_details": "تفاصيل المشترية",
+    "no_purchases_found": "لم يتم العثور على مشتريات",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {مشترية} =1 {هذه المشترية} other {# مشتريات}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {مشترية} =1 {هذه المشترية} other {# مشتريات}}",
     "form": {
-      
+      "purchase_number": {
+        "label": "رقم الشراء",
+        "placeholder": "أدخل رقم الشراء",
+        "required": "رقم الشراء مطلوب"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "أدخل الوصف",
+        "required": "الوصف مطلوب"
+      },
+      "amount": {
+        "label": "المبلغ",
+        "placeholder": "أدخل المبلغ",
+        "required": "المبلغ مطلوب",
+        "invalid": "المبلغ غير صالح",
+        "positive": "يجب أن يكون المبلغ رقمًا موجبًا"
+      },
+      "category": {
+        "label": "الفئة",
+        "placeholder": "أدخل الفئة",
+        "required": "الفئة مطلوبة"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "required": "الحالة مطلوبة",
+        "pending": "قيد الانتظار",
+        "paid": "مدفوع",
+        "overdue": "متأخر",
+        "cancelled": "ملغى"
+      },
+      "issue_date": {
+        "label": "تاريخ الإصدار",
+        "placeholder": "أدخل تاريخ الإصدار",
+        "invalid": "تاريخ الإصدار غير صالح"
+      },
+      "due_date": {
+        "label": "تاريخ الاستحقاق",
+        "placeholder": "أدخل تاريخ الاستحقاق",
+        "invalid": "تاريخ الاستحقاق غير صالح"
+      },
+      "incurred_at": {
+        "label": "تاريخ التحمل",
+        "placeholder": "أدخل تاريخ التحمل",
+        "invalid": "تاريخ التحمل غير صالح"
+      },
+      "notes": {
+        "label": "ملاحظات",
+        "placeholder": "أدخل ملاحظاتك هنا"
+      }
     },
     "success": {
       "create": "تم إنشاء المشترية بنجاح",
@@ -4047,13 +4095,10 @@
     "title": "الإنترنت"
   },
   "Domains": {
-    "title": "النطاقات",
-    "add_new": "نطاق جديد",
     "edit_domain": "تعديل النطاق",
     "update_domain": "تحديث النطاق",
     "singular": "نطاق",
     "domain_details": "تفاصيل النطاق",
-    "create_new": "إنشاء نطاق",
     "no_domains_found": "لا توجد نطاقات",
     "search_domains": "بحث عن نطاقات...",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {نطاق} =1 {هذا النطاق} other {# نطاقات}}؟",
@@ -4126,7 +4171,6 @@
     "edit_website": "تعديل الموقع الإلكتروني",
     "update_website": "تحديث الموقع الإلكتروني",
     "description": "إدارة مواقع الويب الخاصة بك.",
-    "create_new": "إنشاء موقع إلكتروني جديد",
     "search_websites": "بحث في المواقع الإلكترونية...",
     "no_websites_found": "لم يتم العثور على مواقع إلكترونية.",
     "edit_title": "تعديل الموقع الإلكتروني",
@@ -4186,11 +4230,9 @@
   },
   "Servers": {
     "title": "الخوادم",
-    "add_new": "خادم جديد",
     "edit_server": "تعديل الخادم",
     "singular": "خادم",
     "server_details": "تفاصيل الخادم",
-    "create_new": "إنشاء خادم",
     "no_servers_found": "لا توجد خوادم",
     "search_servers": "بحث عن خوادم...",
     "manager": "المدير",
@@ -4271,12 +4313,10 @@
   },
   "OnlineStores": {
     "title": "المتاجر الإلكترونية",
-    "add_new": "متجر إلكتروني جديد",
     "edit_online_store": "تعديل المتجر الإلكتروني",
     "update_online_store": "تحديث المتجر الإلكتروني",
     "singular": "متجر إلكتروني",
     "online_store_details": "تفاصيل المتجر الإلكتروني",
-    "create_new": "إنشاء متجر إلكتروني جديد",
     "no_online_stores_found": "لا توجد متاجر إلكترونية",
     "search_online_stores": "بحث عن متاجر إلكترونية...",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {متجر} =1 {هذا المتجر الإلكتروني} other {# متاجر إلكترونية}}؟",
@@ -4343,7 +4383,6 @@
     "title": "السيارات",
     "description": "إدارة جميع سياراتك من مكان واحد.",
     "add_new": "إضافة سيارة جديدة",
-    "create_new": "إنشاء سيارة جديدة",
     "edit_car": "تعديل السيارة",
     "singular": "سيارة",
     "search_cars": "ابحث في السيارات...",

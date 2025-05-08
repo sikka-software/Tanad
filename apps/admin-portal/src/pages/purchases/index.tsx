@@ -127,7 +127,7 @@ export default function PurchasesPage() {
             onAddClick={
               canCreatePurchases ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Purchases.create_new")}
+            createLabel={t("Purchases.add_new")}
             searchPlaceholder={t("Purchases.search_purchases")}
             count={displayData?.length}
             hideOptions={displayData?.length === 0}
@@ -188,7 +188,7 @@ export default function PurchasesPage() {
   );
 }
 
-PurchasesPage.messages = ["Pages", "Purchases", "General"];
+PurchasesPage.messages = ["Pages", "Purchases", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

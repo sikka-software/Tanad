@@ -122,7 +122,7 @@ export default function WebsitesPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Websites.title")}
             onAddClick={canCreateWebsites ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Websites.create_new")}
+            createLabel={t("Websites.add_new")}
             searchPlaceholder={t("Websites.search_websites")}
             count={displayData?.length}
             hideOptions={displayData?.length === 0}

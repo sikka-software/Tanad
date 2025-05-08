@@ -107,7 +107,7 @@ export default function CarsPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Cars.title")}
             onAddClick={canCreateCars ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Cars.create_new")}
+            createLabel={t("Cars.add_new")}
             searchPlaceholder={t("Cars.search_cars")}
             count={cars?.length}
             hideOptions={cars?.length === 0}

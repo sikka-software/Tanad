@@ -113,7 +113,7 @@ export default function InvoicesPage() {
             filterableFields={FILTERABLE_FIELDS}
             title={t("Invoices.title")}
             onAddClick={canCreateInvoices ? () => router.push("/invoices/add") : undefined}
-            createLabel={t("Invoices.create_new")}
+            createLabel={t("Invoices.add_new")}
             searchPlaceholder={t("Invoices.search_invoices")}
             count={invoices?.length}
             hideOptions={invoices?.length === 0}
