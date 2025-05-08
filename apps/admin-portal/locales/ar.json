@@ -234,6 +234,42 @@
     "report_issue_thank_you": "شكراً لك على إبلاغك",
     "report_issue_description_thank_you": "تم إبلاغ فريقنا وسيتم التحقق من هذا الخطأ في الميعاد القريب."
   },
+  "Titles": {
+    "Dashboard": "لوحة التحكم",
+    "Analytics": "التحليلات",
+    "Help": "المساعدة",
+    "Products": "المنتجات",
+    "Invoices": "الفواتير",
+    "Sales": "المبيعات",
+    "Quotes": "عروض الأسعار",
+    "EmployeeRequests": "طلبات الموظفين",
+    "Clients": "العملاء",
+    "Warehouses": "المستودعات",
+    "Branches": "الفروع",
+    "Vendors": "الموردين",
+    "Attendance": "الحضور",
+    "Users": "المستخدمين",
+    "Locations": "المواقع",
+    "Offices": "المكاتب",
+    "Employees": "الموظفين",
+    "AllEmployees": "جميع الموظفين",
+    "Roles": "الأدوار",
+    "Permissions": "الصلاحيات",
+    "Departments": "الأقسام",
+    "Jobs": "الوظائف",
+    "ActivityLogs": "سجلات النشاط",
+    "Cars": "السيارات",
+    "Companies": "الشركات",
+    "Domains": "النطاقات",
+    "Expenses": "المصروفات",
+    "JobListings": "صفحات التوظيف",
+    "OnlineStores": "المتاجر الإلكترونية",
+    "Purchases": "المشتريات",
+    "Salaries": "الرواتب",
+    "Servers": "الخوادم",
+    "Trucks": "الشاحنات",
+    "Websites": "المواقع الإلكترونية"
+  },
   "Flags": {
     "timezone_soon": {
       "title": "قريباً",
@@ -244,6 +280,7 @@
       "description": "شغالين على ربط جميع الأوقات بالتقويم الهجري"
     }
   },
+
   "SEO": {
     "landing": {
       "title": "العمود الفقري لتجارتك",

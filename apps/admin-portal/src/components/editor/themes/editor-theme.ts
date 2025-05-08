@@ -1,6 +1,6 @@
 import { EditorThemeClasses } from "lexical";
 
-import "./editor-theme.css";
+import "./editor-theme.module.css";
 
 export const editorTheme: EditorThemeClasses = {
   root: "!bg-transparent",

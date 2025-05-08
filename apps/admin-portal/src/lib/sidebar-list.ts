@@ -75,14 +75,14 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
   return [
     {
       title: "Dashboard",
-      translationKey: "Dashboard.title",
+      translationKey: "Titles.Dashboard",
       url: "/dashboard",
       icon: LayoutDashboard,
       is_active: pathname.startsWith("/dashboard"),
     },
     {
       title: "Analytics",
-      translationKey: "Analytics.title",
+      translationKey: "Titles.Analytics",
       url: "/analytics",
       icon: BarChart,
       is_active: pathname.startsWith("/analytics"),
@@ -90,7 +90,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
     },
     {
       title: "Activity Logs",
-      translationKey: "ActivityLogs.title",
+      translationKey: "Titles.ActivityLogs",
       url: "/activity",
       icon: TableOfContents,
       is_active: pathname.startsWith("/activity"),
@@ -99,7 +99,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
 
     {
       title: "Contacts",
-      translationKey: "Contacts.title",
+      translationKey: "Titles.Contacts",
       url: "/contacts",
       icon: Users,
       is_active: pathname.startsWith("/contacts"),
@@ -107,7 +107,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
       items: [
         {
           title: "All Contacts",
-          translationKey: "Contacts.all",
+          translationKey: "Titles.AllContacts",
           is_active: pathname === "/contacts",
           url: "/contacts",
           requiredPermission: "contacts.read",
@@ -140,7 +140,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
     },
     {
       title: "Locations",
-      translationKey: "Locations.title",
+      translationKey: "Titles.Locations",
       url: "/locations",
       icon: MapPin,
       is_active: pathname.startsWith("/warehouses") || pathname.startsWith("/branches"),
@@ -212,7 +212,7 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
     },
     {
       title: "Storage",
-      translationKey: "Storage.title",
+      translationKey: "Titles.Storage",
       url: "",
       icon: Package,
       is_active: pathname.startsWith("/products"),
@@ -259,7 +259,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
       items: [
         {
           title: ModulesOptions.employees.label,
-          translationKey: "Employees.allEmployees",
+          translationKey: "Titles.AllEmployees",
           url: ModulesOptions.employees.url,
           action: ModulesOptions.employees.url + "/add",
           is_active: pathname === ModulesOptions.employees.url,
@@ -313,7 +313,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
     },
     {
       title: "Recruitment",
-      translationKey: "Recruitment.title",
+      translationKey: "Titles.Recruitment",
       url: "",
       icon: FileUser,
       is_active: pathname.startsWith("/recruitment"),
