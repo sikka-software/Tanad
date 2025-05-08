@@ -29,7 +29,7 @@ export const createWarehouseFormSchema = (t: (key: string) => string) => {
     phone: z.string().optional(),
     capacity: z.string().optional(),
     status: z.string().default("active"),
-    notes: z.string().optional().nullable(),
+    notes:z.any().optional().nullable(),
   });
 
   const addressSchema = createAddressSchema(t);

@@ -4,7 +4,7 @@ import { getNotesValue } from "@root/src/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { useForm, useFieldArray, FieldValues } from "react-hook-form";
+import { useForm, useFieldArray, FieldValues, FieldError } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -45,7 +45,7 @@ const createInvoiceSchema = (t: (key: string) => string) =>
     status: z.enum(["draft", "sent", "paid", "partially_paid", "overdue", "void"]),
     subtotal: z.number().min(0, t("Invoices.form.subtotal.required")),
     tax_rate: z.number().min(0, t("Invoices.form.tax_rate.required")),
-    notes: z.string().optional().nullable(),
+    notes: z.any().optional().nullable(),
     items: z
       .array(
         z.object({
@@ -473,6 +473,7 @@ export function InvoiceForm({
             handleProductSelection={handleProductSelection}
             title={t("Invoices.products.title")}
             isLoading={loading}
+            isError={form.formState.errors.items as FieldError}
           />
           <NotesSection control={form.control} title={t("Invoices.form.notes.label")} />
         </form>

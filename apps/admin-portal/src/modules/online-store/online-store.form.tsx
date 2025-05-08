@@ -24,7 +24,7 @@ export const createOnlineStoreSchema = (t: (key: string) => string) => {
   const baseOnlineStoreSchema = z.object({
     domain_name: z.string().min(1, t("OnlineStores.form.domain_name.required")),
     platform: z.string().min(1, t("OnlineStores.form.platform.required")),
-    notes: z.string().optional().nullable(),
+    notes:z.any().optional().nullable(),
     status: z.string().min(1, t("OnlineStores.form.status.required")),
   });
 

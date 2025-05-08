@@ -78,7 +78,7 @@ export function QuoteForm({
     expiry_date: z.string().min(1, t("Quotes.validation.expiry_date_required")),
     status: z.string().min(1, t("Quotes.validation.status_required")),
     tax_rate: z.number().min(0, t("Quotes.validation.tax_rate_positive")),
-    notes: z.string().optional().nullable(),
+    notes:z.any().optional().nullable(),
     items: z
       .array(
         z.object({

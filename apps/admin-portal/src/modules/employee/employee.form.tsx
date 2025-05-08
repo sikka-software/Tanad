@@ -116,7 +116,7 @@ export function EmployeeForm({
       }),
       salary: z.array(salaryComponentSchema).optional(),
       status: z.enum(["active", "inactive", "on_leave", "terminated"]),
-      notes: z.string().optional().nullable(),
+      notes:z.any().optional().nullable(),
     });
   };
 

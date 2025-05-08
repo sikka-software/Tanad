@@ -32,7 +32,7 @@ export const createProductSchema = (t: (key: string) => string) =>
         t("Products.form.price.invalid"),
       ),
     sku: z.string().optional(),
-    notes: z.string().optional().nullable(),
+    notes:z.any().optional().nullable(),
     stock_quantity: z
       .string()
       .min(1, t("Products.form.stock_quantity.required"))

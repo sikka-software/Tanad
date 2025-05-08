@@ -32,7 +32,7 @@ export const createServerSchema = (t: (key: string) => string) =>
     tags: z.array(z.string()).optional().or(z.literal("")),
     user_id: z.string().optional().or(z.literal("")),
     enterprise_id: z.string().optional().or(z.literal("")),
-    notes: z.string().optional().nullable(),
+    notes:z.any().optional().nullable(),
   });
 
 export type ServerFormValues = z.input<ReturnType<typeof createServerSchema>>;

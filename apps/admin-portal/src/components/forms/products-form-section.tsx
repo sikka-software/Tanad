@@ -6,6 +6,7 @@ import type {
   UseFieldArrayAppend,
   UseFieldArrayRemove,
   FieldArrayWithId,
+  FieldError,
 } from "react-hook-form";
 import { useFormContext, useWatch } from "react-hook-form";
 
@@ -33,6 +34,7 @@ interface ProductFormSectionProps {
   handleProductSelection: (index: number, productId: string) => void; // Function to handle product selection
   title: string;
   isLoading?: boolean;
+  isError?: FieldError;
 }
 
 // --- Helper Types ---
@@ -82,13 +84,12 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
     canDelete,
   }) => {
     const currency = useUserStore((state) => state.profile?.user_settings.currency);
-    // Call hooks consistently within the Row component instance
     const quantity = useWatch({ control, name: `items.${index}.quantity` });
     const unitPrice = useWatch({ control, name: `items.${index}.unit_price` });
-    const subtotal =
-      quantity && unitPrice
-        ? (parseFloat(quantity || "0") * parseFloat(unitPrice || "0")).toFixed(2)
-        : "0.00";
+
+    const subtotalNumber =
+      typeof quantity === "number" && typeof unitPrice === "number" ? quantity * unitPrice : 0;
+    const subtotal = subtotalNumber.toFixed(2);
 
     return (
       <TableRow key={field.id}>
@@ -114,13 +115,13 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                       if (value && productsData) {
                         const selectedProduct = productsData.find((p) => p.id === value);
                         if (selectedProduct) {
-                          setValue(`items.${index}.unit_price`, selectedProduct.price.toString(), {
+                          setValue(`items.${index}.unit_price`, selectedProduct.price, {
                             shouldValidate: true,
                             shouldDirty: true,
                           });
                         }
                       }
-                      handleProductSelection(index, value);
+                      handleProductSelection(index, value as string);
                     }}
                     renderOption={(option) => (
                       <div className="flex w-full flex-row items-center justify-between gap-2">
@@ -183,8 +184,19 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                 <FormControl>
                   <CurrencyInput
                     showCommas={true}
-                    value={formField.value ? parseFloat(formField.value) : undefined}
-                    onChange={(value) => formField.onChange(value?.toString() || "")}
+                    value={formField.value}
+                    onChange={(valueFromInput) => {
+                      let numValue: number | undefined;
+                      if (typeof valueFromInput === "string") {
+                        numValue = parseFloat(valueFromInput);
+                      } else if (typeof valueFromInput === "number") {
+                        numValue = valueFromInput;
+                      } else {
+                        // Handles undefined, null, etc. by setting numValue to undefined effectively leading to NaN check
+                        numValue = parseFloat(valueFromInput as any); // Let parseFloat produce NaN for undefined/null
+                      }
+                      formField.onChange(isNaN(numValue as number) ? undefined : numValue);
+                    }}
                     placeholder={t("Invoices.products.unit_price.placeholder")}
                     disabled={isLoading}
                   />
@@ -218,7 +230,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
         {/* Subtotal */}
         <TableCell>
           <div className="flex flex-row items-center gap-1 text-right">
-            {MoneyFormatter(parseFloat(subtotal))}
+            {MoneyFormatter(subtotalNumber)}
             {getCurrencySymbol(currency || "sar").symbol}
           </div>
         </TableCell>
@@ -255,6 +267,7 @@ export function ProductsFormSection({
   handleProductSelection,
   title,
   isLoading = false,
+  isError,
 }: ProductFormSectionProps) {
   const t = useTranslations();
   const { setValue } = useFormContext<FormValues>();
@@ -278,6 +291,8 @@ export function ProductsFormSection({
         onCreate={() => append({ product_id: "", description: "", quantity: "1", unit_price: "0" })}
         onCreateText={t("Invoices.products.add_product")}
         onCreateDisabled={isLoading}
+        isError={isError}
+        onErrorText={t("Invoices.products.required")}
       />
       {/* Table Section */}
       <div className="p-4">
