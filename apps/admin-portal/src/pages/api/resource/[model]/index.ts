@@ -178,7 +178,93 @@ const modelMap: Record<string, ModelConfig> = {
       },
     },
   },
-  quotes: { tableName: "quotes" },
+  quotes: {
+    tableName: "quotes",
+    customHandlers: {
+      GET: async (supabase: SupabaseClient<Database>, user_id: string, req: NextApiRequest) => {
+        const { data: membership, error: enterpriseError } = await supabase
+          .from("memberships")
+          .select("enterprise_id")
+          .eq("profile_id", user_id)
+          .maybeSingle();
+
+        if (enterpriseError) {
+          console.error("Error fetching enterprise ID for quote GET:", enterpriseError);
+          throw new Error("Failed to retrieve enterprise association");
+        }
+        if (!membership?.enterprise_id) {
+          throw new Error("User is not associated with an enterprise.");
+        }
+        const enterprise_id = membership.enterprise_id;
+
+        const { data, error } = await supabase
+          .from("quotes")
+          .select("*, client:clients(*)")
+          .eq("enterprise_id", enterprise_id)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching quotes with clients:", error);
+          throw error;
+        }
+        return data;
+      },
+      POST: async (
+        supabase: SupabaseClient<Database>,
+        user_id: string,
+        enterprise_id: string,
+        req: NextApiRequest,
+      ) => {
+        const { items, ...quoteData } = req.body;
+
+        if (!Array.isArray(items) || items.length === 0) {
+          throw new Error("Quote must contain at least one item.");
+        }
+
+        const valuesToInsert = {
+          ...quoteData,
+          created_by: user_id,
+          enterprise_id: enterprise_id,
+        };
+
+        const { data: createdQuote, error: quoteError } = await supabase
+          .from("quotes")
+          .insert(valuesToInsert)
+          .select()
+          .single();
+
+        if (quoteError) {
+          console.error("Error inserting quote:", quoteError);
+          throw quoteError;
+        }
+
+        if (!createdQuote || !createdQuote.id) {
+          console.error("Failed to create quote or get ID");
+          throw new Error("Failed to create quote record.");
+        }
+
+        const quoteItemsToInsert = items.map((item: any) => ({
+          quote_id: createdQuote.id,
+          product_id: item.product_id || null,
+          description: item.description || "",
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+        }));
+
+        const { error: itemsError } = await supabase
+          .from("quote_items")
+          .insert(quoteItemsToInsert);
+
+        if (itemsError) {
+          console.error("Error inserting quote items:", itemsError);
+          // Potentially roll back quote creation or handle differently
+          throw new Error(`Failed to insert quote items: ${itemsError.message}`);
+        }
+
+        return createdQuote;
+      },
+    },
+  },
   vendors: { tableName: "vendors" },
   employee_requests: { tableName: "employee_requests" },
   job_listings: {
