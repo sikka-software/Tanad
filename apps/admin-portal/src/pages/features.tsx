@@ -1,4 +1,5 @@
 import settings from "@root/landing.config";
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 
@@ -48,10 +49,12 @@ export default function FeaturesPage() {
   );
 }
 
+FeaturesPage.messages = ["Pages", "General", "Features"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, FeaturesPage.messages),
     },
   };
 };

@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -62,10 +63,15 @@ export default function AddBranchPage() {
   );
 }
 
+AddBranchPage.messages = ["Pages", "Branches", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../../locales/${locale}.json`)).default,
+        AddBranchPage.messages,
+      ),
     },
   };
 };

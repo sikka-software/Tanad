@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { eq } from "drizzle-orm";
+import { pick } from "lodash";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 
@@ -61,6 +62,8 @@ export default function InvoicePreviewPage({ invoice }: Props) {
   );
 }
 
+InvoicePreviewPage.messages = ["Pages", "Invoices", "General"];
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { params, locale, req, res } = context;
   const invoice_id = params?.id as string;
@@ -107,7 +110,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
       props: {
         invoice: fullInvoice,
-        messages: (await import(`../../../locales/${locale}.json`)).default,
+        messages: pick(
+          (await import(`../../../locales/${locale}.json`)).default,
+          InvoicePreviewPage.messages,
+        ),
       },
     };
   } catch (error) {

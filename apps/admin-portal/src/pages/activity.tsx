@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
@@ -14,8 +15,6 @@ import { useActivityLogs, activityLogKeys } from "@/modules/activity/activity.ho
 import { ActivityLogTable } from "@/modules/activity/activity.table";
 
 import CustomPageMeta from "../components/landing/CustomPageMeta";
-
-// Import Supabase client
 
 const ActivityPage = () => {
   const t = useTranslations();
@@ -75,10 +74,12 @@ const ActivityPage = () => {
 
 export default ActivityPage;
 
+ActivityPage.messages = ["Pages", "General", "ActivityLogs"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, ActivityPage.messages),
     },
   };
 };

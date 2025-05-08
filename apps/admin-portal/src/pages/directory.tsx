@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { Search } from "lucide-react";
 import { GetStaticPropsContext } from "next";
 import { useTranslations } from "next-intl";
@@ -164,10 +165,15 @@ export default function DirectoryPage() {
   );
 }
 
+DirectoryPage.messages = ["Pages", "General", "Directory"];
+
 export async function getStaticProps({ locale }: GetStaticPropsContext) {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../locales/${locale}.json`)).default,
+        DirectoryPage.messages,
+      ),
     },
   };
 }

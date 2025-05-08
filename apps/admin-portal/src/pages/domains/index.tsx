@@ -8,6 +8,7 @@ import {
 import useDomainStore from "@root/src/modules/domain/domain.store";
 import DomainsTable from "@root/src/modules/domain/domain.table";
 import { DomainUpdateData } from "@root/src/modules/domain/domain.type";
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -172,10 +173,15 @@ export default function DomainsPage() {
   );
 }
 
+DomainsPage.messages = ["Pages", "Domains", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../../locales/${locale}.json`)).default,
+        DomainsPage.messages,
+      ),
     },
   };
 };

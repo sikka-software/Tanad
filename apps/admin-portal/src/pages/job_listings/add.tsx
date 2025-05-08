@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 
@@ -37,10 +38,15 @@ export default function AddJobListingPage() {
   );
 }
 
+AddJobListingPage.messages = ["Pages", "JobListings", "General"];
+
 export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {
     props: {
-      messages: (await import(`../../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../../locales/${locale}.json`)).default,
+        AddJobListingPage.messages,
+      ),
     },
   };
 };

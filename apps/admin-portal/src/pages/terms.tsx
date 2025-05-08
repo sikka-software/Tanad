@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 
@@ -22,10 +23,12 @@ export default function TermsPage() {
   );
 }
 
+TermsPage.messages = ["Pages", "Terms", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, TermsPage.messages),
     },
   };
 };

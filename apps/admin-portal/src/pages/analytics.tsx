@@ -1,5 +1,6 @@
 import { differenceInDays, endOfDay, endOfMonth, format, parseISO, startOfMonth } from "date-fns";
 import { ar } from "date-fns/locale";
+import { pick } from "lodash";
 import { Calendar as CalendarIcon, TrendingUp } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -9,13 +10,7 @@ import { DateRange } from "react-day-picker";
 
 import { Button } from "@/ui/button";
 import { Calendar } from "@/ui/calendar";
-import {
-  CardContent,
-  Card,
-  CardTitle,
-  CardDescription,
-  CardHeader,
-} from "@/ui/card";
+import { CardContent, Card, CardTitle, CardDescription, CardHeader } from "@/ui/card";
 import { ChartConfig } from "@/ui/chart";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
@@ -324,10 +319,12 @@ export default function Analytics() {
   );
 }
 
+Analytics.messages = ["Pages", "General", "Analytics"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, Analytics.messages),
     },
   };
 };

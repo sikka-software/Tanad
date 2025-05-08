@@ -64,7 +64,7 @@ export function HeroSection() {
                   <div className="mt-12 flex items-center gap-2">
                     <div key={1} className="bg-foreground/10 rounded-[14px] border p-0.5">
                       <Button asChild size="lg" className="rounded-xl px-5 text-base">
-                        <Link href="#link">
+                        <Link href="/dashboard">
                           <span className="text-nowrap">Start Building</span>
                         </Link>
                       </Button>

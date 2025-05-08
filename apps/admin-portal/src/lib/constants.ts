@@ -160,7 +160,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "branch",
     rpc: "get_module_analytics_branch",
-    title: "Branches.title",
+    title: "Pages.Branches.title",
     add: "branches_added",
     update: "branches_updated",
     delete: "branches_removed",
@@ -168,7 +168,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "job",
     rpc: "get_module_analytics_job",
-    title: "Jobs.title",
+    title: "Pages.Jobs.title",
     add: "jobs_added",
     update: "jobs_updated",
     delete: "jobs_removed",
@@ -176,7 +176,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "server",
     rpc: "get_module_analytics_server",
-    title: "Servers.title",
+    title: "Pages.Servers.title",
     add: "servers_added",
     update: "servers_updated",
     delete: "servers_removed",
@@ -184,7 +184,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "domain",
     rpc: "get_module_analytics_domain",
-    title: "Domains.title",
+    title: "Pages.Domains.title",
     add: "domains_added",
     update: "domains_updated",
     delete: "domains_removed",
@@ -192,7 +192,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "website",
     rpc: "get_module_analytics_website",
-    title: "Websites.title",
+    title: "Pages.Websites.title",
     add: "websites_added",
     update: "websites_updated",
     delete: "websites_removed",
@@ -200,7 +200,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "client",
     rpc: "get_module_analytics_client",
-    title: "Clients.title",
+    title: "Pages.Clients.title",
     add: "clients_added",
     update: "clients_updated",
     delete: "clients_removed",
@@ -208,7 +208,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "office",
     rpc: "get_module_analytics_office",
-    title: "Offices.title",
+    title: "Pages.Offices.title",
     add: "offices_added",
     update: "offices_updated",
     delete: "offices_removed",
@@ -216,7 +216,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "warehouse",
     rpc: "get_module_analytics_warehouse",
-    title: "Warehouses.title",
+    title: "Pages.Warehouses.title",
     add: "warehouses_added",
     update: "warehouses_updated",
     delete: "warehouses_removed",
@@ -224,7 +224,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "product",
     rpc: "get_module_analytics_product",
-    title: "Products.title",
+    title: "Pages.Products.title",
     add: "products_added",
     update: "products_updated",
     delete: "products_removed",
@@ -232,7 +232,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "invoice",
     rpc: "get_module_analytics_invoice",
-    title: "Invoices.title",
+    title: "Pages.Invoices.title",
     add: "invoices_added",
     update: "invoices_updated",
     delete: "invoices_removed",
@@ -241,7 +241,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "employee",
     rpc: "get_module_analytics_employee",
-    title: "Employees.title",
+    title: "Pages.Employees.title",
     add: "employees_added",
     update: "employees_updated",
     delete: "employees_removed",
@@ -249,7 +249,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "expense",
     rpc: "get_module_analytics_expense",
-    title: "Expenses.title",
+    title: "Pages.Expenses.title",
     add: "expenses_added",
     update: "expenses_updated",
     delete: "expenses_removed",
@@ -257,7 +257,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "purchase",
     rpc: "get_module_analytics_purchases",
-    title: "Purchases.title",
+    title: "Pages.Purchases.title",
     add: "purchases_added",
     update: "purchases_updated",
     delete: "purchases_removed",
@@ -265,7 +265,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "employee_request",
     rpc: "get_module_analytics_employee_request",
-    title: "EmployeeRequests.title",
+    title: "Pages.EmployeeRequests.title",
     add: "employee_requests_added",
     update: "employee_requests_updated",
     delete: "employee_requests_removed",
@@ -273,7 +273,7 @@ export const MODULE_ANALYTICS = [
   {
     key: "job_listing",
     rpc: "get_module_analytics_job_listing",
-    title: "JobListings.title",
+    title: "Pages.JobListings.title",
     add: "job_listings_added",
     update: "job_listings_updated",
     delete: "job_listings_removed",

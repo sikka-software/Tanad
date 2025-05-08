@@ -1,5 +1,6 @@
 "use client";
 
+import { pick } from "lodash";
 import { ChevronsUpDown, Mail, Save, User, Loader2, Sidebar } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
@@ -231,10 +232,12 @@ const SettingsPage = () => {
 
 export default SettingsPage;
 
+SettingsPage.messages = ["Pages", "Settings", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, SettingsPage.messages),
     },
   };
 };

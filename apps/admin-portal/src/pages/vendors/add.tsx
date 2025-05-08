@@ -1,16 +1,16 @@
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 
-import { Button } from "@/ui/button";
 import PageTitle from "@/ui/page-title";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 import { generateDummyData } from "@/lib/dummy-generator";
 
-import { VendorForm, type VendorFormValues } from "@/vendor/vendor.form";
+import { VendorForm } from "@/vendor/vendor.form";
 import useVendorStore from "@/vendor/vendor.store";
 
 export default function AddVendorPage() {
@@ -65,10 +65,15 @@ export default function AddVendorPage() {
   );
 }
 
+AddVendorPage.messages = ["Pages", "Vendors", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../../locales/${locale}.json`)).default,
+        AddVendorPage.messages,
+      ),
     },
   };
 };

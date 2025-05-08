@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -26,7 +27,7 @@ import {
 import { FILTERABLE_FIELDS, SORTABLE_COLUMNS } from "@/modules/website/website.options";
 import useWebsiteStore from "@/modules/website/website.store";
 import WebsitesTable from "@/modules/website/website.table";
-import { Website, WebsiteUpdateData } from "@/modules/website/website.type";
+import { Website } from "@/modules/website/website.type";
 import useUserStore from "@/stores/use-user-store";
 
 export default function WebsitesPage() {
@@ -186,10 +187,15 @@ export default function WebsitesPage() {
   );
 }
 
+WebsitesPage.messages = ["Pages", "Websites", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../../locales/${locale}.json`)).default,
+        WebsitesPage.messages,
+      ),
     },
   };
 };

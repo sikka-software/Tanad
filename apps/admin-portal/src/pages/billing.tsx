@@ -1,4 +1,5 @@
 // Components
+import { pick } from "lodash";
 import { CreditCard, Package, User } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -71,10 +72,12 @@ export default function Billing() {
   );
 }
 
+Billing.messages = ["Pages", "Billing", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, Billing.messages),
     },
   };
 };

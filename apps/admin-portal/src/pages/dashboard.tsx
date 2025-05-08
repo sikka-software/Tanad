@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { Terminal } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -292,7 +293,10 @@ export default function Dashboard() {
   if (statsError) {
     return (
       <DataPageLayout>
-        <CustomPageMeta title={t("Pages.Dashboard.title")} description={t("Pages.Dashboard.title")} />
+        <CustomPageMeta
+          title={t("Pages.Dashboard.title")}
+          description={t("Pages.Dashboard.title")}
+        />
         <div className="flex flex-col items-center justify-center gap-4 p-8">
           <h2 className="text-xl font-semibold">{t("Pages.Dashboard.title")}</h2>
           <p className="text-muted-foreground">{statsError}</p>
@@ -369,25 +373,13 @@ export default function Dashboard() {
               value={stats.totalInvoices}
               loading={loadingStats}
               link="/invoices"
-              additionalText={`${stats.pendingInvoices} ${t("Pages.Invoices.pending")}`}
+              // additionalText={`${stats.pendingInvoices} ${t("Pages.Invoices.pending")}`}
             />
             <StatCard
               title={t("Pages.Products.title")}
               value={stats.totalProducts}
               loading={loadingStats}
               link="/products"
-            />
-            <StatCard
-              title={`${t("Pages.Invoices.pending")} ${t("Pages.Invoices.title").toLowerCase()}`}
-              value={stats.pendingInvoices}
-              loading={loadingStats}
-              additionalText={
-                stats.totalInvoices > 0
-                  ? `${((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}% ${t(
-                      "Pages.Invoices.of_total",
-                    )}`
-                  : `0% ${t("Pages.Invoices.of_total")}`
-              }
             />
           </div>
         </div>
@@ -437,10 +429,12 @@ export default function Dashboard() {
   );
 }
 
+Dashboard.messages = ["Pages", "General", "Dashboard"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, Dashboard.messages),
     },
   };
 };

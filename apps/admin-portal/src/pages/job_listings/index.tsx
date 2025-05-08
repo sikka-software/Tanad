@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -184,10 +185,15 @@ export default function JobListingsPage() {
   );
 }
 
+JobListingsPage.messages = ["Pages", "JobListings", "General"];
+
 export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {
     props: {
-      messages: (await import(`../../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../../locales/${locale}.json`)).default,
+        JobListingsPage.messages,
+      ),
     },
   };
 };
