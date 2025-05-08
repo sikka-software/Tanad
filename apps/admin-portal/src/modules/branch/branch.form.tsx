@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Editor } from "@root/src/components/blocks/editor-x/editor";
+import { NotesEditor } from "@root/src/components/blocks/editor-x/notes-editor";
 import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
@@ -376,7 +376,7 @@ export function BranchForm({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Editor
+                    <NotesEditor
                       editorSerializedState={field.value as unknown as SerializedEditorState}
                       onSerializedChange={(value) => field.onChange(value)}
                     />

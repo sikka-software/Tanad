@@ -13,7 +13,7 @@ import { nodes } from "./nodes";
 import { Plugins } from "./plugins";
 
 const editorConfig: InitialConfigType = {
-  namespace: "Editor",
+  namespace: "NotesEditor",
   theme: editorTheme,
   nodes,
   onError: (error: Error) => {
@@ -21,7 +21,7 @@ const editorConfig: InitialConfigType = {
   },
 };
 
-export function Editor({
+export function NotesEditor({
   editorState,
   editorSerializedState,
   onChange,
