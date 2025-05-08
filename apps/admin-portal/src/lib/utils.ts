@@ -14,6 +14,11 @@ export const navigationMenuTriggerStyle = cva(
   "group inline-flex h-10 w-max items-center gap-1 justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 ",
 );
 
+export const getNotesValue = (defaultValues: any) =>
+  defaultValues?.notes && typeof defaultValues.notes === "object" && "root" in defaultValues.notes
+    ? defaultValues.notes
+    : null;
+
 export function convertToPascalCase(inputString: string) {
   // Return an empty string if the input is null, undefined, or an empty/whitespace string
   if (inputString === null || inputString === undefined) {

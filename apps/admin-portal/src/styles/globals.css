@@ -173,6 +173,22 @@ body {
   }
 }
 
+@layer utilities {
+  .rounded-inner-1 {
+    border-radius: calc(var(--radius) - 0.25rem); /* 4px if 1rem = 16px */
+  }
+  .rounded-inner-2 {
+    border-radius: calc(var(--radius) - 0.5rem); /* 8px */
+  }
+  .rounded-inner-3 {
+    border-radius: calc(var(--radius) - 0.75rem); /* 12px */
+  }
+  .rounded-inner-4 {
+    border-radius: calc(var(--radius) - 1rem); /* 16px */
+  }
+  /* You can add more specific utilities here as needed */
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -1,4 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { NotesEditor } from "@root/src/components/blocks/editor-x/notes-editor";
+import FormSectionHeader from "@root/src/components/forms/form-section-header";
+import { getNotesValue } from "@root/src/lib/utils";
+import { SerializedEditorState } from "lexical";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -36,8 +40,8 @@ export const createCompanySchema = (t: (key: string) => string) => {
     website: z.string().optional(),
     industry: z.string().optional(),
     size: z.string().optional(),
-    notes: z.string().optional(),
     status: z.string().default("active"),
+    notes: z.any().optional().nullable(),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -71,7 +75,7 @@ export function CompanyForm({
       website: defaultValues?.website || "",
       industry: defaultValues?.industry || "",
       size: defaultValues?.size || "",
-      notes: defaultValues?.notes || "",
+      notes: getNotesValue(defaultValues) || "",
       status: defaultValues?.status || "active",
       short_address: defaultValues?.short_address || "",
       additional_number: defaultValues?.additional_number || "",
@@ -143,7 +147,7 @@ export function CompanyForm({
               website: data.website?.trim() || undefined,
               industry: data.industry?.trim() || undefined,
               size: data.size?.trim() || undefined,
-              notes: data.notes?.trim() || undefined,
+              notes: data.notes ?? null,
               status: data.status as "active" | "inactive" | "draft" | "archived" | null,
               short_address: data.short_address?.trim() || undefined,
               building_number: data.building_number?.trim() || undefined,
@@ -173,7 +177,7 @@ export function CompanyForm({
             website: data.website?.trim() || undefined,
             industry: data.industry?.trim() || undefined,
             size: data.size?.trim() || undefined,
-            notes: data.notes?.trim() || undefined,
+            notes: data.notes ?? null,
             status: data.status as "active" | "inactive" | "draft" | "archived" | null,
             user_id: profile?.id || "",
             short_address: data.short_address?.trim() || undefined,
@@ -322,17 +326,26 @@ export function CompanyForm({
               )}
             />
           </div>
+        </div>
+
+        <AddressFormSection
+          inDialog={editMode}
+          title={t("Companies.form.address.label")}
+          control={form.control}
+          isLoading={isLoading}
+        />
+
+        <FormSectionHeader inDialog={editMode} title={t("Companies.form.notes.label")} />
+        <div className="form-container">
           <FormField
             control={form.control}
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Companies.form.notes.label")}</FormLabel>
                 <FormControl>
-                  <Textarea
-                    disabled={isLoading}
-                    placeholder={t("Companies.form.notes.placeholder")}
-                    {...field}
+                  <NotesEditor
+                    editorSerializedState={field.value as unknown as SerializedEditorState}
+                    onSerializedChange={(value) => field.onChange(value)}
                   />
                 </FormControl>
                 <FormMessage />
@@ -340,12 +353,6 @@ export function CompanyForm({
             )}
           />
         </div>
-
-        <AddressFormSection
-          title={t("Companies.form.address.label")}
-          control={form.control}
-          isLoading={isLoading}
-        />
       </form>
     </Form>
   );

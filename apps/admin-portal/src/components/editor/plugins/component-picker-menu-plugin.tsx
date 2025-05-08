@@ -18,7 +18,7 @@ import { useEditorModal } from "@/components/editor/editor-hooks/use-modal";
 import { ComponentPickerOption } from "@/components/editor/plugins/picker/component-picker-option";
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
-import { PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "../../ui/popover";
 
 const LexicalTypeaheadMenuPlugin = dynamic(
   () => import("./default/lexical-typeahead-menu-plugin"),
@@ -76,12 +76,13 @@ export function ComponentPickerMenuPlugin({
   return (
     <>
       {modal}
-      {/* @ts-ignore */}
-      <LexicalTypeaheadMenuPlugin<ComponentPickerOption>
+      <LexicalTypeaheadMenuPlugin
         onQueryChange={setQueryString}
+        // @ts-ignore
         onSelectOption={onSelectOption}
         triggerFn={checkForTriggerMatch}
         options={options}
+        // @ts-ignore
         menuRenderFn={(
           anchorElementRef: RefObject<HTMLElement | null | undefined>,
           itemProps: {

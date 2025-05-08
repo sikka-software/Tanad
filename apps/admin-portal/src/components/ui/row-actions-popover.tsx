@@ -1,32 +1,11 @@
 "use client";
 
-import {
-  Archive,
-  ArrowDownAZ,
-  ArrowUpAZ,
-  ArrowUpDown,
-  Copy,
-  Edit,
-  Eye,
-  MoreVertical,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Archive, Copy, Edit, Eye, MoreVertical, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Button } from "@/ui/button";
-import { Label } from "@/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select";
-import { Separator } from "@/ui/separator";
-import { Switch } from "@/ui/switch";
-
-import { SortableColumn } from "@/types/common.type";
-
-import IconButton from "./icon-button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 interface RowActionsPopoverProps {
   onEdit?: () => void;
@@ -57,6 +36,9 @@ const RowActionsPopover = ({
   const locale = useLocale();
   const [open, setOpen] = useState(false);
 
+  let buttonClasses =
+    "focus-visible:ring-ring rounded-inner-1 flex flex-row items-center justify-start p-0 px-2 h-8 gap-2 focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:outline-none";
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -66,27 +48,15 @@ const RowActionsPopover = ({
       </PopoverTrigger>
       <PopoverContent
         side="left"
-        className="flex max-w-30 flex-col p-0"
+        className="flex max-w-24 flex-col p-1"
         align="center"
         dir={locale === "ar" ? "rtl" : "ltr"}
       >
-        {onDelete && (
-          <Button
-            onClick={onDelete}
-            variant="ghost"
-            className="flex flex-row items-center justify-start gap-2"
-            size="default"
-            type="button"
-          >
-            <Trash2 className="size-4" />
-            {t("General.delete")}
-          </Button>
-        )}
         {onEdit && (
           <Button
             onClick={onEdit}
             variant="ghost"
-            className="flex flex-row items-center justify-start gap-2"
+            className={buttonClasses}
             size="default"
             type="button"
           >
@@ -94,11 +64,12 @@ const RowActionsPopover = ({
             <span>{t("General.edit")}</span>
           </Button>
         )}
+
         {onDuplicate && (
           <Button
             onClick={onDuplicate}
             variant="ghost"
-            className="flex flex-row items-center justify-start gap-2"
+            className={buttonClasses}
             size="default"
             type="button"
           >
@@ -110,7 +81,7 @@ const RowActionsPopover = ({
           <Button
             onClick={onPreview}
             variant="ghost"
-            className="flex flex-row items-center justify-start gap-2"
+            className={buttonClasses}
             size="default"
             type="button"
           >
@@ -122,7 +93,7 @@ const RowActionsPopover = ({
           <Button
             onClick={onView}
             variant="ghost"
-            className="flex flex-row items-center justify-start gap-2"
+            className={buttonClasses}
             size="default"
             type="button"
           >
@@ -134,12 +105,24 @@ const RowActionsPopover = ({
           <Button
             onClick={onArchive}
             variant="ghost"
-            className="flex flex-row items-center justify-start gap-2"
+            className={buttonClasses}
             size="default"
             type="button"
           >
             <Archive className="size-4" />
             {t("General.archive")}
+          </Button>
+        )}
+        {onDelete && (
+          <Button
+            onClick={onDelete}
+            variant="ghost"
+            className={buttonClasses}
+            size="default"
+            type="button"
+          >
+            <Trash2 className="text-destructive size-4" />
+            {t("General.delete")}
           </Button>
         )}
       </PopoverContent>

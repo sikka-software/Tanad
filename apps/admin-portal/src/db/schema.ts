@@ -322,7 +322,7 @@ export const clients = pgTable(
     region: text(),
     country: text(),
     zip_code: text(),
-    notes: text(),
+    notes: jsonb(),
     user_id: uuid().notNull(),
     company: uuid(),
     enterprise_id: uuid().notNull(),
@@ -367,7 +367,7 @@ export const companies = pgTable(
     zip_code: text(),
     industry: text(),
     size: text(),
-    notes: text(),
+    notes: jsonb(),
     status: common_status().default("active"),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
@@ -442,7 +442,7 @@ export const employees = pgTable(
     department_id: uuid(),
     position: text(),
     salary: jsonb().default([]),
-    notes: text(),
+    notes: jsonb(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }),
   },
   (table) => [
@@ -562,7 +562,7 @@ CASE
     WHEN (tax_rate IS NULL) THEN subtotal
     ELSE round((subtotal * ((1)::numeric + tax_rate)), 2)
 END`),
-    notes: text(),
+    notes: jsonb(),
     client_id: uuid().notNull(),
     created_by: uuid(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow(),
@@ -654,7 +654,7 @@ export const products = pgTable(
     stock_quantity: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
     unit: text(),
     status: common_status().default("active"),
-    notes: text(),
+    notes: jsonb(),
   },
   (table) => [
     index("idx_products_enterprise_id").using(
@@ -691,7 +691,7 @@ export const offices = pgTable(
     manager: uuid(),
     status: common_status().default("active"),
     user_id: uuid().notNull(),
-    notes: text(),
+    notes: jsonb(),
     enterprise_id: uuid().notNull(),
     code: text(),
   },
@@ -893,7 +893,7 @@ export const quotes = pgTable(
     status: text().default("draft").notNull(),
     subtotal: numeric({ precision: 10, scale: 2 }).default("0").notNull(),
     tax_rate: numeric({ precision: 5, scale: 2 }).default("0"),
-    notes: text(),
+    notes: jsonb(),
     client_id: uuid().notNull(),
     user_id: uuid().notNull(),
     tax_amount: numeric({ precision: 10, scale: 2 }).generatedAlwaysAs(sql`
@@ -1287,7 +1287,7 @@ export const employee_requests = pgTable(
     end_date: date(),
     amount: numeric({ precision: 10, scale: 2 }),
     attachments: jsonb().default([]),
-    notes: text(),
+    notes: jsonb(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     user_id: uuid().notNull(),
@@ -1354,7 +1354,7 @@ export const expenses = pgTable(
     category: text().notNull(),
     due_date: date(),
     issue_date: date().default(sql`CURRENT_DATE`),
-    notes: text(),
+    notes: jsonb(),
     expense_number: text().notNull(),
     status: text().default("pending").notNull(),
     user_id: uuid().notNull(),
@@ -1386,7 +1386,7 @@ export const purchases = pgTable(
     category: text().notNull(),
     due_date: date(),
     issue_date: date().default(sql`CURRENT_DATE`),
-    notes: text(),
+    notes: jsonb(),
     purchase_number: text().notNull(),
     status: text().default("pending").notNull(),
     user_id: uuid().notNull(),
@@ -1427,7 +1427,7 @@ export const vendors = pgTable(
     region: text(),
     country: text(),
     zip_code: text(),
-    notes: text(),
+    notes: jsonb(),
     user_id: uuid().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
@@ -1586,7 +1586,7 @@ export const salaries = pgTable(
     created_at: timestamp({ withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
-    notes: text(),
+    notes: jsonb(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
     employee_id: uuid().notNull(),
@@ -1692,7 +1692,7 @@ export const warehouses = pgTable(
     zip_code: text(),
     capacity: numeric({ precision: 10, scale: 2 }),
     status: common_status().default("active"),
-    notes: text(),
+    notes: jsonb(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
     phone: text(),
@@ -1892,7 +1892,7 @@ export const domains = pgTable(
       .notNull(),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
-    notes: text(),
+    notes: jsonb(),
   },
   (table) => [
     index("domains_domain_name_idx").using(
@@ -1934,7 +1934,7 @@ export const websites = pgTable(
     status: common_status().default("active"),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
-    notes: text(),
+    notes: jsonb(),
   },
   (table) => [
     index("websites_domain_name_idx").using(
@@ -1978,7 +1978,7 @@ export const online_stores = pgTable(
     status: common_status().default("active"),
     user_id: uuid().notNull(),
     enterprise_id: uuid().notNull(),
-    notes: text(),
+    notes: jsonb(),
   },
   (table) => [
     index("online_stores_domain_name_idx").using(
@@ -2027,7 +2027,7 @@ export const servers = pgTable(
     monthly_cost: numeric({ precision: 10, scale: 2 }),
     annual_cost: numeric({ precision: 10, scale: 2 }),
     payment_cycle: payment_cycle(),
-    notes: text(),
+    notes: jsonb(),
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),
@@ -2078,7 +2078,7 @@ export const cars = pgTable(
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),
-    notes: text(),
+    notes: jsonb(),
     updated_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),
@@ -2121,7 +2121,7 @@ export const trucks = pgTable(
     created_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),
-    notes: text(),
+    notes: jsonb(),
     updated_at: timestamp({ withTimezone: true, mode: "string" })
       .default(sql`timezone('utc'::text, now())`)
       .notNull(),

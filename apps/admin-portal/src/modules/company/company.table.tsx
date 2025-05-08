@@ -84,11 +84,6 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
       validationSchema: z.number().min(0, t("Companies.form.size.invalid")),
     },
     {
-      accessorKey: "notes",
-      header: t("Companies.form.notes.label"),
-      validationSchema: z.string().optional(),
-    },
-    {
       accessorKey: "status",
       header: t("Companies.form.status.label"),
       validationSchema: z.boolean(),

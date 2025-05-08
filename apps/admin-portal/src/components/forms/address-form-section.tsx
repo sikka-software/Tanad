@@ -8,35 +8,27 @@ import { Input } from "@/ui/input";
 import { Badge } from "@/components/ui/badge";
 import IconButton from "@/components/ui/icon-button";
 import NumberInput from "@/components/ui/number-input";
-import { Separator } from "@/components/ui/separator";
 
 import FormSectionHeader from "./form-section-header";
-
-// Define the shape of the form values this section expects
-// Adjust this based on the actual full form schema if needed
-interface AddressFormValues {
-  short_address?: string;
-  building_number?: string;
-  street_name?: string;
-  city?: string;
-  region?: string;
-  country?: string;
-  zip_code?: string;
-  additional_number?: string;
-}
 
 interface AddressFormSectionProps {
   control: Control<any>; // Use Control<AddressFormValues> or Control<any>
   isLoading?: boolean;
   title: string;
+  inDialog?: boolean;
 }
 
-export function AddressFormSection({ control, isLoading = false, title }: AddressFormSectionProps) {
+export function AddressFormSection({
+  control,
+  isLoading = false,
+  title,
+  inDialog = false,
+}: AddressFormSectionProps) {
   const t = useTranslations();
 
   return (
     <div>
-      <FormSectionHeader title={title} />
+      <FormSectionHeader inDialog={inDialog} title={title} />
 
       <div className="mx-auto grid max-w-2xl grid-cols-1 gap-4 p-4 md:grid-cols-2">
         <FormField
