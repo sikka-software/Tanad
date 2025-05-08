@@ -11,13 +11,24 @@ import {
   type LexicalNode,
   PASTE_COMMAND,
 } from "lexical";
+import {
+  Clipboard,
+  ClipboardPaste,
+  CopyIcon,
+  LucideProps,
+  Scissors,
+  Trash2Icon,
+} from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
-import { useCallback, useMemo, JSX } from "react";
+import { useCallback, useMemo, JSX, RefAttributes } from "react";
 import * as React from "react";
 import { toast } from "sonner";
 
 import { Command, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+import { ScrollArea } from "../../ui/scroll-area";
 
 const LexicalContextMenuPlugin = dynamic(() => import("./default/lexical-context-menu-plugin"), {
   ssr: false,
@@ -26,35 +37,45 @@ const LexicalContextMenuPlugin = dynamic(() => import("./default/lexical-context
 export class ContextMenuOption extends MenuOption {
   title: string;
   onSelect: (targetNode: LexicalNode | null) => void;
+  icon?: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
   constructor(
     title: string,
     options: {
       onSelect: (targetNode: LexicalNode | null) => void;
+      icon?: React.ForwardRefExoticComponent<
+        Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
+      >;
     },
   ) {
     super(title);
     this.title = title;
     this.onSelect = options.onSelect.bind(this);
+    this.icon = options.icon;
   }
 }
 
 export function ContextMenuPlugin(): JSX.Element {
+  const t = useTranslations();
+  const locale = useLocale();
   const [editor] = useLexicalComposerContext();
   const [isOpen, setIsOpen] = React.useState(false);
 
   const defaultOptions = useMemo(() => {
     return [
-      new ContextMenuOption(`Copy`, {
+      new ContextMenuOption(t("General.copy"), {
         onSelect: (_node) => {
           editor.dispatchCommand(COPY_COMMAND, null);
         },
+        icon: Clipboard,
       }),
-      new ContextMenuOption(`Cut`, {
+
+      new ContextMenuOption(t("General.cut"), {
         onSelect: (_node) => {
           editor.dispatchCommand(CUT_COMMAND, null);
         },
+        icon: Scissors,
       }),
-      new ContextMenuOption(`Paste`, {
+      new ContextMenuOption(t("General.paste"), {
         onSelect: (_node) => {
           navigator.clipboard.read().then(async function (...args) {
             const data = new DataTransfer();
@@ -83,32 +104,33 @@ export function ContextMenuPlugin(): JSX.Element {
             editor.dispatchCommand(PASTE_COMMAND, event);
           });
         },
+        icon: ClipboardPaste,
       }),
-      new ContextMenuOption(`Paste as Plain Text`, {
-        onSelect: (_node) => {
-          navigator.clipboard.read().then(async function (...args) {
-            const permission = await navigator.permissions.query({
-              // @ts-expect-error These types are incorrect.
-              name: "clipboard-read",
-            });
+      // new ContextMenuOption(`Paste as Plain Text`, {
+      //   onSelect: (_node) => {
+      //     navigator.clipboard.read().then(async function (...args) {
+      //       const permission = await navigator.permissions.query({
+      //         // @ts-expect-error These types are incorrect.
+      //         name: "clipboard-read",
+      //       });
 
-            if (permission.state === "denied") {
-              toast.warning("Not allowed to paste from clipboard.");
-              return;
-            }
+      //       if (permission.state === "denied") {
+      //         toast.warning("Not allowed to paste from clipboard.");
+      //         return;
+      //       }
 
-            const data = new DataTransfer();
-            const items = await navigator.clipboard.readText();
-            data.setData("text/plain", items);
+      //       const data = new DataTransfer();
+      //       const items = await navigator.clipboard.readText();
+      //       data.setData("text/plain", items);
 
-            const event = new ClipboardEvent("paste", {
-              clipboardData: data,
-            });
-            editor.dispatchCommand(PASTE_COMMAND, event);
-          });
-        },
-      }),
-      new ContextMenuOption(`Delete Node`, {
+      //       const event = new ClipboardEvent("paste", {
+      //         clipboardData: data,
+      //       });
+      //       editor.dispatchCommand(PASTE_COMMAND, event);
+      //     });
+      //   },
+      // }),
+      new ContextMenuOption(t("General.delete"), {
         onSelect: (_node) => {
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
@@ -118,6 +140,7 @@ export function ContextMenuPlugin(): JSX.Element {
             ancestorNodeWithRootAsParent?.remove();
           }
         },
+        icon: Trash2Icon,
       }),
     ];
   }, [editor]);
@@ -187,7 +210,11 @@ export function ContextMenuPlugin(): JSX.Element {
                     userSelect: "none",
                   }}
                 />
-                <PopoverContent className="w-[200px] p-1">
+                <PopoverContent
+                  dir={locale === "ar" ? "rtl" : "ltr"}
+                  className="w-[100px] p-1"
+                  onWheel={(e) => e.stopPropagation()}
+                >
                   <Command>
                     <CommandList>
                       {options.map((option) => (
@@ -197,6 +224,7 @@ export function ContextMenuPlugin(): JSX.Element {
                             selectOptionAndCleanUp(option);
                           }}
                         >
+                          {option.icon && <option.icon />}
                           {option.title}
                         </CommandItem>
                       ))}

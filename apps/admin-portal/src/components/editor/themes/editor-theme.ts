@@ -3,6 +3,7 @@ import { EditorThemeClasses } from "lexical";
 import "./editor-theme.css";
 
 export const editorTheme: EditorThemeClasses = {
+  root: "!bg-transparent",
   ltr: "text-left",
   rtl: "text-right",
   heading: {

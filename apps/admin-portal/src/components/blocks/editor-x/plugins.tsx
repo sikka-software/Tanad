@@ -194,7 +194,7 @@ export function Plugins({}) {
         <RichTextPlugin
           contentEditable={
             <div className="">
-              <div className="" ref={onRef} onWheel={(e) => e.stopPropagation()}>
+              <div className="" ref={onRef}>
                 <ContentEditable
                   placeholder={t("Forms.notes.placeholder")}
                   className="ContentEditable__root relative block h-[330px] overflow-auto px-8 py-4 text-start focus:outline-none"

@@ -369,7 +369,7 @@ export function BranchForm({
           />
 
           <FormSectionHeader title={t("Branches.form.notes.label")} />
-          <div className="form-container">
+          <div className="form-container bg-green-400">
             <FormField
               control={form.control}
               name="notes"
