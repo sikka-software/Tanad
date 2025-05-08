@@ -1,7 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Editor } from "@root/src/components/blocks/editor-x/editor";
 import { ComboboxAdd } from "@root/src/components/ui/combobox-add";
 import { CommandSelect } from "@root/src/components/ui/command-select";
 import { FormDialog } from "@root/src/components/ui/form-dialog";
+import { SerializedEditorState } from "lexical";
 import { useTranslations, useLocale } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -42,7 +44,7 @@ export const createBranchSchema = (t: (key: string) => string) => {
     status: z.enum(["active", "inactive"], {
       message: t("Branches.form.status.required"),
     }),
-    notes: z.string().optional().or(z.literal("")),
+    notes: z. string().optional().or(z.literal("")),
   });
 
   const addressSchema = createAddressSchema(t);
@@ -359,12 +361,22 @@ export function BranchForm({
                 <FormItem>
                   <FormLabel>{t("Branches.form.notes.label")}</FormLabel>
                   <FormControl>
-                    <Textarea
+                    <Editor
+                      editorSerializedState={field.value as unknown as SerializedEditorState}
+                      onSerializedChange={(value) => field.onChange(value)}
+                    />
+                    {/* <RichNotes
                       placeholder={t("Branches.form.notes.placeholder")}
                       className="min-h-[120px]"
                       {...field}
                       disabled={isLoading}
-                    />
+                    /> */}
+                    {/* <Textarea
+                      placeholder={t("Branches.form.notes.placeholder")}
+                      className="min-h-[120px]"
+                      {...field}
+                      disabled={isLoading}
+                    /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
