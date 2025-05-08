@@ -415,12 +415,32 @@ function getSystemAdminMenus(pathname: string): SidebarMenuGroupProps["items"] {
   ];
 }
 
+function getFleetMenus(pathname: string): SidebarMenuGroupProps["items"] {
+  return [
+    {
+      title: ModulesOptions.cars.label,
+      translationKey: ModulesOptions.cars.label,
+      icon: ModulesOptions.cars.icon,
+      url: ModulesOptions.cars.url,
+      is_active: pathname === ModulesOptions.cars.url,
+    },
+    {
+      title: ModulesOptions.trucks.label,
+      translationKey: ModulesOptions.trucks.label,
+      icon: ModulesOptions.trucks.icon,
+      url: ModulesOptions.trucks.url,
+      is_active: pathname === ModulesOptions.trucks.url,
+    },
+  ];
+}
+
 export function getMenuList(pathname?: string): Record<string, SidebarMenuGroupProps["items"]> {
   return {
     Administration: getAdministrationMenus(pathname || ""),
     Accounting: getAccountingMenus(pathname || ""),
     HumanResources: getHrMenus(pathname || ""),
     Internet: getInternetMenus(pathname || ""),
+    Fleet: getFleetMenus(pathname || ""),
     SystemAdmin: getSystemAdminMenus(pathname || ""),
   };
 }

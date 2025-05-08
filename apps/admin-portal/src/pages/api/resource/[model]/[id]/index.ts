@@ -50,6 +50,8 @@ const modelMap: Record<string, ModelConfig> = {
     query: db.query.job_listings,
     idField: "id",
   },
+  cars: { table: schema.cars, query: db.query.cars, idField: "id" },
+  trucks: { table: schema.trucks, query: db.query.trucks, idField: "id" },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

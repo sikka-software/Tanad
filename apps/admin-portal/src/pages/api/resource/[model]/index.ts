@@ -258,6 +258,8 @@ const modelMap: Record<string, ModelConfig> = {
       },
     },
   },
+  cars: { tableName: "cars" },
+  trucks: { tableName: "trucks" },
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

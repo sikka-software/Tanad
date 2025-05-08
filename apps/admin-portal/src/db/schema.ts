@@ -2062,37 +2062,91 @@ export const servers = pgTable(
   ],
 );
 
-export const cars = pgTable("cars", {
-  id: uuid().defaultRandom().primaryKey().notNull(),
-  name: text().notNull(),
-  make: text().notNull(),
-  model: text().notNull(),
-  year: text().notNull(),
-  color: text(),
-  vin: text(),
-  code: text(),
-  license_country: text(),
-  license_plate: text(),
-  created_at: timestamp({ withTimezone: true, mode: "string" })
-    .default(sql`timezone('utc'::text, now())`)
-    .notNull(),
-});
+export const cars = pgTable(
+  "cars",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    name: text().notNull(),
+    make: text().notNull(),
+    model: text().notNull(),
+    year: text().notNull(),
+    color: text(),
+    vin: text(),
+    code: text(),
+    license_country: text(),
+    license_plate: text(),
+    created_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    notes: text(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+  },
+  (table) => [
+    index("cars_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("cars_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("cars_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "cars_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "cars_user_id_users_id_fk",
+    }),
+  ],
+);
 
-export const trucks = pgTable("trucks", {
-  id: uuid().defaultRandom().primaryKey().notNull(),
-  name: text().notNull(),
-  make: text().notNull(),
-  model: text().notNull(),
-  year: text().notNull(),
-  color: text(),
-  vin: text(),
-  code: text(),
-  license_country: text(),
-  license_plate: text(),
-  created_at: timestamp({ withTimezone: true, mode: "string" })
-    .default(sql`timezone('utc'::text, now())`)
-    .notNull(),
-});
+export const trucks = pgTable(
+  "trucks",
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    name: text().notNull(),
+    make: text().notNull(),
+    model: text().notNull(),
+    year: text().notNull(),
+    color: text(),
+    vin: text(),
+    code: text(),
+    license_country: text(),
+    license_plate: text(),
+    created_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    notes: text(),
+    updated_at: timestamp({ withTimezone: true, mode: "string" })
+      .default(sql`timezone('utc'::text, now())`)
+      .notNull(),
+    user_id: uuid().notNull(),
+    enterprise_id: uuid().notNull(),
+  },
+  (table) => [
+    index("trucks_enterprise_id_idx").using(
+      "btree",
+      table.enterprise_id.asc().nullsLast().op("uuid_ops"),
+    ),
+    index("trucks_name_idx").using("btree", table.name.asc().nullsLast().op("text_ops")),
+    index("trucks_user_id_idx").using("btree", table.user_id.asc().nullsLast().op("uuid_ops")),
+    foreignKey({
+      columns: [table.enterprise_id],
+      foreignColumns: [enterprises.id],
+      name: "trucks_enterprise_id_enterprises_id_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.user_id],
+      foreignColumns: [usersInAuth.id],
+      name: "trucks_user_id_users_id_fk",
+    }),
+  ],
+);
 
 export const user_roles = pgTable(
   "user_roles",

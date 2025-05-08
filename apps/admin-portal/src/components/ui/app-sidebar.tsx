@@ -256,6 +256,10 @@ export function AppSidebar() {
           <NavMain title={t("Internet.title")} items={searchableMenuGroups.Internet} />
         )}
 
+        {searchableMenuGroups.Fleet && searchableMenuGroups.Fleet.length > 0 && (
+          <NavMain title={t("Fleet.title")} items={searchableMenuGroups.Fleet} />
+        )}
+
         {searchableMenuGroups.SystemAdmin && searchableMenuGroups.SystemAdmin.length > 0 && (
           <NavMain title={t("SystemAdmin.title")} items={searchableMenuGroups.SystemAdmin} />
         )}
