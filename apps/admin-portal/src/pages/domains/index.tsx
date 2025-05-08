@@ -173,7 +173,7 @@ export default function DomainsPage() {
   );
 }
 
-DomainsPage.messages = ["Pages", "Domains", "General"];
+DomainsPage.messages = ["Pages", "Domains", "Notes", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

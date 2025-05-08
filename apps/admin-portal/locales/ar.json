@@ -3504,6 +3504,10 @@
     "phone": "الهاتف",
     "address": "العنوان"
   },
+  "Notes": {
+    "label": "ملاحظات",
+    "placeholder": "أدخل الملاحظات"
+  },
   "Forms": {
     "description": {
       "label": "الوصف",

@@ -60,7 +60,7 @@ export default function AddDomainPage() {
   );
 }
 
-AddDomainPage.messages = ["Pages", "Domains", "General"];
+AddDomainPage.messages = ["Pages", "Domains", "Notes", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

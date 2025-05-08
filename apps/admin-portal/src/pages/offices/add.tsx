@@ -60,7 +60,7 @@ export default function AddOfficePage() {
   );
 }
 
-AddOfficePage.messages = ["Offices", "Pages", "General", "Forms"];
+AddOfficePage.messages = ["Offices", "Pages", "Notes", "General", "Forms"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
