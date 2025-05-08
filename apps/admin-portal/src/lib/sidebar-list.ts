@@ -75,14 +75,14 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
   return [
     {
       title: "Dashboard",
-      translationKey: "Titles.Dashboard",
+      translationKey: "Pages.Dashboard.title",
       url: "/dashboard",
       icon: LayoutDashboard,
       is_active: pathname.startsWith("/dashboard"),
     },
     {
       title: "Analytics",
-      translationKey: "Titles.Analytics",
+      translationKey: "Pages.Analytics.title",
       url: "/analytics",
       icon: BarChart,
       is_active: pathname.startsWith("/analytics"),
@@ -90,7 +90,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
     },
     {
       title: "Activity Logs",
-      translationKey: "Titles.ActivityLogs",
+      translationKey: "Pages.Activity.title",
       url: "/activity",
       icon: TableOfContents,
       is_active: pathname.startsWith("/activity"),
@@ -99,19 +99,19 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
 
     {
       title: "Contacts",
-      translationKey: "Titles.Contacts",
+      translationKey: "Pages.Contacts.title",
       url: "/contacts",
       icon: Users,
       is_active: pathname.startsWith("/contacts"),
       requiredPermission: "contacts.read",
       items: [
-        {
-          title: "All Contacts",
-          translationKey: "Titles.AllContacts",
-          is_active: pathname === "/contacts",
-          url: "/contacts",
-          requiredPermission: "contacts.read",
-        },
+        // {
+        //   title: "All Contacts",
+        //   translationKey: "Pages.Contacts.all",
+        //   is_active: pathname === "/contacts",
+        //   url: "/contacts",
+        //   requiredPermission: "contacts.read",
+        // },
         {
           title: ModulesOptions.companies.label,
           translationKey: ModulesOptions.companies.label,
@@ -140,7 +140,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
     },
     {
       title: "Locations",
-      translationKey: "Titles.Locations",
+      translationKey: "Pages.Locations.title",
       url: "/locations",
       icon: MapPin,
       is_active: pathname.startsWith("/warehouses") || pathname.startsWith("/branches"),
@@ -211,10 +211,10 @@ function getAccountingMenus(pathname: string): SidebarMenuGroupProps["items"] {
       ],
     },
     {
-      title: "Storage",
-      translationKey: "Titles.Storage",
+      title: ModulesOptions.storage.label,
+      translationKey: ModulesOptions.storage.label,
       url: "",
-      icon: Package,
+      icon: ModulesOptions.storage.icon,
       is_active: pathname.startsWith("/products"),
       items: [
         {
@@ -259,7 +259,7 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
       items: [
         {
           title: ModulesOptions.employees.label,
-          translationKey: "Titles.AllEmployees",
+          translationKey: "Pages.Employees.all",
           url: ModulesOptions.employees.url,
           action: ModulesOptions.employees.url + "/add",
           is_active: pathname === ModulesOptions.employees.url,
@@ -312,8 +312,8 @@ function getHrMenus(pathname: string): SidebarMenuGroupProps["items"] {
       ],
     },
     {
-      title: "Recruitment",
-      translationKey: "Titles.Recruitment",
+      title: ModulesOptions.recruitment.label,
+      translationKey: ModulesOptions.recruitment.label,
       url: "",
       icon: FileUser,
       is_active: pathname.startsWith("/recruitment"),

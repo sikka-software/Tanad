@@ -241,27 +241,33 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         {searchableMenuGroups.Administration && searchableMenuGroups.Administration.length > 0 && (
-          <NavMain title={t("Administration.title")} items={searchableMenuGroups.Administration} />
+          <NavMain
+            title={t("Pages.Administration.title")}
+            items={searchableMenuGroups.Administration}
+          />
         )}
 
         {searchableMenuGroups.Accounting && searchableMenuGroups.Accounting.length > 0 && (
-          <NavMain title={t("Accounting.title")} items={searchableMenuGroups.Accounting} />
+          <NavMain title={t("Pages.Accounting.title")} items={searchableMenuGroups.Accounting} />
         )}
 
         {searchableMenuGroups.HumanResources && searchableMenuGroups.HumanResources.length > 0 && (
-          <NavMain title={t("HumanResources.title")} items={searchableMenuGroups.HumanResources} />
+          <NavMain
+            title={t("Pages.HumanResources.title")}
+            items={searchableMenuGroups.HumanResources}
+          />
         )}
 
         {searchableMenuGroups.Internet && searchableMenuGroups.Internet.length > 0 && (
-          <NavMain title={t("Internet.title")} items={searchableMenuGroups.Internet} />
+          <NavMain title={t("Pages.Internet.title")} items={searchableMenuGroups.Internet} />
         )}
 
         {searchableMenuGroups.Fleet && searchableMenuGroups.Fleet.length > 0 && (
-          <NavMain title={t("Fleet.title")} items={searchableMenuGroups.Fleet} />
+          <NavMain title={t("Pages.Fleet.title")} items={searchableMenuGroups.Fleet} />
         )}
 
         {searchableMenuGroups.SystemAdmin && searchableMenuGroups.SystemAdmin.length > 0 && (
-          <NavMain title={t("SystemAdmin.title")} items={searchableMenuGroups.SystemAdmin} />
+          <NavMain title={t("Pages.SystemAdmin.title")} items={searchableMenuGroups.SystemAdmin} />
         )}
       </SidebarContent>
       <SidebarFooter className="border-t">

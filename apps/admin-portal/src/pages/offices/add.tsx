@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -33,15 +34,15 @@ export default function AddOfficePage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Offices.add_new")} />
+      <CustomPageMeta title={t("Pages.Offices.add_new")} />
       <PageTitle
         formButtons
         formId="office-form"
         loading={isLoading}
         onCancel={() => router.push("/offices")}
         texts={{
-          title: t("Offices.add_new"),
-          submit_form: t("Offices.add_new"),
+          title: t("Pages.Offices.add_new"),
+          submit_form: t("Pages.Offices.add_new"),
           cancel: t("General.cancel"),
         }}
         dummyButton={handleDummyData}
@@ -59,10 +60,15 @@ export default function AddOfficePage() {
   );
 }
 
+AddOfficePage.messages = ["Offices", "Pages", "General", "Forms"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../../locales/${locale}/offices.json`)).default,
+      messages: pick(
+        (await import(`../../../locales/${locale}.json`)).default,
+        AddOfficePage.messages,
+      ),
     },
   };
 };
