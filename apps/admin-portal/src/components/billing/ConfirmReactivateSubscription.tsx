@@ -1,94 +1,85 @@
-import { AlertCircle, Loader2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
-interface ConfirmReactivateSubscriptionProps {
+export interface ConfirmReactivateSubscriptionProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onReactivate: () => Promise<void>;
-  subscriptionId: string | null;
+  isReactivating: boolean;
+  onConfirm: () => Promise<void>;
+  planName: string;
 }
 
-export function ConfirmReactivateSubscription({
+export function ConfirmReactivateSubscriptionDialog({
   open,
   onOpenChange,
-  onReactivate,
-  subscriptionId,
+  isReactivating,
+  onConfirm,
+  planName,
 }: ConfirmReactivateSubscriptionProps) {
   const t = useTranslations();
-  const [loading, setLoading] = useState(false);
+  const locale = useLocale();
+  const [error, setError] = useState<string | null>(null);
 
-  const handleReactivateSubscription = async () => {
-    if (!subscriptionId) return;
-
+  const handleReactivate = async () => {
     try {
-      setLoading(true);
-
-      // Call the API to reactivate the subscription
-      const response = await fetch("/api/stripe/reactivate-subscription", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          subscriptionId,
+      setError(null);
+      toast.loading(
+        t("Billing.reactivate_subscription.loading", {
+          fallback: "Reactivating subscription...",
         }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to reactivate subscription");
-      }
-
-      // Call the onReactivate callback
-      await onReactivate();
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Error reactivating subscription:", error);
-    } finally {
-      setLoading(false);
+      );
+      await onConfirm();
+      toast.dismiss();
+    } catch (err: any) {
+      toast.dismiss();
+      setError(err.message || "An error occurred while reactivating your subscription");
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-blue-500" />
-            {t("Billing.reactivate_subscription.title")}
-          </DialogTitle>
-          <DialogDescription className="pt-2">
-            {t("Billing.reactivate_subscription.description")}
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="text-sm">
-          <ul className="list-disc space-y-2 pl-5">
-            <li>{t("Billing.reactivate_subscription.benefit_1")}</li>
-            <li>{t("Billing.reactivate_subscription.benefit_2")}</li>
-          </ul>
-        </div>
-
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="ghost" onClick={() => onOpenChange(false)} disabled={loading}>
-            {t("Billing.reactivate_subscription.go_back")}
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent dir={locale === "ar" ? "rtl" : "ltr"}>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {t("Billing.reactivate_subscription.title", { fallback: "Reactivate Subscription" })}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {t("Billing.reactivate_subscription.description", {
+              plan: planName,
+              fallback: `Are you sure you want to reactivate your ${planName}? Your subscription will continue and you'll be billed normally on your next billing date.`,
+            })}
+          </AlertDialogDescription>
+          {error && (
+            <div className="mt-2 rounded-md bg-red-50 p-3 text-sm text-red-600">
+              <p>{error}</p>
+            </div>
+          )}
+        </AlertDialogHeader>
+        <AlertDialogFooter className="gap-2">
+          <AlertDialogCancel disabled={isReactivating}>
+            {t("Billing.reactivate_subscription.cancel", { fallback: "Cancel" })}
+          </AlertDialogCancel>
+          <Button variant="default" onClick={handleReactivate} disabled={isReactivating}>
+            {isReactivating
+              ? t("Billing.reactivate_subscription.processing", { fallback: "Processing..." })
+              : t("Billing.reactivate_subscription.confirm", {
+                  fallback: "Reactivate Subscription",
+                })}
           </Button>
-          <Button onClick={handleReactivateSubscription} disabled={loading} className="gap-2">
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {t("Billing.reactivate_subscription.confirm")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
