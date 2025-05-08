@@ -25,6 +25,9 @@ declare global {
 let lastRequestTime = 0;
 let requestPromise: Promise<any> | null = null;
 
+// Event name for subscription updates
+const SUBSCRIPTION_UPDATED_EVENT = "subscriptionUpdated";
+
 interface SubscriptionData {
   id: string | null;
   name: string | null;
@@ -605,6 +608,70 @@ export function useSubscription() {
     }
   };
 
+  /**
+   * Reactivate a canceled subscription
+   */
+  const reactivateSubscription = async (): Promise<{
+    success: boolean;
+    subscription?: any;
+    error?: string;
+  }> => {
+    try {
+      if (!user || !subscriptionData.id) {
+        throw new Error("No subscription to reactivate");
+      }
+
+      if (!subscriptionData.cancelAt) {
+        throw new Error("Subscription is not scheduled for cancellation");
+      }
+
+      // Check if we have a profile-based pseudo ID
+      if (subscriptionData.id === "profile-based") {
+        throw new Error("Cannot reactivate a profile-based subscription. Please contact support.");
+      }
+
+      const response = await fetch("/api/stripe/reactivate-subscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscriptionId: subscriptionData.id,
+          userId: user.id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || errorData.error || "Failed to reactivate subscription",
+        );
+      }
+
+      const data = await response.json();
+
+      // Dispatch event to notify subscribers that subscription has been updated
+      const event = new CustomEvent(SUBSCRIPTION_UPDATED_EVENT);
+      window.dispatchEvent(event);
+      window.dispatchEvent(new Event("subscription_updated")); // for backwards compatibility
+
+      // Refresh user data and subscription data
+      await fetchUserAndProfile();
+      await fetchSubscription(true);
+
+      return {
+        success: true,
+        subscription: data.subscription,
+      };
+    } catch (error) {
+      console.error("Error reactivating subscription:", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error occurred",
+      };
+    }
+  };
+
   // Fix the useEffect to prevent infinite loops
   useEffect(() => {
     // Skip if the page just regained focus after tab switch or Alt+Tab
@@ -710,5 +777,6 @@ export function useSubscription() {
     createSubscription,
     updateSubscription,
     cancelSubscription,
+    reactivateSubscription,
   };
 }
