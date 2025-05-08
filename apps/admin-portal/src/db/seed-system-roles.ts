@@ -190,6 +190,20 @@ const systemRolePermissions: Record<string, string[]> = {
     "online_stores.update",
     "online_stores.duplicate",
     "online_stores.export",
+
+    "cars.read",
+    "cars.create",
+    "cars.delete",
+    "cars.update",
+    "cars.export",
+    "cars.duplicate",
+
+    "trucks.read",
+    "trucks.create",
+    "trucks.delete",
+    "trucks.update",
+    "trucks.export",
+    "trucks.duplicate",
   ],
   human_resources: [
     "employees.read",

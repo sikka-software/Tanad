@@ -87,6 +87,8 @@ export const activity_target_type = pgEnum("activity_target_type", [
   "WEBSITE",
   "PURCHASE",
   "ONLINE_STORE",
+  "CAR",
+  "TRUCK",
 ]);
 export const app_permission = pgEnum("app_permission", [
   "users.create",
@@ -233,6 +235,18 @@ export const app_permission = pgEnum("app_permission", [
   "online_stores.update",
   "online_stores.export",
   "online_stores.duplicate",
+  "cars.read",
+  "cars.create",
+  "cars.delete",
+  "cars.update",
+  "cars.export",
+  "cars.duplicate",
+  "trucks.read",
+  "trucks.create",
+  "trucks.delete",
+  "trucks.update",
+  "trucks.export",
+  "trucks.duplicate",
 ]);
 export const app_role = pgEnum("app_role", ["superadmin", "admin", "accounting", "hr"]);
 export const payment_cycle = pgEnum("payment_cycle", ["monthly", "annual"]);
@@ -2047,6 +2061,38 @@ export const servers = pgTable(
     }),
   ],
 );
+
+export const cars = pgTable("cars", {
+  id: uuid().defaultRandom().primaryKey().notNull(),
+  name: text().notNull(),
+  make: text().notNull(),
+  model: text().notNull(),
+  year: text().notNull(),
+  color: text(),
+  vin: text(),
+  code: text(),
+  liscese_country: text(),
+  license_plate: text(),
+  created_at: timestamp({ withTimezone: true, mode: "string" })
+    .default(sql`timezone('utc'::text, now())`)
+    .notNull(),
+});
+
+export const trucks = pgTable("trucks", {
+  id: uuid().defaultRandom().primaryKey().notNull(),
+  name: text().notNull(),
+  make: text().notNull(),
+  model: text().notNull(),
+  year: text().notNull(),
+  color: text(),
+  vin: text(),
+  code: text(),
+  liscese_country: text(),
+  license_plate: text(),
+  created_at: timestamp({ withTimezone: true, mode: "string" })
+    .default(sql`timezone('utc'::text, now())`)
+    .notNull(),
+});
 
 export const user_roles = pgTable(
   "user_roles",

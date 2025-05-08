@@ -127,6 +127,48 @@ export type Database = {
           },
         ]
       }
+      cars: {
+        Row: {
+          code: string | null
+          color: string | null
+          created_at: string
+          id: string
+          license_plate: string | null
+          liscese_country: string | null
+          make: string
+          model: string
+          name: string
+          vin: string | null
+          year: string
+        }
+        Insert: {
+          code?: string | null
+          color?: string | null
+          created_at?: string
+          id?: string
+          license_plate?: string | null
+          liscese_country?: string | null
+          make: string
+          model: string
+          name: string
+          vin?: string | null
+          year: string
+        }
+        Update: {
+          code?: string | null
+          color?: string | null
+          created_at?: string
+          id?: string
+          license_plate?: string | null
+          liscese_country?: string | null
+          make?: string
+          model?: string
+          name?: string
+          vin?: string | null
+          year?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           additional_number: string | null
@@ -1208,6 +1250,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          cancel_at: number | null
+          cancel_at_period_end: boolean | null
           created_at: string | null
           email: string | null
           enterprise_id: string | null
@@ -1222,6 +1266,8 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          cancel_at?: number | null
+          cancel_at_period_end?: boolean | null
           created_at?: string | null
           email?: string | null
           enterprise_id?: string | null
@@ -1236,6 +1282,8 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          cancel_at?: number | null
+          cancel_at_period_end?: boolean | null
           created_at?: string | null
           email?: string | null
           enterprise_id?: string | null
@@ -1623,6 +1671,48 @@ export type Database = {
         }
         Relationships: []
       }
+      trucks: {
+        Row: {
+          code: string | null
+          color: string | null
+          created_at: string
+          id: string
+          license_plate: string | null
+          liscese_country: string | null
+          make: string
+          model: string
+          name: string
+          vin: string | null
+          year: string
+        }
+        Insert: {
+          code?: string | null
+          color?: string | null
+          created_at?: string
+          id?: string
+          license_plate?: string | null
+          liscese_country?: string | null
+          make: string
+          model: string
+          name: string
+          vin?: string | null
+          year: string
+        }
+        Update: {
+          code?: string | null
+          color?: string | null
+          created_at?: string
+          id?: string
+          license_plate?: string | null
+          liscese_country?: string | null
+          make?: string
+          model?: string
+          name?: string
+          vin?: string | null
+          year?: string
+        }
+        Relationships: []
+      }
       user_enterprise_roles: {
         Row: {
           created_at: string | null
@@ -1950,6 +2040,15 @@ export type Database = {
           branches_updated: number
         }[]
       }
+      get_module_analytics_cars: {
+        Args: { start_date?: string; end_date?: string; time_interval?: string }
+        Returns: {
+          period_start: string
+          cars_added: number
+          cars_removed: number
+          cars_updated: number
+        }[]
+      }
       get_module_analytics_client: {
         Args: { start_date?: string; end_date?: string; time_interval?: string }
         Returns: {
@@ -2186,6 +2285,8 @@ export type Database = {
         | "DOMAIN"
         | "WEBSITE"
         | "ONLINE_STORE"
+        | "CAR"
+        | "TRUCK"
       app_permission:
         | "users.create"
         | "users.read"
@@ -2331,6 +2432,18 @@ export type Database = {
         | "online_stores.update"
         | "online_stores.export"
         | "online_stores.duplicate"
+        | "cars.read"
+        | "cars.create"
+        | "cars.delete"
+        | "cars.update"
+        | "cars.export"
+        | "cars.duplicate"
+        | "trucks.read"
+        | "trucks.create"
+        | "trucks.delete"
+        | "trucks.update"
+        | "trucks.export"
+        | "trucks.duplicate"
       app_role: "superadmin" | "admin" | "accounting" | "hr"
       common_status: "active" | "inactive" | "draft" | "archived"
       employee_status:
@@ -2503,6 +2616,8 @@ export const Constants = {
         "DOMAIN",
         "WEBSITE",
         "ONLINE_STORE",
+        "CAR",
+        "TRUCK",
       ],
       app_permission: [
         "users.create",
@@ -2649,6 +2764,18 @@ export const Constants = {
         "online_stores.update",
         "online_stores.export",
         "online_stores.duplicate",
+        "cars.read",
+        "cars.create",
+        "cars.delete",
+        "cars.update",
+        "cars.export",
+        "cars.duplicate",
+        "trucks.read",
+        "trucks.create",
+        "trucks.delete",
+        "trucks.update",
+        "trucks.export",
+        "trucks.duplicate",
       ],
       app_role: ["superadmin", "admin", "accounting", "hr"],
       common_status: ["active", "inactive", "draft", "archived"],
