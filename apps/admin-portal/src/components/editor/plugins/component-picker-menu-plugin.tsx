@@ -12,12 +12,14 @@ import { useBasicTypeaheadTriggerMatch } from "@lexical/react/LexicalTypeaheadMe
 import { cn } from "@root/src/lib/utils";
 import { TextNode } from "lexical";
 import dynamic from "next/dynamic";
-import { useCallback, useMemo, useState, JSX } from "react";
+import React, { useCallback, useMemo, useState, JSX, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 
 import { useEditorModal } from "@/components/editor/editor-hooks/use-modal";
 import { ComponentPickerOption } from "@/components/editor/plugins/picker/component-picker-option";
-import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+
+// Removed Popover imports as we are creating a custom popover-like structure
+// import { Popover, PopoverContent } from "@/components/ui/popover";
 
 const LexicalTypeaheadMenuPlugin = dynamic(
   () => import("./default/lexical-typeahead-menu-plugin"),
@@ -43,9 +45,7 @@ export function ComponentPickerMenuPlugin({
     if (!queryString) {
       return baseOptions;
     }
-
     const regex = new RegExp(queryString, "i");
-
     return [
       ...(dynamicOptionsFn?.({ queryString }) || []),
       ...baseOptions.filter(
@@ -53,7 +53,7 @@ export function ComponentPickerMenuPlugin({
           regex.test(option.title) || option.keywords.some((keyword) => regex.test(keyword)),
       ),
     ];
-  }, [editor, queryString, showModal]);
+  }, [baseOptions, dynamicOptionsFn, queryString]);
 
   const onSelectOption = useCallback(
     (
@@ -68,7 +68,7 @@ export function ComponentPickerMenuPlugin({
         closeMenu();
       });
     },
-    [editor],
+    [editor, showModal],
   );
 
   return (
@@ -84,12 +84,39 @@ export function ComponentPickerMenuPlugin({
           anchorElementRef,
           { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
         ) => {
+          const listRef = useRef<HTMLDivElement>(null);
+
+          useEffect(() => {
+            if (listRef.current) {
+              listRef.current.focus({ preventScroll: true });
+            }
+          }, []);
+
+          useEffect(() => {
+            if (listRef.current && selectedIndex !== null) {
+              const selectedButton = listRef.current.querySelector(
+                `button[data-index="${selectedIndex}"]`,
+              ) as HTMLElement;
+              if (selectedButton) {
+                selectedButton.scrollIntoView({ block: "nearest" });
+              }
+            }
+          }, [selectedIndex]);
+
           return anchorElementRef.current && options.length
             ? createPortal(
-                <div className="fixed z-[200] w-[250px] rounded-md shadow-md">
-                  <Command
-                    className="z-[199]"
+                // This div is the main popover container, positioned by anchorElementRef.current (its parent in the portal)
+                <div
+                  className="bg-popover text-popover-foreground absolute z-[200] w-[250px] rounded-md border p-1 shadow-md"
+                  // style={{ top: 0, left: 0 }} // To align with anchor if anchor is just a point.
+                  // Or rely on anchorElementRef having dimensions and this flowing into it.
+                >
+                  <div // This div is the scrollable list container
+                    ref={listRef}
+                    tabIndex={-1} // Make it programmatically focusable
+                    role="listbox"
                     onKeyDown={(e) => {
+                      if (options.length === 0) return;
                       if (e.key === "ArrowUp") {
                         e.preventDefault();
                         setHighlightedIndex(
@@ -102,30 +129,46 @@ export function ComponentPickerMenuPlugin({
                         setHighlightedIndex(
                           selectedIndex !== null ? (selectedIndex + 1) % options.length : 0,
                         );
+                      } else if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        if (selectedIndex !== null && options[selectedIndex]) {
+                          selectOptionAndCleanUp(options[selectedIndex]);
+                        }
                       }
                     }}
+                    className="max-h-[240px] w-full overflow-y-auto outline-none focus:outline-none"
                   >
-                    <CommandList className="z-[199]">
-                      <CommandGroup className="z-[199]">
-                        {options.map((option, index) => (
-                          <CommandItem
-                            key={option.key}
-                            value={option.title}
-                            onSelect={() => {
-                              selectOptionAndCleanUp(option);
-                            }}
-                            className={cn(
-                              "z-[199] flex items-center gap-2",
-                              selectedIndex === index ? "bg-accent" : "!bg-transparent",
-                            )}
-                          >
-                            {option.icon}
-                            {option.title}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
+                    {options.map((option, index) => (
+                      <button
+                        key={option.key}
+                        role="option"
+                        aria-selected={selectedIndex === index}
+                        data-index={index} // For querySelector in scrollIntoView effect
+                        onMouseDown={(e) => {
+                          // Use onMouseDown to highlight before click potentially steals focus
+                          e.preventDefault(); // Prevent blur on editor
+                          setHighlightedIndex(index);
+                        }}
+                        onClick={() => {
+                          selectOptionAndCleanUp(option);
+                        }}
+                        onMouseEnter={() => {
+                          setHighlightedIndex(index);
+                        }}
+                        className={cn(
+                          "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm outline-none",
+                          "hover:bg-accent hover:text-accent-foreground", // Standard hover
+                          selectedIndex === index
+                            ? "bg-accent text-accent-foreground" // Selected item
+                            : "text-popover-foreground bg-transparent", // Default item state
+                          "focus-visible:bg-accent focus-visible:text-accent-foreground", // Keyboard focus
+                        )}
+                      >
+                        {option.icon}
+                        {option.title}
+                      </button>
+                    ))}
+                  </div>
                 </div>,
                 anchorElementRef.current,
               )
