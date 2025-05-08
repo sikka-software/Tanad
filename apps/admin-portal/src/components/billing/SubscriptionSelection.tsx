@@ -265,56 +265,47 @@ export default function SubscriptionSelection({
   };
 
   const handlePaymentSuccess = async () => {
-    setIsPaymentDialogOpen(false);
     setIsLoading(true);
     setSelectedPlan("");
-
-    // Clear any caches to ensure fresh data
-    console.log("Payment successful, refreshing subscription data");
+    setIsPaymentDialogOpen(false);
 
     try {
-      // Show a loading toast
-      const loadingToast = toast.loading("Updating your subscription...");
-
-      // Dispatch custom events immediately to notify other components
-      console.log("Broadcasting subscription update events");
-      window.dispatchEvent(new CustomEvent("subscription_updated"));
-
-      // Import and use the constant from CurrentPlan
-      try {
-        const module = await import("@/components/billing/CurrentPlan");
-        if (module.SUBSCRIPTION_UPDATED_EVENT) {
-          console.log(`Dispatching ${module.SUBSCRIPTION_UPDATED_EVENT} event`);
-          window.dispatchEvent(new CustomEvent(module.SUBSCRIPTION_UPDATED_EVENT));
-        }
-      } catch (err) {
-        console.warn("Error dispatching SUBSCRIPTION_UPDATED_EVENT:", err);
-      }
-
-      // Refresh data with multiple retries
-      const maxRetries = 3;
+      // Retry the data refresh with timeout for better reliability
       let retryCount = 0;
+      const maxRetries = 3;
       let success = false;
 
+      // Try refreshing data a few times with delay to allow backend systems to update
       while (retryCount < maxRetries && !success) {
         try {
-          // Wait a moment for backend to process the subscription
+          console.log(
+            `Attempting data refresh after payment (attempt ${retryCount + 1}/${maxRetries})`,
+          );
+
+          // Wait for backend to process payment before refreshing
           await new Promise((resolve) => setTimeout(resolve, 1000));
 
-          // Refresh the data
-          await Promise.all([refetchSubscription(), fetchUserAndProfile()]);
+          // Refresh subscription data
+          await refetchSubscription();
+          await fetchUserAndProfile();
+
           console.log("Subscription data refreshed successfully");
           success = true;
-        } catch (error) {
-          console.error(`Retry ${retryCount + 1}/${maxRetries} failed:`, error);
+        } catch (refreshError) {
+          console.error(`Refresh attempt ${retryCount + 1} failed:`, refreshError);
           retryCount++;
+
           // Wait longer between retries
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          if (retryCount < maxRetries) {
+            await new Promise((resolve) => setTimeout(resolve, 1000 * retryCount));
+          }
         }
       }
 
-      // Clear loading toast
-      toast.dismiss(loadingToast);
+      // If we still failed to refresh, log the issue
+      if (!success) {
+        console.warn("All refresh attempts failed, continuing anyway");
+      }
 
       // Show success message
       toast.success(
@@ -323,14 +314,8 @@ export default function SubscriptionSelection({
         }),
       );
 
-      // Force reload the page without confirmation to ensure all components are updated correctly
-      setTimeout(() => {
-        // Use router.push instead of window.location to preserve locale and Next.js context
-        router.push({
-          pathname: "/billing",
-          query: { refresh: Date.now() }, // Add timestamp to force full refresh
-        });
-      }, 1500);
+      // No need to force reload the page - remove this code
+      // The event listeners will handle the data refresh
     } catch (error) {
       console.error("Error refreshing subscription data:", error);
       toast.error(

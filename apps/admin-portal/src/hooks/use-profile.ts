@@ -108,7 +108,7 @@ export function useUpdateProfile() {
         const updatedProfile = {
           ...userStore.profile,
           full_name: data.full_name || userStore.profile.full_name,
-          avatar_url: data.avatar_url || userStore.profile.avatar_url,
+          //      avatar_url: data.avatar_url || userStore.profile.avatar_url || "",
           address: data.address || userStore.profile.address,
           email: data.email || userStore.profile.email,
           username: data.username || userStore.profile.username,
