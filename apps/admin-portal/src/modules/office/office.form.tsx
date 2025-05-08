@@ -348,11 +348,16 @@ export function OfficeForm({
             </div>
           </div>
           <AddressFormSection
+            inDialog={editMode}
             title={t("Offices.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
-          <NotesSection control={form.control} title={t("Offices.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Offices.form.notes.label")}
+          />
         </form>
       </Form>
       <FormDialog

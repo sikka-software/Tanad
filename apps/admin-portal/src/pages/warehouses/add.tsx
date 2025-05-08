@@ -62,7 +62,7 @@ export default function AddWarehousePage() {
   );
 }
 
-AddWarehousePage.messages = ["Pages", "Warehouses", "General"];
+AddWarehousePage.messages = ["Pages", "Warehouses", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

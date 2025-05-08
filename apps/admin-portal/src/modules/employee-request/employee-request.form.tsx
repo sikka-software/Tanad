@@ -116,7 +116,7 @@ export function EmployeeRequestForm({
       ...data,
       title: data.title.trim(),
       description: data.description?.trim() || undefined,
-      notes: data.notes?.trim() || undefined,
+      notes: data.notes,
       start_date: data.start_date ? data.start_date.toISOString() : undefined,
       end_date: data.end_date ? data.end_date.toISOString() : undefined,
     };
@@ -373,7 +373,11 @@ export function EmployeeRequestForm({
               )}
             />
           </div>
-          <NotesSection control={form.control} title={t("EmployeeRequests.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("EmployeeRequests.form.notes.label")}
+          />
         </form>
       </Form>
 

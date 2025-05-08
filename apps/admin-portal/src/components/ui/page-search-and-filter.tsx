@@ -139,7 +139,7 @@ const PageSearchAndFilter = ({
         )}
 
         {onAddClick && (
-          <Button size="sm" className="h-8" onClick={onAddClick}>
+          <Button size="sm" className="h-8 cursor-pointer" onClick={onAddClick}>
             <Plus className="me-1 h-4 w-4" />
             <span>{createLabel}</span>
           </Button>

@@ -205,7 +205,7 @@ export function EmployeeForm({
       phone: data.phone?.trim() || undefined,
       position: data.position.trim(),
       hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
-      notes: data.notes?.trim() || undefined,
+      notes: data.notes,
       department_id: data.department || undefined,
       salary: (data.salary || []).map((comp) => ({
         ...comp,
@@ -517,7 +517,11 @@ export function EmployeeForm({
             </div>
           </div>
 
-          <NotesSection control={form.control} title={t("Employees.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Employees.form.notes.label")}
+          />
         </form>
       </Form>
 

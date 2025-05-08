@@ -88,7 +88,7 @@ export function ServerForm({
       os: data.os?.trim() || null,
       status: data.status?.trim() || undefined,
       tags: Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : null,
-      notes: data.notes?.trim() || null,
+      notes: data.notes,
     };
 
     try {
@@ -293,7 +293,11 @@ export function ServerForm({
             />
           </div>
         </div>
-        <NotesSection control={form.control} title={t("Servers.form.notes.label")} />
+        <NotesSection
+          inDialog={editMode}
+          control={form.control}
+          title={t("Servers.form.notes.label")}
+        />
       </form>
     </Form>
   );

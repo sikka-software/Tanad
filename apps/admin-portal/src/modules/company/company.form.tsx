@@ -331,7 +331,11 @@ export function CompanyForm({
           isLoading={isLoading}
         />
 
-        <NotesSection control={form.control} title={t("Companies.form.notes.label")} />
+        <NotesSection
+          inDialog={editMode}
+          control={form.control}
+          title={t("Companies.form.notes.label")}
+        />
       </form>
     </Form>
   );

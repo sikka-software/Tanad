@@ -63,7 +63,7 @@ export default function AddBranchPage() {
   );
 }
 
-AddBranchPage.messages = ["Pages", "Branches", "General"];
+AddBranchPage.messages = ["Pages", "Branches", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

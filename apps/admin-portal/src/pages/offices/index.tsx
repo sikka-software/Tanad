@@ -176,7 +176,7 @@ export default function OfficesPage() {
   );
 }
 
-OfficesPage.messages = ["Offices", "Pages", "General"];
+OfficesPage.messages = ["Offices", "Pages", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

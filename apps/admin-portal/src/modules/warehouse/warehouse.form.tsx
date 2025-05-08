@@ -100,7 +100,7 @@ export function WarehouseForm({
               code: data.code.trim(),
               capacity: data.capacity ? parseInt(data.capacity) : null,
               status: data.status as "active" | "inactive" | "draft" | "archived" | null,
-              notes: data.notes?.trim() || null,
+              notes: data.notes,
               short_address: data.short_address?.trim() || undefined,
               building_number: data.building_number?.trim() || undefined,
               street_name: data.street_name?.trim() || undefined,
@@ -126,7 +126,7 @@ export function WarehouseForm({
             name: data.name.trim(),
             code: data.code.trim(),
             capacity: data.capacity ? parseInt(data.capacity) : null,
-            notes: data.notes?.trim() || null,
+            notes: data.notes,
             status: data.status as "active" | "inactive" | "draft" | "archived" | null,
             user_id: profile?.id || "",
             short_address: data.short_address?.trim() || undefined,
@@ -261,12 +261,17 @@ export function WarehouseForm({
           </div>
         </div>
         <AddressFormSection
+          inDialog={editMode}
           title={t("Warehouses.form.address.label")}
           control={form.control}
           isLoading={isLoading}
         />
 
-        <NotesSection control={form.control} title={t("Warehouses.form.notes.label")} />
+        <NotesSection
+          inDialog={editMode}
+          control={form.control}
+          title={t("Warehouses.form.notes.label")}
+        />
       </form>
     </Form>
   );

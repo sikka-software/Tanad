@@ -480,7 +480,7 @@ export function QuoteForm({
               </div>
             </div>
           </div> */}
-          <NotesSection control={form.control} title={t("Quotes.notes")} />
+          <NotesSection inDialog={editMode} control={form.control} title={t("Quotes.notes")} />
         </form>
       </Form>
 

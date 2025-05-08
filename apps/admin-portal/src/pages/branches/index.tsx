@@ -187,7 +187,7 @@ export default function BranchesPage() {
   );
 }
 
-BranchesPage.messages = ["Pages", "Branches", "General"];
+BranchesPage.messages = ["Pages", "Branches", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

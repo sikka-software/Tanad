@@ -118,7 +118,7 @@ export function VendorForm({
               region: data.region?.trim() || undefined,
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
-              notes: data.notes?.trim() || null,
+              notes: data.notes,
             },
           },
           {
@@ -147,7 +147,7 @@ export function VendorForm({
             enterprise_id: membership?.enterprise_id || "",
             user_id: profile?.id || "",
             updated_at: new Date().toISOString(),
-            notes: data.notes?.trim() || null,
+            notes: data.notes,
           },
           {
             onSuccess: async () => {
@@ -261,12 +261,17 @@ export function VendorForm({
           </div>
 
           <AddressFormSection
+            inDialog={editMode}
             title={t("Vendors.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
 
-          <NotesSection control={form.control} title={t("Vendors.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Vendors.form.notes.label")}
+          />
         </form>
       </Form>
 

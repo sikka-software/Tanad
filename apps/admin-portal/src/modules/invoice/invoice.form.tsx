@@ -475,7 +475,11 @@ export function InvoiceForm({
             isLoading={loading}
             isError={form.formState.errors.items as FieldError}
           />
-          <NotesSection control={form.control} title={t("Invoices.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Invoices.form.notes.label")}
+          />
         </form>
       </Form>
 

@@ -152,9 +152,6 @@ export default function ClientsPage() {
               setIsFormDialogOpen(false);
               setActionableClient(null);
               setLoadingSaveClient(false);
-              toast.success(t("General.successful_operation"), {
-                description: t("Clients.success.update"),
-              });
             }}
             defaultValues={actionableClient}
             editMode={true}
@@ -174,7 +171,7 @@ export default function ClientsPage() {
   );
 }
 
-ClientsPage.messages = ["Pages", "Clients", "General"];
+ClientsPage.messages = ["Pages", "Clients", "General", "Forms"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

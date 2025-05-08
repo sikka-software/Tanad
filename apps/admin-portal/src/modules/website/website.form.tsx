@@ -190,7 +190,11 @@ export function WebsiteForm({
               )}
             />
           </div>
-          <NotesSection control={form.control} title={t("Websites.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Websites.form.notes.label")}
+          />
         </form>
       </Form>
     </div>

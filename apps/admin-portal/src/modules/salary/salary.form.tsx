@@ -154,7 +154,7 @@ export function SalaryForm({
       const created_at = defaultValues?.created_at || undefined;
       const currency = defaultValues?.currency || undefined;
       const payment_date = data.payment_date;
-      const notes = data.notes?.trim() || undefined;
+      const notes = data.notes || undefined;
 
       const payload = {
         amount,
@@ -481,7 +481,11 @@ export function SalaryForm({
               </div>
             </div>
           </div>
-          <NotesSection control={form.control} title={t("Salaries.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Salaries.form.notes.label")}
+          />
         </form>
       </Form>
 

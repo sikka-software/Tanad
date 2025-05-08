@@ -361,7 +361,11 @@ export function PurchaseForm({
               )}
             />
           </div>
-          <NotesSection control={form.control} title={t("Purchases.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Purchases.form.notes.label")}
+          />
         </form>
       </Form>
     </div>

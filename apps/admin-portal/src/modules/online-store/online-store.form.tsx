@@ -84,7 +84,7 @@ export function OnlineStoreForm({
             data: {
               domain_name: data.domain_name.trim(),
               status: data.status?.trim() as "active" | "inactive" | null,
-              notes: data.notes?.trim() || null,
+              notes: data.notes,
             },
           },
           {
@@ -100,7 +100,7 @@ export function OnlineStoreForm({
           {
             domain_name: data.domain_name.trim(),
             status: data.status?.trim() as "active" | "inactive" | null,
-            notes: data.notes?.trim() || null,
+            notes: data.notes,
             user_id: user?.id,
             updated_at: new Date().toISOString(),
             enterprise_id: membership?.enterprise_id || "",
@@ -211,7 +211,11 @@ export function OnlineStoreForm({
             )}
           />
         </div>
-        <NotesSection control={form.control} title={t("OnlineStores.form.notes.label")} />
+        <NotesSection
+          inDialog={editMode}
+          control={form.control}
+          title={t("OnlineStores.form.notes.label")}
+        />
       </form>
     </Form>
   );

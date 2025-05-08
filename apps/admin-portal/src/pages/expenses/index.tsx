@@ -174,7 +174,7 @@ export default function ExpensesPage() {
   );
 }
 
-ExpensesPage.messages = ["Pages", "Expenses", "General"];
+ExpensesPage.messages = ["Pages", "Expenses", "Forms", "General"];
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {

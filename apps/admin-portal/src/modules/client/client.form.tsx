@@ -118,7 +118,7 @@ export function ClientForm({
               region: data.region?.trim() || null,
               country: data.country?.trim() || null,
               zip_code: data.zip_code?.trim() || null,
-              notes: data.notes?.trim() || null,
+              notes: data.notes,
             },
           },
           {
@@ -143,7 +143,7 @@ export function ClientForm({
             region: data.region?.trim() || null,
             country: data.country?.trim() || null,
             zip_code: data.zip_code?.trim() || null,
-            notes: data.notes?.trim() || null,
+            notes: data.notes,
             additional_number: null,
             user_id: user?.id || "",
             enterprise_id: membership?.enterprise_id || "",
@@ -259,11 +259,16 @@ export function ClientForm({
           </div>
 
           <AddressFormSection
+            inDialog={editMode}
             title={t("Clients.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
-          <NotesSection control={form.control} title={t("Clients.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Clients.form.notes.label")}
+          />
         </form>
       </Form>
 

@@ -202,7 +202,6 @@ export function BranchForm({
     <div>
       <Form {...form}>
         <form id={formHtmlId} onSubmit={form.handleSubmit(handleSubmit)}>
-          {/* <FormSectionHeader inDialog title={t("Branches.form.details.label")} /> */}
           <div className="form-container">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
@@ -364,11 +363,16 @@ export function BranchForm({
           </div>
 
           <AddressFormSection
+            inDialog={editMode}
             title={t("Branches.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
-          <NotesSection control={form.control} title={t("Branches.form.notes.label")} />
+          <NotesSection
+            inDialog={editMode}
+            control={form.control}
+            title={t("Branches.form.notes.label")}
+          />
         </form>
       </Form>
 

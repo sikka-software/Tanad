@@ -107,7 +107,7 @@ export function ProductForm({
               stock_quantity: data.stock_quantity?.trim()
                 ? parseInt(data.stock_quantity.trim())
                 : undefined,
-              notes: data.notes?.trim() || null,
+              notes: data.notes,
             },
           },
           {
@@ -269,7 +269,11 @@ export function ProductForm({
             )}
           />
         </div>
-        <NotesSection control={form.control} title={t("Products.form.notes.label")} />
+        <NotesSection
+          inDialog={editMode}
+          control={form.control}
+          title={t("Products.form.notes.label")}
+        />
       </form>
     </Form>
   );

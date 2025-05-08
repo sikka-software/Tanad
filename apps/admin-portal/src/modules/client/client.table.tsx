@@ -64,11 +64,17 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       header: t("Clients.form.zip_code.label"),
       validationSchema: z.string().min(1, t("Clients.form.zip_code.required")),
     },
-    {
-      accessorKey: "notes",
-      header: t("Clients.form.notes.label"),
-      validationSchema: z.string().optional(),
-    },
+
+    // {
+    //   accessorKey: "status",
+    //   header: t("Clients.form.status.label"),
+    //   validationSchema: z.enum(["active", "inactive"]),
+    //   cellType: "status",
+    //   options: [
+    //     { label: t("Clients.form.status.active"), value: "active" },
+    //     { label: t("Clients.form.status.inactive"), value: "inactive" },
+    //   ],
+    // },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {
