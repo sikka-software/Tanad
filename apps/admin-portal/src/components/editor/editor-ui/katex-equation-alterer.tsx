@@ -1,37 +1,35 @@
-import * as React from 'react'
-import { useCallback, useState, JSX } from 'react'
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import * as React from "react";
+import { useCallback, useState, JSX } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { ErrorBoundary } from 'react-error-boundary'
-
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-
-import KatexRenderer from '@/components/editor/editor-ui/katex-renderer'
+import KatexRenderer from "@/components/editor/editor-ui/katex-renderer";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
-  initialEquation?: string
-  onConfirm: (equation: string, inline: boolean) => void
-}
+  initialEquation?: string;
+  onConfirm: (equation: string, inline: boolean) => void;
+};
 
 export default function KatexEquationAlterer({
   onConfirm,
-  initialEquation = '',
+  initialEquation = "",
 }: Props): JSX.Element {
-  const [editor] = useLexicalComposerContext()
-  const [equation, setEquation] = useState<string>(initialEquation)
-  const [inline, setInline] = useState<boolean>(true)
+  const [editor] = useLexicalComposerContext();
+  const [equation, setEquation] = useState<string>(initialEquation);
+  const [inline, setInline] = useState<boolean>(true);
 
   const onClick = useCallback(() => {
-    onConfirm(equation, inline)
-  }, [onConfirm, equation, inline])
+    onConfirm(equation, inline);
+  }, [onConfirm, equation, inline]);
 
   const onCheckboxChange = useCallback(() => {
-    setInline(!inline)
-  }, [setInline, inline])
+    setInline(!inline);
+  }, [setInline, inline]);
 
   return (
     <>
@@ -39,11 +37,7 @@ export default function KatexEquationAlterer({
         <Label htmlFor="inline-toggle" className="text-sm font-medium">
           Inline
         </Label>
-        <Checkbox
-          id="inline-toggle"
-          checked={inline}
-          onCheckedChange={onCheckboxChange}
-        />
+        <Checkbox id="inline-toggle" checked={inline} onCheckedChange={onCheckboxChange} />
       </div>
 
       <div className="space-y-2">
@@ -70,13 +64,9 @@ export default function KatexEquationAlterer({
 
       <div className="space-y-2">
         <Label className="text-sm font-medium">Visualization</Label>
-        <div className="rounded-md border bg-muted p-4">
+        <div className="bg-muted rounded-md border p-4">
           <ErrorBoundary onError={(e) => editor._onError(e)} fallback={null}>
-            <KatexRenderer
-              equation={equation}
-              inline={false}
-              onDoubleClick={() => null}
-            />
+            <KatexRenderer equation={equation} inline={false} onDoubleClick={() => null} />
           </ErrorBoundary>
         </div>
       </div>
@@ -85,5 +75,5 @@ export default function KatexEquationAlterer({
         <Button onClick={onClick}>Confirm</Button>
       </div>
     </>
-  )
+  );
 }
