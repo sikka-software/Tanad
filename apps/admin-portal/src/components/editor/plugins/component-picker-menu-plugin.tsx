@@ -113,6 +113,8 @@ export function ComponentPickerMenuPlugin({
                     }}
                   />
                   <PopoverContent
+                    align="start"
+                    sideOffset={0}
                     className="w-[250px] p-0 shadow-md"
                     // onOpenAutoFocus={(e) => e.preventDefault()} // User commented this out, keeping it as is
                     onWheel={(e) => e.stopPropagation()}

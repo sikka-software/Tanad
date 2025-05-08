@@ -30,7 +30,6 @@ export default function AddBranchPage() {
       form.setValue("city", dummyData.city);
       form.setValue("state", dummyData.state);
       form.setValue("zip_code", dummyData.zip_code);
-      form.setValue("manager", dummyData.full_name);
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
       form.setValue("notes", "Test branch notes");
     }
