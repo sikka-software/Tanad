@@ -37,12 +37,12 @@ const RowActionsPopover = ({
   const [open, setOpen] = useState(false);
 
   let buttonClasses =
-    "focus-visible:ring-ring rounded-inner-1 flex flex-row items-center justify-start p-0 px-2 h-8 gap-2 focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:outline-none";
+    "focus-visible:ring-ring cursor-pointer rounded-inner-1 flex flex-row items-center justify-start p-0 px-2 h-8 gap-2 focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:outline-none";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <div className="flex h-full min-h-8 w-full flex-col items-center justify-center">
+        <div className="flex h-full min-h-8 w-full cursor-pointer flex-col items-center justify-center">
           <MoreVertical className="size-4" />
         </div>
       </PopoverTrigger>

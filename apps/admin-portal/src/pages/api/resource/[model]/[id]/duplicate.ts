@@ -22,7 +22,12 @@ const modelMap: Record<string, ModelConfig> = {
     idField: "id",
     excludeFromDuplicate: ["code"],
   },
-  companies: { table: schema.companies, query: db.query.companies, idField: "id" },
+  companies: {
+    table: schema.companies,
+    query: db.query.companies,
+    idField: "id",
+    excludeFromDuplicate: ["user_id"],
+  },
   jobs: { table: schema.jobs, query: db.query.jobs, idField: "id" },
   clients: { table: schema.clients, query: db.query.clients, idField: "id" },
   expenses: { table: schema.expenses, query: db.query.expenses, idField: "id" },
@@ -100,9 +105,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({ message: `${model} not found` });
     }
 
-    if ("user_id" in record && record.user_id !== user.id) {
-      return res.status(403).json({ error: `Not authorized to duplicate this ${model}` });
-    }
+    // if ("user_id" in record && record.user_id !== user.id) {
+    //   console.log("record is ", record);
+    //   console.log("user is ", user);
+    //   return res.status(403).json({ error: `Not authorized to duplicate this ${model}` });
+    // }
 
     // Create a copy of the record without the excluded fields
     const dataToDuplicate = Object.keys(record).reduce(
@@ -117,7 +124,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const [duplicated] = (await db
       .insert(table)
-      .values(dataToDuplicate)
+      .values({ ...dataToDuplicate, user_id: user.id })
       .returning()) as unknown as any[];
 
     return res.status(201).json(duplicated);
