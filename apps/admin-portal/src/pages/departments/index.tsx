@@ -185,7 +185,7 @@ export default function DepartmentsPage() {
   );
 }
 
-DepartmentsPage.messages = ["Pages", "Departments", "General"];
+DepartmentsPage.messages = ["Notes", "Pages", "Departments", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

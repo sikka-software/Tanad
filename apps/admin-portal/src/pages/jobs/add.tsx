@@ -70,7 +70,7 @@ export default function AddJobPage() {
   );
 }
 
-AddJobPage.messages = ["Pages", "Jobs", "General"];
+AddJobPage.messages = ["Notes", "Pages", "Jobs", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

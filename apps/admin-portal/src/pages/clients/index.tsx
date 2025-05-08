@@ -174,7 +174,7 @@ export default function ClientsPage() {
   );
 }
 
-ClientsPage.messages = ["Pages", "Clients", "General", "Forms"];
+ClientsPage.messages = ["Notes", "Pages", "Clients", "General", "Forms"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

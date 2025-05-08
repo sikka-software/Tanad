@@ -63,7 +63,7 @@ export default function AddCarPage() {
   );
 }
 
-AddCarPage.messages = ["Pages", "Cars", "General"];
+AddCarPage.messages = ["Pages", "Cars", "Notes", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

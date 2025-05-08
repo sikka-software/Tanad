@@ -189,7 +189,7 @@ export default function ProductsPage() {
   );
 }
 
-ProductsPage.messages = ["Pages", "Products", "Forms", "General"];
+ProductsPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

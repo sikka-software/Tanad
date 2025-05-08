@@ -177,7 +177,7 @@ export default function WarehousesPage() {
   );
 }
 
-WarehousesPage.messages = ["Pages", "Warehouses", "Forms", "General"];
+WarehousesPage.messages = ["Notes", "Pages", "Warehouses", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

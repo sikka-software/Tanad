@@ -42,7 +42,6 @@ export default function BranchesPage() {
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [actionableBranch, setActionableBranch] = useState<BranchUpdateData | null>(null);
-  const [displayData, setDisplayData] = useState<Branch[]>([]);
 
   const loadingSaveBranch = useBranchStore((state) => state.isLoading);
   const setLoadingSaveBranch = useBranchStore((state) => state.setIsLoading);
@@ -60,24 +59,14 @@ export default function BranchesPage() {
   const filterCaseSensitive = useBranchStore((state) => state.filterCaseSensitive);
   const getFilteredBranches = useBranchStore((state) => state.getFilteredData);
   const getSortedBranches = useBranchStore((state) => state.getSortedData);
-  const setViewMode = useBranchStore((state) => state.setViewMode);
 
   const { data: branches, isLoading: loadingFetchBranches, error } = useBranches();
   const { mutate: duplicateBranch } = useDuplicateBranch();
   const { mutateAsync: deleteBranches, isPending: isDeleting } = useBulkDeleteBranches();
-  const { mutate: updateBranch } = useUpdateBranch();
   const { createDeleteHandler } = useDeleteHandler();
 
-  useEffect(() => {
-    if (branches) {
-      setDisplayData(branches);
-    } else {
-      setDisplayData([]);
-    }
-  }, [branches]);
-
   const { handleAction: onActionClicked } = useDataTableActions({
-    data: displayData,
+    data: branches,
     setSelectedRows,
     setIsDeleteDialogOpen,
     setIsFormDialogOpen,
@@ -91,15 +80,14 @@ export default function BranchesPage() {
     success: "Branches.success.delete",
     error: "Branches.error.delete",
     onSuccess: () => {
-      setDisplayData((current) => current.filter((row) => !selectedRows.includes(row.id)));
       clearSelection();
       setIsDeleteDialogOpen(false);
     },
   });
 
   const filteredBranches = useMemo(() => {
-    return getFilteredBranches(displayData);
-  }, [displayData, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
+    return getFilteredBranches(branches || []);
+  }, [branches, getFilteredBranches, searchQuery, filterConditions, filterCaseSensitive]);
 
   const sortedBranches = useMemo(() => {
     return getSortedBranches(filteredBranches);
@@ -131,8 +119,8 @@ export default function BranchesPage() {
             onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Branches.add")}
             searchPlaceholder={t("Pages.Branches.search")}
-            count={displayData?.length}
-            hideOptions={displayData?.length === 0}
+            count={branches?.length}
+            hideOptions={branches?.length === 0}
           />
         )}
 
@@ -190,7 +178,7 @@ export default function BranchesPage() {
   );
 }
 
-BranchesPage.messages = ["Pages", "Branches", "Forms", "General"];
+BranchesPage.messages = ["Pages", "Branches", "Forms", "Notes", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

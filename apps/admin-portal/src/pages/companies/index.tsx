@@ -176,7 +176,7 @@ export default function CompaniesPage() {
   );
 }
 
-CompaniesPage.messages = ["Pages", "General", "Companies", "Forms"];
+CompaniesPage.messages = ["Notes", "Pages", "General", "Companies", "Forms"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

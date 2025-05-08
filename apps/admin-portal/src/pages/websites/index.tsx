@@ -190,7 +190,7 @@ export default function WebsitesPage() {
   );
 }
 
-WebsitesPage.messages = ["Pages", "Websites", "General"];
+WebsitesPage.messages = ["Notes", "Pages", "Websites", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

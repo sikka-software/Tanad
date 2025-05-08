@@ -61,7 +61,7 @@ export default function AddPurchasePage() {
   );
 }
 
-AddPurchasePage.messages = ["Pages", "Purchases", "Forms", "General"];
+AddPurchasePage.messages = ["Notes", "Pages", "Purchases", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

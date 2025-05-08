@@ -180,7 +180,7 @@ export default function OnlineStoresPage() {
   );
 }
 
-OnlineStoresPage.messages = ["Pages", "OnlineStores", "General"];
+OnlineStoresPage.messages = ["Notes", "Pages", "OnlineStores", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

@@ -61,7 +61,7 @@ export default function AddEmployeePage() {
   );
 }
 
-AddEmployeePage.messages = ["Pages", "Employees", "General"];
+AddEmployeePage.messages = ["Notes", "Pages", "Employees", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

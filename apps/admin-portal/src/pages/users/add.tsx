@@ -58,7 +58,7 @@ export default function AddUserPage() {
   );
 }
 
-AddUserPage.messages = ["Pages", "Users", "General"];
+AddUserPage.messages = ["Notes", "Pages", "Users", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

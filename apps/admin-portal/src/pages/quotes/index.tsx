@@ -150,7 +150,7 @@ export default function QuotesPage() {
   );
 }
 
-QuotesPage.messages = ["Pages", "Quotes", "General"];
+QuotesPage.messages = ["Notes", "Pages", "Quotes", "General"];
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {

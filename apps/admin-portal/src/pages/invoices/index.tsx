@@ -178,7 +178,7 @@ export default function InvoicesPage() {
   );
 }
 
-InvoicesPage.messages = ["Pages", "Invoices", "General"];
+InvoicesPage.messages = ["Notes", "Pages", "Invoices", "General"];
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {

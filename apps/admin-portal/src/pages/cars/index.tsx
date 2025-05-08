@@ -168,7 +168,7 @@ export default function CarsPage() {
   );
 }
 
-CarsPage.messages = ["Pages", "Cars", "General"];
+CarsPage.messages = ["Pages", "Cars", "Notes", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

@@ -175,7 +175,7 @@ export default function VendorsPage() {
   );
 }
 
-VendorsPage.messages = ["Pages", "Vendors", "Forms", "General"];
+VendorsPage.messages = ["Notes", "Pages", "Vendors", "Forms", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

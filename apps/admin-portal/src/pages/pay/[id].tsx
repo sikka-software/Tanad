@@ -62,7 +62,7 @@ export default function InvoicePreviewPage({ invoice }: Props) {
   );
 }
 
-InvoicePreviewPage.messages = ["Pages", "Invoices", "General"];
+InvoicePreviewPage.messages = ["Notes", "Pages", "Invoices", "General"];
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { params, locale, req, res } = context;

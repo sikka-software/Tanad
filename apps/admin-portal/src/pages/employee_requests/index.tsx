@@ -187,7 +187,7 @@ export default function EmployeeRequestsPage() {
   );
 }
 
-EmployeeRequestsPage.messages = ["Pages", "EmployeeRequests", "General"];
+EmployeeRequestsPage.messages = ["Notes", "Pages", "EmployeeRequests", "General"];
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {

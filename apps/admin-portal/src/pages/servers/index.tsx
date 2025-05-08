@@ -176,7 +176,7 @@ export default function ServersPage() {
   );
 }
 
-ServersPage.messages = ["Pages", "Servers", "General"];
+ServersPage.messages = ["Notes", "Pages", "Servers", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

@@ -59,7 +59,7 @@ export default function AddClientPage() {
   );
 }
 
-AddClientPage.messages = ["Pages", "Clients", "Forms", "General"];
+AddClientPage.messages = ["Pages", "Clients", "Forms", "Notes", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

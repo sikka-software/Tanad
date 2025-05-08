@@ -49,7 +49,7 @@ export default function AddInvoicePage() {
   );
 }
 
-AddInvoicePage.messages = ["Pages", "Invoices", "General"];
+AddInvoicePage.messages = ["Notes", "Pages", "Invoices", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

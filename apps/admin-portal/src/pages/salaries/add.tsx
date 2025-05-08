@@ -45,7 +45,7 @@ export default function AddSalaryPage() {
   );
 }
 
-AddSalaryPage.messages = ["Pages", "Salaries", "General"];
+AddSalaryPage.messages = ["Notes", "Pages", "Salaries", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

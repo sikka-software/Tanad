@@ -50,7 +50,7 @@ export default function AddRolePage() {
   );
 }
 
-AddRolePage.messages = ["Pages", "Roles", "General"];
+AddRolePage.messages = ["Notes", "Pages", "Roles", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {

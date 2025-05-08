@@ -183,7 +183,7 @@ export default function UsersPage() {
   );
 }
 
-UsersPage.messages = ["Pages", "Users", "General"];
+UsersPage.messages = ["Notes", "Pages", "Users", "General"];
 
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
