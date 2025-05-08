@@ -114,23 +114,21 @@ export function ComponentPickerMenuPlugin({
                   />
                   <PopoverContent
                     className="w-[250px] p-0 shadow-md"
-                    // onOpenAutoFocus={(e) => e.preventDefault()} // Prevent focus stealing
+                    // onOpenAutoFocus={(e) => e.preventDefault()} // User commented this out, keeping it as is
                     onWheel={(e) => e.stopPropagation()}
                   >
                     <Command
-                      onKeyDown={(e) => {
-                        if (e.key === "ArrowUp") {
-                          e.preventDefault();
-                          setHighlightedIndex(
-                            selectedIndex !== null
-                              ? (selectedIndex - 1 + options.length) % options.length
-                              : options.length - 1,
-                          );
-                        } else if (e.key === "ArrowDown") {
-                          e.preventDefault();
-                          setHighlightedIndex(
-                            selectedIndex !== null ? (selectedIndex + 1) % options.length : 0,
-                          );
+                      // Remove custom onKeyDown handler
+                      value={
+                        selectedIndex !== null && options[selectedIndex]
+                          ? options[selectedIndex].key
+                          : undefined
+                      }
+                      onValueChange={(currentValue) => {
+                        // Find the index of the item with the current value (key)
+                        const newIndex = options.findIndex((option) => option.key === currentValue);
+                        if (newIndex !== -1) {
+                          setHighlightedIndex(newIndex);
                         }
                       }}
                     >
@@ -139,15 +137,17 @@ export function ComponentPickerMenuPlugin({
                           {options.map((option, index) => (
                             <CommandItem
                               key={option.key}
-                              value={option.title}
+                              value={option.key} // Set value for cmdk to track
                               onSelect={() => {
                                 selectOptionAndCleanUp(option);
                                 setIsOpen(false); // Close popover on select
                               }}
-                              className={cn(
-                                "flex items-center gap-2",
-                                selectedIndex === index ? "bg-accent" : "!bg-transparent",
-                              )}
+                              // Rely on cmdk's default hover/selection (aria-selected)
+                              // className={cn(
+                              //   "flex items-center gap-2",
+                              //   selectedIndex === index ? "bg-accent" : "!bg-transparent",
+                              // )}
+                              className="flex items-center gap-2" // Keep basic layout styles
                             >
                               {option.icon}
                               {option.title}
