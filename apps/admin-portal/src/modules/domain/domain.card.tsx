@@ -18,13 +18,9 @@ const DomainCard = ({ domain }: { domain: Domain }) => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          {domain.notes && (
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <User className="h-4 w-4" />
-              <span>{domain.notes}</span>
-            </div>
-          )}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-500">Status: {domain.status}</p>
+          <p className="text-sm text-gray-500">Expires: {domain.payment_cycle}</p>
         </div>
       </CardContent>
     </Card>

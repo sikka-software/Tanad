@@ -40,11 +40,6 @@ const ClientCard = ({ client }: { client: Client }) => {
               </p>
             </div>
           </div>
-          {client.notes && (
-            <p className="mt-2 border-t pt-2 text-sm text-gray-500 dark:text-gray-400">
-              {client.notes}
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>

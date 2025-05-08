@@ -4,8 +4,8 @@ import { $getNearestNodeFromDOMNode } from "lexical";
 import { useEffect, useRef, useState, JSX } from "react";
 import * as React from "react";
 import { createPortal } from "react-dom";
+import { useDebounce } from "use-debounce";
 
-import { useDebounce } from "@/components/editor/editor-hooks/use-debounce";
 import { CopyButton } from "@/components/editor/editor-ui/code-button";
 
 const CODE_PADDING = 8;
@@ -32,7 +32,7 @@ function CodeActionMenuContainer({ anchorElem }: { anchorElem: HTMLElement }): J
     return codeDOMNodeRef.current;
   }
 
-  const debouncedOnMouseMove = useDebounce(
+  const [debouncedCallback, debouncedControls] = useDebounce(
     (event: MouseEvent) => {
       const { codeDOMNode, isOutside } = getMouseInfo(event);
       if (isOutside) {
@@ -70,7 +70,7 @@ function CodeActionMenuContainer({ anchorElem }: { anchorElem: HTMLElement }): J
       }
     },
     50,
-    1000,
+    { maxWait: 1000 },
   );
 
   useEffect(() => {
@@ -78,14 +78,14 @@ function CodeActionMenuContainer({ anchorElem }: { anchorElem: HTMLElement }): J
       return;
     }
 
-    document.addEventListener("mousemove", debouncedOnMouseMove);
+    document.addEventListener("mousemove", debouncedCallback);
 
     return () => {
       setShown(false);
-      debouncedOnMouseMove.cancel();
-      document.removeEventListener("mousemove", debouncedOnMouseMove);
+      debouncedControls.cancel();
+      document.removeEventListener("mousemove", debouncedCallback);
     };
-  }, [shouldListenMouseMove, debouncedOnMouseMove]);
+  }, [shouldListenMouseMove, debouncedCallback, debouncedControls]);
 
   useEffect(() => {
     return editor.registerMutationListener(

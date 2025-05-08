@@ -1,4 +1,4 @@
-import { Calendar, DollarSign, FileText, Tag } from "lucide-react";
+import { Calendar, DollarSign, Tag } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Badge } from "@/ui/badge";
@@ -58,12 +58,6 @@ const ExpenseCard = ({ expense }: { expense: Expense }) => {
             <Tag className="h-4 w-4" />
             <span>{expense.category}</span>
           </div>
-          {expense.notes && (
-            <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <FileText className="mt-1 h-4 w-4" />
-              <p>{expense.notes}</p>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

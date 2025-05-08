@@ -26,8 +26,9 @@ import { PlusIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, JSX } from "react";
 import * as React from "react";
 import { createPortal } from "react-dom";
+import { useDebounce } from "use-debounce";
 
-import { useDebounce } from "@/components/editor/editor-hooks/use-debounce";
+// import { useDebounce } from "@/components/editor/editor-hooks/use-debounce";
 
 const BUTTON_WIDTH_PX = 20;
 
@@ -45,7 +46,7 @@ function TableHoverActionsContainer({
   const tableSetRef = useRef<Set<NodeKey>>(new Set());
   const tableCellDOMNodeRef = useRef<HTMLElement | null>(null);
 
-  const debouncedOnMouseMove = useDebounce(
+  const [debouncedCallback, debouncedControls] = useDebounce(
     (event: MouseEvent) => {
       const { isOutside, tableDOMNode } = getMouseInfo(event);
 
@@ -128,7 +129,7 @@ function TableHoverActionsContainer({
       }
     },
     50,
-    250,
+    { maxWait: 250 },
   );
 
   // Hide the buttons on any table dimensions change to prevent last row cells
@@ -145,15 +146,15 @@ function TableHoverActionsContainer({
       return;
     }
 
-    document.addEventListener("mousemove", debouncedOnMouseMove);
+    document.addEventListener("mousemove", debouncedCallback);
 
     return () => {
       setShownRow(false);
       setShownColumn(false);
-      debouncedOnMouseMove.cancel();
-      document.removeEventListener("mousemove", debouncedOnMouseMove);
+      debouncedControls.cancel();
+      document.removeEventListener("mousemove", debouncedCallback);
     };
-  }, [shouldListenMouseMove, debouncedOnMouseMove]);
+  }, [shouldListenMouseMove, debouncedCallback, debouncedControls]);
 
   useEffect(() => {
     return mergeRegister(

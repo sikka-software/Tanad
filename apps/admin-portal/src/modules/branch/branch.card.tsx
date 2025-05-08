@@ -52,11 +52,6 @@ const BranchCard = ({ branch }: { branch: Branch }) => {
               <p>{`${branch.city}, ${branch.region} ${branch.zip_code}`}</p>
             </div>
           </div>
-          {branch.notes && (
-            <p className="mt-2 border-t pt-2 text-sm text-gray-500 dark:text-gray-400">
-              {branch.notes}
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>

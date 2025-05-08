@@ -71,9 +71,6 @@ const CompanyCard = ({ company }: { company: Company }) => {
               <span>{company.size} employees</span>
             </div>
           )}
-          {company.notes && (
-            <p className="mt-2 border-t pt-2 text-sm text-gray-500">{company.notes}</p>
-          )}
         </div>
       </CardContent>
     </Card>

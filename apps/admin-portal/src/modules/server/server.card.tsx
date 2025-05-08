@@ -54,11 +54,6 @@ const ServerCard = ({ server }: { server: Server }) => {
               <p>{server.provider}</p>
             </div>
           </div>
-          {server.notes && (
-            <p className="mt-2 border-t pt-2 text-sm text-gray-500 dark:text-gray-400">
-              {server.notes}
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>

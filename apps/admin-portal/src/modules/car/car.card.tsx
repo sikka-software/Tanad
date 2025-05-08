@@ -1,4 +1,3 @@
-import { User } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader } from "@/ui/card";
@@ -13,7 +12,6 @@ const CarCard = ({ car }: { car: Car }) => {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold">{car.name}</h3>
-            {/* Updated to display make, model, and year based on the schema */}
             <p className="text-sm text-gray-500">
               {t("make")}: {car.make} | {t("model")}: {car.model} | {t("year")}: {car.year}
             </p>
@@ -22,8 +20,6 @@ const CarCard = ({ car }: { car: Car }) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {/* Removed car.notes and car.registrar as they are not in the schema */}
-          {/* Added display for other schema properties */}
           {car.color && (
             <div className="text-sm text-gray-600 dark:text-gray-400">
               <span className="font-semibold">{t("color")}:</span> {car.color}

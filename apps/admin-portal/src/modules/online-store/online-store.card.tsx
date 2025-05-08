@@ -16,16 +16,7 @@ const OnlineStoreCard = ({ onlineStore }: { onlineStore: OnlineStore }) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {onlineStore.notes && (
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <User className="size-4" />
-              <span>{onlineStore.notes}</span>
-            </div>
-          )}
-        </div>
-      </CardContent>
+      <CardContent></CardContent>
     </Card>
   );
 };

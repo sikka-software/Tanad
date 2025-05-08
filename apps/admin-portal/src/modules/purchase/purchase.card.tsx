@@ -26,7 +26,6 @@ const PurchaseCard = ({ purchase }: { purchase: Purchase }) => {
           <p className="text-sm text-gray-500">Amount: {purchase.amount}</p>
           <p className="text-sm text-gray-500">Category: {purchase.category}</p>
           <p className="text-sm text-gray-500">Due Date: {purchase.due_date}</p>
-          <p className="text-sm text-gray-500">Notes: {purchase.notes}</p>
         </div>
       </CardContent>
     </Card>
