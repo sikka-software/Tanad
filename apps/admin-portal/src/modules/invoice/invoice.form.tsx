@@ -4,7 +4,7 @@ import { getNotesValue } from "@root/src/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -25,7 +25,7 @@ import { ModuleFormProps } from "@/types/common.type";
 import { ClientForm } from "@/client/client.form";
 
 import { useInvoices } from "@/modules/invoice/invoice.hooks";
-import { InvoiceUpdateData, InvoiceCreateData } from "@/modules/invoice/invoice.type";
+import { InvoiceUpdateData, InvoiceCreateData, InvoiceItem } from "@/modules/invoice/invoice.type";
 import useUserStore from "@/stores/use-user-store";
 
 import { useCreateInvoice, useUpdateInvoice } from "../invoice/invoice.hooks";
@@ -52,19 +52,11 @@ const createInvoiceSchema = (t: (key: string) => string) =>
           product_id: z.string().optional(),
           description: z.string(),
           quantity: z
-            .number()
-            .min(1, t("Invoices.form.quantity.required"))
-            .refine(
-              (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
-              t("Invoices.form.quantity.required"),
-            ),
+            .number({ invalid_type_error: t("Invoices.form.quantity.invalid") })
+            .min(1, t("Invoices.form.quantity.required")),
           unit_price: z
-            .number()
-            .min(1, t("Invoices.form.price.required"))
-            .refine(
-              (val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0,
-              t("Invoices.form.price.required"),
-            ),
+            .number({ invalid_type_error: t("Invoices.form.price.invalid") })
+            .min(0, t("Invoices.form.price.required")),
         }),
       )
       .min(1, t("Invoices.form.items.required"))
@@ -101,28 +93,39 @@ export function InvoiceForm({
   const isLoading = useInvoiceStore((state) => state.isLoading);
   const setIsLoading = useInvoiceStore((state) => state.setIsLoading);
 
+  const formDefaultValues = {
+    client_id: defaultValues?.client_id || "",
+    invoice_number: defaultValues?.invoice_number || "",
+    issue_date: defaultValues?.issue_date
+      ? new Date(defaultValues.issue_date as string)
+      : new Date(),
+    due_date: defaultValues?.due_date
+      ? new Date(defaultValues.due_date as string)
+      : new Date(new Date().setDate(new Date().getDate() + 30)),
+    status:
+      (defaultValues?.status as
+        | "draft"
+        | "sent"
+        | "paid"
+        | "partially_paid"
+        | "overdue"
+        | "void") || "draft",
+    subtotal: defaultValues?.subtotal || 0,
+    tax_rate: defaultValues?.tax_rate || 0,
+    notes: getNotesValue(defaultValues as any),
+    items: defaultValues?.items
+      ? (defaultValues.items as InvoiceItem[]).map((item) => ({
+          product_id: item.product_id ?? "",
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+        }))
+      : [{ product_id: "", description: "", quantity: 1, unit_price: 0 }],
+  };
+
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(createInvoiceSchema(t)),
-    defaultValues: {
-      client_id: defaultValues?.client_id || "",
-      invoice_number: defaultValues?.invoice_number || "",
-      issue_date: defaultValues?.issue_date || new Date(),
-      due_date: defaultValues?.due_date,
-      status:
-        (defaultValues?.status as
-          | "draft"
-          | "sent"
-          | "paid"
-          | "partially_paid"
-          | "overdue"
-          | "void") || "draft",
-      subtotal: defaultValues?.subtotal || 0,
-      tax_rate: defaultValues?.tax_rate || 0,
-      notes: getNotesValue(defaultValues),
-      items: defaultValues?.items || [
-        { product_id: "", description: "", quantity: 1, unit_price: "0" },
-      ],
-    },
+    defaultValues: formDefaultValues,
   });
 
   useEffect(() => {
@@ -151,7 +154,7 @@ export function InvoiceForm({
     };
 
     getClients();
-  }, [t]);
+  }, [t, supabase]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -159,27 +162,27 @@ export function InvoiceForm({
   });
 
   // Add this new function to calculate subtotal
-  const calculateSubtotal = (items: any[]) => {
+  const calculateSubtotal = (items: InvoiceFormValues["items"]) => {
     return items.reduce((sum, item) => {
-      const quantity = parseFloat(item.quantity) || 0;
-      const price = parseFloat(item.unit_price) || 0;
+      const quantity = item.quantity || 0;
+      const price = item.unit_price || 0;
       return sum + quantity * price;
     }, 0);
   };
 
   // Watch items and tax_rate for changes to update totals
-  const items = form.watch("items");
-  const tax_rate = form.watch("tax_rate");
+  const watchedItems = form.watch("items");
+  const watchedTaxRate = form.watch("tax_rate");
 
   useEffect(() => {
-    const subtotal = calculateSubtotal(items);
+    const subtotal = calculateSubtotal(watchedItems);
     form.setValue("subtotal", subtotal);
-  }, [items, form]);
+  }, [watchedItems, form]);
 
   const handleProductSelection = (index: number, product_id: string) => {
     const selectedProduct = products.find((product) => product.id === product_id);
     if (selectedProduct) {
-      form.setValue(`items.${index}.unit_price`, selectedProduct.price.toString());
+      form.setValue(`items.${index}.unit_price`, selectedProduct.price);
       form.setValue(`items.${index}.description`, selectedProduct.description || "");
     }
   };
@@ -190,36 +193,36 @@ export function InvoiceForm({
       toast.error(t("General.unauthorized"), {
         description: t("General.must_be_logged_in"),
       });
+      setIsLoading(false);
       return;
     }
 
+    const itemsPayload = data.items.map((item) => ({
+      product_id: item.product_id || null,
+      description: item.description,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+    }));
+
     try {
-      if (editMode && defaultValues) {
-        if (!defaultValues.id) {
-          console.error("Invoice ID missing in edit mode");
-          toast.error(t("Invoices.error.missing_id"));
-          setIsLoading(false);
-          return;
-        }
+      if (editMode && defaultValues?.id) {
+        const invoiceDataForUpdate: InvoiceUpdateData = {
+          id: defaultValues.id as string,
+          client_id: data.client_id,
+          invoice_number: data.invoice_number,
+          issue_date: data.issue_date.toISOString(),
+          due_date: data.due_date?.toISOString() || null,
+          status: data.status,
+          subtotal: data.subtotal,
+          tax_rate: data.tax_rate,
+          notes: data.notes || null,
+          items: itemsPayload,
+        };
+
         await updateInvoice(
           {
-            id: defaultValues.id,
-            data: {
-              client_id: data.client_id,
-              invoice_number: data.invoice_number,
-              issue_date: data.issue_date.toISOString(),
-              due_date: data.due_date?.toISOString() || null,
-              status: data.status,
-              subtotal: data.subtotal,
-              tax_rate: data.tax_rate,
-              notes: data.notes || null,
-              items: data.items.map((item) => ({
-                ...item,
-                product_id: item.product_id || "",
-                quantity: parseFloat(item.quantity),
-                unit_price: parseFloat(item.unit_price),
-              })),
-            },
+            id: defaultValues.id as string,
+            data: invoiceDataForUpdate,
           },
           {
             onSuccess: async () => {
@@ -232,7 +235,6 @@ export function InvoiceForm({
       } else {
         await createInvoice(
           {
-            user_id: profile?.id || "",
             client_id: data.client_id,
             invoice_number: data.invoice_number,
             issue_date: data.issue_date.toISOString(),
@@ -241,12 +243,7 @@ export function InvoiceForm({
             subtotal: data.subtotal,
             tax_rate: data.tax_rate,
             notes: data.notes || null,
-            items: data.items.map((item) => ({
-              ...item,
-              product_id: item.product_id || "",
-              quantity: parseFloat(item.quantity),
-              unit_price: parseFloat(item.unit_price),
-            })),
+            items: itemsPayload,
           },
           {
             onSuccess: async (response) => {
@@ -258,11 +255,12 @@ export function InvoiceForm({
         );
       }
     } catch (error) {
-      setIsLoading(false);
-      console.error("Failed to save company:", error);
+      console.error("Failed to save invoice:", error);
       toast.error(t("General.error_operation"), {
-        description: t("Companies.error.create"),
+        description: editMode ? t("Invoices.error.update") : t("Invoices.error.create"),
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -466,9 +464,8 @@ export function InvoiceForm({
             />
           </div>
 
-          {/* Use the new ProductFormSection component */}
           <ProductsFormSection
-            control={form.control}
+            control={form.control as any}
             fields={fields}
             append={append}
             remove={remove}
