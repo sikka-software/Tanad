@@ -232,7 +232,169 @@
     "report_issue_title": "إبلاغ عن خطأ",
     "report_issue_description": "مساعدتنا بتزويد تفاصيل إضافية عن ما قد يحدث",
     "report_issue_thank_you": "شكراً لك على إبلاغك",
-    "report_issue_description_thank_you": "تم إبلاغ فريقنا وسيتم التحقق من هذا الخطأ في الميعاد القريب."
+    "report_issue_description_thank_you": "تم إبلاغ فريقنا وسيتم التحقق من هذا الخطأ في الميعاد القريب.",
+    "sign_out": "تسجيل الخروج",
+    "Feedback": {
+      "give_feedback": "عندك ملاحظات؟",
+      "feedback_placeholder": "أكتب ملاحظاتك هنا",
+      "feedback_dialog_description": "إذا عندك إقتراح أو شكوى أو أي ملاحظات حول الخدمة، يمكنك إرسالها هنا",
+      "submit_feedback": "إرسال الملاحظات",
+      "submitting": "جاري الإرسال...",
+      "feedback_submitted": "تم إرسال الملاحظات بنجاح",
+      "thank_you_feedback": "شكرا لك على مساعدتنا في تحسين خدمتنا",
+      "error_submitting_feedback": "فشل إرسال الملاحظات. الرجاء المحاولة مرة أخرى."
+    }
+  },
+
+  "Pages": {
+    "Activity": {
+      "title": "سجلات النشاط",
+      "description": "إدارة السجلات الخاصة بالنشاطات"
+    },
+    "Settings": {
+      "title": "الإعدادات",
+      "description": "إدارة الإعدادات العامة"
+    },
+    "Account": {
+      "title": "الحساب",
+      "description": "إدارة الحسابات الشخصية"
+    },
+    "Billing": {
+      "title": "الفواتير",
+      "description": "إدارة الفواتير"
+    },
+    "Administration": { "title": "الإدارة" },
+    "Accounting": { "title": "المحاسبة" },
+    "HumanResources": { "title": "الموارد البشرية" },
+    "Recruitment": { "title": "التوظيف" },
+    "Storage": { "title": "التخزين" },
+    "Internet": { "title": "الإنترنت" },
+    "Fleet": { "title": "المركبات" },
+    "SystemAdmin": { "title": "الإدارة المركزية" },
+    "Dashboard": { "title": "لوحة التحكم" },
+    "Analytics": { "title": "التحليلات" },
+    "Help": { "title": "المساعدة" },
+    "Products": {
+      "title": "المنتجات",
+      "add_new": "إضافة منتج جديد"
+    },
+    "Invoices": {
+      "title": "الفواتير",
+      "add_new": "إضافة فاتورة جديدة"
+    },
+    "Sales": {
+      "title": "المبيعات",
+      "add_new": "إضافة مبيعة جديدة"
+    },
+    "Quotes": {
+      "title": "عروض الأسعار",
+      "add_new": "إضافة عرض أسعار جديد"
+    },
+    "Contacts": {
+      "title": "جهات الإتصال",
+      "add_new": "إضافة جهة إتصال جديدة"
+    },
+    "EmployeeRequests": {
+      "title": "طلبات الموظفين",
+      "add_new": "إضافة طلب جديد"
+    },
+    "Clients": {
+      "title": "العملاء",
+      "add_new": "إضافة عميل جديد"
+    },
+    "Warehouses": {
+      "title": "المستودعات",
+      "add_new": "إضافة مستودع جديد"
+    },
+    "Branches": {
+      "title": "الفروع",
+      "add_new": "إضافة فرع جديد"
+    },
+    "Vendors": {
+      "title": "الموردين",
+      "add_new": "إضافة مورد جديد"
+    },
+    "Attendance": {
+      "title": "الحضور",
+      "add_new": "إضافة حضور جديد"
+    },
+    "Users": {
+      "title": "المستخدمين",
+      "add_new": "إضافة مستخدم جديد"
+    },
+    "Locations": {
+      "title": "المواقع",
+      "add_new": "إضافة موقع جديد"
+    },
+    "Offices": {
+      "title": "المكاتب",
+      "add_new": "إضافة مكتب جديد"
+    },
+    "Employees": {
+      "all": "جميع الموظفين",
+      "title": "الموظفين",
+      "add_new": "إضافة موظف جديد"
+    },
+    "Roles": {
+      "title": "الأدوار",
+      "add_new": "إضافة دور جديد"
+    },
+    "Permissions": {
+      "title": "الصلاحيات",
+      "add_new": "إضافة صلاحية جديدة"
+    },
+    "Departments": {
+      "title": "الأقسام",
+      "add_new": "إضافة قسم جديد"
+    },
+    "Jobs": {
+      "title": "الوظائف",
+      "add_new": "إضافة وظيفة جديدة"
+    },
+    "Cars": {
+      "title": "السيارات",
+      "add_new": "إضافة سيارة جديدة"
+    },
+    "Companies": {
+      "title": "الشركات",
+      "add_new": "إضافة شركة جديدة"
+    },
+    "Domains": {
+      "title": "النطاقات",
+      "add_new": "إضافة نطاق جديد"
+    },
+    "Expenses": {
+      "title": "المصروفات",
+      "add_new": "إضافة مصروف جديد"
+    },
+    "JobListings": {
+      "title": "صفحات التوظيف",
+      "add_new": "إضافة صفحة توظيف جديدة"
+    },
+    "OnlineStores": {
+      "title": "المتاجر الإلكترونية",
+      "add_new": "إضافة متجر إلكتروني جديد"
+    },
+    "Purchases": {
+      "title": "المشتريات",
+      "add_new": "إضافة مشتري جديد"
+    },
+    "Salaries": {
+      "title": "الرواتب",
+      "add_new": "إضافة راتب جديد"
+    },
+    "Servers": {
+      "title": "الخوادم",
+      "add_new": "إضافة خادم جديد"
+    },
+    "Trucks": {
+      "title": "الشاحنات",
+      "add_new": "إضافة شاحنة جديدة"
+    },
+    "Websites": {
+      "title": "المواقع الإلكترونية",
+      "add_new": "إضافة موقع إلكتروني جديد"
+    }
   },
   "Flags": {
     "timezone_soon": {
@@ -244,6 +406,7 @@
       "description": "شغالين على ربط جميع الأوقات بالتقويم الهجري"
     }
   },
+
   "SEO": {
     "landing": {
       "title": "العمود الفقري لتجارتك",
@@ -1292,16 +1455,7 @@
       }
     }
   },
-  "Feedback": {
-    "give_feedback": "عندك ملاحظات؟",
-    "feedback_placeholder": "أكتب ملاحظاتك هنا",
-    "feedback_dialog_description": "إذا عندك إقتراح أو شكوى أو أي ملاحظات حول الخدمة، يمكنك إرسالها هنا",
-    "submit_feedback": "إرسال الملاحظات",
-    "submitting": "جاري الإرسال...",
-    "feedback_submitted": "تم إرسال الملاحظات بنجاح",
-    "thank_you_feedback": "شكرا لك على مساعدتنا في تحسين خدمتنا",
-    "error_submitting_feedback": "فشل إرسال الملاحظات. الرجاء المحاولة مرة أخرى."
-  },
+
   "Profile": {
     "general": "العامة",
     "security": "الأمان",
@@ -2769,15 +2923,7 @@
       }
     }
   },
-  "Administration": {
-    "title": "الإدارة"
-  },
-  "Accounting": {
-    "title": "المحاسبة"
-  },
-  "HumanResources": {
-    "title": "الموارد البشرية"
-  },
+
   "Jobs": {
     "title": "الوظائف",
     "create_job": "إنشاء وظيفة",
@@ -3515,8 +3661,6 @@
     "organization": "المؤسسة"
   },
   "Offices": {
-    "title": "المكاتب",
-    "add_new": "مكتب جديد",
     "edit_office": "تعديل المكتب",
     "update_office": "تحديث المكتب",
     "singular": "مكتب",
@@ -3540,7 +3684,8 @@
       "manager": {
         "label": "المدير",
         "placeholder": "اختر المدير",
-        "required": "المدير مطلوب"
+        "required": "المدير مطلوب",
+        "invalid_uuid": "يجب إختيار مدير من القائمة"
       },
       "address": {
         "label": "عنوان المكتب",
@@ -3601,9 +3746,9 @@
       "deleting": "جاري حذف المكتب..."
     },
     "error": {
-      "creating": "حدث خطأ أثناء إنشاء المكتب",
-      "updating": "حدث خطأ أثناء تحديث المكتب",
-      "deleting": "حدث خطأ أثناء حذف المكتب"
+      "create": "حدث خطأ أثناء إنشاء المكتب",
+      "update": "حدث خطأ أثناء تحديث المكتب",
+      "delete": "حدث خطأ أثناء حذف المكتب"
     }
   },
   "Departments": {

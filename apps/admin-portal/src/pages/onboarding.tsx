@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
@@ -60,10 +61,15 @@ export default function OnboardingPage() {
   );
 }
 
+OnboardingPage.messages = ["General", "OnBoarding"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../locales/${locale}.json`)).default,
+        OnboardingPage.messages,
+      ),
     },
   };
 };

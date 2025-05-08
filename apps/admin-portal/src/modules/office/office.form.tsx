@@ -124,7 +124,7 @@ export function OfficeForm({
               region: data.region?.trim() || undefined,
               country: data.country?.trim() || undefined,
               zip_code: data.zip_code?.trim() || undefined,
-              notes: data.notes?.trim() || undefined,
+              notes: data.notes,
             },
           },
           {
@@ -156,7 +156,7 @@ export function OfficeForm({
             enterprise_id: membership.enterprise_id,
             status: "active",
             user_id: user.id,
-            notes: data.notes?.trim() || undefined,
+            notes: data.notes,
           },
           {
             onSuccess: async (response) => {

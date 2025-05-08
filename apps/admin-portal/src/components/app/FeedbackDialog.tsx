@@ -4,23 +4,19 @@ import { toast } from "sonner";
 
 import { Button } from "@/ui/button";
 // UI
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/ui/dialog";
+import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/ui/dialog";
 import { Textarea } from "@/ui/textarea";
 
-import useUserStore from "@/stores/use-user-store";
 import { createClient } from "@/utils/supabase/component";
+
+import useUserStore from "@/stores/use-user-store";
 
 interface FeedbackDialogProps {
   onOpenChange?: (open: boolean) => void;
 }
 
 export function FeedbackDialog({ onOpenChange }: FeedbackDialogProps) {
-  const t = useTranslations();
+  const t = useTranslations("General");
   const lang = useLocale();
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,9 +46,7 @@ export function FeedbackDialog({ onOpenChange }: FeedbackDialogProps) {
       onOpenChange?.(false);
     } catch (error) {
       console.error(error);
-      toast.error(t("General.error"), {
-        description: t("Feedback.error_submitting_feedback"),
-      });
+      toast.error(t("Feedback.error_submitting_feedback"));
     } finally {
       setIsSubmitting(false);
     }

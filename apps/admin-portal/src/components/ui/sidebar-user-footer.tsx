@@ -105,19 +105,19 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
                 <Link href="/settings">
                   <DropdownMenuItem className="cursor-pointer">
                     <Settings className="me-2 h-4 w-4" />
-                    {t("Settings.title")}
+                    {t("Pages.Settings.title")}
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/account">
                   <DropdownMenuItem className="cursor-pointer">
                     <User2 className="me-2 h-4 w-4" />
-                    {t("Account.title")}
+                    {t("Pages.Account.title")}
                   </DropdownMenuItem>
                 </Link>
                 <Link href="/billing">
                   <DropdownMenuItem className="cursor-pointer">
                     <CreditCard className="me-2 h-4 w-4" />
-                    {t("Billing.title")}
+                    {t("Pages.Billing.title")}
                   </DropdownMenuItem>
                 </Link>
               </DropdownMenuGroup>
@@ -126,18 +126,18 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
                 <Link href="/help">
                   <DropdownMenuItem className="cursor-pointer">
                     <HelpCircle className="me-2 h-4 w-4" />
-                    {t("Help.title")}
+                    {t("Pages.Help.title")}
                   </DropdownMenuItem>
                 </Link>
                 <DropdownMenuItem className="cursor-pointer" onClick={() => setOpen(true)}>
                   <MessageSquareWarning className="me-2 h-4 w-4" />
-                  {t("Feedback.give_feedback")}
+                  {t("General.Feedback.give_feedback")}
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
                 <LogOut className="me-2 h-4 w-4" />
-                {t("Auth.sign_out")}
+                {t("General.sign_out")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

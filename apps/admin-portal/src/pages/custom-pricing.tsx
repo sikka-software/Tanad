@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 
 import DepartmentBox from "../components/landing/pricing/department-box";
@@ -28,10 +29,15 @@ const CustomPricingPage = () => {
 
 export default CustomPricingPage;
 
+CustomPricingPage.messages = ["Pages", "Pricing", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../locales/${locale}.json`)).default,
+        CustomPricingPage.messages,
+      ),
     },
   };
 };

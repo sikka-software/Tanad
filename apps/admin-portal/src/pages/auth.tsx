@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
@@ -385,10 +386,12 @@ export default function Auth() {
   );
 }
 
+Auth.messages = ["Pages", "Auth", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, Auth.messages),
     },
   };
 };

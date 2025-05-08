@@ -12,9 +12,10 @@ export function AppBreadcrumb() {
 
   // Rather than creating a new translation context, handle namespace translation differently
   const getTranslatedKey = (key: string) => {
+    console.log("key", key);
     if (!key) return "";
 
-    const [namespace, translationKey] = key.split(".");
+    const [namespace, translationKey, translationSubKey] = key.split(".");
     // Use the default t function if no namespace is provided
     if (!translationKey) {
       return t(key);
@@ -22,7 +23,7 @@ export function AppBreadcrumb() {
 
     try {
       // Try to use the namespace and key directly from the base t function
-      return t(`${namespace}.${translationKey}`);
+      return t(`${namespace}.${translationKey}${translationSubKey ? `.${translationSubKey}` : ""}`);
     } catch (error) {
       // Fallback to just the key if namespace doesn't exist
       return translationKey;
@@ -51,7 +52,7 @@ export function AppBreadcrumb() {
       if (pathname !== "/") {
         breadcrumbs.push({
           path: "/dashboard",
-          label: t("Dashboard.title"),
+          label: t("Pages.Dashboard.title"),
           is_active: false,
         });
       }
@@ -72,7 +73,7 @@ export function AppBreadcrumb() {
     return [
       {
         path: "/dashboard",
-        label: t("Dashboard.title"),
+        label: t("Pages.Dashboard.title"),
         is_active: pathname === "/",
       },
     ];

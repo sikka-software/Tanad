@@ -8,320 +8,236 @@ type RouteMap = {
 
 // Main route mapping
 export const routeMap: RouteMap = {
-  "/dashboard": { label: "Dashboard", translationKey: "Dashboard.title" },
-  "/invoices": { label: "Invoices", translationKey: "Invoices.title" },
-  "/quotes": { label: "Quotes", translationKey: "Quotes.title" },
-  "/companies": { label: "Companies", translationKey: "Companies.title" },
-  "/clients": { label: "Clients", translationKey: "Clients.title" },
-  "/products": { label: "Products", translationKey: "Products.title" },
-  "/employees": { label: "Employees", translationKey: "Employees.title" },
-  "/employee_requests": { label: "Employee Requests", translationKey: "EmployeeRequests.title" },
-  "/jobs": { label: "Jobs", translationKey: "Jobs.title" },
-  "/job_listings": { label: "Job Listings", translationKey: "JobListings.title" },
-  "/applicants": { label: "Applicants", translationKey: "Applicants.title" },
-  "/settings": { label: "Settings", translationKey: "Settings.title" },
-  "/vendors": { label: "Vendors", translationKey: "Vendors.title" },
-  "/salaries": { label: "Salaries", translationKey: "Salaries.title" },
-  "/reports": { label: "Reports", translationKey: "Reports.title" },
-  "/warehouses": { label: "Warehouses", translationKey: "Warehouses.title" },
-  "/branches": { label: "Branches", translationKey: "Branches.title" },
-  "/departments": { label: "Departments", translationKey: "Departments.title" },
-  "/offices": { label: "Offices", translationKey: "Offices.title" },
-  "/expenses": { label: "Expenses", translationKey: "Expenses.title" },
-  "/roles": { label: "Roles", translationKey: "Roles.title" },
-  "/activity": { label: "Activity", translationKey: "Activity.title" },
+  "/dashboard": { label: "Pages.Dashboard.title", translationKey: "Pages.Dashboard.title" },
+  "/activity": { label: "Pages.Activity", translationKey: "Pages.Activity" },
+  "/analytics": { label: "Pages.Analytics", translationKey: "Pages.Analytics" },
+  "/settings": { label: "Pages.Settings.title", translationKey: "Pages.Settings.title" },
+  "/roles": { label: "Pages.Roles.title", translationKey: "Pages.Roles.title" },
+  "/users": { label: "Pages.Users.title", translationKey: "Pages.Users.title" },
+
+  "/invoices": { label: "Pages.Invoices.title", translationKey: "Pages.Invoices.title" },
+  "/quotes": { label: "Pages.Quotes.title", translationKey: "Pages.Quotes.title" },
+  "/companies": { label: "Pages.Companies.title", translationKey: "Pages.Companies.title" },
+  "/clients": { label: "Pages.Clients.title", translationKey: "Pages.Clients.title" },
+  "/products": { label: "Pages.Products.title", translationKey: "Pages.Products.title" },
+  "/employees": { label: "Pages.Employees.title", translationKey: "Pages.Employees.title" },
+  "/employee_requests": {
+    label: "Pages.EmployeeRequests.title",
+    translationKey: "Pages.EmployeeRequests.title",
+  },
+  "/jobs": { label: "Pages.Jobs.title", translationKey: "Pages.Jobs.title" },
+  "/job_listings": { label: "Pages.JobListings.title", translationKey: "Pages.JobListings.title" },
+  "/applicants": { label: "Pages.Applicants.title", translationKey: "Pages.Applicants.title" },
+  "/vendors": { label: "Pages.Vendors.title", translationKey: "Pages.Vendors.title" },
+  "/salaries": { label: "Pages.Salaries.title", translationKey: "Pages.Salaries.title" },
+  "/reports": { label: "Pages.Reports.title", translationKey: "Pages.Reports.title" },
+  "/warehouses": { label: "Pages.Warehouses.title", translationKey: "Pages.Warehouses.title" },
+  "/branches": { label: "Pages.Branches.title", translationKey: "Pages.Branches.title" },
+  "/departments": { label: "Pages.Departments.title", translationKey: "Pages.Departments.title" },
+  "/offices": { label: "Pages.Offices.title", translationKey: "Pages.Offices.title" },
+  "/expenses": { label: "Pages.Expenses.title", translationKey: "Pages.Expenses.title" },
+  "/domains": { label: "Pages.Domains.title", translationKey: "Pages.Domains.title" },
+  "/servers": { label: "Pages.Servers.title", translationKey: "Pages.Servers.title" },
+  "/websites": { label: "Pages.Websites.title", translationKey: "Pages.Websites.title" },
+  "/online_stores": {
+    label: "Pages.OnlineStores.title",
+    translationKey: "Pages.OnlineStores.title",
+  },
 };
 
 // Dynamic route patterns and their handling
 export const dynamicRoutePatterns = [
   {
     pattern: /^\/dashboard$/,
-    breadcrumbs: [{ path: "/dashboard", labelKey: "Dashboard.title" }],
+    breadcrumbs: [{ path: "/dashboard", labelKey: "Pages.Dashboard.title" }],
   },
   {
     pattern: /^\/invoices\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/invoices", labelKey: "Invoices.title" },
-      { path: "", labelKey: "Invoices.add_new", is_active: true },
-    ],
-  },
-  {
-    pattern: /^\/invoices\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/invoices", labelKey: "Invoices.title" },
-      { path: "", labelKey: "Invoices.edit", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/invoices", labelKey: "Pages.Invoices.title" },
+      { path: "", labelKey: "Pages.Invoices.add_new", is_active: true },
     ],
   },
   {
     pattern: /^\/quotes\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/quotes", labelKey: "Quotes.title" },
-      { path: "/quotes/add", labelKey: "Quotes.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/quotes", labelKey: "Pages.Quotes.title" },
+      { path: "", labelKey: "Pages.Quotes.add_new", is_active: true },
     ],
   },
   {
     pattern: /^\/clients\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/clients", labelKey: "Clients.title" },
-      { path: "/clients/add", labelKey: "Clients.add_new", is_active: true },
-    ],
-  },
-  {
-    pattern: /^\/clients\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/clients", labelKey: "Clients.title" },
-      { path: "", labelKey: "Clients.edit", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/clients", labelKey: "Pages.Clients.title" },
+      { path: "", labelKey: "Pages.Clients.add_new", is_active: true },
     ],
   },
   {
     pattern: /^\/products\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/products", labelKey: "Products.title" },
-      { path: "/products/add", labelKey: "Products.add_new", is_active: true },
-    ],
-  },
-  {
-    pattern: /^\/products\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/products", labelKey: "Products.title" },
-      { path: "", labelKey: "Products.edit", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/products", labelKey: "Pages.Products.title" },
+      { path: "", labelKey: "Pages.Products.add_new", is_active: true },
     ],
   },
   {
     pattern: /^\/employees\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/employees", labelKey: "Employees.title" },
-      { path: "/employees/add", labelKey: "Employees.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/employees", labelKey: "Pages.Employees.title" },
+      { path: "", labelKey: "Pages.Employees.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/employees\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/employees", labelKey: "Employees.title" },
-      { path: "", labelKey: "Employees.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/employee_requests\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/employee_requests", labelKey: "EmployeeRequests.title" },
-      { path: "/employee_requests/add", labelKey: "EmployeeRequests.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/employee_requests", labelKey: "Pages.EmployeeRequests.title" },
+      { path: "", labelKey: "Pages.EmployeeRequests.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/employee_requests\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/employee_requests", labelKey: "EmployeeRequests.title" },
-      { path: "", labelKey: "EmployeeRequests.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/jobs\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/jobs", labelKey: "Jobs.title" },
-      { path: "/jobs/add", labelKey: "Jobs.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/jobs", labelKey: "Pages.Jobs.title" },
+      { path: "", labelKey: "Pages.Jobs.add_new", is_active: true },
     ],
   },
   {
     pattern: /^\/job_listings\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/job_listings", labelKey: "JobListings.title" },
-      { path: "/job_listings/add", labelKey: "JobListings.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/job_listings", labelKey: "Pages.JobListings.title" },
+      { path: "", labelKey: "Pages.JobListings.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/jobs\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/jobs", labelKey: "Jobs.title" },
-      { path: "", labelKey: "Jobs.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/warehouses\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/warehouses", labelKey: "Warehouses.title" },
-      { path: "/warehouses/add", labelKey: "Warehouses.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/warehouses", labelKey: "Pages.Warehouses.title" },
+      { path: "", labelKey: "Pages.Warehouses.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/warehouses\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/warehouses", labelKey: "Warehouses.title" },
-      { path: "", labelKey: "Warehouses.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/branches\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/branches", labelKey: "Branches.title" },
-      { path: "/branches/add", labelKey: "Branches.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/branches", labelKey: "Pages.Branches.title" },
+      { path: "", labelKey: "Pages.Branches.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/branches\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/branches", labelKey: "Branches.title" },
-      { path: "", labelKey: "Branches.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/companies\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/companies", labelKey: "Companies.title" },
-      { path: "/companies/add", labelKey: "Companies.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/companies", labelKey: "Pages.Companies.title" },
+      { path: "", labelKey: "Pages.Companies.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/companies\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/companies", labelKey: "Companies.title" },
-      { path: "", labelKey: "Companies.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/vendors\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/vendors", labelKey: "Vendors.title" },
-      { path: "/vendors/add", labelKey: "Vendors.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/vendors", labelKey: "Pages.Vendors.title" },
+      { path: "", labelKey: "Pages.Vendors.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/vendors\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/vendors", labelKey: "Vendors.title" },
-      { path: "", labelKey: "Vendors.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/salaries\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/salaries", labelKey: "Salaries.title" },
-      { path: "/salaries/add", labelKey: "Salaries.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/salaries", labelKey: "Pages.Salaries.title" },
+      { path: "", labelKey: "Pages.Salaries.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/salaries\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/salaries", labelKey: "Salaries.title" },
-      { path: "", labelKey: "Salaries.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/departments\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/departments", labelKey: "Departments.title" },
-      { path: "/departments/add", labelKey: "Departments.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/departments", labelKey: "Pages.Departments.title" },
+      { path: "", labelKey: "Pages.Departments.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/departments\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/departments", labelKey: "Departments.title" },
-      { path: "", labelKey: "Departments.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/offices\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/offices", labelKey: "Offices.title" },
-      { path: "/offices/add", labelKey: "Offices.add_new", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/offices", labelKey: "Pages.Offices.title" },
+      { path: "", labelKey: "Pages.Offices.add_new", is_active: true },
     ],
   },
-  {
-    pattern: /^\/offices\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/offices", labelKey: "Offices.title" },
-      { path: "", labelKey: "Offices.edit", is_active: true },
-    ],
-  },
+
   {
     pattern: /^\/expenses\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/expenses", labelKey: "Expenses.title" },
-      { path: "/expenses/add", labelKey: "Expenses.add_new", is_active: true },
-    ],
-  },
-  {
-    pattern: /^\/expenses\/edit\/(.+)$/,
-    breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/expenses", labelKey: "Expenses.title" },
-      { path: "", labelKey: "Expenses.edit", is_active: true },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/expenses", labelKey: "Pages.Expenses.title" },
+      { path: "", labelKey: "Pages.Expenses.add_new", is_active: true },
     ],
   },
   {
     pattern: /^\/roles\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/roles", labelKey: "Roles.title" },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/roles", labelKey: "Pages.Roles.title" },
+      { path: "", labelKey: "Pages.Roles.add_new", is_active: true },
     ],
   },
   {
     pattern: /^\/activity$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/activity", labelKey: "ActivityLogs.title" },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/activity", labelKey: "Pages.Activity.title" },
     ],
   },
   // domains
   {
     pattern: /^\/domains\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/domains", labelKey: "Domains.title" },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/domains", labelKey: "Pages.Domains.title" },
+      { path: "", labelKey: "Pages.Domains.add_new", is_active: true },
     ],
   },
   // servers
   {
     pattern: /^\/servers\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/servers", labelKey: "Servers.title" },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/servers", labelKey: "Pages.Servers.title" },
+      { path: "", labelKey: "Pages.Servers.add_new", is_active: true },
     ],
   },
   // websites
   {
     pattern: /^\/websites\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/websites", labelKey: "Websites.title" },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/websites", labelKey: "Pages.Websites.title" },
+      { path: "", labelKey: "Pages.Websites.add_new", is_active: true },
     ],
   },
   // online_stores
   {
     pattern: /^\/online_stores\/add$/,
     breadcrumbs: [
-      { path: "/dashboard", labelKey: "Dashboard.title" },
-      { path: "/online_stores", labelKey: "OnlineStores.title" },
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/online_stores", labelKey: "Pages.OnlineStores.title" },
+      { path: "", labelKey: "Pages.OnlineStores.add_new", is_active: true },
     ],
   },
 ];

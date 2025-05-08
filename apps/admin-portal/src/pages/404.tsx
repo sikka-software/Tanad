@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -7,7 +8,7 @@ import { Button } from "@/ui/button";
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 
 export default function Eror404Page() {
-  const t = useTranslations("Landing");
+  const t = useTranslations();
   return (
     <>
       <CustomPageMeta title={t("not-found.title")} />
@@ -22,10 +23,12 @@ export default function Eror404Page() {
   );
 }
 
+Eror404Page.messages = ["Pages", "General", "404"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, Eror404Page.messages),
     },
   };
 };

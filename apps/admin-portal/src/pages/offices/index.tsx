@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -92,7 +93,10 @@ export default function OfficesPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Offices.title")} description={t("Offices.description")} />
+      <CustomPageMeta
+        title={t("Pages.Offices.title")}
+        description={t("Pages.Offices.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -106,9 +110,9 @@ export default function OfficesPage() {
             store={useOfficeStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Offices.title")}
+            title={t("Pages.Offices.title")}
             onAddClick={canCreateOffices ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Offices.add_new")}
+            createLabel={t("Pages.Offices.add_new")}
             searchPlaceholder={t("Offices.search_offices")}
             count={offices?.length}
             hideOptions={offices?.length === 0}
@@ -172,10 +176,15 @@ export default function OfficesPage() {
   );
 }
 
+OfficesPage.messages = ["Offices", "Pages", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../../locales/${locale}.json`)).default,
+        OfficesPage.messages,
+      ),
     },
   };
 };

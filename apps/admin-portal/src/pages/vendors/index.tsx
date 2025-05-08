@@ -2,6 +2,7 @@ import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { BranchForm } from "@root/src/modules/branch/branch.form";
 import { Branch, BranchUpdateData } from "@root/src/modules/branch/branch.type";
 import { VendorForm } from "@root/src/modules/vendor/vendor.form";
+import { pick } from "lodash";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -174,11 +175,15 @@ export default function VendorsPage() {
   );
 }
 
-// Add getStaticProps for translations
+VendorsPage.messages = ["Pages", "Vendors", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../../locales/${locale}.json`)).default,
+        VendorsPage.messages,
+      ),
     },
   };
 };

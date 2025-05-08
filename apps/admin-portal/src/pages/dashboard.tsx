@@ -1,3 +1,4 @@
+import { pick } from "lodash";
 import { Terminal } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
@@ -292,9 +293,12 @@ export default function Dashboard() {
   if (statsError) {
     return (
       <DataPageLayout>
-        <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
+        <CustomPageMeta
+          title={t("Pages.Dashboard.title")}
+          description={t("Pages.Dashboard.title")}
+        />
         <div className="flex flex-col items-center justify-center gap-4 p-8">
-          <h2 className="text-xl font-semibold">{t("Dashboard.error_loading")}</h2>
+          <h2 className="text-xl font-semibold">{t("Pages.Dashboard.title")}</h2>
           <p className="text-muted-foreground">{statsError}</p>
         </div>
       </DataPageLayout>
@@ -303,7 +307,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Dashboard.title")} description={t("Dashboard.description")} />
+      <CustomPageMeta title={t("Pages.Dashboard.title")} description={t("Pages.Dashboard.title")} />
       {profile?.stripe_customer_id && (
         <div className="bg-green-500/20 p-1 text-center text-xs text-green-700 dark:text-green-300">
           ✓ Premium Account
@@ -312,22 +316,22 @@ export default function Dashboard() {
       <div className="space-y-8 p-4">
         {/* Contacts Section */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold">{t("Contacts.title")}</h2>
+          <h2 className="mb-4 text-lg font-semibold">{t("Pages.Contacts.title")}</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <StatCard
-              title={t("Clients.title")}
+              title={t("Pages.Clients.title")}
               value={stats.totalClients}
               loading={loadingStats}
               link="/clients"
             />
             <StatCard
-              title={t("Companies.title")}
+              title={t("Pages.Companies.title")}
               value={stats.totalCompanies}
               loading={loadingStats}
               link="/companies"
             />
             <StatCard
-              title={t("Vendors.title")}
+              title={t("Pages.Vendors.title")}
               value={stats.totalVendors}
               loading={loadingStats}
               link="/vendors"
@@ -337,22 +341,22 @@ export default function Dashboard() {
 
         {/* Locations Section */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold">{t("Locations.title")}</h2>
+          <h2 className="mb-4 text-lg font-semibold">{t("Pages.Locations.title")}</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <StatCard
-              title={t("Offices.title")}
+              title={t("Pages.Offices.title")}
               value={stats.totalOffices}
               loading={loadingStats}
               link="/offices"
             />
             <StatCard
-              title={t("Warehouses.title")}
+              title={t("Pages.Warehouses.title")}
               value={stats.totalWarehouses}
               loading={loadingStats}
               link="/warehouses"
             />
             <StatCard
-              title={t("Branches.title")}
+              title={t("Pages.Branches.title")}
               value={stats.totalBranches}
               loading={loadingStats}
               link="/branches"
@@ -362,54 +366,42 @@ export default function Dashboard() {
 
         {/* Sales & Revenue Section */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold">{t("Sales.title")}</h2>
+          <h2 className="mb-4 text-lg font-semibold">{t("Pages.Sales.title")}</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <StatCard
-              title={t("Invoices.title")}
+              title={t("Pages.Invoices.title")}
               value={stats.totalInvoices}
               loading={loadingStats}
               link="/invoices"
-              additionalText={`${stats.pendingInvoices} ${t("Dashboard.pending")}`}
+              // additionalText={`${stats.pendingInvoices} ${t("Pages.Invoices.pending")}`}
             />
             <StatCard
-              title={t("Products.title")}
+              title={t("Pages.Products.title")}
               value={stats.totalProducts}
               loading={loadingStats}
               link="/products"
-            />
-            <StatCard
-              title={`${t("Invoices.pending")} ${t("Invoices.title").toLowerCase()}`}
-              value={stats.pendingInvoices}
-              loading={loadingStats}
-              additionalText={
-                stats.totalInvoices > 0
-                  ? `${((stats.pendingInvoices / stats.totalInvoices) * 100).toFixed(1)}% ${t(
-                      "Dashboard.of_total",
-                    )}`
-                  : `0% ${t("Dashboard.of_total")}`
-              }
             />
           </div>
         </div>
 
         {/* Human Resources Section */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold">{t("HumanResources.title")}</h2>
+          <h2 className="mb-4 text-lg font-semibold">{t("Pages.HumanResources.title")}</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <StatCard
-              title={t("Employees.title")}
+              title={t("Pages.Employees.title")}
               value={stats.totalEmployees}
               loading={loadingStats}
               link="/employees"
             />
             <StatCard
-              title={t("Departments.title")}
+              title={t("Pages.Departments.title")}
               value={stats.totalDepartments}
               loading={loadingStats}
               link="/departments"
             />
             <StatCard
-              title={t("Jobs.title")}
+              title={t("Pages.Jobs.title")}
               value={stats.totalJobs}
               loading={loadingStats}
               link="/jobs"
@@ -437,10 +429,12 @@ export default function Dashboard() {
   );
 }
 
+Dashboard.messages = ["Pages", "General", "Dashboard"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick((await import(`../../locales/${locale}.json`)).default, Dashboard.messages),
     },
   };
 };

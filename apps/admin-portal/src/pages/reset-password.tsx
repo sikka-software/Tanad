@@ -1,5 +1,6 @@
 // This page is used to reset the password. the url will be coming from supabase email and it will have a token
 // we will use the token to reset the password
+import { pick } from "lodash";
 import { Loader2 } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
 import { GetStaticProps } from "next";
@@ -172,10 +173,15 @@ const ResetPassword = () => {
 
 export default ResetPassword;
 
+ResetPassword.messages = ["Pages", "Auth", "General"];
+
 export const getStaticProps: GetStaticProps = async ({ locale }) => {
   return {
     props: {
-      messages: (await import(`../../locales/${locale}.json`)).default,
+      messages: pick(
+        (await import(`../../locales/${locale}.json`)).default,
+        ResetPassword.messages,
+      ),
     },
   };
 };
