@@ -28,12 +28,8 @@ import { CharacterLimitPlugin } from "@/components/editor/plugins/actions/charac
 import { ClearEditorActionPlugin } from "@/components/editor/plugins/actions/clear-editor-plugin";
 import { CounterCharacterPlugin } from "@/components/editor/plugins/actions/counter-character-plugin";
 import { EditModeTogglePlugin } from "@/components/editor/plugins/actions/edit-mode-toggle-plugin";
-import { ImportExportPlugin } from "@/components/editor/plugins/actions/import-export-plugin";
 import { MarkdownTogglePlugin } from "@/components/editor/plugins/actions/markdown-toggle-plugin";
 import { MaxLengthPlugin } from "@/components/editor/plugins/actions/max-length-plugin";
-import { ShareContentPlugin } from "@/components/editor/plugins/actions/share-content-plugin";
-import { SpeechToTextPlugin } from "@/components/editor/plugins/actions/speech-to-text-plugin";
-import { TreeViewPlugin } from "@/components/editor/plugins/actions/tree-view-plugin";
 import { AutoLinkPlugin } from "@/components/editor/plugins/auto-link-plugin";
 import { AutocompletePlugin } from "@/components/editor/plugins/autocomplete-plugin";
 import { CodeActionMenuPlugin } from "@/components/editor/plugins/code-action-menu-plugin";
@@ -311,7 +307,6 @@ export function Plugins({}) {
             <CounterCharacterPlugin charset="UTF-16" />
           </div>
           <div className="flex flex-1 justify-end">
-    
             <MarkdownTogglePlugin
               shouldPreserveNewLinesInMarkdown={true}
               transformers={[

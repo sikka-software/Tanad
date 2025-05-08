@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Copyright (c) Meta Platforms, Inc. and affiliates.
@@ -7,17 +7,9 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import { Dispatch, useCallback, useEffect, useRef, useState, JSX } from 'react'
-import * as React from 'react'
-
-import {
-  $createLinkNode,
-  $isAutoLinkNode,
-  $isLinkNode,
-  TOGGLE_LINK_COMMAND,
-} from '@lexical/link'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $findMatchingParent, mergeRegister } from '@lexical/utils'
+import { $createLinkNode, $isAutoLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $findMatchingParent, mergeRegister } from "@lexical/utils";
 import {
   $getSelection,
   $isLineBreakNode,
@@ -30,17 +22,18 @@ import {
   KEY_ESCAPE_COMMAND,
   LexicalEditor,
   SELECTION_CHANGE_COMMAND,
-} from 'lexical'
-import { Check, Pencil, Trash, X } from 'lucide-react'
-import { createPortal } from 'react-dom'
+} from "lexical";
+import { Check, Pencil, Trash, X } from "lucide-react";
+import { Dispatch, useCallback, useEffect, useRef, useState, JSX } from "react";
+import * as React from "react";
+import { createPortal } from "react-dom";
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-
-import { useFloatingLinkContext } from '@/components/editor/context/floating-link-context'
-import { getSelectedNode } from '@/components/editor/utils/get-selected-node'
-import { setFloatingElemPositionForLinkEditor } from '@/components/editor/utils/set-floating-elem-position-for-link-editor'
-import { sanitizeUrl } from '@/components/editor/utils/url'
+import { useFloatingLinkContext } from "@/components/editor/context/floating-link-context";
+import { getSelectedNode } from "@/components/editor/utils/get-selected-node";
+import { setFloatingElemPositionForLinkEditor } from "@/components/editor/utils/set-floating-elem-position-for-link-editor";
+import { sanitizeUrl } from "@/components/editor/utils/url";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 function FloatingLinkEditor({
   editor,
@@ -50,45 +43,45 @@ function FloatingLinkEditor({
   isLinkEditMode,
   setIsLinkEditMode,
 }: {
-  editor: LexicalEditor
-  isLink: boolean
-  setIsLink: Dispatch<boolean>
-  anchorElem: HTMLElement
-  isLinkEditMode: boolean
-  setIsLinkEditMode: Dispatch<boolean>
+  editor: LexicalEditor;
+  isLink: boolean;
+  setIsLink: Dispatch<boolean>;
+  anchorElem: HTMLElement;
+  isLinkEditMode: boolean;
+  setIsLinkEditMode: Dispatch<boolean>;
 }): JSX.Element {
-  const editorRef = useRef<HTMLDivElement | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [linkUrl, setLinkUrl] = useState('')
-  const [editedLinkUrl, setEditedLinkUrl] = useState('https://')
-  const [lastSelection, setLastSelection] = useState<BaseSelection | null>(null)
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [editedLinkUrl, setEditedLinkUrl] = useState("https://");
+  const [lastSelection, setLastSelection] = useState<BaseSelection | null>(null);
 
   const $updateLinkEditor = useCallback(() => {
-    const selection = $getSelection()
+    const selection = $getSelection();
     if ($isRangeSelection(selection)) {
-      const node = getSelectedNode(selection)
-      const linkParent = $findMatchingParent(node, $isLinkNode)
+      const node = getSelectedNode(selection);
+      const linkParent = $findMatchingParent(node, $isLinkNode);
 
       if (linkParent) {
-        setLinkUrl(linkParent.getURL())
+        setLinkUrl(linkParent.getURL());
       } else if ($isLinkNode(node)) {
-        setLinkUrl(node.getURL())
+        setLinkUrl(node.getURL());
       } else {
-        setLinkUrl('')
+        setLinkUrl("");
       }
       if (isLinkEditMode) {
-        setEditedLinkUrl(linkUrl)
+        setEditedLinkUrl(linkUrl);
       }
     }
-    const editorElem = editorRef.current
-    const nativeSelection = window.getSelection()
-    const activeElement = document.activeElement
+    const editorElem = editorRef.current;
+    const nativeSelection = window.getSelection();
+    const activeElement = document.activeElement;
 
     if (editorElem === null) {
-      return
+      return;
     }
 
-    const rootElement = editor.getRootElement()
+    const rootElement = editor.getRootElement();
 
     if (
       selection !== null &&
@@ -98,185 +91,178 @@ function FloatingLinkEditor({
       editor.isEditable()
     ) {
       const domRect: DOMRect | undefined =
-        nativeSelection.focusNode?.parentElement?.getBoundingClientRect()
+        nativeSelection.focusNode?.parentElement?.getBoundingClientRect();
       if (domRect) {
-        domRect.y += 40
-        setFloatingElemPositionForLinkEditor(domRect, editorElem, anchorElem)
+        domRect.y += 40;
+        setFloatingElemPositionForLinkEditor(domRect, editorElem, anchorElem);
       }
-      setLastSelection(selection)
-    } else if (!activeElement || activeElement.className !== 'link-input') {
+      setLastSelection(selection);
+    } else if (!activeElement || activeElement.className !== "link-input") {
       if (rootElement !== null) {
-        setFloatingElemPositionForLinkEditor(null, editorElem, anchorElem)
+        setFloatingElemPositionForLinkEditor(null, editorElem, anchorElem);
       }
-      setLastSelection(null)
-      setIsLinkEditMode(false)
-      setLinkUrl('')
+      setLastSelection(null);
+      setIsLinkEditMode(false);
+      setLinkUrl("");
     }
 
-    return true
-  }, [anchorElem, editor, setIsLinkEditMode, isLinkEditMode, linkUrl])
+    return true;
+  }, [anchorElem, editor, setIsLinkEditMode, isLinkEditMode, linkUrl]);
 
   useEffect(() => {
-    const scrollerElem = anchorElem.parentElement
+    const scrollerElem = anchorElem.parentElement;
 
     const update = () => {
       editor.getEditorState().read(() => {
-        $updateLinkEditor()
-      })
-    }
+        $updateLinkEditor();
+      });
+    };
 
-    window.addEventListener('resize', update)
+    window.addEventListener("resize", update);
 
     if (scrollerElem) {
-      scrollerElem.addEventListener('scroll', update)
+      scrollerElem.addEventListener("scroll", update);
     }
 
     return () => {
-      window.removeEventListener('resize', update)
+      window.removeEventListener("resize", update);
 
       if (scrollerElem) {
-        scrollerElem.removeEventListener('scroll', update)
+        scrollerElem.removeEventListener("scroll", update);
       }
-    }
-  }, [anchorElem.parentElement, editor, $updateLinkEditor])
+    };
+  }, [anchorElem.parentElement, editor, $updateLinkEditor]);
 
   useEffect(() => {
     return mergeRegister(
       editor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
-          $updateLinkEditor()
-        })
+          $updateLinkEditor();
+        });
       }),
 
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         () => {
-          $updateLinkEditor()
-          return true
+          $updateLinkEditor();
+          return true;
         },
-        COMMAND_PRIORITY_LOW
+        COMMAND_PRIORITY_LOW,
       ),
       editor.registerCommand(
         KEY_ESCAPE_COMMAND,
         () => {
           if (isLink) {
-            setIsLink(false)
-            return true
+            setIsLink(false);
+            return true;
           }
-          return false
+          return false;
         },
-        COMMAND_PRIORITY_HIGH
-      )
-    )
-  }, [editor, $updateLinkEditor, setIsLink, isLink])
+        COMMAND_PRIORITY_HIGH,
+      ),
+    );
+  }, [editor, $updateLinkEditor, setIsLink, isLink]);
 
   useEffect(() => {
     editor.getEditorState().read(() => {
-      $updateLinkEditor()
-    })
-  }, [editor, $updateLinkEditor])
+      $updateLinkEditor();
+    });
+  }, [editor, $updateLinkEditor]);
 
   useEffect(() => {
     if (isLinkEditMode && inputRef.current) {
-      inputRef.current.focus()
-      setIsLink(true)
+      inputRef.current.focus();
+      setIsLink(true);
     }
-  }, [isLinkEditMode, isLink])
+  }, [isLinkEditMode, isLink]);
 
-  const monitorInputInteraction = (
-    event: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      handleLinkSubmission()
-    } else if (event.key === 'Escape') {
-      event.preventDefault()
-      setIsLinkEditMode(false)
+  const monitorInputInteraction = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleLinkSubmission();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      setIsLinkEditMode(false);
     }
-  }
+  };
 
   const handleLinkSubmission = () => {
     if (lastSelection !== null) {
-      if (linkUrl !== '') {
-        editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl(editedLinkUrl))
+      if (linkUrl !== "") {
+        editor.dispatchCommand(TOGGLE_LINK_COMMAND, sanitizeUrl(editedLinkUrl));
         editor.update(() => {
-          const selection = $getSelection()
+          const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            const parent = getSelectedNode(selection).getParent()
+            const parent = getSelectedNode(selection).getParent();
             if ($isAutoLinkNode(parent)) {
               const linkNode = $createLinkNode(parent.getURL(), {
                 rel: parent.__rel,
                 target: parent.__target,
                 title: parent.__title,
-              })
-              parent.replace(linkNode, true)
+              });
+              parent.replace(linkNode, true);
             }
           }
-        })
+        });
       }
-      setEditedLinkUrl('https://')
-      setIsLinkEditMode(false)
+      setEditedLinkUrl("https://");
+      setIsLinkEditMode(false);
     }
-  }
+  };
   return (
     <div
       ref={editorRef}
-      className="absolute left-0 top-0 w-full max-w-sm rounded-md opacity-0 shadow-md"
+      className="absolute top-0 left-0 w-full max-w-sm rounded-md opacity-0 shadow-md"
     >
       {!isLink ? null : isLinkEditMode ? (
-        <div className="flex items-center space-x-2 rounded-md border p-1 pl-2">
+        <div className="flex items-center gap-1 rounded-md border p-1">
           <Input
             ref={inputRef}
             value={editedLinkUrl}
+            className="h-8"
             onChange={(event) => setEditedLinkUrl(event.target.value)}
             onKeyDown={monitorInputInteraction}
-            className="flex-grow"
           />
           <Button
-            size="icon"
-            variant="ghost"
+            className="size-8"
+            variant="outline"
             onClick={() => {
-              setIsLinkEditMode(false)
-              setIsLink(false)
+              setIsLinkEditMode(false);
+              setIsLink(false);
             }}
-            className="shrink-0"
           >
             <X className="h-4 w-4" />
           </Button>
-          <Button
-            size="icon"
-            onClick={handleLinkSubmission}
-            className="shrink-0"
-          >
+          <Button className="size-8" onClick={handleLinkSubmission}>
             <Check className="h-4 w-4" />
           </Button>
         </div>
       ) : (
-        <div className="flex items-center justify-between rounded-md border p-1 pl-2">
+        <div className="flex items-center justify-between rounded-md border p-1 ps-4">
           <a
             href={sanitizeUrl(linkUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            className="overflow-hidden text-ellipsis whitespace-nowrap text-sm"
+            className="overflow-hidden text-sm text-ellipsis whitespace-nowrap"
           >
             {linkUrl}
           </a>
-          <div className="flex">
+          <div className="flex gap-1">
             <Button
-              size="icon"
               variant="ghost"
+              className="size-8"
               onClick={() => {
-                setEditedLinkUrl(linkUrl)
-                setIsLinkEditMode(true)
+                setEditedLinkUrl(linkUrl);
+                setIsLinkEditMode(true);
               }}
             >
               <Pencil className="h-4 w-4" />
             </Button>
             <Button
-              size="icon"
+              className="size-8"
               variant="destructive"
               onClick={() => {
-                editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
+                editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
               }}
             >
               <Trash className="h-4 w-4" />
@@ -285,91 +271,87 @@ function FloatingLinkEditor({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function useFloatingLinkEditorToolbar(
   editor: LexicalEditor,
   anchorElem: HTMLDivElement | null,
   isLinkEditMode: boolean,
-  setIsLinkEditMode: Dispatch<boolean>
+  setIsLinkEditMode: Dispatch<boolean>,
 ): JSX.Element | null {
-  const [activeEditor, setActiveEditor] = useState(editor)
-  const [isLink, setIsLink] = useState(false)
+  const [activeEditor, setActiveEditor] = useState(editor);
+  const [isLink, setIsLink] = useState(false);
 
   useEffect(() => {
     function $updateToolbar() {
-      const selection = $getSelection()
+      const selection = $getSelection();
       if ($isRangeSelection(selection)) {
-        const focusNode = getSelectedNode(selection)
-        const focusLinkNode = $findMatchingParent(focusNode, $isLinkNode)
-        const focusAutoLinkNode = $findMatchingParent(
-          focusNode,
-          $isAutoLinkNode
-        )
+        const focusNode = getSelectedNode(selection);
+        const focusLinkNode = $findMatchingParent(focusNode, $isLinkNode);
+        const focusAutoLinkNode = $findMatchingParent(focusNode, $isAutoLinkNode);
         if (!(focusLinkNode || focusAutoLinkNode)) {
-          setIsLink(false)
-          return
+          setIsLink(false);
+          return;
         }
         const badNode = selection
           .getNodes()
           .filter((node) => !$isLineBreakNode(node))
           .find((node) => {
-            const linkNode = $findMatchingParent(node, $isLinkNode)
-            const autoLinkNode = $findMatchingParent(node, $isAutoLinkNode)
+            const linkNode = $findMatchingParent(node, $isLinkNode);
+            const autoLinkNode = $findMatchingParent(node, $isAutoLinkNode);
             return (
               (focusLinkNode && !focusLinkNode.is(linkNode)) ||
               (linkNode && !linkNode.is(focusLinkNode)) ||
               (focusAutoLinkNode && !focusAutoLinkNode.is(autoLinkNode)) ||
               (autoLinkNode &&
-                (!autoLinkNode.is(focusAutoLinkNode) ||
-                  autoLinkNode.getIsUnlinked()))
-            )
-          })
+                (!autoLinkNode.is(focusAutoLinkNode) || autoLinkNode.getIsUnlinked()))
+            );
+          });
 
         if (!badNode) {
-          setIsLink(true)
+          setIsLink(true);
         } else {
-          setIsLink(false)
+          setIsLink(false);
         }
       }
     }
     return mergeRegister(
       editor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
-          $updateToolbar()
-        })
+          $updateToolbar();
+        });
       }),
       editor.registerCommand(
         SELECTION_CHANGE_COMMAND,
         (_payload, newEditor) => {
-          $updateToolbar()
-          setActiveEditor(newEditor)
-          return false
+          $updateToolbar();
+          setActiveEditor(newEditor);
+          return false;
         },
-        COMMAND_PRIORITY_CRITICAL
+        COMMAND_PRIORITY_CRITICAL,
       ),
       editor.registerCommand(
         CLICK_COMMAND,
         (payload) => {
-          const selection = $getSelection()
+          const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            const node = getSelectedNode(selection)
-            const linkNode = $findMatchingParent(node, $isLinkNode)
+            const node = getSelectedNode(selection);
+            const linkNode = $findMatchingParent(node, $isLinkNode);
             if ($isLinkNode(linkNode) && (payload.metaKey || payload.ctrlKey)) {
-              window.open(linkNode.getURL(), '_blank')
-              return true
+              window.open(linkNode.getURL(), "_blank");
+              return true;
             }
           }
-          return false
+          return false;
         },
-        COMMAND_PRIORITY_LOW
-      )
-    )
-  }, [editor])
+        COMMAND_PRIORITY_LOW,
+      ),
+    );
+  }, [editor]);
 
   if (!anchorElem) {
-    return null
+    return null;
   }
 
   return createPortal(
@@ -381,22 +363,17 @@ function useFloatingLinkEditorToolbar(
       isLinkEditMode={isLinkEditMode}
       setIsLinkEditMode={setIsLinkEditMode}
     />,
-    anchorElem
-  )
+    anchorElem,
+  );
 }
 
 export function FloatingLinkEditorPlugin({
   anchorElem,
 }: {
-  anchorElem: HTMLDivElement | null
+  anchorElem: HTMLDivElement | null;
 }): JSX.Element | null {
-  const [editor] = useLexicalComposerContext()
-  const { isLinkEditMode, setIsLinkEditMode } = useFloatingLinkContext()
+  const [editor] = useLexicalComposerContext();
+  const { isLinkEditMode, setIsLinkEditMode } = useFloatingLinkContext();
 
-  return useFloatingLinkEditorToolbar(
-    editor,
-    anchorElem,
-    isLinkEditMode,
-    setIsLinkEditMode
-  )
+  return useFloatingLinkEditorToolbar(editor, anchorElem, isLinkEditMode, setIsLinkEditMode);
 }
