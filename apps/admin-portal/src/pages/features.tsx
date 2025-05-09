@@ -51,10 +51,10 @@ export default function FeaturesPage() {
 
 FeaturesPage.messages = ["Pages", "General", "Features"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, FeaturesPage.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, FeaturesPage.messages),
+//     },
+//   };
+// };

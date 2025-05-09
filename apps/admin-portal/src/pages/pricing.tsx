@@ -324,15 +324,15 @@ export default function PricingPage() {
 
 PricingPage.messages = ["Pages", "General", "Pricing"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const billingCurrencies = ["sar", "usd"];
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   const billingCurrencies = ["sar", "usd"];
 
-  const billingCycles = ["monthly", "yearly"];
-  return {
-    props: {
-      billingCycles,
-      billingCurrencies,
-      messages: pick((await import(`../../locales/${locale}.json`)).default, PricingPage.messages),
-    },
-  };
-};
+//   const billingCycles = ["monthly", "yearly"];
+//   return {
+//     props: {
+//       billingCycles,
+//       billingCurrencies,
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, PricingPage.messages),
+//     },
+//   };
+// };

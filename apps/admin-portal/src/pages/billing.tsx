@@ -74,10 +74,10 @@ export default function Billing() {
 
 Billing.messages = ["Pages", "Billing", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, Billing.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, Billing.messages),
+//     },
+//   };
+// };

@@ -64,13 +64,13 @@ export default function AddProductPage() {
 
 AddProductPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddProductPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddProductPage.messages,
+//       ),
+//     },
+//   };
+// };

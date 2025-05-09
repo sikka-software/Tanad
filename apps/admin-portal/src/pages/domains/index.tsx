@@ -175,13 +175,13 @@ export default function DomainsPage() {
 
 DomainsPage.messages = ["Pages", "Domains", "Notes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        DomainsPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         DomainsPage.messages,
+//       ),
+//     },
+//   };
+// };

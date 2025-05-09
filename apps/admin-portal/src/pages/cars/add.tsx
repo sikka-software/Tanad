@@ -65,13 +65,13 @@ export default function AddCarPage() {
 
 AddCarPage.messages = ["Pages", "Cars", "Notes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddCarPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddCarPage.messages,
+//       ),
+//     },
+//   };
+// };

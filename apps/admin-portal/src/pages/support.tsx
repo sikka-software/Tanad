@@ -20,10 +20,10 @@ export default function SupportPage() {
 
 SupportPage.messages = ["Pages", "Support", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, SupportPage.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, SupportPage.messages),
+//     },
+//   };
+// };

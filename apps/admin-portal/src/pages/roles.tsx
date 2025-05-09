@@ -229,10 +229,10 @@ export default function RolesPage() {
 
 RolesPage.messages = ["Pages", "Roles", "Notes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, RolesPage.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, RolesPage.messages),
+//     },
+//   };
+// };

@@ -190,13 +190,13 @@ export default function ProductsPage() {
 
 ProductsPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        ProductsPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         ProductsPage.messages,
+//       ),
+//     },
+//   };
+// };

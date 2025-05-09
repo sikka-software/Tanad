@@ -62,13 +62,13 @@ export default function AddWebsitePage() {
 
 AddWebsitePage.messages = ["Notes", "Pages", "Websites", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddWebsitePage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddWebsitePage.messages,
+//       ),
+//     },
+//   };
+// };

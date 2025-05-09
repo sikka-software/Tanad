@@ -178,13 +178,13 @@ export default function CompaniesPage() {
 
 CompaniesPage.messages = ["Notes", "Pages", "General", "Companies", "Forms"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        CompaniesPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         CompaniesPage.messages,
+//       ),
+//     },
+//   };
+// };

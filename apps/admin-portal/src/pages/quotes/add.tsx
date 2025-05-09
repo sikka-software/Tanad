@@ -46,13 +46,13 @@ export default function AddQuotePage() {
 
 AddQuotePage.messages = ["Notes", "Pages", "Quotes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddQuotePage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddQuotePage.messages,
+//       ),
+//     },
+//   };
+// };

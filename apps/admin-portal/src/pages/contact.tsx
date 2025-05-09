@@ -117,10 +117,10 @@ export default function ContactPage() {
 
 ContactPage.messages = ["Pages", "General", "Contact"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, ContactPage.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, ContactPage.messages),
+//     },
+//   };
+// };

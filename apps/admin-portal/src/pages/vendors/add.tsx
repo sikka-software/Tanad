@@ -67,13 +67,13 @@ export default function AddVendorPage() {
 
 AddVendorPage.messages = ["Notes", "Pages", "Vendors", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddVendorPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddVendorPage.messages,
+//       ),
+//     },
+//   };
+// };

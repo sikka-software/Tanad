@@ -182,13 +182,13 @@ export default function OnlineStoresPage() {
 
 OnlineStoresPage.messages = ["Notes", "Pages", "OnlineStores", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        OnlineStoresPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         OnlineStoresPage.messages,
+//       ),
+//     },
+//   };
+// };

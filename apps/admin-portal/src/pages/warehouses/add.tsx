@@ -64,13 +64,13 @@ export default function AddWarehousePage() {
 
 AddWarehousePage.messages = ["Notes", "Pages", "Warehouses", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddWarehousePage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddWarehousePage.messages,
+//       ),
+//     },
+//   };
+// };

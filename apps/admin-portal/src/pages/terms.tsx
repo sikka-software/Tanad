@@ -25,10 +25,10 @@ export default function TermsPage() {
 
 TermsPage.messages = ["Pages", "Terms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, TermsPage.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, TermsPage.messages),
+//     },
+//   };
+// };

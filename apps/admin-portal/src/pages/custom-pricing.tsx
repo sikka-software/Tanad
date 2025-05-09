@@ -31,13 +31,13 @@ export default CustomPricingPage;
 
 CustomPricingPage.messages = ["Pages", "Pricing", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../locales/${locale}.json`)).default,
-        CustomPricingPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../locales/${locale}.json`)).default,
+//         CustomPricingPage.messages,
+//       ),
+//     },
+//   };
+// };

@@ -88,10 +88,10 @@ export default function ContactsPage() {
 
 ContactsPage.messages = ["Pages", "General", "Contacts"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, ContactsPage.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, ContactsPage.messages),
+//     },
+//   };
+// };

@@ -52,13 +52,13 @@ export default function AddRolePage() {
 
 AddRolePage.messages = ["Notes", "Pages", "Roles", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddRolePage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddRolePage.messages,
+//       ),
+//     },
+//   };
+// };

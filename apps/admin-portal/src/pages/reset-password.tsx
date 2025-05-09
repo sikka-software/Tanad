@@ -175,13 +175,13 @@ export default ResetPassword;
 
 ResetPassword.messages = ["Pages", "Auth", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../locales/${locale}.json`)).default,
-        ResetPassword.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../locales/${locale}.json`)).default,
+//         ResetPassword.messages,
+//       ),
+//     },
+//   };
+// };

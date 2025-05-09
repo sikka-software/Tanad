@@ -177,13 +177,13 @@ export default function VendorsPage() {
 
 VendorsPage.messages = ["Notes", "Pages", "Vendors", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        VendorsPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         VendorsPage.messages,
+//       ),
+//     },
+//   };
+// };

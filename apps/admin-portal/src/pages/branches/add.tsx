@@ -65,13 +65,13 @@ export default function AddBranchPage() {
 
 AddBranchPage.messages = ["Pages", "Branches", "Forms", "Notes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddBranchPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddBranchPage.messages,
+//       ),
+//     },
+//   };
+// };

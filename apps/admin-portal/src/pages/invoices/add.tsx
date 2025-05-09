@@ -51,13 +51,13 @@ export default function AddInvoicePage() {
 
 AddInvoicePage.messages = ["Notes", "Pages", "Invoices", "ProductsFormSection", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddInvoicePage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddInvoicePage.messages,
+//       ),
+//     },
+//   };
+// };

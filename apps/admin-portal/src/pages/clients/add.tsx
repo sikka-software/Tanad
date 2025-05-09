@@ -61,13 +61,13 @@ export default function AddClientPage() {
 
 AddClientPage.messages = ["Pages", "Clients", "Forms", "Notes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddClientPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddClientPage.messages,
+//       ),
+//     },
+//   };
+// };

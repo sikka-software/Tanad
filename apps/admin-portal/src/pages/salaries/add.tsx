@@ -47,13 +47,13 @@ export default function AddSalaryPage() {
 
 AddSalaryPage.messages = ["Notes", "Pages", "Salaries", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddSalaryPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddSalaryPage.messages,
+//       ),
+//     },
+//   };
+// };

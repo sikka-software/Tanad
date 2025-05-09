@@ -11,10 +11,10 @@ export default function LegalPage() {
 
 LegalPage.messages = ["Pages", "General", "Legal"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, LegalPage.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, LegalPage.messages),
+//     },
+//   };
+// };

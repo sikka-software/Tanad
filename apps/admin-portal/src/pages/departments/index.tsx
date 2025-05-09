@@ -187,13 +187,13 @@ export default function DepartmentsPage() {
 
 DepartmentsPage.messages = ["Notes", "Pages", "Departments", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        DepartmentsPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         DepartmentsPage.messages,
+//       ),
+//     },
+//   };
+// };

@@ -234,10 +234,10 @@ export default SettingsPage;
 
 SettingsPage.messages = ["Pages", "Settings", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, SettingsPage.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, SettingsPage.messages),
+//     },
+//   };
+// };

@@ -64,13 +64,13 @@ export default function AddExpensePage() {
 
 AddExpensePage.messages = ["Notes", "Pages", "Expenses", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddExpensePage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddExpensePage.messages,
+//       ),
+//     },
+//   };
+// };

@@ -63,13 +63,13 @@ export default function AddEmployeePage() {
 
 AddEmployeePage.messages = ["Notes", "Pages", "Employees", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddEmployeePage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddEmployeePage.messages,
+//       ),
+//     },
+//   };
+// };

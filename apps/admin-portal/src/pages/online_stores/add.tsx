@@ -61,13 +61,13 @@ export default function AddOnlineStorePage() {
 
 AddOnlineStorePage.messages = ["Notes", "Pages", "OnlineStores", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddOnlineStorePage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddOnlineStorePage.messages,
+//       ),
+//     },
+//   };
+// };

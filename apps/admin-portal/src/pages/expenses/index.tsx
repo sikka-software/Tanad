@@ -175,13 +175,13 @@ export default function ExpensesPage() {
 }
 
 ExpensesPage.messages = ["Notes", "Pages", "Expenses", "Forms", "General"];
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        ExpensesPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         ExpensesPage.messages,
+//       ),
+//     },
+//   };
+// };

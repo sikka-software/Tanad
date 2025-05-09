@@ -193,13 +193,13 @@ export default function PurchasesPage() {
 
 PurchasesPage.messages = ["Notes", "Pages", "Purchases", "Forms", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        PurchasesPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         PurchasesPage.messages,
+//       ),
+//     },
+//   };
+// };

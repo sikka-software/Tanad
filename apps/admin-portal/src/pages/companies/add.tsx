@@ -68,13 +68,13 @@ export default function AddCompanyPage() {
 
 AddCompanyPage.messages = ["Notes", "Pages", "General", "Companies", "Forms"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        AddCompanyPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         AddCompanyPage.messages,
+//       ),
+//     },
+//   };
+// };

@@ -151,13 +151,13 @@ export default function QuotesPage() {
 }
 
 QuotesPage.messages = ["Notes", "Pages", "Quotes", "General"];
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        QuotesPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         QuotesPage.messages,
+//       ),
+//     },
+//   };
+// };

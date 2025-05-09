@@ -188,13 +188,13 @@ export default function EmployeeRequestsPage() {
 }
 
 EmployeeRequestsPage.messages = ["Notes", "Pages", "EmployeeRequests", "General"];
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        EmployeeRequestsPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         EmployeeRequestsPage.messages,
+//       ),
+//     },
+//   };
+// };

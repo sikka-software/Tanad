@@ -180,13 +180,13 @@ export default function BranchesPage() {
 
 BranchesPage.messages = ["Pages", "Branches", "Forms", "Notes", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        BranchesPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         BranchesPage.messages,
+//       ),
+//     },
+//   };
+// };

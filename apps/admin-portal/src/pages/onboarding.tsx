@@ -63,13 +63,13 @@ export default function OnboardingPage() {
 
 OnboardingPage.messages = ["General", "OnBoarding"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../locales/${locale}.json`)).default,
-        OnboardingPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../locales/${locale}.json`)).default,
+//         OnboardingPage.messages,
+//       ),
+//     },
+//   };
+// };

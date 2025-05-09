@@ -255,13 +255,13 @@ export default EnterprisePage;
 
 EnterprisePage.messages = ["Pages", "General", "Enterprise"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../locales/${locale}.json`)).default,
-        EnterprisePage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../locales/${locale}.json`)).default,
+//         EnterprisePage.messages,
+//       ),
+//     },
+//   };
+// };

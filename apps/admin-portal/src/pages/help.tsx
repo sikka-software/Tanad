@@ -79,10 +79,10 @@ export default function HelpPage() {
 
 HelpPage.messages = ["Pages", "General", "Help"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick((await import(`../../locales/${locale}.json`)).default, HelpPage.messages),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick((await import(`../../locales/${locale}.json`)).default, HelpPage.messages),
+//     },
+//   };
+// };

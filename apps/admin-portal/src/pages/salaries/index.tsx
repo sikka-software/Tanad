@@ -173,13 +173,13 @@ export default function SalariesPage() {
 
 SalariesPage.messages = ["Notes", "Pages", "Salaries", "General"];
 
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      messages: pick(
-        (await import(`../../../locales/${locale}.json`)).default,
-        SalariesPage.messages,
-      ),
-    },
-  };
-};
+// export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+//   return {
+//     props: {
+//       messages: pick(
+//         (await import(`../../../locales/${locale}.json`)).default,
+//         SalariesPage.messages,
+//       ),
+//     },
+//   };
+// };
