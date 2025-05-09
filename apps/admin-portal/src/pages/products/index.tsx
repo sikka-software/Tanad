@@ -160,7 +160,7 @@ export default function ProductsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Pages.Products.add")}
+          title={actionableProduct ? t("Pages.Products.edit") : t("Pages.Products.add")}
           formId="product-form"
           loadingSave={loadingSaveProduct}
         >

@@ -148,7 +148,7 @@ export default function WarehousesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Warehouses.edit_warehouse")}
+          title={actionableWarehouse ? t("Pages.Warehouses.edit") : t("Pages.Warehouses.add")}
           formId="warehouse-form"
           loadingSave={loadingSaveWarehouse}
         >

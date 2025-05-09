@@ -144,7 +144,7 @@ export default function OfficesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Pages.Offices.edit")}
+          title={actionableOffice ? t("Pages.Offices.edit") : t("Pages.Offices.add")}
           formId="office-form"
           loadingSave={loadingSaveOffice}
         >

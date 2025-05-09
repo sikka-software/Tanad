@@ -145,7 +145,7 @@ export default function ClientsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Pages.Clients.edit")}
+          title={actionableClient ? t("Pages.Clients.edit") : t("Pages.Clients.add")}
           formId="client-form"
           loadingSave={loadingSaveClient}
         >

@@ -36,6 +36,7 @@ export const routeMap: RouteMap = {
   "/departments": { label: "Pages.Departments.title", translationKey: "Pages.Departments.title" },
   "/offices": { label: "Pages.Offices.title", translationKey: "Pages.Offices.title" },
   "/expenses": { label: "Pages.Expenses.title", translationKey: "Pages.Expenses.title" },
+  "/purchases": { label: "Pages.Purchases.title", translationKey: "Pages.Purchases.title" },
   "/domains": { label: "Pages.Domains.title", translationKey: "Pages.Domains.title" },
   "/servers": { label: "Pages.Servers.title", translationKey: "Pages.Servers.title" },
   "/websites": { label: "Pages.Websites.title", translationKey: "Pages.Websites.title" },
@@ -238,6 +239,14 @@ export const dynamicRoutePatterns = [
       { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
       { path: "/online_stores", labelKey: "Pages.OnlineStores.title" },
       { path: "", labelKey: "Pages.OnlineStores.add", is_active: true },
+    ],
+  },
+  {
+    pattern: /^\/purchases\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/purchases", labelKey: "Pages.Purchases.title" },
+      { path: "", labelKey: "Pages.Purchases.add", is_active: true },
     ],
   },
 ];

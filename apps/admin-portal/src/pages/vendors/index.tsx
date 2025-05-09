@@ -146,7 +146,7 @@ export default function VendorsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Pages.Vendors.edit")}
+          title={actionableVendor ? t("Pages.Vendors.edit") : t("Pages.Vendors.add")}
           formId="vendor-form"
           loadingSave={loadingSaveVendor}
         >

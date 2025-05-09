@@ -143,7 +143,7 @@ export default function CompaniesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Companies.edit_company")}
+          title={actionableCompany ? t("Pages.Companies.edit") : t("Pages.Companies.add")}
           formId="company-form"
           loadingSave={loadingSaveCompany}
         >

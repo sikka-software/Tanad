@@ -144,7 +144,7 @@ export default function DomainsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Domains.edit_domain")}
+          title={actionableDomain ? t("Pages.Domains.edit") : t("Pages.Domains.add")}
           formId="domain-form"
           loadingSave={loadingSaveDomain}
         >

@@ -507,7 +507,7 @@ export function JobForm({
       <FormDialog
         open={isDepartmentDialogOpen}
         onOpenChange={setIsDepartmentDialogOpen}
-        title={t(`${chosenForm}.add_new`)}
+        title={t(`Pages.${chosenForm}.add`)}
         formId="department-form"
         loadingSave={isDepartmentSaving}
         // dummyData={() => process.env.NODE_ENV === "development" && generateDummyDepartment()} // Commented out

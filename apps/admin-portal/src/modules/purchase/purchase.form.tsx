@@ -1,21 +1,25 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import NotesSection from "@root/src/components/forms/notes-section";
-import { CommandSelect } from "@root/src/components/ui/command-select";
-import { getNotesValue } from "@root/src/lib/utils";
 import { useTranslations, useLocale } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import CodeInput from "@/ui/code-input";
+import { CommandSelect } from "@/ui/command-select";
+import { CurrencyInput } from "@/ui/currency-input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
+
+import NotesSection from "@/components/forms/notes-section";
+
+import { getNotesValue } from "@/lib/utils";
 
 import { ModuleFormProps } from "@/types/common.type";
 
 import useUserStore from "@/stores/use-user-store";
 
-import { useCreatePurchase, useUpdatePurchase } from "./purchase.hooks";
+import { useCreatePurchase, usePurchases, useUpdatePurchase } from "./purchase.hooks";
 import usePurchaseStore from "./purchase.store";
 import { PurchaseUpdateData, PurchaseCreateData } from "./purchase.type";
 
@@ -91,6 +95,7 @@ export function PurchaseForm({
   const { user, enterprise } = useUserStore();
   const { mutate: createPurchase } = useCreatePurchase();
   const { mutate: updatePurchase } = useUpdatePurchase();
+  const { data: purchases } = usePurchases();
 
   const isLoading = usePurchaseStore((state: any) => state.isLoading);
   const setIsLoading = usePurchaseStore((state: any) => state.setIsLoading);
@@ -205,11 +210,30 @@ export function PurchaseForm({
                   <FormItem>
                     <FormLabel>{t("Purchases.form.purchase_number.label")} *</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder={t("Purchases.form.purchase_number.placeholder")}
-                        {...field}
-                        disabled={isLoading}
-                      />
+                      <CodeInput
+                        onSerial={() => {
+                          const nextNumber = (purchases?.length || 0) + 1;
+                          const paddedNumber = String(nextNumber).padStart(4, "0");
+                          form.setValue("purchase_number", `PUR-${paddedNumber}`);
+                        }}
+                        onRandom={() => {
+                          const randomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                          let randomCode = "";
+                          for (let i = 0; i < 5; i++) {
+                            randomCode += randomChars.charAt(
+                              Math.floor(Math.random() * randomChars.length),
+                            );
+                          }
+                          form.setValue("purchase_number", `PUR-${randomCode}`);
+                        }}
+                      >
+                        <Input
+                          placeholder={t("Purchases.form.purchase_number.placeholder")}
+                          {...field}
+                          disabled={isLoading}
+                          aria-invalid={!!form.formState.errors.purchase_number}
+                        />
+                      </CodeInput>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -242,26 +266,13 @@ export function PurchaseForm({
                   <FormItem>
                     <FormLabel>{t("Purchases.form.amount.label")} *</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
+                      <CurrencyInput
                         placeholder={t("Purchases.form.amount.placeholder")}
-                        {...field}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val === "") {
-                            field.onChange(undefined);
-                          } else {
-                            const num = parseFloat(val);
-                            field.onChange(isNaN(num) ? undefined : num);
-                          }
-                        }}
-                        value={
-                          field.value === undefined || field.value === null
-                            ? ""
-                            : String(field.value)
-                        }
                         disabled={isLoading}
+                        {...field}
+                        showCommas={true}
+                        value={field.value ? parseFloat(String(field.value)) : undefined}
+                        onChange={(value) => field.onChange(value)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -276,6 +287,7 @@ export function PurchaseForm({
                     <FormLabel>{t("Purchases.form.status.label")} *</FormLabel>
                     <FormControl>
                       <CommandSelect
+                        disabled={isLoading}
                         direction={locale === "ar" ? "rtl" : "ltr"}
                         data={[
                           { label: t("Purchases.form.status.pending"), value: "pending" },

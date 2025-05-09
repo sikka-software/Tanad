@@ -151,7 +151,7 @@ export default function OnlineStoresPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Pages.OnlineStores.add")}
+          title={actionableOnlineStore ? t("Pages.OnlineStores.edit") : t("Pages.OnlineStores.add")}
           formId="online-store-form"
           loadingSave={loadingSaveOnlineStore}
         >

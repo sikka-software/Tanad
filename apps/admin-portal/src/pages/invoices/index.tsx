@@ -146,7 +146,7 @@ export default function InvoicesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Invoices.edit_invoice")}
+          title={actionableInvoice ? t("Pages.Invoices.edit") : t("Pages.Invoices.add")}
           formId="invoice-form"
           loadingSave={loadingSaveInvoice}
         >

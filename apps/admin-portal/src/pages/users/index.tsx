@@ -154,7 +154,7 @@ export default function UsersPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={formDialogTitle}
+          title={actionableUser ? t("Pages.Users.edit") : t("Pages.Users.add")}
           formId="user-form"
           loadingSave={loadingSaveUser}
         >

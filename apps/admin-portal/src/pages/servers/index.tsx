@@ -147,7 +147,7 @@ export default function ServersPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Pages.Servers.add")}
+          title={actionableServer ? t("Pages.Servers.edit") : t("Pages.Servers.add")}
           formId="server-form"
           loadingSave={loadingSaveServer}
         >

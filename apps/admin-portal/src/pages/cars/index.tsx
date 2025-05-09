@@ -139,7 +139,7 @@ export default function CarsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Cars.edit_car")}
+          title={actionableCar ? t("Pages.Cars.edit") : t("Pages.Cars.add")}
           formId="car-form"
           loadingSave={loadingSaveCar}
         >

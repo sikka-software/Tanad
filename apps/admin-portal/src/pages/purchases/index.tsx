@@ -162,7 +162,7 @@ export default function PurchasesPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Pages.Purchases.add")}
+          title={actionablePurchase ? t("Pages.Purchases.edit") : t("Pages.Purchases.add")}
           formId="purchase-form"
           loadingSave={loadingSavePurchase}
         >

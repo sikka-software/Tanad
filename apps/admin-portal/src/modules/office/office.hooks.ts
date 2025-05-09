@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import {
   createOffice,
@@ -40,6 +42,7 @@ export function useOffice(id: string) {
 // Hook to create a office
 export function useCreateOffice() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
   return useMutation({
     mutationFn: (office: OfficeCreateData) => createOffice(office),
     onSuccess: (newOffice: Office) => {
@@ -48,6 +51,15 @@ export function useCreateOffice() {
         ...(Array.isArray(previousOffices) ? previousOffices : []),
         newOffice,
       ]);
+
+      toast.success(t("General.successful_operation"), {
+        description: t("Offices.success.create"),
+      });
+    },
+    onError: (error) => {
+      toast.error(t("General.error_operation"), {
+        description: t("Offices.error.create"),
+      });
     },
   });
 }
@@ -55,12 +67,22 @@ export function useCreateOffice() {
 // Hook to update a office
 export function useUpdateOffice() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
+
   return useMutation({
     mutationFn: ({ id, office }: { id: string; office: OfficeUpdateData }) =>
       updateOffice(id, office),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Offices.success.update"),
+      });
+    },
+    onError: (error) => {
+      toast.error(t("General.error_operation"), {
+        description: t("Offices.error.update"),
+      });
     },
   });
 }
@@ -68,11 +90,20 @@ export function useUpdateOffice() {
 // Hook to duplicate a office
 export function useDuplicateOffice() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
   return useMutation({
     mutationFn: (id: string) => duplicateOffice(id),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Offices.success.duplicate"),
+      });
+    },
+    onError: (error) => {
+      toast.error(t("General.error_operation"), {
+        description: t("Offices.error.duplicate"),
+      });
     },
   });
 }
@@ -80,11 +111,20 @@ export function useDuplicateOffice() {
 // Hook to delete a office
 export function useDeleteOffice() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
   return useMutation({
     mutationFn: deleteOffice,
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
       queryClient.removeQueries({ queryKey: officeKeys.detail(variables) });
+      toast.success(t("General.successful_operation"), {
+        description: t("Offices.success.delete"),
+      });
+    },
+    onError: (error) => {
+      toast.error(t("General.error_operation"), {
+        description: t("Offices.error.delete"),
+      });
     },
   });
 }
@@ -92,10 +132,19 @@ export function useDeleteOffice() {
 // Hook to bulk delete offices
 export function useBulkDeleteOffices() {
   const queryClient = useQueryClient();
+  const t = useTranslations();
   return useMutation({
     mutationFn: bulkDeleteOffices,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
+      toast.success(t("General.successful_operation"), {
+        description: t("Offices.success.bulk_delete"),
+      });
+    },
+    onError: (error) => {
+      toast.error(t("General.error_operation"), {
+        description: t("Offices.error.bulk_delete"),
+      });
     },
   });
 }

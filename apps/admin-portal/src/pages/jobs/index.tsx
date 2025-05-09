@@ -145,7 +145,7 @@ export default function JobsPage() {
         <FormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          title={t("Jobs.edit_job")}
+          title={actionableJob ? t("Pages.Jobs.edit") : t("Pages.Jobs.add")}
           formId="job-form"
           loadingSave={isLoading}
         >
