@@ -1,17 +1,40 @@
 import { OTPInput, SlotProps } from "input-otp";
+import * as React from "react";
 import { useId } from "react";
 
 import { cn } from "@/lib/utils";
 
 export default function DigitsInput({ className, ...props }: React.ComponentProps<"input">) {
-  const id = useId();
+  const generatedId = useId();
+  const id = props.id || generatedId;
+
+  const value =
+    typeof props.value === "string"
+      ? props.value
+      : typeof props.value === "number"
+        ? String(props.value)
+        : "";
+
+  const handleChange = (otpValue: string) => {
+    if (props.onChange) {
+      (props.onChange as any)(otpValue);
+    }
+  };
+
+  const maxLength = typeof props.maxLength === "number" ? props.maxLength : 17;
+
   return (
-    <div dir="ltr">
+    <div dir="ltr" className={cn(className)}>
       <OTPInput
+        value={value}
+        onChange={handleChange}
+        onBlur={props.onBlur}
+        disabled={props.disabled}
+        name={props.name}
         id={id}
+        maxLength={maxLength}
         dir="ltr"
         containerClassName="flex items-center gap-3 has-disabled:opacity-50 w-full"
-        maxLength={17}
         render={({ slots }) => (
           <>
             <div className="flex w-full">
