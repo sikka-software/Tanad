@@ -29,6 +29,7 @@ interface CrudChartProps {
   xAxisKey: string;
   footerPrimaryText?: string;
   footerSecondaryText?: string;
+  className?: string;
 }
 
 export function CrudChart({
@@ -39,6 +40,7 @@ export function CrudChart({
   xAxisKey,
   footerPrimaryText,
   footerSecondaryText,
+  className,
 }: CrudChartProps) {
   const t = useTranslations();
 
@@ -47,7 +49,7 @@ export function CrudChart({
   }
 
   return (
-    <ChartContainer config={chartConfig}>
+    <ChartContainer className={className} config={chartConfig}>
       <BarChart accessibilityLayer data={chartData}>
         <CartesianGrid vertical={false} />
         <XAxis dataKey={xAxisKey} tickLine={false} tickMargin={10} axisLine={false} />

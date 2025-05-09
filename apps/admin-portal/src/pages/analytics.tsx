@@ -240,7 +240,7 @@ export default function Analytics() {
         </div>
       </div>
 
-      <main className="mx-auto flex max-w-2xl flex-row items-center justify-start gap-4 p-4">
+      <main className="mx-auto flex flex-row items-center justify-start gap-4 p-4">
         {/* <LinesChart
           title={t("Analytics.crud_analytics_title")}
           description={t("Analytics.crud_analytics_description")}
@@ -292,8 +292,9 @@ export default function Analytics() {
               </SelectContent>
             </Select>
           </CardHeader>
-          <CardContent>
+          <CardContent className="max-h-[200px] w-full">
             <CrudChart
+              className="h-[180px] w-full"
               title={t("Analytics.crud_analytics_title")}
               description={t("Analytics.crud_analytics_description")}
               chartData={analyticsData.chartData}
