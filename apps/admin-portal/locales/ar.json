@@ -1305,20 +1305,139 @@
     "delete_actions": "الحذف"
   },
   "Billing": {
-    "pro_plan": "الباقة الإحترافية",
-    "only_for_enterprise_users": "لباقة المؤسسات فقط",
-    "upgrade_to_enterprise_for_advanced_analytics": "قم بالترقية لباقة المؤسسات للوصول إلى التحليلات المتقدمة",
-    "enterprise_plan": "باقة المؤسسات",
-    "title": "الدفع",
-    "description": "إدارة جميع طرق الدفع الخاصة بك",
-    "upgrade_dialog": {
-      "title": "ترقية إلى المستوى التالي",
-      "description": "قم بترقية خطتك لإنشاء المزيد من البكلات",
-      "unlimited_puklas": "إنشاء عدد لا محدود من البكلات",
-      "custom_design_and_colors": "تصميم خاص وألوان مخصصة",
-      "advanced_analytics": "تحليلات متقدمة ودعم بالبريد الإلكتروني"
+    "pro_plan": "الخطة الاحترافية",
+    "tanad_free": "تاناد مجاني",
+    "tanad_pro": "تاناد برو",
+    "tanad_business": "تاناد للأعمال",
+    "tanad_enterprise": "تاناد للمؤسسات",
+    "only_for_enterprise_users": "لمستخدمي الخطة المؤسسية فقط",
+    "manage_billing_description": "إدارة معلومات الفوترة وطرق الدفع",
+    "upgrade_to_enterprise_for_advanced_analytics": "قم بالترقية إلى الخطة المؤسسية للحصول على تحليلات متقدمة",
+    "enterprise_plan": "الخطة المؤسسية",
+    "update_plan": "تحديث الخطة",
+    "need_custom_solution": "هل تحتاج إلى حل مخصص؟",
+    "contact_sales_description": "اتصل بفريق المبيعات للحصول على حل مخصص لعملك",
+    "contact_sales": "اتصل بالمبيعات",
+    "cancel_subscription": {
+      "button": "إلغاء الاشتراك",
+      "title": "إلغاء الاشتراك",
+      "description": "هل أنت متأكد أنك تريد إلغاء اشتراكك؟",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد"
     },
-    "upgrade_now": "ترقية الآن"
+    "manage_description": "إدارة معلومات الفوترة وطرق الدفع",
+    "billing_history": {
+      "title": "سجل الفواتير",
+      "description": "عرض سجل الفواتير الخاص بك",
+      "invoice_date": "التاريخ",
+      "invoice_number": "رقم الفاتورة",
+      "invoice_amount": "المبلغ",
+      "invoice_plan": "الخطة",
+      "invoice_status": "الحالة",
+      "invoice_status_paid": "مدفوعة",
+      "invoice_status_unpaid": "غير مدفوعة",
+      "invoice_status_refunded": "تم الاسترداد",
+      "invoice_status_failed": "فشلت",
+      "invoice_status_pending": "قيد الانتظار",
+      "invoice_status_cancelled": "ملغية",
+      "actions": "إجراءات"
+    },
+    "title": "الفوترة",
+    "description": "إدارة جميع طرق الدفع الخاصة بك",
+    "current_plan": {
+      "title": "الخطة الحالية",
+      "description": "إدارة خطتك الحالية",
+      "upgrade": "ترقية",
+      "cancel": "إلغاء"
+    },
+    "free_plan_badge": "مجاني",
+    "pro_plan_badge": "برو",
+    "enterprise_plan_badge": "مؤسسي",
+    "monthly_billing": "الدفع الشهري",
+    "yearly_billing": "الدفع السنوي",
+    "subscription_plans": "خطط الاشتراك",
+    "choose_the_right_plan": "اختر الخطة المناسبة لعملك",
+    "tanad_free_description": "الخطة المجانية للاستخدام الشخصي",
+    "subscription_status": {
+      "active": "مفعل",
+      "inactive": "غير مفعل",
+      "cancelled": "ملغي",
+      "expired": "منتهي",
+      "pending": "قيد الانتظار",
+      "refunded": "مسترجع"
+    },
+    "features": {
+      "basic_access": "وصول أساسي",
+      "custom_design_and_colors": "تصميم وألوان مخصصة",
+      "advanced_analytics": "تحليلات متقدمة ودعم عبر البريد الإلكتروني",
+      "standard_support": "دعم قياسي",
+      "community_access": "وصول إلى المجتمع",
+      "limited_clients": "عملاء محدودون",
+      "limited_projects": "مشاريع محدودة",
+      "basic_invoicing": "فوترة أساسية",
+      "limited_employees": "موظفون محدودون",
+      "basic_attendance": "حضور أساسي",
+      "unlimited_projects": "مشاريع غير محدودة",
+      "priority_support": "دعم ذو أولوية",
+      "custom_branding": "علامة تجارية مخصصة",
+      "api_access": "وصول إلى API",
+      "client_portal": "بوابة العميل",
+      "invoicing_manage": "إدارة الفواتير",
+      "employee_manage": "إدارة الموظفين",
+      "payroll_manage": "إدارة الرواتب",
+      "vendor_manage": "إدارة الموردين",
+      "product_manage": "إدارة المنتجات",
+      "product_catalog": "كتالوج المنتجات",
+      "dedicated_support": "دعم مخصص",
+      "advanced_support": "دعم متقدم",
+      "white_label": "علامة بيضاء",
+      "team_collaboration": "تعاون الفريق",
+      "extended_api": "API ممتد",
+      "sso_auth": "مصادقة SSO",
+      "entreprise_integration": "تكامل المؤسسة",
+      "unlimited_employees": "موظفون غير محدودين",
+      "multi_branch": "متعدد الفروع",
+      "warehouse_management": "إدارة المستودعات",
+      "advanced_reports": "تقارير متقدمة",
+      "job_listing": "قائمة الوظائف",
+      "purchase_management": "إدارة المشتريات",
+      "company_management": "إدارة الشركة",
+      "unlimited_access": "وصول غير محدود",
+      "premium_support": "دعم مميز",
+      "ai_analytics": "تحليلات الذكاء الاصطناعي",
+      "advanced_permissions": "أذونات متقدمة",
+      "unlimited_api": "API غير محدود",
+      "advanced_sso": "أتمتة متقدمة",
+      "custom_integrations": "تكاملات مخصصة",
+      "account_manager": "مدير الحساب",
+      "custom_development": "تطوير مخصص",
+      "advanced_security": "أمان متقدم",
+      "data_management": "إدارة البيانات",
+      "custom_automation": "أتمتة مخصصة",
+      "biomitric_auth": "مصادقة بيومترية",
+      "complete_white_label": "علامة بيضاء كاملة"
+    },
+
+    "selected_plan_button": "اختر الخطة",
+    "tanad_pro_description": "الخطة الاحترافية للشركات الصغيرة",
+    "tanad_business_description": "خطة الأعمال للشركات المتوسطة",
+    "tanad_enterprise_description": "الخطة المؤسسية للشركات الكبيرة",
+    "view_billing_history": "عرض سجل الفواتير",
+    "view_billing_plans": "عرض خطط الفوترة",
+    "choose_plan_description": "اختر الخطة التي تناسبك",
+    "usage_title": "الاستخدام",
+    "usage_description": "عرض معلومات الاستخدام والفوترة الخاصة بك",
+    "used_of_total": "مستخدم من الإجمالي",
+    "total_puklas": "الإجمالي",
+    "available_puklas": "متاح",
+    "upgrade_dialog": {
+      "title": "الترقية إلى المستوى التالي",
+      "description": "قم بترقية خطتك لإنشاء المزيد من البوكلات",
+      "unlimited_puklas": "إنشاء بوكلات غير محدودة",
+      "custom_design_and_colors": "تصميم وألوان مخصصة",
+      "advanced_analytics": "تحليلات متقدمة ودعم عبر البريد الإلكتروني"
+    },
+    "upgrade_now": "قم بالترقية الآن"
   },
   "Account": {
     "title": "الحساب",
@@ -2673,139 +2792,6 @@
       "already_checked_in": "تم تسجيل الدخول بالفعل اليوم",
       "not_checked_in": "لم يتم تسجيل الدخول بعد",
       "error": "حدث خطأ أثناء معالجة طلبك"
-    }
-  },
-  "Users": {
-    "title": "المستخدمون",
-    "add_new": "مستخدم جديد",
-    "edit_user": "تعديل المستخدم",
-    "update_user": "تحديث المستخدم",
-    "user_details": "تفاصيل المستخدم",
-    "login_details": "تفاصيل تسجيل الدخول",
-    "personal_info": "المعلومات الشخصية",
-    "permissions": "الصلاحيات",
-    "no_users": "لا يوجد مستخدمين",
-    "active_users": "المستخدمون النشطون",
-    "inactive_users": "المستخدمون غير النشطين",
-    "search_placeholder": "بحث عن مستخدمين...",
-    "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {مستخدم} =1 {هذا المستخدم} other {# مستخدمين}}؟",
-    "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {مستخدم} =1 {هذا المستخدم} other {# مستخدمين}}",
-    "add_dialog": {
-      "title": "مستخدم جديد",
-      "description": "املأ التفاصيل لإنشاء مستخدم جديد. سينتمي إلى نفس المؤسسة."
-    },
-    "permissions_popover": "الصلاحيات",
-    "created_at_never": "أبدًا",
-    "actions": {
-      "open_menu": "فتح القائمة",
-      "edit": "تعديل المستخدم",
-      "delete": "حذف المستخدم",
-      "activate": "تفعيل المستخدم",
-      "deactivate": "تعطيل المستخدم",
-      "reset_password": "إعادة تعيين كلمة المرور"
-    },
-    "edit_dialog": {
-      "title": "تعديل المستخدم",
-      "description": "قم بإجراء تغييرات على ملف تعريف المستخدم هنا.",
-      "email_label": "البريد الإلكتروني",
-      "role_label": "الدور",
-      "select_role_placeholder": "اختر الدور",
-      "save_button": "حفظ التغييرات"
-    },
-    "delete_dialog": {
-      "title": "حذف المستخدم",
-      "description": "هل أنت متأكد أنك تريد حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.",
-      "user_prefix": "المستخدم: ",
-      "no_email": "لا يوجد بريد إلكتروني",
-      "delete_button": "حذف"
-    },
-
-    "form": {
-      "first_name": {
-        "label": "الاسم الأول",
-        "placeholder": "أدخل الاسم الأول",
-        "required": "الاسم الأول مطلوب"
-      },
-      "last_name": {
-        "label": "الاسم الأخير",
-        "placeholder": "أدخل الاسم الأخير",
-        "required": "الاسم الأخير مطلوب"
-      },
-      "name": {
-        "label": "الاسم الكامل",
-        "placeholder": "أدخل الاسم الكامل",
-        "required": "الاسم الكامل مطلوب"
-      },
-      "email": {
-        "label": "البريد الإلكتروني",
-        "placeholder": "أدخل البريد الإلكتروني",
-        "required": "البريد الإلكتروني مطلوب",
-        "invalid": "البريد الإلكتروني غير صالح"
-      },
-      "password": {
-        "label": "كلمة المرور",
-        "placeholder": "أدخل كلمة المرور",
-        "required": "كلمة المرور مطلوبة",
-        "min_length": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
-        "confirm": "تأكيد كلمة المرور",
-        "confirm_placeholder": "تأكيد كلمة المرور",
-        "mismatch": "كلمات المرور غير متطابقة"
-      },
-      "role": {
-        "label": "الدور",
-        "placeholder": "اختر دورًا",
-        "required": "الدور مطلوب",
-        "admin": "مدير النظام",
-        "manager": "مدير",
-        "employee": "موظف",
-        "user": "مستخدم عادي",
-        "search_placeholder": "بحث عن دور..."
-      },
-      "status": {
-        "label": "الحالة",
-        "active": "نشط",
-        "inactive": "غير نشط",
-        "suspended": "معلق"
-      },
-      "phone": {
-        "label": "رقم الهاتف",
-        "placeholder": "أدخل رقم الهاتف"
-      },
-      "department": {
-        "label": "القسم",
-        "placeholder": "اختر القسم"
-      },
-      "avatar": {
-        "label": "الصورة الشخصية",
-        "upload": "رفع صورة",
-        "remove": "إزالة الصورة"
-      },
-      "permissions": {
-        "label": "الصلاحيات",
-        "placeholder": "اختر الصلاحيات"
-      },
-      "created_at": {
-        "label": "تاريخ الإنشاء"
-      },
-      "updated_at": {
-        "label": "تاريخ التحديث"
-      }
-    },
-    "messages": {
-      "create": "تم إنشاء المستخدم بنجاح",
-      "update": "تم تحديث المستخدم بنجاح",
-      "delete": "تم حذف المستخدم بنجاح",
-      "error": "حدث خطأ أثناء معالجة طلبك"
-    },
-    "success": {
-      "create": "تم إنشاء المستخدم بنجاح",
-      "update": "تم تحديث المستخدم بنجاح",
-      "delete": "تم حذف المستخدم بنجاح"
-    },
-    "error": {
-      "create": "حدث خطأ أثناء إنشاء المستخدم",
-      "update": "حدث خطأ أثناء تحديث المستخدم",
-      "delete": "حدث خطأ أثناء حذف المستخدم"
     }
   },
   "Locations": {
