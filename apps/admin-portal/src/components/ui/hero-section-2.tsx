@@ -62,7 +62,7 @@ export function HeroSection() {
                     applications that look and feel the way you mean it.
                   </p>
                   <div className="mt-12 flex items-center gap-2">
-                    <div key={1} className="bg-foreground/10 rounded-[14px] border p-0.5">
+                    <div key={1} className="bg-foreground/10 rounded-md border p-0.5">
                       <Button asChild size="lg" className="rounded-xl px-5 text-base">
                         <Link href="/dashboard">
                           <span className="text-nowrap">Start Building</span>
@@ -97,7 +97,7 @@ export function HeroSection() {
                 ...transitionVariants,
               }}
             >
-              <div className="relative mt-8 -me-56 overflow-hidden px-2 sm:mt-12 sm:me-0 md:mt-20">
+              <div className="relative -me-56 mt-8 overflow-hidden px-2 sm:me-0 sm:mt-12 md:mt-20">
                 <div
                   aria-hidden
                   className="to-background absolute inset-0 z-10 bg-gradient-to-b from-transparent from-35%"

@@ -696,7 +696,7 @@ function SheetTable<
                   type="checkbox"
                   checked={row.getIsSelected()}
                   onChange={row.getToggleSelectedHandler()}
-                  className="h-4 w-4 rounded border-gray-300"
+                  className="h-4 w-4 rounded-md border-gray-300"
                 />
               </div>
               <div className="bg-border absolute end-0 top-0 h-full w-[0.5px]" />
@@ -930,7 +930,7 @@ function SheetTable<
                       type="checkbox"
                       checked={table.getIsAllPageRowsSelected()}
                       onChange={table.getToggleAllPageRowsSelectedHandler()}
-                      className="h-4 w-4 rounded border-gray-300"
+                      className="h-4 w-4 rounded-md border-gray-300"
                       title={t("General.select_all")}
                     />
                   </div>

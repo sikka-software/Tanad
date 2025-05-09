@@ -8,14 +8,7 @@ import { useRouter } from "next/router";
 import React from "react";
 
 import { Button } from "@/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/ui/dropdown-menu";
+import { DropdownMenuSeparator } from "@/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/ui/radix-collapsible";
 import {
@@ -108,7 +101,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="hover:bg-primary hover:text-primary-foreground !size-5 flex-shrink-0 cursor-pointer !p-0"
+                      className="hover:border-primary !size-5 flex-shrink-0 cursor-pointer !p-0 hover:border"
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -162,7 +155,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                   asChild
                   className={cn(
                     subItem.is_active &&
-                      "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+                      "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground cursor-pointer",
                   )}
                 >
                   <Link href={subItem.url}>
@@ -171,7 +164,7 @@ const CollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][number]
                 </SidebarMenuSubButton>
                 {subItem.action && (
                   <SidebarMenuAction
-                    className="absolute !end-1 top-1/2 -translate-y-1/2 cursor-pointer"
+                    className="hover:border-primary absolute !end-1 top-1/2 -translate-y-1/2 cursor-pointer hover:border"
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
@@ -201,8 +194,9 @@ const NonCollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][numb
         <SidebarMenuButton
           tooltip={t(item.translationKey)}
           className={cn(
-            item.is_active &&
-              "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+            item.is_active
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground cursor-pointer rounded-md"
+              : "cursor-pointer",
           )}
         >
           {item.icon && <item.icon />}
@@ -211,9 +205,15 @@ const NonCollapsibleSidebarMenuItem = (item: SidebarMenuGroupProps["items"][numb
       </Link>
       {item.action && (
         <Link href={item.action}>
-          <SidebarMenuAction className="absolute !end-1 top-1/2 -translate-y-1/2">
+          <SidebarMenuAction
+            className={cn(
+              "hover:border-primary absolute !end-1 top-1/2 !size-5 flex-shrink-0 -translate-y-1/2 cursor-pointer rounded-md !p-0 hover:border",
+              item.is_active &&
+                "bg-primary hover:border-secondary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground",
+            )}
+          >
             <Plus className="!size-3" />
-            <span className="sr-only">More</span>
+            <span className="sr-only">Add</span>
           </SidebarMenuAction>
         </Link>
       )}

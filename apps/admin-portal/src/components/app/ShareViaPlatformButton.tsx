@@ -14,7 +14,7 @@ export const ShareViaPlatformButton: React.FC<ShareViaPlatformButtonType> = (
   return (
     <div
       onClick={props.handleClick}
-      className="flex cursor-pointer flex-row justify-between rounded p-4 transition-all hover:bg-gray-100"
+      className="flex cursor-pointer flex-row justify-between rounded-md p-4 transition-all hover:bg-gray-100"
     >
       <span>{props.title}</span>
       <ChevronRight className={lang === "ar" ? "rotate-180" : ""} />

@@ -37,7 +37,7 @@ const MobileNavMenuItem: React.FC<CustomMotionDivProps> = (props) => {
               // unstyled hideArrow
               className="w-full text-start"
             >
-              <div className="cursor-pointer rounded p-6 text-3xl font-bold transition-all  hover:bg-primary/10">
+              <div className="cursor-pointer rounded-md p-6 text-3xl font-bold transition-all  hover:bg-primary/10">
                 {props.trigger}
               </div>
             </AccordionTrigger>
@@ -46,7 +46,7 @@ const MobileNavMenuItem: React.FC<CustomMotionDivProps> = (props) => {
                 {props.item.subitems.map((s: any, i: number) => (
                   <div
                     key={i}
-                    className="flex cursor-pointer flex-row items-center gap-2 rounded px-4 transition-all hover:bg-primary/10"
+                    className="flex cursor-pointer flex-row items-center gap-2 rounded-md px-4 transition-all hover:bg-primary/10"
                   >
                     <div className="h-[1px] w-[10px] bg-primary"></div>
                     <div className="p-2 text-lg">{s}</div>
@@ -72,7 +72,7 @@ const MobileNavMenuItem: React.FC<CustomMotionDivProps> = (props) => {
           }}
           {...props}
         >
-          <div className="cursor-pointer rounded p-6 text-3xl font-bold transition-all hover:bg-primary/10">
+          <div className="cursor-pointer rounded-md p-6 text-3xl font-bold transition-all hover:bg-primary/10">
             {props.trigger}
           </div>
         </motion.div>

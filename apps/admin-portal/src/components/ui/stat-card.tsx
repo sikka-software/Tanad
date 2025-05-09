@@ -32,7 +32,7 @@ export function StatCard({ title, value, loading, link, additionalText, icon }: 
         <Button
           size="icon_sm"
           variant="outline"
-          className="absolute end-0 top-0 cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0"
+          className="absolute end-0 top-0 cursor-pointer rounded-e-none rounded-t-none border-e-0 border-t-0 opacity-0 transition-opacity group-hover:opacity-100"
           style={{
             borderStartEndRadius: "var(--radius)",
           }}
@@ -58,9 +58,11 @@ export function StatCard({ title, value, loading, link, additionalText, icon }: 
 
   return link ? (
     <Link href={link}>
-      <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">{cardContent}</Card>
+      <Card className="group h-full cursor-pointer transition-shadow hover:shadow-lg">
+        {cardContent}
+      </Card>
     </Link>
   ) : (
-    <Card className="h-full">{cardContent}</Card>
+    <Card className="group h-full">{cardContent}</Card>
   );
 }

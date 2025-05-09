@@ -44,6 +44,10 @@ export const routeMap: RouteMap = {
     label: "Pages.OnlineStores.title",
     translationKey: "Pages.OnlineStores.title",
   },
+  // cars
+  "/cars": { label: "Pages.Cars.title", translationKey: "Pages.Cars.title" },
+  // trucks
+  "/trucks": { label: "Pages.Trucks.title", translationKey: "Pages.Trucks.title" },
 };
 
 // Dynamic route patterns and their handling
@@ -244,6 +248,24 @@ export const dynamicRoutePatterns = [
       { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
       { path: "/purchases", labelKey: "Pages.Purchases.title" },
       { path: "", labelKey: "Pages.Purchases.add", is_active: true },
+    ],
+  },
+  // cars
+  {
+    pattern: /^\/cars\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/cars", labelKey: "Pages.Cars.title" },
+      { path: "", labelKey: "Pages.Cars.add", is_active: true },
+    ],
+  },
+  // trucks
+  {
+    pattern: /^\/trucks\/add$/,
+    breadcrumbs: [
+      { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
+      { path: "/trucks", labelKey: "Pages.Trucks.title" },
+      { path: "", labelKey: "Pages.Trucks.add", is_active: true },
     ],
   },
 ];

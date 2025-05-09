@@ -36,7 +36,7 @@ export const Chip = React.forwardRef<HTMLSpanElement, ChipTypes>(
   ) => {
     let defaultStyles = "flex flex-row w-fit gap-1 items-center  px-2.5 py-1  font-bold ";
     let radiusStyles = {
-      inherit: " rounded",
+      inherit: " rounded-md",
       full: "rounded-full",
       none: "rounded-none",
     };

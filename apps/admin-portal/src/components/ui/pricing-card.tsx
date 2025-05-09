@@ -58,9 +58,9 @@ export const PricingCard: FC<PricingCardProps> = ({
 }) => {
   const lang = useLocale();
   let cardSizes = {
-    small: "w-full max-w-sm rounded border dark:border-gray-700 bg-background",
-    medium: "w-full rounded min-w-fit border dark:border-gray-700 bg-background",
-    large: "w-full max-w-lg rounded border dark:border-gray-700 bg-background",
+    small: "w-full max-w-sm rounded-md border dark:border-gray-700 bg-background",
+    medium: "w-full rounded-md min-w-fit border dark:border-gray-700 bg-background",
+    large: "w-full max-w-lg rounded-md border dark:border-gray-700 bg-background",
   };
   return (
     <>
@@ -76,7 +76,7 @@ export const PricingCard: FC<PricingCardProps> = ({
             currentPlan ? "border-primary dark:border-primary/70 border-2" : "border",
             cardSizes[size],
             "relative flex flex-col justify-between gap-4 p-4",
-            recommended ? "rounded rounded-t-none" : "rounded",
+            recommended ? "rounded-md rounded-t-none" : "rounded-md",
           )}
         >
           {recommended && (

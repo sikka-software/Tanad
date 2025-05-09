@@ -113,7 +113,7 @@ export const Signature: FC<SignatureCanvasProps> = ({
       <canvas
         ref={canvasRef}
         {...canvasProps}
-        className={cn("rounded border bg-[var(--constant-background)]", canvasProps?.className)}
+        className={cn("rounded-md border bg-[var(--constant-background)]", canvasProps?.className)}
       />
 
       <div className="flex flex-row justify-between">
