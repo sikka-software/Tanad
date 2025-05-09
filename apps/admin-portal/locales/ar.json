@@ -1358,6 +1358,7 @@
     "subscription_plans": "خطط الاشتراك",
     "choose_the_right_plan": "اختر الخطة المناسبة لعملك",
     "tanad_free_description": "الخطة المجانية للاستخدام الشخصي",
+    "available_plans": "الخطط المتاحة",
     "subscription_status": {
       "active": "مفعل",
       "inactive": "غير مفعل",
@@ -1365,6 +1366,37 @@
       "expired": "منتهي",
       "pending": "قيد الانتظار",
       "refunded": "مسترجع"
+    },
+
+    "payment": {
+      "dialog_title": "طريقة الدفع",
+      "selected_plan_price": "سعر الخطة المختارة",
+      "enter_details": "أدخل تفاصيل الدفع",
+      "card": "بطاقة الائتمان",
+      "wallet": "محفظة",
+      "payment_method": "طريقة الدفع",
+      "payment_status": "حالة الدفع",
+      "credit_card": "بطاقة الائتمان",
+      "debit_card": "بطاقة الخصم",
+      "payment_details": "تفاصيل الدفع",
+      "saved_card": "بطاقة محفوظة",
+      "digital_wallet": "محفظة رقمية",
+      "setting_up_payment": "إعداد الدفع",
+      "save_card": "حفظ البطاقة",
+      "terms": "الشروط والأحكام",
+      "privacy": "الخصوصية",
+      "terms_agreement_start": "بالموافقة على",
+      "terms_agreement_middle": "والشروط والأحكام",
+      "terms_agreement_end": "والخصوصية",
+      "terms_agreement_link": "الشروط والأحكام والخصوصية",
+      "payment_success": "تم الدفع بنجاح",
+      "payment_failed": "فشل الدفع",
+      "payment_pending": "قيد الدفع",
+      "payment_refunded": "تم الاسترجاع",
+      "pay_with_paypal": "دفع بايبال",
+      "google_pay": "دفع جوجل باي",
+      "complete_payment": "إكمال الدفع",
+      "processing": "يتم المعالجة"
     },
     "features": {
       "basic_access": "وصول أساسي",
@@ -1399,7 +1431,7 @@
       "multi_branch": "متعدد الفروع",
       "warehouse_management": "إدارة المستودعات",
       "advanced_reports": "تقارير متقدمة",
-      "job_listing": "قائمة الوظائف",
+      "job_listings": "قائمة الوظائف",
       "purchase_management": "إدارة المشتريات",
       "company_management": "إدارة الشركة",
       "unlimited_access": "وصول غير محدود",
@@ -1415,7 +1447,14 @@
       "data_management": "إدارة البيانات",
       "custom_automation": "أتمتة مخصصة",
       "biomitric_auth": "مصادقة بيومترية",
-      "complete_white_label": "علامة بيضاء كاملة"
+      "complete_white_label": "علامة بيضاء كاملة",
+      "enterprise_integrations": "تكامل المؤسسة",
+
+      "invoice_customization": "تخصيص الفواتير",
+      "employee_management": "إدارة الموظفين",
+      "payroll_processing": "معالجة الرواتب",
+      "vendor_management": "إدارة الموردين",
+      "product_management": "إدارة المنتجات"
     },
 
     "selected_plan_button": "اختر الخطة",
