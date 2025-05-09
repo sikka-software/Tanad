@@ -188,7 +188,7 @@ export default function EmployeeRequestsPage() {
 }
 
 EmployeeRequestsPage.messages = ["Notes", "Pages", "EmployeeRequests", "General"];
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

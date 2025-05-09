@@ -187,7 +187,7 @@ export default function DepartmentsPage() {
 
 DepartmentsPage.messages = ["Notes", "Pages", "Departments", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

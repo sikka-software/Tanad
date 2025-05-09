@@ -179,7 +179,7 @@ export default function EmployeesPage() {
 
 EmployeesPage.messages = ["Notes", "Pages", "Employees", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

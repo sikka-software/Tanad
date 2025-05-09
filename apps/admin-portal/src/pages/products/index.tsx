@@ -190,7 +190,7 @@ export default function ProductsPage() {
 
 ProductsPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

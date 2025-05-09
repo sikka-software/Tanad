@@ -151,7 +151,7 @@ export default function QuotesPage() {
 }
 
 QuotesPage.messages = ["Notes", "Pages", "Quotes", "General"];
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

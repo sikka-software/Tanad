@@ -189,7 +189,7 @@ export default function WebsitesPage() {
 
 WebsitesPage.messages = ["Notes", "Pages", "Websites", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

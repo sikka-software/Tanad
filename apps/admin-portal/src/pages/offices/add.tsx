@@ -62,7 +62,7 @@ export default function AddOfficePage() {
 
 AddOfficePage.messages = ["Offices", "Pages", "Notes", "General", "Forms"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

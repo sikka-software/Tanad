@@ -173,7 +173,7 @@ export default function SalariesPage() {
 
 SalariesPage.messages = ["Notes", "Pages", "Salaries", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -72,7 +72,7 @@ export default function AddJobPage() {
 
 AddJobPage.messages = ["Notes", "Pages", "Jobs", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

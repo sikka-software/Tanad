@@ -182,7 +182,7 @@ export default function OnlineStoresPage() {
 
 OnlineStoresPage.messages = ["Notes", "Pages", "OnlineStores", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -431,7 +431,7 @@ export default function Dashboard() {
 
 Dashboard.messages = ["Pages", "General", "Dashboard"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Dashboard.messages),

@@ -301,7 +301,7 @@ export default function Account() {
 
 Account.messages = ["Pages", "Account", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Account.messages),

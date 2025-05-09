@@ -255,7 +255,7 @@ export default EnterprisePage;
 
 EnterprisePage.messages = ["Pages", "General", "Enterprise"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

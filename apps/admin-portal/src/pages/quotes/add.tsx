@@ -46,7 +46,7 @@ export default function AddQuotePage() {
 
 AddQuotePage.messages = ["Notes", "Pages", "Quotes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

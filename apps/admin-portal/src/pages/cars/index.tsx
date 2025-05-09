@@ -170,7 +170,7 @@ export default function CarsPage() {
 
 CarsPage.messages = ["Pages", "Cars", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../../locales/${locale}.json`)).default, CarsPage.messages),

@@ -64,7 +64,7 @@ export default function AddExpensePage() {
 
 AddExpensePage.messages = ["Notes", "Pages", "Expenses", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

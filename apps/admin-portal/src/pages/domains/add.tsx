@@ -62,7 +62,7 @@ export default function AddDomainPage() {
 
 AddDomainPage.messages = ["Pages", "Domains", "Notes", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

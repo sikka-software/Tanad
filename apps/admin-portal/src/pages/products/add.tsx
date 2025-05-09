@@ -64,7 +64,7 @@ export default function AddProductPage() {
 
 AddProductPage.messages = ["Notes", "Pages", "Products", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

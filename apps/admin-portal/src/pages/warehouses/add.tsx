@@ -64,7 +64,7 @@ export default function AddWarehousePage() {
 
 AddWarehousePage.messages = ["Notes", "Pages", "Warehouses", "Forms", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

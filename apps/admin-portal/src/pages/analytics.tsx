@@ -322,7 +322,7 @@ export default function Analytics() {
 
 Analytics.messages = ["Pages", "General", "Analytics"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Analytics.messages),

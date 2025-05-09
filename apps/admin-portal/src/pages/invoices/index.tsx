@@ -179,7 +179,7 @@ export default function InvoicesPage() {
 }
 
 InvoicesPage.messages = ["Notes", "Pages", "Invoices", "General"];
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

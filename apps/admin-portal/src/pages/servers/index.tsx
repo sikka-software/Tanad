@@ -178,7 +178,7 @@ export default function ServersPage() {
 
 ServersPage.messages = ["Notes", "Pages", "Servers", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

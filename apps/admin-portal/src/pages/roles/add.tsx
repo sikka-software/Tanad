@@ -52,7 +52,7 @@ export default function AddRolePage() {
 
 AddRolePage.messages = ["Notes", "Pages", "Roles", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

@@ -355,7 +355,7 @@ export default function Auth() {
 
 Auth.messages = ["Pages", "Auth", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick((await import(`../../locales/${locale}.json`)).default, Auth.messages),

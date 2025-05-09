@@ -51,7 +51,7 @@ export default function AddInvoicePage() {
 
 AddInvoicePage.messages = ["Notes", "Pages", "Invoices", "General"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       messages: pick(

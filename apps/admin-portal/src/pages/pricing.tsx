@@ -324,7 +324,7 @@ export default function PricingPage() {
 
 PricingPage.messages = ["Pages", "General", "Pricing"];
 
-export const getStaticProps: GetStaticProps = async ({ locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const billingCurrencies = ["sar", "usd"];
 
   const billingCycles = ["monthly", "yearly"];
