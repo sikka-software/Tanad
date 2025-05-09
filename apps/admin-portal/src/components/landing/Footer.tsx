@@ -69,7 +69,7 @@ export default function Footer(props: any) {
           </CustomMotionDiv>
           <CustomMotionDiv delay={0.1}>
             <div className="text-muted-foreground w-full pt-4 text-center text-sm md:text-start xl:whitespace-nowrap">
-              {t("footer.tagline")}
+              {t("General.tagline")}
             </div>
           </CustomMotionDiv>
           <div className="flex w-full flex-row justify-center gap-4 ps-0 pt-4 md:justify-start">

@@ -23,9 +23,18 @@ import {
   Car,
   Truck,
   Package,
+  LucideIcon,
 } from "lucide-react";
 
-const ModulesOptions = {
+const ModulesOptions: Record<
+  string,
+  {
+    icon: LucideIcon;
+    label: string;
+    translationKey: string;
+    url: string;
+  }
+> = {
   dashboard: {
     icon: LayoutDashboard,
     label: "Pages.Dashboard.title",
@@ -177,6 +186,7 @@ const ModulesOptions = {
     url: "/settings",
   },
   internet: {
+    icon: Globe,
     label: "Pages.Internet.title",
     translationKey: "Pages.Internet.title",
     url: "/internet",

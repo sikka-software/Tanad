@@ -1,5 +1,16 @@
+import { ModulesOptions } from "@root/tanad.config";
 import { pick } from "lodash";
-import { Terminal } from "lucide-react";
+import {
+  Briefcase,
+  Building2,
+  DollarSign,
+  FileText,
+  Package,
+  Store,
+  UserRound,
+  UsersRound,
+  Warehouse,
+} from "lucide-react";
 import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -11,32 +22,15 @@ import { createClient } from "@/utils/supabase/component";
 
 import CustomPageMeta from "@/components/landing/CustomPageMeta";
 import DataPageLayout from "@/components/layouts/data-page-layout";
-import ActivityCalendar from "@/components/ui/activity-calendar";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
 
 import { getActivityCountsByDate } from "@/modules/activity/activity.service";
 import useUserStore from "@/stores/use-user-store";
 
-// Interface for the data returned by the view
-interface DashboardStatsViewData {
-  total_invoices: number;
-  total_products: number;
-  total_revenue: number;
-  pending_invoices: number;
-  total_employees: number;
-  total_departments: number;
-  total_jobs: number;
-  total_clients: number;
-  total_companies: number;
-  total_vendors: number;
-  total_offices: number;
-  total_warehouses: number;
-  total_branches: number;
-}
+import { convertToPascalCase } from "../lib/utils";
 
 // Update state interface to match view column names (or map later)
 interface DashboardStats {
+  totalSalaries: number;
   totalInvoices: number;
   totalProducts: number;
   totalRevenue: number;
@@ -50,6 +44,20 @@ interface DashboardStats {
   totalOffices: number;
   totalWarehouses: number;
   totalBranches: number;
+  totalCars: number;
+  totalTrucks: number;
+  totalExpenses: number;
+  totalPurchases: number;
+  totalQuotes: number;
+  totalRoles: number;
+  totalJobListings: number;
+  totalEmployeeRequests: number;
+  totalApplicants: number;
+  totalUsers: number;
+  totalDomains: number;
+  totalWebsites: number;
+  totalServers: number;
+  totalOnlineStores: number;
 }
 
 // New interface for activity count data
@@ -71,9 +79,24 @@ export default function Dashboard() {
     totalClients: 0,
     totalCompanies: 0,
     totalVendors: 0,
+    totalSalaries: 0,
     totalOffices: 0,
     totalWarehouses: 0,
     totalBranches: 0,
+    totalCars: 0,
+    totalTrucks: 0,
+    totalExpenses: 0,
+    totalQuotes: 0,
+    totalPurchases: 0,
+    totalRoles: 0,
+    totalJobListings: 0,
+    totalEmployeeRequests: 0,
+    totalApplicants: 0,
+    totalUsers: 0,
+    totalDomains: 0,
+    totalWebsites: 0,
+    totalServers: 0,
+    totalOnlineStores: 0,
   });
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState<string | null>(null);
@@ -84,39 +107,7 @@ export default function Dashboard() {
   const [activityError, setActivityError] = useState<string | null>(null);
 
   const t = useTranslations();
-  const router = useRouter();
   const { user, profile, enterprise } = useUserStore();
-
-  const createOptions = [
-    {
-      label: t("Dashboard.add_product"),
-      value: "product",
-      path: "/products/add",
-    },
-    {
-      label: t("Dashboard.add_invoice"),
-      value: "invoice",
-      path: "/invoices/add",
-    },
-    { label: t("Dashboard.add_client"), value: "client", path: "/clients/add" },
-    {
-      label: t("Dashboard.add_employee"),
-      value: "employee",
-      path: "/employees/add",
-    },
-    {
-      label: t("Dashboard.add_warehouse"),
-      value: "warehouse",
-      path: "/warehouses/add",
-    },
-  ];
-
-  const handleCreateOption = (value: string) => {
-    const option = createOptions.find((opt) => opt.value === value);
-    if (option) {
-      router.push(option.path);
-    }
-  };
 
   // Fetch dashboard stats and activity data
   useEffect(() => {
@@ -186,6 +177,21 @@ export default function Dashboard() {
             totalOffices,
             totalWarehouses,
             totalBranches,
+            totalCars,
+            totalTrucks,
+            totalExpenses,
+            totalPurchases,
+            totalSalaries,
+            totalQuotes,
+            totalRoles,
+            totalJobListings,
+            totalEmployeeRequests,
+            totalApplicants,
+            totalUsers,
+            totalDomains,
+            totalWebsites,
+            totalServers,
+            totalOnlineStores,
           ] = await Promise.all([
             fetchCount("invoices"),
             fetchCount("invoices", { status: "pending" }),
@@ -200,6 +206,21 @@ export default function Dashboard() {
             fetchCount("offices"),
             fetchCount("warehouses"),
             fetchCount("branches"),
+            fetchCount("cars"),
+            fetchCount("trucks"),
+            fetchCount("expenses"),
+            fetchCount("purchases"),
+            fetchCount("salaries"),
+            fetchCount("quotes"),
+            fetchCount("roles"),
+            fetchCount("job_listings"),
+            fetchCount("employee_requests"),
+            fetchCount("applicants"),
+            fetchCount("users"),
+            fetchCount("domains"),
+            fetchCount("websites"),
+            fetchCount("servers"),
+            fetchCount("online_stores"),
           ]);
 
           if (isMounted) {
@@ -217,6 +238,21 @@ export default function Dashboard() {
               totalOffices,
               totalWarehouses,
               totalBranches,
+              totalCars,
+              totalTrucks,
+              totalExpenses,
+              totalPurchases,
+              totalSalaries,
+              totalQuotes,
+              totalRoles,
+              totalJobListings,
+              totalEmployeeRequests,
+              totalApplicants,
+              totalUsers,
+              totalDomains,
+              totalWebsites,
+              totalServers,
+              totalOnlineStores,
             });
           }
         } catch (err) {
@@ -239,9 +275,24 @@ export default function Dashboard() {
               totalClients: 0,
               totalCompanies: 0,
               totalVendors: 0,
+              totalSalaries: 0,
               totalOffices: 0,
               totalWarehouses: 0,
               totalBranches: 0,
+              totalCars: 0,
+              totalTrucks: 0,
+              totalExpenses: 0,
+              totalPurchases: 0,
+              totalQuotes: 0,
+              totalRoles: 0,
+              totalJobListings: 0,
+              totalEmployeeRequests: 0,
+              totalApplicants: 0,
+              totalUsers: 0,
+              totalDomains: 0,
+              totalWebsites: 0,
+              totalServers: 0,
+              totalOnlineStores: 0,
             });
           }
         } finally {
@@ -252,34 +303,37 @@ export default function Dashboard() {
       };
 
       // --- Fetch Activity Counts ---
-      const fetchActivity = async () => {
-        try {
-          const endDate = new Date(); // Today
-          const startDate = new Date();
-          startDate.setFullYear(endDate.getFullYear() - 1);
-          startDate.setDate(startDate.getDate() + 1); // Start from the day *after* one year ago
+      // const fetchActivity = async () => {
+      //   try {
+      //     const endDate = new Date(); // Today
+      //     const startDate = new Date();
+      //     startDate.setFullYear(endDate.getFullYear() - 1);
+      //     startDate.setDate(startDate.getDate() + 1); // Start from the day *after* one year ago
 
-          const counts = await getActivityCountsByDate(startDate, endDate);
-          if (isMounted) {
-            setActivityCounts(counts);
-          }
-        } catch (err) {
-          console.error("Error fetching activity counts:", err);
-          if (isMounted) {
-            setActivityError(
-              err instanceof Error ? err.message : "An error occurred while fetching activity data",
-            );
-            setActivityCounts([]); // Clear data on error
-          }
-        } finally {
-          if (isMounted) {
-            setLoadingActivity(false);
-          }
-        }
-      };
+      //     const counts = await getActivityCountsByDate(startDate, endDate);
+      //     if (isMounted) {
+      //       setActivityCounts(counts);
+      //     }
+      //   } catch (err) {
+      //     console.error("Error fetching activity counts:", err);
+      //     if (isMounted) {
+      //       setActivityError(
+      //         err instanceof Error ? err.message : "An error occurred while fetching activity data",
+      //       );
+      //       setActivityCounts([]); // Clear data on error
+      //     }
+      //   } finally {
+      //     if (isMounted) {
+      //       setLoadingActivity(false);
+      //     }
+      //   }
+      // };
 
       // Run fetches concurrently
-      await Promise.all([fetchStats(), fetchActivity()]);
+      await Promise.all([
+        fetchStats(),
+        //  fetchActivity()
+      ]);
     }
 
     fetchData();
@@ -316,113 +370,34 @@ export default function Dashboard() {
       <div className="space-y-8 p-4">
         {/* Contacts Section */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold">{t("Pages.Contacts.title")}</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <StatCard
-              title={t("Pages.Clients.title")}
-              value={stats.totalClients}
-              loading={loadingStats}
-              link="/clients"
-            />
-            <StatCard
-              title={t("Pages.Companies.title")}
-              value={stats.totalCompanies}
-              loading={loadingStats}
-              link="/companies"
-            />
-            <StatCard
-              title={t("Pages.Vendors.title")}
-              value={stats.totalVendors}
-              loading={loadingStats}
-              link="/vendors"
-            />
+          {/* <h2 className="mb-4 text-lg font-semibold">{t("Pages.Contacts.title")}</h2> */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(ModulesOptions).map(([key, module]) => {
+              const skippedModules = [
+                "dashboard",
+                "activity_logs",
+                "analytics",
+                "sales",
+                "human_resources",
+                "internet",
+                "storage",
+                "recruitment",
+                "settings",
+              ];
+              if (skippedModules.includes(key)) return null;
+              const pascalKey = convertToPascalCase(key);
+              return (
+                <StatCard
+                  key={key}
+                  icon={<module.icon className="size-4 bg--500 m-0" />}
+                  title={t(module.translationKey)}
+                  value={stats[`total${pascalKey}` as keyof DashboardStats]}
+                  loading={loadingStats}
+                  link={module.url}
+                />
+              );
+            })}
           </div>
-        </div>
-
-        {/* Locations Section */}
-        <div>
-          <h2 className="mb-4 text-lg font-semibold">{t("Pages.Locations.title")}</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <StatCard
-              title={t("Pages.Offices.title")}
-              value={stats.totalOffices}
-              loading={loadingStats}
-              link="/offices"
-            />
-            <StatCard
-              title={t("Pages.Warehouses.title")}
-              value={stats.totalWarehouses}
-              loading={loadingStats}
-              link="/warehouses"
-            />
-            <StatCard
-              title={t("Pages.Branches.title")}
-              value={stats.totalBranches}
-              loading={loadingStats}
-              link="/branches"
-            />
-          </div>
-        </div>
-
-        {/* Sales & Revenue Section */}
-        <div>
-          <h2 className="mb-4 text-lg font-semibold">{t("Pages.Sales.title")}</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <StatCard
-              title={t("Pages.Invoices.title")}
-              value={stats.totalInvoices}
-              loading={loadingStats}
-              link="/invoices"
-              // additionalText={`${stats.pendingInvoices} ${t("Pages.Invoices.pending")}`}
-            />
-            <StatCard
-              title={t("Pages.Products.title")}
-              value={stats.totalProducts}
-              loading={loadingStats}
-              link="/products"
-            />
-          </div>
-        </div>
-
-        {/* Human Resources Section */}
-        <div>
-          <h2 className="mb-4 text-lg font-semibold">{t("Pages.HumanResources.title")}</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <StatCard
-              title={t("Pages.Employees.title")}
-              value={stats.totalEmployees}
-              loading={loadingStats}
-              link="/employees"
-            />
-            <StatCard
-              title={t("Pages.Departments.title")}
-              value={stats.totalDepartments}
-              loading={loadingStats}
-              link="/departments"
-            />
-            <StatCard
-              title={t("Pages.Jobs.title")}
-              value={stats.totalJobs}
-              loading={loadingStats}
-              link="/jobs"
-            />
-          </div>
-
-          {/* <div className="mt-8">
-            <h3 className="mb-4 text-lg font-semibold">{t("ActivityLogs.title")}</h3>
-            {activityError && (
-              <Alert variant="destructive" className="mb-4">
-                <Terminal className="h-4 w-4" />
-                <AlertTitle>Error Loading Activity</AlertTitle>
-                <AlertDescription>{activityError}</AlertDescription>
-              </Alert>
-            )}
-            {loadingActivity ? (
-              <Skeleton className="h-[180px] w-full rounded-md" />
-            ) : (
-              <ActivityCalendar data={activityCounts} />
-            )}
-          </div> */}
         </div>
       </div>
     </div>

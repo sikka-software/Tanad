@@ -181,7 +181,7 @@ export default function Auth() {
           src={logoSrc}
         />
         <div className="text-muted-foreground w-full pt-4 text-center text-sm md:text-start xl:whitespace-nowrap">
-          {t("Landing.footer.tagline")}
+          {t("General.tagline")}
         </div>
       </div>
       {isForgotPassword ? (
