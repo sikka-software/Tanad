@@ -44,6 +44,9 @@ interface EnterpriseType {
   id: string;
   name: string;
   created_at: string;
+  email: string | null;
+  industry: string | null;
+  size: string | null;
 }
 
 interface MembershipType {
