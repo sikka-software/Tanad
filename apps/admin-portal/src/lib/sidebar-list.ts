@@ -90,7 +90,7 @@ function getAdministrationMenus(pathname: string): SidebarMenuGroupProps["items"
     },
     {
       title: "Activity Logs",
-      translationKey: "Pages.Activity.title",
+      translationKey: "Pages.ActivityLogs.title",
       url: "/activity",
       icon: TableOfContents,
       is_active: pathname.startsWith("/activity"),

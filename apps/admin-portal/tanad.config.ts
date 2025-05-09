@@ -40,8 +40,8 @@ const ModulesOptions = {
   },
   activity_logs: {
     icon: TableOfContents,
-    label: "Pages.Activity.title",
-    translationKey: "Pages.Activity.title",
+    label: "Pages.ActivityLogs.title",
+    translationKey: "Pages.ActivityLogs.title",
     url: "/activity",
   },
   sales: {

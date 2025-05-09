@@ -247,7 +247,7 @@
   },
 
   "Pages": {
-    "Activity": {
+    "ActivityLogs": {
       "title": "سجل الأنشطة",
       "description": "إدارة السجلات الخاصة بالنشاطات"
     },
@@ -4254,7 +4254,7 @@
     "title": "المتاجر الإلكترونية",
     "singular": "متجر إلكتروني"
   },
-  "Activity": {
+  "ActivityLogs": {
     "title": "سجل الأنشطة",
     "description": "سجل الأنشطة التي تمت في المؤسسة خلال فترة محددة",
     "dialog": {

@@ -56,11 +56,11 @@ const ActivityPage = () => {
 
   return (
     <div>
-      <CustomPageMeta title={t("Activity.title")} description={t("Activity.description")} />
+      <CustomPageMeta title={t("ActivityLogs.title")} description={t("ActivityLogs.description")} />
       <DataPageLayout>
         <CardHeader className="p-4 pb-0">
-          <CardTitle>{t("Activity.title")}</CardTitle>
-          <CardDescription>{t("Activity.description")}</CardDescription>
+          <CardTitle>{t("ActivityLogs.title")}</CardTitle>
+          <CardDescription>{t("ActivityLogs.description")}</CardDescription>
         </CardHeader>
         <div className="flex flex-col gap-4 p-4">
           <ActivityLogFilters />
@@ -74,7 +74,7 @@ const ActivityPage = () => {
 
 export default ActivityPage;
 
-ActivityPage.messages = ["Pages", "General", "Activity"];
+ActivityPage.messages = ["Pages", "General", "ActivityLogs"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

@@ -71,7 +71,7 @@ export function useExportActivityLogs() {
 
   const exportLogs = async (filters?: ActivityFilters) => {
     try {
-      toast.info(t("Activity.info.export_started")); // Assuming key
+      toast.info(t("ActivityLogs.info.export_started")); // Assuming key
       const data = await exportActivities(filters);
       // Here, you would typically convert `data` (CSV, JSON, etc.) to a blob and trigger download
       // For example, to download as JSON:
@@ -82,11 +82,11 @@ export function useExportActivityLogs() {
       link.href = jsonString;
       link.download = `activity_logs_${new Date().toISOString().split("T")[0]}.json`;
       link.click();
-      toast.success(t("Activity.success.export_completed")); // Assuming key
+      toast.success(t("ActivityLogs.success.export_completed")); // Assuming key
     } catch (error: any) {
       console.error("Export failed:", error);
       toast.error(t("General.error_occurred"), {
-        description: error.message || t("Activity.error.export_failed"),
+        description: error.message || t("ActivityLogs.error.export_failed"),
       });
     }
   };

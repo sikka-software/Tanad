@@ -9,7 +9,7 @@ type RouteMap = {
 // Main route mapping
 export const routeMap: RouteMap = {
   "/dashboard": { label: "Pages.Dashboard.title", translationKey: "Pages.Dashboard.title" },
-  "/activity": { label: "Pages.Activity.title", translationKey: "Pages.Activity.title" },
+  "/activity": { label: "Pages.ActivityLogs.title", translationKey: "Pages.ActivityLogs.title" },
   "/analytics": { label: "Pages.Analytics.title", translationKey: "Pages.Analytics.title" },
   "/settings": { label: "Pages.Settings.title", translationKey: "Pages.Settings.title" },
   "/roles": { label: "Pages.Roles.title", translationKey: "Pages.Roles.title" },
@@ -199,7 +199,7 @@ export const dynamicRoutePatterns = [
     pattern: /^\/activity$/,
     breadcrumbs: [
       { path: "/dashboard", labelKey: "Pages.Dashboard.title" },
-      { path: "/activity", labelKey: "Pages.Activity.title", is_active: true },
+      { path: "/activity", labelKey: "Pages.ActivityLogs.title", is_active: true },
     ],
   },
   // domains
