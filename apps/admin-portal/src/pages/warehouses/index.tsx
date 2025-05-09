@@ -1,7 +1,7 @@
 import { FormDialog } from "@root/src/components/ui/form-dialog";
 import { WarehouseForm } from "@root/src/modules/warehouse/warehouse.form";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";

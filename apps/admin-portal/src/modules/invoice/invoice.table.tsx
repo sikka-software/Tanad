@@ -101,6 +101,10 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       accessorKey: "status",
       header: t("Invoices.form.status.label"),
       validationSchema: z.string().min(1, t("Invoices.form.status.required")),
+      cell: ({ row }) => {
+        const status = row.original.status;
+        return <div className="text-sm font-medium">{t(`Invoices.form.status.${status}`)}</div>;
+      },
     },
   ];
 

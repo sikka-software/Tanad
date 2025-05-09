@@ -1,6 +1,6 @@
 import { pick } from "lodash";
 import { Terminal } from "lucide-react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";

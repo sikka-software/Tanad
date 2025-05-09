@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState } from "react";

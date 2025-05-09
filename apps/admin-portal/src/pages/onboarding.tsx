@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import Image from "next/image";

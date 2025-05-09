@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations, useLocale } from "next-intl";
 
 // import PrivacyPolicyAr from "@/components/legal/privacy-policy-ar.mdx";

@@ -1,6 +1,6 @@
 import useDomainStore from "@root/src/modules/domain/domain.store";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 

@@ -3,7 +3,7 @@ import { BranchForm } from "@root/src/modules/branch/branch.form";
 import { Branch } from "@root/src/modules/branch/branch.type";
 import { SalaryForm } from "@root/src/modules/salary/salary.form";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";

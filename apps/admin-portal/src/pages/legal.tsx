@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 
 export default function LegalPage() {
   return (

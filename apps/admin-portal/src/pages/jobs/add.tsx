@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";

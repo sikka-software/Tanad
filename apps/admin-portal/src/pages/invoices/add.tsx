@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -49,7 +49,7 @@ export default function AddInvoicePage() {
   );
 }
 
-AddInvoicePage.messages = ["Notes", "Pages", "Invoices", "General"];
+AddInvoicePage.messages = ["Notes", "Pages", "Invoices", "Forms", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

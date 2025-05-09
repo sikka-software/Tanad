@@ -1,6 +1,6 @@
 import settings from "@root/landing.config";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 
 import BottomCTA from "@/components/landing/BottomCTA";

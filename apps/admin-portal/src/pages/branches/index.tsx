@@ -1,6 +1,6 @@
 import { FormSheet } from "@root/src/components/ui/form-sheet";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";

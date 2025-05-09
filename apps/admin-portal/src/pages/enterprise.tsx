@@ -2,7 +2,7 @@
 
 import { pick } from "lodash";
 import { Asterisk, Edit, Save, X } from "lucide-react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";

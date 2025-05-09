@@ -1,5 +1,5 @@
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 
 import DepartmentBox from "../components/landing/pricing/department-box";
 import PricingCalculator from "../components/landing/pricing/pricing-calculator";

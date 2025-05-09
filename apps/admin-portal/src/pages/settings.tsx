@@ -2,7 +2,7 @@
 
 import { pick } from "lodash";
 import { ChevronsUpDown, Mail, Save, User, Loader2, Sidebar } from "lucide-react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";

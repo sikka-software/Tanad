@@ -2,7 +2,7 @@ import { User } from "@supabase/supabase-js";
 import { pick } from "lodash";
 import { EyeOff } from "lucide-react";
 import { Eye } from "lucide-react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";

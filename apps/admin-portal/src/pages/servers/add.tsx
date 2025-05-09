@@ -1,7 +1,7 @@
 import { SERVER_OS } from "@root/src/lib/constants";
 import { SERVER_PROVIDERS } from "@root/src/lib/constants";
 import { pick } from "lodash";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 

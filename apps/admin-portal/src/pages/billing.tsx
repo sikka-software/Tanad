@@ -1,7 +1,7 @@
 // Components
 import { pick } from "lodash";
 import { CreditCard, Package, User } from "lucide-react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";

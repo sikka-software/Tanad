@@ -1961,38 +1961,9 @@
     }
   },
   "Invoices": {
-    "title": "الفواتير",
-    "edit_invoice": "تعديل الفاتورة",
-    "update_invoice": "تحديث الفاتورة",
     "invoice_details": "تفاصيل الفاتورة",
-    "invoice_number": "فاتورة #{number}",
-    "enter_invoice_number": "أدخل رقم الفاتورة",
     "confirm_delete": "هل أنت متأكد من رغبتك في حذف {count, plural, =0 {فاتورة} =1 {هذه الفاتورة} other {# فواتير}}؟",
     "delete_description": "سيتم حذف كافة البيانات المرتبطة بـ{count, plural, =0 {فاتورة} =1 {هذه الفاتورة} other {# فواتير}}",
-    "description": "الوصف",
-    "enter_description": "أدخل وصف الفاتورة",
-    "search_invoices": "بحث عن فواتير",
-    "price": "السعر",
-    "price_required": "السعر مطلوب",
-    "stock_quantity": "كمية المخزون",
-    "stock_quantity_required": "كمية المخزون مطلوبة",
-    "sku": "رمز المنتج",
-    "enter_sku": "أدخل رمز المنتج (اختياري)",
-    "no_description": "لا يوجد وصف",
-    "sku_label": "رمز المنتج: {value}",
-    "stock_label": "المخزون: {value}",
-    "creating": "جاري الإنشاء...",
-    "no_invoices_found": "لم يتم العثور على فواتير",
-    "add_first_invoice": "أضف أول فاتورة",
-    "client": "العميل",
-    "select_client": "اختر عميل",
-    "search_clients": "بحث عن عملاء...",
-    "no_clients": "لا يوجد عملاء",
-    "add_new_client": "عميل جديد",
-    "edit_client": "تعديل العميل",
-    "amount": "المبلغ",
-    "due_date": "تاريخ الاستحقاق",
-    "select_status": "اختر حالة",
     "success": {
       "create": "تم إنشاء الفاتورة بنجاح",
       "update": "تم تحديث الفاتورة بنجاح",
@@ -2059,6 +2030,21 @@
       "total": {
         "label": "المجموع"
       },
+      "products": {
+        "title": "المنتجات",
+        "add_product": "إضافة منتج",
+        "no_products": "لا توجد منتجات مضافة",
+        "product": "المنتج",
+        "quantity": "الكمية",
+        "unit_price": "سعر الوحدة",
+        "subtotal": "المجموع الفرعي",
+        "select_product": "اختر منتج",
+        "search_products": "بحث عن منتجات",
+        "no_products_found": "لم يتم العثور على منتجات",
+        "add_new_product": "منتج جديد",
+        "edit_product": "تعديل المنتج",
+        "product_description": "وصف المنتج"
+      },
       "status": {
         "label": "الحالة",
         "placeholder": "اختر حالة",
@@ -2066,7 +2052,8 @@
         "pending": "قيد الانتظار",
         "paid": "مدفوعة",
         "overdue": "متأخرة",
-        "cancelled": "ملغاة"
+        "cancelled": "ملغاة",
+        "partially_paid": "مدفوع جزئيا"
       },
       "subtotal": {
         "label": "المجموع الفرعي"
@@ -2078,24 +2065,6 @@
         "label": "ملاحظات",
         "placeholder": "أدخل ملاحظاتك"
       }
-    },
-    "actions": {
-      "preview": "معاينة"
-    },
-    "products": {
-      "title": "المنتجات",
-      "add_product": "إضافة منتج",
-      "no_products": "لا توجد منتجات مضافة",
-      "product": "المنتج",
-      "quantity": "الكمية",
-      "unit_price": "سعر الوحدة",
-      "subtotal": "المجموع الفرعي",
-      "select_product": "اختر منتج",
-      "search_products": "بحث عن منتجات",
-      "no_products_found": "لم يتم العثور على منتجات",
-      "add_new_product": "منتج جديد",
-      "edit_product": "تعديل المنتج",
-      "product_description": "وصف المنتج"
     }
   },
   "Sales": {
