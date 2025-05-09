@@ -1990,16 +1990,9 @@
       "overdue": "متأخرة",
       "cancelled": "ملغاة"
     },
-    "notes": "ملاحظات",
-    "enter_notes": "أدخل أي ملاحظات إضافية",
-    "client_added": "تمت إضافة العميل بنجاح",
-    "submitting": "جاري الإرسال...",
-    "invoice_hash": "فاتورة #{number}",
-    "issue_date": "تاريخ الإصدار",
     "form": {
       "invoice_number": {
         "label": "رقم الفاتورة",
-
         "placeholder": "أدخل رقم الفاتورة",
         "required": "رقم الفاتورة مطلوب"
       },
@@ -2030,21 +2023,6 @@
       "total": {
         "label": "المجموع"
       },
-      "products": {
-        "title": "المنتجات",
-        "add_product": "إضافة منتج",
-        "no_products": "لا توجد منتجات مضافة",
-        "product": "المنتج",
-        "quantity": "الكمية",
-        "unit_price": "سعر الوحدة",
-        "subtotal": "المجموع الفرعي",
-        "select_product": "اختر منتج",
-        "search_products": "بحث عن منتجات",
-        "no_products_found": "لم يتم العثور على منتجات",
-        "add_new_product": "منتج جديد",
-        "edit_product": "تعديل المنتج",
-        "product_description": "وصف المنتج"
-      },
       "status": {
         "label": "الحالة",
         "placeholder": "اختر حالة",
@@ -2066,6 +2044,34 @@
         "placeholder": "أدخل ملاحظاتك"
       }
     }
+  },
+
+  "ProductsFormSection": {
+    "title": "المنتجات",
+    "description": {
+      "label": "الوصف",
+      "placeholder": "أدخل وصف المنتج"
+    },
+    "add_product": "إضافة منتج",
+    "no_products": "لا توجد منتجات مضافة",
+    "product": "المنتج",
+    "quantity": {
+      "label": "الكمية",
+      "placeholder": "أدخل الكمية",
+      "invalid": "الكمية يجب أن تكون رقماً موجباً"
+    },
+    "unit_price": {
+      "label": "سعر الوحدة",
+      "placeholder": "أدخل سعر الوحدة",
+      "invalid": "السعر يجب أن يكون رقماً موجباً"
+    },
+    "subtotal": "المجموع الفرعي",
+    "select_product": "اختر منتج",
+    "search_products": "بحث عن منتجات",
+    "no_products_found": "لم يتم العثور على منتجات",
+    "add_new_product": "منتج جديد",
+    "edit_product": "تعديل المنتج",
+    "product_description": "وصف المنتج"
   },
   "Sales": {
     "title": "المبيعات",

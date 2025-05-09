@@ -137,11 +137,11 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                       </div>
                     )}
                     texts={{
-                      placeholder: t("Invoices.products.select_product"),
-                      searchPlaceholder: t("Invoices.products.search_products"),
-                      noItems: t("Invoices.products.no_products_found"),
+                      placeholder: t("ProductsFormSection.select_product"),
+                      searchPlaceholder: t("ProductsFormSection.search_products"),
+                      noItems: t("ProductsFormSection.no_products_found"),
                     }}
-                    addText={t("Invoices.products.add_new_product")}
+                    addText={t("ProductsFormSection.add_new_product")}
                     onAddClick={onAddNewProduct}
                   />
                 </FormControl>
@@ -197,7 +197,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
                       }
                       formField.onChange(isNaN(numValue as number) ? undefined : numValue);
                     }}
-                    placeholder={t("Invoices.products.unit_price.placeholder")}
+                    placeholder={t("ProductsFormSection.unit_price.placeholder")}
                     disabled={isLoading}
                   />
                 </FormControl>
@@ -216,7 +216,7 @@ const ProductRow: React.FC<ProductRowProps> = React.memo(
               <FormItem className="space-y-0">
                 <FormControl>
                   <Input
-                    placeholder={t("Forms.description.placeholder")}
+                    placeholder={t("ProductsFormSection.description.placeholder")}
                     {...formField}
                     disabled={isLoading}
                   />
@@ -288,11 +288,13 @@ export function ProductsFormSection({
     <div>
       <FormSectionHeader
         title={title}
-        onCreate={() => append({ product_id: undefined, description: "", quantity: 1, unit_price: 0 })}
-        onCreateText={t("Invoices.products.add_product")}
+        onCreate={() =>
+          append({ product_id: undefined, description: "", quantity: 1, unit_price: 0 })
+        }
+        onCreateText={t("ProductsFormSection.add_product")}
         onCreateDisabled={isLoading}
         isError={isError}
-        onErrorText={t("Invoices.products.required")}
+        onErrorText={t("ProductsFormSection.required")}
       />
       {/* Table Section */}
       <div className="p-4">
@@ -300,11 +302,11 @@ export function ProductsFormSection({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("Invoices.products.product")}</TableHead>
-                <TableHead>{t("Invoices.products.quantity")}</TableHead>
-                <TableHead>{t("Invoices.products.unit_price")}</TableHead>
-                <TableHead>{t("Forms.description.label")}</TableHead>
-                <TableHead>{t("Invoices.products.subtotal")}</TableHead>
+                <TableHead>{t("ProductsFormSection.product")}</TableHead>
+                <TableHead>{t("ProductsFormSection.quantity.label")}</TableHead>
+                <TableHead>{t("ProductsFormSection.unit_price.label")}</TableHead>
+                <TableHead>{t("ProductsFormSection.description.label")}</TableHead>
+                <TableHead>{t("ProductsFormSection.subtotal")}</TableHead>
                 <TableHead></TableHead> {/* Action column header */}
               </TableRow>
             </TableHeader>
@@ -335,7 +337,8 @@ export function ProductsFormSection({
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="h-24 text-center">
-                    {t("products.no_products")} {/* Ensure this translation key exists */}
+                    {t("ProductsFormSection.no_products")}{" "}
+                    {/* Ensure this translation key exists */}
                   </TableCell>
                 </TableRow>
               )}

@@ -49,7 +49,7 @@ export default function AddInvoicePage() {
   );
 }
 
-AddInvoicePage.messages = ["Notes", "Pages", "Invoices", "Forms", "General"];
+AddInvoicePage.messages = ["Notes", "Pages", "Invoices", "ProductsFormSection", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
