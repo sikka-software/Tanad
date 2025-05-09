@@ -80,7 +80,6 @@ export default function ProductsPage() {
       setIsDeleteDialogOpen(false);
     },
     onError: (error: Error) => {
-      console.log("error is ", error);
       if (
         error?.message?.includes("violates foreign key constraint") &&
         error?.message?.includes("invoice_items_product_id_fkey")

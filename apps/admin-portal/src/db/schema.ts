@@ -399,6 +399,7 @@ export const departments = pgTable(
     updated_at: timestamp({ withTimezone: true, mode: "string" }).default(
       sql`timezone('utc'::text, now())`,
     ),
+    notes: jsonb(),
     status: common_status().default("active"),
     enterprise_id: uuid().notNull(),
   },

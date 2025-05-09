@@ -60,7 +60,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     data: { user },
   } = await supabaseUserClient.auth.getUser();
 
-  console.log("user", user);
   if (!user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
@@ -223,7 +222,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
 
             newUserId = userIdResult[0].id;
-            console.log(`Found existing user ID via RPC: ${newUserId}`);
+            // console.log(`Found existing user ID via RPC: ${newUserId}`);
 
             // *** Use supabaseAdmin for profile check/creation ***
             const { data: existingProfile, error: profileCheckError } = await supabaseAdmin
@@ -238,34 +237,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
 
             if (!existingProfile) {
-              console.log(`Profile for user ${newUserId} not found. Creating profile...`);
+              // console.log(`Profile for user ${newUserId} not found. Creating profile...`);
               // Profile doesn't exist, create it using data from the request
-              const { error: createProfileError } = await supabaseAdmin
-                .from("profiles")
-                .insert({
-                  id: newUserId, // Link to the auth user
-                  email: email, // From request body
-                  full_name: full_name, // Use full_name directly
-                  // Add other default/required profile fields if necessary
-                });
+              const { error: createProfileError } = await supabaseAdmin.from("profiles").insert({
+                id: newUserId, // Link to the auth user
+                email: email, // From request body
+                full_name: full_name, // Use full_name directly
+                // Add other default/required profile fields if necessary
+              });
 
               if (createProfileError) {
                 console.error("Error creating missing profile:", createProfileError);
                 // Don't rollback auth user here, as it already existed
                 throw createProfileError;
               }
-              console.log(`Profile created for user ${newUserId}`);
+              // console.log(`Profile created for user ${newUserId}`);
             }
             // *** END ADDED PROFILE CHECK ***
           } else {
             // It's a different error, rethrow it
-            console.error("Auth User Creation Error (non-email_exists):", error);
+            // console.error("Auth User Creation Error (non-email_exists):", error);
             throw error;
           }
         }
 
         // 3. Ensure the profile exists (Upsert based on newUserId)
-        console.log(`Ensuring profile exists for user ID: ${newUserId}`);
+        // console.log(`Ensuring profile exists for user ID: ${newUserId}`);
         const { error: profileUpsertError } = await supabaseAdmin.from("profiles").upsert(
           {
             id: newUserId, // This is the foreign key to auth.users.id
@@ -287,7 +284,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
           throw profileUpsertError; // Propagate the error
         }
-        console.log(`Profile ensured for user ID: ${newUserId}`);
+        // console.log(`Profile ensured for user ID: ${newUserId}`);
 
         // 4. Get the role_id based on the provided role name
         const { data: fetchedRoleData, error: roleError } = await supabaseUserClient // Renamed roleData to fetchedRoleData
@@ -303,7 +300,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         const roleId = fetchedRoleData.id;
-        console.log(`Found role ID: ${roleId} for role name: ${roleName}`);
+        // console.log(`Found role ID: ${roleId} for role name: ${roleName}`);
 
         // 5. Check if the user (newly created or existing) is already in the target enterprise
         // (This check was previously step 3, moved here after profile/role confirmation)
@@ -322,20 +319,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         if (existingMembership) {
           // User already exists in this enterprise, return conflict
-          console.log(`User ${newUserId} already exists in enterprise ${creatorEnterpriseId}.`);
+          // console.log(`User ${newUserId} already exists in enterprise ${creatorEnterpriseId}.`);
           return res.status(409).json({
             error: "User already exists in this enterprise.",
             code: "USER_MEMBERSHIP_EXISTS",
           });
         }
-        console.log(
-          `User ${newUserId} not yet in enterprise ${creatorEnterpriseId}. Proceeding to add membership.`,
-        );
+        // console.log(
+        //   `User ${newUserId} not yet in enterprise ${creatorEnterpriseId}. Proceeding to add membership.`,
+        // );
 
         // 6. Create the membership entry
-        console.log(
-          `Attempting to create membership for user ${newUserId} in enterprise ${creatorEnterpriseId} with role ${roleId}`,
-        );
+        // console.log(
+        //   `Attempting to create membership for user ${newUserId} in enterprise ${creatorEnterpriseId} with role ${roleId}`,
+        // );
         const { data: newMembership, error: membershipCreationError } = await supabaseAdmin
           .from("memberships")
           .insert({ profile_id: newUserId, enterprise_id: creatorEnterpriseId, role_id: roleId })
@@ -387,7 +384,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           phone: profileData?.phone ?? null,
         };
 
-        console.log("Successfully created user and membership:", newUserResponse);
+        // console.log("Successfully created user and membership:", newUserResponse);
         return res.status(201).json(newUserResponse);
 
       case "DELETE":

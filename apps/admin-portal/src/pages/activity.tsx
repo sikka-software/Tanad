@@ -41,7 +41,7 @@ const ActivityPage = () => {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "activity_log" },
         (payload) => {
-          console.log("New activity log received:", payload.new);
+          // console.log("New activity log received:", payload.new);
           // Invalidate the query to refetch activity logs
           queryClient.invalidateQueries({ queryKey: activityLogKeys.lists() });
         },

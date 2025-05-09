@@ -371,6 +371,7 @@ export type Database = {
           enterprise_id: string
           id: string
           name: string
+          notes: Json | null
           status: Database["public"]["Enums"]["common_status"] | null
           updated_at: string | null
           user_id: string
@@ -381,6 +382,7 @@ export type Database = {
           enterprise_id: string
           id?: string
           name: string
+          notes?: Json | null
           status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string | null
           user_id: string
@@ -391,6 +393,7 @@ export type Database = {
           enterprise_id?: string
           id?: string
           name?: string
+          notes?: Json | null
           status?: Database["public"]["Enums"]["common_status"] | null
           updated_at?: string | null
           user_id?: string
@@ -1444,6 +1447,7 @@ export type Database = {
         Row: {
           client_id: string
           created_at: string | null
+          created_by: string | null
           enterprise_id: string
           expiry_date: string
           id: string
@@ -1460,6 +1464,7 @@ export type Database = {
         Insert: {
           client_id: string
           created_at?: string | null
+          created_by?: string | null
           enterprise_id: string
           expiry_date: string
           id?: string
@@ -1476,6 +1481,7 @@ export type Database = {
         Update: {
           client_id?: string
           created_at?: string | null
+          created_by?: string | null
           enterprise_id?: string
           expiry_date?: string
           id?: string
@@ -1496,6 +1502,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clients"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "user_enterprises"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -1657,6 +1677,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_reactivations: {
+        Row: {
+          created_at: string
+          id: string
+          subscription_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          subscription_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          subscription_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       templates: {
         Row: {

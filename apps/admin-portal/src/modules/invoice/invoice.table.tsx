@@ -48,7 +48,6 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
   const canPreviewInvoice = true;
 
   const rowSelection = Object.fromEntries(selectedRows.map((id) => [id, true]));
-  console.log("data is ", data);
   const columns: ExtendedColumnDef<Invoice>[] = [
     {
       accessorKey: "invoice_number",

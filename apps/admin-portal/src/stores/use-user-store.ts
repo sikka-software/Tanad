@@ -184,11 +184,11 @@ const useUserStore = create<UserState>((set, get) => ({
             const permissions = permissionsData.map((p) => p.permission_name);
             set({ permissions });
           }
-          console.log("user", session.user);
-          console.log("profile", profileData);
-          console.log("permissions", permissionsData);
-          console.log("membership", membershipData);
-          console.log("enterprise", enterpriseData);
+          // console.log("user", session.user);
+          // console.log("profile", profileData);
+          // console.log("permissions", permissionsData);
+          // console.log("membership", membershipData);
+          // console.log("enterprise", enterpriseData);
         }
       }
     } catch (error: any) {

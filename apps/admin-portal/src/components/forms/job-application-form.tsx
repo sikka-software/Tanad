@@ -1,9 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -23,9 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   first_name: z.string().min(2, "First name is required"),
@@ -33,9 +34,7 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number is required"),
   experience: z.string().min(1, "Please select your experience level"),
-  coverLetter: z
-    .string()
-    .min(50, "Cover letter should be at least 50 characters"),
+  coverLetter: z.string().min(50, "Cover letter should be at least 50 characters"),
   resume: z.any().refine((file) => file?.length === 1, "Resume is required"),
 });
 
@@ -44,14 +43,9 @@ type ApplicationFormProps = {
   onSubmitSuccess: () => void;
 };
 
-export default function ApplicationForm({
-  jobTitle,
-  onSubmitSuccess,
-}: ApplicationFormProps) {
+export default function ApplicationForm({ jobTitle, onSubmitSuccess }: ApplicationFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(
-    null
-  );
+  const [submitStatus, setSubmitStatus] = useState<"success" | "error" | null>(null);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -73,7 +67,6 @@ export default function ApplicationForm({
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      console.log("Form submitted:", values);
       setSubmitStatus("success");
 
       // Reset form after successful submission
@@ -90,14 +83,12 @@ export default function ApplicationForm({
 
   if (submitStatus === "success") {
     return (
-      <Alert className="bg-green-50 border-green-200">
+      <Alert className="border-green-200 bg-green-50">
         <CheckCircle2 className="h-5 w-5 text-green-600" />
-        <AlertTitle className="text-green-800">
-          Application Submitted!
-        </AlertTitle>
+        <AlertTitle className="text-green-800">Application Submitted!</AlertTitle>
         <AlertDescription className="text-green-700">
-          Thank you for applying to the {jobTitle} position. We'll review your
-          application and get back to you soon.
+          Thank you for applying to the {jobTitle} position. We'll review your application and get
+          back to you soon.
         </AlertDescription>
       </Alert>
     );
@@ -107,7 +98,7 @@ export default function ApplicationForm({
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium">Apply for: {jobTitle}</h3>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="mt-1 text-sm text-gray-500">
           Please fill out the form below to apply for this position.
         </p>
       </div>
@@ -124,7 +115,7 @@ export default function ApplicationForm({
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="first_name"
@@ -154,7 +145,7 @@ export default function ApplicationForm({
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="email"
@@ -162,11 +153,7 @@ export default function ApplicationForm({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="john.doe@example.com"
-                      {...field}
-                    />
+                    <Input type="email" placeholder="john.doe@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -194,23 +181,16 @@ export default function ApplicationForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Experience Level</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select your experience level" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="entry">
-                      Entry Level (0-2 years)
-                    </SelectItem>
+                    <SelectItem value="entry">Entry Level (0-2 years)</SelectItem>
                     <SelectItem value="mid">Mid Level (3-5 years)</SelectItem>
-                    <SelectItem value="senior">
-                      Senior Level (6+ years)
-                    </SelectItem>
+                    <SelectItem value="senior">Senior Level (6+ years)</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -232,8 +212,7 @@ export default function ApplicationForm({
                   />
                 </FormControl>
                 <FormDescription>
-                  Briefly describe your relevant experience and why you're
-                  interested in this role.
+                  Briefly describe your relevant experience and why you're interested in this role.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

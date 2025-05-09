@@ -514,8 +514,6 @@ function SheetTable<
       const rowIndex = tanStackRow.index;
       const colKey = getColumnKey(colDef);
 
-      console.log("eddiging?");
-
       if (isRowDisabled(disabledRows, groupKey, rowIndex) || disabledColumns.includes(colKey)) {
         return;
       }
@@ -573,7 +571,6 @@ function SheetTable<
         };
         return { ...prev, [groupKey]: { ...groupErrors, [rowId]: rowErrors } };
       });
-      console.log("eddiging?");
       if (errorMessage) {
         console.error(`Row "${rowId}", Col "${colKey}" error: ${errorMessage}`);
       } else if (onEdit) {

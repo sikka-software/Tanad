@@ -25,7 +25,6 @@ export default function AddOnlineStorePage() {
     const form = (window as any).onlineStoreForm;
     if (form) {
       let dd = dummyData.randomPicker(E_COMMERCE_PLATFORMS);
-      console.log(dd.value);
       form.setValue("domain_name", dummyData.first_name.toLowerCase() + ".com");
       form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
       form.setValue("platform", dd.value);

@@ -48,10 +48,7 @@ export const routeMap: RouteMap = {
 
 // Dynamic route patterns and their handling
 export const dynamicRoutePatterns = [
-  {
-    pattern: /^\/dashboard$/,
-    breadcrumbs: [{ path: "/dashboard", labelKey: "Pages.Dashboard.title" }],
-  },
+  { pattern: /^\/dashboard$/, breadcrumbs: [] },
   {
     pattern: /^\/invoices\/add$/,
     breadcrumbs: [

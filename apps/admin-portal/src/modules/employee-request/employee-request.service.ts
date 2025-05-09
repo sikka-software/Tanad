@@ -70,7 +70,7 @@ export async function updateEmployeeRequest(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
     });
-    console.log("response", response);
+    // console.log("response", response);
     // if (!response.ok) {
     //   let errorDetails = {};
     //   let errorMessage = `Failed to update employee request with id ${id}. Status: ${response.status}`;

@@ -12,7 +12,6 @@ export function AppBreadcrumb() {
 
   // Rather than creating a new translation context, handle namespace translation differently
   const getTranslatedKey = (key: string) => {
-    console.log("key", key);
     if (!key) return "";
 
     const [namespace, translationKey, translationSubKey] = key.split(".");

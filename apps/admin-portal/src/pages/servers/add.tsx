@@ -23,9 +23,7 @@ export default function AddServerPage() {
 
   const handleDummyData = () => {
     const dummyData = generateDummyData();
-
     const form = (window as any).serverForm;
-    console.log("form is ,", form);
     if (form) {
       form.setValue("name", dummyData.full_name);
       form.setValue("ip_address", dummyData.random_ip_address);

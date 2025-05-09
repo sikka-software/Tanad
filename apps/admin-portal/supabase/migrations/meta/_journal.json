@@ -379,6 +379,13 @@
       "when": 1746724650485,
       "tag": "0053_slow_annihilus",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1746754876516,
+      "tag": "0054_jittery_wither",
+      "breakpoints": true
     }
   ]
 }

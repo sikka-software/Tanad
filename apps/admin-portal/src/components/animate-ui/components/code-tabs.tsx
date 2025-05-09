@@ -1,9 +1,9 @@
 "use client";
 
+import { CopyButton } from "@root/src/components/ui/copy-button";
 import { useTheme } from "next-themes";
 import * as React from "react";
 
-import { CopyButton } from "@root/src/components/ui/copy-button";
 import {
   Tabs,
   TabsContent,
@@ -68,9 +68,6 @@ function CodeTabs({
 
           newHighlightedCodes[command] = highlighted;
         }
-
-        console.log("newHighlightedCodes", newHighlightedCodes);
-        console.log("codes", codes);
 
         setHighlightedCodes(newHighlightedCodes);
       } catch (error) {

@@ -159,7 +159,7 @@ const SidebarSettings = ({
   // Load menu configuration from profile if available
   useEffect(() => {
     if (!profile) {
-      console.log("No profile available yet, skipping menu configuration");
+      // console.log("No profile available yet, skipping menu configuration");
       return;
     }
 

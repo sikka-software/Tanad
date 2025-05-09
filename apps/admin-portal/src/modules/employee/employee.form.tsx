@@ -182,16 +182,16 @@ export function EmployeeForm({
   const handleSubmit = async (data: z.input<ReturnType<typeof createEmployeeFormSchema>>) => {
     setIsEmployeeSaving(true);
     // Log dirtyFields for debugging
-    console.log("Form dirtyFields:", form.formState.dirtyFields);
-    console.log("Form isDirty:", form.formState.isDirty);
+    // console.log("Form dirtyFields:", form.formState.dirtyFields);
+    // console.log("Form isDirty:", form.formState.isDirty);
 
     // Explicitly check if any field has been marked as dirty
     const isActuallyDirty = Object.keys(form.formState.dirtyFields).length > 0;
-    console.log("Is Actually Dirty (based on dirtyFields object):", isActuallyDirty);
+    // console.log("Is Actually Dirty (based on dirtyFields object):", isActuallyDirty);
 
     // Check if editing and if the form is actually dirty based on the dirtyFields object
     if (editMode && !isActuallyDirty) {
-      console.log("Form not dirty (based on dirtyFields), closing without saving.");
+      // console.log("Form not dirty (based on dirtyFields), closing without saving.");
       // If nothing changed, just close the form without an API call or toast
       onSuccess?.();
       return;

@@ -63,8 +63,6 @@ export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = as
       .eq("id", id)
       .single();
 
-    console.log("data is ", data);
-
     if (error) {
       // Handle specific errors like not found (PGRST116) or others
       if (error.code === "PGRST116") {
@@ -140,7 +138,6 @@ export default function JobListingPreviewPage({
       </Alert>
     );
   }
-  console.log("jobListing is ", jobListing);
 
   // Extract jobs from the nested structure
   const jobs: Job[] = jobListing?.job_listing_jobs.map((jlj) => jlj.jobs).filter(Boolean) || [];

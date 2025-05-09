@@ -129,7 +129,7 @@ const GeneralSettings = ({
       // If email has changed, you might need to update it through auth system
       if (data.email !== user?.email) {
         // Handle email update through auth provider if needed
-        console.log("Email changed, might need additional auth updates");
+        // console.log("Email changed, might need additional auth updates");
       }
 
       // Reset the form with the current data to clear dirty state
