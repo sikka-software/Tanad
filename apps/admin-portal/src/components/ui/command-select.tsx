@@ -54,6 +54,7 @@ type CommandSelectTypes<T> = {
   ariaInvalid?: boolean;
   inCell?: boolean;
   buttonClassName?: string;
+  placeholderClassName?: string;
 };
 export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTypes<any>>(
   (
@@ -73,6 +74,7 @@ export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTy
       ariaInvalid,
       inCell = false,
       buttonClassName,
+      placeholderClassName,
       ...props
     },
     ref,
@@ -128,7 +130,7 @@ export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTy
                   type="button"
                   aria-expanded={open}
                   className={cn(
-                    "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+                    "ring-offset-background focus-visible:ring-ring inline-flex h-9 w-full cursor-pointer items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
                     props.preview
                       ? "cursor-default rounded-none border-transparent px-0 !ring-0 !ring-offset-0 !outline-none"
                       : "bg-background px-3",
@@ -138,11 +140,17 @@ export const CommandSelect = React.forwardRef<HTMLButtonElement, CommandSelectTy
                     buttonClassName,
                   )}
                 >
-                  {selectedItem
-                    ? renderSelected
-                      ? renderSelected(selectedItem)
-                      : getProperty(selectedItem, labelKey)
-                    : props.texts?.placeholder || ". . ."}
+                  {selectedItem ? (
+                    renderSelected ? (
+                      renderSelected(selectedItem)
+                    ) : (
+                      getProperty(selectedItem, labelKey)
+                    )
+                  ) : (
+                    <div className={placeholderClassName}>
+                      {props.texts?.placeholder || ". . ."}
+                    </div>
+                  )}
                   {!inCell && (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

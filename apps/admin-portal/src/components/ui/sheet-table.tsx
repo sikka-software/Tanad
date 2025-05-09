@@ -342,7 +342,7 @@ function SheetTable<
     texts,
     onActionClicked,
     columns,
-    data,
+    data: initialData,
     onEdit,
     disabledColumns = [],
     disabledRows = [],
@@ -371,6 +371,22 @@ function SheetTable<
 
   const t = useTranslations();
   const locale = useLocale();
+
+  /**
+   * Ensure a minimum of 10 rows are displayed, padding with empty rows if needed.
+   */
+  const MIN_ROWS = 30;
+  const data = React.useMemo(() => {
+    if (initialData.length < MIN_ROWS) {
+      const emptyRowsNeeded = MIN_ROWS - initialData.length;
+      const emptyRowObjects = Array.from({ length: emptyRowsNeeded }, (_, i) => {
+        // Provide a unique ID for placeholder rows, conform to T's id constraint
+        return { id: `empty-row-${i}-${Math.random().toString(36).substring(7)}` } as T;
+      });
+      return [...initialData, ...emptyRowObjects];
+    }
+    return initialData;
+  }, [initialData]);
 
   /**
    * If column sizing is enabled, we track sizes in state.
@@ -767,6 +783,7 @@ function SheetTable<
                     defaultValue={String(selectedOption?.value)}
                     popoverClassName="w-fit"
                     buttonClassName="bg-transparent p-0"
+                    placeholderClassName="w-full p-0"
                     valueKey="value"
                     labelKey="label"
                     onChange={async (value) => {
@@ -774,17 +791,17 @@ function SheetTable<
                         onEdit(rowId, colKey as keyof T, value as T[keyof T]);
                       }
                     }}
-                    texts={{
-                      placeholder: ". . .",
-                    }}
+                    texts={{ placeholder: ". . ." }}
                     renderSelected={(item) => {
                       return (
                         <div
                           className={cn(
-                            "flex h-full w-full items-center justify-center bg-green-500 px-2 text-center text-xs font-bold",
-                            item.value === "active" &&
-                              "text-primary bg-green-200 hover:bg-green-200",
-                            item.value === "inactive" && "text-primary bg-red-200 hover:bg-red-200",
+                            "flex h-full w-full items-center justify-center bg-green-500 p-0 !px-2 text-center text-xs font-bold",
+                            {
+                              "text-primary bg-green-200 hover:bg-green-200":
+                                item.value === "active",
+                              "text-primary bg-red-200 hover:bg-red-200": item.value === "inactive",
+                            },
                           )}
                         >
                           {item.label}

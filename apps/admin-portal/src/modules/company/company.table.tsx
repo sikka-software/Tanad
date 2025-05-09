@@ -68,6 +68,7 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
       header: t("Companies.form.city.label"),
       validationSchema: z.string().optional(),
     },
+
     {
       accessorKey: "state",
       header: t("Companies.form.state.label"),
