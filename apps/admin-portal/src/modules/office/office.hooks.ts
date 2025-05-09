@@ -87,7 +87,6 @@ export function useUpdateOffice() {
   });
 }
 
-// Hook to duplicate a office
 export function useDuplicateOffice() {
   const queryClient = useQueryClient();
   const t = useTranslations();
@@ -96,9 +95,6 @@ export function useDuplicateOffice() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: officeKeys.detail(data.id) });
       queryClient.invalidateQueries({ queryKey: officeKeys.lists() });
-      toast.success(t("General.successful_operation"), {
-        description: t("Offices.success.duplicate"),
-      });
     },
     onError: (error) => {
       toast.error(t("General.error_operation"), {

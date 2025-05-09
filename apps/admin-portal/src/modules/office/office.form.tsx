@@ -37,7 +37,7 @@ const createOfficeSchema = (t: (key: string) => string) => {
     phone: z.string().optional().or(z.literal("")),
     manager: z
       .string({ invalid_type_error: t("Offices.form.manager.invalid_uuid") })
-      .uuid({ message: t("Offices.form.manager.invalid_uuid") })
+      // .uuid({ message: t("Offices.form.manager.invalid_uuid") })
       .optional()
       .nullable(),
     status: z.enum(["active", "inactive"], {

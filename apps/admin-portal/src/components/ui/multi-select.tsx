@@ -296,6 +296,7 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
           style={{ width: "var(--radix-popover-trigger-width)" }}
           dir={locale === "ar" ? "rtl" : "ltr"}
           onEscapeKeyDown={() => setIsPopoverOpen(false)}
+          onWheel={(e) => e.stopPropagation()}
         >
           <Command>
             <CommandInput placeholder={t("General.search")} onKeyDown={handleInputKeyDown} />
