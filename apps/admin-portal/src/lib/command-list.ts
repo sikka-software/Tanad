@@ -180,7 +180,7 @@ export const commandList = [
     ],
   },
   {
-    heading: "Pages.Navigation.organization",
+    heading: "Pages.SystemAdmin.title",
     items: [
       {
         icon: ModulesOptions.users.icon,
