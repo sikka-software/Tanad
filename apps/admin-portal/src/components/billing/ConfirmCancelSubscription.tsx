@@ -40,6 +40,11 @@ export function ConfirmCancelSubscriptionDialog({
                 "هل أنت متأكد من رغبتك في إلغاء اشتراكك؟ ستفقد الوصول إلى الميزات المتقدمة في نهاية فترة الفوترة الحالية.",
             })}
           </DialogDescription>
+          <DialogDescription className="text-muted-foreground mt-2 text-sm">
+            {t("Billing.cancel_subscription.features_end_notice", {
+              fallback: "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية.",
+            })}
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mt-4 flex-col gap-2 sm:flex-row sm:justify-between">
           <Button

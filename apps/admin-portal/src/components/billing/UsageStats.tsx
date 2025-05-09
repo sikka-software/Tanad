@@ -3,6 +3,16 @@ import { useLocale, useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+interface UsageItemProps {
+  title: string;
+  description?: string;
+  total: number;
+  used: number;
+  available: number;
+  usedPercentage: number;
+}
 
 interface UsageStatsProps {
   total: number;
@@ -11,6 +21,72 @@ interface UsageStatsProps {
   usedPercentage: number;
   isLoading?: boolean;
   isPageLoading?: boolean;
+  employeeUsage?: {
+    total: number;
+    used: number;
+    available: number;
+    usedPercentage: number;
+  };
+  storageUsage?: {
+    total: number;
+    used: number;
+    available: number;
+    usedPercentage: number;
+  };
+  invoiceUsage?: {
+    total: number;
+    used: number;
+    available: number;
+    usedPercentage: number;
+  };
+  clientsUsage?: {
+    total: number;
+    used: number;
+    available: number;
+    usedPercentage: number;
+  };
+}
+
+function UsageItem({ title, description, total, used, available, usedPercentage }: UsageItemProps) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const isRtl = locale === "ar";
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-start justify-between">
+        <h3 className="text-xl font-bold">{title}</h3>
+        <span className="text-lg font-semibold">{usedPercentage.toFixed(0)}%</span>
+      </div>
+
+      {description && <p className="text-muted-foreground text-sm">{description}</p>}
+
+      <div className="space-y-2">
+        <Progress value={usedPercentage} className="h-2.5 bg-gray-200" />
+
+        <div className="text-sm">
+          {t("Billing.usage.used_of_total", {
+            used,
+            total,
+            fallback: `${used} of ${total}`,
+          })}
+        </div>
+      </div>
+
+      <div className="flex justify-between pt-1 text-sm">
+        <div>
+          <p className="text-muted-foreground">{t("Billing.usage.total", { fallback: "Total" })}</p>
+          <p className="font-medium">{total}</p>
+        </div>
+        <div className={isRtl ? "text-start" : "text-end"}>
+          <p className="text-muted-foreground">
+            {t("Billing.usage.available", { fallback: "Available" })}
+          </p>
+          <p className="font-medium">{available}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function UsageStats({
@@ -20,6 +96,10 @@ export default function UsageStats({
   usedPercentage,
   isLoading: componentIsLoading,
   isPageLoading,
+  employeeUsage,
+  storageUsage,
+  invoiceUsage,
+  clientsUsage,
 }: UsageStatsProps) {
   const t = useTranslations();
   const locale = useLocale();
@@ -30,50 +110,81 @@ export default function UsageStats({
   const isLoading = isPageLoading !== undefined ? isPageLoading : componentIsLoading || false;
 
   if (isLoading) {
-    return <Skeleton className="h-[180px] w-full flex-1 rounded-lg" />;
+    return <Skeleton className="h-[300px] w-full flex-1 rounded-lg" />;
   }
 
   return (
     <Card className="bg-background flex-1 border p-6">
-      <div className="space-y-4">
-        <div className="flex items-start justify-between">
-          <h3 className="text-xl font-bold">
-            {t("Billing.usage_title", { fallback: "Billing.usage_title" })}
-          </h3>
-          <span className="text-lg font-semibold">{usedPercentage.toFixed(0)}%</span>
-        </div>
+      <Tabs defaultValue="invoices" className="w-full">
+        <TabsList className="mb-4 grid w-full grid-cols-4">
+          <TabsTrigger value="invoices">{t("Billing.Invoices.title")}</TabsTrigger>
+          <TabsTrigger value="employees">{t("Billing.Employees.title")}</TabsTrigger>
+          <TabsTrigger value="clients">{t("Billing.Clients.title")}</TabsTrigger>
+          <TabsTrigger value="storage">{t("Billing.usage.storage")}</TabsTrigger>
+        </TabsList>
 
-        <p className="text-muted-foreground text-sm">
-          {t("Billing.usage_description", { fallback: "Billing.usage_description" })}
-        </p>
+        <TabsContent value="invoices" className="mt-0">
+          <UsageItem
+            title={t("Billing.Invoices.title")}
+            description={t("Billing.usage.description")}
+            total={invoiceUsage?.total || total}
+            used={invoiceUsage?.used || used}
+            available={invoiceUsage?.available || available}
+            usedPercentage={invoiceUsage?.usedPercentage || usedPercentage}
+          />
+        </TabsContent>
 
-        <div className="space-y-2">
-          <Progress value={usedPercentage} className="h-2.5 bg-gray-200" />
+        <TabsContent value="employees" className="mt-0">
+          {employeeUsage ? (
+            <UsageItem
+              title={t("Billing.usage.employees")}
+              description={t("Billing.usage.description")}
+              total={employeeUsage.total}
+              used={employeeUsage.used}
+              available={employeeUsage.available}
+              usedPercentage={employeeUsage.usedPercentage}
+            />
+          ) : (
+            <div className="py-8 text-center">
+              <p className="text-muted-foreground">{t("General.coming_soon")}</p>
+            </div>
+          )}
+        </TabsContent>
 
-          <div className="text-sm">
-            {t("Billing.used_of_total", {
-              used,
-              total,
-              fallback: `${used} of ${total}`,
-            })}
-          </div>
-        </div>
+        <TabsContent value="clients" className="mt-0">
+          {clientsUsage ? (
+            <UsageItem
+              title={t("Billing.usage.clients")}
+              description={t("Billing.usage.description")}
+              total={clientsUsage.total}
+              used={clientsUsage.used}
+              available={clientsUsage.available}
+              usedPercentage={clientsUsage.usedPercentage}
+            />
+          ) : (
+            <div className="py-8 text-center">
+              <p className="text-muted-foreground">{t("General.coming_soon")}</p>
+            </div>
+          )}
+        </TabsContent>
 
-        <div className="flex justify-between pt-1 text-sm">
-          <div>
-            <p className="text-muted-foreground">
-              {t("Billing.total", { fallback: "Billing.total" })}
-            </p>
-            <p className="font-medium">{total}</p>
-          </div>
-          <div className={isRtl ? "text-start" : "text-end"}>
-            <p className="text-muted-foreground">
-              {t("Billing.available", { fallback: "Billing.available" })}
-            </p>
-            <p className="font-medium">{available}</p>
-          </div>
-        </div>
-      </div>
+        <TabsContent value="storage" className="mt-0">
+          {storageUsage ? (
+            <UsageItem
+              title={t("Billing.usage.storage")}
+              description={t("Billing.usage.description")}
+              total={storageUsage.total}
+              used={storageUsage.used}
+              available={storageUsage.available}
+              usedPercentage={storageUsage.usedPercentage}
+            />
+          ) : (
+            <div className="py-8 text-center">
+              <p className="text-muted-foreground">{t("General.coming_soon")}</p>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </Card>
   );
 }

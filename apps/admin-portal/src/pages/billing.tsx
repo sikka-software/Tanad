@@ -1,9 +1,8 @@
 "use client";
 
-import { Info } from "lucide-react";
 // Components
 import { pick } from "lodash";
-import { CreditCard, Package, User } from "lucide-react";
+import { Info } from "lucide-react";
 import { GetStaticProps } from "next";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
@@ -150,6 +149,9 @@ export default function Billing() {
   // Calculate the page loading state
   const isPageLoading = isRefreshing || !user || !shouldRender;
 
+  // Check if we should show upgrade options
+  const canUpgrade = profile?.subscribed_to === "tanad_free";
+
   // Return a skeleton version of the page layout for loading state
   if (!user) {
     return (
@@ -194,7 +196,13 @@ export default function Billing() {
           ) : (
             <div className="flex flex-col gap-4 md:flex-row">
               <CurrentPlan />
-              <UsageStats {...usageData} />
+              <UsageStats
+                {...usageData}
+                employeeUsage={usageData.employeeUsage}
+                storageUsage={usageData.storageUsage}
+                invoiceUsage={usageData.invoiceUsage}
+                clientsUsage={usageData.clientsUsage}
+              />
             </div>
           )}
         </div>

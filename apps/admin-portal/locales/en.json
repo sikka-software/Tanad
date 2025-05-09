@@ -1104,12 +1104,48 @@
     "enterprise_plan": "Enterprise Plan",
     "update_plan": "Update Plan",
     "need_custom_solution": "Need a custom solution?",
+
+    "Invoices": {
+      "title": "Invoices",
+      "description": "Manage all your invoices"
+    },
+    "Employees": {
+      "title": "Employees",
+      "description": "Manage all your employees"
+    },
+    "Clients": {
+      "title": "Clients",
+      "description": "Manage all your clients"
+    },
     "subscription_status": {
       "active": "Active",
       "inactive": "Inactive",
       "cancelled": "Cancelled",
       "expired": "Expired",
       "pending": "Pending"
+    },
+    "usage": {
+      "title": "Usage",
+      "description": "View your usage and billing information",
+      "used_of_total": "Used of Total",
+      "total": "Total",
+      "available": "Available",
+      "free_tier": "Free Tier",
+      "pro_tier": "Pro Tier",
+      "business_tier": "Business Tier",
+      "enterprise_tier": "Enterprise Tier",
+      "upgrade_now": "Upgrade Now",
+      "upgrade_description": "Upgrade your plan to get more resources",
+      "view_details": "View Details",
+      "puklas": "Puklas",
+      "storage": "Storage",
+      "bandwidth": "Bandwidth",
+      "api_requests": "API Requests",
+      "custom_domains": "Custom Domains",
+      "team_members": "Team Members",
+      "employees": "Employees",
+      "clients": "Clients",
+      "invoices": "Invoices"
     },
 
     "payment": {
@@ -1149,7 +1185,8 @@
       "title": "Cancel Subscription",
       "description": "Are you sure you want to cancel your subscription?",
       "cancel": "Cancel",
-      "confirm": "Confirm"
+      "confirm": "Confirm",
+      "features_end_notice": "All features will remain available until the end of the current billing period."
     },
     "manage_description": "Manage your billing information and payment methods",
     "billing_history": {
