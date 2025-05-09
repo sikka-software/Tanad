@@ -336,7 +336,7 @@ const SidebarSettings = ({
         <form ref={formRef} onSubmit={handleSubmit}>
           {Object.entries(menuList).map(([groupName, items]) => (
             <div key={groupName} className="space-y-4">
-              <h3 className="text-sm font-medium">{t(`${groupName}.title`)}</h3>
+              <h3 className="text-sm font-medium">{t(`Pages.${groupName}.title`)}</h3>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}

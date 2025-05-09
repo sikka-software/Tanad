@@ -376,6 +376,7 @@ export function JobListingForm({
         loadingSave={isJobSaving}
       >
         <JobForm
+          nestedForm
           formHtmlId="job-form"
           onSuccess={() => {
             setIsJobDialogOpen(false);

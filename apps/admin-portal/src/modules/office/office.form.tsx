@@ -58,6 +58,7 @@ export function OfficeForm({
   onSuccess,
   defaultValues,
   editMode,
+  nestedForm,
 }: ModuleFormProps<OfficeCreateData | OfficeUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -303,7 +304,7 @@ export function OfficeForm({
                         texts={{
                           placeholder: t("Offices.form.manager.placeholder"),
                           searchPlaceholder: t("Pages.Employees.search"),
-                          noItems: t("Offices.form.manager.no_employees"),
+                          noItems: t("Pages.Employees.no_employees_found"),
                         }}
                         addText={t("Pages.Employees.add")}
                         onAddClick={() => setIsEmployeeFormDialogOpen(true)}
@@ -348,13 +349,13 @@ export function OfficeForm({
             </div>
           </div>
           <AddressFormSection
-            inDialog={editMode}
+            inDialog={editMode || nestedForm}
             title={t("Offices.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
           <NotesSection
-            inDialog={editMode}
+            inDialog={editMode || nestedForm}
             control={form.control}
             title={t("Offices.form.notes.label")}
           />
@@ -368,6 +369,7 @@ export function OfficeForm({
         loadingSave={isEmployeeSaving}
       >
         <EmployeeForm
+          nestedForm
           formHtmlId="employee-form"
           onSuccess={() => {
             setIsEmployeeSaving(false);

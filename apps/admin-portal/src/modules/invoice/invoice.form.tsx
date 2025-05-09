@@ -73,6 +73,7 @@ export function InvoiceForm({
   editMode,
   onSuccess,
   defaultValues,
+  nestedForm,
 }: ModuleFormProps<InvoiceUpdateData | InvoiceCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -476,7 +477,7 @@ export function InvoiceForm({
             isError={form.formState.errors.items as FieldError}
           />
           <NotesSection
-            inDialog={editMode}
+            inDialog={editMode || nestedForm}
             control={form.control}
             title={t("Invoices.form.notes.label")}
           />
@@ -491,7 +492,7 @@ export function InvoiceForm({
         cancelText={t("cancel")}
         submitText={t("save")}
       >
-        <ClientForm formHtmlId="client-form" />
+        <ClientForm formHtmlId="client-form" nestedForm />
       </FormDialog>
       <FormDialog
         open={isNewProductDialogOpen}
@@ -501,7 +502,7 @@ export function InvoiceForm({
         cancelText={t("cancel")}
         submitText={t("save")}
       >
-        <ProductForm formHtmlId="product-form" />
+        <ProductForm formHtmlId="product-form" nestedForm />
       </FormDialog>
     </>
   );

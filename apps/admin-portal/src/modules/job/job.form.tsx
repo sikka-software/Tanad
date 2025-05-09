@@ -514,6 +514,7 @@ export function JobForm({
       >
         {chosenForm === "Warehouses" && (
           <WarehouseForm
+            nestedForm
             formHtmlId="warehouse-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
@@ -523,6 +524,7 @@ export function JobForm({
         )}
         {chosenForm === "Offices" && (
           <OfficeForm
+            nestedForm
             formHtmlId="office-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
@@ -532,6 +534,7 @@ export function JobForm({
         )}
         {chosenForm === "Branches" && (
           <BranchForm
+            nestedForm
             formHtmlId="branch-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);
@@ -541,6 +544,7 @@ export function JobForm({
         )}
         {chosenForm === "Departments" && (
           <DepartmentForm
+            nestedForm
             formHtmlId="department-form"
             onSuccess={() => {
               setIsDepartmentSaving(false);

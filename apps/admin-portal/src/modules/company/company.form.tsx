@@ -52,6 +52,7 @@ export function CompanyForm({
   onSuccess,
   defaultValues,
   editMode,
+  nestedForm,
 }: ModuleFormProps<CompanyUpdateData | CompanyCreateData>) {
   const t = useTranslations();
   const { profile, membership } = useUserStore();
@@ -325,14 +326,14 @@ export function CompanyForm({
         </div>
 
         <AddressFormSection
-          inDialog={editMode}
+          inDialog={editMode || nestedForm}
           title={t("Companies.form.address.label")}
           control={form.control}
           isLoading={isLoading}
         />
 
         <NotesSection
-          inDialog={editMode}
+          inDialog={editMode || nestedForm}
           control={form.control}
           title={t("Companies.form.notes.label")}
         />

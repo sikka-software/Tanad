@@ -68,6 +68,7 @@ export function BranchForm({
   onSuccess,
   defaultValues,
   editMode,
+  nestedForm,
 }: ModuleFormProps<BranchUpdateData | BranchCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -360,13 +361,13 @@ export function BranchForm({
           </div>
 
           <AddressFormSection
-            inDialog={editMode}
+            inDialog={editMode || nestedForm}
             title={t("Branches.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
           <NotesSection
-            inDialog={editMode}
+            inDialog={editMode || nestedForm}
             control={form.control}
             title={t("Branches.form.notes.label")}
           />
@@ -381,6 +382,7 @@ export function BranchForm({
         loadingSave={isEmployeeSaving}
       >
         <EmployeeForm
+          nestedForm
           formHtmlId="employee-form"
           onSuccess={() => {
             setIsEmployeeSaving(false);

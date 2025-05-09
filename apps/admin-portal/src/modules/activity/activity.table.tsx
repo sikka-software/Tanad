@@ -85,13 +85,13 @@ export function ActivityLogTable() {
             ) : isError ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center text-red-500">
-                  {t("ActivityLogs.error_fetching")}: {error?.message || "Unknown error"}
+                  {t("Activity.error_fetching")}: {error?.message || "Unknown error"}
                 </TableCell>
               </TableRow>
             ) : activityLogs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-muted-foreground text-center">
-                  {t("ActivityLogs.no_activity_logs_found")}
+                  {t("Activity.no_activity_logs_found")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -137,7 +137,7 @@ export function ActivityLogTable() {
                           </Badge>
                         </div>
                         <div className="text-muted-foreground text-xs">
-                          {t(`ActivityLogs.action_description.${item.action_type.toLowerCase()}`, {
+                          {t(`Activity.action_description.${item.action_type.toLowerCase()}`, {
                             action: t(`General.${item.action_type.toLowerCase()}`),
                             target: t(`General.${item.target_type?.toLowerCase()}`) || "item",
                             name: item.target_name || item.target_id || "N/A",

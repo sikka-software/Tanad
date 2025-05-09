@@ -299,7 +299,7 @@ export default function Account() {
   // );
 }
 
-Account.messages = ["Pages", "Account", "General"];
+Account.messages = ["Pages", "Profile", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

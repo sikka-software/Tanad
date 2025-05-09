@@ -24,7 +24,6 @@ import { ModuleFormProps } from "@/types/common.type";
 import { ClientForm } from "@/client/client.form";
 import { useClients } from "@/client/client.hooks";
 import useClientStore from "@/client/client.store";
-import { Client } from "@/client/client.type";
 
 import { Product } from "@/product/product.type";
 
@@ -493,8 +492,9 @@ export function QuoteForm({
         submitText={t("General.save")}
       >
         <ClientForm
+          nestedForm
           formHtmlId="client-form-quote"
-          onSuccess={(newClientData?: Client) => {
+          onSuccess={() => {
             setIsClientSaving(false);
             setIsClientDialogOpen(false);
           }}

@@ -378,20 +378,16 @@ export function UserForm({ onSuccess, formHtmlId, defaultValues }: ModuleFormPro
         </div>
       </form>
 
-      {/* Role Creation Dialog */}
       <FormDialog
         open={isRoleDialogOpen}
         onOpenChange={setIsRoleDialogOpen}
-        title={t("Pages.Roles.add")} // Use Role translation
-        formId="role-form" // ID for the RoleForm inside
+        title={t("Pages.Roles.add")}
+        formId="role-form"
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
         loadingSave={isSavingRole}
       >
-        <RoleForm
-          formHtmlId="role-form" // Match the FormDialog's formId
-          onSuccess={handleRoleCreated} // Callback on successful creation
-        />
+        <RoleForm formHtmlId="role-form" onSuccess={handleRoleCreated} nestedForm />
       </FormDialog>
     </Form>
   );

@@ -221,10 +221,14 @@ export function ServerForm({
                         noItems: t("Servers.form.location.no_items"),
                       }}
                       renderOption={(item) => (
-                        <div>{t(`Country.${item.label.toLowerCase().split(" ").join("_")}`)}</div>
+                        <div>
+                          {t(`Forms.Country.${item.label.toLowerCase().split(" ").join("_")}`)}
+                        </div>
                       )}
                       renderSelected={(item) => (
-                        <div>{t(`Country.${item.label.toLowerCase().split(" ").join("_")}`)}</div>
+                        <div>
+                          {t(`Forms.Country.${item.label.toLowerCase().split(" ").join("_")}`)}
+                        </div>
                       )}
                       onChange={field.onChange}
                     />

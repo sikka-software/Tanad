@@ -283,7 +283,7 @@ export function VendorForm({
         cancelText={t("General.cancel")}
         submitText={t("General.save")}
       >
-        <CompanyForm formHtmlId="company-form" />
+        <CompanyForm formHtmlId="company-form" nestedForm />
       </FormDialog>
     </>
   );

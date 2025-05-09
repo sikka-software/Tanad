@@ -51,6 +51,7 @@ export function ClientForm({
   onSuccess,
   defaultValues,
   editMode = false,
+  nestedForm,
 }: ModuleFormProps<ClientCreateData | ClientUpdateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -259,13 +260,13 @@ export function ClientForm({
           </div>
 
           <AddressFormSection
-            inDialog={editMode}
+            inDialog={editMode || nestedForm}
             title={t("Clients.form.address.label")}
             control={form.control}
             isLoading={isLoading}
           />
           <NotesSection
-            inDialog={editMode}
+            inDialog={editMode || nestedForm}
             control={form.control}
             title={t("Clients.form.notes.label")}
           />
@@ -278,7 +279,11 @@ export function ClientForm({
         title={t("Pages.Companies.add")}
         formId="company-form"
       >
-        <CompanyForm formHtmlId="company-form" onSuccess={() => setIsCompanyDialogOpen(false)} />
+        <CompanyForm
+          nestedForm
+          formHtmlId="company-form"
+          onSuccess={() => setIsCompanyDialogOpen(false)}
+        />
       </FormDialog>
     </>
   );

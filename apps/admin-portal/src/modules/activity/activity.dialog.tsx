@@ -27,7 +27,7 @@ export function ActivityLogDialog() {
     <Dialog open={isDialogOpen} onOpenChange={closeDialog}>
       <DialogContent className="sm:max-w-[600px]" dir={locale === "ar" ? "rtl" : "ltr"}>
         <DialogHeader>
-          <DialogTitle>{t("ActivityLogs.dialog.title")}</DialogTitle>
+          <DialogTitle>{t("Activity.dialog.title")}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[60vh]" dir={locale === "ar" ? "rtl" : "ltr"}>
           <div className="grid gap-4 p-4">
@@ -44,7 +44,7 @@ export function ActivityLogDialog() {
                 return (
                   <div key={key} className="grid grid-cols-3 items-center gap-4">
                     <span className="text-muted-foreground h-full text-sm font-medium">
-                      {t(`ActivityLogs.fields.${key}` as any, {}, {
+                      {t(`Activity.fields.${key}` as any, {}, {
                         defaultValue: key.replace(/_/g, " "),
                       } as any)}
                     </span>

@@ -197,7 +197,7 @@ export function RoleForm({
                     <AccordionTrigger className="py-2">
                       <div className="flex w-full items-center justify-between pe-4">
                         {/* Display the capitalized category name */}
-                        <span>{t(`${category}.title`)}</span>
+                        <span>{t(`Pages.${category}.title`)}</span>
                         <div className="flex items-center space-x-2">
                           <Checkbox
                             // Check if all permissions in this category are selected by permission.id

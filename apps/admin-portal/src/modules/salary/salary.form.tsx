@@ -498,6 +498,7 @@ export function SalaryForm({
         dummyData={() => process.env.NODE_ENV === "development" && generateDummyEmployee()}
       >
         <EmployeeForm
+          nestedForm
           formHtmlId="employee-form"
           onSuccess={() => {
             setIsEmployeeSaving(false);

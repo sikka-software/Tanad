@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import FormSectionHeader from "@root/src/components/forms/form-section-header";
 import NotesSection from "@root/src/components/forms/notes-section";
 import { getNotesValue } from "@root/src/lib/utils";
 import { PlusCircle, Trash2Icon } from "lucide-react";
@@ -51,6 +52,7 @@ export function EmployeeForm({
   onSuccess,
   defaultValues,
   editMode,
+  nestedForm,
 }: ModuleFormProps<EmployeeUpdateData | EmployeeCreateData>) {
   const t = useTranslations();
   const locale = useLocale();
@@ -423,18 +425,14 @@ export function EmployeeForm({
             </div>
           </div>
 
-          <div className="bg-muted sticky top-12 z-10 flex !min-h-12 items-center justify-between gap-4 border-y border-b px-2">
-            <h2 className="ms-2 text-xl font-bold">{t("Employees.salary_section_title")}</h2>
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => append({ type: "", amount: 0 })}
-              disabled={isEmployeeSaving}
-            >
-              <PlusCircle className="me-2 size-4" />
-              {t("Employees.form.salary.add_component")}
-            </Button>
-          </div>
+          <FormSectionHeader
+            title={t("Employees.salary_section_title")}
+            onCreate={() => append({ type: "", amount: 0 })}
+            onCreateText={t("Employees.form.salary.add_component")}
+            onCreateDisabled={isEmployeeSaving}
+            isError={false}
+            inDialog={editMode || nestedForm}
+          />
 
           <div className="form-container">
             <FormLabel>{t("Employees.form.salary.label")}</FormLabel>
@@ -518,7 +516,7 @@ export function EmployeeForm({
           </div>
 
           <NotesSection
-            inDialog={editMode}
+            inDialog={editMode || nestedForm}
             control={form.control}
             title={t("Employees.form.notes.label")}
           />

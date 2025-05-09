@@ -69,24 +69,24 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
   const handleExportCSV = async () => {
     setPdfData(null);
     setIsProcessingExport(true);
-    const toastId = toast.loading(t("ActivityLogs.export.loading"));
+    const toastId = toast.loading(t("Activity.export.loading"));
     try {
       const logsToExport = await exportActivities(filters);
 
       if (logsToExport.length === 0) {
-        toast.info(t("ActivityLogs.export.noData"), { id: toastId });
+        toast.info(t("Activity.export.noData"), { id: toastId });
         return;
       }
 
       const headers = [
-        { label: t("ActivityLogs.export.headers.timestamp"), key: "created_at" },
-        { label: t("ActivityLogs.export.headers.userEmail"), key: "user_email" },
-        { label: t("ActivityLogs.export.headers.userName"), key: "user_full_name" },
-        { label: t("ActivityLogs.export.headers.actionType"), key: "action_type" },
-        { label: t("ActivityLogs.export.headers.targetType"), key: "target_type" },
-        { label: t("ActivityLogs.export.headers.targetName"), key: "target_name" },
-        { label: t("ActivityLogs.export.headers.targetId"), key: "target_id" },
-        { label: t("ActivityLogs.export.headers.details"), key: "details" },
+        { label: t("Activity.export.headers.timestamp"), key: "created_at" },
+        { label: t("Activity.export.headers.userEmail"), key: "user_email" },
+        { label: t("Activity.export.headers.userName"), key: "user_full_name" },
+        { label: t("Activity.export.headers.actionType"), key: "action_type" },
+        { label: t("Activity.export.headers.targetType"), key: "target_type" },
+        { label: t("Activity.export.headers.targetName"), key: "target_name" },
+        { label: t("Activity.export.headers.targetId"), key: "target_id" },
+        { label: t("Activity.export.headers.details"), key: "details" },
       ];
 
       const formattedData = logsToExport.map((log) => ({
@@ -100,10 +100,10 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
         headers,
         `activity_logs_${format(new Date(), "yyyyMMddHHmmss")}.csv`,
       );
-      toast.success(t("ActivityLogs.export.successCSV"), { id: toastId });
+      toast.success(t("Activity.export.successCSV"), { id: toastId });
     } catch (error) {
       console.error("Failed to export activity logs as CSV:", error);
-      toast.error(t("ActivityLogs.export.errorCSV"), { id: toastId });
+      toast.error(t("Activity.export.errorCSV"), { id: toastId });
     } finally {
       setIsProcessingExport(false);
     }
@@ -112,21 +112,21 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
   const handlePreparePDF = async () => {
     setPdfData(null);
     setIsProcessingExport(true);
-    const toastId = toast.loading(t("ActivityLogs.export.preparingPDF"));
+    const toastId = toast.loading(t("Activity.export.preparingPDF"));
     try {
       const logsToExport = await exportActivities(filters);
 
       if (logsToExport.length === 0) {
-        toast.info(t("ActivityLogs.export.noData"), { id: toastId });
+        toast.info(t("Activity.export.noData"), { id: toastId });
         setPdfData([]);
         return;
       }
 
       setPdfData(logsToExport);
-      toast.success(t("ActivityLogs.export.readyPDF"), { id: toastId, duration: 2000 });
+      toast.success(t("Activity.export.readyPDF"), { id: toastId, duration: 2000 });
     } catch (error) {
       console.error("Failed to prepare activity logs for PDF export:", error);
-      toast.error(t("ActivityLogs.export.errorPDF"), { id: toastId });
+      toast.error(t("Activity.export.errorPDF"), { id: toastId });
       setPdfData(null);
     } finally {
       setTimeout(() => setIsProcessingExport(false), 500);
@@ -137,12 +137,10 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
     if (!pdfData || pdfData.length === 0 || isGeneratingLink) return;
 
     setIsGeneratingLink(true);
-    const toastId = toast.loading(t("ActivityLogs.export.generatingPDF"));
+    const toastId = toast.loading(t("Activity.export.generatingPDF"));
 
     try {
-      const docElement = (
-        <ActivityLogPDFDocument data={pdfData} title={t("ActivityLogs.pdfTitle")} />
-      );
+      const docElement = <ActivityLogPDFDocument data={pdfData} title={t("Activity.pdfTitle")} />;
       const blob = await pdf(docElement).toBlob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -152,10 +150,10 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      toast.success(t("ActivityLogs.export.successPDF"), { id: toastId });
+      toast.success(t("Activity.export.successPDF"), { id: toastId });
     } catch (error) {
       console.error("Failed to generate or download PDF:", error);
-      toast.error(t("ActivityLogs.export.errorPDF"), { id: toastId });
+      toast.error(t("Activity.export.errorPDF"), { id: toastId });
     } finally {
       setIsGeneratingLink(false);
     }
@@ -168,7 +166,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
           <Input
             type="search"
-            placeholder={t("ActivityLogs.filters.search")}
+            placeholder={t("Activity.filters.search")}
             className="w-full ps-8"
             value={filters.searchQuery}
             onChange={(e) => setFilters({ searchQuery: e.target.value })}
@@ -191,32 +189,28 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
             >
               <div className="grid grid-cols-1 gap-4 rounded-md border p-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {t("ActivityLogs.filters.event_type")}
-                  </label>
+                  <label className="text-sm font-medium">{t("Activity.filters.event_type")}</label>
                   <Select
                     value={filters.eventType}
                     onValueChange={(value) => setFilters({ eventType: value })}
                     dir={locale === "ar" ? "rtl" : "ltr"}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={t("ActivityLogs.filters.select_event_type")} />
+                      <SelectValue placeholder={t("Activity.filters.select_event_type")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("ActivityLogs.filters.all_events")}</SelectItem>
-                      <SelectItem value="created">{t("ActivityLogs.filters.create")}</SelectItem>
-                      <SelectItem value="updated">{t("ActivityLogs.filters.update")}</SelectItem>
-                      <SelectItem value="deleted">{t("ActivityLogs.filters.delete")}</SelectItem>
-                      <SelectItem value="duplicated">
-                        {t("ActivityLogs.filters.duplicate")}
-                      </SelectItem>
+                      <SelectItem value="all">{t("Activity.filters.all_events")}</SelectItem>
+                      <SelectItem value="created">{t("Activity.filters.create")}</SelectItem>
+                      <SelectItem value="updated">{t("Activity.filters.update")}</SelectItem>
+                      <SelectItem value="deleted">{t("Activity.filters.delete")}</SelectItem>
+                      <SelectItem value="duplicated">{t("Activity.filters.duplicate")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <Label>{t("ActivityLogs.filters.date_range")}</Label>
+                  <Label>{t("Activity.filters.date_range")}</Label>
                   <DatePicker
-                    placeholder={t("ActivityLogs.filters.select_date_range")}
+                    placeholder={t("Activity.filters.select_date_range")}
                     date={filters.dateRange}
                     onSelect={(d) => {
                       if (d === undefined || (d && "from" in d)) {
@@ -229,7 +223,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t("ActivityLogs.filters.user")}</label>
+                  <label className="text-sm font-medium">{t("Activity.filters.user")}</label>
                   <MultiSelect
                     options={
                       users?.map((user) => ({
@@ -246,7 +240,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                     }
                     onValueChange={(selectedUserIds) => setFilters({ user: selectedUserIds })}
                     value={filters.user}
-                    placeholder={t("ActivityLogs.filters.selectUser")}
+                    placeholder={t("Activity.filters.selectUser")}
                     className="w-full"
                     loading={isLoadingUsers}
                   />
@@ -254,7 +248,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                 <div className="flex justify-end">
                   <Button variant="ghost" size="sm" onClick={handleClearFilters}>
                     <X className="me-2 h-4 w-4" />
-                    {t("ActivityLogs.filters.clearFilters")}
+                    {t("Activity.filters.clearFilters")}
                   </Button>
                 </div>
               </div>
@@ -285,7 +279,7 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                   direction: "ltr",
                 }}
               >
-                {t("ActivityLogs.export.exportAs", {
+                {t("Activity.export.exportAs", {
                   fileType: "CSV",
                 })}
               </DropdownMenuItem>
@@ -316,20 +310,20 @@ export function ActivityLogFilters({}: ActivityLogFiltersProps) {
                 )}
               >
                 {isProcessingExport ? (
-                  <span>{t("ActivityLogs.export.preparingPDFShort")}</span>
+                  <span>{t("Activity.export.preparingPDFShort")}</span>
                 ) : isGeneratingLink ? (
-                  <span>{t("ActivityLogs.export.generatingPDF")}</span>
+                  <span>{t("Activity.export.generatingPDF")}</span>
                 ) : pdfData === null ? (
                   <span>
-                    {t("ActivityLogs.export.exportAs", {
+                    {t("Activity.export.exportAs", {
                       fileType: "PDF",
                     })}
                   </span>
                 ) : pdfData.length === 0 ? (
-                  <span className="text-muted-foreground">{t("ActivityLogs.export.noData")}</span>
+                  <span className="text-muted-foreground">{t("Activity.export.noData")}</span>
                 ) : (
                   <span>
-                    {t("ActivityLogs.export.downloadPDF", {
+                    {t("Activity.export.downloadPDF", {
                       fileType: "PDF",
                     })}
                   </span>

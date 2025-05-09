@@ -69,7 +69,7 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
       data,
       renderOption,
       renderSelected,
-      addText = "Add Category",
+      addText = "Add New",
       ariaInvalid,
       inCell = false,
       buttonClassName,
@@ -191,11 +191,10 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                   placeholder={props.texts?.searchPlaceholder || "Search"}
                 />
               )}
-              <CommandEmpty>{props.texts?.noItems || "No items found."}</CommandEmpty>
               <div className="flex flex-row items-center gap-2">
                 <Button
                   variant="outline"
-                  className="w-full rounded-none !text-blue-500 dark:!text-blue-400"
+                  className="w-full cursor-pointer rounded-none border-x-0 border-t-0 border-b bg-blue-100 !text-blue-600 hover:bg-blue-200 hover:!text-blue-600 dark:bg-blue-900 dark:!text-blue-300 hover:dark:bg-blue-800 hover:dark:!text-white"
                   onClick={() => {
                     setOpen(false);
                     props.onAddClick?.();
@@ -205,6 +204,8 @@ export const ComboboxAdd = React.forwardRef<HTMLButtonElement, ComboboxAddTypes<
                   <Plus className="size-4" />
                 </Button>
               </div>
+              <CommandEmpty>{props.texts?.noItems || "No items found."}</CommandEmpty>
+
               <CommandList>
                 <CommandGroup className={cn("max-h-[200px]", data.length > 0 && "overflow-y-auto")}>
                   {data.map((item: any, i) => (

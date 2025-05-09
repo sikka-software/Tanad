@@ -127,7 +127,7 @@ export default function RoleCard({ role, onActionClick, disableActions = false }
                       <Popover key={category}>
                         <PopoverTrigger asChild>
                           <Badge variant="secondary" className="cursor-pointer font-normal">
-                            {t(`${displayCategory}.title`)} ({assignedCount})
+                            {t(`Pages.${displayCategory}.title`)} ({assignedCount})
                           </Badge>
                         </PopoverTrigger>
                         <PopoverContent className="w-fit p-0" dir={locale === "ar" ? "rtl" : "ltr"}>

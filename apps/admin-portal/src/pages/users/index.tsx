@@ -183,7 +183,7 @@ export default function UsersPage() {
   );
 }
 
-UsersPage.messages = ["Notes", "Pages", "Users", "General"];
+UsersPage.messages = ["Notes", "Pages", "Users", "Roles", "General"];
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {

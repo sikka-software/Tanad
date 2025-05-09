@@ -182,7 +182,7 @@ const GeneralSettings = ({
                       <FormLabel>{t("Settings.general.profile.name")}</FormLabel>
                       <FormControl>
                         {isLoadingProfile ? (
-                          <Skeleton className="h-10 w-full" />
+                          <Skeleton className="h-8 w-full" />
                         ) : (
                           <Input {...field} disabled={isSaving} />
                         )}
@@ -199,7 +199,7 @@ const GeneralSettings = ({
                       <FormLabel>{t("Settings.general.profile.email")}</FormLabel>
                       <FormControl>
                         {isLoadingProfile ? (
-                          <Skeleton className="h-10 w-full" />
+                          <Skeleton className="h-8 w-full" />
                         ) : (
                           <Input type="email" {...field} disabled={true} />
                         )}
@@ -223,7 +223,7 @@ const GeneralSettings = ({
                     <FormItem>
                       <FormLabel>{t("Settings.general.regional.language")}</FormLabel>
                       {isLoadingProfile ? (
-                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-8 w-full" />
                       ) : (
                         <Select
                           disabled={isSaving}
@@ -260,7 +260,7 @@ const GeneralSettings = ({
                       <FormItem>
                         <FormLabel>{t("Settings.general.regional.timezone")}</FormLabel>
                         {isLoadingProfile ? (
-                          <Skeleton className="h-10 w-full" />
+                          <Skeleton className="h-8 w-full" />
                         ) : (
                           <BetaFlag
                             title={t("Flags.timezone_soon.title")}

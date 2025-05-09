@@ -50,6 +50,7 @@ export interface ModuleFormProps<T> {
   onSuccess?: () => void;
   defaultValues?: T | null;
   editMode?: boolean;
+  nestedForm?: boolean;
 }
 
 export interface AddressProps {
