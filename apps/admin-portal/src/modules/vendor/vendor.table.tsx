@@ -74,11 +74,6 @@ const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       header: t("form.products.label"),
       validationSchema: z.string().optional(),
     },
-    {
-      accessorKey: "notes",
-      header: t("form.notes.label"),
-      validationSchema: z.string().optional(),
-    },
   ];
 
   const handleEdit = async (rowId: string, columnId: string, value: unknown) => {

@@ -115,11 +115,6 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       header: t("Offices.form.zip_code.label"),
       validationSchema: z.string().min(1, t("Offices.form.zip_code.required")),
     },
-    {
-      accessorKey: "notes",
-      header: t("Offices.form.notes.label"),
-      validationSchema: z.string().optional(),
-    },
 
     {
       accessorKey: "status",

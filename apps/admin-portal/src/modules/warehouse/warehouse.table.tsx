@@ -122,11 +122,7 @@ const WarehouseTable = ({
       header: t("Warehouses.form.zip_code.label"),
       validationSchema: z.string().min(1, t("Warehouses.form.zip_code.required")),
     },
-    {
-      accessorKey: "notes",
-      header: t("Warehouses.form.notes.label"),
-      validationSchema: z.string().optional(),
-    },
+
     {
       accessorKey: "status",
       header: t("Warehouses.form.status.label"),
