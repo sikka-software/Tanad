@@ -38,59 +38,6 @@ interface JobListingPreviewProps {
   error?: string;
 }
 
-export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = async (context) => {
-  const { id } = context.params || {};
-  const supabase = createClient(context);
-
-  if (!id || typeof id !== "string") {
-    return { notFound: true }; // Or handle invalid ID appropriately
-  }
-
-  try {
-    // Fetch the job listing and nest the full job details through the junction table
-    const { data, error } = await supabase
-      .from("job_listings")
-      .select(
-        `
-        *,
-        job_listing_jobs (
-          jobs (
-            *
-          )
-        )
-      `,
-      )
-      .eq("id", id)
-      .single();
-
-    if (error) {
-      // Handle specific errors like not found (PGRST116) or others
-      if (error.code === "PGRST116") {
-        console.warn(`Job listing not found for ID: ${id}`);
-        return { props: { jobListing: null } }; // Return null if not found
-      }
-      console.error(`Error fetching job listing ${id}:`, error);
-      throw new Error(error.message); // Rethrow other errors
-    }
-
-    return {
-      props: {
-        jobListing: data as JobListingWithJobs, // Cast to the expected structure
-        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
-      },
-    };
-  } catch (error: any) {
-    console.error("Failed in getServerSideProps:", error);
-    return {
-      props: {
-        jobListing: null,
-        error: error.message || "Failed to load job listing.",
-        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
-      },
-    };
-  }
-};
-
 // --- Helper function to adapt Job to JobCard/Modal expected props ---
 // Adjust this based on the actual props needed by JobCard and JobDetailsModal
 // This might involve mapping fields or ensuring the components accept the 'Job' type.
@@ -172,7 +119,10 @@ export default function JobListingPreviewPage({
     <main className="bg-background min-h-screen">
       <Head>
         {/* Add Head details if needed, e.g., listing title */}
-        <title>{jobListing.title || "Career Opportunities"}</title>
+        <title>
+          {t("Pages.JobListings.single") + " | " + jobListing.title ||
+            t("Pages.JobListings.single")}
+        </title>
         <meta
           name="description"
           content={jobListing.description || "View available job positions."}
@@ -276,3 +226,56 @@ export default function JobListingPreviewPage({
     </main>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<JobListingPreviewProps> = async (context) => {
+  const { id } = context.params || {};
+  const supabase = createClient(context);
+
+  if (!id || typeof id !== "string") {
+    return { notFound: true }; // Or handle invalid ID appropriately
+  }
+
+  try {
+    // Fetch the job listing and nest the full job details through the junction table
+    const { data, error } = await supabase
+      .from("job_listings")
+      .select(
+        `
+        *,
+        job_listing_jobs (
+          jobs (
+            *
+          )
+        )
+      `,
+      )
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      // Handle specific errors like not found (PGRST116) or others
+      if (error.code === "PGRST116") {
+        console.warn(`Job listing not found for ID: ${id}`);
+        return { props: { jobListing: null } }; // Return null if not found
+      }
+      console.error(`Error fetching job listing ${id}:`, error);
+      throw new Error(error.message); // Rethrow other errors
+    }
+
+    return {
+      props: {
+        jobListing: data as JobListingWithJobs, // Cast to the expected structure
+        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
+      },
+    };
+  } catch (error: any) {
+    console.error("Failed in getServerSideProps:", error);
+    return {
+      props: {
+        jobListing: null,
+        error: error.message || "Failed to load job listing.",
+        messages: (await import(`../../../../locales/${context.locale}.json`)).default,
+      },
+    };
+  }
+};

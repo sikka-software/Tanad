@@ -52,6 +52,18 @@ const RowActionsPopover = ({
         align="center"
         dir={locale === "ar" ? "rtl" : "ltr"}
       >
+        {onPreview && (
+          <Button
+            onClick={onPreview}
+            variant="ghost"
+            className={buttonClasses}
+            size="default"
+            type="button"
+          >
+            <Eye className="size-4" />
+            {t("General.preview")}
+          </Button>
+        )}
         {onEdit && (
           <Button
             onClick={onEdit}
@@ -77,18 +89,7 @@ const RowActionsPopover = ({
             {t("General.duplicate")}
           </Button>
         )}
-        {onPreview && (
-          <Button
-            onClick={onPreview}
-            variant="ghost"
-            className={buttonClasses}
-            size="default"
-            type="button"
-          >
-            <Eye className="size-4" />
-            {t("General.preview")}
-          </Button>
-        )}
+
         {onView && (
           <Button
             onClick={onView}
