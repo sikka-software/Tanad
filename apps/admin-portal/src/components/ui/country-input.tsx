@@ -119,7 +119,6 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                   role="combobox"
                   type="button"
                   variant="outline"
-                  // size="sm"
                   disabled={disabled}
                   aria-expanded={open}
                   className={cn(
@@ -130,25 +129,13 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                     // inCell && "h-10 rounded-none border-none",
                     // buttonClassName,
                   )}
-                  // className={cn(
-                  //   "ring-offset-background focus-visible:ring-ring inline-flex w-full items-center justify-between rounded-md border py-2 text-sm font-normal transition-all select-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
-                  //   props.preview
-                  //     ? "cursor-default rounded-none border-transparent px-0"
-                  //     : "bg-background px-3",
-                  // )}
                 >
                   {selectedItem
                     ? renderSelected
                       ? renderSelected(selectedItem)
                       : getProperty(selectedItem, labelKey)
                     : props.texts?.placeholder || ". . ."}
-                  {/* {value
-                    ? getProperty(
-                        data.find((item: any) => item[valueKey] === value) ||
-                          {},
-                        labelKey,
-                      )
-                    : props.texts?.placeholder || ". . ."} */}
+
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={cn(
@@ -166,12 +153,10 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
                     <path d="m6 9 6 6 6-6" />
                   </svg>
                 </Button>
-                {/* <HelperText helperText={props.helperText} /> */}
               </div>
             )}
           </PopoverTrigger>
           <PopoverContent
-            // sideOffset={0}
             align="start"
             className={cn(
               "w-[var(--radix-popover-trigger-width)] p-0",
@@ -179,7 +164,6 @@ const CountryInput = React.forwardRef<HTMLDivElement, CountryInputTypes<any>>(
               popoverClassName,
             )}
             dir={dir}
-            // container={containerRef.current}
           >
             <Command
               filter={

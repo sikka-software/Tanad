@@ -425,6 +425,7 @@ export function EmployeeForm({
                         onChange={field.onChange}
                         disabled={isEmployeeSaving}
                         dir={locale === "ar" ? "rtl" : "ltr"}
+                        labelKey={locale === "ar" ? "arabic_label" : "label"}
                         texts={{
                           placeholder: t("Employees.form.nationality.placeholder"),
                           searchPlaceholder: t("Forms.country.search_placeholder"),
