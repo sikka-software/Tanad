@@ -371,8 +371,10 @@ export default function Dashboard() {
           {Object.entries(
             Object.entries(ModulesOptions).reduce(
               (acc, [key, module]) => {
-                // Use a default category if somehow undefined, though type system should prevent this
-                const category = module.category || "Uncategorized";
+                if (!module.category) { // If category is empty (e.g., "" or undefined)
+                  return acc; // Skip this module, don't add it to any category
+                }
+                const category = module.category; // Category is guaranteed to be a non-empty string here
                 if (!acc[category]) {
                   acc[category] = [];
                 }

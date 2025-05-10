@@ -266,6 +266,8 @@
     },
     "Finance": { "title": "المالية" },
     "CRM": { "title": "المبيعات والتسويق" },
+    "Operations": { "title": "العمليات" },
+    "IT": { "title": "تقنية المعلومات" },
     "Administration": { "title": "الإدارة" },
     "Accounting": { "title": "المحاسبة" },
     "HumanResources": { "title": "الموارد البشرية" },

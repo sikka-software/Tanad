@@ -34,8 +34,31 @@ const ModulesOptions: Record<
     translationKey: string;
     url: string;
     category: string;
+    dashboardOptions?: {
+      size?: "sm" | "md" | "lg";
+    };
   }
 > = {
+  users: {
+    icon: UserRoundCog,
+    label: "Pages.Users.title",
+    translationKey: "Pages.Users.title",
+    url: "/users",
+    category: "Administration",
+    dashboardOptions: {
+      size: "sm",
+    },
+  },
+  roles: {
+    icon: ShieldPlus,
+    label: "Pages.Roles.title",
+    translationKey: "Pages.Roles.title",
+    url: "/roles",
+    category: "Administration",
+    dashboardOptions: {
+      size: "sm",
+    },
+  },
   dashboard: {
     icon: LayoutDashboard,
     label: "Pages.Dashboard.title",
@@ -78,13 +101,7 @@ const ModulesOptions: Record<
     url: "/companies",
     category: "CRM",
   },
-  roles: {
-    icon: ShieldPlus,
-    label: "Pages.Roles.title",
-    translationKey: "Pages.Roles.title",
-    url: "/roles",
-    category: "Administration",
-  },
+
   applicants: {
     icon: Users,
     label: "Pages.Applicants.title",
@@ -197,13 +214,7 @@ const ModulesOptions: Record<
     url: "/salaries",
     category: "Finance",
   },
-  users: {
-    icon: UserRoundCog,
-    label: "Pages.Users.title",
-    translationKey: "Pages.Users.title",
-    url: "/users",
-    category: "Administration",
-  },
+
   settings: {
     icon: Settings,
     label: "Pages.Settings.title",

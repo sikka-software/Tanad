@@ -65,7 +65,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
                   className="h-8 ps-1.5"
                   onClick={() => setOpenCommandMenu(true)}
                 >
-                  <kbd className="bg-muted pointer-events-none hidden h-5 items-center gap-1 rounded-md border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
+                  <kbd className="bg-muted pointer-events-none hidden h-5 items-center gap-1 rounded-inner-1 border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
                     <span className="text-xs">⌘</span>K
                   </kbd>
                   <span className="text-muted-foreground text-xs">{t("General.quick_access")}</span>
