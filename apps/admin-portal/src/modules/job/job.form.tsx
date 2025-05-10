@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import NumberInputWithButtons from "@root/src/components/ui/number-input-buttons";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, ShoppingCart, Store, Warehouse } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -59,6 +60,7 @@ const createJobFormSchema = (t: (key: string) => string) =>
     start_date: z.date().optional(),
     end_date: z.date().optional(),
     status: z.string().default("active"),
+    available_positions: z.string().optional(),
   });
 
 export type JobFormValues = z.input<ReturnType<typeof createJobFormSchema>>;
@@ -105,6 +107,7 @@ export function JobForm({
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
       status: defaultValues?.status || "active",
+      available_positions: (defaultValues as JobCreateData)?.available_positions || "1",
     },
   });
 
@@ -140,6 +143,7 @@ export function JobForm({
               status: data.status as "active" | "inactive" | "draft" | "archived" | null,
               start_date: data.start_date?.toISOString() || null,
               end_date: data.end_date?.toISOString() || null,
+              available_positions: data.available_positions?.trim() || null,
             },
           },
           {
@@ -166,6 +170,7 @@ export function JobForm({
             status: data.status as "active" | "inactive" | "draft" | "archived" | null,
             start_date: data.start_date?.toISOString() || null,
             end_date: data.end_date?.toISOString() || null,
+            available_positions: data.available_positions?.trim() || null,
             user_id: user?.id,
           },
           {
@@ -340,6 +345,24 @@ export function JobForm({
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="available_positions"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t("Jobs.form.available_positions.label")}</FormLabel>
+                <FormControl>
+                  <NumberInputWithButtons
+                    defaultValue={field.value ? parseInt(field.value) : 0}
+                    minValue={0}
+                    onChange={(value) => field.onChange(value?.toString() || "")}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}

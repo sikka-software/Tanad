@@ -962,6 +962,7 @@ export type Database = {
       }
       jobs: {
         Row: {
+          available_positions: string | null
           benefits: string | null
           created_at: string
           department: string | null
@@ -981,6 +982,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          available_positions?: string | null
           benefits?: string | null
           created_at?: string
           department?: string | null
@@ -1000,6 +1002,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          available_positions?: string | null
           benefits?: string | null
           created_at?: string
           department?: string | null

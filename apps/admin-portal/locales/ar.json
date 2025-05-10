@@ -3011,6 +3011,10 @@
         "label": "الوصف",
         "placeholder": "أدخل وصف الوظيفة"
       },
+      "available_positions": {
+        "label": "المناصب المتاحة",
+        "placeholder": "أدخل المناصب المتاحة"
+      },
       "requirements": {
         "label": "المتطلبات",
         "placeholder": "أدخل متطلبات الوظيفة"
