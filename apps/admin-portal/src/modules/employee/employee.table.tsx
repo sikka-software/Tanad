@@ -9,6 +9,7 @@ import TableSkeleton from "@/ui/table-skeleton";
 import { ModuleTableProps } from "@/types/common.type";
 
 import { useDepartments } from "@/department/department.hooks";
+import { useJobs } from "@/job/job.hooks";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
@@ -24,6 +25,7 @@ const EmployeesTable = ({
 }: ModuleTableProps<Employee>) => {
   const t = useTranslations();
   const { data: departments } = useDepartments();
+  const { data: jobs } = useJobs();
   const { mutateAsync: updateEmployee } = useUpdateEmployee();
   const selectedRows = useEmployeeStore((state) => state.selectedRows);
   const setSelectedRows = useEmployeeStore((state) => state.setSelectedRows);
@@ -64,6 +66,11 @@ const EmployeesTable = ({
       accessorKey: "job_id",
       header: t("Employees.form.job.label"),
       validationSchema: z.string().min(1, t("Employees.form.job.required")),
+      cell: ({ row }) => {
+        const jobId = row.original.job_id;
+        const job = jobs?.find((j) => j.id === jobId);
+        return job ? job.title : jobId || "-";
+      },
     },
     {
       accessorKey: "nationality",
