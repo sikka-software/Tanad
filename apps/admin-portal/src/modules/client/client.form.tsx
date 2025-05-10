@@ -17,6 +17,8 @@ import { createAddressSchema } from "@/components/forms/address-schema";
 import NotesSection from "@/components/forms/notes-section";
 import PhoneInput from "@/components/ui/phone-input";
 
+import { Constants } from "@/lib/database.types";
+
 import { ModuleFormProps, CommonStatus } from "@/types/common.type";
 
 import { useCreateClient, useUpdateClient } from "@/client/client.hooks";
@@ -37,7 +39,7 @@ export const createClientSchema = (t: (key: string) => string) => {
       .email(t("Clients.form.validation.email_invalid")),
     phone: z.string().min(1, t("Clients.form.validation.phone_required")),
     company: z.string().nullish(),
-    status: 
+    status: z.enum(CommonStatus),
     notes: z.any().optional().nullable(),
   });
 
@@ -73,13 +75,15 @@ export function ClientForm({
       email: defaultValues?.email || "",
       phone: defaultValues?.phone || "",
       company: defaultValues?.company || undefined,
-      short_address: defaultValues?.short_address || "",
-      building_number: defaultValues?.building_number || "",
-      street_name: defaultValues?.street_name || "",
-      city: defaultValues?.city || "",
-      region: defaultValues?.region || "",
-      country: defaultValues?.country || "",
-      zip_code: defaultValues?.zip_code || "",
+      short_address:
+        typeof defaultValues?.short_address === "string" ? defaultValues.short_address : "",
+      building_number:
+        typeof defaultValues?.building_number === "string" ? defaultValues.building_number : "",
+      street_name: typeof defaultValues?.street_name === "string" ? defaultValues.street_name : "",
+      city: typeof defaultValues?.city === "string" ? defaultValues.city : "",
+      region: typeof defaultValues?.region === "string" ? defaultValues.region : "",
+      country: typeof defaultValues?.country === "string" ? defaultValues.country : "",
+      zip_code: typeof defaultValues?.zip_code === "string" ? defaultValues.zip_code : "",
       notes: getNotesValue(defaultValues) || "",
       status: defaultValues?.status || "active",
     },
@@ -115,13 +119,15 @@ export function ClientForm({
               email: data.email.trim(),
               phone: data.phone.trim(),
               company: data.company || null,
-              short_address: data.short_address?.trim() || null,
-              building_number: data.building_number?.trim() || null,
-              street_name: data.street_name?.trim() || null,
-              city: data.city?.trim() || null,
-              region: data.region?.trim() || null,
-              country: data.country?.trim() || null,
-              zip_code: data.zip_code?.trim() || null,
+              short_address:
+                typeof data.short_address === "string" ? data.short_address.trim() : null,
+              building_number:
+                typeof data.building_number === "string" ? data.building_number.trim() : null,
+              street_name: typeof data.street_name === "string" ? data.street_name.trim() : null,
+              city: typeof data.city === "string" ? data.city.trim() : null,
+              region: typeof data.region === "string" ? data.region.trim() : null,
+              country: typeof data.country === "string" ? data.country.trim() : null,
+              zip_code: typeof data.zip_code === "string" ? data.zip_code.trim() : null,
               status: data.status,
               notes: data.notes,
             },
@@ -141,13 +147,15 @@ export function ClientForm({
             email: data.email.trim(),
             phone: data.phone.trim(),
             company: data.company || null,
-            short_address: data.short_address?.trim() || null,
-            building_number: data.building_number?.trim() || null,
-            street_name: data.street_name?.trim() || null,
-            city: data.city?.trim() || null,
-            region: data.region?.trim() || null,
-            country: data.country?.trim() || null,
-            zip_code: data.zip_code?.trim() || null,
+            short_address:
+              typeof data.short_address === "string" ? data.short_address.trim() : null,
+            building_number:
+              typeof data.building_number === "string" ? data.building_number.trim() : null,
+            street_name: typeof data.street_name === "string" ? data.street_name.trim() : null,
+            city: typeof data.city === "string" ? data.city.trim() : null,
+            region: typeof data.region === "string" ? data.region.trim() : null,
+            country: typeof data.country === "string" ? data.country.trim() : null,
+            zip_code: typeof data.zip_code === "string" ? data.zip_code.trim() : null,
             status: data.status,
             notes: data.notes,
             additional_number: null,

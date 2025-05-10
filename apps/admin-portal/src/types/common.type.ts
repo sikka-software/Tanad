@@ -1,9 +1,9 @@
 import { currencies } from "@/lib/constants/currencies";
 import { locales } from "@/lib/constants/locales";
 
-import { Database } from "../lib/database.types";
+import { Database, Constants } from "../lib/database.types";
 
-export type CommonStatus = Database["public"]["Enums"]["common_status"];
+export const CommonStatus = Constants.public.Enums.common_status;
 
 export type LanguageProps = (typeof locales)[number];
 export type CurrencyProps = (typeof currencies)[number];

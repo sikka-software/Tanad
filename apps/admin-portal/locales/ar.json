@@ -2638,6 +2638,15 @@
         "placeholder": "اختر أو أضف شركة",
         "search_placeholder": "ابحث عن الشركات...",
         "no_companies": "لم يتم العثور على شركات"
+      },
+      "status": {
+        "label": "الحالة",
+        "placeholder": "اختر الحالة",
+        "required": "الحالة مطلوبة",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "draft": "مسودة",
+        "archived": "مؤرشف"
       }
     },
     "success": {
