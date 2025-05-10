@@ -102,7 +102,7 @@ export default function DepartmentsPage() {
         title={t("Pages.Departments.title")}
         description={t("Pages.Departments.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={departments?.length} itemsText={t("Pages.Departments.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -121,7 +121,6 @@ export default function DepartmentsPage() {
             }
             createLabel={t("Pages.Departments.add")}
             searchPlaceholder={t("Pages.Departments.search")}
-            count={departments?.length}
             hideOptions={departments?.length === 0}
           />
         )}

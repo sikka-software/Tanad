@@ -113,7 +113,7 @@ export default function PurchasesPage() {
         title={t("Pages.Purchases.title")}
         description={t("Pages.Purchases.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={purchases?.length} itemsText={t("Pages.Purchases.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -132,7 +132,6 @@ export default function PurchasesPage() {
             }
             createLabel={t("Pages.Purchases.add")}
             searchPlaceholder={t("Pages.Purchases.search")}
-            count={displayData?.length}
             hideOptions={displayData?.length === 0}
           />
         )}

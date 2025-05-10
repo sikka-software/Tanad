@@ -77,11 +77,12 @@ const EmployeesTable = ({
     {
       accessorKey: "nationality",
       header: t("Employees.form.nationality.label"),
+      maxSize: 100,
       validationSchema: z.string().min(1, t("Employees.form.nationality.required")),
     },
     {
       accessorKey: "status",
-      maxSize: 10,
+      maxSize: 100,
       header: t("Employees.form.status.label"),
       validationSchema: z.enum(["active", "inactive", "on_leave", "terminated", "resigned"]),
       cellType: "select",
@@ -210,6 +211,7 @@ const EmployeesTable = ({
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditEmployee}
       canDuplicateAction={canDuplicateEmployee}
       canViewAction={canViewEmployee}

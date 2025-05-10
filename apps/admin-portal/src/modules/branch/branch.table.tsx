@@ -122,6 +122,7 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
     },
     {
       accessorKey: "status",
+      maxSize: 80,
       header: t("Branches.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
       cellType: "status",
@@ -189,6 +190,7 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditBranch}
       canDuplicateAction={canDuplicateBranch}
       canViewAction={canViewBranch}

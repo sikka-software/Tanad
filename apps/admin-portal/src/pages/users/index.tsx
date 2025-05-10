@@ -107,7 +107,7 @@ export default function UsersPage() {
   return (
     <div>
       <CustomPageMeta title={t("Pages.Users.title")} description={t("Pages.Users.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={users?.length} itemsText={t("Pages.Users.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -124,7 +124,6 @@ export default function UsersPage() {
             onAddClick={handleAddClick}
             createLabel={t("Pages.Users.add")}
             searchPlaceholder={t("Pages.Users.search")}
-            count={users?.length}
             hideOptions={users?.length === 0}
           />
         )}

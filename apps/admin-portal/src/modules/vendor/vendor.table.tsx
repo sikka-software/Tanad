@@ -122,6 +122,7 @@ const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditVendor}
       canDuplicateAction={canDuplicateVendor}
       canViewAction={canViewVendor}

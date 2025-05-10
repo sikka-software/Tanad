@@ -97,7 +97,7 @@ export default function CompaniesPage() {
         title={t("Pages.Companies.title")}
         description={t("Pages.Companies.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={companies?.length} itemsText={t("Pages.Companies.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -116,7 +116,6 @@ export default function CompaniesPage() {
             }
             createLabel={t("Pages.Companies.create")}
             searchPlaceholder={t("Pages.Companies.search")}
-            count={companies?.length}
             hideOptions={companies?.length === 0}
           />
         )}

@@ -132,6 +132,7 @@ const ExpensesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditExpense}
       canDuplicateAction={canDuplicateExpense}
       canViewAction={canViewExpense}

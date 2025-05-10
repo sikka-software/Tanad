@@ -95,7 +95,7 @@ export default function ExpensesPage() {
   return (
     <div>
       <CustomPageMeta title={t("Expenses.title")} description={t("Expenses.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={expenses?.length} itemsText={t("Pages.Expenses.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -112,7 +112,6 @@ export default function ExpensesPage() {
             onAddClick={canCreateExpenses ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Expenses.add")}
             searchPlaceholder={t("Pages.Expenses.search")}
-            count={expenses?.length}
             hideOptions={expenses?.length === 0}
           />
         )}

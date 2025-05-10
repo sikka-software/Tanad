@@ -115,6 +115,7 @@ export default function UsersTable({
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditUser}
       canDuplicateAction={canDuplicateUser}
       canViewAction={canViewUser}

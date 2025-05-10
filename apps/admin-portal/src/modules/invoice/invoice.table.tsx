@@ -162,6 +162,7 @@ const InvoicesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditInvoice}
       canDuplicateAction={canDuplicateInvoice}
       canViewAction={canViewInvoice}

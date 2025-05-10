@@ -125,6 +125,7 @@ const WarehouseTable = ({
 
     {
       accessorKey: "status",
+      maxSize: 80,
       header: t("Warehouses.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
       cellType: "status",
@@ -184,6 +185,7 @@ const WarehouseTable = ({
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditWarehouse}
       canDuplicateAction={canDuplicateWarehouse}
       canViewAction={canViewWarehouse}

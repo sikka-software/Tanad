@@ -101,7 +101,7 @@ export default function EmployeesPage() {
   return (
     <div>
       <CustomPageMeta title={t("Employees.title")} description={t("Employees.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={employees?.length} itemsText={t("Pages.Employees.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -120,7 +120,6 @@ export default function EmployeesPage() {
             }
             createLabel={t("Pages.Employees.add")}
             searchPlaceholder={t("Pages.Employees.search")}
-            count={employees?.length}
             hideOptions={employees?.length === 0}
           />
         )}

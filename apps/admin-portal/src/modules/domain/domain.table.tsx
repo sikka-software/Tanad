@@ -67,6 +67,7 @@ const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
     },
     {
       accessorKey: "status",
+      maxSize: 80,
       header: t("Domains.form.status.label"),
       validationSchema: z.enum(["active", "inactive"]),
       cellType: "status",
@@ -124,6 +125,7 @@ const DomainsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditDomain}
       canDuplicateAction={canDuplicateDomain}
       canViewAction={canViewDomain}

@@ -170,6 +170,7 @@ const SalariesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditSalary}
       canDuplicateAction={canDuplicateSalary}
       canViewAction={canViewSalary}

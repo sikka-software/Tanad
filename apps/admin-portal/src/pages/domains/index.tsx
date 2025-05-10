@@ -97,7 +97,7 @@ export default function DomainsPage() {
   return (
     <div>
       <CustomPageMeta title={t("Domains.title")} description={t("Domains.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={domains?.length} itemsText={t("Pages.Domains.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -114,7 +114,6 @@ export default function DomainsPage() {
             onAddClick={canCreateDomains ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Domains.add")}
             searchPlaceholder={t("Pages.Domains.search")}
-            count={domains?.length}
             hideOptions={domains?.length === 0}
           />
         )}

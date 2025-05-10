@@ -92,7 +92,7 @@ export default function CarsPage() {
   return (
     <div>
       <CustomPageMeta title={t("Cars.title")} description={t("Cars.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={cars?.length} itemsText={t("Pages.Cars.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -109,7 +109,6 @@ export default function CarsPage() {
             onAddClick={canCreateCars ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Cars.add")}
             searchPlaceholder={t("Pages.Cars.search")}
-            count={cars?.length}
             hideOptions={cars?.length === 0}
           />
         )}

@@ -123,6 +123,7 @@ const PurchasesTable = ({
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditPurchase}
       canDuplicateAction={canDuplicatePurchase}
       canViewAction={canViewPurchase}

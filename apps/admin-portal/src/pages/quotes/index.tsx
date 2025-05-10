@@ -92,7 +92,7 @@ export default function QuotesPage() {
   return (
     <div>
       <CustomPageMeta title={t("Pages.Quotes.title")} description={t("Pages.Quotes.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={quotes?.length} itemsText={t("Pages.Quotes.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -109,7 +109,6 @@ export default function QuotesPage() {
             onAddClick={canCreateQuotes ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Quotes.add")}
             searchPlaceholder={t("Pages.Quotes.search")}
-            count={quotes?.length}
             hideOptions={quotes?.length === 0}
           />
         )}

@@ -98,7 +98,7 @@ export default function ClientsPage() {
         title={t("Pages.Clients.title")}
         description={t("Pages.Clients.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={clients?.length} itemsText={t("Pages.Clients.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -115,7 +115,6 @@ export default function ClientsPage() {
             onAddClick={canCreateClients ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Clients.add")}
             searchPlaceholder={t("Pages.Clients.search")}
-            count={clients?.length}
             hideOptions={clients?.length === 0}
           />
         )}

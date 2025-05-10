@@ -164,7 +164,6 @@ export default function RolesPage() {
             }}
             createLabel={t("Roles.create_role")}
             searchPlaceholder={t("Roles.search_roles")}
-            count={allRoles?.length}
             hideOptions={allRoles?.length === 0}
           />
         )}

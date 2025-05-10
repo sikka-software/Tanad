@@ -124,6 +124,7 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditClient}
       canDuplicateAction={canDuplicateClient}
       canViewAction={canViewClient}

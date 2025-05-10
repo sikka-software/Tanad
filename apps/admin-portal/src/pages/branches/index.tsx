@@ -102,7 +102,7 @@ export default function BranchesPage() {
         title={t("Pages.Branches.title")}
         description={t("Pages.Branches.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={branches?.length} itemsText={t("Pages.Branches.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -119,7 +119,6 @@ export default function BranchesPage() {
             onAddClick={canCreateBranches ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Branches.add")}
             searchPlaceholder={t("Pages.Branches.search")}
-            count={branches?.length}
             hideOptions={branches?.length === 0}
           />
         )}

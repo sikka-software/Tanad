@@ -39,7 +39,6 @@ export interface PageSearchAndFilterProps extends React.HTMLAttributes<HTMLDivEl
   onAddClick?: () => void;
   createLabel?: string;
   searchPlaceholder?: string;
-  count?: number;
   sortableColumns: SortableColumn[];
   filterableFields?: FilterableField[];
   hideOptions?: boolean;
@@ -54,7 +53,6 @@ const PageSearchAndFilter = ({
   searchPlaceholder = "Search...",
   sortableColumns,
   filterableFields,
-  count,
   hideOptions = false,
   ...props
 }: PageSearchAndFilterProps) => {
@@ -97,11 +95,6 @@ const PageSearchAndFilter = ({
             <Search className="text-muted-foreground absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2" />
           </div>
         )}
-        {count && count > 0 ? (
-          <div className="relative max-w-md flex-1">
-            <span className="text-muted-foreground text-sm">{count}</span>
-          </div>
-        ) : null}
       </div>
 
       <div className="flex items-center gap-2">

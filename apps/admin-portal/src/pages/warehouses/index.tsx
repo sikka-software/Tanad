@@ -102,7 +102,7 @@ export default function WarehousesPage() {
         title={t("Pages.Warehouses.title")}
         description={t("Pages.Warehouses.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={warehouses?.length} itemsText={t("Pages.Warehouses.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -121,7 +121,6 @@ export default function WarehousesPage() {
             }
             createLabel={t("Pages.Warehouses.create")}
             searchPlaceholder={t("Pages.Warehouses.search")}
-            count={warehouses?.length}
             hideOptions={warehouses?.length === 0}
           />
         )}

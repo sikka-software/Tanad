@@ -110,7 +110,7 @@ export default function WebsitesPage() {
         title={t("Pages.Websites.title")}
         description={t("Pages.Websites.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={websites?.length} itemsText={t("Pages.Websites.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -127,7 +127,6 @@ export default function WebsitesPage() {
             onAddClick={canCreateWebsites ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Websites.add")}
             searchPlaceholder={t("Pages.Websites.search")}
-            count={displayData?.length}
             hideOptions={displayData?.length === 0}
           />
         )}

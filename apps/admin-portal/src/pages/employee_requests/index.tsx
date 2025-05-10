@@ -110,7 +110,7 @@ export default function EmployeeRequestsPage() {
         title={t("Pages.EmployeeRequests.title")}
         description={t("Pages.EmployeeRequests.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={requests?.length} itemsText={t("Pages.EmployeeRequests.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -129,7 +129,6 @@ export default function EmployeeRequestsPage() {
             }
             createLabel={t("Pages.EmployeeRequests.add")}
             searchPlaceholder={t("Pages.EmployeeRequests.search")}
-            count={requests?.length}
             hideOptions={requests?.length === 0}
           />
         )}

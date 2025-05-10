@@ -126,6 +126,7 @@ const ProductsTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditProduct}
       canDuplicateAction={canDuplicateProduct}
       canViewAction={canViewProduct}

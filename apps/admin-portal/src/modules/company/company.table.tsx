@@ -86,6 +86,7 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
     },
     {
       accessorKey: "status",
+      maxSize: 80,
       header: t("Companies.form.status.label"),
       validationSchema: z.boolean(),
       cellType: "status",
@@ -143,6 +144,7 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditCompany}
       canDuplicateAction={canDuplicateCompany}
       canViewAction={canViewCompany}

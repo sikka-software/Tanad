@@ -98,7 +98,7 @@ export default function InvoicesPage() {
   return (
     <div>
       <CustomPageMeta title={t("Invoices.title")} description={t("Invoices.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={invoices?.length} itemsText={t("Pages.Invoices.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -115,7 +115,6 @@ export default function InvoicesPage() {
             onAddClick={canCreateInvoices ? () => router.push("/invoices/add") : undefined}
             createLabel={t("Pages.Invoices.add")}
             searchPlaceholder={t("Pages.Invoices.search")}
-            count={invoices?.length}
             hideOptions={invoices?.length === 0}
           />
         )}

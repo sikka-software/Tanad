@@ -127,6 +127,7 @@ const TrucksTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePro
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditTruck}
       canDuplicateAction={canDuplicateTruck}
       canViewAction={canViewTruck}

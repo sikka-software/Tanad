@@ -100,7 +100,7 @@ export default function OnlineStoresPage() {
   return (
     <div>
       <CustomPageMeta title={t("OnlineStores.title")} description={t("OnlineStores.description")} />
-      <DataPageLayout>
+      <DataPageLayout count={onlineStores?.length} itemsText={t("Pages.OnlineStores.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -119,7 +119,6 @@ export default function OnlineStoresPage() {
             }
             createLabel={t("Pages.OnlineStores.add")}
             searchPlaceholder={t("Pages.OnlineStores.search")}
-            count={onlineStores?.length}
             hideOptions={onlineStores?.length === 0}
           />
         )}

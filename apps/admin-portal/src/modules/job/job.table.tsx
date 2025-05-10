@@ -103,6 +103,7 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
     },
     {
       accessorKey: "status",
+      maxSize: 80,
       header: t("Jobs.form.status.label"),
       validationSchema: z.boolean(),
       cellType: "status",
@@ -163,6 +164,7 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditJob}
       canDuplicateAction={canDuplicateJob}
       canViewAction={canViewJob}

@@ -751,16 +751,27 @@ function SheetTable<
             if (enableColumnSizing) {
               const size = cell.column.getSize();
               if (size) style.width = `${size}px`;
-              if (colDef.minSize) style.minWidth = `${colDef.minSize}px`;
-              if (colDef.maxSize) style.maxWidth = `${colDef.maxSize}px`;
+              if (colDef.minSize)
+                style.minWidth =
+                  typeof colDef.minSize === "number" ? `${colDef.minSize}px` : colDef.minSize;
+              if (colDef.maxSize)
+                style.maxWidth =
+                  typeof colDef.maxSize === "number" ? `${colDef.maxSize}px` : colDef.maxSize;
             } else {
-              // Set default width if not specified
               if (!colDef.size && !colDef.minSize && !colDef.maxSize) {
                 style.width = "150px";
               }
-              // Set minimum width if not specified
               if (!colDef.minSize && !style.minWidth) {
                 style.minWidth = "120px";
+              }
+              if (colDef.maxSize) {
+                style.maxWidth =
+                  typeof colDef.maxSize === "number" ? `${colDef.maxSize}px` : colDef.maxSize;
+                if (style.width) {
+                  const widthPx = parseInt(style.width.toString());
+                  const maxPx = parseInt(style.maxWidth.toString());
+                  if (widthPx > maxPx) style.width = style.maxWidth;
+                }
               }
             }
 
@@ -778,7 +789,7 @@ function SheetTable<
                 <TableCell
                   key={cell.id}
                   className={cn(
-                    "relative border p-0",
+                    "relative overflow-hidden border p-0",
                     {
                       "bg-muted": isDisabled,
                       "bg-destructive/25": errorMsg,
@@ -787,6 +798,7 @@ function SheetTable<
                       ? colDef.className(rowData)
                       : colDef.className,
                   )}
+                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
                 >
                   <CommandSelect
                     dir={locale === "ar" ? "rtl" : "ltr"}
@@ -794,8 +806,8 @@ function SheetTable<
                     inCell
                     isLoading={false}
                     defaultValue={String(selectedOption?.value)}
-                    popoverClassName="w-fit"
-                    buttonClassName="bg-transparent p-0"
+                    popoverClassName="w-full max-w-full"
+                    buttonClassName="bg-transparent p-0 w-full max-w-full"
                     placeholderClassName="w-full p-0"
                     valueKey="value"
                     labelKey="label"
@@ -834,7 +846,7 @@ function SheetTable<
                 <TableCell
                   key={cell.id}
                   className={cn(
-                    "relative border p-0",
+                    "force-maxwidth-cell relative overflow-hidden border p-0",
                     {
                       "bg-muted": isDisabled,
                       "bg-destructive/25": errorMsg,
@@ -843,6 +855,7 @@ function SheetTable<
                       ? colDef.className(rowData)
                       : colDef.className,
                   )}
+                  style={{ ...style, overflow: "hidden", minWidth: 0 }}
                 >
                   <CommandSelect
                     dir={locale === "ar" ? "rtl" : "ltr"}
@@ -850,8 +863,8 @@ function SheetTable<
                     inCell
                     isLoading={false}
                     defaultValue={String(cellValue)}
-                    popoverClassName="w-fit"
-                    buttonClassName="bg-transparent"
+                    popoverClassName="w-full max-w-full"
+                    buttonClassName="bg-transparent w-full max-w-full"
                     valueKey="value"
                     labelKey="label"
                     onChange={async (value) => {
@@ -875,7 +888,7 @@ function SheetTable<
               <TableCell
                 key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
-                  "relative overflow-scroll border tiny-scrollbar", // 'relative' for absolute icons if you prefer
+                  "tiny-scrollbar relative overflow-scroll border", // 'relative' for absolute icons if you prefer
                   {
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,
@@ -938,7 +951,7 @@ function SheetTable<
     // Data columns
     columns.forEach((col) => {
       if (col.minSize) {
-        minWidth += typeof col.minSize === 'number' ? col.minSize : parseInt(col.minSize, 10);
+        minWidth += typeof col.minSize === "number" ? col.minSize : parseInt(col.minSize, 10);
       } else {
         minWidth += 120; // default min width
       }
@@ -947,7 +960,7 @@ function SheetTable<
   }, [columns, enableRowSelection, enableRowActions]);
 
   return (
-    <div ref={parentRef} className="relative max-h-[calc(100vh-5rem)] overflow-auto p-0 pb-2">
+    <div ref={parentRef} className="relative max-h-[calc(100vh-7.6rem)] overflow-auto p-0 pb-2">
       <Table id={id} style={{ minWidth: totalMinWidth }}>
         {/* <TableCaption>Dynamic, editable data table with grouping & nested sub-rows.</TableCaption> */}
         {/* Primary header */}
@@ -972,28 +985,38 @@ function SheetTable<
               {enableRowActions && (
                 <TableHead
                   className="bg-muted sticky start-8 top-0 !z-20 border-e border-none text-start"
-                  style={{ width: "30px", minWidth: "30px", maxWidth: "30px" }}
+                  style={{ width: "20px", minWidth: "20px", maxWidth: "20px" }}
                 />
               )}
 
               {table.getHeaderGroups().map((headerGroup) =>
                 headerGroup.headers.map((header) => {
                   const style: React.CSSProperties = {};
+                  const col = header.column.columnDef;
                   if (enableColumnSizing) {
-                    const col = header.column.columnDef;
                     const size = header.getSize();
                     if (size) style.width = `${size}px`;
-                    if (col.minSize) style.minWidth = `${col.minSize}px`;
-                    if (col.maxSize) style.maxWidth = `${col.maxSize}px`;
+                    if (col.minSize)
+                      style.minWidth =
+                        typeof col.minSize === "number" ? `${col.minSize}px` : col.minSize;
+                    if (col.maxSize)
+                      style.maxWidth =
+                        typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
                   } else {
-                    // Set default width if not specified
-                    const col = header.column.columnDef;
                     if (!col.size && !col.minSize && !col.maxSize) {
                       style.width = "150px";
                     }
-                    // Set minimum width if not specified
                     if (!col.minSize && !style.minWidth) {
                       style.minWidth = "120px";
+                    }
+                    if (col.maxSize) {
+                      style.maxWidth =
+                        typeof col.maxSize === "number" ? `${col.maxSize}px` : col.maxSize;
+                      if (style.width) {
+                        const widthPx = parseInt(style.width.toString());
+                        const maxPx = parseInt(style.maxWidth.toString());
+                        if (widthPx > maxPx) style.width = style.maxWidth;
+                      }
                     }
                   }
 

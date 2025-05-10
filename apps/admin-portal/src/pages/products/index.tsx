@@ -111,7 +111,7 @@ export default function ProductsPage() {
         title={t("Pages.Products.title")}
         description={t("Pages.Products.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={products?.length} itemsText={t("Pages.Products.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -128,7 +128,6 @@ export default function ProductsPage() {
             onAddClick={canCreateProducts ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Products.add")}
             searchPlaceholder={t("Pages.Products.search")}
-            count={products?.length}
             hideOptions={products?.length === 0}
           />
         )}

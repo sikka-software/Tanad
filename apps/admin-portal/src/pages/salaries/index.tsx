@@ -99,7 +99,7 @@ export default function SalariesPage() {
         title={t("Pages.Salaries.title")}
         description={t("Pages.Salaries.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={salaries?.length} itemsText={t("Pages.Salaries.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -116,7 +116,6 @@ export default function SalariesPage() {
             onAddClick={canCreateSalaries ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Salaries.create")}
             searchPlaceholder={t("Pages.Salaries.search")}
-            count={salaries?.length}
             hideOptions={salaries?.length === 0}
           />
         )}

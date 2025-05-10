@@ -158,6 +158,7 @@ const EmployeeRequestsTable = ({
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditEmployeeRequest}
       canDuplicateAction={canDuplicateEmployeeRequest}
       canViewAction={canViewEmployeeRequest}

@@ -63,6 +63,7 @@ const JobListingsTable = ({
     },
     {
       accessorKey: "status",
+      maxSize: 80,
       header: t("JobListings.form.status.label"),
       validationSchema: z.boolean(),
       cellType: "status",
@@ -121,6 +122,7 @@ const JobListingsTable = ({
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditJobListing}
       canDuplicateAction={canDuplicateJobListing}
       canViewAction={canViewJobListing}

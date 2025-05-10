@@ -97,7 +97,7 @@ export default function OfficesPage() {
         title={t("Pages.Offices.title")}
         description={t("Pages.Offices.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={offices?.length} itemsText={t("Pages.Offices.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -114,7 +114,6 @@ export default function OfficesPage() {
             onAddClick={canCreateOffices ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Offices.add")}
             searchPlaceholder={t("Pages.Offices.search")}
-            count={offices?.length}
             hideOptions={offices?.length === 0}
           />
         )}

@@ -100,7 +100,7 @@ export default function ServersPage() {
         title={t("Pages.Servers.title")}
         description={t("Pages.Servers.description")}
       />
-      <DataPageLayout>
+      <DataPageLayout count={servers?.length} itemsText={t("Pages.Servers.title")}>
         {selectedRows.length > 0 ? (
           <SelectionMode
             selectedRows={selectedRows}
@@ -117,7 +117,6 @@ export default function ServersPage() {
             onAddClick={canCreateServers ? () => router.push(router.pathname + "/add") : undefined}
             createLabel={t("Pages.Servers.add")}
             searchPlaceholder={t("Pages.Servers.search")}
-            count={servers?.length}
             hideOptions={servers?.length === 0}
           />
         )}

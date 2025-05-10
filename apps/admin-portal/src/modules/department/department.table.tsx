@@ -190,6 +190,7 @@ const DepartmentsTable = ({ data, isLoading, error, onActionClicked }: Departmen
       showHeader={true}
       enableRowSelection={true}
       enableRowActions={true}
+      enableColumnSizing={true}
       canEditAction={canEditDepartment}
       canDuplicateAction={canDuplicateDepartment}
       canViewAction={canViewDepartment}
