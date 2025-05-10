@@ -8,8 +8,9 @@ import TableSkeleton from "@/ui/table-skeleton";
 
 import { ModuleTableProps } from "@/types/common.type";
 
-import { useDepartments } from "@/department/department.hooks";
 import { useJobs } from "@/job/job.hooks";
+
+import { useDepartments } from "@/department/department.hooks";
 
 import { useUpdateEmployee } from "@/employee/employee.hooks";
 import useEmployeeStore from "@/employee/employee.store";
@@ -54,6 +55,7 @@ const EmployeesTable = ({
     },
     {
       accessorKey: "email",
+      dir: "ltr",
       header: t("Employees.form.email.label"),
       validationSchema: z.string().email(t("Employees.form.email.invalid")),
     },

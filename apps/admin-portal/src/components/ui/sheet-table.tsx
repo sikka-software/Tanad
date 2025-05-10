@@ -59,6 +59,7 @@ export type ExtendedColumnDef<TData extends object, TValue = unknown> = Omit<
   style?: React.CSSProperties; // style for inline styles
   enableEditing?: boolean;
   noPadding?: boolean;
+  dir?: "ltr" | "rtl";
 };
 
 /**
@@ -749,6 +750,11 @@ function SheetTable<
               if (size) style.width = `${size}px`;
               if (colDef.minSize) style.minWidth = `${colDef.minSize}px`;
               if (colDef.maxSize) style.maxWidth = `${colDef.maxSize}px`;
+            } else {
+              // Set default width if not specified
+              if (!colDef.size && !colDef.minSize && !colDef.maxSize) {
+                style.width = "10px";
+              }
             }
 
             // Render cell content with customizations for the first cell
@@ -862,7 +868,7 @@ function SheetTable<
               <TableCell
                 key={rowId + colKey + String(cell.getValue() ?? "")}
                 className={cn(
-                  "relative border", // 'relative' for absolute icons if you prefer
+                  "relative overflow-scroll border tiny-scrollbar", // 'relative' for absolute icons if you prefer
                   {
                     "bg-muted": isDisabled,
                     "bg-destructive/25": errorMsg,
@@ -872,6 +878,7 @@ function SheetTable<
                     ? colDef.className(rowData)
                     : colDef.className,
                 )}
+                dir={colDef.dir}
                 style={style}
                 contentEditable={colDef.enableEditing !== false ? !isDisabled : false}
                 suppressContentEditableWarning
@@ -950,6 +957,12 @@ function SheetTable<
                     if (size) style.width = `${size}px`;
                     if (col.minSize) style.minWidth = `${col.minSize}px`;
                     if (col.maxSize) style.maxWidth = `${col.maxSize}px`;
+                  } else {
+                    // Set default width if not specified
+                    const col = header.column.columnDef;
+                    if (!col.size && !col.minSize && !col.maxSize) {
+                      style.width = "10px";
+                    }
                   }
 
                   return (
