@@ -97,7 +97,7 @@ export default function JobsPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Jobs.title")} description={t("Jobs.description")} />
+      <CustomPageMeta title={t("Pages.Jobs.title")} description={t("Pages.Jobs.description")} />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -111,10 +111,10 @@ export default function JobsPage() {
             store={useJobsStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Jobs.title")}
+            title={t("Pages.Jobs.title")}
             onAddClick={canCreateJobs ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Jobs.create_job")}
-            searchPlaceholder={t("Jobs.search_jobs")}
+            createLabel={t("Pages.Jobs.add")}
+            searchPlaceholder={t("Pages.Jobs.search")}
             count={jobs?.length}
             hideOptions={jobs?.length === 0}
           />

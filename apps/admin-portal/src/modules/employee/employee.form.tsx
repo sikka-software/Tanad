@@ -119,7 +119,7 @@ export function EmployeeForm({
           return count === 0;
         }, t("Employees.form.email.duplicate")),
       phone: z.string().optional(),
-      position: z.string().min(1, t("Employees.form.position.required")),
+      job_id: z.string().min(1, t("Employees.form.job.required")),
       department: z.string().nullable(),
       hire_date: z.date({
         required_error: t("Employees.form.hire_date.required"),
@@ -137,7 +137,7 @@ export function EmployeeForm({
       last_name: defaultValues?.last_name || "",
       email: defaultValues?.email || "",
       phone: defaultValues?.phone ?? "",
-      position: defaultValues?.position || "",
+      job_id: defaultValues?.job_id || "",
       department: defaultValues?.department_id || null,
       hire_date: defaultValues?.hire_date ? new Date(defaultValues.hire_date) : undefined,
       salary: defaultValues?.salary as { type: string; amount: number }[] | undefined,
@@ -162,7 +162,7 @@ export function EmployeeForm({
         ...defaultValues,
         status: mappedStatus as "active" | "inactive" | "on_leave" | "terminated",
         hire_date: defaultValues.hire_date ? new Date(defaultValues.hire_date) : undefined,
-        position: defaultValues.position || "",
+        job_id: defaultValues.job_id || "",
         phone: defaultValues.phone || "",
         salary:
           (defaultValues.salary as { type: string; amount: number }[] | undefined) || undefined,
@@ -207,7 +207,6 @@ export function EmployeeForm({
       last_name: data.last_name.trim(),
       email: data.email.trim(),
       phone: data.phone?.trim() || undefined,
-      position: data.position.trim(),
       hire_date: data.hire_date ? data.hire_date.toISOString().split("T")[0] : undefined,
       notes: data.notes,
       department_id: data.department || undefined,
@@ -343,10 +342,10 @@ export function EmployeeForm({
 
               <FormField
                 control={form.control}
-                name="position"
+                name="job_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("Employees.form.position.label")} *</FormLabel>
+                    <FormLabel>{t("Employees.form.job.label")} *</FormLabel>
                     <FormControl>
                       <ComboboxAdd
                         dir={locale === "ar" ? "rtl" : "ltr"}
@@ -363,12 +362,6 @@ export function EmployeeForm({
                         addText={t("Pages.Jobs.add")}
                         onAddClick={() => setIsJobDialogOpen(true)}
                       />
-
-                      {/* <Input
-                        placeholder={t("Employees.form.position.placeholder")}
-                        disabled={isEmployeeSaving}
-                        {...field}
-                      /> */}
                     </FormControl>
                     <FormMessage />
                   </FormItem>

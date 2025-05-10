@@ -93,7 +93,10 @@ export default function CompaniesPage() {
   }
   return (
     <div>
-      <CustomPageMeta title={t("Companies.title")} description={t("Companies.description")} />
+      <CustomPageMeta
+        title={t("Pages.Companies.title")}
+        description={t("Pages.Companies.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -107,12 +110,12 @@ export default function CompaniesPage() {
             store={useCompanyStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Companies.title")}
+            title={t("Pages.Companies.title")}
             onAddClick={
               canCreateCompanies ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Companies.create_company")}
-            searchPlaceholder={t("Companies.search_companies")}
+            createLabel={t("Pages.Companies.create")}
+            searchPlaceholder={t("Pages.Companies.search")}
             count={companies?.length}
             hideOptions={companies?.length === 0}
           />

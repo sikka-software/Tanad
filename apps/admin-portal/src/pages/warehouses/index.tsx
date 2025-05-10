@@ -98,7 +98,10 @@ export default function WarehousesPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Warehouses.title")} description={t("Warehouses.description")} />
+      <CustomPageMeta
+        title={t("Pages.Warehouses.title")}
+        description={t("Pages.Warehouses.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -112,12 +115,12 @@ export default function WarehousesPage() {
             store={useWarehouseStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Warehouses.title")}
+            title={t("Pages.Warehouses.title")}
             onAddClick={
               canCreateWarehouses ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("Warehouses.create_warehouse")}
-            searchPlaceholder={t("Warehouses.search_warehouses")}
+            createLabel={t("Pages.Warehouses.create")}
+            searchPlaceholder={t("Pages.Warehouses.search")}
             count={warehouses?.length}
             hideOptions={warehouses?.length === 0}
           />

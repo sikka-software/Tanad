@@ -95,7 +95,10 @@ export default function SalariesPage() {
 
   return (
     <div>
-      <CustomPageMeta title={t("Salaries.title")} description={t("Salaries.description")} />
+      <CustomPageMeta
+        title={t("Pages.Salaries.title")}
+        description={t("Pages.Salaries.description")}
+      />
       <DataPageLayout>
         {selectedRows.length > 0 ? (
           <SelectionMode
@@ -109,10 +112,10 @@ export default function SalariesPage() {
             store={useSalaryStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("Salaries.title")}
+            title={t("Pages.Salaries.title")}
             onAddClick={canCreateSalaries ? () => router.push(router.pathname + "/add") : undefined}
-            createLabel={t("Salaries.create_salary")}
-            searchPlaceholder={t("Salaries.search_salaries")}
+            createLabel={t("Pages.Salaries.create")}
+            searchPlaceholder={t("Pages.Salaries.search")}
             count={salaries?.length}
             hideOptions={salaries?.length === 0}
           />

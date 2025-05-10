@@ -61,9 +61,9 @@ const EmployeesTable = ({
       validationSchema: z.string().optional(),
     },
     {
-      accessorKey: "position",
-      header: t("Employees.form.position.label"),
-      validationSchema: z.string().min(1, t("Employees.form.position.required")),
+      accessorKey: "job_id",
+      header: t("Employees.form.job.label"),
+      validationSchema: z.string().min(1, t("Employees.form.job.required")),
     },
     {
       accessorKey: "department_id",
