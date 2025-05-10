@@ -291,7 +291,6 @@ export function JobListingForm({
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="description"
@@ -310,7 +309,9 @@ export function JobListingForm({
               )}
             />
           </div>
+
           <JobListingOptionsSection
+            inDialog={editMode}
             form={form}
             availableLocations={availableLocations}
             availableDepartments={availableDepartments}
@@ -319,6 +320,7 @@ export function JobListingForm({
           />
 
           <FormSectionHeader
+            inDialog={editMode}
             title={t("JobListings.jobs_section.title")}
             subtitle={t("JobListings.jobs_section.subtitle")}
             onCreateText={t("Pages.Jobs.add")}

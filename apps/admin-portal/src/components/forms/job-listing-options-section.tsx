@@ -37,6 +37,7 @@ interface JobListingOptionsSectionProps {
   availableDepartments: { id: string; name: string }[];
   loadingLocations?: boolean; // Add loading state for locations
   loadingDepartments?: boolean; // Add loading state for departments
+  inDialog?: boolean;
 }
 
 const JobListingOptionsSection = ({
@@ -45,13 +46,14 @@ const JobListingOptionsSection = ({
   availableDepartments,
   loadingLocations,
   loadingDepartments,
+  inDialog,
 }: JobListingOptionsSectionProps) => {
   const t = useTranslations();
   const lang = useLocale();
   const [selectedCurrency, setSelectedCurrency] = useState<string>("");
   return (
     <div>
-      <FormSectionHeader title={t("JobListings.options.title")} />
+      <FormSectionHeader inDialog={inDialog} title={t("JobListings.options.title")} />
       <div className="form-container">
         {/* Currency Selection */}
         <FormField

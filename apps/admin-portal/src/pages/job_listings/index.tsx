@@ -115,12 +115,12 @@ export default function JobListingsPage() {
             store={useJobListingsStore}
             sortableColumns={SORTABLE_COLUMNS}
             filterableFields={FILTERABLE_FIELDS}
-            title={t("JobListings.title")}
+            title={t("Pages.JobListings.title")}
             onAddClick={
               canCreateJobListings ? () => router.push(router.pathname + "/add") : undefined
             }
-            createLabel={t("JobListings.create_listing")}
-            searchPlaceholder={t("JobListings.search_listings")}
+            createLabel={t("Pages.JobListings.add")}
+            searchPlaceholder={t("Pages.JobListings.search")}
             count={jobListings?.length}
             hideOptions={jobListings?.length === 0}
           />
@@ -140,7 +140,7 @@ export default function JobListingsPage() {
                 data={sortedListings as JobListingWithJobs[]}
                 isLoading={isLoading}
                 error={error instanceof Error ? error : null}
-                emptyMessage={t("JobListings.no_listings_found")}
+                emptyMessage={t("Pages.JobListings.no_listings_found")}
                 renderItem={(listing: JobListingWithJobs) => (
                   <JobListingCard key={listing.id} jobListing={listing} />
                 )}
@@ -185,7 +185,7 @@ export default function JobListingsPage() {
   );
 }
 
-JobListingsPage.messages = ["Notes", "Pages", "JobListings", "General"];
+JobListingsPage.messages = ["Notes", "Pages", "JobListings", "Jobs", "General"];
 
 export const getStaticProps = async ({ locale }: { locale: string }) => {
   return {

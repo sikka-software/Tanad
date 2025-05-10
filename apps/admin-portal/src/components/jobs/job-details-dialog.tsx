@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar, MapPin, Briefcase, DollarSign } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -29,12 +29,16 @@ export default function JobDetailsModal({
   onClose: () => void;
 }) {
   const t = useTranslations();
+  const locale = useLocale();
   if (!job) return null;
   const [activeTab, setActiveTab] = useState("details");
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+      <DialogContent
+        dir={locale === "ar" ? "rtl" : "ltr"}
+        className="max-h-[90vh] max-w-3xl overflow-y-auto"
+      >
         <DialogHeader>
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
@@ -47,7 +51,8 @@ export default function JobDetailsModal({
                   <MapPin className="me-1 h-4 w-4" /> {job.location}
                 </span>
                 <span className="flex items-center text-sm text-gray-500">
-                  <Calendar className="me-1 h-4 w-4" /> {t("JobDetails.posted", { date: job.created_at })}
+                  <Calendar className="me-1 h-4 w-4" />{" "}
+                  {t("JobDetails.posted", { date: job.created_at })}
                 </span>
                 {job.salary && (
                   <span className="flex items-center text-sm text-gray-500">
@@ -62,7 +67,12 @@ export default function JobDetailsModal({
           </div>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="mt-4"
+          dir={locale === "ar" ? "rtl" : "ltr"}
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="details">{t("JobDetails.job_details_tab")}</TabsTrigger>
             <TabsTrigger value="apply">{t("JobDetails.apply_now_tab")}</TabsTrigger>

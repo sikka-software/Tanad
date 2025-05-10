@@ -1,9 +1,9 @@
 import { JobListingNotFound } from "@root/src/components/app/job-listing-not-found";
 import JobCard from "@root/src/components/jobs/job-card";
 import JobDetailsModal from "@root/src/components/jobs/job-details-dialog";
+import CustomPageMeta from "@root/src/components/landing/CustomPageMeta";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useTranslations } from "next-intl";
-import Head from "next/head";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useState } from "react";
 
@@ -65,6 +65,7 @@ export default function JobListingPreviewPage({
   enterpriseName, // Destructure enterpriseName
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const t = useTranslations();
+  const locale = useLocale();
   const router = useRouter();
 
   // State from job-listings.tsx
@@ -120,18 +121,11 @@ export default function JobListingPreviewPage({
 
   return (
     <main className="bg-background min-h-screen">
-      <Head>
-        {/* Add Head details if needed, e.g., listing title */}
-        <title>
-          {enterpriseName && jobListing?.title
-            ? `${enterpriseName} | ${jobListing.title}`
-            : jobListing?.title || t("Pages.JobListings.single")}
-        </title>
-        <meta
-          name="description"
-          content={jobListing.description || t("JobListingPreview.meta_description_default")}
-        />
-      </Head>
+      <CustomPageMeta
+        title={`${enterpriseName} | ${jobListing.title}`}
+        description={jobListing.description || t("JobListingPreview.meta_description_default")}
+      />
+
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
           <h1 className="text-foreground mb-2 text-3xl font-bold">{jobListing.title}</h1>
@@ -149,7 +143,7 @@ export default function JobListingPreviewPage({
         </header>
 
         {/* Filter UI from job-listings.tsx */}
-        <div className="bg-background border-border mb-8 rounded-lg border p-6 shadow-sm">
+        <div className="bg--500 border-border mb-8 rounded-md border p-6 shadow-sm">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
               <Input
@@ -160,7 +154,11 @@ export default function JobListingPreviewPage({
               />
             </div>
             <div>
-              <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+              <Select
+                dir={locale === "ar" ? "rtl" : "ltr"}
+                value={selectedDepartment}
+                onValueChange={setSelectedDepartment}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder={t("Jobs.department_placeholder") || "Department"} />
                 </SelectTrigger>
@@ -177,7 +175,11 @@ export default function JobListingPreviewPage({
               </Select>
             </div>
             <div>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <Select
+                dir={locale === "ar" ? "rtl" : "ltr"}
+                value={selectedLocation}
+                onValueChange={setSelectedLocation}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder={t("JobListings.location_placeholder") || "Location"} />
                 </SelectTrigger>
