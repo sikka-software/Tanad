@@ -264,6 +264,8 @@
       "title": "الفواتير",
       "description": "إدارة الفواتير"
     },
+    "Finance": { "title": "المالية" },
+    "CRM": { "title": "المبيعات والتسويق" },
     "Administration": { "title": "الإدارة" },
     "Accounting": { "title": "المحاسبة" },
     "HumanResources": { "title": "الموارد البشرية" },

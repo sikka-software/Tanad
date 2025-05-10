@@ -86,8 +86,8 @@ export default function Dashboard() {
     totalCars: 0,
     totalTrucks: 0,
     totalExpenses: 0,
-    totalQuotes: 0,
     totalPurchases: 0,
+    totalQuotes: 0,
     totalRoles: 0,
     totalJobListings: 0,
     totalEmployeeRequests: 0,
@@ -341,9 +341,8 @@ export default function Dashboard() {
     return () => {
       isMounted = false;
     };
-  }, [user?.id, enterprise?.id, supabase]); // Add supabase as dependency
+  }, [user?.id, enterprise?.id, supabase]);
 
-  // Show error state for stats (kept separate for now)
   if (statsError) {
     return (
       <DataPageLayout>
@@ -368,36 +367,56 @@ export default function Dashboard() {
         </div>
       )}
       <div className="space-y-8 p-4">
-        {/* Contacts Section */}
         <div>
-          {/* <h2 className="mb-4 text-lg font-semibold">{t("Pages.Contacts.title")}</h2> */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(ModulesOptions).map(([key, module]) => {
-              const skippedModules = [
-                "dashboard",
-                "activity_logs",
-                "analytics",
-                "sales",
-                "human_resources",
-                "internet",
-                "storage",
-                "recruitment",
-                "settings",
-              ];
-              if (skippedModules.includes(key)) return null;
-              const pascalKey = convertToPascalCase(key);
-              return (
-                <StatCard
-                  key={key}
-                  icon={<module.icon className="size-4 bg--500 m-0" />}
-                  title={t(module.translationKey)}
-                  value={stats[`total${pascalKey}` as keyof DashboardStats]}
-                  loading={loadingStats}
-                  link={module.url}
-                />
-              );
-            })}
-          </div>
+          {Object.entries(
+            Object.entries(ModulesOptions).reduce(
+              (acc, [key, module]) => {
+                // Use a default category if somehow undefined, though type system should prevent this
+                const category = module.category || "Uncategorized";
+                if (!acc[category]) {
+                  acc[category] = [];
+                }
+                // Add the original key to the module object for use in loops
+                acc[category].push({ ...module, key });
+                return acc;
+              },
+              {} as Record<string, Array<(typeof ModulesOptions)[string] & { key: string }>>,
+            ),
+          ).map(([categoryName, modulesInCategory]) => (
+            <div key={categoryName} className="mb-8">
+              <h2 className="mb-4 text-2xl font-semibold capitalize">
+                {/* You might want to translate category names too if they are dynamic */}
+                {t(`Pages.${categoryName.replace(/\s+/g, "_")}.title`) || categoryName}
+              </h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {modulesInCategory.map((module) => {
+                  const skippedModules = [
+                    "dashboard",
+                    "activity_logs", // Still skipping these as per original logic
+                    "analytics",
+                    "sales",
+                    "human_resources",
+                    "internet",
+                    "storage",
+                    "recruitment",
+                    "settings",
+                  ];
+                  if (skippedModules.includes(module.key)) return null;
+                  const pascalKey = convertToPascalCase(module.key);
+                  return (
+                    <StatCard
+                      key={module.key}
+                      icon={<module.icon className="bg--500 m-0 size-4" />}
+                      title={t(module.translationKey)}
+                      value={stats[`total${pascalKey}` as keyof DashboardStats]}
+                      loading={loadingStats}
+                      link={module.url}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
