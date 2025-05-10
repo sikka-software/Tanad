@@ -682,7 +682,7 @@ function SheetTable<
           className={cn(
             "relative", // it's will remove border for icons cells
             disabled ? "bg-muted" : "",
-            row.getIsSelected() ? "bg-muted/50" : "",
+            row.getIsSelected() ? "bg-muted/50 dark:bg-muted/50" : "",
           )}
           // On mouse enter/leave, set hovered row
           onMouseEnter={() => setHoveredRowId(rowId)}
@@ -823,9 +823,10 @@ function SheetTable<
                           className={cn(
                             "flex h-full w-full items-center justify-center bg-green-500 p-0 !px-2 text-center text-xs font-bold",
                             {
-                              "text-primary bg-green-200 hover:bg-green-200":
+                              "text-primary bg-green-200 hover:bg-green-200 dark:bg-green-700 dark:hover:bg-green-700":
                                 item.value === "active",
-                              "text-primary bg-red-200 hover:bg-red-200": item.value === "inactive",
+                              "text-primary bg-red-200 hover:bg-red-200 dark:bg-red-700 dark:hover:bg-red-700":
+                                item.value === "inactive",
                             },
                           )}
                         >
