@@ -93,14 +93,17 @@ const JobListingJobsSelection = ({
                       }`}
                       onClick={() => handleJobSelect(job.id)}
                     >
+                      <div className="flex flex-row justify-between mb-2">
+                        <span className="text-sm text-gray-500">0/10</span>
+                        {selectedJobs.includes(job.id) && (
+                          <div className="bg-primary size-3 rounded-full" />
+                        )}
+                      </div>
                       <div className="flex items-start justify-between">
                         <div>
                           <h4 className="font-semibold">{job.title}</h4>
                           <p className="text-sm text-gray-500">{t(`Jobs.form.type.${job.type}`)}</p>
                         </div>
-                        {selectedJobs.includes(job.id) && (
-                          <div className="bg-primary h-4 w-4 rounded-full" />
-                        )}
                       </div>
                       <div className="mt-2 space-y-1">
                         {job.department && (

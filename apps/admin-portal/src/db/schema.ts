@@ -1658,6 +1658,7 @@ export const jobs = pgTable(
     status: common_status().default("active"),
     start_date: date(),
     end_date: date(),
+    available_positions: text(),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     user_id: uuid().notNull(),
