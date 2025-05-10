@@ -29,6 +29,7 @@ export default function AddOfficePage() {
       form.setValue("street_name", dummyData.city);
       form.setValue("city", dummyData.state);
       form.setValue("zip_code", String(dummyData.zip_code));
+      form.setValue("status", dummyData.randomPicker(["active", "inactive"]));
     }
   };
 
