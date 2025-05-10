@@ -102,18 +102,18 @@ const OfficesTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
 
     {
       accessorKey: "city",
-      header: t("Offices.form.city.label"),
-      validationSchema: z.string().min(1, t("Offices.form.city.required")),
+      header: t("Forms.city.label"),
+      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
-      accessorKey: "state",
-      header: t("Offices.form.state.label"),
-      validationSchema: z.string().min(1, t("Offices.form.state.required")),
+      accessorKey: "region",
+      header: t("Forms.region.label"),
+      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
     {
       accessorKey: "zip_code",
-      header: t("Offices.form.zip_code.label"),
-      validationSchema: z.string().min(1, t("Offices.form.zip_code.required")),
+      header: t("Forms.zip_code.label"),
+      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
 
     {

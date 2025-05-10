@@ -46,23 +46,23 @@ const ClientsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
     },
     {
       accessorKey: "address",
-      header: t("Clients.form.address.label"),
-      validationSchema: z.string().min(1, t("Clients.form.address.required")),
+      header: t("Forms.address.label"),
+      validationSchema: z.string().min(1, t("Forms.address.required")),
     },
     {
       accessorKey: "city",
-      header: t("Clients.form.city.label"),
-      validationSchema: z.string().min(1, t("Clients.form.city.required")),
+      header: t("Forms.city.label"),
+      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
-      accessorKey: "state",
-      header: t("Clients.form.state.label"),
-      validationSchema: z.string().min(1, t("Clients.form.state.required")),
+      accessorKey: "region",
+      header: t("Forms.region.label"),
+      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
     {
       accessorKey: "zip_code",
-      header: t("Clients.form.zip_code.label"),
-      validationSchema: z.string().min(1, t("Clients.form.zip_code.required")),
+      header: t("Forms.zip_code.label"),
+      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
 
     // {

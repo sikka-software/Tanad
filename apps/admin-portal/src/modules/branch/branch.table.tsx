@@ -102,23 +102,23 @@ const BranchesTable = ({ data, isLoading, error, onActionClicked }: ModuleTableP
 
     {
       accessorKey: "address",
-      header: t("Branches.form.address.label"),
-      validationSchema: z.string().min(1, t("Branches.form.address.required")),
+      header: t("Forms.address.label"),
+      validationSchema: z.string().min(1, t("Forms.address.required")),
     },
     {
       accessorKey: "city",
-      header: t("Branches.form.city.label"),
-      validationSchema: z.string().min(1, t("Branches.form.city.required")),
+      header: t("Forms.city.label"),
+      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
-      accessorKey: "state",
-      header: t("Branches.form.state.label"),
-      validationSchema: z.string().min(1, t("Branches.form.state.required")),
+      accessorKey: "region",
+      header: t("Forms.region.label"),
+      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
     {
       accessorKey: "zip_code",
-      header: t("Branches.form.zip_code.label"),
-      validationSchema: z.string().min(1, t("Branches.form.zip_code.required")),
+      header: t("Forms.zip_code.label"),
+      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
     {
       accessorKey: "status",

@@ -100,6 +100,9 @@ const WarehouseTable = ({
               searchPlaceholder: t("Pages.Employees.search"),
               noItems: t("Warehouses.form.manager.no_employees"),
             }}
+            renderSelected={(value) => {
+              return <p className="pe-2 text-start">{value.label}</p>;
+            }}
             addText={t("Pages.Employees.add")}
             ariaInvalid={false}
           />
@@ -109,18 +112,18 @@ const WarehouseTable = ({
 
     {
       accessorKey: "city",
-      header: t("Warehouses.form.city.label"),
-      validationSchema: z.string().min(1, t("Warehouses.form.city.required")),
+      header: t("Forms.city.label"),
+      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
-      accessorKey: "state",
-      header: t("Warehouses.form.state.label"),
-      validationSchema: z.string().min(1, t("Warehouses.form.state.required")),
+      accessorKey: "region",
+      header: t("Forms.region.label"),
+      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
     {
       accessorKey: "zip_code",
-      header: t("Warehouses.form.zip_code.label"),
-      validationSchema: z.string().min(1, t("Warehouses.form.zip_code.required")),
+      header: t("Forms.zip_code.label"),
+      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
 
     {

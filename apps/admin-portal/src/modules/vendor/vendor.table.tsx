@@ -51,23 +51,23 @@ const VendorsTable = ({ data, isLoading, error, onActionClicked }: ModuleTablePr
     },
     {
       accessorKey: "address",
-      header: t("form.address.label"),
-      validationSchema: z.string().min(1, t("form.address.required")),
+      header: t("Forms.address.label"),
+      validationSchema: z.string().min(1, t("Forms.address.required")),
     },
     {
       accessorKey: "city",
-      header: t("form.city.label"),
-      validationSchema: z.string().min(1, t("form.city.required")),
+      header: t("Forms.city.label"),
+      validationSchema: z.string().min(1, t("Forms.city.required")),
     },
     {
-      accessorKey: "state",
-      header: t("form.state.label"),
-      validationSchema: z.string().min(1, t("form.state.required")),
+      accessorKey: "region",
+      header: t("Forms.region.label"),
+      validationSchema: z.string().min(1, t("Forms.region.required")),
     },
     {
       accessorKey: "zip_code",
-      header: t("form.zip_code.label"),
-      validationSchema: z.string().min(1, t("form.zip_code.required")),
+      header: t("Forms.zip_code.label"),
+      validationSchema: z.string().min(1, t("Forms.zip_code.required")),
     },
     {
       accessorKey: "products",

@@ -60,23 +60,23 @@ const CompaniesTable = ({ data, isLoading, error, onActionClicked }: ModuleTable
     },
     {
       accessorKey: "address",
-      header: t("Companies.form.address.label"),
+      header: t("Forms.address.label"),
       validationSchema: z.string().optional(),
     },
     {
       accessorKey: "city",
-      header: t("Companies.form.city.label"),
+      header: t("Forms.city.label"),
       validationSchema: z.string().optional(),
     },
 
     {
-      accessorKey: "state",
-      header: t("Companies.form.state.label"),
+      accessorKey: "region",
+      header: t("Forms.region.label"),
       validationSchema: z.string().optional(),
     },
     {
       accessorKey: "zip_code",
-      header: t("Companies.form.zip_code.label"),
+      header: t("Forms.zip_code.label"),
       validationSchema: z.string().optional(),
     },
     {
