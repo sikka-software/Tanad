@@ -441,7 +441,7 @@ export const employees = pgTable(
     termination_date: date(),
     status: employee_status().default("active"),
     department_id: uuid(),
-    position: text(),
+    job_id: uuid(),
     salary: jsonb().default([]),
     notes: jsonb(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }),
@@ -457,10 +457,19 @@ export const employees = pgTable(
       "btree",
       table.enterprise_id.asc().nullsLast().op("uuid_ops"),
     ),
+    index("employees_job_id_idx").using(
+      "btree",
+      table.job_id.asc().nullsLast().op("uuid_ops"),
+    ),
     foreignKey({
       columns: [table.department_id],
       foreignColumns: [departments.id],
       name: "employees_department_id_departments_id_fk",
+    }).onDelete("set null"),
+    foreignKey({
+      columns: [table.job_id],
+      foreignColumns: [jobs.id],
+      name: "employees_job_id_jobs_id_fk",
     }).onDelete("set null"),
   ],
 );
@@ -1658,7 +1667,7 @@ export const jobs = pgTable(
     status: common_status().default("active"),
     start_date: date(),
     end_date: date(),
-    available_positions: text(),
+    available_positions: numeric().notNull().default("0"),
     created_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     updated_at: timestamp({ withTimezone: true, mode: "string" }).defaultNow().notNull(),
     user_id: uuid().notNull(),
