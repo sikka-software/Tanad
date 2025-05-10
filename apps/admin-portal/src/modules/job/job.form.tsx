@@ -60,7 +60,7 @@ const createJobFormSchema = (t: (key: string) => string) =>
     start_date: z.date().optional(),
     end_date: z.date().optional(),
     status: z.string().default("active"),
-    available_positions: z.string().optional(),
+    total_positions: z.string().optional(),
   });
 
 export type JobFormValues = z.input<ReturnType<typeof createJobFormSchema>>;
@@ -107,7 +107,10 @@ export function JobForm({
       start_date: defaultValues?.start_date ? new Date(defaultValues.start_date) : undefined,
       end_date: defaultValues?.end_date ? new Date(defaultValues.end_date) : undefined,
       status: defaultValues?.status || "active",
-      available_positions: (defaultValues as JobCreateData)?.available_positions || "1",
+      total_positions:
+        defaultValues && typeof (defaultValues as any).total_positions !== "undefined"
+          ? String((defaultValues as any).total_positions)
+          : "1",
     },
   });
 
@@ -143,7 +146,10 @@ export function JobForm({
               status: data.status as "active" | "inactive" | "draft" | "archived" | null,
               start_date: data.start_date?.toISOString() || null,
               end_date: data.end_date?.toISOString() || null,
-              available_positions: data.available_positions?.trim() || null,
+              total_positions:
+                data.total_positions && data.total_positions.trim() !== ""
+                  ? Number(data.total_positions)
+                  : undefined,
             },
           },
           {
@@ -170,7 +176,10 @@ export function JobForm({
             status: data.status as "active" | "inactive" | "draft" | "archived" | null,
             start_date: data.start_date?.toISOString() || null,
             end_date: data.end_date?.toISOString() || null,
-            available_positions: data.available_positions?.trim() || null,
+            total_positions:
+              data.total_positions && data.total_positions.trim() !== ""
+                ? Number(data.total_positions)
+                : undefined,
             user_id: user?.id,
           },
           {
@@ -348,10 +357,10 @@ export function JobForm({
 
           <FormField
             control={form.control}
-            name="available_positions"
+            name="total_positions"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Jobs.form.available_positions.label")}</FormLabel>
+                <FormLabel>{t("Jobs.form.total_positions.label")}</FormLabel>
                 <FormControl>
                   <NumberInputWithButtons
                     value={(() => {

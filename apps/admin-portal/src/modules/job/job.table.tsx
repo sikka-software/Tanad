@@ -82,11 +82,21 @@ const JobTable = ({ data, isLoading, error, onActionClicked }: ModuleTableProps<
         ),
     },
     {
-      accessorKey: "available_positions",
-      header: t("Jobs.form.available_positions.label"),
+      accessorKey: "total_positions",
+      header: t("Jobs.form.total_positions.label"),
       cell: (props: CellContext<Job, unknown>) => {
-        const value = props.row.original.available_positions;
-        if (value === null || value === undefined || value === "") return "N/A";
+        const value = props.row.original.total_positions;
+        if (value === null || value === undefined) return "N/A";
+        const num = typeof value === "number" ? value : parseInt(value, 10);
+        return isNaN(num) ? "N/A" : num;
+      },
+    },
+    {
+      accessorKey: "occupied_positions",
+      header: t("Jobs.form.occupied_positions.label"),
+      cell: (props: CellContext<Job, unknown>) => {
+        const value = props.row.original.total_positions;
+        if (value === null || value === undefined) return "N/A";
         const num = typeof value === "number" ? value : parseInt(value, 10);
         return isNaN(num) ? "N/A" : num;
       },

@@ -11,7 +11,8 @@ export const FILTERABLE_FIELDS: FilterableField[] = [
 
 export const SORTABLE_COLUMNS: SortableColumn[] = [
   { value: "created_at", translationKey: "Jobs.form.created_at.label" },
-  { value: "available_positions", translationKey: "Jobs.form.available_positions.label" },
+  { value: "total_positions", translationKey: "Jobs.form.total_positions.label" },
+  { value: "occupied_positions", translationKey: "Jobs.form.occupied_positions.label" },
   { value: "title", translationKey: "Jobs.form.title.label" },
   { value: "description", translationKey: "Jobs.form.description.label" },
   { value: "requirements", translationKey: "Jobs.form.requirements.label" },

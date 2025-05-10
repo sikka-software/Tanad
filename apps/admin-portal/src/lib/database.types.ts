@@ -969,7 +969,6 @@ export type Database = {
       }
       jobs: {
         Row: {
-          available_positions: number
           benefits: string | null
           created_at: string
           department: string | null
@@ -978,18 +977,19 @@ export type Database = {
           enterprise_id: string
           id: string
           location: string | null
+          occupied_positions: number
           requirements: string | null
           responsibilities: string | null
           salary: number | null
           start_date: string | null
           status: Database["public"]["Enums"]["common_status"] | null
           title: string
+          total_positions: number
           type: string
           updated_at: string
           user_id: string
         }
         Insert: {
-          available_positions?: number
           benefits?: string | null
           created_at?: string
           department?: string | null
@@ -998,18 +998,19 @@ export type Database = {
           enterprise_id: string
           id?: string
           location?: string | null
+          occupied_positions?: number
           requirements?: string | null
           responsibilities?: string | null
           salary?: number | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["common_status"] | null
           title: string
+          total_positions?: number
           type: string
           updated_at?: string
           user_id: string
         }
         Update: {
-          available_positions?: number
           benefits?: string | null
           created_at?: string
           department?: string | null
@@ -1018,12 +1019,14 @@ export type Database = {
           enterprise_id?: string
           id?: string
           location?: string | null
+          occupied_positions?: number
           requirements?: string | null
           responsibilities?: string | null
           salary?: number | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["common_status"] | null
           title?: string
+          total_positions?: number
           type?: string
           updated_at?: string
           user_id?: string
