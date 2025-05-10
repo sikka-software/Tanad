@@ -42,6 +42,8 @@ export function ConfirmReactivateSubscriptionDialog({
       );
       await onConfirm();
       toast.dismiss();
+      // Close the dialog after successful reactivation
+      onOpenChange(false);
     } catch (err: any) {
       toast.dismiss();
       setError(err.message || "An error occurred while reactivating your subscription");
@@ -58,7 +60,7 @@ export function ConfirmReactivateSubscriptionDialog({
           <AlertDialogDescription>
             {t("Billing.reactivate_subscription.description", {
               plan: planName,
-              fallback: `Are you sure you want to reactivate your ${planName}? Your subscription will continue and you'll be billed normally on your next billing date.`,
+              fallback: `Are you sure you want to reactivate your ${planName}? Your subscription will be restored and billing will resume according to your previous billing cycle.`,
             })}
           </AlertDialogDescription>
           {error && (

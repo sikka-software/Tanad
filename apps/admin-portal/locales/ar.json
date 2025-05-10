@@ -1306,10 +1306,10 @@
   },
   "Billing": {
     "pro_plan": "الخطة الاحترافية",
-    "tanad_free": "تاناد مجاني",
-    "tanad_pro": "تاناد برو",
-    "tanad_business": "تاناد للأعمال",
-    "tanad_enterprise": "تاناد للمؤسسات",
+    "tanad_free": "تند مجاني",
+    "tanad_pro": "تند برو",
+    "tanad_business": "تند للأعمال",
+    "tanad_enterprise": "تند للمؤسسات",
     "only_for_enterprise_users": "لمستخدمي الخطة المؤسسية فقط",
     "manage_billing_description": "إدارة معلومات الفوترة وطرق الدفع",
     "upgrade_to_enterprise_for_advanced_analytics": "قم بالترقية إلى الخطة المؤسسية للحصول على تحليلات متقدمة",
@@ -1325,6 +1325,29 @@
       "cancel": "إلغاء",
       "confirm": "تأكيد",
       "features_end_notice": "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية."
+    },
+    "Invoices": {
+      "title": "الفواتير",
+      "description": "إدارة جميع الفواتير الخاصة بك",
+      "invoice_date": "التاريخ",
+      "invoice_number": "رقم الفاتورة",
+      "invoice_amount": "المبلغ"
+    },
+    "Clients": {
+      "title": "العملاء",
+      "description": "إدارة جميع العملاء الخاصة بك",
+      "client_name": "اسم العميل",
+      "client_email": "البريد الإلكتروني",
+      "client_phone": "الهاتف",
+      "client_address": "العنوان",
+      "client_city": "المدينة"
+    },
+    "Employees": {
+      "title": "الموظفين",
+      "description": "إدارة جميع الموظفين الخاصة بك",
+      "employee_name": "اسم الموظف",
+      "employee_email": "البريد الإلكتروني",
+      "employee_phone": "الهاتف"
     },
 
     "manage_description": "إدارة معلومات الفوترة وطرق الدفع",
@@ -1364,15 +1387,28 @@
     "subscription_status": {
       "active": "مفعل",
       "inactive": "غير مفعل",
+      "canceling": "قيد الإلغاء",
       "cancelled": "ملغي",
       "expired": "منتهي",
       "pending": "قيد الانتظار",
       "refunded": "مسترجع"
     },
-
+    "service_end": {
+      "title": "نهاية الخدمة",
+      "description": "ستنتهي خدمتك في",
+      "days": "أيام",
+      "date": "التاريخ",
+      "days_remaining": "أيام متبقية",
+      "hours": "ساعات",
+      "minutes": "دقائق",
+      "seconds": "ثواني",
+      "message": "ستظل جميع الميزات متاحة حتى نهاية دورة الفوترة الحالية."
+    },
+    "most_popular": "أكثر شعبية",
+    "reactivate_subscription": "إعادة تفعيل الاشتراك",
     "payment": {
       "dialog_title": "طريقة الدفع",
-      "selected_plan_price": "سعر الخطة المختارة",
+      "selected_plan_price": "السعر: {{price}}",
       "enter_details": "أدخل تفاصيل الدفع",
       "card": "بطاقة الائتمان",
       "wallet": "محفظة",
@@ -1398,8 +1434,16 @@
       "pay_with_paypal": "دفع بايبال",
       "google_pay": "دفع جوجل باي",
       "complete_payment": "إكمال الدفع",
-      "processing": "يتم المعالجة"
+      "processing": "يتم المعالجة",
+      "setting_up": "يتم إعداد الدفع"
     },
+
+    "billing_cycle": "دورة الفوترة",
+    "next_billing": {
+      "title": "الفوترة القادمة"
+    },
+
+    "amount": "المبلغ",
     "features": {
       "basic_access": "وصول أساسي",
       "custom_design_and_colors": "تصميم وألوان مخصصة",

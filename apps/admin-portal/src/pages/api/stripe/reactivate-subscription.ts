@@ -15,10 +15,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Get the subscription ID from the request body
-    const { subscriptionId, userId } = req.body;
+    const { subscriptionId, userId, customerId } = req.body;
 
-    if (!subscriptionId) {
-      return res.status(400).json({ error: "Subscription ID is required" });
+    if (!subscriptionId && !userId) {
+      return res.status(400).json({ error: "Either Subscription ID or User ID is required" });
+    }
+
+    if (!customerId) {
+      return res.status(400).json({ error: "Customer ID is required" });
     }
 
     // Create Supabase client
@@ -29,6 +33,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       .select("*")
       .eq("id", userId)
       .single();
+
+    if (userError) {
+      return res.status(404).json({ error: "User not found", details: userError.message });
+    }
+
+    // Special case for profile-based subscriptions
+    if (subscriptionId === "profile-based") {
+      // For profile-based subscriptions, we just update the cancel flags in the database
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          cancel_at_period_end: false,
+          cancel_at: null,
+        })
+        .eq("id", userId);
+
+      if (updateError) {
+        return res.status(500).json({
+          error: "Failed to reactivate profile-based subscription",
+          details: updateError.message,
+        });
+      }
+
+      // Log the reactivation
+      await supabase.from("subscription_reactivations").insert({
+        user_id: userId,
+        subscription_id: "profile-based",
+        created_at: new Date().toISOString(),
+      });
+
+      // Return success
+      return res.status(200).json({
+        success: true,
+        subscription: {
+          id: "profile-based",
+          status: "active",
+          cancel_at_period_end: false,
+          cancel_at: null,
+        },
+      });
+    }
 
     // Check rate limiting
     const { data: reactivationHistory, error: historyError } = await supabase
@@ -58,22 +103,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
     // Check if subscription belongs to this user
-    if (
-      typeof subscription.customer === "string" &&
-      subscription.customer !== user.stripe_customer_id
-    ) {
+    if (typeof subscription.customer === "string" && subscription.customer !== customerId) {
       return res.status(403).json({ error: "Subscription does not belong to this user" });
     }
 
-    // Check if subscription is actually canceling (has cancel_at set)
-    if (!subscription.cancel_at) {
-      return res.status(400).json({ error: "Subscription is not scheduled for cancellation" });
+    // Check if subscription is either actually canceling (has cancel_at set) or is already canceled
+    if (!subscription.cancel_at && subscription.status !== "canceled") {
+      return res
+        .status(400)
+        .json({ error: "Subscription is not scheduled for cancellation or already canceled" });
     }
 
-    // Reactivate the subscription
-    const updatedSubscription = await stripe.subscriptions.update(subscriptionId, {
-      cancel_at_period_end: false,
-    });
+    // Reactivate the subscription - handle both cases
+    let updatedSubscription;
+    if (subscription.status === "canceled") {
+      // For actually canceled subscriptions, create a new subscription with the same price
+      const items = subscription.items.data.map((item) => ({
+        price: item.price.id,
+        quantity: item.quantity,
+      }));
+
+      updatedSubscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items,
+        metadata: subscription.metadata,
+      });
+    } else {
+      // For subscriptions scheduled for cancellation, just remove the cancel_at_period_end flag
+      updatedSubscription = await stripe.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: false,
+      });
+    }
 
     // Log the reactivation
     await supabase.from("subscription_reactivations").insert({

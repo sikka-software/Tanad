@@ -136,7 +136,6 @@ export function useSubscription() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, profile, loading: userLoading, fetchUserAndProfile } = useUserStore();
-  const lastRefetchRef = useRef<number | null>(null);
   const initialLoadDone = useRef(false);
   const lastFetchTime = useRef<number | null>(null);
 
@@ -256,9 +255,11 @@ export function useSubscription() {
             planLookupKey: profile.subscribed_to,
             status: "active", // Assume active if in profile
             isExpired: false,
-            cancelAt: profile.cancel_at_period_end
-              ? profile.cancel_at || Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
-              : null,
+            cancelAt:
+              profile.cancel_at ||
+              (profile.cancel_at_period_end
+                ? Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60
+                : null),
           });
           setLoading(false);
           return;
@@ -310,7 +311,7 @@ export function useSubscription() {
           // If we have an active subscription from Stripe
           if (subInfo.id) {
             const subscription = stripeData.subscription;
-
+            console.log("subscription", subscription);
             // Get the price details from the subscription
             const price = subscription.plan?.amount
               ? `${(subscription.plan.amount / 100).toFixed(2)} ${subscription.plan.currency.toUpperCase()}`
@@ -617,17 +618,58 @@ export function useSubscription() {
     error?: string;
   }> => {
     try {
-      if (!user || !subscriptionData.id) {
-        throw new Error("No subscription to reactivate");
+      if (!user) {
+        throw new Error("User not authenticated");
       }
 
-      if (!subscriptionData.cancelAt) {
-        throw new Error("Subscription is not scheduled for cancellation");
-      }
-
-      // Check if we have a profile-based pseudo ID
+      // Check if we have a profile-based subscription
       if (subscriptionData.id === "profile-based") {
-        throw new Error("Cannot reactivate a profile-based subscription. Please contact support.");
+        // For profile-based subscriptions, we'll update the profile directly
+        const supabase = createClient();
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            cancel_at_period_end: false,
+            cancel_at: null,
+          })
+          .eq("id", user.id);
+
+        if (error) {
+          throw new Error("Failed to reactivate profile-based subscription: " + error.message);
+        }
+
+        // Refresh user data and subscription data
+        await fetchUserAndProfile();
+        await fetchSubscription(true);
+
+        return {
+          success: true,
+        };
+      }
+
+      // For already canceled subscriptions, we may not have an ID in the state
+      // In that case, we need to try to fetch the latest canceled subscription from the API
+      let subscriptionIdToReactivate = subscriptionData.id;
+
+      if (!subscriptionIdToReactivate) {
+        // Try to get the most recent canceled subscription from the API
+        const response = await fetch("/api/stripe/get-subscription?includeInactive=true", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch canceled subscription");
+        }
+
+        const data = await response.json();
+        if (data.subscription?.id) {
+          subscriptionIdToReactivate = data.subscription.id;
+        } else {
+          throw new Error("No canceled subscription found to reactivate");
+        }
       }
 
       const response = await fetch("/api/stripe/reactivate-subscription", {
@@ -636,7 +678,7 @@ export function useSubscription() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          subscriptionId: subscriptionData.id,
+          subscriptionId: subscriptionIdToReactivate,
           userId: user.id,
         }),
       });

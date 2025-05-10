@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Get the customer ID from the query
-  const { customerId } = req.query;
+  const { customerId, includeInactive } = req.query;
 
   if (!customerId) {
     return res.status(400).json({ error: "Customer ID is required" });
@@ -36,11 +36,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Initialize Stripe
     const stripe = getStripeInstance();
 
+    // Determine status to query - include inactive/canceled subscriptions if requested
+    const status = includeInactive === "true" ? "all" : "active";
+
     // Get the customer's subscriptions
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId as string,
-      status: "all",
-      limit: 1,
+      status,
+      limit: 5, // Increase limit to find recently canceled subscriptions
       expand: ["data.default_payment_method", "data.plan"],
     });
 

@@ -1120,10 +1120,22 @@
     "subscription_status": {
       "active": "Active",
       "inactive": "Inactive",
+      "canceling": "Canceling",
       "cancelled": "Cancelled",
       "expired": "Expired",
       "pending": "Pending"
     },
+    "service_end": {
+      "title": "Service End",
+      "description": "Your service will end on",
+      "days": "days",
+      "hours": "hours",
+      "minutes": "minutes",
+      "seconds": "seconds",
+      "message": "All features will remain available until the end of the current billing period."
+    },
+    "most_popular": "Most Popular",
+    "reactivate_subscription": "Reactivate Subscription",
     "usage": {
       "title": "Usage",
       "description": "View your usage and billing information",
@@ -1150,7 +1162,7 @@
 
     "payment": {
       "dialog_title": "Payment Method",
-      "selected_plan_price": "Selected Plan Price",
+      "selected_plan_price": "Price: {{price}}",
       "enter_details": "Enter Payment Details",
       "card": "Credit Card",
       "wallet": "Wallet",

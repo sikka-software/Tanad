@@ -49,6 +49,7 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
       query: { ...router.query, refresh: Date.now() },
     });
   };
+  console.log("subscription", subscription);
 
   // Memoize the refresh function to prevent unnecessary re-renders
   const refreshData = useCallback(async () => {
@@ -166,17 +167,6 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
       return;
     }
 
-    // Check for profile-based subscription
-    if (subscription.id === "profile-based") {
-      toast.error(
-        t("Billing.profile_based_reactivation_error", {
-          fallback:
-            "Cannot reactivate a subscription that's only in your profile. Please contact support.",
-        }),
-      );
-      return;
-    }
-
     setIsReactivating(true);
     try {
       const response = await subscription.reactivateSubscription();
@@ -190,6 +180,10 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
 
         // Refresh data to update UI
         await refreshData();
+
+        // Dispatch a custom event to notify other components about usage stats changes
+        const usageUpdatedEvent = new CustomEvent("usage_stats_updated");
+        window.dispatchEvent(usageUpdatedEvent);
 
         // Close the dialog
         setIsReactivateDialogOpen(false);
@@ -269,6 +263,63 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
       })
     : t("Billing.tanad_free", { fallback: "Free Plan" });
 
+  // Add a function to format the cancellation date
+  const formatCancelAtDate = (cancelAt: string | number | null) => {
+    if (!cancelAt) return null;
+
+    try {
+      let date;
+      if (typeof cancelAt === "string") {
+        date = new Date(cancelAt);
+      } else {
+        date = new Date(cancelAt * 1000);
+      }
+
+      if (isNaN(date.getTime())) {
+        return null;
+      }
+
+      // Format the date based on locale
+      const options: Intl.DateTimeFormatOptions = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+
+      return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-US", options);
+    } catch (error) {
+      console.error("Error formatting cancellation date:", error);
+      return null;
+    }
+  };
+
+  // Calculate days remaining until cancellation
+  const getDaysRemaining = (cancelAt: string | number | null) => {
+    if (!cancelAt) return null;
+
+    try {
+      let cancelDate;
+      if (typeof cancelAt === "string") {
+        cancelDate = new Date(cancelAt);
+      } else {
+        cancelDate = new Date(cancelAt * 1000);
+      }
+
+      if (isNaN(cancelDate.getTime())) {
+        return null;
+      }
+
+      const today = new Date();
+      const diffTime = Math.abs(cancelDate.getTime() - today.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return diffDays;
+    } catch (error) {
+      console.error("Error calculating days remaining:", error);
+      return null;
+    }
+  };
+
   return (
     <>
       <div className="bg-background relative flex-1 rounded-lg border p-6">
@@ -306,7 +357,7 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
                     variant="outline"
                     className="border-orange-200 bg-orange-50 text-orange-700"
                   >
-                    {t("Billing.canceling", { fallback: "قيد الإلغاء" })}
+                    {t("Billing.subscription_status.canceling", { fallback: "قيد الإلغاء" })}
                   </Badge>
                 )}
               </div>
@@ -323,12 +374,113 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
                       }`}
                 </p>
               )}
-              {/* Next billing date */}
-              {nextBillingDate && (
-                <p className="text-foreground mt-2 font-medium">
-                  {t("Billing.next_billing_date", { fallback: "التاريخ التالي للفوتر" })}:{" "}
-                  {nextBillingDate}
-                </p>
+
+              {/* Next billing date and cycle - enhanced section */}
+              {subscription.status === "active" &&
+                !subscription.cancelAt &&
+                subscription.planLookupKey !== "tanad_free" && (
+                  <div className="bg-primary/5 border-primary/10 mt-3 rounded-md border p-3">
+                    <p className="text-foreground text-sm font-semibold">
+                      {t("Billing.next_billing.title", { fallback: "Next Billing Information" })}:
+                    </p>
+                    <div className="mt-1 flex flex-col gap-1 text-sm">
+                      {nextBillingDate && (
+                        <p className="text-foreground">
+                          <span className="font-medium">
+                            {t("Billing.next_billing_date", { fallback: "Next Payment Date" })}:
+                          </span>{" "}
+                          {nextBillingDate}
+                        </p>
+                      )}
+                      <p className="text-foreground">
+                        <span className="font-medium">
+                          {t("Billing.billing_cycle", { fallback: "Billing Cycle" })}:
+                        </span>{" "}
+                        {locale === "ar"
+                          ? subscription.billingCycle === "month"
+                            ? "شهري"
+                            : "سنوي"
+                          : subscription.billingCycle === "month"
+                            ? "Monthly"
+                            : "Yearly"}
+                      </p>
+                      <p className="text-foreground">
+                        <span className="font-medium">
+                          {t("Billing.amount", { fallback: "Amount" })}:
+                        </span>{" "}
+                        {locale === "ar"
+                          ? subscription?.price?.replace("SAR", "ريال سعودي")
+                          : subscription?.price}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+              {/* For canceled subscriptions - show when service will end */}
+              {subscription.cancelAt && (
+                <div className="mt-3 rounded-md border border-orange-200 bg-orange-50/80 p-3">
+                  <div className="flex items-start gap-2">
+                    <div className="mt-0.5 rounded-full bg-orange-100 p-1.5">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="text-orange-600"
+                      >
+                        <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+                        <path d="M12 7v5l2 2"></path>
+                      </svg>
+                    </div>
+
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-orange-700">
+                        {t("Billing.service_end.title", { fallback: "نهاية الخدمة:" })}
+                      </p>
+
+                      <div className="mt-1.5">
+                        <div className="flex flex-col gap-1 text-sm text-orange-700">
+                          <p className="flex items-center gap-1">
+                            <span className="font-medium">
+                              {t("Billing.service_end.date", { fallback: "تاريخ الإنتهاء:" })}
+                            </span>{" "}
+                            <span className="font-semibold">
+                              {formatCancelAtDate(subscription.cancelAt) ||
+                                nextBillingDate ||
+                                "N/A"}
+                            </span>
+                          </p>
+
+                          {getDaysRemaining(subscription.cancelAt) && (
+                            <p className="flex items-center gap-1">
+                              <span className="font-medium">
+                                {t("Billing.service_end.days_remaining", {
+                                  fallback: "الأيام المتبقية:",
+                                })}
+                              </span>{" "}
+                              <span className="font-semibold">
+                                {locale === "ar"
+                                  ? `${getDaysRemaining(subscription.cancelAt)} يوم`
+                                  : `${getDaysRemaining(subscription.cancelAt)} days`}
+                              </span>
+                            </p>
+                          )}
+
+                          <p className="mt-1.5 text-orange-600">
+                            {t("Billing.service_end.message", {
+                              fallback:
+                                "ستظل جميع الميزات متاحة حتى نهاية الفترة، ثم سيتم تحويل الحساب إلى الباقة المجانية.",
+                            })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
@@ -361,7 +513,7 @@ export default function CurrentPlan({ isPageLoading }: CurrentPlanProps) {
             )}
 
           {/* Reactivate subscription button for canceled subscriptions */}
-          {subscription.cancelAt && subscription.id !== "profile-based" && (
+          {(subscription.cancelAt || subscription.status === "canceled") && (
             <div className="mt-4">
               <Button
                 variant="outline"

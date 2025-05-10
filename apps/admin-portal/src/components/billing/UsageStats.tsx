@@ -1,4 +1,7 @@
 import { useLocale, useTranslations } from "next-intl";
+import { useEffect } from "react";
+
+import { useUsage } from "@/hooks/use-usage";
 
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -104,6 +107,21 @@ export default function UsageStats({
   const t = useTranslations();
   const locale = useLocale();
   const isRtl = locale === "ar";
+  const { refresh: refreshUsageData } = useUsage();
+
+  // Listen for usage stats update events
+  useEffect(() => {
+    const handleUsageStatsUpdated = () => {
+      console.log("Usage stats update event received, refreshing usage data");
+      refreshUsageData();
+    };
+
+    window.addEventListener("usage_stats_updated", handleUsageStatsUpdated);
+
+    return () => {
+      window.removeEventListener("usage_stats_updated", handleUsageStatsUpdated);
+    };
+  }, [refreshUsageData]);
 
   // Combine component-level loading with page-level loading
   // If isPageLoading is provided, use it; otherwise use the component's isLoading
