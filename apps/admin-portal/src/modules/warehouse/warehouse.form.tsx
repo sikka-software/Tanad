@@ -261,6 +261,7 @@ export function WarehouseForm({
           </div>
         </div>
         <AddressFormSection
+          dir={locale === "ar" ? "rtl" : "ltr"}
           inDialog={editMode}
           title={t("Warehouses.form.address.label")}
           control={form.control}

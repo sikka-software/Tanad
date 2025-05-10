@@ -41,6 +41,8 @@ import useJobStore from "../job/job.store";
 import { useCreateEmployee } from "./employee.hooks";
 import { useUpdateEmployee } from "./employee.hooks";
 
+import CountryInput from "@/ui/country-input";
+
 const salaryComponentSchema = z.object({
   type: z.string().min(1, "Type is required"),
   amount: z.coerce
@@ -418,27 +420,19 @@ export function EmployeeForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("Employees.form.nationality.label")} *</FormLabel>
-                    <Select
-                      dir={locale === "ar" ? "rtl" : "ltr"}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={isEmployeeSaving}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t("Employees.form.nationality.placeholder")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">{t("Employees.form.status.active")}</SelectItem>
-                        <SelectItem value="inactive">
-                          {t("Employees.form.status.inactive")}
-                        </SelectItem>
-                        <SelectItem value="on_leave">
-                          {t("Employees.form.status.on_leave")}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <CountryInput
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        disabled={isEmployeeSaving}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        ariaInvalid={!!form.formState.errors.nationality}
+                        placeholder={t("Employees.form.nationality.placeholder")}
+                        searchPlaceholder={t("Forms.country.search_placeholder")}
+                        noItems={t("Forms.country.no_items")}
+                        t={t}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

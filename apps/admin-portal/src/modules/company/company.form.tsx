@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import NotesSection from "@root/src/components/forms/notes-section";
 import { getNotesValue } from "@root/src/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -55,6 +55,7 @@ export function CompanyForm({
   nestedForm,
 }: ModuleFormProps<CompanyUpdateData | CompanyCreateData>) {
   const t = useTranslations();
+  const locale = useLocale();
   const { profile, membership } = useUserStore();
   const { mutateAsync: createCompany, isPending: isCreating } = useCreateCompany();
   const { mutateAsync: updateCompany, isPending: isUpdating } = useUpdateCompany();
@@ -326,6 +327,7 @@ export function CompanyForm({
         </div>
 
         <AddressFormSection
+          dir={locale === "ar" ? "rtl" : "ltr"}
           inDialog={editMode || nestedForm}
           title={t("Companies.form.address.label")}
           control={form.control}

@@ -1,27 +1,49 @@
+import { countries } from "@root/src/lib/constants/countries";
+import React from "react";
+
 import { Combobox } from "./combobox";
 
-const CountryInput = ({ dir }: { dir: "rtl" | "ltr" }) => {
+interface CountryInputProps {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  dir: "rtl" | "ltr";
+  ariaInvalid?: boolean;
+  placeholder?: string;
+  searchPlaceholder?: string;
+  noItems?: string;
+  t?: (key: string) => string; // Optional translation function
+}
+
+const CountryInput: React.FC<CountryInputProps> = ({
+  value,
+  onChange,
+  disabled = false,
+  dir,
+  ariaInvalid,
+  placeholder = "Select a country",
+  searchPlaceholder = "Search countries...",
+  noItems = "No countries found.",
+  t,
+}) => {
   return (
-    <div>
-      <Combobox
-        dir={dir}
-        data={[]}
-        labelKey="label"
-        valueKey="value"
-        defaultValue={field.value}
-        value={field.value}
-        inputProps={{ disabled: isLoading }}
-        texts={{
-          placeholder: t("OnlineStores.form.platform.placeholder"),
-          searchPlaceholder: t("OnlineStores.form.platform.search_placeholder"),
-          noItems: t("OnlineStores.form.platform.no_items"),
-        }}
-        renderOption={(item) => <div>{t(item.label)}</div>}
-        renderSelected={(item) => <div>{t(item.label)}</div>}
-        onChange={field.onChange}
-        ariaInvalid={!!form.formState.errors.platform}
-      />
-    </div>
+    <Combobox
+      dir={dir}
+      data={countries}
+      labelKey="label"
+      valueKey="value"
+      value={value}
+      onChange={onChange}
+      inputProps={{ disabled }}
+      ariaInvalid={ariaInvalid}
+      texts={{
+        placeholder: placeholder,
+        searchPlaceholder: searchPlaceholder,
+        noItems: noItems,
+      }}
+      renderOption={(item) => <div>{dir === "rtl" ? item.arabic_label : item.label}</div>}
+      renderSelected={(item) => <div>{dir === "rtl" ? item.arabic_label : item.label}</div>}
+    />
   );
 };
 

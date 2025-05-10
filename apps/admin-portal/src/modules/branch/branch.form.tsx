@@ -361,6 +361,7 @@ export function BranchForm({
           </div>
 
           <AddressFormSection
+            dir={locale === "ar" ? "rtl" : "ltr"}
             inDialog={editMode || nestedForm}
             title={t("Branches.form.address.label")}
             control={form.control}

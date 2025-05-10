@@ -2,6 +2,7 @@ import { MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { Control } from "react-hook-form";
 
+import CountryInput from "@/ui/country-input";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 
@@ -16,6 +17,7 @@ interface AddressFormSectionProps {
   isLoading?: boolean;
   title: string;
   inDialog?: boolean;
+  dir: "rtl" | "ltr";
 }
 
 export function AddressFormSection({
@@ -23,6 +25,7 @@ export function AddressFormSection({
   isLoading = false,
   title,
   inDialog = false,
+  dir,
 }: AddressFormSectionProps) {
   const t = useTranslations();
 
@@ -153,11 +156,15 @@ export function AddressFormSection({
             <FormItem>
               <FormLabel>{t("Forms.country.label")}</FormLabel>
               <FormControl>
-                <Input
+                <CountryInput
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
                   disabled={isLoading}
+                  dir={dir}
+                  ariaInvalid={false}
                   placeholder={t("Forms.country.placeholder")}
-                  {...field}
-                  value={field.value || ""} // Ensure controlled component
+                  searchPlaceholder={t("Forms.country.search_placeholder")}
+                  noItems={t("Forms.country.no_items")}
                 />
               </FormControl>
               <FormMessage />

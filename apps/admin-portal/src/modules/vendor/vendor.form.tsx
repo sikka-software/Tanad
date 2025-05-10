@@ -261,6 +261,7 @@ export function VendorForm({
           </div>
 
           <AddressFormSection
+            dir={locale === "ar" ? "rtl" : "ltr"}
             inDialog={editMode}
             title={t("Vendors.form.address.label")}
             control={form.control}

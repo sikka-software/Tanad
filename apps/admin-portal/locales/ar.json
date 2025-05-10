@@ -3634,7 +3634,9 @@
     },
     "country": {
       "label": "الدولة",
-      "placeholder": "أدخل الدولة"
+      "placeholder": "أدخل الدولة",
+      "search_placeholder": "ابحث عن دولة",
+      "no_items": "لا يوجد دول"
     },
     "state": {
       "label": "المنطقة",

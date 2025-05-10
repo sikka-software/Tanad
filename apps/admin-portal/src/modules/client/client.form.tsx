@@ -260,6 +260,7 @@ export function ClientForm({
           </div>
 
           <AddressFormSection
+            dir={locale === "ar" ? "rtl" : "ltr"}
             inDialog={editMode || nestedForm}
             title={t("Clients.form.address.label")}
             control={form.control}
