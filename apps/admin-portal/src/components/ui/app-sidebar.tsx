@@ -271,7 +271,7 @@ export function AppSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter className="border-t">
-        <SidebarUserFooter user={profile as ProfileType} />
+        {profile && <SidebarUserFooter user={profile as ProfileType} />}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

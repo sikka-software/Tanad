@@ -1,6 +1,6 @@
 {
   "name": "@tanad/admin",
-  "version": "0.17.12",
+  "version": "0.17.13",
   "license": "Proprietary",
   "author": {
     "name": "Sikka Software",
@@ -75,6 +75,8 @@
     "@react-pdf/renderer": "^4.3.0",
     "@react-spring/three": "^9.7.5",
     "@shadergradient/react": "^2.0.25",
+    "@stripe/react-stripe-js": "^3.7.0",
+    "@stripe/stripe-js": "^7.3.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.4",
     "@tailwindcss/postcss": "^4.1.6",
@@ -121,6 +123,7 @@
     "shiki": "^3.4.0",
     "signature_pad": "^5.0.7",
     "sonner": "^2.0.3",
+    "stripe": "^18.1.0",
     "tailwind-merge": "^3.2.0",
     "tailwindcss-animate": "^1.0.7",
     "throttle-debounce": "^5.0.2",

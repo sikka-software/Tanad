@@ -2,21 +2,19 @@
 
 import { Dialog } from "@radix-ui/react-dialog";
 import {
-  MessageSquareWarning,
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
   CreditCard,
-  LogOut,
-  Sparkles,
-  User2,
   HelpCircle,
-  Cog,
+  LogOut,
+  MessageSquareWarning,
   Settings,
+  User2,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 import {
@@ -39,7 +37,23 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
   const t = useTranslations();
   const lang = useLocale();
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const signOut = useUserStore((state) => state.signOut);
+
+  // Early return if no user to prevent null reference errors
+  if (!user) {
+    return null;
+  }
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success(t("Auth.signed_out_successfully"));
+      router.push("/auth");
+    } catch (error) {
+      toast.error(t("Auth.error_signing_out"));
+    }
+  };
 
   return (
     <>
@@ -121,7 +135,7 @@ export function SidebarUserFooter({ user }: { user: ProfileType }) {
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer" onClick={signOut}>
+              <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
                 <LogOut className="me-2 h-4 w-4" />
                 {t("General.sign_out")}
               </DropdownMenuItem>

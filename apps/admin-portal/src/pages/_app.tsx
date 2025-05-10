@@ -51,6 +51,27 @@ function AppContent({ Component, pageProps, router }: AppProps) {
     document.documentElement.classList.add(arabicFont.className);
   }, []);
 
+  // Prevent beforeunload confirmation dialog for programmatic navigation
+  useEffect(() => {
+    // Detect if refresh is intentional and suppress confirmation dialog
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // If the URL has a refresh parameter, it's an intentional refresh from our app
+      if (window.location.href.includes("refresh=")) {
+        // Cancel the event
+        e.preventDefault();
+        // Chrome requires returnValue to be set
+        e.returnValue = "";
+        return "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   // Don't render anything until mounted
   if (!mounted) {
     return null;
