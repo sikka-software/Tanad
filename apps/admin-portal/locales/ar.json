@@ -1375,6 +1375,7 @@
       "upgrade": "ترقية",
       "cancel": "إلغاء"
     },
+    "update_to_plan": "ترقية إلى الخطة {{plan}}",
     "free_plan_badge": "مجاني",
     "pro_plan_badge": "برو",
     "enterprise_plan_badge": "مؤسسي",

@@ -1159,12 +1159,17 @@
       "clients": "Clients",
       "invoices": "Invoices"
     },
+    "update_to_plan": "Update to {{plan}}",
 
     "payment": {
       "dialog_title": "Payment Method",
       "selected_plan_price": "Price: {{price}}",
       "enter_details": "Enter Payment Details",
+      "subscription_updated_successfully": "Subscription updated successfully",
+      "subscription_failed": "Subscription failed",
+      "subscription_successful": "Subscription successful",
       "card": "Credit Card",
+      "success": "Success Payment",
       "wallet": "Wallet",
       "payment_method": "Payment Method",
       "payment_status": "Payment Status",
